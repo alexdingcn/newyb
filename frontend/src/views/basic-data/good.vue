@@ -6,7 +6,7 @@
 <template>
     <div class="layout">
         <Layout :style="{minHeight: '100vh'}">
-            <Sider collapsible :collapsed-width="150" v-model="isCollapsed" :style="{background: '#fff'}">
+            <Sider collapsible :collapsed-width="150" :style="{background: '#fff'}">
                 <Card :bordered="false" dis-hover>
                     <p slot="title">
                         <Icon type="android-options"></Icon> 商品分类
@@ -27,7 +27,7 @@
                 <Card class="margin-left-10">
                     <p slot="title">
                         <Icon type="ios-information"></Icon>
-                        商品 {{ selectedCategory }}
+                        商品 {{ selectedCategory.title }}
                     </p>
                     <ButtonGroup slot="extra">
                     	<Button type="primary" icon="android-add-circle" @click="addGoods">添加</Button>
@@ -60,8 +60,8 @@ export default {
         return {
             totalGoodsCount: 0,
             currentPage: 1,
-            goodCat: [],
-            selectedCategory: '',
+            goodCat: [ {title:'全部', id:0, selected:true} ],
+            selectedCategory: {},
             disableDelCategory: true,
             orderColumns: [
                 {
@@ -80,7 +80,7 @@ export default {
                     title: '商品名称',
                     key: 'name',
                     align: 'center',
-                    width: 200,
+                    width: 220,
                     sortable: true,
                     fixed: 'left',
                     render: (h, params) => {
@@ -153,7 +153,8 @@ export default {
             var self = this;
             util.ajax.get('/good/category/tree')
                     .then(function (response) {
-                        self.goodCat = response.data;
+                        self.goodCat = self.goodCat.slice(0,1);
+                        self.goodCat = self.goodCat.concat(response.data);
                     })
                     .catch(function (error) {
                         console.log(error);
@@ -162,8 +163,9 @@ export default {
         loadGoodsData () {
             var self = this;
             util.ajax.get('/goods/list', { params : {
-                page: this.currentPage
-            }})
+                    page: this.currentPage,
+                    catId: this.selectedCategory.id
+                }})
                 .then(function (response) {
                     self.goodsData = response.data.data;
                     self.totalGoodsCount = response.data.total;
@@ -175,7 +177,7 @@ export default {
         onTreeNodeSelected (items) {
             if (items && items.length > 0) {
                 this.disableDelCategory = false;
-                this.selectedCategory = items[0].title;
+                this.selectedCategory = items[0];
                 this.loadGoodsData();
             } else {
                 this.disableDelCategory = true;
@@ -220,12 +222,12 @@ export default {
         },
         delCategory () {
             var self = this;
-            util.ajax.post('/good/category/remove', { name: this.selectedCategory })
+            util.ajax.post('/good/category/remove', { id: this.selectedCategory.id })
                     .then(function (response) {
                         self.loadTree();
                     })
                     .catch(function (error) {
-                        console.log(error);
+                        self.$Message.warning(error.response.data.message);
                     })
         },
 		exportData() {
@@ -234,7 +236,7 @@ export default {
                 });
 		},
         addGoods() {
-            let argu = { goods_category: this.selectedCategory };
+            let argu = { goods_category: this.selectedCategory.id };
             this.$router.push({
                 name: 'goods-info',
                 params: argu
