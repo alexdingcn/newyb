@@ -1,6 +1,7 @@
 package com.yiban.erp.controller.good;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.yiban.erp.dao.GoodsMapper;
 import com.yiban.erp.entities.Goods;
 import org.slf4j.Logger;
@@ -27,9 +28,22 @@ public class GoodController {
      * @return
      */
     @RequestMapping(value = "/list", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> list() {
-        List<Goods> goodsList = goodsMapper.selectAll();
-        return ResponseEntity.ok().body(JSON.toJSONString(goodsList));
+    public ResponseEntity<String> list(@RequestParam(required = false) Integer page,
+                                       @RequestParam(required = false) Integer size) {
+        Integer currentPage = page;
+        Integer pageSize = size;
+        if (page == null) {
+            currentPage = 1;
+        }
+        if (size == null) {
+            pageSize = 10;
+        }
+        Long count = goodsMapper.selectCount();
+        List<Goods> goodsList = goodsMapper.selectAll((currentPage - 1) * pageSize, pageSize);
+        JSONObject result = new JSONObject();
+        result.put("total", count);
+        result.put("data", JSON.toJSON(goodsList));
+        return ResponseEntity.ok().body(result.toJSONString());
     }
 
     @RequestMapping(value = "/{goodsId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
