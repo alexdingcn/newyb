@@ -226,8 +226,8 @@ export default {
                     })
         },
         onChangeName() {
-            util.setCurrentPageTitle(this, this.formItem.name, true);
             if (this.formItem.name !== '') {
+                util.setCurrentPageTitle(this, this.formItem.name, true);
                 var self = this;
                 util.ajax.post('/util/pinyinAbbr', { name: this.formItem.name })
                     .then(function (response) {

@@ -14,8 +14,8 @@
     <result column="code" jdbcType="VARCHAR" property="code" />
     <result column="enable" jdbcType="BIT" property="enable" />
     <result column="factory_id" jdbcType="INTEGER" property="factoryId" />
-    <result column="unit" jdbcType="VARCHAR" property="unit" />
-    <result column="pack_unit" jdbcType="VARCHAR" property="packUnit" />
+    <result column="unit" jdbcType="INTEGER" property="unit" />
+    <result column="pack_unit" jdbcType="INTEGER" property="packUnit" />
     <result column="medium_pack" jdbcType="INTEGER" property="mediumPack" />
     <result column="big_pack" jdbcType="INTEGER" property="bigPack" />
     <result column="pinyin" jdbcType="VARCHAR" property="pinyin" />
@@ -77,8 +77,8 @@
     values (#{id,jdbcType=BIGINT}, #{name,jdbcType=VARCHAR}, #{companyId,jdbcType=INTEGER}, 
       #{categoryId,jdbcType=INTEGER}, #{fullName,jdbcType=VARCHAR}, #{origin,jdbcType=VARCHAR}, 
       #{jx,jdbcType=VARCHAR}, #{spec,jdbcType=VARCHAR}, #{serial,jdbcType=VARCHAR}, #{code,jdbcType=VARCHAR}, 
-      #{enable,jdbcType=BIT}, #{factoryId,jdbcType=INTEGER}, #{unit,jdbcType=VARCHAR}, 
-      #{packUnit,jdbcType=VARCHAR}, #{mediumPack,jdbcType=INTEGER}, #{bigPack,jdbcType=INTEGER}, 
+      #{enable,jdbcType=BIT}, #{factoryId,jdbcType=INTEGER}, #{unit,jdbcType=INTEGER},
+      #{packUnit,jdbcType=INTEGER}, #{mediumPack,jdbcType=INTEGER}, #{bigPack,jdbcType=INTEGER},
       #{pinyin,jdbcType=VARCHAR}, #{storageCondition,jdbcType=VARCHAR}, #{storageDescription,jdbcType=VARCHAR}, 
       #{comment,jdbcType=VARCHAR}, #{certId,jdbcType=BIGINT}, #{brandId,jdbcType=INTEGER}, 
       #{permitId,jdbcType=BIGINT}, #{jxId,jdbcType=INTEGER}, #{isForeign,jdbcType=BIT}, 
@@ -237,10 +237,10 @@
         #{factoryId,jdbcType=INTEGER},
       </if>
       <if test="unit != null">
-        #{unit,jdbcType=VARCHAR},
+        #{unit,jdbcType=INTEGER},
       </if>
       <if test="packUnit != null">
-        #{packUnit,jdbcType=VARCHAR},
+        #{packUnit,jdbcType=INTEGER},
       </if>
       <if test="mediumPack != null">
         #{mediumPack,jdbcType=INTEGER},
@@ -347,10 +347,10 @@
         factory_id = #{factoryId,jdbcType=INTEGER},
       </if>
       <if test="unit != null">
-        unit = #{unit,jdbcType=VARCHAR},
+        unit = #{unit,jdbcType=INTEGER},
       </if>
       <if test="packUnit != null">
-        pack_unit = #{packUnit,jdbcType=VARCHAR},
+        pack_unit = #{packUnit,jdbcType=INTEGER},
       </if>
       <if test="mediumPack != null">
         medium_pack = #{mediumPack,jdbcType=INTEGER},
@@ -434,8 +434,8 @@
       code = #{code,jdbcType=VARCHAR},
       enable = #{enable,jdbcType=BIT},
       factory_id = #{factoryId,jdbcType=INTEGER},
-      unit = #{unit,jdbcType=VARCHAR},
-      pack_unit = #{packUnit,jdbcType=VARCHAR},
+      unit = #{unit,jdbcType=INTEGER},
+      pack_unit = #{packUnit,jdbcType=INTEGER},
       medium_pack = #{mediumPack,jdbcType=INTEGER},
       big_pack = #{bigPack,jdbcType=INTEGER},
       pinyin = #{pinyin,jdbcType=VARCHAR},

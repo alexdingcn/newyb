@@ -50,7 +50,12 @@ public class GoodController {
     @RequestMapping(value = "/add", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> add(@RequestBody Goods goods) {
         logger.info("ADD new good category:{}", goods);
-        int result = goodsMapper.insertSelective(goods);
+        int result = 0;
+        if (goods.getId() == null) {
+            result = goodsMapper.insertSelective(goods);
+        } else {
+            result = goodsMapper.updateByPrimaryKey(goods);
+        }
         if (result > 0) {
             return ResponseEntity.ok().build();
         }

@@ -27,9 +27,9 @@ public class Goods {
 
     private Integer factoryId;
 
-    private String unit;
+    private Integer unit;
 
-    private String packUnit;
+    private Integer packUnit;
 
     private Integer mediumPack;
 
@@ -171,20 +171,20 @@ public class Goods {
         this.factoryId = factoryId;
     }
 
-    public String getUnit() {
+    public Integer getUnit() {
         return unit;
     }
 
-    public void setUnit(String unit) {
-        this.unit = unit == null ? null : unit.trim();
+    public void setUnit(Integer unit) {
+        this.unit = unit;
     }
 
-    public String getPackUnit() {
+    public Integer getPackUnit() {
         return packUnit;
     }
 
-    public void setPackUnit(String packUnit) {
-        this.packUnit = packUnit == null ? null : packUnit.trim();
+    public void setPackUnit(Integer packUnit) {
+        this.packUnit = packUnit;
     }
 
     public Integer getMediumPack() {
