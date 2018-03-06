@@ -11,6 +11,8 @@ public class Goods {
 
     private Integer categoryId;
 
+    private String categoryName;
+
     private String fullName;
 
     private String origin;
@@ -27,9 +29,15 @@ public class Goods {
 
     private Integer factoryId;
 
+    private String factory;
+
     private Integer unit;
 
+    private String unitName;
+
     private Integer packUnit;
+
+    private String packUnitName;
 
     private Integer mediumPack;
 
@@ -361,5 +369,37 @@ public class Goods {
 
     public void setUpdatedBy(String updatedBy) {
         this.updatedBy = updatedBy == null ? null : updatedBy.trim();
+    }
+
+    public String getCategoryName() {
+        return categoryName;
+    }
+
+    public void setCategoryName(String categoryName) {
+        this.categoryName = categoryName;
+    }
+
+    public String getFactory() {
+        return factory;
+    }
+
+    public void setFactory(String factory) {
+        this.factory = factory;
+    }
+
+    public String getUnitName() {
+        return unitName;
+    }
+
+    public void setUnitName(String unitName) {
+        this.unitName = unitName;
+    }
+
+    public String getPackUnitName() {
+        return packUnitName;
+    }
+
+    public void setPackUnitName(String packUnitName) {
+        this.packUnitName = packUnitName;
     }
 }

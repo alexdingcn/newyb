@@ -75,7 +75,7 @@ public class GoodCategoryController {
         if (id <= 0) {
             return ResponseEntity.badRequest().body(ErrorCode.GOODS_CATEGORY_ID_MISSING.toString());
         }
-        Long goodsCount = goodsMapper.selectCount(id);
+        Long goodsCount = goodsMapper.selectCount(id, null);
         if (goodsCount > 0) {
             return ResponseEntity.badRequest().body(ErrorCode.GOODS_REMAINED_IN_CATEGORY.toString());
         }

@@ -29,14 +29,15 @@ public class GoodController {
      */
     @RequestMapping(value = "/list", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> list(@RequestParam(required = false) Integer catId,
+                                       @RequestParam(required = false) String search,
                                        @RequestParam(required = false) Integer page,
                                        @RequestParam(required = false) Integer size) {
-        logger.info("Get goods list, catId={}, page={}, size={}", catId, page, size);
+        logger.info("Get goods list, search={}, catId={}, page={}, size={}", search, catId, page, size);
         Integer pageSize = size == null ? 10 : size;
         Integer offset = (page == null || page <= 0 ? 0 : page - 1) * pageSize;
 
-        Long count = goodsMapper.selectCount(catId);
-        List<Goods> goodsList = goodsMapper.selectAll(catId, offset, pageSize);
+        Long count = goodsMapper.selectCount(catId, search);
+        List<Goods> goodsList = goodsMapper.selectAll(catId, search, offset, pageSize);
         JSONObject result = new JSONObject();
         result.put("total", count);
         result.put("data", JSON.toJSON(goodsList));
