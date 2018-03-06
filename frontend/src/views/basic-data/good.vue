@@ -4,42 +4,49 @@
 </style>
 
 <template>
-    <div class="access">
-        <Row>
-            <Col span="6">
-                <Card>
+    <div class="layout">
+        <Layout :style="{minHeight: '100vh'}">
+            <Sider collapsible :collapsed-width="150" v-model="isCollapsed" :style="{background: '#fff'}">
+                <Card :bordered="false" dis-hover>
                     <p slot="title">
                         <Icon type="android-options"></Icon> 商品分类
                     </p>
-                    <ButtonGroup slot="extra">
-                        <Button type="primary" icon="android-add-circle" size="small" @click="addCategory">添加</Button>
-                        <Button type="success" icon="edit" size="small" @click="addCategory" :disabled="disableDelCategory"></Button>
-                        <Button type="error" icon="android-remove-circle" size="small" @click="delCategory" :disabled="disableDelCategory"></Button>
-                    </ButtonGroup>
 
                     <div class="good-category-con">
+                        <ButtonGroup slot="extra">
+                            <Button type="primary" icon="android-add-circle" size="small" @click="addCategory">添加</Button>
+                            <Button type="success" icon="edit" size="small" @click="addCategory" :disabled="disableDelCategory"></Button>
+                            <Button type="error" icon="android-remove-circle" size="small" @click="delCategory" :disabled="disableDelCategory"></Button>
+                        </ButtonGroup>
+
                         <Tree :data="goodCat" @on-select-change="onTreeNodeSelected" ref="goodCatTree"></Tree>
                     </div>
                 </Card>
-            </Col>
-            <Col span="18" class="padding-left-10">
-                <Card>
+            </Sider>
+            <Layout>
+                <Card class="margin-left-10">
                     <p slot="title">
                         <Icon type="ios-information"></Icon>
                         商品 {{ selectedCategory }}
                     </p>
                     <ButtonGroup slot="extra">
-
-                        <Button type="primary" icon="android-add-circle" size="small" @click="addGoods">添加</Button>
-                        <Button type="error" icon="android-remove-circle" size="small" @click="delGoods">删除</Button>
+                    	<Button type="primary" icon="android-add-circle" @click="addGoods">添加</Button>
+                        <Button type="error" icon="android-remove-circle" @click="delGoods">删除</Button>
+                        <Button type="ghost" icon="ios-download-outline" @click="exportData">导出当前页数据</Button>
                     </ButtonGroup>
 
-                    <Row type="flex" justify="center" align="middle" class="advanced-router margin-top-8">
+                    <Row type="flex" align="middle" class="advanced-router margin-top-8">
                         <Table border highlight-row :columns="orderColumns" :data="goodsData" ref="goodsTable" style="width: 100%;" size="small"></Table>
                     </Row>
+                    <Row class="margin-top-8">
+                        <div style="float: right;">
+                            <Page :total="totalGoodsCount" :current="currentPage" @on-change="changePage" size="small" show-total></Page>
+                        </div>
+                    </Row>
+
                 </Card>
-            </Col>
-        </Row>
+            </Layout>
+        </Layout>
     </div>
 </template>
 
@@ -51,6 +58,8 @@ export default {
     name: 'access_index',
     data () {
         return {
+            totalGoodsCount: 0,
+            currentPage: 1,
             goodCat: [],
             selectedCategory: '',
             disableDelCategory: true,
@@ -58,13 +67,14 @@ export default {
                 {
                     type: 'selection',
                     width: 60,
-                    align: 'center'
+                    align: 'center',
+                    fixed: 'left'
                 },
                 {
                     type: 'index',
                     title: '',
-                    width: 40,
-//                    fixed: 'left'
+                    width: 60,
+                    fixed: 'left'
                 },
                 {
                     title: '商品名称',
@@ -72,7 +82,7 @@ export default {
                     align: 'center',
                     width: 200,
                     sortable: true,
-//                    fixed: 'left',
+                    fixed: 'left',
                     render: (h, params) => {
                         return h('Button', {
                             props: {
@@ -151,9 +161,12 @@ export default {
         },
         loadGoodsData () {
             var self = this;
-            util.ajax.get('/goods/list')
+            util.ajax.get('/goods/list', { params : {
+                page: this.currentPage
+            }})
                 .then(function (response) {
-                    self.goodsData = response.data;
+                    self.goodsData = response.data.data;
+                    self.totalGoodsCount = response.data.total;
                 })
                 .catch(function (error) {
                     console.log(error);
@@ -215,7 +228,11 @@ export default {
                         console.log(error);
                     })
         },
-
+		exportData() {
+			this.$refs.goodsTable.exportCsv({
+                    filename: '原始数据'
+                });
+		},
         addGoods() {
             let argu = { goods_category: this.selectedCategory };
             this.$router.push({
@@ -237,6 +254,10 @@ export default {
             } else {
                 this.$Message.warning("请选择一个商品后操作");
             }
+        },
+        changePage(pageNumber) {
+            this.currentPage = pageNumber;
+            this.loadGoodsData();
         }
     }
 };
