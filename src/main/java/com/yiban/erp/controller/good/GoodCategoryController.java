@@ -4,13 +4,14 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.yiban.erp.dao.GoodCategoryMapper;
+import com.yiban.erp.dao.GoodsMapper;
 import com.yiban.erp.entities.GoodCategory;
+import com.yiban.erp.exception.ErrorCode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -27,6 +28,8 @@ public class GoodCategoryController {
     @Autowired
     private GoodCategoryMapper goodCategoryMapper;
 
+    @Autowired
+    private GoodsMapper goodsMapper;
     /**
      * 获取产品类别的目录树
      *
@@ -43,9 +46,6 @@ public class GoodCategoryController {
             obj.put("loading", false);
             obj.put("id", category.getId());
             obj.put("expand", false);
-            if (i == 0) {
-                obj.put("selected", true);
-            }
             obj.put("children", new JSONArray());
             arr.add(obj);
             i++;
@@ -70,16 +70,20 @@ public class GoodCategoryController {
     @RequestMapping(value = "/remove", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> remove(@RequestBody String payload) {
         JSONObject requestBody = JSON.parseObject(payload);
-        String name = requestBody.getString("name");
-        if (StringUtils.isEmpty(name)) {
-            return ResponseEntity.badRequest().body("Empty name");
+        Integer id = requestBody.getInteger("id");
+        logger.info("DELETE good category:{}", id);
+        if (id <= 0) {
+            return ResponseEntity.badRequest().body(ErrorCode.GOODS_CATEGORY_ID_MISSING.toString());
         }
-        logger.info("DELETE good category:{}", name);
+        Long goodsCount = goodsMapper.selectCount(id);
+        if (goodsCount > 0) {
+            return ResponseEntity.badRequest().body(ErrorCode.GOODS_REMAINED_IN_CATEGORY.toString());
+        }
 
-        int result = goodCategoryMapper.deleteByName(name);
+        int result = goodCategoryMapper.deleteByPrimaryKey(id);
         if (result > 0) {
             return ResponseEntity.ok().build();
         }
-        return ResponseEntity.badRequest().body("Failed to delete");
+        return ResponseEntity.badRequest().body(ErrorCode.FAILED_DELETE_FROM_DB.toString());
     }
 }
