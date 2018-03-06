@@ -1,0 +1,463 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yiban.erp.dao.GoodsMapper">
+  <resultMap id="BaseResultMap" type="com.yiban.erp.entities.Goods">
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="name" jdbcType="VARCHAR" property="name" />
+    <result column="company_id" jdbcType="INTEGER" property="companyId" />
+    <result column="category_id" jdbcType="INTEGER" property="categoryId" />
+    <result column="full_name" jdbcType="VARCHAR" property="fullName" />
+    <result column="origin" jdbcType="VARCHAR" property="origin" />
+    <result column="jx" jdbcType="VARCHAR" property="jx" />
+    <result column="spec" jdbcType="VARCHAR" property="spec" />
+    <result column="serial" jdbcType="VARCHAR" property="serial" />
+    <result column="code" jdbcType="VARCHAR" property="code" />
+    <result column="enable" jdbcType="BIT" property="enable" />
+    <result column="factory_id" jdbcType="INTEGER" property="factoryId" />
+    <result column="unit" jdbcType="VARCHAR" property="unit" />
+    <result column="pack_unit" jdbcType="VARCHAR" property="packUnit" />
+    <result column="medium_pack" jdbcType="INTEGER" property="mediumPack" />
+    <result column="big_pack" jdbcType="INTEGER" property="bigPack" />
+    <result column="pinyin" jdbcType="VARCHAR" property="pinyin" />
+    <result column="storage_condition" jdbcType="VARCHAR" property="storageCondition" />
+    <result column="storage_description" jdbcType="VARCHAR" property="storageDescription" />
+    <result column="comment" jdbcType="VARCHAR" property="comment" />
+    <result column="cert_id" jdbcType="BIGINT" property="certId" />
+    <result column="brand_id" jdbcType="INTEGER" property="brandId" />
+    <result column="permit_id" jdbcType="BIGINT" property="permitId" />
+    <result column="jx_id" jdbcType="INTEGER" property="jxId" />
+    <result column="is_foreign" jdbcType="BIT" property="isForeign" />
+    <result column="is_tcm" jdbcType="BIT" property="isTcm" />
+    <result column="is_prescription" jdbcType="BIT" property="isPrescription" />
+    <result column="in_check" jdbcType="BIT" property="inCheck" />
+    <result column="first_check" jdbcType="BIT" property="firstCheck" />
+    <result column="special_managed" jdbcType="BIT" property="specialManaged" />
+    <result column="need_care" jdbcType="BIT" property="needCare" />
+    <result column="warning_days" jdbcType="INTEGER" property="warningDays" />
+    <result column="created_time" jdbcType="TIMESTAMP" property="createdTime" />
+    <result column="updated_time" jdbcType="TIMESTAMP" property="updatedTime" />
+    <result column="created_by" jdbcType="VARCHAR" property="createdBy" />
+    <result column="updated_by" jdbcType="VARCHAR" property="updatedBy" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, name, company_id, category_id, full_name, origin, jx, spec, serial, code, enable, 
+    factory_id, unit, pack_unit, medium_pack, big_pack, pinyin, storage_condition, storage_description, 
+    comment, cert_id, brand_id, permit_id, jx_id, is_foreign, is_tcm, is_prescription, 
+    in_check, first_check, special_managed, need_care, warning_days, created_time, updated_time, 
+    created_by, updated_by
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from goods
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from goods
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from goods
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="com.yiban.erp.entities.Goods">
+    insert into goods (id, name, company_id, 
+      category_id, full_name, origin, 
+      jx, spec, serial, code, 
+      enable, factory_id, unit, 
+      pack_unit, medium_pack, big_pack, 
+      pinyin, storage_condition, storage_description, 
+      comment, cert_id, brand_id, 
+      permit_id, jx_id, is_foreign, 
+      is_tcm, is_prescription, in_check, 
+      first_check, special_managed, need_care, 
+      warning_days, created_time, updated_time, 
+      created_by, updated_by)
+    values (#{id,jdbcType=BIGINT}, #{name,jdbcType=VARCHAR}, #{companyId,jdbcType=INTEGER}, 
+      #{categoryId,jdbcType=INTEGER}, #{fullName,jdbcType=VARCHAR}, #{origin,jdbcType=VARCHAR}, 
+      #{jx,jdbcType=VARCHAR}, #{spec,jdbcType=VARCHAR}, #{serial,jdbcType=VARCHAR}, #{code,jdbcType=VARCHAR}, 
+      #{enable,jdbcType=BIT}, #{factoryId,jdbcType=INTEGER}, #{unit,jdbcType=VARCHAR}, 
+      #{packUnit,jdbcType=VARCHAR}, #{mediumPack,jdbcType=INTEGER}, #{bigPack,jdbcType=INTEGER}, 
+      #{pinyin,jdbcType=VARCHAR}, #{storageCondition,jdbcType=VARCHAR}, #{storageDescription,jdbcType=VARCHAR}, 
+      #{comment,jdbcType=VARCHAR}, #{certId,jdbcType=BIGINT}, #{brandId,jdbcType=INTEGER}, 
+      #{permitId,jdbcType=BIGINT}, #{jxId,jdbcType=INTEGER}, #{isForeign,jdbcType=BIT}, 
+      #{isTcm,jdbcType=BIT}, #{isPrescription,jdbcType=BIT}, #{inCheck,jdbcType=BIT}, 
+      #{firstCheck,jdbcType=BIT}, #{specialManaged,jdbcType=BIT}, #{needCare,jdbcType=BIT}, 
+      #{warningDays,jdbcType=INTEGER}, #{createdTime,jdbcType=TIMESTAMP}, #{updatedTime,jdbcType=TIMESTAMP}, 
+      #{createdBy,jdbcType=VARCHAR}, #{updatedBy,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.yiban.erp.entities.Goods">
+    insert into goods
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="name != null">
+        name,
+      </if>
+      <if test="companyId != null">
+        company_id,
+      </if>
+      <if test="categoryId != null">
+        category_id,
+      </if>
+      <if test="fullName != null">
+        full_name,
+      </if>
+      <if test="origin != null">
+        origin,
+      </if>
+      <if test="jx != null">
+        jx,
+      </if>
+      <if test="spec != null">
+        spec,
+      </if>
+      <if test="serial != null">
+        serial,
+      </if>
+      <if test="code != null">
+        code,
+      </if>
+      <if test="enable != null">
+        enable,
+      </if>
+      <if test="factoryId != null">
+        factory_id,
+      </if>
+      <if test="unit != null">
+        unit,
+      </if>
+      <if test="packUnit != null">
+        pack_unit,
+      </if>
+      <if test="mediumPack != null">
+        medium_pack,
+      </if>
+      <if test="bigPack != null">
+        big_pack,
+      </if>
+      <if test="pinyin != null">
+        pinyin,
+      </if>
+      <if test="storageCondition != null">
+        storage_condition,
+      </if>
+      <if test="storageDescription != null">
+        storage_description,
+      </if>
+      <if test="comment != null">
+        comment,
+      </if>
+      <if test="certId != null">
+        cert_id,
+      </if>
+      <if test="brandId != null">
+        brand_id,
+      </if>
+      <if test="permitId != null">
+        permit_id,
+      </if>
+      <if test="jxId != null">
+        jx_id,
+      </if>
+      <if test="isForeign != null">
+        is_foreign,
+      </if>
+      <if test="isTcm != null">
+        is_tcm,
+      </if>
+      <if test="isPrescription != null">
+        is_prescription,
+      </if>
+      <if test="inCheck != null">
+        in_check,
+      </if>
+      <if test="firstCheck != null">
+        first_check,
+      </if>
+      <if test="specialManaged != null">
+        special_managed,
+      </if>
+      <if test="needCare != null">
+        need_care,
+      </if>
+      <if test="warningDays != null">
+        warning_days,
+      </if>
+      <if test="createdTime != null">
+        created_time,
+      </if>
+      <if test="updatedTime != null">
+        updated_time,
+      </if>
+      <if test="createdBy != null">
+        created_by,
+      </if>
+      <if test="updatedBy != null">
+        updated_by,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=BIGINT},
+      </if>
+      <if test="name != null">
+        #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="companyId != null">
+        #{companyId,jdbcType=INTEGER},
+      </if>
+      <if test="categoryId != null">
+        #{categoryId,jdbcType=INTEGER},
+      </if>
+      <if test="fullName != null">
+        #{fullName,jdbcType=VARCHAR},
+      </if>
+      <if test="origin != null">
+        #{origin,jdbcType=VARCHAR},
+      </if>
+      <if test="jx != null">
+        #{jx,jdbcType=VARCHAR},
+      </if>
+      <if test="spec != null">
+        #{spec,jdbcType=VARCHAR},
+      </if>
+      <if test="serial != null">
+        #{serial,jdbcType=VARCHAR},
+      </if>
+      <if test="code != null">
+        #{code,jdbcType=VARCHAR},
+      </if>
+      <if test="enable != null">
+        #{enable,jdbcType=BIT},
+      </if>
+      <if test="factoryId != null">
+        #{factoryId,jdbcType=INTEGER},
+      </if>
+      <if test="unit != null">
+        #{unit,jdbcType=VARCHAR},
+      </if>
+      <if test="packUnit != null">
+        #{packUnit,jdbcType=VARCHAR},
+      </if>
+      <if test="mediumPack != null">
+        #{mediumPack,jdbcType=INTEGER},
+      </if>
+      <if test="bigPack != null">
+        #{bigPack,jdbcType=INTEGER},
+      </if>
+      <if test="pinyin != null">
+        #{pinyin,jdbcType=VARCHAR},
+      </if>
+      <if test="storageCondition != null">
+        #{storageCondition,jdbcType=VARCHAR},
+      </if>
+      <if test="storageDescription != null">
+        #{storageDescription,jdbcType=VARCHAR},
+      </if>
+      <if test="comment != null">
+        #{comment,jdbcType=VARCHAR},
+      </if>
+      <if test="certId != null">
+        #{certId,jdbcType=BIGINT},
+      </if>
+      <if test="brandId != null">
+        #{brandId,jdbcType=INTEGER},
+      </if>
+      <if test="permitId != null">
+        #{permitId,jdbcType=BIGINT},
+      </if>
+      <if test="jxId != null">
+        #{jxId,jdbcType=INTEGER},
+      </if>
+      <if test="isForeign != null">
+        #{isForeign,jdbcType=BIT},
+      </if>
+      <if test="isTcm != null">
+        #{isTcm,jdbcType=BIT},
+      </if>
+      <if test="isPrescription != null">
+        #{isPrescription,jdbcType=BIT},
+      </if>
+      <if test="inCheck != null">
+        #{inCheck,jdbcType=BIT},
+      </if>
+      <if test="firstCheck != null">
+        #{firstCheck,jdbcType=BIT},
+      </if>
+      <if test="specialManaged != null">
+        #{specialManaged,jdbcType=BIT},
+      </if>
+      <if test="needCare != null">
+        #{needCare,jdbcType=BIT},
+      </if>
+      <if test="warningDays != null">
+        #{warningDays,jdbcType=INTEGER},
+      </if>
+      <if test="createdTime != null">
+        #{createdTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updatedTime != null">
+        #{updatedTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createdBy != null">
+        #{createdBy,jdbcType=VARCHAR},
+      </if>
+      <if test="updatedBy != null">
+        #{updatedBy,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.yiban.erp.entities.Goods">
+    update goods
+    <set>
+      <if test="name != null">
+        name = #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="companyId != null">
+        company_id = #{companyId,jdbcType=INTEGER},
+      </if>
+      <if test="categoryId != null">
+        category_id = #{categoryId,jdbcType=INTEGER},
+      </if>
+      <if test="fullName != null">
+        full_name = #{fullName,jdbcType=VARCHAR},
+      </if>
+      <if test="origin != null">
+        origin = #{origin,jdbcType=VARCHAR},
+      </if>
+      <if test="jx != null">
+        jx = #{jx,jdbcType=VARCHAR},
+      </if>
+      <if test="spec != null">
+        spec = #{spec,jdbcType=VARCHAR},
+      </if>
+      <if test="serial != null">
+        serial = #{serial,jdbcType=VARCHAR},
+      </if>
+      <if test="code != null">
+        code = #{code,jdbcType=VARCHAR},
+      </if>
+      <if test="enable != null">
+        enable = #{enable,jdbcType=BIT},
+      </if>
+      <if test="factoryId != null">
+        factory_id = #{factoryId,jdbcType=INTEGER},
+      </if>
+      <if test="unit != null">
+        unit = #{unit,jdbcType=VARCHAR},
+      </if>
+      <if test="packUnit != null">
+        pack_unit = #{packUnit,jdbcType=VARCHAR},
+      </if>
+      <if test="mediumPack != null">
+        medium_pack = #{mediumPack,jdbcType=INTEGER},
+      </if>
+      <if test="bigPack != null">
+        big_pack = #{bigPack,jdbcType=INTEGER},
+      </if>
+      <if test="pinyin != null">
+        pinyin = #{pinyin,jdbcType=VARCHAR},
+      </if>
+      <if test="storageCondition != null">
+        storage_condition = #{storageCondition,jdbcType=VARCHAR},
+      </if>
+      <if test="storageDescription != null">
+        storage_description = #{storageDescription,jdbcType=VARCHAR},
+      </if>
+      <if test="comment != null">
+        comment = #{comment,jdbcType=VARCHAR},
+      </if>
+      <if test="certId != null">
+        cert_id = #{certId,jdbcType=BIGINT},
+      </if>
+      <if test="brandId != null">
+        brand_id = #{brandId,jdbcType=INTEGER},
+      </if>
+      <if test="permitId != null">
+        permit_id = #{permitId,jdbcType=BIGINT},
+      </if>
+      <if test="jxId != null">
+        jx_id = #{jxId,jdbcType=INTEGER},
+      </if>
+      <if test="isForeign != null">
+        is_foreign = #{isForeign,jdbcType=BIT},
+      </if>
+      <if test="isTcm != null">
+        is_tcm = #{isTcm,jdbcType=BIT},
+      </if>
+      <if test="isPrescription != null">
+        is_prescription = #{isPrescription,jdbcType=BIT},
+      </if>
+      <if test="inCheck != null">
+        in_check = #{inCheck,jdbcType=BIT},
+      </if>
+      <if test="firstCheck != null">
+        first_check = #{firstCheck,jdbcType=BIT},
+      </if>
+      <if test="specialManaged != null">
+        special_managed = #{specialManaged,jdbcType=BIT},
+      </if>
+      <if test="needCare != null">
+        need_care = #{needCare,jdbcType=BIT},
+      </if>
+      <if test="warningDays != null">
+        warning_days = #{warningDays,jdbcType=INTEGER},
+      </if>
+      <if test="createdTime != null">
+        created_time = #{createdTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updatedTime != null">
+        updated_time = #{updatedTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createdBy != null">
+        created_by = #{createdBy,jdbcType=VARCHAR},
+      </if>
+      <if test="updatedBy != null">
+        updated_by = #{updatedBy,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.yiban.erp.entities.Goods">
+    update goods
+    set name = #{name,jdbcType=VARCHAR},
+      company_id = #{companyId,jdbcType=INTEGER},
+      category_id = #{categoryId,jdbcType=INTEGER},
+      full_name = #{fullName,jdbcType=VARCHAR},
+      origin = #{origin,jdbcType=VARCHAR},
+      jx = #{jx,jdbcType=VARCHAR},
+      spec = #{spec,jdbcType=VARCHAR},
+      serial = #{serial,jdbcType=VARCHAR},
+      code = #{code,jdbcType=VARCHAR},
+      enable = #{enable,jdbcType=BIT},
+      factory_id = #{factoryId,jdbcType=INTEGER},
+      unit = #{unit,jdbcType=VARCHAR},
+      pack_unit = #{packUnit,jdbcType=VARCHAR},
+      medium_pack = #{mediumPack,jdbcType=INTEGER},
+      big_pack = #{bigPack,jdbcType=INTEGER},
+      pinyin = #{pinyin,jdbcType=VARCHAR},
+      storage_condition = #{storageCondition,jdbcType=VARCHAR},
+      storage_description = #{storageDescription,jdbcType=VARCHAR},
+      comment = #{comment,jdbcType=VARCHAR},
+      cert_id = #{certId,jdbcType=BIGINT},
+      brand_id = #{brandId,jdbcType=INTEGER},
+      permit_id = #{permitId,jdbcType=BIGINT},
+      jx_id = #{jxId,jdbcType=INTEGER},
+      is_foreign = #{isForeign,jdbcType=BIT},
+      is_tcm = #{isTcm,jdbcType=BIT},
+      is_prescription = #{isPrescription,jdbcType=BIT},
+      in_check = #{inCheck,jdbcType=BIT},
+      first_check = #{firstCheck,jdbcType=BIT},
+      special_managed = #{specialManaged,jdbcType=BIT},
+      need_care = #{needCare,jdbcType=BIT},
+      warning_days = #{warningDays,jdbcType=INTEGER},
+      created_time = #{createdTime,jdbcType=TIMESTAMP},
+      updated_time = #{updatedTime,jdbcType=TIMESTAMP},
+      created_by = #{createdBy,jdbcType=VARCHAR},
+      updated_by = #{updatedBy,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+</mapper>
