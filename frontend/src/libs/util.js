@@ -75,17 +75,17 @@ util.handleTitle = function (vm, item) {
 };
 
 util.setCurrentPageTitle = function (vm, title, isSub) {
-    var openedPage = vm.$store.state.app.pageOpenedList.filter(page => page.name == vm.$store.state.app.currentPageName);
+    var openedPage = vm.$store.state.app.pageOpenedList.filter(page => page.name === vm.$store.state.app.currentPageName);
     if (openedPage && openedPage.length > 0) {
         if (!isSub) {
-            openedPage[0].title = title ;
+            openedPage[0].title = title;
         } else {
             var oldTitle = openedPage[0].title;
             var lastIndex = oldTitle.lastIndexOf('-');
             if (lastIndex < 0) {
                 openedPage[0].title = oldTitle + ' - ' + title;
             } else if (title !== '') {
-                openedPage[0].title = oldTitle.substr(0, lastIndex+1) + ' ' + title ;
+                openedPage[0].title = oldTitle.substr(0, lastIndex + 1) + ' ' + title;
             }
         }
     }
