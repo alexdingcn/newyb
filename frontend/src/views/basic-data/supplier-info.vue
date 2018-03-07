@@ -8,25 +8,25 @@
             <Card>
                 <p slot="title">
                     <Icon type="compose"></Icon>
-                     {{ formItem.name || '生产企业' }}
+                     {{ formItem.name || '供应商' }}
                 </p>
 
                 <div slot="extra">
-                    <Button type="text" @click="searchRelatedGoods" v-show="formItem.id" icon="search">查看企业名下商品</Button>
-                    <Button type="success" @click="submitFactory" v-show="formItem.id">保存</Button>
-                    <Button type="primary" @click="submitFactory" v-show="!formItem.id">提交</Button>
+                    <Button type="text" @click="searchRelatedGoods" v-show="formItem.id" icon="search">查看该企业供应商品</Button>
+                    <Button type="success" @click="submitSupplier" v-show="formItem.id">保存</Button>
+                    <Button type="primary" @click="submitSupplier" v-show="!formItem.id">提交</Button>
                 </div>
 
-                <Form :model="formItem" :rules="ruleValidate" :label-width="80">
+                <Form :model="formItem" :rules="ruleValidate" :label-width="100">
                     <Row>
                         <Col span="6">
                             <FormItem label="企业名称" prop="name">
-                                <Input v-model="formItem.name" placeholder="生产企业名称" @on-blur="onChangeName"/>
+                                <Input v-model="formItem.name" placeholder="供应商名称" @on-blur="onChangeName"/>
                             </FormItem>
                         </Col>
                         <Col span="6">
-                            <FormItem label="类别" >
-
+                            <FormItem label="简称" >
+                                <Input v-model="formItem.shortName" placeholder="简称"/>
                             </FormItem>
                         </Col>
                         <Col span="6">
@@ -43,7 +43,7 @@
                     <Row>
                         <Col span="7">
                             <FormItem label="城市" prop="placeCodes">
-                                <al-cascader v-model="formItem.placeCodes" level="2"/>
+                                <al-cascader v-model="formItem.placeCodes" level="2" />
                             </FormItem>
                         </Col>
                         <Col span="12">
@@ -91,6 +91,30 @@
                             </FormItem>
                         </Col>
                     </Row>
+                    <Row>
+                        <Col span="12">
+                            <FormItem label="仓库地址" prop="warehouseAddr">
+                                <Input v-model="formItem.warehouseAddr"/>
+                            </FormItem>
+                        </Col>
+                        <Col span="6">
+                            <FormItem label="电子监管码" prop="digitalAuditCode">
+                                <Input v-model="formItem.digitalAuditCode"/>
+                            </FormItem>
+                        </Col>
+                    </Row>
+                    <Row>
+                        <Col span="12">
+                            <FormItem label="经营范围" prop="businessScope">
+                                <Input v-model="formItem.businessScope"/>
+                            </FormItem>
+                        </Col>
+                        <Col span="6">
+                            <FormItem label="档案号" prop="archiveNumber">
+                                <Input v-model="formItem.archiveNumber"/>
+                            </FormItem>
+                        </Col>
+                    </Row>
 
                     <h3>证件</h3>
                     <Row>
@@ -103,6 +127,11 @@
                             <FormItem label="许可证期限" prop="permitExp">
                                 <DatePicker type="date" placeholder="许可证到期日" v-model="formItem.permitExp"/>
                             </FormItem>
+                        </Col>
+                        <Col span="8">
+                            <Upload action="post">
+                                <Button type="primary" icon="ios-cloud-upload-outline">上传文件</Button>
+                            </Upload>
                         </Col>
                     </Row>
                     <Row>
@@ -118,9 +147,16 @@
                         </Col>
                     </Row>
                     <Row>
-                        <FormItem label="GMP认证">
-                            <Checkbox v-model="formItem.isGmp" />
-                        </FormItem>
+                        <Col span="6">
+                            <FormItem label="检查首营档案">
+                                <Checkbox v-model="formItem.needFirstCheck" />
+                            </FormItem>
+                        </Col>
+                        <Col span="12">
+                            <FormItem label="审查结论" prop="comment">
+                                <Input v-model="formItem.comment"/>
+                            </FormItem>
+                        </Col>
                     </Row>
 
                     <h3>银行帐户</h3>
@@ -139,18 +175,6 @@
                             <FormItem label="税号" prop="taxNumber">
                                 <Input v-model="formItem.taxNumber"/>
                             </FormItem>
-                        </Col>
-                    </Row>
-
-
-                    <Row>
-                        <Col span="12">
-                            <FormItem label="备注" prop="comment">
-                                <Input v-model="formItem.comment"/>
-                            </FormItem>
-                        </Col>
-                        <Col span="6">
-
                         </Col>
                     </Row>
 
@@ -189,8 +213,8 @@ export default {
     methods: {
         init () {
             var self = this;
-            if (this.$route.params && this.$route.params.factory_id) {
-                util.ajax.get('/factory/' + this.$route.params.factory_id)
+            if (this.$route.params && this.$route.params.supplier_id) {
+                util.ajax.get('/supplier/' + this.$route.params.supplier_id)
                     .then(function (response) {
                         self.formItem = response.data;
                         util.title(response.data.name);
@@ -208,19 +232,19 @@ export default {
                         console.log(error);
                     });
             } else {
-                util.title('新建生产企业');
+                util.title('新建供应商');
                 util.setCurrentPageTitle(this, '新建', true);
                 this.formItem = {
                     pinyin: ''
                 };
             }
         },
-        submitFactory() {
+        submitSupplier() {
             var self = this;
-            util.ajax.post('/factory/add', this.formItem)
+            util.ajax.post('/supplier/add', this.formItem)
                     .then(function (response) {
                         self.formItem.id = response.data;
-                        self.$Message.info("生产企业" + self.formItem.name + "保存成功");
+                        self.$Message.info("供应商" + self.formItem.name + "保存成功");
                     })
                     .catch(function (error) {
                         console.log(error);
@@ -240,7 +264,7 @@ export default {
             }
         },
         searchRelatedGoods() {
-            let argu = { factory_id: this.$route.params.factory_id };
+            let argu = { supplier_id: this.$route.params.supplier_id };
             this.$router.push({
                 name: 'basic_data_good',
                 params: argu
