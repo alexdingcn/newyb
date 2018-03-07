@@ -60,6 +60,9 @@
     <if test="categoryId != null and categoryId > 0">
       and category_id = #{categoryId}
     </if>
+    <if test="factoryId != null and factoryId > 0">
+      and factory_id = #{factoryId}
+    </if>
     <if test="search != null and search != ''">
       <bind name="pattern" value="'%' + search + '%'" />
       and ( name like #{pattern}  or pinyin like #{pattern} )
@@ -76,6 +79,9 @@
     where 1 = 1
     <if test="categoryId != null and categoryId > 0">
       and category_id = #{categoryId}
+    </if>
+    <if test="factoryId != null and factoryId > 0">
+      and factory_id = #{factoryId}
     </if>
     <if test="search != null and search != ''">
       <bind name="pattern" value="'%' + search + '%'" />

@@ -59,6 +59,7 @@ export const otherRouter = {
         { path: 'home', title: {i18n: 'home'}, name: 'home_index', component: () => import('@/views/home/home.vue') },
 { path: 'goods/:goods_id', title: '商品详情', name: 'goods-info', component: () => import('@/views/basic-data/goods-info.vue') }, // 商品详情
 { path: 'factory/:factory_id', title: '生产企业详情', name: 'factory-info', component: () => import('@/views/basic-data/factory-info.vue') }, // 生产企业详情
+{ path: 'supplier/:supplier_id', title: '供应商详情', name: 'supplier-info', component: () => import('@/views/basic-data/supplier-info.vue') }, // 供应商详情
 { path: 'ownspace', title: '个人中心', name: 'ownspace_index', component: () => import('@/views/own-space/own-space.vue') },
 { path: 'order/:order_id', title: '订单详情', name: 'order-info', component: () => import('@/views/advanced-router/component/order-info.vue') }, // 用于展示动态路由
 { path: 'shopping', title: '购物详情', name: 'shopping', component: () => import('@/views/advanced-router/component/shopping-info.vue') }, // 用于展示带参路由
@@ -76,13 +77,46 @@ export const appRouter = [
         component: Main,
         children: [
             { path: 'goods', title: '商品档案', name: 'basic_data_good', component: () => import('@/views/basic-data/good.vue') },
-{ path: 'factory', title: '生产企业', name: 'basic_data_factory', component: () => import('@/views/basic-data/factory.vue') },
-{ path: 'supplier', title: '供应商', name: 'basic_data_supplier', component: () => import('@/views/basic-data/supplier.vue') },
-{ path: 'client', title: '客户档案', name: 'basic_data_client', component: () => import('@/views/basic-data/client.vue') },
-{ path: 'buyer', title: '采购员', name: 'basic_data_buyer', component: () => import('@/views/basic-data/buyer.vue') },
-{ path: 'sale', title: '销售员', name: 'basic_data_sale', component: () => import('@/views/basic-data/sale.vue') },
-{ path: 'price', title: '价格设置', name: 'basic_data_price', component: () => import('@/views/basic-data/price.vue') },
-]
+            { path: 'factory', title: '生产企业', name: 'basic_data_factory', component: () => import('@/views/basic-data/factory.vue') },
+            { path: 'supplier', title: '供应商', name: 'basic_data_supplier', component: () => import('@/views/basic-data/supplier.vue') },
+            { path: 'client', title: '客户档案', name: 'basic_data_client', component: () => import('@/views/basic-data/client.vue') },
+            { path: 'buyer', title: '采购员', name: 'basic_data_buyer', component: () => import('@/views/basic-data/buyer.vue') },
+            { path: 'sale', title: '销售员', name: 'basic_data_sale', component: () => import('@/views/basic-data/sale.vue') },
+            { path: 'price', title: '价格设置', name: 'basic_data_price', component: () => import('@/views/basic-data/price.vue') },
+        ]
+    },
+{
+    path: '/buy',
+    icon: 'bag',
+    name: 'buy',
+    title: '采购',
+    component: Main,
+    children: [
+        { path: 'buy', title: '采购制单', name: 'buy_order', component: () => import('@/views/basic-data/good.vue') },
+        { path: 'buyreview', title: '采购单审核', name: 'buy_order_review', component: () => import('@/views/basic-data/factory.vue') },
+    ]
+},
+{
+    path: '/sell',
+    icon: 'ios-calculator',
+    name: 'sell',
+    title: '销售',
+    component: Main,
+    children: [
+        { path: 'sell', title: '销售制单', name: 'sell_order', component: () => import('@/views/basic-data/good.vue') },
+        { path: 'sellreview', title: '销售单审核', name: 'sell_review', component: () => import('@/views/basic-data/factory.vue') },
+    ]
+},
+{
+    path: '/warehouse',
+    icon: 'social-buffer',
+    name: 'sell',
+    title: '库存',
+    component: Main,
+    children: [
+        { path: 'sell', title: '销售制单', name: 'sell_order', component: () => import('@/views/basic-data/good.vue') },
+        { path: 'sellreview', title: '销售单审核', name: 'sell_review', component: () => import('@/views/basic-data/factory.vue') },
+    ]
 },
 {
     path: '/access',
@@ -91,8 +125,8 @@ export const appRouter = [
     title: '权限管理',
     component: Main,
     children: [
-    { path: 'index', title: '权限管理', name: 'access_index', component: () => import('@/views/access/access.vue') }
-]
+        { path: 'index', title: '权限管理', name: 'access_index', component: () => import('@/views/access/access.vue') }
+    ]
 },
 {
     path: '/access-test',

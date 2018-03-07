@@ -6,7 +6,7 @@
 <template>
     <div class="layout">
         <Layout :style="{minHeight: '100vh'}">
-            <Sider collapsible :collapsed-width="150" :style="{background: '#fff'}">
+            <Sider collapsible defaultCollapsed :collapsed-width="150" :style="{background: '#fff'}" v-show="sidebarVisible">
                 <Card :bordered="false" dis-hover>
                     <p slot="title">
                         <Icon type="android-options"></Icon> 商品分类
@@ -29,14 +29,17 @@
                         <Icon type="ios-information"></Icon>
                         商品 {{ selectedCategory.title }}
                     </p>
-                    <ButtonGroup slot="extra">
-                    	<Button type="primary" icon="android-add-circle" @click="addGoods">添加</Button>
-                        <Button type="error" icon="android-remove-circle" @click="delGoods">删除</Button>
-                        <Button type="ghost" icon="ios-download-outline" @click="exportData">导出当前页数据</Button>
-                    </ButtonGroup>
+                    <div slot="extra">
+                        <Input v-model="searchGoodsVal" icon="search" placeholder="商品名称/拼音简称" style="width: 300px"></Input>
+                        <ButtonGroup>
+                            <Button type="primary" icon="android-add-circle" @click="addGoods">添加</Button>
+                            <Button type="error" icon="android-remove-circle" @click="delGoods">删除</Button>
+                            <Button type="ghost" icon="ios-download-outline" @click="exportData">导出当前页数据</Button>
+                        </ButtonGroup>
+                    </div>
 
                     <Row type="flex" align="middle" class="advanced-router margin-top-8">
-                        <Table border highlight-row :columns="orderColumns" :data="goodsData" ref="goodsTable" style="width: 100%;" size="small"></Table>
+                        <Table border stripe highlight-row :loading="goodsTableLoading" :columns="orderColumns" :data="goodsData" ref="goodsTable" style="width: 100%;" size="small"></Table>
                     </Row>
                     <Row class="margin-top-8">
                         <div style="float: right;">
@@ -53,16 +56,21 @@
 <script>
 import axios from 'axios';
 import util from '@/libs/util.js';
+import _ from 'lodash'
 
 export default {
-    name: 'access_index',
+    name: 'goods',
     data () {
         return {
+            sidebarVisible: true,
+            searchFactoryId: 0,
+            searchGoodsVal: '',
             totalGoodsCount: 0,
             currentPage: 1,
             goodCat: [ {title:'全部', id:0, selected:true} ],
             selectedCategory: {},
             disableDelCategory: true,
+            goodsTableLoading: false,
             orderColumns: [
                 {
                     type: 'selection',
@@ -102,11 +110,22 @@ export default {
                     }
                 },
                 {
+                    title: '类别',
+                    key: 'categoryName',
+                    width: 100,
+                    align: 'center'
+                },
+                {
                     title: '产地',
                     key: 'origin',
                     width: 100,
+                    align: 'center'
+                },
+                {
+                    title: '计量单位',
+                    key: 'unitName',
+                    width: 80,
                     align: 'center',
-                    sortable: true
                 },
                 {
                     title: '剂型',
@@ -136,14 +155,19 @@ export default {
                 {
                     title: '在单数',
                     key: 'factory',
+                    width:100,
                     align: 'center'
                 },
             ],
             goodsData: []
         };
     },
+    activated() {
+        this.loadTree();
+    },
     mounted() {
         this.loadTree();
+        this.loadGoodsData();
     },
     computed: {
 
@@ -162,15 +186,25 @@ export default {
         },
         loadGoodsData () {
             var self = this;
+            this.goodsTableLoading = true;
+            // read factory id
+            if (this.$route.params && this.$route.params.factory_id) {
+                this.searchFactoryId = this.$route.params.factory_id;
+                this.sidebarVisible = false;
+            }
             util.ajax.get('/goods/list', { params : {
                     page: this.currentPage,
+                    search: this.searchGoodsVal,
+                    factoryId: this.searchFactoryId,
                     catId: this.selectedCategory.id
                 }})
                 .then(function (response) {
+                    self.goodsTableLoading = false;
                     self.goodsData = response.data.data;
                     self.totalGoodsCount = response.data.total;
                 })
                 .catch(function (error) {
+                    self.goodsTableLoading = false;
                     console.log(error);
                 });
         },
@@ -232,7 +266,7 @@ export default {
         },
 		exportData() {
 			this.$refs.goodsTable.exportCsv({
-                    filename: '原始数据'
+                    filename: '商品数据'
                 });
 		},
         addGoods() {
@@ -260,7 +294,15 @@ export default {
         changePage(pageNumber) {
             this.currentPage = pageNumber;
             this.loadGoodsData();
+        },
+        handleSearchGoods(value) {
+            console.log(value);
         }
+    },
+    watch: {
+        searchGoodsVal: _.debounce(function() {
+            this.loadGoodsData();
+        }, 1000)
     }
 };
 </script>

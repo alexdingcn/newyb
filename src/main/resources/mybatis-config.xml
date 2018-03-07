@@ -12,6 +12,7 @@
         <mapper resource="mapping/GoodCategoryMapper.xml"/>
         <mapper resource="mapping/GoodsMapper.xml"/>
         <mapper resource="mapping/FactoryMapper.xml"/>
+        <mapper resource="mapping/SupplierMapper.xml"/>
         <mapper resource="mapping/UnitMapper.xml"/>
     </mappers>
 </configuration>

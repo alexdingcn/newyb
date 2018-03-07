@@ -21,9 +21,12 @@ public interface GoodsMapper {
     int updateByPrimaryKey(Goods record);
 
     List<Goods> selectAll(@Param("categoryId") Integer catId,
+                          @Param("factoryId") Integer factoryId,
                           @Param("search") String search,
                           @Param("offset") Integer offset,
                           @Param("limit") Integer limit);
 
-    Long selectCount(@Param("categoryId") Integer catId, @Param("search") String search);
+    Long selectCount(@Param("categoryId") Integer catId,
+                     @Param("factoryId") Integer factoryId,
+                     @Param("search") String search);
 }
