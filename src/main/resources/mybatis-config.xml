@@ -14,5 +14,6 @@
         <mapper resource="mapping/FactoryMapper.xml"/>
         <mapper resource="mapping/SupplierMapper.xml"/>
         <mapper resource="mapping/UnitMapper.xml"/>
+        <mapper resource="mapping/SupplierContactMapper.xml"/>
     </mappers>
 </configuration>

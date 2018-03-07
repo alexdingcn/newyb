@@ -71,10 +71,11 @@ public class SupplierController {
     @RequestMapping(value = "/add", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> add(@RequestBody Supplier supplier) {
         logger.info("ADD new supplier:{}", supplier);
-        supplier.setCreatedBy("admin");
-        supplier.setCreatedTime(new Date());
+
         int result = 0;
         if (supplier.getId() == null) {
+            supplier.setCreatedBy("admin");
+            supplier.setCreatedTime(new Date());
             result = supplierMapper.insertSelective(supplier);
         } else {
             result = supplierMapper.updateByPrimaryKey(supplier);
