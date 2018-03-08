@@ -32,7 +32,6 @@
               <Button @click="closedModal" long>取消</Button>
             </Col>
           </Row>
-            
         </div>
     </Modal>
 </template>
@@ -152,7 +151,7 @@ export default {
     doAddCategory(data) {
       console.log("do add a category info:" + data);
       util.ajax
-        .post("/customer/category/add")
+        .post("/customer/category/add", data)
         .then(respones => {
           this.$Message.success("新建客户类成功");
           submitSuccessEvent();
@@ -167,7 +166,7 @@ export default {
     doUpdateCategory(data) {
       console.log("do update a category info:" + data);
       util.ajax
-        .post("/customer/category/update")
+        .post("/customer/category/update", data)
         .then(respones => {
           this.$Message.success("客户类信息修改成功");
           submitSuccessEvent();

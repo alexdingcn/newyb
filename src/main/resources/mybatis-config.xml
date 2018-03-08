@@ -15,5 +15,9 @@
         <mapper resource="mapping/SupplierMapper.xml"/>
         <mapper resource="mapping/UnitMapper.xml"/>
         <mapper resource="mapping/SupplierContactMapper.xml"/>
+        <mapper resource="mapping/CustomerCategoryMapper.xml"/>
+        <mapper resource="mapping/CustomerCertMapper.xml"/>
+        <mapper resource="mapping/CustomerMapper.xml"/>
+        <mapper resource="mapping/CustomerRepMapper.xml"/>
     </mappers>
 </configuration>

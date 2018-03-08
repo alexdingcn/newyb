@@ -304,7 +304,7 @@ export default {
       }
       this.spinShow = true;
       util.ajax
-        .delete("customer/category/delete")
+        .delete("/customer/category/remove", {categoryId: delData.id})
         .then(response => {
           this.$Message.success("客户类信信息删除成功");
           this.getCategoryArr();
