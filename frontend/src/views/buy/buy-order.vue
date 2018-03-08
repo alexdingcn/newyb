@@ -17,7 +17,7 @@
                     </ButtonGroup>
                 </div>
                 
-                <Form :model="buyOrder" :label-width="70">
+                <Form :model="buyOrder" :label-width="75">
                     <Row>
                         <Col span="6">
                             <FormItem label="供应商" prop="supplierId" >
@@ -26,6 +26,7 @@
 									filterable
 									clearable
 									remote
+									size="small"
 									placeholder="供应商名称/拼音"
 									:remote-method="querySupplier"
 									:loading="supplierLoading">
@@ -33,19 +34,20 @@
 								</Select>
                             </FormItem>
                         </Col>
+                        <Col span="5">
+             				<FormItem label="供应商代表" prop="supplierAgent" >
+                                
+                            </FormItem>
+                        </Col>
                         <Col span="6">
              				<FormItem label="账期" prop="paymentTerm">
-                                <InputNumber v-model="buyOrder.paymentTerm" :min="0"/>
+                                <InputNumber v-model="buyOrder.paymentTerm" :min="0" size="small" @on-change="handlePaymentTermChange"/>
                             </FormItem>
                         </Col>
-                        <Col span="6">
-                            <FormItem label="采购员" prop="buyerId">
-                                <Input v-model="buyOrder.buyerId"/>
-                            </FormItem>
-                        </Col>
+                       
                         <Col span="6">
                             <FormItem label="发票类型" prop="fapiaoType">
-                                <Select v-model="buyOrder.fapiaoType">
+                                <Select v-model="buyOrder.fapiaoType" size="small">
                                 	<Option v-for="item in fapiaoTypes" :value="item.value" :key="item.value">{{ item.label }}</Option>
 								</Select>
                             </FormItem>
@@ -53,28 +55,50 @@
                     </Row>
                     <Row>
                     	<Col span="6">
-             				<FormItem label="摘要" prop="comment">
-                                <Input v-model="buyOrder.comment" />
+                            <FormItem label="采购员" prop="buyerId">
+                                <Input v-model="buyOrder.buyerId" size="small"/>
                             </FormItem>
                         </Col>
-                        <Col span="6">
+                        <Col span="5">
              				<FormItem label="入库日期" prop="incomingDate">
-             					<DatePicker type="date" :value="buyOrder.incomingDate"></DatePicker>
+             					<DatePicker type="date" size="small" v-model="buyOrder.incomingDate" @on-change="handleIncomingDateChange"></DatePicker>
                             </FormItem>
                         </Col>
                         <Col span="6">
              				<FormItem label="付款期限" prop="paymentDate">
-                                <DatePicker type="date" :value="buyOrder.paymentDate"></DatePicker>
+                                <DatePicker type="date" size="small" v-model="buyOrder.paymentDate" @on-change="handlePaymentDateChange"></DatePicker>
                             </FormItem>
                         </Col>
                         <Col span="6">
              				<FormItem label="自定单号" prop="refNo">
-                                <Input v-model="buyOrder.refNo" />
+                                <Input v-model="buyOrder.refNo" size="small"/>
                             </FormItem>
                         </Col>
                     </Row>
                     <Row>
-                    	<Col span="8">
+                    	<Col span="6">
+                    		<FormItem label="运输方式" prop="shipMethod">
+                                <Input v-model="buyOrder.shipMethod" size="small"/>
+                            </FormItem>
+                    	</Col>
+                    	<Col span="5">
+             				<FormItem label="运输工具" prop="shipTool">
+                                <Input v-model="buyOrder.shipTool" size="small"/>
+                            </FormItem>
+                        </Col>
+                    	<Col span="6">
+             				<FormItem label="温控方式" prop="temperControl">
+                                <Input v-model="buyOrder.temperControl" size="small"/>
+                            </FormItem>
+                        </Col>
+                    	<Col span="6">
+             				<FormItem label="仓库点" prop="destWarehouse">
+                                <Input v-model="buyOrder.destWarehouse" size="small"/>
+                            </FormItem>
+                        </Col>
+                    </Row>
+                    <Row>
+                    	<Col span="6">
                     		<FormItem label="选择商品">
 								<Select
 									ref="goodsSelect"
@@ -82,6 +106,7 @@
 									clearable
 									remote
 									placeholder="输入 商品名称/拼音 后选择"
+									size="small"
 									@on-change="onSelectGoods"
 									:remote-method="queryGoods"
 									:loading="goodsLoading">
@@ -92,17 +117,29 @@
 								</Select>
 							</FormItem>
                     	</Col>
+                    	<Col span="5">
+             				<FormItem label="预到货日期" prop="eta">
+                                <DatePicker type="date" v-model="buyOrder.eta" size="small"/>
+                            </FormItem>
+                        </Col>
+                    	<Col span="12">
+             				<FormItem label="备注" prop="comment">
+                                <Input v-model="buyOrder.comment" size="small"/>
+                            </FormItem>
+                        </Col>
+                    	<!--
                     	<Col span="6">
                     		<Button type="primary" icon="ios-list-outline" class="margin-left-5"></Button>
                     	</Col>
+                    	-->
                     </Row>
                     
-					<Table border highlight-row ellipsis
+					<Table border highlight-row
+						class="margin-top-8"
 						:columns="orderColumns" :data="orderItems" 
 						ref="buyOrderTable" style="width: 100%;" size="small"
 						no-data-text="在商品输入框选择后添加"
-						@on-row-dblclick="handleRowDbClick"
-						>
+						@on-row-dblclick="handleRowDbClick">
 						<div slot="footer">
 							<h3 class="padding-left-20" >
 								<b>合计金额:</b> ￥{{ totalAmount }}
@@ -139,6 +176,7 @@
                 orderItems: [],
                 buyOrder: {
                 	paymentTerm: 1,
+                	eta: moment().format('YYYY-MM-DD'),
                 	incomingDate: moment().format('YYYY-MM-DD'),
                 	paymentDate: moment().add(1,'d').format('YYYY-MM-DD'),
                 	orderItemIds: []
@@ -148,16 +186,19 @@
                         type: 'index',
                         title: '',
                         align: 'center',
+                        width: 30
                     },
                     {
 						title: '货号',
 						align: 'center',
 						key: 'id',
+						width: 50
 					},
                     {
                         title: '商品名称',
                         key: 'name',
                         align: 'center',
+                        width: 150,
                         sortable: true,
                         render: (h, params) => {
 							return h('Button', {
@@ -178,29 +219,41 @@
 						}
 					},
 					{
+						title: '产地',
+						key: 'origin',
+						align: 'center',
+						width: 60
+					},
+					{
+						title: '剂型',
+						key: 'jx',
+						align: 'center',
+						width: 60
+					},
+					{
 						title: '规格',
 						key: 'spec',
 						align: 'center',
+						width: 80
 					},
 					{
 						title: '生产企业',
 						key: 'factory',
 						align: 'center',
-					},
-					{
-						title: '产地',
-						key: 'origin',
-						align: 'center',
+						width: 120
 					},
 					{
 						title: '单位',
 						key: 'unitName',
 						align: 'center',
+						width: 50
 					},
+
 					{
                         title: '数量',
                         key: 'quantity',
                         align: 'center',
+                        width: 80,
                         render: (h, params) => {
                         	console.log(params);
                         	var self = this;
@@ -238,6 +291,7 @@
                         title: '单价',
                         key: 'price',
                         align: 'center',
+                        width: 80,
                         render: (h, params) => {
                         	var self = this;
 							return h('Input', {
@@ -282,17 +336,50 @@
 					{
                         title: '金额',
                         key: 'amount',
-                        align: 'center'
+                        align: 'center',
+                        width: 80
+					},
+					{
+						title: '整件单位',
+						key: 'packUnitName',
+						align: 'center',
+						width: 60
+					},
+					{
+						title: '大件装量',
+						key: 'bigPack',
+						align: 'center',
+						width: 60
+					},
+					{
+                        title: '库存',
+                        key: 'balance',
+                        align: 'center',
+                        width: 100
+					},
+					{
+                        title: '在单数',
+                        key: 'ongoing',
+                        align: 'center',
+                        width: 100,
+					},
+					{
+                        title: '最近采购价',
+                        key: 'last',
+                        align: 'center',
+                        width: 100,
 					},
 					{
                         title: '批号',
                         key: 'batch',
                         align: 'center',
+                        width: 100,
 					},
 					{
                         title: '有效期',
                         key: 'exp',
                         align: 'center',
+                        width: 100,
 					},
         	]
         };
@@ -379,6 +466,21 @@
             		}
 				}
 				this.$refs.goodsSelect.clearSingleSelect();
+            },
+            handleIncomingDateChange(val) {
+            	var incoming = moment(val);
+            	var payment = moment(this.buyOrder.paymentDate);
+            	var diffDays = payment.diff(incoming, 'days');
+            	this.buyOrder.paymentTerm = diffDays;
+            },
+            handlePaymentDateChange(val) {
+            	var incoming = moment(this.buyOrder.incomingDate);
+            	var payment = moment(val);
+            	var diffDays = payment.diff(incoming, 'days');
+            	this.buyOrder.paymentTerm = diffDays;
+            },
+            handlePaymentTermChange(val) {
+            	this.buyOrder.paymentDate = moment(this.buyOrder.incomingDate).add(val,'d').format('YYYY-MM-DD');
             }
         }
     };
