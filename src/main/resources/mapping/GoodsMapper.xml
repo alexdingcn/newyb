@@ -65,7 +65,7 @@
     </if>
     <if test="search != null and search != ''">
       <bind name="pattern" value="'%' + search + '%'" />
-      and ( name like #{pattern}  or pinyin like #{pattern} )
+      and ( name like #{pattern}  or lower(pinyin) like lower(#{pattern}) )
     </if>
   </select>
   <select id="selectAll" resultType="com.yiban.erp.entities.Goods">
@@ -85,7 +85,7 @@
     </if>
     <if test="search != null and search != ''">
       <bind name="pattern" value="'%' + search + '%'" />
-      and ( g.name like #{pattern} or g.pinyin like #{pattern} )
+      and ( g.name like #{pattern} or lower(g.pinyin) like lower(#{pattern}) )
     </if>
     <if test="offset != null and limit != null">
       limit #{offset}, #{limit}

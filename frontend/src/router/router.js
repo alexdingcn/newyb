@@ -92,8 +92,8 @@ export const appRouter = [
     title: '采购',
     component: Main,
     children: [
-        { path: 'buy', title: '采购制单', name: 'buy_order', component: () => import('@/views/basic-data/good.vue') },
-        { path: 'buyreview', title: '采购单审核', name: 'buy_order_review', component: () => import('@/views/basic-data/factory.vue') },
+        { path: 'order', title: '采购制单', name: 'buy_order', component: () => import('@/views/buy/buy-order.vue') },
+        { path: 'review', title: '采购单审核', name: 'buy_order_review', component: () => import('@/views/basic-data/factory.vue') },
     ]
 },
 {
@@ -103,14 +103,14 @@ export const appRouter = [
     title: '销售',
     component: Main,
     children: [
-        { path: 'sell', title: '销售制单', name: 'sell_order', component: () => import('@/views/basic-data/good.vue') },
-        { path: 'sellreview', title: '销售单审核', name: 'sell_review', component: () => import('@/views/basic-data/factory.vue') },
+        { path: 'order', title: '销售制单', name: 'sell_order', component: () => import('@/views/basic-data/good.vue') },
+        { path: 'review', title: '销售单审核', name: 'sell_review', component: () => import('@/views/basic-data/factory.vue') },
     ]
 },
 {
     path: '/warehouse',
     icon: 'social-buffer',
-    name: 'sell',
+    name: 'warehouse',
     title: '库存',
     component: Main,
     children: [

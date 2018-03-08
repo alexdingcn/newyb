@@ -57,7 +57,7 @@
     from supplier
     where name like #{pattern}
     or contact like #{pattern}
-    or pinyin like #{pattern}
+    or lower(pinyin) like lower(#{pattern})
     order by id desc
   </select>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
