@@ -8,13 +8,15 @@ public class Customer {
 
     private Integer companyId;
 
-    private Integer customerNo;
+    private String customerNo;
 
     private String name;
 
     private String shorName;
 
     private String pinyin;
+
+    private String status;
 
     private Boolean enabled;
 
@@ -102,11 +104,11 @@ public class Customer {
         this.companyId = companyId;
     }
 
-    public Integer getCustomerNo() {
+    public String getCustomerNo() {
         return customerNo;
     }
 
-    public void setCustomerNo(Integer customerNo) {
+    public void setCustomerNo(String customerNo) {
         this.customerNo = customerNo;
     }
 
@@ -132,6 +134,14 @@ public class Customer {
 
     public void setPinyin(String pinyin) {
         this.pinyin = pinyin == null ? null : pinyin.trim();
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 
     public Boolean getEnabled() {

@@ -2,6 +2,7 @@ package com.yiban.erp.dao;
 
 import com.yiban.erp.entities.CustomerCategory;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -20,4 +21,7 @@ public interface CustomerCategoryMapper {
     int updateByPrimaryKey(CustomerCategory record);
 
     List<CustomerCategory> getAllByCompanyId(Integer companyId);
+
+    List<CustomerCategory> getByParentId(@Param("companyId") Integer companyId,
+                                         @Param("parentId") Integer parentId);
 }

@@ -3,13 +3,13 @@
 </style>
 
 <template>
-    <Modal v-model="isShowModal" :closable="false" >
+    <Modal v-model="isShowModal" :closable="false" :title="modalTitle">
         <Form ref="custCatForm" :model="custCatFormData" :rules="ruleValidate" label-position="right" :label-width="100" class="margin-right-10">
             <FormItem label="分类编码" prop="categoryNo">
-                <Input v-model="custCatFormData.categoryNo" placeholder="输入客户类编码"></Input>
+                <Input type="text" v-model="custCatFormData.categoryNo" placeholder="输入客户类编码"></Input>
             </FormItem>
             <FormItem label="类别名称" prop="name">
-                <Input v-model="custCatFormData.name" placeholder="输入客户类名称"></Input>
+                <Input type="text" v-model="custCatFormData.name" placeholder="输入客户类名称"></Input>
             </FormItem>
             <FormItem label="上级类别">
                 <Select v-model="custCatFormData.parentId" placeholder="选择上级类别">
@@ -53,41 +53,80 @@ export default {
       type: Array,
       default: []
     },
-    editeData: Object,
+    editeData: {
+      type: Object,
+      default: null
+    },
     showModal: {
       type: Boolean,
       default: false
     }
   },
   data() {
+    const validCategoryNoExist = (rule, value, callback) => {
+      let categoryNoVal = this.custCatFormData.categoryNo;
+      console.log(typeof categoryNoVal);
+      console.log('validate category value:' + categoryNoVal + " isNa:" + (isNaN(categoryNoVal)));
+      if (isNaN(categoryNoVal)) {
+        callback(new Error("分类编码格式为数字"));
+      } else {
+        callback();
+      }
+    };
+    const validNameExist = (rule, value, callback) => {
+      if (this.custCatFormData.name && this.custCatFormData.name.toString().trim() != "") {
+        callback();
+      } else {
+        this.custCatFormData.name = "";
+        callback(new Error("类别名称不能为空"));
+      }
+    };
+
     return {
       isShowModal: false,
       loading: false,
       custCatFormData: {
         id: "",
-        categoryNo: "",
+        categoryNo: '',
         name: "",
         parentId: -1,
         comment: ""
       },
-      parentCateList: [
+      ruleValidate: {
+        name: [
+          { required: true, message: "类别名称不能为空", trigger: 'blur' },
+          { validator: validNameExist, trigger: 'blur' }
+        ],
+        categoryNo: [
+          { required: true,  message: "分类编码不能为空", trigger: 'blur' },
+          { validator: validCategoryNoExist, trigger: 'blur' }
+        ]
+      }
+    };
+  },
+  computed: {
+    parentCateList() {
+      return [
         {
           id: -1,
           name: "顶级"
         },
         ...this.categorys
-      ],
-      ruleValidate: {
-        categoryNo: [
-          { required: true, message: "请输入类别编码", trigger: "blue" }
-        ],
-        name: [{ required: true, message: "请输入类别编码", trigger: "blue" }]
+      ];
+    },
+    modalTitle() {
+      let updName = "";
+      if (this.action === "edit" && this.editeData) {
+        updName =
+          "修改 " +
+          this.editeData.name +
+          "(" +
+          this.editeData.id +
+          ")" +
+          "信息";
       }
-    };
-  },
-  mounted() {
-    console.log(this);
-    this.initData();
+      return this.action === "add" ? "新建客户分组" : updName;
+    }
   },
   watch: {
     showModal(data) {
@@ -96,25 +135,26 @@ export default {
     isShowModal(data) {
       if (!data) {
         this.$emit("dialog-closed");
+      } else {
+        this.initUpdData();
       }
     }
   },
   methods: {
-    initData() {
-      console.log(this.action + ", " + this.showModal + ", " + this.editeData);
+    initUpdData() {
       if (this.action === "edit" && this.editeData) {
         this.custCatFormData.id = this.editeData.id;
         this.custCatFormData.categoryNo = this.editeData.categoryNo;
         this.custCatFormData.name = this.editeData.name;
         this.custCatFormData.parentId = this.editeData.parentId;
         this.custCatFormData.comment = this.editeData.comment;
-      } else {
-        this.$refs.custCatForm.resetFields();
       }
     },
 
     ok() {
       this.loading = true;
+      console.log(this.custCatFormData);
+      console.log(this.$refs.custCatForm);
       this.$refs.custCatForm.validate(valid => {
         if (!valid) {
           this.loading = false;
@@ -128,9 +168,8 @@ export default {
             this.doUpdateCategory(categoryData);
           } else {
             this.$Message.error("系统异常, 操作类型错误");
-            this.loading = false;
-            return;
           }
+          this.loading = false;
         }
       });
     },
@@ -149,31 +188,27 @@ export default {
     },
 
     doAddCategory(data) {
-      console.log("do add a category info:" + data);
       util.ajax
         .post("/customer/category/add", data)
         .then(respones => {
           this.$Message.success("新建客户类成功");
-          submitSuccessEvent();
+          this.submitSuccessEvent();
           this.isShowModal = false;
         })
         .catch(error => {
-          this.loading = false;
           console.log(error);
         });
     },
 
     doUpdateCategory(data) {
-      console.log("do update a category info:" + data);
       util.ajax
         .post("/customer/category/update", data)
         .then(respones => {
           this.$Message.success("客户类信息修改成功");
-          submitSuccessEvent();
+          this.submitSuccessEvent();
           this.isShowModal = false;
         })
         .catch(error => {
-          this.loading = false;
           console.log(error);
         });
     }

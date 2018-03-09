@@ -27,7 +27,7 @@
         <Col span="18" class="padding-left-10">
             <Card>
                 <p slot="title">
-                    <Icon type="person"></Icon> 客户 {{selectedCategory}}
+                    <Icon type="person"></Icon> 客户 <strong>{{selectCategoryName}}</strong>
                 </p>
 
                 <ButtonGroup slot="extra" >
@@ -47,10 +47,14 @@
 
                 <Row type="flex" justify="center" align="middle" class="margin-top-20">
                     <Table border highlight-row :columns="orderColumns" :data="customersData" 
-                        ref="customersTable" style="width: 100%;" height="450" size="small">
+                        :loading="customerTableLoading" 
+                        @on-selection-change="tableSelecttionChange" 
+                        ref="customersTable" style="width: 100%;" size="small">
                     </Table>
                     <Row type="flex" justify="end">
-                        <Page :total="customersCount" show-total></Page>
+                        <Page :total="customersCount" show-total show-sizer 
+                          @on-change="pageChange"
+                          @on-page-size-change="pageSizeChange"></Page>
                     </Row>
                 </Row>
             </Card>
@@ -65,33 +69,32 @@
                     @category-submit="onCategorySubmit"
                     @dialog-closed='onDialogClosed'>
         </customer-category>
-
-        <Spin size="large" fix v-if="spinShow">
-            <Icon type="load-c" size=18 class="spin-icon-load"></Icon>
-        </Spin>
   </div>
 </template>
 
 <script>
 import util from "@/libs/util.js";
 import dataConver from "@/libs/data-conver.js";
-import customerCategory from "./customer-category.vue";
+import customerCategory from "@/views/customer/customer-category.vue";
 
 export default {
-  name: "client",
+  name: "customer",
   components: {
     customerCategory
   },
   data() {
     return {
-      spinShow: false,
-      disableDelCategory: true,
       categoryModal: false,
       customerCategoryAction: "add",
       categorys: [],
       selectedCategory: null,
       searchSelectVal: "searchByName",
       searchVal: "",
+      customerTableLoading: false,
+      customersCount: 0,
+      tableCurrPage: 1,
+      tableCurrPageSize: 10,
+      tableSelectionData: [],
       customersData: [],
       orderColumns: [
         {
@@ -124,7 +127,11 @@ export default {
                 },
                 on: {
                   click: () => {
-                    let argu = { customer_id: params.row.id };
+                    let argu = { 
+                      showView:'edit', 
+                      showTitle: params.row.name,
+                      id: params.row.id 
+                    };
                     this.$router.push({
                       name: "customer-info",
                       params: argu
@@ -152,7 +159,11 @@ export default {
                 },
                 on: {
                   click: () => {
-                    let argu = { customer_id: params.row.id };
+                    let argu = { 
+                      showView:'edit', 
+                      showTitle: params.row.name,
+                      id: params.row.id 
+                    };
                     this.$router.push({
                       name: "customer-info",
                       params: argu
@@ -184,12 +195,12 @@ export default {
           }
         },
         {
-          width: 100,
+          width: 120,
           title: "客户类别",
           key: "categoryId",
           align: "center",
           render: (h, params) => {
-            let categoryItem = this.selectObjectById(
+            let categoryItem = dataConver.selectObjectById(
               params.row.categoryId,
               this.categorys
             );
@@ -197,37 +208,37 @@ export default {
           }
         },
         {
-          width: 100,
+          width: 120,
           title: "城市",
           key: "city",
           align: "center"
         },
         {
-          width: 100,
+          width: 120,
           title: "法定代表人",
           key: "legalPersion",
           align: "center"
         },
         {
-          width: 100,
+          width: 120,
           title: "负责人",
           key: "employee",
           align: "center"
         },
         {
-          width: 100,
+          width: 120,
           title: "联系电话",
           key: "contactPhone",
           align: "center"
         },
         {
-          width: 100,
+          width: 150,
           title: "经营范围",
           key: "businessScope",
           align: "center"
         },
         {
-          width: 100,
+          width: 120,
           title: "创建人",
           key: "createBy",
           align: "center"
@@ -239,23 +250,42 @@ export default {
     this.getCategoryArr();
   },
   computed: {
-    customersCount() {
-      return this.customersData.length;
+    disableDelCategory() {
+      return !(this.selectedCategory && this.selectedCategory.id > 0);
+    },
+    selectCategoryName() {
+      if (this.selectedCategory && this.selectedCategory.name) {
+        return this.selectedCategory.name;
+      } else {
+        return "";
+      }
     },
     customerCat() {
       let attr = {
-        rootId: null,
+        rootId: -1,
         idKey: "id",
         titleKey: "name",
         parentKey: "parentId",
-        expand: false
+        expand: true
       };
-      return dataConver.arryToIviewTreeData(this.categorys, attr);
+      let allChild = dataConver.arryToIviewTreeData(this.categorys, attr);
+      return [
+        {
+          id: -1,
+          title: '所有',
+          expand: attr.expand,
+          children: allChild
+        }
+      ];
+    }
+  },
+  watch: {
+    categorys() {
+      this.selectedCategory = null;
     }
   },
   methods: {
     getCategoryArr() {
-      this.spinShow = true;
       util.ajax
         .get("/customer/category/list")
         .then(res => {
@@ -264,15 +294,11 @@ export default {
         .catch(error => {
           console.log(error);
         });
-      this.spinShow = false;
     },
 
     openAddCategoryModal() {
       this.customerCategoryAction = "add";
       this.categoryModal = true;
-      console.log(
-        "click open add category modal, categoryModal:" + this.categoryModal
-      );
     },
 
     openEditCategoryModal() {
@@ -281,13 +307,19 @@ export default {
     },
 
     onTreeNodeSelected(data) {
-      console.log(data);
-      this.disableDelCategory = false;
-      this.selectedCategory = selectObjectById(data.id, this.categorys);
+      let chooseData = data[0];
+      if (!chooseData) {
+        return;
+      }
+      if (chooseData.id <= 0) {
+        this.selectCustomerByCategory();
+        return;
+      }
+      this.selectedCategory = dataConver.selectObjectById(data[0].id, this.categorys);
+      this.selectCustomerByCategory(this.selectedCategory.id);
     },
 
     onCategorySubmit(submitData) {
-      console.log("category modal ok btn click" + submitData);
       this.categoryModal = false;
       this.getCategoryArr();
     },
@@ -299,12 +331,11 @@ export default {
     delCategory() {
       let delData = this.selectedCategory;
       if (!delData || !delData.id || delData.id <= 0) {
-        console.log("delete category but not choose category.");
         return;
       }
-      this.spinShow = true;
+      let removeUrl = "/customer/category/remove/" + delData.id;
       util.ajax
-        .delete("/customer/category/remove", {categoryId: delData.id})
+        .delete(removeUrl)
         .then(response => {
           this.$Message.success("客户类信信息删除成功");
           this.getCategoryArr();
@@ -312,28 +343,109 @@ export default {
         .catch(error => {
           console.log(error);
         });
-      this.spinShow = false;
     },
 
-    searchBtnClicked() {},
+    selectCustomerByCategory(categoryId) {
+      this.loadCustomerList(this.tableCurrPage, this.tableCurrPageSize, categoryId);
+    },
 
-    addCustomer() {},
+    pageChange(data) {
+      this.tableCurrPage = data;
+      let currCategoryId = this.selectedCategory
+        ? this.selectedCategory.id
+        : "";
+      this.loadCustomerList(this.tableCurrPage, this.tableCurrPageSize, currCategoryId)
+    },
 
-    delCustomers() {},
+    pageSizeChange(data) {
+      this.tableCurrPageSize = data;
+      let currCategoryId = this.selectedCategory
+        ? this.selectedCategory.id
+        : "";
+      this.loadCustomerList(1, this.tableCurrPageSize, currCategoryId)
+    },
 
-    selectObjectById(id, arrs) {
-      let result = null;
-      if (!arrs || arrs.length <= 0) {
-        return result;
-      }
-      for (let item in arrs) {
-        if (id === item.id) {
-          result = item;
-          break;
+    loadCustomerList(page, size, categoryId) {
+      this.customerTableLoading = true;
+      let reqPage = page && page > 0 ? page : 1;
+      let reqSize = size && size > 0 ? size : 10;
+      let reqCustomerNo = null;
+      let reqData = {
+        page: reqPage,
+        size: reqSize,
+        categoryId: categoryId
+      };
+      if (this.searchVal && this.searchVal != "") {
+        if (this.searchSelectVal === "searchByName") {
+          reqData.customerName = this.searchVal;
+        } else if (this.searchSelectVal === "searchByNo") {
+          reqData.customerNo = this.searchVal;
         }
       }
-      return result;
+      util.ajax
+        .get("/customer/list", { params: reqData })
+        .then(response => {
+          let result = response.data;
+          this.customersData = result.data;
+          this.customersCount = result.count;
+          this.customerTableLoading = false;
+        })
+        .catch(error => {
+          console.log(error);
+          this.customerTableLoading = false;
+        });
+    },
+
+    searchBtnClicked() {
+      let currCategoryId = this.selectedCategory
+        ? this.selectedCategory.id
+        : "";
+      this.loadCustomerList(this.tableCurrPage, this.tableCurrPageSize, currCategoryId);
+    },
+
+    tableSelecttionChange(data) {
+      console.log(data);
+      this.tableSelectionData = data;
+    },
+
+    delCustomers() {
+      if (this.tableSelectionData.length <= 0) {
+        this.$Message.warning('请先选择需要删除的客户信息');
+        return;
+      }
+      this.customerTableLoading = true;
+      let delData = [];
+      for (let i=0; i< this.tableSelectionData.length; i++) {
+        let item = this.tableSelectionData[i];
+        delData.push(item.id);
+      }
+      console.log(delData);
+      util.ajax
+        .post('/customer/delete', delData, {headers:{'Content-Type': 'application/json'}})
+        .then(response => {
+          this.customerTableLoading = false;
+          this.searchBtnClicked();
+          let delCount = response.data.count;
+          this.$Message.success('成功删除' + delCount + '条客户信息');
+        })
+        .catch(error => {
+          this.customerTableLoading = false;
+          console.log(error);
+        })
+    },
+
+    addCustomer() {
+      let argus = {
+        showView: 'add',
+        showTitle: '新建客户信息',
+        id: ''
+      };
+      this.$router.push({
+        name: 'customer-info',
+        params: argus
+      });
     }
+
   }
 };
 </script>

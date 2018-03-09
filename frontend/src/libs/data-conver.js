@@ -14,7 +14,7 @@ attributes = {
 }
 */
 dataConver.arryToIviewTreeData = function (arrs, attributes) {
-    let resData = arrs;
+    let resData = [...arrs];
     let tree = [];
     for (let i = 0; i < resData.length; i++) {
         if (attributes.rootId === null || attributes.rootId === undefined || resData[i][attributes.parentKey] === attributes.rootId) {
@@ -30,11 +30,11 @@ dataConver.arryToIviewTreeData = function (arrs, attributes) {
         }
     }
     run(tree);
-    function run (chiArr) {
+    function run(chiArr) {
         if (resData.length !== 0) {
             for (let i = 0; i < chiArr.length; i++) {
                 for (let j = 0; j < resData.length; j++) {
-                    if (chiArr[i].id === resData[j][attributes.parentId]) {
+                    if (chiArr[i].id === resData[j][attributes.parentKey]) {
                         let obj = {
                             id: resData[j][attributes.idKey],
                             title: resData[j][attributes.titleKey],
@@ -51,6 +51,20 @@ dataConver.arryToIviewTreeData = function (arrs, attributes) {
         }
     }
     return tree;
+};
+
+dataConver.selectObjectById = function (id, arrs) {
+    let result = null;
+    if (!arrs || arrs.length <= 0) {
+        return result;
+    }
+    for (let i = 0; i < arrs.length; i++) {
+        if (id === arrs[i].id) {
+            result = arrs[i];
+            break;
+        }
+    }
+    return result;
 };
 
 export default dataConver;

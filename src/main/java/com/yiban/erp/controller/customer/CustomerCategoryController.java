@@ -3,16 +3,15 @@ package com.yiban.erp.controller.customer;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.yiban.erp.dao.CustomerCategoryMapper;
+import com.yiban.erp.dao.CustomerMapper;
+import com.yiban.erp.entities.Customer;
 import com.yiban.erp.entities.CustomerCategory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
 import java.util.List;
@@ -25,14 +24,14 @@ public class CustomerCategoryController {
 
     @Autowired
     private CustomerCategoryMapper customerCategoryMapper;
+    @Autowired
+    private CustomerMapper customerMapper;
 
     @RequestMapping(value = "/list", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<JSON> getList() {
         Integer companyId = 1;
         List<CustomerCategory> categories = customerCategoryMapper.getAllByCompanyId(companyId);
-        JSONObject result = new JSONObject();
-        result.put("data", categories);
-        return ResponseEntity.ok().body((JSON) result);
+        return ResponseEntity.ok().body((JSON) JSON.toJSON(categories));
     }
 
     @RequestMapping(value = "/add", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -78,14 +77,23 @@ public class CustomerCategoryController {
         }
     }
 
-    @RequestMapping(value = "/remove", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> remove(@RequestBody String reqData) {
+    @RequestMapping(value = "/remove/{categoryId}", method = RequestMethod.DELETE)
+    public ResponseEntity<String> remove(@PathVariable Integer categoryId) {
         String userName = "admin";
-        logger.info("user:{} request remove customer category reqData:{}", userName, reqData);
-        JSONObject reqObj = JSON.parseObject(reqData);
-        Integer categoryId = reqObj.getInteger("categoryId");
+        Integer companyId = 1;
+        logger.info("user:{} request remove customer category categoryId:{}", userName, categoryId);
         if (categoryId == null) {
             return ResponseEntity.badRequest().body("Request params error");
+        }
+        //先验证当前分组是否存在客户信息，如果存在，不能删除
+        List<Customer> customers = customerMapper.getByCategoryId(companyId, categoryId);
+        if (!customers.isEmpty()) {
+            return ResponseEntity.badRequest().body("分组下存在有客户信息, 不能删除");
+        }
+        //验证当前分组是否有子分组，如果存在，不能删除
+        List<CustomerCategory> categories = customerCategoryMapper.getByParentId(companyId, categoryId);
+        if (!categories.isEmpty()) {
+            return ResponseEntity.badRequest().body("分组下存在子分组, 不能删除");
         }
         int count = customerCategoryMapper.deleteByPrimaryKey(categoryId);
         if (count > 0) {

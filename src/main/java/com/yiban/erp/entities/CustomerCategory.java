@@ -7,7 +7,7 @@ public class CustomerCategory {
 
     private Integer companyId;
 
-    private Integer categoryNo;
+    private String categoryNo;
 
     private String name;
 
@@ -41,11 +41,11 @@ public class CustomerCategory {
         this.companyId = companyId;
     }
 
-    public Integer getCategoryNo() {
+    public String getCategoryNo() {
         return categoryNo;
     }
 
-    public void setCategoryNo(Integer categoryNo) {
+    public void setCategoryNo(String categoryNo) {
         this.categoryNo = categoryNo;
     }
 
