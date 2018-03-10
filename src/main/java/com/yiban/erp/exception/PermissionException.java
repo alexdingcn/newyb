@@ -1,24 +1,25 @@
 package com.yiban.erp.exception;
 
+
 /**
- * 业务异常
+ * 访问权限异常
  */
-public class BizException extends Exception {
+public class PermissionException extends Exception {
 
     private ErrorCode errorCode;
 
     private Object extra;
 
-    public BizException() {
+    public PermissionException() {
         super();
     }
 
-    public BizException(ErrorCode errorCode) {
+    public PermissionException(ErrorCode errorCode) {
         super(errorCode.getMessage());
         this.errorCode = errorCode;
     }
 
-    public BizException(ErrorCode errorCode, Object extra) {
+    public PermissionException(ErrorCode errorCode, Object extra) {
         super(errorCode.getMessage());
         this.errorCode = errorCode;
         this.extra = extra;

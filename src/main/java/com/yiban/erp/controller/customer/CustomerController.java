@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.yiban.erp.dao.CustomerMapper;
 import com.yiban.erp.entities.Customer;
+import com.yiban.erp.exception.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +30,7 @@ public class CustomerController {
                                      @RequestParam(name = "size", required = false) Integer size,
                                      @RequestParam(name = "categoryId", required = false) Integer reqCategoryId,
                                      @RequestParam(name = "customerName", required = false) String reqCustomerName,
-                                     @RequestParam(name = "customerNo", required = false) String reqCustomerNo) {
+                                     @RequestParam(name = "customerNo", required = false) String reqCustomerNo)  throws Exception {
         logger.info("get customer list page:{}, size:{}, categoryId:{}, customerName:{}, customerNo:{}",
                 page, size, reqCategoryId, reqCustomerName, reqCustomerNo);
         Integer companyId = 1;
@@ -56,13 +57,13 @@ public class CustomerController {
     }
 
     @RequestMapping(value = "/delete", method = RequestMethod.POST)
-    public ResponseEntity<String> delete(@RequestBody String reqData) {
+    public ResponseEntity<String> delete(@RequestBody String reqData) throws Exception {
         Integer companyId = 1;
         String userName = "admin";
         logger.info("user:{} request delete customer, request params:{}", userName, reqData);
         List<Integer> deleteIds = JSON.parseArray(reqData, Integer.class);
         if (deleteIds.isEmpty()) {
-            return ResponseEntity.badRequest().body("Request params is empty.");
+            throw new BizException(ErrorCode.CUSTOMER_DEL_PARAMS_EMPTY);
         }
         int delCount = customerMapper.deleteByIdList(deleteIds, companyId, userName, new Date());
         JSONObject result = new JSONObject();
@@ -71,10 +72,6 @@ public class CustomerController {
     }
 
 
-    @RequestMapping(value = "/xxx", method = RequestMethod.POST)
-    public ResponseEntity<String> doSomething() throws Exception {
-        // do something
-        return ResponseEntity.ok().body("xxx");
-    }
+
 
 }

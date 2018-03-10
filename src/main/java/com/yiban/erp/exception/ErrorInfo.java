@@ -1,9 +1,11 @@
 package com.yiban.erp.exception;
 
 
+import com.alibaba.fastjson.JSON;
+
 import java.util.Date;
 
-public class ErrorInfo<T> {
+public class ErrorInfo {
 
 //    public static final Integer OK = 0;
 //
@@ -19,7 +21,7 @@ public class ErrorInfo<T> {
 
     private String url;
 
-    private T data;
+    private JSON data; //会序列化成JSON串
 
     public Integer getCode() {
         return code;
@@ -61,11 +63,11 @@ public class ErrorInfo<T> {
         this.url = url;
     }
 
-    public T getData() {
+    public JSON getData() {
         return data;
     }
 
-    public void setData(T data) {
+    public void setData(JSON data) {
         this.data = data;
     }
 }

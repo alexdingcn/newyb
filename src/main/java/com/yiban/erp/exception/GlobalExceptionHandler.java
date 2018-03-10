@@ -1,10 +1,10 @@
 package com.yiban.erp.exception;
 
 import com.alibaba.fastjson.JSON;
-import com.yiban.erp.entities.SystemError;
+import com.alibaba.fastjson.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -22,67 +22,98 @@ public class GlobalExceptionHandler {
     private static final String DEFAULT_MESSAGE = "系统异常，请稍后再试";
     private static final Integer DEFAULT_DISPLAY = ErrorDisplay.MESSAGE.getCode();
 
-    @Autowired
-    private ErrorMessageService errorMessageService;
 
     @ExceptionHandler(BizException.class)
     @ResponseBody
     public ResponseEntity<JSON> handleBizException(HttpServletRequest request, BizException e) {
         String url = request.getRequestURL().toString();
         logger.warn("Request action url:{} have an BizException:", url, e.getErrorCode());
-
-        SystemError systemError = errorMessageService.getByErrorCode(e.getErrorCode());
-        if (systemError == null) {
-            return ResponseEntity.badRequest().body((JSON) JSON.toJSON(getDefaultErrorInfo(e.getMessage())));
-        }else {
-            return ResponseEntity.badRequest().body((JSON) JSON.toJSON(getBySystemError(systemError, e.getExtra())));
-        }
+        ErrorInfo errorInfo = getErrorInfo(e.getErrorCode(), url, getExtraJson(e.getExtra()));
+        return ResponseEntity.badRequest().body((JSON) JSON.toJSON(errorInfo));
     }
 
     @ExceptionHandler(BizRuntimeException.class)
     @ResponseBody
     public ResponseEntity<JSON> handleBizRuntimeException(HttpServletRequest request, BizRuntimeException e) {
         String url = request.getRequestURL().toString();
-        logger.warn("Request action url:{} have an BizRuntimeException:", url, e.getErrorCode());
-        SystemError systemError = errorMessageService.getByErrorCode(e.getErrorCode());
-        if (systemError == null) {
-            return ResponseEntity.badRequest().body((JSON) JSON.toJSON(getDefaultErrorInfo(e.getMessage())));
-        }else {
-            return ResponseEntity.badRequest().body((JSON) JSON.toJSON(getBySystemError(systemError, e.getExtra())));
-        }
+        logger.error("Request action url:{} have an BizRuntimeException:", url, e);
+        ErrorInfo errorInfo = getErrorInfo(e.getErrorCode(), url, getExtraJson(e.getExtra()));
+        return ResponseEntity.badRequest().body((JSON) JSON.toJSON(errorInfo));
     }
 
+    /**
+     * 访问权限异常
+     * HttpStatus 403
+     */
+    @ExceptionHandler(PermissionException.class)
+    @ResponseBody
+    public ResponseEntity<JSON> handlePermissionException(HttpServletRequest request, PermissionException e) {
+        String url = request.getRequestURL().toString();
+        logger.warn("Request action url:{} have an BizRuntimeException:", url, e.getErrorCode());
+        ErrorInfo errorInfo = getErrorInfo(e.getErrorCode(), url, getExtraJson(e.getExtra()));
+        return new ResponseEntity((JSON) JSON.toJSON(errorInfo), HttpStatus.FORBIDDEN);
+    }
+
+    /**
+     * 未定义异常
+     * HttpStatus 500
+     */
     @ExceptionHandler(Exception.class)
     @ResponseBody
     public ResponseEntity<JSON> handleDefaultException(HttpServletRequest request, Exception e) {
         String url = request.getRequestURL().toString();
-        logger.warn("Request action url:{} have an Exception:", url, e.getMessage());
-        return ResponseEntity.badRequest().body((JSON) JSON.toJSON(getDefaultErrorInfo(e.getMessage())));
+        logger.error("Request action url:{} have an Exception:", url, e);
+        ErrorInfo errorInfo = getErrorInfo(null, url, getExtraJson(e.toString()));
+        return new ResponseEntity((JSON) JSON.toJSON(errorInfo), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-    private ErrorInfo<String> getBySystemError(SystemError systemError, Object data) {
-        ErrorInfo<String> errorInfo = new ErrorInfo<>();
-        errorInfo.setCode(systemError.getCode());
-        errorInfo.setMessage(systemError.getMessage());
-        errorInfo.setDisplay(systemError.getDisplay());
+    private ErrorInfo getErrorInfo(ErrorCode errorCode, String url, JSON extra) {
+        return errorCode == null ? getDefaultErrorInfo(url, extra) :
+                getByErrorCode(errorCode, url, extra);
+    }
+
+    private ErrorInfo getByErrorCode(ErrorCode errorCode, String url, JSON extra) {
+        ErrorInfo errorInfo = new ErrorInfo();
+        errorInfo.setCode(errorCode.getCode());
+        errorInfo.setMessage(errorCode.getMessage());
+        errorInfo.setDisplay(errorCode.getDisplay() == null ? DEFAULT_DISPLAY : errorCode.getDisplay().getCode());
+        errorInfo.setUrl(url);
         errorInfo.setTimestamp(new Date());
-        if (data == null){
-            errorInfo.setData(systemError.getExtra());
-        }else {
-            errorInfo.setData(JSON.toJSONString(data));
-        }
+        errorInfo.setData(extra);
         return errorInfo;
     }
 
-    private ErrorInfo getDefaultErrorInfo(String extra) {
+    private ErrorInfo getDefaultErrorInfo(String url, JSON extra) {
         ErrorInfo errorInfo = new ErrorInfo();
         errorInfo.setCode(DEFAULT_CODE);
         errorInfo.setMessage(DEFAULT_MESSAGE);
         errorInfo.setDisplay(DEFAULT_DISPLAY);
         errorInfo.setTimestamp(new Date());
         errorInfo.setData(extra);
+        errorInfo.setUrl(url);
         return errorInfo;
     }
 
+    private JSON getExtraJson(Object extra) {
+        if (extra == null) {
+            return null;
+        }
+        JSON result = null;
+        if (extra instanceof String) {
+            JSONObject extraInfo = new JSONObject();
+            extraInfo.put("message", extra);
+            result = extraInfo;
+        }else {
+            try{
+                result = (JSON) JSON.toJSON(extra);
+            }catch (Exception e) {
+                logger.error("extra parse to json fail, extra:{}", extra.toString());
+                JSONObject extraInfo = new JSONObject();
+                extraInfo.put("message", extra);
+                result = extraInfo;
+            }
+        }
+        return result;
+    }
 
 }

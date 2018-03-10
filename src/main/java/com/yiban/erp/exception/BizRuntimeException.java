@@ -1,5 +1,8 @@
 package com.yiban.erp.exception;
 
+/**
+ * 业务异常，RuntimeException子类
+ */
 public class BizRuntimeException extends RuntimeException {
 
     private ErrorCode errorCode;
