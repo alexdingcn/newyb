@@ -69,4 +69,12 @@ public class CustomerController {
         result.put("count", delCount);
         return ResponseEntity.ok().body(result.toJSONString());
     }
+
+
+    @RequestMapping(value = "/xxx", method = RequestMethod.POST)
+    public ResponseEntity<String> doSomething() throws Exception {
+        // do something
+        return ResponseEntity.ok().body("xxx");
+    }
+
 }

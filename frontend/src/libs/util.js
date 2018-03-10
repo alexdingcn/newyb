@@ -283,4 +283,55 @@ util.checkUpdate = function (vm) {
     });
 };
 
+function showErrorMessage (vm, data) {
+    if (!data) {
+        vm.$Notice.error({
+            title: '系统异常',
+            desc: '系统数据格式错误, 请联系技术人员'
+        });
+    }
+    let display = data.display;
+    let code = data.code ? data.code : 9999;
+    let message = data.message ? data.message : '交易出现异常';
+    switch (display) {
+        case 1:
+            vm.$Message.error(message);
+            break;
+        case 2:
+            vm.$Notice.error({
+                title: '错误码: ' + code,
+                desc: message
+            });
+            break;
+        case 3:
+            vm.$Modal.error({
+                title: '错误码: ' + code,
+                content: message
+            });
+            break;
+        default:
+            vm.$Notice.error({
+                title: '系统异常',
+                desc: '系统数据格式错误, 请联系技术人员'
+            });
+            break;
+    }
+};
+
+util.errorProcessor = function (vm, error, callback) {
+    let httpCode = error.status;
+    let data = error.data;
+    if (httpCode === 403) {
+        vm.$router.push('error-403', { params: data });
+    } else if (httpCode === 500) {
+        vm.$router.push('error-500', { params: data });
+    } else {
+        if (callback) {
+            callback(data);
+        } else {
+            showErrorMessage(vm, data);
+        }
+    }
+};
+
 export default util;

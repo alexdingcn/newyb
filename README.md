@@ -152,6 +152,134 @@ Webpack提供了一整套前端工程自动化的解决方案
 
 
 > 你也可以在生产环境中运行`cd springboot_vue/frontend;npm run build`进行编译并配合Nginx
+
+
+### 后台数据接口封装
+
+- 错误异常处理方式
+
+> 所有的错误使用异常形式抛出, 所有的异常处理使用捕获异常统一处理(见GlobalExceptionHandler), 所有的controller层的方法全部把异常抛出。如下:
+
+````
+    @RequestMapping(value = "/xxx", method = RequestMethod.POST) 
+    public ResponseEntity<String> doSomething() throws Exception {
+        // do something
+        return ResponseEntity.ok().body("xxx");
+    }
+````
+
+- 错误码定义
+
+> 错误码定义在ErrorCode 中使用enum定义关键key名称和code, 具体错误信息描述和显示方案，定义在数据库error_message 表中。
+> 改数据表数据在系统启动时，自动加载入本地缓存，使用Map的数据形式，根据code获取对应的错误描述信息。
+
+- 错误异常数据接口封装
+
+````JSON
+    {
+        code: 9999,
+        message: "错误信息",
+        display: 1,
+        timestamp: 123456789
+        url: "https://xxxx.com/xxxx",
+        data: {}
+    }
+````
+
+- 格式描述
+
+
+|字段|类型|描述|
+|-|-|-|
+|code|Integer|错误码|
+|message|String|错误提示信息|
+|display|Integer|展示方式(iview的三种提示方式): <br>1-Message()<br/>2-Notice<br/>3-Modal|
+|timestamp|Data|报错时间|
+|url|String|请求资源路径|
+|data|Object|补充数据|
+
+
+- display展示方式
+
+1. Message
+
+[![](https://github.com/alexdingcn/newyb/raw/master/images/display-Message.png?raw=true)]()
+
+> iview 中的定义的全局Message提示框, 使用 ````this.$Message.error(message)```` 方式直接提示
+
+2. Notice 
+
+[![](https://github.com/alexdingcn/newyb/raw/master/images/display-Notice.png?raw=true)]()
+
+> iview 中定义的Notice通知提醒, 使用````this.$Notice.error({title:'错误码：' + code, desc: message})```` 方式直接提示, 可以根据情景自定义显示内容
+
+3. Modal 
+
+[![](https://github.com/alexdingcn/newyb/raw/master/images/display-Modal.png?raw=true)]()
+
+> iview 中定义的Modal对话框, 使用````this.$Modal.error({title:'错误码：' + code, content: message})```` 方式直接提示, 可以根据情景自定义显示内容
+
+
+### 前端ajax错误统一处理
+
+> 方式如下代码，在有回调函数的情况下，直接返回的是后台定义的错误异常数据对象，如果没有定义有回调函数，直接按错误信息中定义的展示方式展示错误信息
+
+````js
+function showErrorMessage (vm, data) {
+    if (!data) {
+        vm.$Notice.error({
+            title: '系统异常',
+            desc: '系统数据格式错误, 请联系技术人员'
+        });
+    }
+    let display = data.display;
+    let code = data.code ? data.code : 9999;
+    let message = data.message ? data.message : '交易出现异常';
+    switch (display) {
+        case 1:
+            vm.$Message.error(message);
+            break;
+        case 2:
+            vm.$Notice.error({
+                title: '错误码: ' + code,
+                desc: message
+            });
+            break;
+        case 3:
+            vm.$Modal.error({
+                title: '错误码: ' + code,
+                content: message
+            });
+            break;
+        default:
+            vm.$Notice.error({
+                title: '系统异常',
+                desc: '系统数据格式错误, 请联系技术人员'
+            });
+            break;
+    }
+};
+
+util.errorProcessor = function (vm, error, callback) {
+    let httpCode = error.status;
+    let data = error.data;
+    if (httpCode === 403) {
+        vm.$router.push('error-403', { params: data });
+    } else if (httpCode === 500) {
+        vm.$router.push('error-500', { params: data });
+    } else {
+        if (callback) {
+            callback(data);
+        } else {
+            showErrorMessage(vm, data);
+        }
+    }
+};
+
+````
+
+
+
         
 ## 未来计划
 
