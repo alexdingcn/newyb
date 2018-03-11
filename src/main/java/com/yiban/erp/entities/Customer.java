@@ -54,9 +54,9 @@ public class Customer {
 
     private String classAttTwo;
 
-    private Integer sealModel;
+    private String sealModel;
 
-    private Integer billModel;
+    private String billModel;
 
     private String businessScope;
 
@@ -69,6 +69,10 @@ public class Customer {
     private String bankName;
 
     private String dutyAccount;
+
+    private String quaCheck;
+
+    private String fileNo;
 
     private String superviseNo;
 
@@ -288,19 +292,19 @@ public class Customer {
         this.classAttTwo = classAttTwo == null ? null : classAttTwo.trim();
     }
 
-    public Integer getSealModel() {
+    public String getSealModel() {
         return sealModel;
     }
 
-    public void setSealModel(Integer sealModel) {
+    public void setSealModel(String sealModel) {
         this.sealModel = sealModel;
     }
 
-    public Integer getBillModel() {
+    public String getBillModel() {
         return billModel;
     }
 
-    public void setBillModel(Integer billModel) {
+    public void setBillModel(String billModel) {
         this.billModel = billModel;
     }
 

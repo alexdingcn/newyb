@@ -325,8 +325,11 @@ util.errorProcessor = function (vm, error, callback) {
     let data = response.data;
     if (httpCode === 403) {
         vm.$router.push('error-403', { params: data });
-    } else if (httpCode === 500) {
-        vm.$router.push('error-500', { params: data });
+    } else if (httpCode === 404) {
+        vm.$Notice.error({
+            title: '系统异常',
+            desc: '获取系统资源路径失败, 请联系技术人员'
+        });
     } else {
         if (callback) {
             callback(data);

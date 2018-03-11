@@ -19,5 +19,6 @@
         <mapper resource="mapping/CustomerCertMapper.xml"/>
         <mapper resource="mapping/CustomerMapper.xml"/>
         <mapper resource="mapping/CustomerRepMapper.xml"/>
+        <mapper resource="mapping/FileInfoMapper.xml"/>
     </mappers>
 </configuration>

@@ -153,8 +153,6 @@ export default {
 
     ok() {
       this.loading = true;
-      console.log(this.custCatFormData);
-      console.log(this.$refs.custCatForm);
       this.$refs.custCatForm.validate(valid => {
         if (!valid) {
           this.loading = false;

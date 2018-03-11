@@ -6,8 +6,7 @@
     <result column="customer_id" property="customerId" jdbcType="INTEGER" />
     <result column="license_name" property="licenseName" jdbcType="VARCHAR" />
     <result column="license_exp" property="licenseExp" jdbcType="DATE" />
-    <result column="license_number" property="licenseNumber" jdbcType="VARCHAR" />
-    <result column="license_image" property="licenseImage" jdbcType="VARCHAR" />
+    <result column="image_no" property="imageNo" jdbcType="VARCHAR" />
     <result column="comment" property="comment" jdbcType="VARCHAR" />
     <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
     <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
@@ -15,7 +14,7 @@
     <result column="update_by" property="updateBy" jdbcType="VARCHAR" />
   </resultMap>
   <sql id="Base_Column_List" >
-    id, customer_id, license_name, license_exp, license_number, license_image, comment, 
+    id, customer_id, license_name, license_exp, image_no, comment,
     create_time, update_time, create_by, update_by
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
@@ -30,11 +29,11 @@
   </delete>
   <insert id="insert" parameterType="com.yiban.erp.entities.CustomerCert" keyProperty="id" useGeneratedKeys="true">
     insert into customer_cert (customer_id, license_name,
-      license_exp, license_number, license_image, 
+      license_exp, image_no,
       comment, create_time, update_time, 
       create_by, update_by)
     values (#{customerId,jdbcType=INTEGER}, #{licenseName,jdbcType=VARCHAR},
-      #{licenseExp,jdbcType=DATE}, #{licenseNumber,jdbcType=VARCHAR}, #{licenseImage,jdbcType=VARCHAR}, 
+      #{licenseExp,jdbcType=DATE}, #{imageNo,jdbcType=VARCHAR},
       #{comment,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, 
       #{createBy,jdbcType=VARCHAR}, #{updateBy,jdbcType=VARCHAR})
   </insert>
@@ -50,11 +49,8 @@
       <if test="licenseExp != null" >
         license_exp,
       </if>
-      <if test="licenseNumber != null" >
-        license_number,
-      </if>
-      <if test="licenseImage != null" >
-        license_image,
+      <if test="imageNo != null" >
+        image_no,
       </if>
       <if test="comment != null" >
         comment,
@@ -82,11 +78,8 @@
       <if test="licenseExp != null" >
         #{licenseExp,jdbcType=DATE},
       </if>
-      <if test="licenseNumber != null" >
-        #{licenseNumber,jdbcType=VARCHAR},
-      </if>
-      <if test="licenseImage != null" >
-        #{licenseImage,jdbcType=VARCHAR},
+      <if test="imageNo != null" >
+        #{imageNo,jdbcType=VARCHAR},
       </if>
       <if test="comment != null" >
         #{comment,jdbcType=VARCHAR},
@@ -117,11 +110,8 @@
       <if test="licenseExp != null" >
         license_exp = #{licenseExp,jdbcType=DATE},
       </if>
-      <if test="licenseNumber != null" >
-        license_number = #{licenseNumber,jdbcType=VARCHAR},
-      </if>
-      <if test="licenseImage != null" >
-        license_image = #{licenseImage,jdbcType=VARCHAR},
+      <if test="imageNo != null" >
+        image_no = #{imageNo,jdbcType=VARCHAR},
       </if>
       <if test="comment != null" >
         comment = #{comment,jdbcType=VARCHAR},
@@ -146,8 +136,7 @@
     set customer_id = #{customerId,jdbcType=INTEGER},
       license_name = #{licenseName,jdbcType=VARCHAR},
       license_exp = #{licenseExp,jdbcType=DATE},
-      license_number = #{licenseNumber,jdbcType=VARCHAR},
-      license_image = #{licenseImage,jdbcType=VARCHAR},
+      image_no = #{imageNo,jdbcType=VARCHAR},
       comment = #{comment,jdbcType=VARCHAR},
       create_time = #{createTime,jdbcType=TIMESTAMP},
       update_time = #{updateTime,jdbcType=TIMESTAMP},
@@ -155,4 +144,16 @@
       update_by = #{updateBy,jdbcType=VARCHAR}
     where id = #{id,jdbcType=INTEGER}
   </update>
+
+  <select id="getByCustomerId" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select <include refid="Base_Column_List"/> from cutomer_cert where customer_id=#{customerId};
+  </select>
+
+  <delete id="removeByIds" parameterType="map" >
+    delete from customer_cert where id in
+    <foreach collection="ids" item="id" separator="," close=")" open="(">
+      #{id}
+    </foreach>
+  </delete>
+
 </mapper>

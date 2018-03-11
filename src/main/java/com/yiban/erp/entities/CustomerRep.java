@@ -19,6 +19,8 @@ public class CustomerRep {
 
     private Boolean isDefault;
 
+    private Date defaultTime; //时间最大的就是默认使用的值
+
     private String comment;
 
     private Date createTime;
@@ -91,6 +93,14 @@ public class CustomerRep {
 
     public void setIsDefault(Boolean isDefault) {
         this.isDefault = isDefault;
+    }
+
+    public Date getDefaultTime() {
+        return defaultTime;
+    }
+
+    public void setDefaultTime(Date defaultTime) {
+        this.defaultTime = defaultTime;
     }
 
     public String getComment() {

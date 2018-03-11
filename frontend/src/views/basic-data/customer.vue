@@ -51,11 +51,11 @@
                         @on-selection-change="tableSelecttionChange" 
                         ref="customersTable" style="width: 100%;" size="small">
                     </Table>
-                    <Row type="flex" justify="end">
-                        <Page :total="customersCount" show-total show-sizer 
-                          @on-change="pageChange"
-                          @on-page-size-change="pageSizeChange"></Page>
-                    </Row>
+                </Row>
+                <Row type="flex" justify="end">
+                    <Page :total="customersCount" show-total show-sizer 
+                      @on-change="pageChange"
+                      @on-page-size-change="pageSizeChange"></Page>
                 </Row>
             </Card>
         </Col>

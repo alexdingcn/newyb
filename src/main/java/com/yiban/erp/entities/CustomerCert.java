@@ -11,9 +11,7 @@ public class CustomerCert {
 
     private Date licenseExp;
 
-    private String licenseNumber;
-
-    private String licenseImage;
+    private String imageNo;
 
     private String comment;
 
@@ -57,20 +55,12 @@ public class CustomerCert {
         this.licenseExp = licenseExp;
     }
 
-    public String getLicenseNumber() {
-        return licenseNumber;
+    public String getImageNo() {
+        return imageNo;
     }
 
-    public void setLicenseNumber(String licenseNumber) {
-        this.licenseNumber = licenseNumber == null ? null : licenseNumber.trim();
-    }
-
-    public String getLicenseImage() {
-        return licenseImage;
-    }
-
-    public void setLicenseImage(String licenseImage) {
-        this.licenseImage = licenseImage == null ? null : licenseImage.trim();
+    public void setImageNo(String imageNo) {
+        this.imageNo = imageNo;
     }
 
     public String getComment() {
