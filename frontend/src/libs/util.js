@@ -2,6 +2,7 @@ import axios from 'axios';
 import env from '../../build/env';
 import semver from 'semver';
 import packjson from '../../package.json';
+import { stringify } from 'querystring';
 
 let util = {
 
@@ -290,7 +291,7 @@ function showErrorMessage (vm, data) {
             desc: '系统数据格式错误, 请联系技术人员'
         });
     }
-    let display = data.display;
+    let display = data.display ? data.display : 1;
     let code = data.code ? data.code : 9999;
     let message = data.message ? data.message : '交易出现异常';
     switch (display) {
@@ -319,8 +320,9 @@ function showErrorMessage (vm, data) {
 };
 
 util.errorProcessor = function (vm, error, callback) {
-    let httpCode = error.status;
-    let data = error.data;
+    let response = error.response;
+    let httpCode = response.status;
+    let data = response.data;
     if (httpCode === 403) {
         vm.$router.push('error-403', { params: data });
     } else if (httpCode === 500) {

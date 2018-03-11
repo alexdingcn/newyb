@@ -54,8 +54,13 @@ export default {
       return this.showTitle;
     }
   },
+  watch: {
+    '$route': this.initData()
+  },
   methods: {
     initData() {
+      showView = this.$route.params.showView;
+      showTitle: this.$route.params.showTitle;
       this.getAllCategorys();
     },
 

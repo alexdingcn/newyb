@@ -190,26 +190,26 @@ export default {
     doAddCategory(data) {
       util.ajax
         .post("/customer/category/add", data)
-        .then(respones => {
+        .then((respones) => {
           this.$Message.success("新建客户类成功");
           this.submitSuccessEvent();
           this.isShowModal = false;
         })
-        .catch(error => {
-          console.log(error);
+        .catch((error) => {
+          util.errorProcessor(this, error);
         });
     },
 
     doUpdateCategory(data) {
       util.ajax
         .post("/customer/category/update", data)
-        .then(respones => {
+        .then((respones) => {
           this.$Message.success("客户类信息修改成功");
           this.submitSuccessEvent();
           this.isShowModal = false;
         })
-        .catch(error => {
-          console.log(error);
+        .catch((error) => {
+          util.errorProcessor(this, error);
         });
     }
   }

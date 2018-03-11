@@ -288,11 +288,11 @@ export default {
     getCategoryArr() {
       util.ajax
         .get("/customer/category/list")
-        .then(res => {
+        .then((res) => {
           this.categorys = res.data;
         })
-        .catch(error => {
-          console.log(error);
+        .catch((error) => {
+          util.errorProcessor(this, error);
         });
     },
 
@@ -336,12 +336,12 @@ export default {
       let removeUrl = "/customer/category/remove/" + delData.id;
       util.ajax
         .delete(removeUrl)
-        .then(response => {
+        .then((response) => {
           this.$Message.success("客户类信信息删除成功");
           this.getCategoryArr();
         })
-        .catch(error => {
-          console.log(error);
+        .catch((error) => {
+          util.errorProcessor(this, error);
         });
     },
 
@@ -384,14 +384,14 @@ export default {
       }
       util.ajax
         .get("/customer/list", { params: reqData })
-        .then(response => {
+        .then((response) => {
           let result = response.data;
           this.customersData = result.data;
           this.customersCount = result.count;
           this.customerTableLoading = false;
         })
-        .catch(error => {
-          console.log(error);
+        .catch((error) => {
+          util.errorProcessor(this, error);
           this.customerTableLoading = false;
         });
     },
@@ -404,7 +404,6 @@ export default {
     },
 
     tableSelecttionChange(data) {
-      console.log(data);
       this.tableSelectionData = data;
     },
 
@@ -419,18 +418,17 @@ export default {
         let item = this.tableSelectionData[i];
         delData.push(item.id);
       }
-      console.log(delData);
       util.ajax
         .post('/customer/delete', delData, {headers:{'Content-Type': 'application/json'}})
-        .then(response => {
+        .then((response) => {
           this.customerTableLoading = false;
           this.searchBtnClicked();
           let delCount = response.data.count;
           this.$Message.success('成功删除' + delCount + '条客户信息');
         })
-        .catch(error => {
+        .catch((error) => {
           this.customerTableLoading = false;
-          console.log(error);
+          util.errorProcessor(this, error);
         })
     },
 

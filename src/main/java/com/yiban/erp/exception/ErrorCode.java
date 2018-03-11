@@ -12,8 +12,9 @@ public enum ErrorCode {
     GOODS_REMAINED_IN_CATEGORY(1200, "该分类下还有商品,请先移除商品后操作"),
 
     CUSTOMER_DEL_PARAMS_EMPTY(2001, "请选择需要删除的客户"),
-    CUSTOMER_CAT_HAVE_CUST(2001, "分组下存在有客户信息, 不能删除"),
-    CUSTOMER_CAT_HAVE_CAT(2002, "分组下存在子分组, 不能删除"),
+    CUSTOMER_CAT_HAVE_CUST(2001, "分组下存在有客户信息, 不能删除", ErrorDisplay.NOTICE),
+    CUSTOMER_CAT_HAVE_CAT(2002, "分组下存在子分组, 不能删除", ErrorDisplay.MODAL),
+    CUSTOMER_CAT_DEL_PARAMS(2003, "请选择需要删除的分组"),
 
     ACCESS_PERMISSION(9001, "无访问权限", ErrorDisplay.MODAL);
 

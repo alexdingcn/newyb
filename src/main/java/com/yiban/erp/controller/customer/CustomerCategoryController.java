@@ -6,6 +6,7 @@ import com.yiban.erp.dao.CustomerCategoryMapper;
 import com.yiban.erp.dao.CustomerMapper;
 import com.yiban.erp.entities.Customer;
 import com.yiban.erp.entities.CustomerCategory;
+import com.yiban.erp.exception.BizException;
 import com.yiban.erp.exception.BizRuntimeException;
 import com.yiban.erp.exception.ErrorCode;
 import org.slf4j.Logger;
@@ -84,17 +85,17 @@ public class CustomerCategoryController {
         Integer companyId = 1;
         logger.info("user:{} request remove customer category categoryId:{}", userName, categoryId);
         if (categoryId == null) {
-            return ResponseEntity.badRequest().body("Request params error");
+            throw new BizException(ErrorCode.CUSTOMER_CAT_DEL_PARAMS);
         }
         //先验证当前分组是否存在客户信息，如果存在，不能删除
         List<Customer> customers = customerMapper.getByCategoryId(companyId, categoryId);
         if (!customers.isEmpty()) {
-            throw new BizRuntimeException(ErrorCode.CUSTOMER_CAT_HAVE_CUST);
+            throw new BizException(ErrorCode.CUSTOMER_CAT_HAVE_CUST);
         }
         //验证当前分组是否有子分组，如果存在，不能删除
         List<CustomerCategory> categories = customerCategoryMapper.getByParentId(companyId, categoryId);
         if (!categories.isEmpty()) {
-            throw new BizRuntimeException(ErrorCode.CUSTOMER_CAT_HAVE_CAT);
+            throw new BizException(ErrorCode.CUSTOMER_CAT_HAVE_CAT);
         }
         int count = customerCategoryMapper.deleteByPrimaryKey(categoryId);
         if (count > 0) {
