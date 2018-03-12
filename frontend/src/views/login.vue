@@ -12,8 +12,8 @@
                 </p>
                 <div class="form-con">
                     <Form ref="loginForm" :model="form" :rules="rules">
-                        <FormItem prop="userName">
-                            <Input v-model="form.userName" placeholder="请输入用户名">
+                        <FormItem prop="username">
+                            <Input v-model="form.username" placeholder="请输入用户名/手机号">
                                 <span slot="prepend">
                                     <Icon :size="16" type="person"></Icon>
                                 </span>
@@ -26,11 +26,24 @@
                                 </span>
                             </Input>
                         </FormItem>
+
                         <FormItem>
                             <Button @click="handleSubmit" type="primary" long>登录</Button>
                         </FormItem>
+                        <Alert type="error" v-show="loginResponse" show-icon>{{ loginResponse }}</Alert>
+
+                        <Row>
+                            <Col span="12">
+                                <Checkbox-group v-model="form.remember">
+                                    <Checkbox label="记住我"></Checkbox>
+                                </Checkbox-group>
+                            </Col>
+                            <Col span="12">
+                                <a style="float:right" @click="toRegister">新用户注册</a>
+                            </Col>
+                        </Row>
                     </Form>
-                    <p class="login-tip">输入任意用户名和密码即可</p>
+
                 </div>
             </Card>
         </div>
@@ -39,11 +52,15 @@
 
 <script>
 import Cookies from 'js-cookie';
+import util from '@/libs/util.js';
+import Qs from 'qs'
+
 export default {
     data () {
         return {
+            loginResponse: '',
             form: {
-                userName: 'iview_admin',
+                username: Cookies.get('user'),
                 password: ''
             },
             rules: {
@@ -60,19 +77,33 @@ export default {
         handleSubmit () {
             this.$refs.loginForm.validate((valid) => {
                 if (valid) {
-                    Cookies.set('user', this.form.userName);
-                    Cookies.set('password', this.form.password);
-                    this.$store.commit('setAvator', 'https://ss1.bdstatic.com/70cFvXSh_Q1YnxGkpoWK1HF6hhy/it/u=3448484253,3685836170&fm=27&gp=0.jpg');
-                    if (this.form.userName === 'iview_admin') {
-                        Cookies.set('access', 0);
-                    } else {
-                        Cookies.set('access', 1);
-                    }
-                    this.$router.push({
-                        name: 'home_index'
-                    });
+                    var self = this;
+                    var data = Qs.stringify(this.form);
+                    util.ajax.post('/login', data, {
+                                headers:{'Content-Type':'application/x-www-form-urlencoded'}
+                            })
+                            .then(function (response) {
+                                self.$store.commit('setToken', 'token');
+                                Cookies.set('user', self.form.username);
+                                self.$store.commit('setAvator', 'https://ss1.bdstatic.com/70cFvXSh_Q1YnxGkpoWK1HF6hhy/it/u=3448484253,3685836170&fm=27&gp=0.jpg');
+                                if (self.form.username === 'iview_admin') {
+                                    Cookies.set('access', 0);
+                                } else {
+                                    Cookies.set('access', 1);
+                                }
+                                self.$router.push({
+                                    name: 'home_index'
+                                });
+
+                            })
+                            .catch(function (error) {
+                                self.loginResponse = error.message;
+                            });
                 }
             });
+        },
+        toRegister() {
+            this.$router.push('/register');
         }
     }
 };

@@ -5,16 +5,28 @@ export const loginRouter = {
         path: '/login',
         name: 'login',
         meta: {
-            title: 'Login - 登录'
+            title: '登录',
+            noAuth: true
         },
         component: () => import('@/views/login.vue')
+};
+
+export const registerRouter = {
+        path: '/register',
+        name: 'register',
+        meta: {
+            title: '注册',
+            noAuth: true
+        },
+        component: () => import('@/views/register.vue')
 };
 
 export const page404 = {
         path: '/*',
         name: 'error-404',
         meta: {
-            title: '404-页面不存在'
+            title: '404-页面不存在',
+            noAuth: true
         },
         component: () => import('@/views/error-page/404.vue')
 };
@@ -22,7 +34,8 @@ export const page404 = {
 export const page403 = {
         path: '/403',
         meta: {
-            title: '403-权限不足'
+            title: '403-权限不足',
+            noAuth: true
         },
         name: 'error-403',
         component: () => import('@//views/error-page/403.vue')
@@ -31,7 +44,8 @@ export const page403 = {
 export const page500 = {
         path: '/500',
         meta: {
-            title: '500-服务端错误'
+            title: '500-服务端错误',
+            noAuth: true
         },
         name: 'error-500',
         component: () => import('@/views/error-page/500.vue')
@@ -280,11 +294,13 @@ export const appRouter = [
 // 所有上面定义的路由都要写在下面的routers里
 export const routers = [
         loginRouter,
+        registerRouter,
         otherRouter,
         preview,
         locking,
         ...appRouter,
-    page500,
-    page403,
-    page404
+        page500,
+        page403,
+        page404
 ];
+
