@@ -18,7 +18,7 @@ public class Customer {
 
     private String status;
 
-    private Boolean enabled;
+    private Boolean isDisable; //是否禁用 true-警用，false-启用
 
     private Boolean canSaleSpecial;
 
@@ -148,12 +148,12 @@ public class Customer {
         this.status = status;
     }
 
-    public Boolean getEnabled() {
-        return enabled;
+    public Boolean getDisable() {
+        return isDisable;
     }
 
-    public void setEnabled(Boolean enabled) {
-        this.enabled = enabled;
+    public void setDisable(Boolean disable) {
+        isDisable = disable;
     }
 
     public Boolean getCanSaleSpecial() {
@@ -426,5 +426,21 @@ public class Customer {
 
     public void setCustomerReps(List<CustomerRep> customerReps) {
         this.customerReps = customerReps;
+    }
+
+    public String getQuaCheck() {
+        return quaCheck;
+    }
+
+    public void setQuaCheck(String quaCheck) {
+        this.quaCheck = quaCheck;
+    }
+
+    public String getFileNo() {
+        return fileNo;
+    }
+
+    public void setFileNo(String fileNo) {
+        this.fileNo = fileNo;
     }
 }

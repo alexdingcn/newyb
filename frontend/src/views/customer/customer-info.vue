@@ -52,7 +52,7 @@
                   </Col>
                   <Col span="8">
                     <FormItem label="是否禁用" >
-                      <Checkbox v-model="formItem.enabled"></Checkbox>
+                      <Checkbox v-model="formItem.disable"></Checkbox>
                     </FormItem>
                   </Col>
                 </Row>
@@ -339,7 +339,7 @@
                   <Input type="text" v-model="repFormItem.postcode" ></Input>
                 </FormItem>
                 <FormItem label="是否禁用" >
-                  <Checkbox v-model="repFormItem.enabled"></Checkbox>
+                  <Checkbox v-model="repFormItem.disable"></Checkbox>
                 </FormItem>
                 <FormItem label="是否默认使用" >
                   <Checkbox v-model="repFormItem.isDefault"></Checkbox>
@@ -373,13 +373,30 @@ import dataConver from "@/libs/data-conver.js";
 
 export default {
   name: "customer-info",
+  props: {
+    action: {
+      type: String,
+      required: true,
+      validator: function(value) {
+        return value === "add" || value === "edit";
+      }
+    },
+    categorys: {
+      type: Array,
+      required: true,
+      default: []
+    },
+    editCustomer: {
+      type: Object,
+      default: null,
+    }
+  },
   data() {
     return {
       showView: 'add',
       showTitle: '新建客户信息',
       editId: '',
       submitBtnLoading: false,
-      categorys: [],
       formItem: {
         id: '',
         categoryId: '',
@@ -387,7 +404,7 @@ export default {
         name: '',
         shorName: '',
         pinyin: '',
-        enabled: 0,
+        disable: 0,
         canSaleSpecial: 0,
         limitSpecial: 0,
         direction: 0,
@@ -425,12 +442,6 @@ export default {
         {
           type: "selection",
           width: 60,
-          align: "center"
-        },
-        {
-          type: "index",
-          width: 80,
-          title: "序号",
           align: "center"
         },
         {
@@ -499,12 +510,6 @@ export default {
           align: "center",
         },
         {
-          type: "index",
-          width: 80,
-          title: "序号",
-          align: "center"
-        },
-        {
           title: "代表人姓名",
           key: "name",
           align: "center", 
@@ -517,7 +522,7 @@ export default {
                 },
                 on: {
                   click: () => {
-                    this.repEditBtnClick(params.row.id);
+                    this.repEditBtnClick(params.row);
                   }
                 }
               },
@@ -532,25 +537,24 @@ export default {
         },
         {
           title: "收货地址",
-          width: 300,
           key: "repertoryAddress",
           align: "center"
         },
         {
           title: "是否禁用",
-          key: "enabled",
+          key: "disable",
           align: "center",
           sortable: true,
           render: (h, params) => {
-            let isTrue = params.row.enabled;
+            let disableVal = params.row.disable;
             return h("div", [
               h("Icon", {
                 props: {
-                  type: isTrue ? "checkmark-circled" : "close-circled",
-                  color: isTrue ? "#00a854" : "#e96500"
+                  type: disableVal ? "close-circled" : "checkmark-circled",
+                  color: disableVal ? "#e96500" : "#00a854"
                 }
               }),
-              h("strong", isTrue ? "启用" : "已禁用")
+              h("strong", disableVal ? "已禁用" : "启用")
             ]);
           }
         },
@@ -588,7 +592,7 @@ export default {
         contactPhone: '',
         repertoryAddress: '',
         postcode: '',
-        enabled: 0,
+        disable: 0,
         isDefault: 1,
         comment: ''
       },
@@ -628,9 +632,6 @@ export default {
       }
     };
   },
-  mounted() {
-    this.initData();
-  },
   computed: {
     titleDispayIcon() {
       if (this.showView === "add") {
@@ -644,36 +645,42 @@ export default {
     }
   },
   watch: {
-    
+    editCustomer(data) {
+      if (data && data.id > 0 && this.action === 'edit') {
+        this.changeToEditModal(this.editCustomer)
+      }
+    },
+    action(data) {
+      if (data === 'add') {
+        this.changeToAddModal();
+      }
+    }
   },
   methods: {
-    initData() {
-      this.getAllCategorys();
-    },
-
-    getAllCategorys() {
-      util.ajax
-        .get("/customer/category/list")
-        .then((res) => {
-          this.categorys = res.data;
-        })
-        .catch((error) => {
-          util.errorProcessor(this, error);
-        });
+    changeToAddModal() {
+      this.$refs.customerForm.resetFields();
+      this.formItem = {};
+      this.certTabData = [];
+      this.repTabData = [];
+      this.editId = '';
+      this.showView = 'add';
+      this.showTitle = '新建客户信息';
     },
 
     changeToEditModal(data) {
       if (!data || !data.id) {
-        this.$Notice.warn("获取编辑模式下的客户标识失败");
-        return
+        this.$Notice.warn({title: '系统异常', desc: '获取编辑模式下的客户标识失败'});
+        return;
       }
       this.formItem = data;
-      //enabled 后台1代表可用，0代表禁用，前端显示刚好取反
-      this.formItem.enabled = !data.enabled;
-      console.log(data);
       this.editId = data.id;
       this.showView = 'edit';
       this.showTitle = data.name;
+      if (this.action === 'add') {
+        this.$emit("add-to-edit");
+      }
+      this.refreshCertData(this.editId);
+      this.refreshRepData(this.editId);
     },
 
     submitCustomer() {
@@ -696,11 +703,10 @@ export default {
 
     doAddCustomer() {
       let reqData = this.formItem;
-      //enabled 后台1代表可用，0代表禁用，前端显示刚好取反
-      reqData.enabled = !this.formItem.enabled;
       util.ajax.post("/customer/add", reqData, {headers:{'Content-Type': 'application/json'}})
         .then((response) => {
           this.$Message.success("新建客户成功");
+          this.$emit("add-success", response.data);
           this.changeToEditModal(response.data);
         })
         .catch((error) => {
@@ -717,15 +723,13 @@ export default {
         });
         return;
       }
-      //enabled 后台1代表可用，0代表禁用，前端显示刚好取反
-      reqData.enabled = !this.formItem.enabled;
       util.ajax.post("/customer/update", reqData, {headers:{'Content-Type': 'application/json'}})
         .then((response) => {
           this.$Message.success("修改客户成功");
-          changeToEditModal(response.data);
+          this.$emit("update-success", response.data);
+          this.changeToEditModal(response.data);
         })
         .catch((error) => {
-          console.log(error.response);
           util.errorProcessor(this, error);
         });
     },
@@ -861,8 +865,8 @@ export default {
       this.repModalType = 'add';
     },
 
-    repEditBtnClick(repId) {
-      this.repFormItem.id = repId;
+    repEditBtnClick(data) {
+      this.repFormItem = data;
       this.repModalShow = true;
       this.repModalType = 'edit';
     },

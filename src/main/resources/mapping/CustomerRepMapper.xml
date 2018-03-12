@@ -8,7 +8,7 @@
     <result column="contact_phone" property="contactPhone" jdbcType="VARCHAR" />
     <result column="repertory_address" property="repertoryAddress" jdbcType="VARCHAR" />
     <result column="postcode" property="postcode" jdbcType="VARCHAR" />
-    <result column="enabled" property="enabled" jdbcType="BIT" />
+    <result column="is_disable" property="isDisable" jdbcType="BIT" />
     <result column="default_time" property="defaultTime" jdbcType="TIMESTAMP" />
     <result column="comment" property="comment" jdbcType="VARCHAR" />
     <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
@@ -17,7 +17,7 @@
     <result column="update_by" property="updateBy" jdbcType="VARCHAR" />
   </resultMap>
   <sql id="Base_Column_List" >
-    id, customer_id, name, contact_phone, repertory_address, postcode, enabled, default_time,
+    id, customer_id, name, contact_phone, repertory_address, postcode, is_disable, default_time,
     comment, create_time, update_time, create_by, update_by
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
@@ -33,12 +33,12 @@
   <insert id="insert" parameterType="com.yiban.erp.entities.CustomerRep" keyProperty="id" useGeneratedKeys="true" >
     insert into customer_rep (customer_id, name,
       contact_phone, repertory_address, postcode, 
-      enabled, default_time, comment,
+      is_disable, default_time, comment,
       create_time, update_time, create_by, 
       update_by)
     values (#{customerId,jdbcType=INTEGER}, #{name,jdbcType=VARCHAR},
       #{contactPhone,jdbcType=VARCHAR}, #{repertoryAddress,jdbcType=VARCHAR}, #{postcode,jdbcType=VARCHAR}, 
-      #{enabled,jdbcType=BIT}, #{defaultTime,jdbcType=TIMESTAMP}, #{comment,jdbcType=VARCHAR},
+      #{isDisable,jdbcType=BIT}, #{defaultTime,jdbcType=TIMESTAMP}, #{comment,jdbcType=VARCHAR},
       #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, #{createBy,jdbcType=VARCHAR}, 
       #{updateBy,jdbcType=VARCHAR})
   </insert>
@@ -60,8 +60,8 @@
       <if test="postcode != null" >
         postcode,
       </if>
-      <if test="enabled != null" >
-        enabled,
+      <if test="isDisable != null" >
+        is_disable,
       </if>
       <if test="defaultTime != null" >
         default_time,
@@ -98,8 +98,8 @@
       <if test="postcode != null" >
         #{postcode,jdbcType=VARCHAR},
       </if>
-      <if test="enabled != null" >
-        #{enabled,jdbcType=BIT},
+      <if test="isDisable != null" >
+        #{isDisable,jdbcType=BIT},
       </if>
       <if test="defaultTime != null" >
         #{defaultTime,jdbcType=TIMESTAMP},
@@ -139,8 +139,8 @@
       <if test="postcode != null" >
         postcode = #{postcode,jdbcType=VARCHAR},
       </if>
-      <if test="enabled != null" >
-        enabled = #{enabled,jdbcType=BIT},
+      <if test="isDisable != null" >
+        is_disable = #{isDisable,jdbcType=BIT},
       </if>
       <if test="defaultTime != null" >
         default_time = #{defaultTime,jdbcType=TIMESTAMP},
@@ -170,7 +170,7 @@
       contact_phone = #{contactPhone,jdbcType=VARCHAR},
       repertory_address = #{repertoryAddress,jdbcType=VARCHAR},
       postcode = #{postcode,jdbcType=VARCHAR},
-      enabled = #{enabled,jdbcType=BIT},
+      is_disable = #{isDisable,jdbcType=BIT},
       default_time = #{defaultTime,jdbcType=TIMESTAMP},
       comment = #{comment,jdbcType=VARCHAR},
       create_time = #{createTime,jdbcType=TIMESTAMP},

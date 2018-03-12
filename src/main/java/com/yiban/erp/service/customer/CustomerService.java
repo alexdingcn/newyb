@@ -223,7 +223,7 @@ public class CustomerService {
             Integer customerId = entry.getKey();
             List<CustomerRep> list = entry.getValue();
             CustomerRep defaultValue = getDefaultCustomerRep(customerId);
-            if (defaultValue == null) {
+            if (defaultValue == null || list.isEmpty()) {
                 continue;
             }
             for (CustomerRep rep : list) {
@@ -252,8 +252,10 @@ public class CustomerService {
             logger.warn("add customer rep but params can not validate.");
             throw new BizException(ErrorCode.CUSTOMER_REP_PARAMS_ERROR);
         }
-        if (reqRep.getIsDefault() == true) {
+        if (reqRep.getIsDefault()) {
             reqRep.setDefaultTime(new Date()); //设置为默认使用
+        }else {
+            reqRep.setDefaultTime(null);
         }
         reqRep.setCreateTime(new Date());
         reqRep.setUpdateBy(reqRep.getCreateBy());

@@ -15,7 +15,7 @@ public class CustomerRep {
 
     private String postcode;
 
-    private Boolean enabled;
+    private Boolean isDisable;
 
     private Boolean isDefault;
 
@@ -79,12 +79,12 @@ public class CustomerRep {
         this.postcode = postcode == null ? null : postcode.trim();
     }
 
-    public Boolean getEnabled() {
-        return enabled;
+    public Boolean getDisable() {
+        return isDisable;
     }
 
-    public void setEnabled(Boolean enabled) {
-        this.enabled = enabled;
+    public void setDisable(Boolean disable) {
+        isDisable = disable;
     }
 
     public Boolean getIsDefault() {

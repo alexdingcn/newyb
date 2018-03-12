@@ -9,7 +9,7 @@
     <result column="shor_name" property="shorName" jdbcType="VARCHAR" />
     <result column="pinyin" property="pinyin" jdbcType="VARCHAR" />
     <result column="status" property="status" jdbcType="VARCHAR" />
-    <result column="enabled" property="enabled" jdbcType="BIT" />
+    <result column="is_disable" property="isDisable" jdbcType="BIT" />
     <result column="can_sale_special" property="canSaleSpecial" jdbcType="BIT" />
     <result column="is_limit_special" property="isLimitSpecial" jdbcType="BIT" />
     <result column="city" property="city" jdbcType="VARCHAR" />
@@ -45,7 +45,7 @@
     <result column="update_by" property="updateBy" jdbcType="VARCHAR" />
   </resultMap>
   <sql id="Base_Column_List" >
-    id, company_id, customer_no, name, shor_name, pinyin, status, enabled, can_sale_special,
+    id, company_id, customer_no, name, shor_name, pinyin, status, is_disable, can_sale_special,
     is_limit_special, city, address, postcode, category_id, legal_persion, employee, 
     contact_phone, contact_fax, email, is_direction, sale_area, salesman, member_level, 
     class_att_one, class_att_two, seal_model, bill_model, business_scope, account_period, 
@@ -65,7 +65,7 @@
   <insert id="insert" parameterType="com.yiban.erp.entities.Customer" keyProperty="id" useGeneratedKeys="true" >
     insert into customer (company_id, customer_no,
       name, shor_name, pinyin, status,
-      enabled, can_sale_special, is_limit_special, 
+      is_disable, can_sale_special, is_limit_special,
       city, address, postcode, 
       category_id, legal_persion, employee, 
       contact_phone, contact_fax, email, 
@@ -78,7 +78,7 @@
       create_by, update_by)
     values (#{companyId,jdbcType=INTEGER}, #{customerNo,jdbcType=VARCHAR},
       #{name,jdbcType=VARCHAR}, #{shorName,jdbcType=VARCHAR}, #{pinyin,jdbcType=VARCHAR}, #{status,jdbcType=VARCHAR},
-      #{enabled,jdbcType=BIT}, #{canSaleSpecial,jdbcType=BIT}, #{isLimitSpecial,jdbcType=BIT}, 
+      #{isDisable,jdbcType=BIT}, #{canSaleSpecial,jdbcType=BIT}, #{isLimitSpecial,jdbcType=BIT},
       #{city,jdbcType=VARCHAR}, #{address,jdbcType=VARCHAR}, #{postcode,jdbcType=VARCHAR}, 
       #{categoryId,jdbcType=INTEGER}, #{legalPersion,jdbcType=VARCHAR}, #{employee,jdbcType=VARCHAR}, 
       #{contactPhone,jdbcType=VARCHAR}, #{contactFax,jdbcType=VARCHAR}, #{email,jdbcType=VARCHAR}, 
@@ -112,8 +112,8 @@
       <if test="status != null" >
         status,
       </if>
-      <if test="enabled != null" >
-        enabled,
+      <if test="isDisable != null" >
+        is_disable,
       </if>
       <if test="canSaleSpecial != null" >
         can_sale_special,
@@ -234,8 +234,8 @@
       <if test="status != null" >
         #{status,jdbcType=VARCHAR},
       </if>
-      <if test="enabled != null" >
-        #{enabled,jdbcType=BIT},
+      <if test="isDisable != null" >
+        #{isDisable,jdbcType=BIT},
       </if>
       <if test="canSaleSpecial != null" >
         #{canSaleSpecial,jdbcType=BIT},
@@ -356,8 +356,8 @@
       <if test="status != null" >
         status = #{status,jdbcType=VARCHAR},
       </if>
-      <if test="enabled != null" >
-        enabled = #{enabled,jdbcType=BIT},
+      <if test="isDisable != null" >
+        is_disable = #{isDisable,jdbcType=BIT},
       </if>
       <if test="canSaleSpecial != null" >
         can_sale_special = #{canSaleSpecial,jdbcType=BIT},
@@ -469,7 +469,7 @@
       shor_name = #{shorName,jdbcType=VARCHAR},
       pinyin = #{pinyin,jdbcType=VARCHAR},
       status = #{status,jdbcType=VARCHAR},
-      enabled = #{enabled,jdbcType=BIT},
+      is_disable = #{isDisable,jdbcType=BIT},
       can_sale_special = #{canSaleSpecial,jdbcType=BIT},
       is_limit_special = #{isLimitSpecial,jdbcType=BIT},
       city = #{city,jdbcType=VARCHAR},
@@ -514,7 +514,7 @@
     <result column="shor_name" property="shorName" jdbcType="VARCHAR" />
     <result column="pinyin" property="pinyin" jdbcType="VARCHAR" />
     <result column="status" property="status" jdbcType="VARCHAR" />
-    <result column="enabled" property="enabled" jdbcType="BIT" />
+    <result column="is_disable" property="isDisable" jdbcType="BIT" />
     <result column="can_sale_special" property="canSaleSpecial" jdbcType="BIT" />
     <result column="is_limit_special" property="isLimitSpecial" jdbcType="BIT" />
     <result column="city" property="city" jdbcType="VARCHAR" />
@@ -576,7 +576,7 @@
       <result column="rep_contact_phone" property="contactPhone" jdbcType="VARCHAR" />
       <result column="rep_repertory_address" property="repertoryAddress" jdbcType="VARCHAR" />
       <result column="rep_postcode" property="postcode" jdbcType="VARCHAR" />
-      <result column="rep_enabled" property="enabled" jdbcType="BIT" />
+      <result column="rep_is_disable" property="isDisable" jdbcType="BIT" />
       <result column="rep_default_time" property="defaultTime" jdbcType="TIMESTAMP" />
       <result column="rep_comment" property="comment" jdbcType="VARCHAR" />
       <result column="rep_create_time" property="createTime" jdbcType="TIMESTAMP" />
@@ -587,7 +587,7 @@
   </resultMap>
 
   <sql id="CUSTOMER_DETAIL_COL">
-    t1.id, t1.company_id, t1.customer_no, t1.name, t1.shor_name, t1.pinyin, t1.status, t1.enabled, t1.can_sale_special,
+    t1.id, t1.company_id, t1.customer_no, t1.name, t1.shor_name, t1.pinyin, t1.status, t1.is_disable, t1.can_sale_special,
     t1.is_limit_special, t1.city, t1.address, t1.postcode, t1.category_id, t1.legal_persion, t1.employee,
     t1.contact_phone, t1.contact_fax, t1.email, t1.is_direction, t1.sale_area, t1.salesman, t1.member_level,
     t1.class_att_one, t1.class_att_two, t1.seal_model, t1.bill_model, t1.business_scope, t1.account_period,
@@ -602,7 +602,7 @@
     t3.create_by as cert_create_by, t3.update_by as cert_update_by,
     t4.id as rep_id, t4.customer_id as rep_customer_id, t4.name as rep_name,
     t4.contact_phone as rep_contact_phone, t4.repertory_address as rep_repertory_address,
-    t4.postcode as rep_postcode, t4.enabled as rep_enabled, t4.default_time as rep_default_time,
+    t4.postcode as rep_postcode, t4.is_disable as rep_is_disable, t4.default_time as rep_default_time,
     t4.comment as rep_comment, t4.create_time as rep_create_time,
     t4.update_time as rep_update_time, t4.create_by as rep_create_by, t4.update_by as rep_update_by
   </sql>

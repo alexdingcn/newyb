@@ -65,8 +65,6 @@ export default {
   data() {
     const validCategoryNoExist = (rule, value, callback) => {
       let categoryNoVal = this.custCatFormData.categoryNo;
-      console.log(typeof categoryNoVal);
-      console.log('validate category value:' + categoryNoVal + " isNa:" + (isNaN(categoryNoVal)));
       if (isNaN(categoryNoVal)) {
         callback(new Error("分类编码格式为数字"));
       } else {

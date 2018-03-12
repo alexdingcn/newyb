@@ -146,7 +146,7 @@
   </update>
 
   <select id="getByCustomerId" parameterType="java.lang.Integer" resultMap="BaseResultMap">
-    select <include refid="Base_Column_List"/> from cutomer_cert where customer_id=#{customerId};
+    select <include refid="Base_Column_List"/> from customer_cert where customer_id=#{customerId};
   </select>
 
   <delete id="removeByIds" parameterType="map" >
