@@ -8,6 +8,12 @@ public enum ErrorCode {
     FAILED_UPDATE_FROM_DB(1002, "无法修改", ErrorDisplay.NOTICE),
     FAILED_PINGYIN_EXCEPTION(1003, "获取拼音缩写失败"),
 
+    // 11xx - 用户
+    USER_NAME_NOT_EXISTED(1100, "用户名不存在"),
+    LOGIN_PASSWORD_INVALID(1101, "密码错误"),
+    USER_REGISTER_FAIL(1102, "用户创建失败"),
+
+    // 12xx - 商品
     GOODS_CATEGORY_ID_MISSING(1201, "缺失商品分类ID"),
     GOODS_REMAINED_IN_CATEGORY(1200, "该分类下还有商品,请先移除商品后操作"),
 
@@ -57,7 +63,9 @@ public enum ErrorCode {
         JSONObject obj = new JSONObject();
         obj.put("code", code);
         obj.put("message", message);
-        obj.put("display", display.name());
+        if (display != null) {
+            obj.put("display", display.name());
+        }
         return obj.toString();
     }
 }

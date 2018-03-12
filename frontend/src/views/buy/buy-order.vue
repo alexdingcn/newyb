@@ -39,41 +39,16 @@
                                 
                             </FormItem>
                         </Col>
-                        <Col span="6">
-             				<FormItem label="账期" prop="paymentTerm">
-                                <InputNumber v-model="buyOrder.paymentTerm" :min="0" size="small" @on-change="handlePaymentTermChange"/>
-                            </FormItem>
-                        </Col>
-                       
-                        <Col span="6">
-                            <FormItem label="发票类型" prop="fapiaoType">
-                                <Select v-model="buyOrder.fapiaoType" size="small">
-                                	<Option v-for="item in fapiaoTypes" :value="item.value" :key="item.value">{{ item.label }}</Option>
-								</Select>
-                            </FormItem>
-                        </Col>
-                    </Row>
-                    <Row>
-                    	<Col span="6">
-                            <FormItem label="采购员" prop="buyerId">
-                                <Input v-model="buyOrder.buyerId" size="small"/>
-                            </FormItem>
-                        </Col>
-                        <Col span="5">
-             				<FormItem label="入库日期" prop="incomingDate">
-             					<DatePicker type="date" size="small" v-model="buyOrder.incomingDate" @on-change="handleIncomingDateChange"></DatePicker>
-                            </FormItem>
-                        </Col>
-                        <Col span="6">
-             				<FormItem label="付款期限" prop="paymentDate">
-                                <DatePicker type="date" size="small" v-model="buyOrder.paymentDate" @on-change="handlePaymentDateChange"></DatePicker>
-                            </FormItem>
-                        </Col>
-                        <Col span="6">
-             				<FormItem label="自定单号" prop="refNo">
-                                <Input v-model="buyOrder.refNo" size="small"/>
-                            </FormItem>
-                        </Col>
+						<Col span="6">
+							<FormItem label="采购员" prop="buyerId">
+								<Input v-model="buyOrder.buyerId" size="small"/>
+							</FormItem>
+						</Col>
+						<Col span="6">
+							<FormItem label="自定单号" prop="refNo">
+								<Input v-model="buyOrder.refNo" size="small"/>
+							</FormItem>
+						</Col>
                     </Row>
                     <Row>
                     	<Col span="6">
@@ -467,21 +442,21 @@
 				}
 				this.$refs.goodsSelect.clearSingleSelect();
             },
-            handleIncomingDateChange(val) {
-            	var incoming = moment(val);
-            	var payment = moment(this.buyOrder.paymentDate);
-            	var diffDays = payment.diff(incoming, 'days');
-            	this.buyOrder.paymentTerm = diffDays;
-            },
-            handlePaymentDateChange(val) {
-            	var incoming = moment(this.buyOrder.incomingDate);
-            	var payment = moment(val);
-            	var diffDays = payment.diff(incoming, 'days');
-            	this.buyOrder.paymentTerm = diffDays;
-            },
-            handlePaymentTermChange(val) {
-            	this.buyOrder.paymentDate = moment(this.buyOrder.incomingDate).add(val,'d').format('YYYY-MM-DD');
-            }
+//            handleIncomingDateChange(val) {
+//            	var incoming = moment(val);
+//            	var payment = moment(this.buyOrder.paymentDate);
+//            	var diffDays = payment.diff(incoming, 'days');
+//            	this.buyOrder.paymentTerm = diffDays;
+//            },
+//            handlePaymentDateChange(val) {
+//            	var incoming = moment(this.buyOrder.incomingDate);
+//            	var payment = moment(val);
+//            	var diffDays = payment.diff(incoming, 'days');
+//            	this.buyOrder.paymentTerm = diffDays;
+//            },
+//            handlePaymentTermChange(val) {
+//            	this.buyOrder.paymentDate = moment(this.buyOrder.incomingDate).add(val,'d').format('YYYY-MM-DD');
+//            }
         }
     };
 </script>

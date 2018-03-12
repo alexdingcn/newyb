@@ -3,9 +3,15 @@ import iView from 'iview';
 import Util from '../libs/util';
 import VueRouter from 'vue-router';
 import Cookies from 'js-cookie';
+import store from '../store'
 import {routers, otherRouter, appRouter} from './router';
 
 Vue.use(VueRouter);
+
+// 页面刷新时，重新赋值token
+if (window.localStorage.getItem('token')) {
+    store.commit('setToken', window.localStorage.getItem('token'))
+}
 
 // 路由配置
 const RouterConfig = {
@@ -18,6 +24,21 @@ export const router = new VueRouter(RouterConfig);
 router.beforeEach((to, from, next) => {
     iView.LoadingBar.start();
     Util.title(to.meta.title);
+
+    if (!to.meta.noAuth) {  // 判断该路由是否需要登录权限
+        if (store.state.user && store.state.user.token) {  // 通过vuex state获取当前的token是否存在
+            next();
+        }
+        else {
+            next({
+                name: 'login'
+            })
+        }
+    }
+    else {
+        next();
+    }
+/*
     if (Cookies.get('locking') === '1' && to.name !== 'locking') { // 判断当前是否是锁定状态
         next({
             replace: true,
@@ -51,6 +72,8 @@ router.beforeEach((to, from, next) => {
             }
         }
     }
+*/
+
 });
 
 router.afterEach((to) => {
@@ -58,3 +81,5 @@ router.afterEach((to) => {
     iView.LoadingBar.finish();
     window.scrollTo(0, 0);
 });
+
+export default router;
