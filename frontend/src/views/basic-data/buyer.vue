@@ -115,10 +115,10 @@
                 for (var key in this.buyers) {
                     params.push(this.buyers[key]);
                 }
-                console.log(params);
                 util.ajax.post('/userrole/save', params)
                     .then(function (response) {
                         if (response.status === 200 && response.data) {
+                            self.$Message.info("保存采购员列表成功");
                             self.getUserList();
                         }
                     })

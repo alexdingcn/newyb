@@ -38,7 +38,7 @@ public class SupplierContactController {
         return ResponseEntity.ok().body(JSON.toJSONString(contactList));
     }
 
-    @RequestMapping(value = "/{supplierId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/{contactId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> get(@PathVariable Integer contactId) {
         SupplierContact contact = supplierContactMapper.selectByPrimaryKey(contactId);
         return ResponseEntity.ok().body(JSON.toJSONString(contact));
