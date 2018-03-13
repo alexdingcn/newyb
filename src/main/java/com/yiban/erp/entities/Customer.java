@@ -18,7 +18,7 @@ public class Customer {
 
     private String status;
 
-    private Boolean enabled;
+    private Boolean isDisable; //是否禁用 true-警用，false-启用
 
     private Boolean canSaleSpecial;
 
@@ -54,9 +54,9 @@ public class Customer {
 
     private String classAttTwo;
 
-    private Integer sealModel;
+    private String sealModel;
 
-    private Integer billModel;
+    private String billModel;
 
     private String businessScope;
 
@@ -69,6 +69,10 @@ public class Customer {
     private String bankName;
 
     private String dutyAccount;
+
+    private String quaCheck;
+
+    private String fileNo;
 
     private String superviseNo;
 
@@ -144,12 +148,12 @@ public class Customer {
         this.status = status;
     }
 
-    public Boolean getEnabled() {
-        return enabled;
+    public Boolean getDisable() {
+        return isDisable;
     }
 
-    public void setEnabled(Boolean enabled) {
-        this.enabled = enabled;
+    public void setDisable(Boolean disable) {
+        isDisable = disable;
     }
 
     public Boolean getCanSaleSpecial() {
@@ -288,19 +292,19 @@ public class Customer {
         this.classAttTwo = classAttTwo == null ? null : classAttTwo.trim();
     }
 
-    public Integer getSealModel() {
+    public String getSealModel() {
         return sealModel;
     }
 
-    public void setSealModel(Integer sealModel) {
+    public void setSealModel(String sealModel) {
         this.sealModel = sealModel;
     }
 
-    public Integer getBillModel() {
+    public String getBillModel() {
         return billModel;
     }
 
-    public void setBillModel(Integer billModel) {
+    public void setBillModel(String billModel) {
         this.billModel = billModel;
     }
 
@@ -422,5 +426,21 @@ public class Customer {
 
     public void setCustomerReps(List<CustomerRep> customerReps) {
         this.customerReps = customerReps;
+    }
+
+    public String getQuaCheck() {
+        return quaCheck;
+    }
+
+    public void setQuaCheck(String quaCheck) {
+        this.quaCheck = quaCheck;
+    }
+
+    public String getFileNo() {
+        return fileNo;
+    }
+
+    public void setFileNo(String fileNo) {
+        this.fileNo = fileNo;
     }
 }

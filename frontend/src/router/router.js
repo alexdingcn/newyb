@@ -74,7 +74,6 @@ export const otherRouter = {
 { path: 'goods/:goods_id', title: '商品详情', name: 'goods-info', component: () => import('@/views/basic-data/goods-info.vue') }, // 商品详情
 { path: 'factory/:factory_id', title: '生产企业详情', name: 'factory-info', component: () => import('@/views/basic-data/factory-info.vue') }, // 生产企业详情
 { path: 'supplier/:supplier_id', title: '供应商详情', name: 'supplier-info', component: () => import('@/views/basic-data/supplier-info.vue') }, // 供应商详情
-{ path: 'customer/:customer_id', title: '客户详情', name: 'customer-info', component: () => import('@/views/customer/customer-info.vue') }, // 客户详情
 { path: 'ownspace', title: '个人中心', name: 'ownspace_index', component: () => import('@/views/own-space/own-space.vue') },
 { path: 'order/:order_id', title: '订单详情', name: 'order-info', component: () => import('@/views/advanced-router/component/order-info.vue') }, // 用于展示动态路由
 { path: 'shopping', title: '购物详情', name: 'shopping', component: () => import('@/views/advanced-router/component/shopping-info.vue') }, // 用于展示带参路由

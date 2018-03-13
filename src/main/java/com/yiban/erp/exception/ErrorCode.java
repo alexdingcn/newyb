@@ -19,9 +19,18 @@ public enum ErrorCode {
     GOODS_CATEGORY_ID_MISSING(1201, "缺失商品分类ID"),
     GOODS_REMAINED_IN_CATEGORY(1200, "该分类下还有商品,请先移除商品后操作"),
 
+    CUSTOMER_GET_FAIL(2000, "获取客户信息失败"),
     CUSTOMER_DEL_PARAMS_EMPTY(2001, "请选择需要删除的客户"),
-    CUSTOMER_CAT_HAVE_CUST(2001, "分组下存在有客户信息, 不能删除"),
-    CUSTOMER_CAT_HAVE_CAT(2002, "分组下存在子分组, 不能删除"),
+    CUSTOMER_CAT_HAVE_CUST(2002, "分组下存在有客户信息, 不能删除", ErrorDisplay.NOTICE),
+    CUSTOMER_CAT_HAVE_CAT(2003, "分组下存在子分组, 不能删除", ErrorDisplay.MODAL),
+    CUSTOMER_CAT_DEL_PARAMS(2004, "请选择需要删除的分组"),
+    CUSTOMER_REQUIRE_PARAMS_ERROR(2005, "验证客户信息必输项失败"),
+    CUSTOMER_CERT_PARAMS_ERROR(2006, "验证客户证件信息必输项失败"),
+    CUSTOMER_CERT_IMAGE_NO_ERROR(2007, "证件信息的档案编号错误"),
+    CUSTOMER_CERT_REMOVE_PARAMS(2008, "请选择需要删除的证件"),
+    CUSTOMER_REP_PARAMS_ERROR(2009, "验证客户代表人信息必输项失败"),
+    CUSTOMER_REP_REMOVE_PARAMS(2010, "请选择需要删除的代表人信息"),
+
 
     ACCESS_PERMISSION(9001, "无访问权限", ErrorDisplay.MODAL);
 

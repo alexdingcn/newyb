@@ -65,8 +65,6 @@ export default {
   data() {
     const validCategoryNoExist = (rule, value, callback) => {
       let categoryNoVal = this.custCatFormData.categoryNo;
-      console.log(typeof categoryNoVal);
-      console.log('validate category value:' + categoryNoVal + " isNa:" + (isNaN(categoryNoVal)));
       if (isNaN(categoryNoVal)) {
         callback(new Error("分类编码格式为数字"));
       } else {
@@ -153,8 +151,6 @@ export default {
 
     ok() {
       this.loading = true;
-      console.log(this.custCatFormData);
-      console.log(this.$refs.custCatForm);
       this.$refs.custCatForm.validate(valid => {
         if (!valid) {
           this.loading = false;
@@ -190,26 +186,26 @@ export default {
     doAddCategory(data) {
       util.ajax
         .post("/customer/category/add", data)
-        .then(respones => {
+        .then((respones) => {
           this.$Message.success("新建客户类成功");
           this.submitSuccessEvent();
           this.isShowModal = false;
         })
-        .catch(error => {
-          console.log(error);
+        .catch((error) => {
+          util.errorProcessor(this, error);
         });
     },
 
     doUpdateCategory(data) {
       util.ajax
         .post("/customer/category/update", data)
-        .then(respones => {
+        .then((respones) => {
           this.$Message.success("客户类信息修改成功");
           this.submitSuccessEvent();
           this.isShowModal = false;
         })
-        .catch(error => {
-          console.log(error);
+        .catch((error) => {
+          util.errorProcessor(this, error);
         });
     }
   }
