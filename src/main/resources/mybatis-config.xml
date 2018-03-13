@@ -23,5 +23,7 @@
         <mapper resource="mapping/CustomerMapper.xml"/>
         <mapper resource="mapping/CustomerRepMapper.xml"/>
         <mapper resource="mapping/FileInfoMapper.xml"/>
+        <mapper resource="mapping/FileTypeMapper.xml"/>
+        <mapper resource="mapping/FileUploadMapper.xml"/>
     </mappers>
 </configuration>

@@ -14,6 +14,7 @@ public enum ErrorCode {
     LOGIN_USERNAME_MISSING(1102, "请输入用户名"),
     LOGIN_PASSWORD_MISSING(1103, "请输入密码"),
     USER_REGISTER_FAIL(1104, "用户创建失败"),
+    USER_GET_FAIL(1105, "获取当前客户信息失败", ErrorDisplay.NOTICE),
 
     // 12xx - 商品
     GOODS_CATEGORY_ID_MISSING(1201, "缺失商品分类ID"),
@@ -30,6 +31,17 @@ public enum ErrorCode {
     CUSTOMER_CERT_REMOVE_PARAMS(2008, "请选择需要删除的证件"),
     CUSTOMER_REP_PARAMS_ERROR(2009, "验证客户代表人信息必输项失败"),
     CUSTOMER_REP_REMOVE_PARAMS(2010, "请选择需要删除的代表人信息"),
+
+    FILE_TYPE_CREATE_FAIL(2101, "新增档案类型失败"),
+    FILE_TYPE_CREATE_PARAMS_ERROR(2102, "类型名称不能为空"),
+    FILE_TYPE_EXIST(2103, "文档类型已经存在"),
+    FILE_ADD_PARAMS_ERROR(2104, "新建档案信息必输项验证失败"),
+    FILE_REMOVE_PARAMS_ERROR(2105, "请选择需要删除的档案信息"),
+    FILE_UPLOAD_PARAMS_ERROR(2106, "上传档案文件时获取档案编号失败"),
+    FILE_UPLOAD_SIZE_ERROR(2107, "上传的档案附件超出允许上传的大小", ErrorDisplay.NOTICE),
+    FILE_UPLOAD_FAIL(2108, "上传档案附件失败", ErrorDisplay.NOTICE),
+    FILE_UPLOAD_FILE_TYPE_ERROR(2109, "上传的文件类型错误"),
+    FILE_UPLOAD_REMOVE_PARAMS(2110, "请选择需要删除的文件"),
 
 
     ACCESS_PERMISSION(9001, "无访问权限", ErrorDisplay.MODAL);

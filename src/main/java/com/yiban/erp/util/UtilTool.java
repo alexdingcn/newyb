@@ -1,13 +1,19 @@
 package com.yiban.erp.util;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Field;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.logging.SimpleFormatter;
 
 public class UtilTool {
 
     private static final Logger logger = LoggerFactory.getLogger(UtilTool.class);
+
+    private static final String DEFAULT_DATE_TIME_PATTERN = "yyyy-MM-dd hh:mm:ss";
 
 
     /**
@@ -35,6 +41,15 @@ public class UtilTool {
             }
         }
         return body;
+    }
+
+    public static String DateFormat(Date date, String pattern) {
+        if (date == null) {
+            return null;
+        }
+        String ft = StringUtils.isBlank(pattern) ? DEFAULT_DATE_TIME_PATTERN : pattern;
+        SimpleDateFormat formatter = new SimpleDateFormat(ft);
+        return formatter.format(date);
     }
 
 }

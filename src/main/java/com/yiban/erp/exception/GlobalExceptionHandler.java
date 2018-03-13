@@ -2,6 +2,7 @@ package com.yiban.erp.exception;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import org.apache.tomcat.util.http.fileupload.FileUploadBase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -9,6 +10,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.multipart.MultipartException;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
@@ -52,6 +55,24 @@ public class GlobalExceptionHandler {
         logger.warn("Request action url:{} have an BizRuntimeException:", url, e.getErrorCode());
         ErrorInfo errorInfo = getErrorInfo(e.getErrorCode(), url, getExtraJson(e.getExtra()));
         return new ResponseEntity((JSON) JSON.toJSON(errorInfo), HttpStatus.FORBIDDEN);
+    }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseBody
+    @ExceptionHandler(MultipartException.class)
+    public ResponseEntity<JSON> handleMultipartException(HttpServletRequest request, MultipartException exception) {
+        if (exception == null) {
+            return ResponseEntity.badRequest().build();
+        }
+        String url = request.getRequestURL().toString();
+        if (exception.getCause() != null && exception.getCause().getCause() != null &&
+                exception.getCause().getCause() instanceof FileUploadBase.SizeLimitExceededException) {
+            ErrorInfo errorInfo = getErrorInfo(ErrorCode.FILE_UPLOAD_SIZE_ERROR, url, null);
+            return ResponseEntity.badRequest().body((JSON) JSON.toJSON(errorInfo));
+        }else {
+            ErrorInfo errorInfo = getErrorInfo(ErrorCode.FILE_UPLOAD_FAIL, url, null);
+            return ResponseEntity.badRequest().body((JSON) JSON.toJSON(errorInfo));
+        }
     }
 
     /**

@@ -108,9 +108,6 @@
   <update id="updateByPrimaryKeySelective" parameterType="com.yiban.erp.entities.CustomerCategory" >
     update customer_category
     <set >
-      <if test="companyId != null" >
-        company_id = #{companyId,jdbcType=INTEGER},
-      </if>
       <if test="categoryNo != null" >
         category_no = #{categoryNo,jdbcType=VARCHAR},
       </if>
@@ -143,7 +140,7 @@
   </update>
   <update id="updateByPrimaryKey" parameterType="com.yiban.erp.entities.CustomerCategory" >
     update customer_category
-    set company_id = #{companyId,jdbcType=INTEGER},
+    set
       category_no = #{categoryNo,jdbcType=VARCHAR},
       name = #{name,jdbcType=VARCHAR},
       parent_id = #{parentId,jdbcType=INTEGER},

@@ -1,6 +1,7 @@
 package com.yiban.erp.entities;
 
 import java.util.Date;
+import java.util.List;
 
 public class FileInfo {
     private Integer id;
@@ -13,6 +14,8 @@ public class FileInfo {
 
     private String fileName;
 
+    private String fileType;
+
     private String comment;
 
     private String createBy;
@@ -22,6 +25,8 @@ public class FileInfo {
     private String updateBy;
 
     private Date updateTime;
+
+    private List<FileUpload> fileUploads;
 
     public Integer getId() {
         return id;
@@ -63,6 +68,14 @@ public class FileInfo {
         this.fileName = fileName == null ? null : fileName.trim();
     }
 
+    public String getFileType() {
+        return fileType;
+    }
+
+    public void setFileType(String fileType) {
+        this.fileType = fileType;
+    }
+
     public String getComment() {
         return comment;
     }
@@ -101,5 +114,13 @@ public class FileInfo {
 
     public void setUpdateTime(Date updateTime) {
         this.updateTime = updateTime;
+    }
+
+    public List<FileUpload> getFileUploads() {
+        return fileUploads;
+    }
+
+    public void setFileUploads(List<FileUpload> fileUploads) {
+        this.fileUploads = fileUploads;
     }
 }

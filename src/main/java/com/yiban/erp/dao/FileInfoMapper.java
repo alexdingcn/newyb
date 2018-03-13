@@ -4,6 +4,9 @@ import com.yiban.erp.entities.FileInfo;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.Date;
+import java.util.List;
+
 @Mapper
 public interface FileInfoMapper {
     int deleteByPrimaryKey(Integer id);
@@ -26,4 +29,18 @@ public interface FileInfoMapper {
      */
     FileInfo getByFileNo(@Param("companyId") Integer companyId,
                          @Param("fileNo") String fileNo);
+
+    Integer getByFileTypeAndNameCount(@Param("companyId") Integer companyId,
+                                             @Param("fileType") String fileType,
+                                             @Param("fileName") String fileName);
+
+    List<FileInfo> getByFileTypeAndName(@Param("companyId") Integer companyId,
+                                        @Param("fileType") String fileType,
+                                        @Param("fileName") String fileName,
+                                        @Param("offset") Integer offset,
+                                        @Param("limit") Integer limit);
+
+    int removeByIds(@Param("ids") List<Integer> ids,
+                    @Param("updateBy") String updateBy,
+                    @Param("updateTime") Date updateTime);
 }
