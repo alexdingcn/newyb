@@ -1,5 +1,7 @@
 package com.yiban.erp.entities;
 
+import java.util.Objects;
+
 public class UserRole {
     private Long id;
 
@@ -69,5 +71,26 @@ public class UserRole {
 
     public void setCanDelete(Boolean canDelete) {
         this.canDelete = canDelete;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null) {
+            return false;
+        }
+        if (o == this) {
+            return true;
+        }
+        if (!(o instanceof UserRole)) {
+            return false;
+        }
+        UserRole userRole = (UserRole) o;
+        return Objects.equals(userId, userRole.getUserId())
+                && Objects.equals(name, userRole.getName())
+                && Objects.equals(canAudit, userRole.getCanAudit())
+                && Objects.equals(canDelete, userRole.getCanDelete())
+                && Objects.equals(canUpdate, userRole.getCanUpdate())
+                && Objects.equals(canWrite, userRole.getCanWrite());
+
     }
 }

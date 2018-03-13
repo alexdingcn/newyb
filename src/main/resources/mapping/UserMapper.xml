@@ -32,9 +32,18 @@
     where id = #{id,jdbcType=BIGINT}
   </select>
 
-  <select id="findUserByNameOrMobile" resultType="com.yiban.erp.entities.User" parameterType="java.lang.String" >
+  <select id="selectAll" resultMap="BaseResultMap" >
     select
-      u.*, ua.identifier as identifier, ua.identifier_type as identifier_type, ua.credential as credential
+    <include refid="Base_Column_List" />
+    from users
+    where status > 0
+  </select>
+
+  <select id="findUserByNameOrMobile" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select
+    u.id, u.company_id, u.nickname, mobile, u.realname, u.email, u.phone, u.idcard, u.forget_token, u.address,
+    u.birthday, u.sex, u.status, u.comment, u.created_by, u.updated_by, u.created_time, u.updated_time,
+    ua.identifier as identifier, ua.identifier_type as identifier_type, ua.credential as credential
     from users u, user_auths ua
     where u.id = ua.user_id
     and ua.identifier = #{identifier, jdbcType=VARCHAR}

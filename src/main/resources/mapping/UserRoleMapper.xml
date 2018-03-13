@@ -25,6 +25,20 @@
     from user_roles
     where user_id = #{userId,jdbcType=BIGINT}
   </select>
+  <select id="findByRoles" resultMap="BaseResultMap">
+    select
+    ur.*
+    from user_roles ur, users u
+    where
+    ur.user_id = u.id
+    and u.company_id = #{companyId, jdbcType=INTEGER}
+    <if test="roleList != null" >
+      and name in
+      <foreach collection="roleList" item="item" open="(" separator="," close=")">
+        #{item}
+      </foreach>
+    </if>
+  </select>
 
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
     delete from user_roles
@@ -38,6 +52,56 @@
       #{canWrite,jdbcType=BIT}, #{canUpdate,jdbcType=BIT}, #{canAudit,jdbcType=BIT}, 
       #{canDelete,jdbcType=BIT})
   </insert>
+  <insert id="replaceInto" parameterType="com.yiban.erp.entities.UserRole" useGeneratedKeys="true" keyProperty="id">
+    replace into user_roles
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="userId != null" >
+        user_id,
+      </if>
+      <if test="name != null" >
+        name,
+      </if>
+      <if test="canWrite != null" >
+        can_write,
+      </if>
+      <if test="canUpdate != null" >
+        can_update,
+      </if>
+      <if test="canAudit != null" >
+        can_audit,
+      </if>
+      <if test="canDelete != null" >
+        can_delete,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=BIGINT},
+      </if>
+      <if test="userId != null" >
+        #{userId,jdbcType=BIGINT},
+      </if>
+      <if test="name != null" >
+        #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="canWrite != null" >
+        #{canWrite,jdbcType=BIT},
+      </if>
+      <if test="canUpdate != null" >
+        #{canUpdate,jdbcType=BIT},
+      </if>
+      <if test="canAudit != null" >
+        #{canAudit,jdbcType=BIT},
+      </if>
+      <if test="canDelete != null" >
+        #{canDelete,jdbcType=BIT},
+      </if>
+    </trim>
+  </insert>
+
   <insert id="insertSelective" parameterType="com.yiban.erp.entities.UserRole" useGeneratedKeys="true" keyProperty="id">
     insert into user_roles
     <trim prefix="(" suffix=")" suffixOverrides="," >

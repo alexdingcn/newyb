@@ -4,6 +4,8 @@ import com.yiban.erp.entities.User;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.List;
+
 @Mapper
 public interface UserMapper {
     int deleteByPrimaryKey(Long id);
@@ -19,4 +21,6 @@ public interface UserMapper {
     int updateByPrimaryKey(User record);
 
     User findUserByNameOrMobile(@Param("identifier") String identifier);
+
+    List<User> selectAll();
 }

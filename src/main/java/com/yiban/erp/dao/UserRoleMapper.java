@@ -21,4 +21,8 @@ public interface UserRoleMapper {
     int updateByPrimaryKey(UserRole record);
 
     List<UserRole> findByUserId(@Param("userId") Long userId);
+
+    List<UserRole> findByRoles(@Param("roleList") List<String> strings, @Param("companyId") Integer companyId);
+
+    int replaceInto(UserRole role);
 }
