@@ -69,7 +69,8 @@
                 },
                 ruleCustom: {
                     company: [
-                        {message: '企业名称不能为空', trigger: 'blur'}
+                        {message: '企业名称不能为空', trigger: 'blur'},
+                        {validator: validatebusinessLicense, trigger: 'blur'}
                     ],
                     businessLicense: [
                         {message: '营业执照注册号不能为空', trigger: 'blur'},
@@ -98,7 +99,7 @@
         },
         methods: {
             handleSubmit (name) {
-                this.loading = true
+                this.loading = true;
                 this.$refs[name].validate((valid) => {
                     if (valid) {
                         var self = this;

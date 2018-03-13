@@ -1,34 +1,29 @@
 package com.yiban.erp.config;
 
-import com.alibaba.fastjson.JSONObject;
-import com.yiban.erp.exception.ErrorCode;
+import com.yiban.erp.dao.UserAuthMapper;
+import com.yiban.erp.dao.UserMapper;
+import com.yiban.erp.dao.UserRoleMapper;
+import com.yiban.erp.service.auth.CustomAuthenticationProvider;
+import com.yiban.erp.service.auth.JWTAuthenticationFilter;
+import com.yiban.erp.service.auth.JWTLoginFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.web.authentication.AuthenticationFailureHandler;
-import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
-import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.io.PrintWriter;
+import java.util.Arrays;
 
 /**
  * CORS configuration
@@ -41,10 +36,12 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     private UserDetailsService userDetailsService;
 
-    @Bean
-    public BCryptPasswordEncoder bCryptPasswordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
+    @Autowired
+    private UserMapper userMapper;
+
+    @Autowired
+    private UserRoleMapper userRoleMapper;
+
 
     @Override
     public void configure(WebSecurity web) throws Exception {
@@ -54,69 +51,92 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .and()
+                .cors()
+                .and()
                 .exceptionHandling().authenticationEntryPoint(new UnauthorizedEntryPoint())
                 .and().csrf().disable()
                 .authorizeRequests()
-                .antMatchers("/login/**", "/register").permitAll()
+                .antMatchers("/login/**", "/logoff").permitAll()
                 .anyRequest().authenticated()
+//                .and()
+//                .formLogin()
+//                .loginProcessingUrl("/login")
+//                .failureHandler(new AuthenticationFailureHandler() {
+//                    @Override
+//                    public void onAuthenticationFailure(HttpServletRequest httpServletRequest,
+//                                                        HttpServletResponse httpServletResponse,
+//                                                        AuthenticationException e) throws IOException, ServletException {
+//                        httpServletResponse.setContentType(MediaType.APPLICATION_JSON_UTF8_VALUE);
+//                        httpServletResponse.setStatus(HttpStatus.BAD_REQUEST.value());
+//                        PrintWriter out = httpServletResponse.getWriter();
+//                        try {
+//                            if (out != null) {
+//                                if (e != null) {
+//                                    JSONObject obj = new JSONObject();
+//                                    if ("Bad credentials".equalsIgnoreCase(e.getMessage())) {
+//                                        obj.put("message", ErrorCode.LOGIN_PASSWORD_INVALID.getMessage());
+//                                    } else {
+//                                        obj.put("message", e.getMessage());
+//                                    }
+//                                    out.write(obj.toJSONString());
+//                                    out.flush();
+//                                }
+//                            }
+//                        } finally {
+//                            if (out != null) {
+//                                out.close();
+//                            }
+//                        }
+//
+//                    }
+//                })
+//                .successHandler(new AuthenticationSuccessHandler() {
+//                    @Override
+//                    public void onAuthenticationSuccess(HttpServletRequest httpServletRequest,
+//                                                        HttpServletResponse httpServletResponse,
+//                                                        Authentication authentication) throws IOException, ServletException {
+//                        if (authentication.isAuthenticated()) {
+//                            SecurityContextHolder.getContext().setAuthentication(authentication);
+//
+//                            Object userDetails = authentication.getDetails();
+//                            if (userDetails instanceof UserDetails) {
+//                                logger.info(String.format("Login %s successfully!", ((UserDetails) userDetails).getUsername()));
+//                            }
+//
+//                        }
+//                    }
+//                })
+//                .permitAll()
+                // 添加一个过滤器 所有访问 /login 的请求交给 JWTLoginFilter 来处理 这个类处理所有的JWT相关内容
                 .and()
-                .formLogin()
-                .loginPage("/login_page")
-                .loginProcessingUrl("/login")
-                .failureHandler(new AuthenticationFailureHandler() {
-                    @Override
-                    public void onAuthenticationFailure(HttpServletRequest httpServletRequest,
-                                                        HttpServletResponse httpServletResponse,
-                                                        AuthenticationException e) throws IOException, ServletException {
-                        httpServletResponse.setContentType(MediaType.APPLICATION_JSON_UTF8_VALUE);
-                        httpServletResponse.setStatus(HttpStatus.BAD_REQUEST.value());
-                        PrintWriter out = httpServletResponse.getWriter();
-                        try {
-                            if (out != null) {
-                                if (e != null) {
-                                    JSONObject obj = new JSONObject();
-                                    if ("Bad credentials".equalsIgnoreCase(e.getMessage())) {
-                                        obj.put("message", ErrorCode.LOGIN_PASSWORD_INVALID.getMessage());
-                                    } else {
-                                        obj.put("message", e.getMessage());
-                                    }
-                                    out.write(obj.toJSONString());
-                                    out.flush();
-                                }
-                            }
-                        } finally {
-                            if (out != null) {
-                                out.close();
-                            }
-                        }
+                .addFilterBefore(new JWTLoginFilter("/login", authenticationManager()),
+                        UsernamePasswordAuthenticationFilter.class)
 
-                    }
-                })
-                .successHandler(new AuthenticationSuccessHandler() {
-                    @Override
-                    public void onAuthenticationSuccess(HttpServletRequest httpServletRequest,
-                                                        HttpServletResponse httpServletResponse,
-                                                        Authentication authentication) throws IOException, ServletException {
-                        if (authentication.isAuthenticated()) {
-                            SecurityContextHolder.getContext().setAuthentication(authentication);
-
-                            Object userDetails = authentication.getDetails();
-                            if (userDetails instanceof UserDetails) {
-                                logger.info(String.format("Login %s successfully!", ((UserDetails)userDetails).getUsername()));
-                            }
-
-                        }
-                    }
-                })
-                .permitAll()
-                .and()
-                .logout()
-                .permitAll();
+                .addFilterBefore(new JWTAuthenticationFilter(), BasicAuthenticationFilter.class);
     }
+
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        final CorsConfiguration configuration = new CorsConfiguration();
+        configuration.setAllowedOrigins(Arrays.asList("*"));
+        configuration.setAllowedMethods(Arrays.asList("HEAD", "GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        // setAllowCredentials(true) is important, otherwise:
+        // The value of the 'Access-Control-Allow-Origin' header in the response must not be the wildcard '*' when the request's credentials mode is 'include'.
+        configuration.setAllowCredentials(true);
+        // setAllowedHeaders is important! Without it, OPTIONS preflight request
+        // will fail with 403 Invalid CORS request
+        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Cache-Control", "Content-Type"));
+        final UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
+    }
+
 
     @Autowired
     public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
-        auth.userDetailsService(userDetailsService).passwordEncoder(bCryptPasswordEncoder());
+        auth.authenticationProvider(new CustomAuthenticationProvider(userMapper, userRoleMapper));
     }
 
 }

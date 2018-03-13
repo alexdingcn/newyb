@@ -11,7 +11,9 @@ public enum ErrorCode {
     // 11xx - 用户
     USER_NAME_NOT_EXISTED(1100, "用户名不存在"),
     LOGIN_PASSWORD_INVALID(1101, "密码错误"),
-    USER_REGISTER_FAIL(1102, "用户创建失败"),
+    LOGIN_USERNAME_MISSING(1102, "请输入用户名"),
+    LOGIN_PASSWORD_MISSING(1103, "请输入密码"),
+    USER_REGISTER_FAIL(1104, "用户创建失败"),
 
     // 12xx - 商品
     GOODS_CATEGORY_ID_MISSING(1201, "缺失商品分类ID"),

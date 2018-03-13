@@ -33,7 +33,6 @@ public class RegisterController {
     @Autowired
     private UserAuthMapper userAuthMapper;
 
-
     @Transactional
     @RequestMapping(value = "/register", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> register(@RequestBody Map requestMap) {
