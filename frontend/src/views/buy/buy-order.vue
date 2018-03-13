@@ -27,6 +27,7 @@
 									clearable
 									remote
 									size="small"
+									@on-change="onSelectSupplier"
 									placeholder="供应商名称/拼音"
 									:remote-method="querySupplier"
 									:loading="supplierLoading">
@@ -35,13 +36,32 @@
                             </FormItem>
                         </Col>
                         <Col span="5">
-             				<FormItem label="供应商代表" prop="supplierAgent" >
-                                
+             				<FormItem label="供应商代表" prop="supplierContact" >
+								<Select ref="supplierContactSelect"
+										v-model="buyOrder.supplierContactId"
+										clearable
+										remote
+										size="small"
+										placeholder="供应商代表"
+										:remote-method="querySupplierContact"
+										:loading="supplierContactLoading">
+									<Option v-for="option in supplierContactOptions" :value="option.id" :label="option.name" :key="option.id">{{option.name}}</Option>
+								</Select>
                             </FormItem>
                         </Col>
 						<Col span="6">
 							<FormItem label="采购员" prop="buyerId">
-								<Input v-model="buyOrder.buyerId" size="small"/>
+								<Select
+										v-model="buyOrder.buyerId"
+										clearable
+										remote
+										size="small"
+										placeholder="采购员">
+									<Option v-for="option in buyerOptions" :value="option.userId" :label="option.nickname" :key="option.userId">
+										{{option.nickname}}
+										{{option.realname||''}}
+									</Option>
+								</Select>
 							</FormItem>
 						</Col>
 						<Col span="6">
@@ -141,6 +161,9 @@
             	supplierOptions: [],
             	goodsLoading: false,
             	goodsOptions: [],
+				buyerOptions: [],
+				supplierContactLoading: false,
+				supplierContactOptions: [],
             	totalAmount: 0,
             	edittingRow: {},
             	fapiaoTypes: [
@@ -360,7 +383,7 @@
         };
         },
         mounted() {
-			
+			this.queryBuyers();
         },
         watch: {
         	orderItems: function () {
@@ -387,6 +410,38 @@
                     this.supplierOptions = [];
                 }
             },
+			queryBuyers() {
+				var self = this;
+				util.ajax.get('/userrole/list', {params: {roleQuery: 'ROLE_BUYER;ROLE_BUYER_SPECIAL'} })
+						.then(function (response) {
+							if (response.status === 200 && response.data) {
+								self.buyerOptions = response.data;
+							}
+						})
+						.catch(function (error) {
+							console.log(error);
+						})
+			},
+			onSelectSupplier(item) {
+				this.$refs.supplierContactSelect.clearSingleSelect();
+				this.querySupplierContact(item);
+			},
+			querySupplierContact(supplierId) {
+				var self = this;
+				if (supplierId) {
+					this.supplierContactLoading = true;
+					util.ajax.get('/supplier/contact/list', {params: {supplierId: supplierId}})
+						.then(function (response) {
+							self.supplierContactLoading = false;
+							self.supplierContactOptions = response.data;
+						})
+						.catch(function (error) {
+							console.log(error);
+						});
+				} else {
+					this.supplierContactOptions = [];
+				}
+			},
             queryGoods (query) {
 				var self = this;
                 if (query !== '') {

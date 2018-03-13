@@ -17,6 +17,12 @@ public class UserRole {
 
     private Boolean canDelete;
 
+    private String realname;
+
+    private String nickname;
+
+    private String mobile;
+
     public Long getId() {
         return id;
     }
@@ -71,6 +77,30 @@ public class UserRole {
 
     public void setCanDelete(Boolean canDelete) {
         this.canDelete = canDelete;
+    }
+
+    public String getRealname() {
+        return realname;
+    }
+
+    public void setRealname(String realname) {
+        this.realname = realname;
+    }
+
+    public String getNickname() {
+        return nickname;
+    }
+
+    public void setNickname(String nickname) {
+        this.nickname = nickname;
+    }
+
+    public String getMobile() {
+        return mobile;
+    }
+
+    public void setMobile(String mobile) {
+        this.mobile = mobile;
     }
 
     @Override

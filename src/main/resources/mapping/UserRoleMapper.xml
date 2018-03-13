@@ -27,7 +27,7 @@
   </select>
   <select id="findByRoles" resultMap="BaseResultMap">
     select
-    ur.*
+    ur.*, u.realname, u.nickname, u.mobile
     from user_roles ur, users u
     where
     ur.user_id = u.id
