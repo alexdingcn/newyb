@@ -70,7 +70,7 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
                 }
             }
 
-            Authentication auth = new UsernamePasswordAuthenticationToken(user.getNickname(), password, grantedAuthorities);
+            Authentication auth = new UsernamePasswordAuthenticationToken(user.getCompactUser(), password, grantedAuthorities);
             return auth;
 
         } else {

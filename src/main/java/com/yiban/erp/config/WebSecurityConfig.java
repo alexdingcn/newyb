@@ -34,9 +34,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     private static final Logger logger = LoggerFactory.getLogger(WebSecurityConfig.class);
 
     @Autowired
-    private UserDetailsService userDetailsService;
-
-    @Autowired
     private UserMapper userMapper;
 
     @Autowired
@@ -60,60 +57,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .authorizeRequests()
                 .antMatchers("/login/**", "/logoff").permitAll()
                 .anyRequest().authenticated()
-//                .and()
-//                .formLogin()
-//                .loginProcessingUrl("/login")
-//                .failureHandler(new AuthenticationFailureHandler() {
-//                    @Override
-//                    public void onAuthenticationFailure(HttpServletRequest httpServletRequest,
-//                                                        HttpServletResponse httpServletResponse,
-//                                                        AuthenticationException e) throws IOException, ServletException {
-//                        httpServletResponse.setContentType(MediaType.APPLICATION_JSON_UTF8_VALUE);
-//                        httpServletResponse.setStatus(HttpStatus.BAD_REQUEST.value());
-//                        PrintWriter out = httpServletResponse.getWriter();
-//                        try {
-//                            if (out != null) {
-//                                if (e != null) {
-//                                    JSONObject obj = new JSONObject();
-//                                    if ("Bad credentials".equalsIgnoreCase(e.getMessage())) {
-//                                        obj.put("message", ErrorCode.LOGIN_PASSWORD_INVALID.getMessage());
-//                                    } else {
-//                                        obj.put("message", e.getMessage());
-//                                    }
-//                                    out.write(obj.toJSONString());
-//                                    out.flush();
-//                                }
-//                            }
-//                        } finally {
-//                            if (out != null) {
-//                                out.close();
-//                            }
-//                        }
-//
-//                    }
-//                })
-//                .successHandler(new AuthenticationSuccessHandler() {
-//                    @Override
-//                    public void onAuthenticationSuccess(HttpServletRequest httpServletRequest,
-//                                                        HttpServletResponse httpServletResponse,
-//                                                        Authentication authentication) throws IOException, ServletException {
-//                        if (authentication.isAuthenticated()) {
-//                            SecurityContextHolder.getContext().setAuthentication(authentication);
-//
-//                            Object userDetails = authentication.getDetails();
-//                            if (userDetails instanceof UserDetails) {
-//                                logger.info(String.format("Login %s successfully!", ((UserDetails) userDetails).getUsername()));
-//                            }
-//
-//                        }
-//                    }
-//                })
-//                .permitAll()
                 // 添加一个过滤器 所有访问 /login 的请求交给 JWTLoginFilter 来处理 这个类处理所有的JWT相关内容
                 .and()
                 .addFilterBefore(new JWTLoginFilter("/login", authenticationManager()),
                         UsernamePasswordAuthenticationFilter.class)
-
                 .addFilterBefore(new JWTAuthenticationFilter(), BasicAuthenticationFilter.class);
     }
 
@@ -121,13 +68,14 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     public CorsConfigurationSource corsConfigurationSource() {
         final CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(Arrays.asList("*"));
-        configuration.setAllowedMethods(Arrays.asList("HEAD", "GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        configuration.setAllowedMethods(Arrays.asList("HEAD", "GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
         // setAllowCredentials(true) is important, otherwise:
         // The value of the 'Access-Control-Allow-Origin' header in the response must not be the wildcard '*' when the request's credentials mode is 'include'.
         configuration.setAllowCredentials(true);
         // setAllowedHeaders is important! Without it, OPTIONS preflight request
         // will fail with 403 Invalid CORS request
-        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Cache-Control", "Content-Type"));
+        //Arrays.asList("Authorization", "Cache-Control", "Content-Type")
+        configuration.setAllowedHeaders(Arrays.asList("*"));
         final UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;

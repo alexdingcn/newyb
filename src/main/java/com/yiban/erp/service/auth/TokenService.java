@@ -1,5 +1,7 @@
 package com.yiban.erp.service.auth;
 
+import com.alibaba.fastjson.JSON;
+import com.yiban.erp.entities.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -24,14 +26,22 @@ public class TokenService {
     private static final String TOKEN_PREFIX = "Bearer";        // Token前缀
     private static final String HEADER_STRING = "Authorization";// 存放Token的Header Key
 
-    static void addAuthentication(HttpServletResponse response, String username) {
+    static void addAuthentication(HttpServletResponse response, Authentication authentication) {
+
+        List<GrantedAuthority> auths = (List<GrantedAuthority>) authentication.getAuthorities();
+        StringBuilder sb = new StringBuilder();
+        for (GrantedAuthority auth : auths) {
+            sb.append(auth.getAuthority());
+        }
 
         // 生成JWT
         String JWT = Jwts.builder()
                 // 保存权限（角色）
-                .claim("authorities", "ROLE_ADMIN,AUTH_WRITE")
+                .claim("authorities", sb.toString())
                 // 用户名写入标题
-                .setSubject(username)
+//                .setSubject(authentication.getName())
+                .claim("user", JSON.toJSONString(authentication.getPrincipal()))
+//                .setSubject(authentication.getName())
                 // 有效期设置
                 .setExpiration(new Date(System.currentTimeMillis() + EXPIRATIONTIME))
                 // 签名设置
@@ -62,8 +72,12 @@ public class TokenService {
                     .parseClaimsJws(token.replace(TOKEN_PREFIX, ""))
                     .getBody();
 
-            // 拿用户名
-            String user = claims.getSubject();
+            // 拿用户
+            User user = null;
+            if (claims.containsKey("user")) {
+                String userStr = (String) claims.get("user");
+                user = JSON.parseObject(userStr, User.class);
+            }
 
             // 得到 权限（角色）
             List<GrantedAuthority> authorities = AuthorityUtils.commaSeparatedStringToAuthorityList((String) claims.get("authorities"));

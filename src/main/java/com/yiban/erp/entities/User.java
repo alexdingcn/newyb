@@ -1,5 +1,6 @@
 package com.yiban.erp.entities;
 
+import com.alibaba.fastjson.annotation.JSONField;
 import com.yiban.erp.constants.IdentifierType;
 
 import java.util.Date;
@@ -213,5 +214,22 @@ public class User {
 
     public void setCredential(String credential) {
         this.credential = credential;
+    }
+
+    @JSONField(serialize = false)
+    public User getCompactUser() {
+        // return cloned user without credential
+        User user = new User();
+        user.setMobile(this.getMobile());
+        user.setCompanyId(this.getCompanyId());
+        user.setNickname(this.getNickname());
+        user.setRealname(this.getRealname());
+        user.setCreatedTime(this.getCreatedTime());
+        user.setUpdatedTime(this.getUpdatedTime());
+        user.setEmail(this.getEmail());
+        user.setId(this.getId());
+        user.setIdcard(this.getIdcard());
+        user.setStatus(this.getStatus());
+        return user;
     }
 }

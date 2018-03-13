@@ -4,11 +4,13 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.yiban.erp.dao.GoodsMapper;
 import com.yiban.erp.entities.Goods;
+import com.yiban.erp.entities.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -28,7 +30,8 @@ public class GoodController {
      * @return
      */
     @RequestMapping(value = "/list", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> list(@RequestParam(required = false) Integer catId,
+    public ResponseEntity<String> list(@AuthenticationPrincipal User user,
+                                        @RequestParam(required = false) Integer catId,
                                        @RequestParam(required = false) String search,
                                        @RequestParam(required = false) Integer factoryId,
                                        @RequestParam(required = false) Integer page,

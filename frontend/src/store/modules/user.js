@@ -11,7 +11,9 @@ const user = {
         },
         logout (state, vm) {
             // Cookies.remove('user');
-            Cookies.remove('access');
+            Cookies.remove('token');
+            localStorage.token = null;
+            state.token = null;
             // 恢复默认样式
             let themeLink = document.querySelector('link[name="theme"]');
             themeLink.setAttribute('href', '');
