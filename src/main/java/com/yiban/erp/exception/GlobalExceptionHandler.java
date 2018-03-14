@@ -65,6 +65,7 @@ public class GlobalExceptionHandler {
             return ResponseEntity.badRequest().build();
         }
         String url = request.getRequestURL().toString();
+        logger.error("update file fail. ", exception);
         if (exception.getCause() != null && exception.getCause().getCause() != null &&
                 exception.getCause().getCause() instanceof FileUploadBase.SizeLimitExceededException) {
             ErrorInfo errorInfo = getErrorInfo(ErrorCode.FILE_UPLOAD_SIZE_ERROR, url, null);

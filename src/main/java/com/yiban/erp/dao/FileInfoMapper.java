@@ -31,12 +31,14 @@ public interface FileInfoMapper {
                          @Param("fileNo") String fileNo);
 
     Integer getByFileTypeAndNameCount(@Param("companyId") Integer companyId,
-                                             @Param("fileType") String fileType,
-                                             @Param("fileName") String fileName);
+                                      @Param("fileType") String fileType,
+                                      @Param("fileName") String fileName,
+                                      @Param("fileNo") String fileNo);
 
     List<FileInfo> getByFileTypeAndName(@Param("companyId") Integer companyId,
                                         @Param("fileType") String fileType,
                                         @Param("fileName") String fileName,
+                                        @Param("fileNo") String fileNo,
                                         @Param("offset") Integer offset,
                                         @Param("limit") Integer limit);
 

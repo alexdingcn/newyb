@@ -20,17 +20,16 @@ const ajaxUrl = env === 'development'
         ? 'https://www.yibanjf.com'
         : 'https://debug.yibanjf.com';
 
-
 util.ajax = axios.create({
     baseURL: ajaxUrl,
-    timeout: 30000,
+    timeout: 30000
 });
 util.ajax.defaults.headers['Content-Type'] = 'application/json';
 
 // http request 拦截器
 util.ajax.interceptors.request.use(
     config => {
-    // 判断是否存在token，如果存在的话，则每个http header都加上token
+        // 判断是否存在token，如果存在的话，则每个http header都加上token
         if (store.state.user.token) {
             config.headers.Authorization = `Bearer ${store.state.user.token}`;
         }
@@ -49,24 +48,19 @@ util.ajax.interceptors.response.use(
     error => {
         if (error.response) {
             switch (error.response.status) {
-            case 401:
-                // 返回 401 清除token信息并跳转到登录页面
-                store.commit('logout', this);
+                case 401:
+                    // 返回 401 清除token信息并跳转到登录页面
+                    store.commit('logout', this);
 
-                router.replace({
-                    path: '/login',
-                    query: {redirect: router.currentRoute.fullPath}
-                })
+                    router.replace({
+                        path: '/login',
+                        query: { redirect: router.currentRoute.fullPath }
+                    });
             }
         }
-        if (error && error.response && error.response.data) {
-            return Promise.reject(error.response.data);  // 返回接口返回的错误信息
-        } else {
-            return Promise.reject('服务器异常');
-        }
+        return Promise.reject(error);  // 返回接口返回的错误信息
     }
 );
-
 
 util.inOf = function (arr, targetArr) {
     let res = true;

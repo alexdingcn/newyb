@@ -1,11 +1,13 @@
 package com.yiban.erp.config;
 
-import org.apache.log4j.Logger;
+import com.yiban.erp.entities.User;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
 import org.aspectj.lang.annotation.Pointcut;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -25,7 +27,7 @@ import java.util.Arrays;
 @Component
 public class WebLogAspect {
 
-    private Logger logger = Logger.getLogger(getClass());
+    private Logger logger = LoggerFactory.getLogger(getClass());
 
     ThreadLocal<Long> startTime = new ThreadLocal<>();
 
@@ -51,6 +53,13 @@ public class WebLogAspect {
 
         logger.info("ARGS : " + Arrays.toString(joinPoint.getArgs()));
 
+        for (Object item : joinPoint.getArgs()) {
+            if (item instanceof User) {
+                User user = (User) item;
+                logger.info("USER :{}, {}", user.getId(), user.getNickname());
+                break;
+            }
+        }
     }
 
     @AfterReturning(returning = "ret", pointcut = "webLog()")

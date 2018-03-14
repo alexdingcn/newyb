@@ -105,7 +105,7 @@ public class FileService {
      * @param size 每页条数
      * @return
      */
-    public List<FileInfo> getList(Integer companyId, String fileType, String fileName, Integer page, Integer size) {
+    public List<FileInfo> getList(Integer companyId, String fileType, String fileName, String fileNo, Integer page, Integer size) {
         if (companyId == null) {
             logger.warn("get file info list but company id is null.");
             return Collections.emptyList();
@@ -115,11 +115,11 @@ public class FileService {
         if (limit != null) {
             offset = (page == null || page <= 0 ? 0 : page - 1) * limit;
         }
-        return fileInfoMapper.getByFileTypeAndName(companyId, fileType, fileName, offset, limit);
+        return fileInfoMapper.getByFileTypeAndName(companyId, fileType, fileName, fileNo, offset, limit);
     }
 
-    public Integer getListCount(Integer companyId, String fileType, String fileName) {
-        return fileInfoMapper.getByFileTypeAndNameCount(companyId, fileType, fileName);
+    public Integer getListCount(Integer companyId, String fileType, String fileName, String fileNo) {
+        return fileInfoMapper.getByFileTypeAndNameCount(companyId, fileType, fileName, fileNo);
     }
 
     public FileInfo addFileInfo(User user, FileInfo fileInfo) throws BizException {
@@ -133,6 +133,7 @@ public class FileService {
             logger.warn("validate add file info fail. user:{}", user.getNickname());
             throw new BizException(ErrorCode.FILE_ADD_PARAMS_ERROR);
         }
+        reqData.setCompanyId(user.getCompanyId());
         reqData.setFileStatus(FileStatus.NORMAL.name().toLowerCase());
         reqData.setCreateBy(user.getNickname());
         reqData.setCreateTime(new Date());
@@ -183,7 +184,7 @@ public class FileService {
         StringBuilder sb = new StringBuilder();
         sb.append(String.valueOf(companyId));
         sb.append(UtilTool.DateFormat(new Date(), "yyMMddHHmmss"));
-        sb.append(RandomStringUtils.random(3));
+        sb.append(RandomStringUtils.randomNumeric(3));
         return sb.toString();
     }
 
@@ -266,7 +267,7 @@ public class FileService {
         fileName.append(String.valueOf(fileId));
         fileName.append("_");
         fileName.append(dateTimeStr);
-        fileName.append(RandomStringUtils.random(2));
+        fileName.append(RandomStringUtils.randomNumeric(2));
         if (originalName.lastIndexOf('.') > 0) {
             fileName.append(originalName.substring(originalName.lastIndexOf('.') - 1));
         }

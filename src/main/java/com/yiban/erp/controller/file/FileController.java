@@ -59,14 +59,15 @@ public class FileController {
                                        @RequestParam(value = "size", required = false) Integer size,
                                        @RequestParam(value = "fileType", required = false) String fileType,
                                        @RequestParam(value = "fileName", required = false) String fileName,
+                                       @RequestParam(value = "fileNo", required = false) String fileNo,
                                        @AuthenticationPrincipal User user) throws Exception {
 
-        logger.debug("user:{} request file info list by params: {} {} {} {}",
-                user.getId(), page, size, fileType, fileName);
-        List<FileInfo> fileInfos = fileService.getList(user.getCompanyId(), fileType, fileName, page, size);
+        logger.debug("user:{} request file info list by params: {} {} {} {} {}",
+                user.getId(), page, size, fileType, fileName, fileNo);
+        List<FileInfo> fileInfos = fileService.getList(user.getCompanyId(), fileType, fileName, fileNo, page, size);
         int count = 0;
         if (!fileInfos.isEmpty()) {
-            count = fileService.getListCount(user.getCompanyId(), fileType, fileName);
+            count = fileService.getListCount(user.getCompanyId(), fileType, fileName, fileNo);
         }
         JSONObject result = new JSONObject();
         result.put("count", count);
@@ -93,9 +94,10 @@ public class FileController {
         return ResponseEntity.ok().body(result.toJSONString());
     }
 
-    @RequestMapping(value = "/upload/add", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/upload/add", method = RequestMethod.POST)
     public ResponseEntity<String> uploadFile(HttpServletRequest request,
                                              @AuthenticationPrincipal User user) throws Exception {
+        logger.info(request.getHeader("Content-Type"));
         MultipartHttpServletRequest mtRequest = (MultipartHttpServletRequest) request;
         String fileInfoId = mtRequest.getParameter("fileId");
         if (StringUtils.isBlank(fileInfoId) || !StringUtils.isNumeric(fileInfoId)) {

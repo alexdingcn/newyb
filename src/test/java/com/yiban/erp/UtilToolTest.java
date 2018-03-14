@@ -2,6 +2,7 @@ package com.yiban.erp;
 
 import com.yiban.erp.entities.Customer;
 import com.yiban.erp.util.UtilTool;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.Test;
 
 public class UtilToolTest {
