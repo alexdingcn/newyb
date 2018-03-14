@@ -97,7 +97,6 @@ public class FileController {
     @RequestMapping(value = "/upload/add", method = RequestMethod.POST)
     public ResponseEntity<String> uploadFile(HttpServletRequest request,
                                              @AuthenticationPrincipal User user) throws Exception {
-        logger.info(request.getHeader("Content-Type"));
         MultipartHttpServletRequest mtRequest = (MultipartHttpServletRequest) request;
         String fileInfoId = mtRequest.getParameter("fileId");
         if (StringUtils.isBlank(fileInfoId) || !StringUtils.isNumeric(fileInfoId)) {

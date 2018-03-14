@@ -557,7 +557,7 @@
       <result column="sequence_no" property="sequenceNo" jdbcType="INTEGER" />
       <result column="cat_comment" property="comment" jdbcType="VARCHAR" />
     </association>
-    <collection property="customerCerts" javaType="com.yiban.erp.entities.CustomerCert">
+    <collection property="customerCerts" ofType="com.yiban.erp.entities.CustomerCert">
       <id column="cert_id" property="id" jdbcType="INTEGER" />
       <result column="cert_customer_id" property="customerId" jdbcType="INTEGER" />
       <result column="cert_license_name" property="licenseName" jdbcType="VARCHAR" />
@@ -569,7 +569,7 @@
       <result column="cert_create_by" property="createBy" jdbcType="VARCHAR" />
       <result column="cert_update_by" property="updateBy" jdbcType="VARCHAR" />
     </collection>
-    <collection property="customerReps" javaType="com.yiban.erp.entities.CustomerRep">
+    <collection property="customerReps" ofType="com.yiban.erp.entities.CustomerRep">
       <id column="rep_id" property="id" jdbcType="INTEGER" />
       <result column="rep_customer_id" property="customerId" jdbcType="INTEGER" />
       <result column="rep_name" property="name" jdbcType="VARCHAR" />

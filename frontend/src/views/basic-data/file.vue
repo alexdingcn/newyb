@@ -126,16 +126,25 @@
               </Form>
           </Row>
           <Row type="flex" justify="center">
-            <Upload ref="uploadComment" multiple :before-upload="handleBeforeUpload" 
-                    action="//jsonplaceholder.typicode.com/posts/">
-                <Button type="ghost" icon="ios-cloud-upload-outline">选择需要上传的文件</Button>
-            </Upload>
-          </Row>
-          <Row type="flex" justify="center" v-for="(value, index) in needUploadFiles" :key="index">
-                <strong>{{ value.file.name }}</strong>
-                <Button size="small" shape="circle" :type="value.btnType" :loading="value.loading" @click="chooseFileBtn(index)">
-                    <Icon :type="value.icon"></Icon>
-                </Button>
+              <Col span="12">
+                <Upload ref="uploadModal" multiple :before-upload="handleBeforeUpload" 
+                        :max-size="uploadMaxSize" 
+                        :format="uploadFormat" 
+                        :data="fileUploadFormData" 
+                        :headers="uploadHeaders" 
+                        :action="uploadAction">
+                    <Button type="ghost" icon="ios-cloud-upload-outline">选择需要上传的文件</Button>
+                </Upload>
+              </Col>
+              <Col span="10" offset="2">
+                <Row type="flex" justify="center">
+                    <p>已选择的文件</p>
+                </Row>
+                <Row type="flex" justify="center" v-for="(item, index) in chooseUploadFiles" :key="index">
+                    <strong>{{item.name}}</strong>
+                    <a href="#" :disabled="item.disabled" @click="removeChooseUploadFile(index)"><Icon :type="item.icon" :color="item.color"></Icon></a>
+                </Row>
+              </Col>
           </Row>
           
           <div slot="footer">
@@ -158,6 +167,7 @@
 
 <script>
 import util from '@/libs/util.js';
+import store from '@/store';
 
 export default {
     name: "basic_data_file",
@@ -270,7 +280,14 @@ export default {
                 comment: ''
             },
             fileUploadSubmitLoading: false,
-            needUploadFiles:[]
+            uploadMaxSize: 10240,
+            uploadFormat: ['png', 'jpg', 'jpeg', 'pdf', 'doc', 'docx', 'xlsx', 'xls', 'csv'],
+            needUploadFiles: [],
+            chooseUploadFiles: [],
+            uploadHeaders: {
+                Authorization: ''
+            },
+            uploadAction: `${util.baseUrl}/file/upload/add`
         }
     },
     mounted() {
@@ -484,25 +501,35 @@ export default {
         },
 
         handleBeforeUpload(file) {
-            let reader = new FileReader()
-            reader.readAsDataURL(file)
-            const _this = this;
             let item = {
-                loading: false,
-                btnType: 'error',
-                icon: 'close-round',
-                file: null
-            }
-            reader.onloadend = (e) => {
-                file.url = reader.result
-                item.file = file;
-            }
-            this.needUploadFiles.push(item);
+                name: file.name,
+                icon: 'close-circled',
+                color: 'red',
+                disabled: false
+            };
+            this.needUploadFiles.push(file);
+            this.chooseUploadFiles.push(item);
             return false;
         },
 
-        chooseFileBtn(data) {
+        removeChooseUploadFile(data) {
+            this.chooseUploadFiles.splice(data, 1);
             this.needUploadFiles.splice(data, 1);
+            this.$refs.uploadModal.fileList.splice(data, 1);
+        },
+
+        getUploadHeaders() {
+            if(store.state.user.token) {
+                return {
+                    Authorization: `Bearer ${store.state.user.token}`
+                };
+            }else {
+                this.$Notice.error({
+                    title: '系统异常',
+                    desc: '请退出后重新登录'
+                });
+                return null;
+            }
         },
 
         fileUploadSubmit() {
@@ -510,26 +537,18 @@ export default {
                 this.$Message.info('请先选择需要上传的文件');
                 return;
             }
+            this.uploadHeaders = this.getUploadHeaders();
+            console.log(this.uploadHeaders);
+            if (!this.uploadTabData || !this.uploadHeaders.Authorization) {
+                return;
+            }
             this.fileUploadSubmitLoading = true;
             for (let i=0; i<this.needUploadFiles.length; i++) {
+                let chooseItem = this.chooseUploadFiles[i];
+                chooseItem.disabled = true;
+                chooseItem.color = '';
                 let item = this.needUploadFiles[i];
-                let reqData = {
-                    fileId: this.fileUploadFormData.fileId,
-                    comment: this.fileUploadFormData.comment,
-                    file: item.file.url
-                };
-                console.log(item.file.url);
-                console.log(reqData);
-                item.loading = true;
-                util.ajax.post("/file/upload/add", reqData, {headers: {'Content-Type': 'multipart/form-data'}})
-                    .then((response) => {
-                        item.btnType = 'success';
-                        item.icon = 'checkmark';
-                    })
-                    .catch((error) => {
-                        util.errorProcessor(this, error);
-                    });
-                item.loading = false;
+                this.$refs.uploadModal.post(item);
             }
             this.fileUploadSubmitLoading = false;
         },

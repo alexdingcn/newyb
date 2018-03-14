@@ -169,7 +169,7 @@
     <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
     <result column="update_by" property="updateBy" jdbcType="VARCHAR" />
     <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
-    <collection property="fileUploads" javaType="com.yiban.erp.entities.FileUpload">
+    <collection property="fileUploads" ofType="com.yiban.erp.entities.FileUpload">
       <id column="upload_id" property="id" jdbcType="INTEGER" />
       <result column="upload_file_id" property="fileId" jdbcType="INTEGER" />
       <result column="upload_comment" property="comment" jdbcType="VARCHAR" />
