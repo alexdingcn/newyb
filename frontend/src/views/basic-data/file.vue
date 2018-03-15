@@ -126,25 +126,19 @@
               </Form>
           </Row>
           <Row type="flex" justify="center">
-              <Col span="12">
-                <Upload ref="uploadModal" multiple :before-upload="handleBeforeUpload" 
-                        :max-size="uploadMaxSize" 
-                        :format="uploadFormat" 
-                        :data="fileUploadFormData" 
-                        :headers="uploadHeaders" 
-                        :action="uploadAction">
-                    <Button type="ghost" icon="ios-cloud-upload-outline">选择需要上传的文件</Button>
-                </Upload>
-              </Col>
-              <Col span="10" offset="2">
-                <Row type="flex" justify="center">
-                    <p>已选择的文件</p>
-                </Row>
-                <Row type="flex" justify="center" v-for="(item, index) in chooseUploadFiles" :key="index">
-                    <strong>{{item.name}}</strong>
-                    <a href="#" :disabled="item.disabled" @click="removeChooseUploadFile(index)"><Icon :type="item.icon" :color="item.color"></Icon></a>
-                </Row>
-              </Col>
+            <Upload ref="uploadModal" multiple :before-upload="handleBeforeUpload" :show-upload-list="false"
+                    :max-size="uploadMaxSize" 
+                    :format="uploadFormat" 
+                    :action="uploadAction">
+                <Button type="ghost" icon="ios-cloud-upload-outline">选择需要上传的文件</Button>
+            </Upload>
+          </Row>
+          <Row type="flex" justify="center">
+              <p>已选择的文件</p>
+          </Row>
+          <Row type="flex" justify="center" v-for="(item, index) in chooseUploadFiles" :key="index">
+            <strong class="margin-right-5 margin-top-10">{{item.name}}</strong>
+            <a class="margin-top-10" href="#" :disabled="item.disabled" @click="removeChooseUploadFile(index)"><Icon size="20" :type="item.icon" :color="item.color"></Icon></a>
           </Row>
           
           <div slot="footer">
@@ -167,7 +161,7 @@
 
 <script>
 import util from '@/libs/util.js';
-import store from '@/store';
+import dataConver from '@/libs/data-conver.js';
 
 export default {
     name: "basic_data_file",
@@ -255,11 +249,11 @@ export default {
                 },
                 {
                     title: '操作',
-                    key: 'action',
+                    key: '',
                     width: 100,
                     align: 'center',
                     render: (h, params) => {
-                        h('Button', {
+                        return h('Button', {
                                     props: {
                                         type: 'error',
                                         size: 'small',
@@ -281,16 +275,13 @@ export default {
             },
             fileUploadSubmitLoading: false,
             uploadMaxSize: 10240,
-            uploadFormat: ['png', 'jpg', 'jpeg', 'pdf', 'doc', 'docx', 'xlsx', 'xls', 'csv'],
-            needUploadFiles: [],
+            uploadFormat: ['png', 'jpg', 'jpeg', 'git', 'tiff', 'pdf', 'doc', 'docx', 'xlsx', 'xls', 'csv', 'txt', 'zip', 'rar', 'tar'],
             chooseUploadFiles: [],
-            uploadHeaders: {
-                Authorization: ''
-            },
             uploadAction: `${util.baseUrl}/file/upload/add`
         }
     },
     mounted() {
+            this.getUploadFormat();
             this.loadFileTypeList();
             this.fileInfoFormChangeToAddView();
     },
@@ -319,6 +310,18 @@ export default {
     },
     methods:{
         
+        getUploadFormat() {
+            util.ajax.get('/file/upload/format')
+                .then((response) => {
+                    if (response.data) {
+                        this.uploadFormat = response.data;
+                    }
+                })
+                .catch((error) => {
+                    util.errorProcessor(this, error);
+                });
+        },
+
         loadFileTypeList() {
             util.ajax.get("/file/filetype/list")
                 .then((response) => {
@@ -328,6 +331,8 @@ export default {
                     util.errorProcessor(this, error);
                 })
         },
+
+        
 
         addFileTypeBtnClick() {
             this.fileTypeModalVisible = true;
@@ -383,11 +388,22 @@ export default {
                 .then((response) => {
                     this.fileTabData = response.data.data;
                     this.fileInfoTotalCount = response.data.count;
+                    this.refreshFileInfoCurreClickData();
                 })
                 .catch((error) => {
                     util.errorProcessor(this, error);
                 });
             this.fileInfoTabLoading = false;
+        },
+
+        refreshFileInfoCurreClickData() {
+            if (!this.fileInfoTabCurrClickData || !this.fileInfoTabCurrClickData.id) {
+                return;
+            }
+            let id = this.fileInfoTabCurrClickData.id;
+            let data = dataConver.selectObjectById(id, this.fileTabData);
+            this.fileInfoTabCurrClickData = data;
+            this.fileInfoFormChangeToEditView(data);
         },
 
         searchBtnClick() {
@@ -444,11 +460,10 @@ export default {
                 this.$Message.warn('获取需要删除的附件标识失败');
                 return;
             }
-            let reqData = {fileUploadId: data};
-            util.ajax.delete("/file/upload/remove", reqData, {headers:{'Content-Type': 'application/json'}})
+            util.ajax.delete("/file/upload/remove/" + data)
                 .then((response) => {
                     this.$Message.success('删除成功');
-                    this.uploadTabData.splice(index, 1); //在列表中删除
+                    this.loadFileInfoList();
                 })
                 .catch((error) => {
                     util.errorProcessor(this, error);
@@ -505,57 +520,56 @@ export default {
                 name: file.name,
                 icon: 'close-circled',
                 color: 'red',
-                disabled: false
+                disabled: false,
+                file: file,
+                isUpload: false
             };
-            this.needUploadFiles.push(file);
             this.chooseUploadFiles.push(item);
             return false;
         },
 
         removeChooseUploadFile(data) {
             this.chooseUploadFiles.splice(data, 1);
-            this.needUploadFiles.splice(data, 1);
             this.$refs.uploadModal.fileList.splice(data, 1);
         },
 
-        getUploadHeaders() {
-            if(store.state.user.token) {
-                return {
-                    Authorization: `Bearer ${store.state.user.token}`
-                };
-            }else {
-                this.$Notice.error({
-                    title: '系统异常',
-                    desc: '请退出后重新登录'
-                });
-                return null;
-            }
-        },
-
         fileUploadSubmit() {
-            if (!this.needUploadFiles || this.needUploadFiles.length < 0) {
+            if (!this.chooseUploadFiles || this.chooseUploadFiles.length <= 0) {
                 this.$Message.info('请先选择需要上传的文件');
                 return;
             }
-            this.uploadHeaders = this.getUploadHeaders();
-            console.log(this.uploadHeaders);
-            if (!this.uploadTabData || !this.uploadHeaders.Authorization) {
-                return;
-            }
             this.fileUploadSubmitLoading = true;
-            for (let i=0; i<this.needUploadFiles.length; i++) {
+            for (let i=0; i<this.chooseUploadFiles.length; i++) {
                 let chooseItem = this.chooseUploadFiles[i];
+                if (chooseItem.isUpload) {
+                    continue;
+                }
                 chooseItem.disabled = true;
                 chooseItem.color = '';
-                let item = this.needUploadFiles[i];
-                this.$refs.uploadModal.post(item);
+                let reqData = new FormData();
+                reqData.append('fileId', this.fileUploadFormData.fileId);
+                reqData.append('comment', this.fileUploadFormData.comment);
+                reqData.append('file', chooseItem.file);
+                util.ajax.post('/file/upload/add', reqData, {headers:{'Content-Type': 'multipart/form-data'}})
+                    .then((response) => {
+                        chooseItem.icon = 'checkmark';
+                        chooseItem.color = 'green';
+                        chooseItem.isUpload = true;
+                    })
+                    .catch((error) => {
+                        chooseItem.icon = 'close';
+                        util.errorProcessor(this, error);
+                    });
             }
             this.fileUploadSubmitLoading = false;
         },
 
         closedfileUploadModal() {
             this.fileUploadFormData = {};
+            this.chooseUploadFiles = [];
+            this.$refs.uploadModal.clearFiles();
             this.fileUploadModalVisible = false;
+            this.loadFileInfoList();
         }
 
     }

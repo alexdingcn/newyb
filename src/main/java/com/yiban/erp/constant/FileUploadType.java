@@ -10,12 +10,18 @@ public enum FileUploadType {
     JPG,
     JPEG,
     PNG,
+    GIF,
+    TIFF,
     PDF,
     DOC,
     DOCX,
     XLSX,
     XLS,
-    CSV;
+    CSV,
+    TXT,
+    ZIP,
+    RAR,
+    TAR;
 
     public static boolean validate(String originalName) {
         if (StringUtils.isBlank(originalName)) {
