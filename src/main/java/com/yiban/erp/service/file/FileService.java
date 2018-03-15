@@ -269,11 +269,23 @@ public class FileService {
         fileName.append(dateTimeStr);
         fileName.append(RandomStringUtils.randomNumeric(2));
         if (originalName.lastIndexOf('.') > 0) {
-            fileName.append(originalName.substring(originalName.lastIndexOf('.') - 1));
+            fileName.append(originalName.substring(originalName.lastIndexOf('.')));
+        }
+        String dir = baseLocation + File.separator + companyId + File.separator + yearMonth;
+        File dirFile = new File(dir);
+        if (!dirFile.exists()) {
+            dirFile.mkdirs();
         }
         String location = companyId + File.separator + yearMonth + File.separator + fileName.toString();
         File saveFile = new File(baseLocation + File.separator + location);
-        String url = fileBaseUrl + "/" + location;
+        StringBuilder url = new StringBuilder(fileBaseUrl);
+        url.append("/");
+        url.append(companyId);
+        url.append("/");
+        url.append(yearMonth);
+        url.append("/");
+        url.append(fileName.toString());
+
         try {
             FileOutputStream os = new FileOutputStream(saveFile);
             BufferedOutputStream out = new BufferedOutputStream(os);
@@ -282,7 +294,7 @@ public class FileService {
             out.close();
             os.close();
 
-            String[] result = {location, url};
+            String[] result = {location, url.toString()};
             return result;
         }catch (Exception e) {
             logger.error("write file have exception. ", e);

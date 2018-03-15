@@ -20,6 +20,8 @@ const ajaxUrl = env === 'development'
         ? 'https://www.yibanjf.com'
         : 'https://debug.yibanjf.com';
 
+util.baseUrl = ajaxUrl;
+
 util.ajax = axios.create({
     baseURL: ajaxUrl,
     timeout: 30000

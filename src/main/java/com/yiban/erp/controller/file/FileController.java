@@ -2,6 +2,7 @@ package com.yiban.erp.controller.file;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.yiban.erp.constant.FileUploadType;
 import com.yiban.erp.entities.FileInfo;
 import com.yiban.erp.entities.FileType;
 import com.yiban.erp.entities.User;
@@ -20,6 +21,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -97,7 +99,6 @@ public class FileController {
     @RequestMapping(value = "/upload/add", method = RequestMethod.POST)
     public ResponseEntity<String> uploadFile(HttpServletRequest request,
                                              @AuthenticationPrincipal User user) throws Exception {
-        logger.info(request.getHeader("Content-Type"));
         MultipartHttpServletRequest mtRequest = (MultipartHttpServletRequest) request;
         String fileInfoId = mtRequest.getParameter("fileId");
         if (StringUtils.isBlank(fileInfoId) || !StringUtils.isNumeric(fileInfoId)) {
@@ -118,18 +119,25 @@ public class FileController {
         return ResponseEntity.ok().body(result.toJSONString());
     }
 
-    @RequestMapping(value = "/upload/remove", method = RequestMethod.DELETE)
-    public ResponseEntity<String> removeLocationFile(@RequestBody String reqData,
+    @RequestMapping(value = "/upload/remove/{uploadId}", method = RequestMethod.DELETE)
+    public ResponseEntity<String> removeLocationFile(@PathVariable Integer uploadId,
                                                      @AuthenticationPrincipal User user) throws Exception {
-        logger.info("user:{} request to remove location file. params:{}", user.getId(), reqData);
-        JSONObject data = JSON.parseObject(reqData);
-        Integer uploadId = data.getInteger("fileUploadId");
+        logger.info("user:{} request to remove location file. params:{}", user.getId(), uploadId);
         if (uploadId == null) {
             logger.warn("user:{} request to remove location file but request params id is null.", user.getId());
             throw new BizException(ErrorCode.FILE_UPLOAD_REMOVE_PARAMS);
         }
         fileService.deleteFileUpload(user, uploadId);
         return ResponseEntity.ok().build();
+    }
+
+    @RequestMapping(value = "/upload/format", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> getAllowFormat() throws Exception {
+        List<String> formats = new ArrayList<>();
+        for (FileUploadType type : FileUploadType.values()) {
+            formats.add(type.name().toLowerCase());
+        }
+        return ResponseEntity.ok().body(JSON.toJSONString(formats));
     }
 
 }
