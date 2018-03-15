@@ -46,6 +46,7 @@ public enum ErrorCode {
     FILE_UPLOAD_FAIL(2108, "上传档案附件失败", ErrorDisplay.NOTICE),
     FILE_UPLOAD_FILE_TYPE_ERROR(2109, "上传的文件类型错误"),
     FILE_UPLOAD_REMOVE_PARAMS(2110, "请选择需要删除的文件"),
+    FILE_GET_INFO_FAIL(2111, "获取档案信息失败"),
 
 
     ACCESS_PERMISSION(9001, "无访问权限", ErrorDisplay.MODAL);

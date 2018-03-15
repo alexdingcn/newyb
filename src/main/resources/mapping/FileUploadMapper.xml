@@ -8,13 +8,14 @@
     <result column="original_name" property="originalName" jdbcType="VARCHAR" />
     <result column="location" property="location" jdbcType="VARCHAR" />
     <result column="load_url" property="loadUrl" jdbcType="VARCHAR" />
+    <result column="expiration" property="expiration" jdbcType="TIMESTAMP" />
     <result column="create_by" property="createBy" jdbcType="VARCHAR" />
     <result column="update_by" property="updateBy" jdbcType="VARCHAR" />
     <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
     <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
   </resultMap>
   <sql id="Base_Column_List" >
-    id, file_id, comment, original_name, location, load_url, create_by, update_by, create_time,
+    id, file_id, comment, original_name, location, load_url, expiration, create_by, update_by, create_time,
     update_time
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
@@ -29,12 +30,13 @@
   </delete>
   <insert id="insert" parameterType="com.yiban.erp.entities.FileUpload" keyProperty="id" useGeneratedKeys="true" >
     insert into file_upload (file_id, comment,
-      original_name, location, load_url, create_by,
+      original_name, location, load_url, expiration, create_by,
       update_by, create_time, update_time
       )
     values (#{fileId,jdbcType=INTEGER}, #{comment,jdbcType=VARCHAR}, #{originalName,jdbcType=VARCHAR},
-      #{location,jdbcType=VARCHAR}, #{loadUrl,jdbcType=VARCHAR}, #{createBy,jdbcType=VARCHAR},
-      #{updateBy,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}
+      #{location,jdbcType=VARCHAR}, #{loadUrl,jdbcType=VARCHAR}, #{expiration,jdbcType=TIMESTAMP},
+      #{createBy,jdbcType=VARCHAR}, #{updateBy,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP},
+      #{updateTime,jdbcType=TIMESTAMP}
       )
   </insert>
   <insert id="insertSelective" parameterType="com.yiban.erp.entities.FileUpload" keyProperty="id" useGeneratedKeys="true" >
@@ -54,6 +56,9 @@
       </if>
       <if test="loadUrl != null" >
         load_url,
+      </if>
+      <if test="expiration != null">
+        expiration,
       </if>
       <if test="createBy != null" >
         create_by,
@@ -83,6 +88,9 @@
       </if>
       <if test="loadUrl != null" >
         #{loadUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="expiration != null">
+        #{expiration,jdbcType=TIMESTAMP},
       </if>
       <if test="createBy != null" >
         #{createBy,jdbcType=VARCHAR},
@@ -116,6 +124,9 @@
       <if test="loadUrl != null" >
         load_url = #{loadUrl,jdbcType=VARCHAR},
       </if>
+      <if test="expiration != null">
+        expiration = #{expiration,jdbcType=TIMESTAMP},
+      </if>
       <if test="createBy != null" >
         create_by = #{createBy,jdbcType=VARCHAR},
       </if>
@@ -138,10 +149,12 @@
       original_name = #{originalName,jdbcType=VARCHAR},
       location = #{location,jdbcType=VARCHAR},
       load_url = #{loadUrl,jdbcType=VARCHAR},
+      expiration = #{expiration,jdbcType=TIMESTAMP},
       create_by = #{createBy,jdbcType=VARCHAR},
       update_by = #{updateBy,jdbcType=VARCHAR},
       create_time = #{createTime,jdbcType=TIMESTAMP},
       update_time = #{updateTime,jdbcType=TIMESTAMP}
     where id = #{id,jdbcType=INTEGER}
   </update>
+
 </mapper>

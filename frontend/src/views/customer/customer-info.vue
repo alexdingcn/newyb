@@ -688,7 +688,7 @@ export default {
       this.$refs.customerForm.validate(valid => {
         if (!valid) {
           this.submitBtnLoading = false;
-          this.$Message.warn("请检查必输项是否输入");
+          this.$Message.warning("请检查必输项是否输入");
           return;
         }else {
           if (this.showView === 'add') {
@@ -759,7 +759,7 @@ export default {
       this.certSubmitBtnLoading = true;
       this.$refs.certForm.validate(valid => {
         if (!valid) {
-          this.$Message.warn('请检查证件必输项');
+          this.$Message.warning('请检查证件必输项');
           this.certSubmitBtnLoading = false;
           return;
         }else {
@@ -795,7 +795,7 @@ export default {
       this.certDelBtnLoading = true;
       let delCertIds = [];
       if (!this.certTabSelectedData || this.certTabSelectedData.length <= 0) {
-        this.$Message.warn('请先选择需要删除的证件信息');
+        this.$Message.warning('请先选择需要删除的证件信息');
         this.certDelBtnLoading = false;
         return;
       }
@@ -840,7 +840,7 @@ export default {
     repDelBtnClick() {
       this.repDelBtnLoading = true;
       if (!this.repTabSelectedData || this.repTabSelectedData.length <= 0) {
-        this.$Message.warn('请先选择需要删除的代表人信息');
+        this.$Message.warning('请先选择需要删除的代表人信息');
         this.repDelBtnLoading = false;
         return;
       }else {
@@ -887,7 +887,7 @@ export default {
       this.repSubmitBtnLoading = true;
       this.$refs.repForm.validate(valid => {
         if (!valid) {
-          this.$Message.warn('请检查表单必输项信息');
+          this.$Message.warning('请检查表单必输项信息');
           this.repSubmitBtnLoading = false;
           return;
         }else {

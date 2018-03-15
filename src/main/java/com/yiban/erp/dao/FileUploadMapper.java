@@ -2,6 +2,9 @@ package com.yiban.erp.dao;
 
 import com.yiban.erp.entities.FileUpload;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 @Mapper
 public interface FileUploadMapper {
@@ -16,4 +19,5 @@ public interface FileUploadMapper {
     int updateByPrimaryKeySelective(FileUpload record);
 
     int updateByPrimaryKey(FileUpload record);
+
 }
