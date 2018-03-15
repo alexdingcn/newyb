@@ -1,0 +1,233 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.yiban.erp.dao.BuyOrderMapper" >
+  <resultMap id="BaseResultMap" type="com.yiban.erp.entities.BuyOrder" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="supplier_id" property="supplierId" jdbcType="BIGINT" />
+    <result column="supplier_contact_id" property="supplierContactId" jdbcType="BIGINT" />
+    <result column="buyer_id" property="buyerId" jdbcType="BIGINT" />
+    <result column="status" property="status" jdbcType="VARCHAR" />
+    <result column="ship_method_id" property="shipMethodId" jdbcType="INTEGER" />
+    <result column="ship_tool_id" property="shipToolId" jdbcType="INTEGER" />
+    <result column="temper_control_id" property="temperControlId" jdbcType="INTEGER" />
+    <result column="warehouse_id" property="warehouseId" jdbcType="INTEGER" />
+    <result column="eta" property="eta" jdbcType="TIMESTAMP" />
+    <result column="ref_no" property="refNo" jdbcType="VARCHAR" />
+    <result column="comment" property="comment" jdbcType="VARCHAR" />
+    <result column="company_id" property="companyId" jdbcType="INTEGER" />
+    <result column="created_by" property="createdBy" jdbcType="VARCHAR" />
+    <result column="updated_by" property="updatedBy" jdbcType="VARCHAR" />
+    <result column="created_time" property="createdTime" jdbcType="TIMESTAMP" />
+    <result column="updated_time" property="updatedTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, supplier_id, supplier_contact_id, buyer_id, status, ship_method_id, ship_tool_id, 
+    temper_control_id, warehouse_id, eta, ref_no, comment, company_id, created_by, updated_by, 
+    created_time, updated_time
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select 
+    <include refid="Base_Column_List" />
+    from buy_order
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
+    delete from buy_order
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="com.yiban.erp.entities.BuyOrder" useGeneratedKeys="true" keyProperty="id">
+    insert into buy_order (supplier_id, supplier_contact_id,
+      buyer_id, status, ship_method_id, 
+      ship_tool_id, temper_control_id, warehouse_id, 
+      eta, ref_no, comment, 
+      company_id, created_by, updated_by, 
+      created_time, updated_time)
+    values (#{supplierId,jdbcType=BIGINT}, #{supplierContactId,jdbcType=BIGINT},
+      #{buyerId,jdbcType=BIGINT}, #{status,jdbcType=VARCHAR}, #{shipMethodId,jdbcType=INTEGER}, 
+      #{shipToolId,jdbcType=INTEGER}, #{temperControlId,jdbcType=INTEGER}, #{warehouseId,jdbcType=INTEGER}, 
+      #{eta,jdbcType=TIMESTAMP}, #{refNo,jdbcType=VARCHAR}, #{comment,jdbcType=VARCHAR}, 
+      #{companyId,jdbcType=INTEGER}, #{createdBy,jdbcType=VARCHAR}, #{updatedBy,jdbcType=VARCHAR}, 
+      #{createdTime,jdbcType=TIMESTAMP}, #{updatedTime,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" parameterType="com.yiban.erp.entities.BuyOrder" useGeneratedKeys="true" keyProperty="id">
+    insert into buy_order
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+
+      <if test="supplierId != null" >
+        supplier_id,
+      </if>
+      <if test="supplierContactId != null" >
+        supplier_contact_id,
+      </if>
+      <if test="buyerId != null" >
+        buyer_id,
+      </if>
+      <if test="status != null" >
+        status,
+      </if>
+      <if test="shipMethodId != null" >
+        ship_method_id,
+      </if>
+      <if test="shipToolId != null" >
+        ship_tool_id,
+      </if>
+      <if test="temperControlId != null" >
+        temper_control_id,
+      </if>
+      <if test="warehouseId != null" >
+        warehouse_id,
+      </if>
+      <if test="eta != null" >
+        eta,
+      </if>
+      <if test="refNo != null" >
+        ref_no,
+      </if>
+      <if test="comment != null" >
+        comment,
+      </if>
+      <if test="companyId != null" >
+        company_id,
+      </if>
+      <if test="createdBy != null" >
+        created_by,
+      </if>
+      <if test="updatedBy != null" >
+        updated_by,
+      </if>
+      <if test="createdTime != null" >
+        created_time,
+      </if>
+      <if test="updatedTime != null" >
+        updated_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+
+      <if test="supplierId != null" >
+        #{supplierId,jdbcType=BIGINT},
+      </if>
+      <if test="supplierContactId != null" >
+        #{supplierContactId,jdbcType=BIGINT},
+      </if>
+      <if test="buyerId != null" >
+        #{buyerId,jdbcType=BIGINT},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=VARCHAR},
+      </if>
+      <if test="shipMethodId != null" >
+        #{shipMethodId,jdbcType=INTEGER},
+      </if>
+      <if test="shipToolId != null" >
+        #{shipToolId,jdbcType=INTEGER},
+      </if>
+      <if test="temperControlId != null" >
+        #{temperControlId,jdbcType=INTEGER},
+      </if>
+      <if test="warehouseId != null" >
+        #{warehouseId,jdbcType=INTEGER},
+      </if>
+      <if test="eta != null" >
+        #{eta,jdbcType=TIMESTAMP},
+      </if>
+      <if test="refNo != null" >
+        #{refNo,jdbcType=VARCHAR},
+      </if>
+      <if test="comment != null" >
+        #{comment,jdbcType=VARCHAR},
+      </if>
+      <if test="companyId != null" >
+        #{companyId,jdbcType=INTEGER},
+      </if>
+      <if test="createdBy != null" >
+        #{createdBy,jdbcType=VARCHAR},
+      </if>
+      <if test="updatedBy != null" >
+        #{updatedBy,jdbcType=VARCHAR},
+      </if>
+      <if test="createdTime != null" >
+        #{createdTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updatedTime != null" >
+        #{updatedTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.yiban.erp.entities.BuyOrder" >
+    update buy_order
+    <set >
+      <if test="supplierId != null" >
+        supplier_id = #{supplierId,jdbcType=BIGINT},
+      </if>
+      <if test="supplierContactId != null" >
+        supplier_contact_id = #{supplierContactId,jdbcType=BIGINT},
+      </if>
+      <if test="buyerId != null" >
+        buyer_id = #{buyerId,jdbcType=BIGINT},
+      </if>
+      <if test="status != null" >
+        status = #{status,jdbcType=VARCHAR},
+      </if>
+      <if test="shipMethodId != null" >
+        ship_method_id = #{shipMethodId,jdbcType=INTEGER},
+      </if>
+      <if test="shipToolId != null" >
+        ship_tool_id = #{shipToolId,jdbcType=INTEGER},
+      </if>
+      <if test="temperControlId != null" >
+        temper_control_id = #{temperControlId,jdbcType=INTEGER},
+      </if>
+      <if test="warehouseId != null" >
+        warehouse_id = #{warehouseId,jdbcType=INTEGER},
+      </if>
+      <if test="eta != null" >
+        eta = #{eta,jdbcType=TIMESTAMP},
+      </if>
+      <if test="refNo != null" >
+        ref_no = #{refNo,jdbcType=VARCHAR},
+      </if>
+      <if test="comment != null" >
+        comment = #{comment,jdbcType=VARCHAR},
+      </if>
+      <if test="createdBy != null" >
+        created_by = #{createdBy,jdbcType=VARCHAR},
+      </if>
+      <if test="updatedBy != null" >
+        updated_by = #{updatedBy,jdbcType=VARCHAR},
+      </if>
+      <if test="createdTime != null" >
+        created_time = #{createdTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updatedTime != null" >
+        updated_time = #{updatedTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+    <if test="companyId != null" >
+      and company_id = #{companyId,jdbcType=INTEGER}
+    </if>
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.yiban.erp.entities.BuyOrder" >
+    update buy_order
+    set supplier_id = #{supplierId,jdbcType=BIGINT},
+      supplier_contact_id = #{supplierContactId,jdbcType=BIGINT},
+      buyer_id = #{buyerId,jdbcType=BIGINT},
+      status = #{status,jdbcType=VARCHAR},
+      ship_method_id = #{shipMethodId,jdbcType=INTEGER},
+      ship_tool_id = #{shipToolId,jdbcType=INTEGER},
+      temper_control_id = #{temperControlId,jdbcType=INTEGER},
+      warehouse_id = #{warehouseId,jdbcType=INTEGER},
+      eta = #{eta,jdbcType=TIMESTAMP},
+      ref_no = #{refNo,jdbcType=VARCHAR},
+      comment = #{comment,jdbcType=VARCHAR},
+      created_by = #{createdBy,jdbcType=VARCHAR},
+      updated_by = #{updatedBy,jdbcType=VARCHAR},
+      created_time = #{createdTime,jdbcType=TIMESTAMP},
+      updated_time = #{updatedTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=BIGINT}
+    <if test="companyId != null" >
+      and company_id = #{companyId,jdbcType=INTEGER}
+    </if>
+  </update>
+</mapper>

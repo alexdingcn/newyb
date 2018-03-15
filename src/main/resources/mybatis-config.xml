@@ -25,5 +25,9 @@
         <mapper resource="mapping/FileInfoMapper.xml"/>
         <mapper resource="mapping/FileTypeMapper.xml"/>
         <mapper resource="mapping/FileUploadMapper.xml"/>
+        <mapper resource="mapping/OptionsMapper.xml"/>
+        <mapper resource="mapping/WarehouseMapper.xml"/>
+        <mapper resource="mapping/BuyOrderMapper.xml"/>
+        <mapper resource="mapping/BuyOrderDetailMapper.xml"/>
     </mappers>
 </configuration>

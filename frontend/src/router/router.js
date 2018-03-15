@@ -129,8 +129,8 @@ export const appRouter = [
     title: '库存',
     component: Main,
     children: [
-        { path: 'sell', title: '销售制单', name: 'sell_order', component: () => import('@/views/basic-data/good.vue') },
-        { path: 'sellreview', title: '销售单审核', name: 'sell_review', component: () => import('@/views/basic-data/factory.vue') },
+        { path: 'setting', title: '仓库点设置', name: 'wh_setting', component: () => import('@/views/warehouse/setting.vue') },
+        { path: 'overview', title: '库存报表', name: 'wh_overview', component: () => import('@/views/warehouse/overview.vue') },
     ]
 },
 {

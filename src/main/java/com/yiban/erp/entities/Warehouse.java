@@ -2,18 +2,14 @@ package com.yiban.erp.entities;
 
 import java.util.Date;
 
-public class SupplierContact {
-    private Long id;
+public class Warehouse {
+    private Integer id;
 
-    private Long supplierId;
+    private Integer companyId;
 
     private String name;
 
-    private String idcard;
-
-    private Boolean enabled;
-
-    private String phone;
+    private String description;
 
     private String createdBy;
 
@@ -23,20 +19,20 @@ public class SupplierContact {
 
     private Date updatedTime;
 
-    public Long getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
-    public Long getSupplierId() {
-        return supplierId;
+    public Integer getCompanyId() {
+        return companyId;
     }
 
-    public void setSupplierId(Long supplierId) {
-        this.supplierId = supplierId;
+    public void setCompanyId(Integer companyId) {
+        this.companyId = companyId;
     }
 
     public String getName() {
@@ -47,28 +43,12 @@ public class SupplierContact {
         this.name = name == null ? null : name.trim();
     }
 
-    public String getIdcard() {
-        return idcard;
+    public String getDescription() {
+        return description;
     }
 
-    public void setIdcard(String idcard) {
-        this.idcard = idcard == null ? null : idcard.trim();
-    }
-
-    public Boolean getEnabled() {
-        return enabled;
-    }
-
-    public void setEnabled(Boolean enabled) {
-        this.enabled = enabled;
-    }
-
-    public String getPhone() {
-        return phone;
-    }
-
-    public void setPhone(String phone) {
-        this.phone = phone == null ? null : phone.trim();
+    public void setDescription(String description) {
+        this.description = description == null ? null : description.trim();
     }
 
     public String getCreatedBy() {

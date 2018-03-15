@@ -20,6 +20,10 @@ public enum ErrorCode {
     GOODS_CATEGORY_ID_MISSING(1201, "缺失商品分类ID"),
     GOODS_REMAINED_IN_CATEGORY(1200, "该分类下还有商品,请先移除商品后操作"),
 
+    // 13xx - 采购
+    BUY_ORDER_NOT_EXISTED(1300, "采购订单不存在"),
+    BUY_ORDER_IS_CHECKED(1301, "采购订单已审核不可修改"),
+
     CUSTOMER_GET_FAIL(2000, "获取客户信息失败"),
     CUSTOMER_DEL_PARAMS_EMPTY(2001, "请选择需要删除的客户"),
     CUSTOMER_CAT_HAVE_CUST(2002, "分组下存在有客户信息, 不能删除", ErrorDisplay.NOTICE),

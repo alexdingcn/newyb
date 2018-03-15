@@ -5,11 +5,14 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.yiban.erp.dao.SupplierMapper;
 import com.yiban.erp.entities.Supplier;
+import com.yiban.erp.entities.User;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
@@ -39,7 +42,7 @@ public class SupplierController {
     @RequestMapping(value = "/search", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> search(@RequestBody Map requestMap) {
         String searchStr = (String) requestMap.get("search");
-        if (!searchStr.isEmpty()) {
+        if (StringUtils.isNotEmpty(searchStr)) {
             List<Supplier> supplierList = supplierMapper.searchByNameOrContact(searchStr);
             return ResponseEntity.ok().body(JSON.toJSONString(supplierList));
         } else {
@@ -69,15 +72,18 @@ public class SupplierController {
     }
 
     @RequestMapping(value = "/add", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> add(@RequestBody Supplier supplier) {
-        logger.info("ADD new supplier:{}", supplier);
+    public ResponseEntity<String> add(@AuthenticationPrincipal User user,
+                                      @RequestBody Supplier supplier) {
+        logger.info("ADD new supplier:{}", supplier.getName());
 
         int result = 0;
         if (supplier.getId() == null) {
-            supplier.setCreatedBy("admin");
+            supplier.setCreatedBy(user.getNickname());
             supplier.setCreatedTime(new Date());
             result = supplierMapper.insertSelective(supplier);
         } else {
+            supplier.setUpdatedBy(user.getNickname());
+            supplier.setUpdatedTime(new Date());
             result = supplierMapper.updateByPrimaryKey(supplier);
         }
         if (result > 0) {
