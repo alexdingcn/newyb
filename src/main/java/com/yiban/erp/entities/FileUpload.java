@@ -15,6 +15,8 @@ public class FileUpload {
 
     private String loadUrl;
 
+    private Date expiration; //使用oss时设置的url签名有效期至
+
     private String createBy;
 
     private String updateBy;
@@ -61,6 +63,14 @@ public class FileUpload {
 
     public void setLocation(String location) {
         this.location = location;
+    }
+
+    public Date getExpiration() {
+        return expiration;
+    }
+
+    public void setExpiration(Date expiration) {
+        this.expiration = expiration;
     }
 
     public String getLoadUrl() {

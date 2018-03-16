@@ -364,12 +364,20 @@
           </div>
       </Modal>
 
+      <Modal v-model="imageShowModal" :width="70" title="档案展示" :closable="true">
+        <file-view :fileNo="showImageNo"></file-view>
+        <div slot="footer">
+
+        </div>
+      </Modal>
+
   </div>
 </template>
 
 <script>
 import util from "@/libs/util.js";
 import dataConver from "@/libs/data-conver.js";
+import fileView from "@/views/basic-data/file-view.vue";
 
 export default {
   name: "customer-info",
@@ -390,6 +398,9 @@ export default {
       type: Object,
       default: null,
     }
+  },
+  components: {
+    fileView
   },
   data() {
     return {
@@ -438,6 +449,8 @@ export default {
       certTabLoading: false,
       certTabData: [],
       certTabSelectedData: [],
+      imageShowModal: false,
+      showImageNo: '',
       certTabColumns: [
         {
           type: "selection",
@@ -454,7 +467,7 @@ export default {
           key: "licenseExp",
           align: "center",
           render: (h, params) => {
-            let date = params.licenseExp;
+            let date = params.row.licenseExp;
             if (!date || isNaN(date)) {
               return h('span', '');
             }else {
@@ -465,7 +478,27 @@ export default {
         {
           title: "档案编号",
           key: "imageNo",
-          align: "center"
+          width: 170,
+          align: "center",
+          render: (h, params) => {
+            let imageNo = params.row.imageNo;
+            if (!imageNo) {
+              return h('span', '');
+            }else {
+              return h('Button', {
+                props: {
+                  type: 'text',
+                  size: 'small',
+                  icon: 'eye'
+                },
+                on: {
+                  click: () => {
+                    this.showImageModal(params.row.imageNo);
+                  }
+                }
+              }, params.row.imageNo);
+            }
+          }
         },
         {
           title: "备注",
@@ -482,7 +515,7 @@ export default {
           key: "updateTime",
           align: "center",
           render: (h, params) => {
-            let date = params.updateTime;
+            let date = params.row.updateTime;
             if (!date || isNaN(date)) {
               return h('span', '');
             }else {
@@ -688,7 +721,7 @@ export default {
       this.$refs.customerForm.validate(valid => {
         if (!valid) {
           this.submitBtnLoading = false;
-          this.$Message.warn("请检查必输项是否输入");
+          this.$Message.warning("请检查必输项是否输入");
           return;
         }else {
           if (this.showView === 'add') {
@@ -759,7 +792,7 @@ export default {
       this.certSubmitBtnLoading = true;
       this.$refs.certForm.validate(valid => {
         if (!valid) {
-          this.$Message.warn('请检查证件必输项');
+          this.$Message.warning('请检查证件必输项');
           this.certSubmitBtnLoading = false;
           return;
         }else {
@@ -795,7 +828,7 @@ export default {
       this.certDelBtnLoading = true;
       let delCertIds = [];
       if (!this.certTabSelectedData || this.certTabSelectedData.length <= 0) {
-        this.$Message.warn('请先选择需要删除的证件信息');
+        this.$Message.warning('请先选择需要删除的证件信息');
         this.certDelBtnLoading = false;
         return;
       }
@@ -840,7 +873,7 @@ export default {
     repDelBtnClick() {
       this.repDelBtnLoading = true;
       if (!this.repTabSelectedData || this.repTabSelectedData.length <= 0) {
-        this.$Message.warn('请先选择需要删除的代表人信息');
+        this.$Message.warning('请先选择需要删除的代表人信息');
         this.repDelBtnLoading = false;
         return;
       }else {
@@ -887,7 +920,7 @@ export default {
       this.repSubmitBtnLoading = true;
       this.$refs.repForm.validate(valid => {
         if (!valid) {
-          this.$Message.warn('请检查表单必输项信息');
+          this.$Message.warning('请检查表单必输项信息');
           this.repSubmitBtnLoading = false;
           return;
         }else {
@@ -933,6 +966,11 @@ export default {
 
     repCancelBtnClick() {
       this.repModalShow = false;
+    },
+
+    showImageModal(imageNo) {
+      this.imageShowModal = true;
+      this.showImageNo = imageNo;
     }
 
 

@@ -1,5 +1,10 @@
 package com.yiban.erp.service.file;
 
+import com.alibaba.fastjson.JSON;
+import com.aliyun.oss.OSSClient;
+import com.aliyun.oss.model.ObjectMetadata;
+import com.aliyun.oss.model.PutObjectResult;
+import com.yiban.erp.constant.Common;
 import com.yiban.erp.constant.FileStatus;
 import com.yiban.erp.constant.FileUploadType;
 import com.yiban.erp.dao.FileInfoMapper;
@@ -23,12 +28,13 @@ import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.annotation.PostConstruct;
 import java.io.BufferedOutputStream;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
+import java.net.URL;
+import java.util.*;
 
 /**
  * 档案处理类
@@ -37,6 +43,9 @@ import java.util.List;
 public class FileService {
 
     private static final Logger logger = LoggerFactory.getLogger(FileService.class);
+
+    private static final String META_USER = "X-OSS-USER";
+    private static final String META_COMPANY = "X-OSS-COMPANY";
 
     @Autowired
     private FileTypeMapper fileTypeMapper;
@@ -49,6 +58,29 @@ public class FileService {
     private String fileBaseUrl; //读取或者获取文件的基础访问路径
     @Value("${file.save.base.location}")
     private String baseLocation; //本地保存文件的基础路径
+    @Value("${file.save.location}")
+    private String saveLocation; //文件保存的服务 两种 local 本地，oss-阿里OSS服务
+
+    @Value("${oss.endpoint}")
+    private String ossEndPoint;
+    @Value("${oss.access.keyid}")
+    private String ossAccessKeyId;
+    @Value("${oss.access.keysecret}")
+    private String ossAccessKeySecret;
+    @Value("${oss.bucket}")
+    private String ossBucket;
+    @Value("${oss.sign.expiration}")
+    private long urlSignedExpiration;
+
+    private OSSClient client;
+
+    @PostConstruct
+    public OSSClient getOssClient(){
+        if (client == null) {
+            client = new OSSClient(ossEndPoint, ossAccessKeyId, ossAccessKeySecret);
+        }
+        return client;
+    }
 
     /**
      * 获取档案类型列表
@@ -96,6 +128,10 @@ public class FileService {
         }
     }
 
+    public Integer getListCount(Integer companyId, String fileType, String fileName, String fileNo) {
+        return fileInfoMapper.getByFileTypeAndNameCount(companyId, fileType, fileName, fileNo);
+    }
+
     /**
      * 获取档案列表
      * @param companyId 必须
@@ -115,11 +151,48 @@ public class FileService {
         if (limit != null) {
             offset = (page == null || page <= 0 ? 0 : page - 1) * limit;
         }
+        //注意：list 返回的结果集不带fileUpload的信息
         return fileInfoMapper.getByFileTypeAndName(companyId, fileType, fileName, fileNo, offset, limit);
     }
 
-    public Integer getListCount(Integer companyId, String fileType, String fileName, String fileNo) {
-        return fileInfoMapper.getByFileTypeAndNameCount(companyId, fileType, fileName, fileNo);
+
+    public FileInfo getFileInfoDetailById(Integer id) {
+        FileInfo fileInfo = fileInfoMapper.getFileInfoDetailById(id);
+        fileInfoSetUploadFileUrl(fileInfo); //处理OSS对象访问签名过期的问题
+        return fileInfo;
+    }
+
+    public FileInfo getFileInfoDetailByFileNo(Integer companyId, String fileNo) {
+        FileInfo fileInfo = fileInfoMapper.getByFileNo(companyId, fileNo);
+        fileInfoSetUploadFileUrl(fileInfo); //处理OSS对象访问签名过期的问题
+        return fileInfo;
+    }
+
+    private void fileInfoSetUploadFileUrl(FileInfo fileInfo) {
+        if (fileInfo == null || fileInfo.getFileUploads() == null
+                || fileInfo.getFileUploads().isEmpty()) {
+            return;
+        }
+        List<FileUpload> uploads = fileInfo.getFileUploads();
+        for (FileUpload fileUpload : uploads) {
+            resetFileUploadUrl(fileUpload);
+        }
+    }
+
+    private FileUpload resetFileUploadUrl(FileUpload fileUpload) {
+        if (fileUpload == null || fileUpload.getExpiration() == null || fileUpload.getLocation() == null) {
+            return fileUpload;
+        }
+        //如果过期时间比当前时间+1小时还小，就直接重新获取URL签名信息
+        Date compareDate = new Date(new Date().getTime() + 3600000);
+        if (compareDate.after(fileUpload.getExpiration())) {
+            Date expiration = new Date(new Date().getTime() + urlSignedExpiration); //有效期设置为一天
+            String newUrl = ossFileUrlSigned(fileUpload.getLocation(), expiration);
+            fileUpload.setExpiration(expiration);
+            fileUpload.setLoadUrl(newUrl);
+            fileUploadMapper.updateByPrimaryKeySelective(fileUpload);
+        }
+        return fileUpload;
     }
 
     public FileInfo addFileInfo(User user, FileInfo fileInfo) throws BizException {
@@ -221,9 +294,10 @@ public class FileService {
             logger.warn("user:{} upload file but type is not enable. file original name:{}", user.getId(), originalName);
             throw new BizException(ErrorCode.FILE_UPLOAD_FILE_TYPE_ERROR);
         }
-        String[] results = persistenceFile(user.getCompanyId(), fileId, file);
-        String location = results[0];
-        String url = results[1];
+        Map<String, Object> results = persistenceFile(user.getId(), user.getCompanyId(), fileId, file);
+        String location = (String) results.get("location");
+        String url = (String) results.get("url");
+        Date expiration = results.get("expiration") == null ? null : (Date) results.get("expiration");
 
         FileUpload fileUpload = new FileUpload();
         fileUpload.setFileId(fileId);
@@ -231,6 +305,7 @@ public class FileService {
         fileUpload.setComment(comment);
         fileUpload.setLocation(location);
         fileUpload.setLoadUrl(url);
+        fileUpload.setExpiration(expiration);
         fileUpload.setCreateBy(user.getNickname());
         fileUpload.setCreateTime(new Date());
         fileUpload.setUpdateBy(user.getNickname());
@@ -242,7 +317,6 @@ public class FileService {
             return url;
         }else {
             logger.warn("user:{} upload persistence file success but insert database fail.", user.getId());
-            removeLocationFile(location); //如果入库失败，把本地文件也删除
             throw new BizRuntimeException(ErrorCode.FAILED_INSERT_FROM_DB);
         }
     }
@@ -254,37 +328,85 @@ public class FileService {
      *  如果成功，必须两个值都返回，失败直接抛出异常
      * @throws BizException
      */
-    private String[] persistenceFile(Integer companyId, Integer fileId, MultipartFile file) throws BizException {
-        //TODO 后续使用其他保存文件的方式，例如挂载阿里的NAS服务
-
-        //上传文件的本地存储路径：baseLocation/companyId/yyyyMM/
-        //上传的文件名重命名为: fileId_yyMMddHHmmss+2位随机数.xxx
-        String originalName = file.getOriginalFilename();
-        Date currentTime = new Date();
-        String yearMonth = UtilTool.DateFormat(currentTime, "yyyyMM");
-        String dateTimeStr = UtilTool.DateFormat(currentTime, "yyMMddHHmmss");
-        StringBuilder fileName = new StringBuilder();
-        fileName.append(String.valueOf(fileId));
-        fileName.append("_");
-        fileName.append(dateTimeStr);
-        fileName.append(RandomStringUtils.randomNumeric(2));
-        if (originalName.lastIndexOf('.') > 0) {
-            fileName.append(originalName.substring(originalName.lastIndexOf('.')));
+    private Map<String, Object>  persistenceFile(Long userId, Integer companyId, Integer fileId, MultipartFile file) throws BizException {
+        if ("oss".equalsIgnoreCase(saveLocation)) {
+            logger.info("upload file save to aliyuncs oss. userId{}", userId);
+            return saveToOss(userId, companyId, fileId, file);
+        }else {
+            logger.info("upload file save to local.");
+            return saveToLocal(userId, companyId, fileId, file);
         }
-        String dir = baseLocation + File.separator + companyId + File.separator + yearMonth;
+    }
+
+    private Map<String, Object> saveToOss(Long userId, Integer companyId, Integer fileId, MultipartFile file) {
+        String originalName = file.getOriginalFilename();
+        String fileName = getFileName(fileId, originalName);
+        StringBuilder key = new StringBuilder(); //OSS key 的规则 companyId/userId/fileName
+        key.append(companyId);
+        key.append("/");
+        key.append(userId);
+        key.append("/");
+        key.append(fileName);
+        try {
+            byte[] fileByte = file.getBytes();
+            ObjectMetadata metadata = new ObjectMetadata();
+            metadata.addUserMetadata(META_USER, String.valueOf(userId));
+            metadata.addUserMetadata(META_COMPANY, String.valueOf(companyId));
+            OSSClient ossClient = getOssClient();
+            String keyValue = key.toString();
+            PutObjectResult result = ossClient.putObject(ossBucket, keyValue,
+                    new ByteArrayInputStream(fileByte), metadata);
+            logger.info("user:{} upload file to aliyun oss success result:{}", userId, JSON.toJSONString(result));
+            //获取签名的URL, 有效期设置为1天
+            Date expiration = new Date(new Date().getTime() + urlSignedExpiration); //有效期设置为一天
+            String url = ossFileUrlSigned(keyValue, expiration);
+            Map<String, Object> map = new HashMap<>();
+            map.put("location", keyValue);
+            map.put("url", url);
+            map.put("expiration", expiration);
+            return map;
+        }catch (Exception e) {
+            logger.error("upload file to aliyun oss have exception.", e);
+            throw new BizRuntimeException(ErrorCode.FILE_UPLOAD_FAIL);
+        }
+    }
+
+    /**
+     * oss 对象获取有效期的签名url
+     * @param key
+     * @param expiration
+     * @return
+     */
+    private String ossFileUrlSigned(String key, Date expiration) {
+        try {
+            logger.info("get key:{} signed url", key);
+            OSSClient ossClient = getOssClient();
+            URL url = ossClient.generatePresignedUrl(ossBucket, key, expiration);
+            return url.toString();
+        }catch (Exception e) {
+            logger.error("oss file get url signed fail. key:{}", key, e);
+            return null;
+        }
+    }
+
+    //本地存储
+    private Map<String, Object> saveToLocal(Long userId, Integer companyId, Integer fileId, MultipartFile file) {
+        String originalName = file.getOriginalFilename();
+        String fileName = getFileName(fileId, originalName);
+        String dir = baseLocation + File.separator + companyId + File.separator + userId;
         File dirFile = new File(dir);
         if (!dirFile.exists()) {
             dirFile.mkdirs();
         }
-        String location = companyId + File.separator + yearMonth + File.separator + fileName.toString();
+        String location = companyId + File.separator + userId + File.separator + fileName;
         File saveFile = new File(baseLocation + File.separator + location);
         StringBuilder url = new StringBuilder(fileBaseUrl);
         url.append("/");
         url.append(companyId);
         url.append("/");
-        url.append(yearMonth);
+        url.append(userId);
         url.append("/");
-        url.append(fileName.toString());
+        url.append(fileName);
 
         try {
             FileOutputStream os = new FileOutputStream(saveFile);
@@ -293,12 +415,42 @@ public class FileService {
             out.flush();
             out.close();
             os.close();
-
-            String[] result = {location, url.toString()};
-            return result;
+            Map<String, Object> map = new HashMap<>();
+            map.put("location", location);
+            map.put("url", url.toString());
+            map.put("expiration", null);
+            return map;
         }catch (Exception e) {
             logger.error("write file have exception. ", e);
             throw new BizRuntimeException(ErrorCode.FILE_UPLOAD_FAIL);
+        }
+    }
+
+    /**
+     * 文件名：档案ID+日期+20位随机码+文件后缀名
+     * @param originalName
+     * @return
+     */
+    private String getFileName(Integer fileId, String originalName) {
+        String dateStr = UtilTool.DateFormat(new Date(), "yyyyMMdd");
+        StringBuilder fileName = new StringBuilder();
+        fileName.append(String.valueOf(fileId));
+        fileName.append("_");
+        fileName.append(dateStr);
+        fileName.append("_");
+        fileName.append(RandomStringUtils.randomAlphanumeric(20));
+        if (originalName.lastIndexOf('.') > 0) {
+            fileName.append(originalName.substring(originalName.lastIndexOf('.')));
+        }
+        return fileName.toString();
+    }
+
+    private void removeOSSObject(String key) {
+        OSSClient ossClient = getOssClient();
+        if (ossClient.doesObjectExist(ossBucket, key)) {
+            ossClient.deleteObject(ossBucket, key);
+        }else {
+            logger.error("oss object key:{} is not exist.", key);
         }
     }
 
@@ -325,7 +477,11 @@ public class FileService {
             return;
         }
         //根据location删除持久化文件
-        removeLocationFile(fileUpload.getLocation());
+        if ("oss".equalsIgnoreCase(saveLocation)) {
+            removeOSSObject(fileUpload.getLocation());
+        }else {
+            removeLocationFile(fileUpload.getLocation());
+        }
         int count = fileUploadMapper.deleteByPrimaryKey(id);
         if (count > 0) {
             logger.info("user:{} delete file upload record success, id:{}", user.getId(), id);

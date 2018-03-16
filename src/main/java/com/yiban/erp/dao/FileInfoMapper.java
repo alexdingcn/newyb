@@ -30,6 +30,8 @@ public interface FileInfoMapper {
     FileInfo getByFileNo(@Param("companyId") Integer companyId,
                          @Param("fileNo") String fileNo);
 
+    FileInfo getFileInfoDetailById(Integer id);
+
     Integer getByFileTypeAndNameCount(@Param("companyId") Integer companyId,
                                       @Param("fileType") String fileType,
                                       @Param("fileName") String fileName,
@@ -45,4 +47,7 @@ public interface FileInfoMapper {
     int removeByIds(@Param("ids") List<Integer> ids,
                     @Param("updateBy") String updateBy,
                     @Param("updateTime") Date updateTime);
+
+
+
 }

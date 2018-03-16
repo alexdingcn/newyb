@@ -15,7 +15,7 @@
             </div>
           </Row>
           <Row>
-            <Col span="11">
+            <Col span="10">
                 <Card>
                     <p slot="title">
                         <Icon type="ios-paper"></Icon> 档案信息 
@@ -46,7 +46,7 @@
                         :page-size="fileInfoTabPageSize" @on-change="fileInfoTabPageChange"></Page>
                 </Card>
             </Col>
-            <Col span="13">
+            <Col span="14">
                 <Card>
                     <p slot="title">
                         <Icon type="document"></Icon> {{fileInforCardTitleName}}
@@ -90,6 +90,7 @@
                         :columns="uploadTabColumns" :data="uploadTabData" size="small">
                     </Table>
                 </Card>
+                <file-view :fileInfo="fileInfoFormItem"></file-view>
             </Col>
           </Row>
       </Row>
@@ -162,9 +163,13 @@
 <script>
 import util from '@/libs/util.js';
 import dataConver from '@/libs/data-conver.js';
+import fileView from "./file-view.vue";
 
 export default {
     name: "basic_data_file",
+    components: {
+        fileView
+    },
     data() {
         return {
             fileTypeList: [],
@@ -243,8 +248,8 @@ export default {
                     align: 'center'
                 },
                 {
-                    title: '文件路径',
-                    key: 'loadUrl',
+                    title: '位置标识',
+                    key: 'location',
                     align: 'center'
                 },
                 {
@@ -295,11 +300,6 @@ export default {
         }
     },
     watch: {
-        fileInfoTabCurrClickData() {
-            if (this.fileInfoTabCurrClickData && this.fileInfoTabCurrClickData.id) {
-                this.fileInfoFormChangeToEditView(this.fileInfoTabCurrClickData)
-            }
-        },
         fileInfoTabSelectedData() {
             if (this.fileInfoTabSelectedData && this.fileInfoTabSelectedData.length > 0) {
                 this.delFileInfoBtnDisable = false;
@@ -331,8 +331,6 @@ export default {
                     util.errorProcessor(this, error);
                 })
         },
-
-        
 
         addFileTypeBtnClick() {
             this.fileTypeModalVisible = true;
@@ -388,22 +386,11 @@ export default {
                 .then((response) => {
                     this.fileTabData = response.data.data;
                     this.fileInfoTotalCount = response.data.count;
-                    this.refreshFileInfoCurreClickData();
                 })
                 .catch((error) => {
                     util.errorProcessor(this, error);
                 });
             this.fileInfoTabLoading = false;
-        },
-
-        refreshFileInfoCurreClickData() {
-            if (!this.fileInfoTabCurrClickData || !this.fileInfoTabCurrClickData.id) {
-                return;
-            }
-            let id = this.fileInfoTabCurrClickData.id;
-            let data = dataConver.selectObjectById(id, this.fileTabData);
-            this.fileInfoTabCurrClickData = data;
-            this.fileInfoFormChangeToEditView(data);
         },
 
         searchBtnClick() {
@@ -447,7 +434,7 @@ export default {
         fileInfoTabRowClick(data) {
             this.fileInfoTabCurrClickData = data;
             if (data && data.id && data.id > 0) {
-                this.fileInfoFormChangeToEditView(data);
+                this.fileInfoFormChangeToEditView(data.id);
             }
         },
 
@@ -455,26 +442,23 @@ export default {
             this.fileInfoTabSelectedData = data;
         },
 
-        removeFileUpload(data, index) {
-            if (!data) {
-                this.$Message.warn('获取需要删除的附件标识失败');
+        fileInfoFormChangeToEditView(fileId) {
+            if (!fileId) {
+                this.$Message.warning('获取档案标识失败');
                 return;
             }
-            util.ajax.delete("/file/upload/remove/" + data)
+            let reqData = {fileId: fileId};
+            util.ajax.get("/file/fileid", {params: reqData})
                 .then((response) => {
-                    this.$Message.success('删除成功');
-                    this.loadFileInfoList();
+                    let result = response.data;
+                    this.fileInforCardTitleName = result.fileName;
+                    this.fileInfoFormItem =  result;
+                    this.uploadTabData = result.fileUploads;
+                    this.fileInfoFormView = 'edit';
                 })
                 .catch((error) => {
                     util.errorProcessor(this, error);
-                })
-        },
-
-        fileInfoFormChangeToEditView(data) {
-            this.fileInforCardTitleName = data.fileName;
-            this.fileInfoFormItem =  data;
-            this.uploadTabData = data.fileUploads;
-            this.fileInfoFormView = 'edit';
+                });
         },
 
         fileInfoFormChangeToAddView() {
@@ -497,7 +481,7 @@ export default {
                         .then((response) => {
                             this.$Message.success('新建档案信息成功');
                             this.loadFileInfoList();
-                            this.fileInfoFormChangeToEditView(response.data);
+                            this.fileInfoFormChangeToEditView(response.data.id);
                         })
                         .catch((error) => {
                             util.errorProcessor(this, error);
@@ -565,11 +549,26 @@ export default {
         },
 
         closedfileUploadModal() {
-            this.fileUploadFormData = {};
+            this.fileInfoFormChangeToEditView(this.fileUploadFormData.fileId); //刷新
             this.chooseUploadFiles = [];
             this.$refs.uploadModal.clearFiles();
             this.fileUploadModalVisible = false;
-            this.loadFileInfoList();
+            this.fileUploadFormData = {};
+        },
+
+        removeFileUpload(data, index) {
+            if (!data) {
+                this.$Message.warning('获取需要删除的附件标识失败');
+                return;
+            }
+            util.ajax.delete("/file/upload/remove/" + data)
+                .then((response) => {
+                    this.$Message.success('删除成功');
+                    this.fileInfoFormChangeToEditView(this.fileInfoFormItem.id); //刷新
+                })
+                .catch((error) => {
+                    util.errorProcessor(this, error);
+                });
         }
 
     }

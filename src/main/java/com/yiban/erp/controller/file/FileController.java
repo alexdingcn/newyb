@@ -77,6 +77,29 @@ public class FileController {
         return ResponseEntity.ok().body(result.toJSONString());
     }
 
+    @RequestMapping(value = "/fileid", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> getDetailById(@RequestParam("fileId") Integer fileId) throws Exception {
+        FileInfo fileInfo = fileService.getFileInfoDetailById(fileId);
+        if (fileInfo != null) {
+            return ResponseEntity.ok().body(JSON.toJSONString(fileInfo));
+        }else {
+            logger.warn("get file info fail by id:{}", fileId);
+            throw new BizException(ErrorCode.FILE_GET_INFO_FAIL);
+        }
+    }
+
+    @RequestMapping(value = "/fileno", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> getDetailByFileNo(@RequestParam("fileNo") String fileNo,
+                                                @AuthenticationPrincipal User user) throws Exception {
+        FileInfo fileInfo = fileService.getFileInfoDetailByFileNo(user.getCompanyId(), fileNo);
+        if (fileInfo != null) {
+            return ResponseEntity.ok().body(JSON.toJSONString(fileInfo));
+        }else {
+            logger.warn("get file info fail by fileNo:{}, company:{}", fileNo, user.getCompanyId());
+            throw new BizException(ErrorCode.FILE_GET_INFO_FAIL);
+        }
+    }
+
     @RequestMapping(value = "/add", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> add(@RequestBody FileInfo fileInfo,
                                       @AuthenticationPrincipal User user) throws Exception {

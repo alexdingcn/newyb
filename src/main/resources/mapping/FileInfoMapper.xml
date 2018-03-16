@@ -176,6 +176,7 @@
       <result column="upload_original_name" property="originalName" jdbcType="VARCHAR" />
       <result column="upload_location" property="location" jdbcType="VARCHAR" />
       <result column="upload_load_url" property="loadUrl" jdbcType="VARCHAR" />
+      <result column="upload_expiration" property="expiration" jdbcType="TIMESTAMP" />
       <result column="upload_create_by" property="createBy" jdbcType="VARCHAR" />
       <result column="upload_update_by" property="updateBy" jdbcType="VARCHAR" />
       <result column="upload_create_time" property="createTime" jdbcType="TIMESTAMP" />
@@ -187,10 +188,19 @@
     t1.id, t1.company_id, t1.file_no, t1.file_status, t1.file_name, t1.file_type,
     t1.comment, t1.create_by, t1.create_time, t1.update_by, t1.update_time,
     t2.id as upload_id, t2.file_id as upload_file_id, t2.comment as upload_comment,
-    t2.original_name as upload_original_name, t2.load_url as upload_load_url, t2.location as upload_location,
+    t2.original_name as upload_original_name, t2.location as upload_location,
+    t2.load_url as upload_load_url, t2.expiration as upload_expiration,
     t2.create_by as upload_create_by, t2.update_by as upload_update_by,
     t2.create_time as upload_create_time, t2.update_time as upload_update_time
   </sql>
+
+  <select id="getFileInfoDetailById" parameterType="java.lang.Integer" resultMap="DetailResultMap">
+    select
+    <include refid="Detail_Column_List"/>
+    from file_info t1 left join file_upload t2 on t1.id=t2.file_id
+    where t1.id = #{id}
+    and t1.file_status != 'delete';
+  </select>
 
   <select id="getByFileNo" parameterType="map" resultMap="DetailResultMap">
     select
@@ -222,8 +232,8 @@
 
   <select id="getByFileTypeAndName" parameterType="map" resultMap="DetailResultMap">
     select
-     <include refid="Detail_Column_List"/>
-    from file_info t1 left join file_upload t2 on t1.id=t2.file_id
+     <include refid="Base_Column_List"/>
+    from file_info t1
     where t1.company_id = #{companyId,jdbcType=INTEGER}
     <if test="fileType != null" >
       and t1.file_type = #{fileType,jdbcType=VARCHAR}
