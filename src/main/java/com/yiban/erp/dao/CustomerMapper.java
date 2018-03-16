@@ -35,12 +35,14 @@ public interface CustomerMapper {
     int selectAllCount(@Param("companyId") Integer companyId,
                        @Param("categoryId") Integer categoryId,
                        @Param("customerName") String customerName,
-                       @Param("customerNo") String customerNo);
+                       @Param("customerNo") String customerNo,
+                       @Param("shorName") String shorName);
 
     List<Customer> selectAll(@Param("companyId") Integer companyId,
                              @Param("categoryId") Integer categoryId,
                              @Param("customerName") String customerName,
                              @Param("customerNo") String customerNo,
+                             @Param("shorName") String shorName,
                              @Param("limit") Integer limit,
                              @Param("offset") Integer offset);
 }

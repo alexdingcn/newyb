@@ -37,23 +37,28 @@ public class CustomerController {
                                      @RequestParam(name = "categoryId", required = false) Integer reqCategoryId,
                                      @RequestParam(name = "customerName", required = false) String reqCustomerName,
                                      @RequestParam(name = "customerNo", required = false) String reqCustomerNo,
+                                     @RequestParam(name= "shorName", required = false) String reqShorName,
                                      @AuthenticationPrincipal User user)  throws Exception {
-        logger.info("get customer list page:{}, size:{}, categoryId:{}, customerName:{}, customerNo:{}",
-                page, size, reqCategoryId, reqCustomerName, reqCustomerNo);
+        logger.info("get customer list page:{}, size:{}, categoryId:{}, customerName:{}, customerNo:{}, shorName:{}",
+                page, size, reqCategoryId, reqCustomerName, reqCustomerNo, reqShorName);
         Integer categoryId = reqCategoryId == null || reqCategoryId <=0 ? null : reqCategoryId;
         String customerName = null;
         String customerNo = null;
+        String shorName = null;
         if (reqCustomerName != null && !"".equals(reqCustomerName.trim())) {
             customerName = reqCustomerName.trim();
         }
         if (reqCustomerNo != null && !"".equals(reqCustomerNo.trim())) {
             customerNo = reqCustomerNo.trim();
         }
+        if (reqShorName != null && !"".equals(reqShorName.trim())) {
+            shorName = reqShorName.trim();
+        }
         Integer pageSize = size == null ? 10 : size;
         Integer offset = (page == null || page <= 0 ? 0 : page - 1) * pageSize;
 
-        int count = customerMapper.selectAllCount(user.getCompanyId(), categoryId, customerName, customerNo);
-        List<Customer> customers = customerMapper.selectAll(user.getCompanyId(), categoryId, customerName, customerNo, pageSize, offset);
+        int count = customerMapper.selectAllCount(user.getCompanyId(), categoryId, customerName, customerNo, shorName);
+        List<Customer> customers = customerMapper.selectAll(user.getCompanyId(), categoryId, customerName, customerNo, shorName, pageSize, offset);
         JSONObject result = new JSONObject();
         result.put("count", count);
         result.put("data", customers);

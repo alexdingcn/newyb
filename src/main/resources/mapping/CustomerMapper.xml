@@ -646,6 +646,10 @@
       <bind name="customerNoVal" value="customerNo + '%'" />
       and customer_no like #{customerNoVal}
     </if>
+    <if test="shorName != null" >
+      <bind name="shorNameVal" value="'%' + shorName + '%'" />
+      and shor_name like #{shorNameVal}
+    </if>
   </select>
 
   <select id="selectAll" parameterType="map" resultMap="BaseResultMap">
@@ -664,6 +668,10 @@
     <if test="customerNo != null" >
       <bind name="customerNoVal" value="customerNo + '%'" />
       and customer_no like #{customerNoVal}
+    </if>
+    <if test="shorName != null" >
+      <bind name="shorNameVal" value="'%' + shorName + '%'" />
+      and shor_name like #{shorNameVal}
     </if>
     <if test="offset != null and limit != null">
       limit #{offset}, #{limit}

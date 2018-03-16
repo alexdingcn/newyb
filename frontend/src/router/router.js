@@ -118,7 +118,7 @@ export const appRouter = [
     title: '销售',
     component: Main,
     children: [
-        { path: 'order', title: '销售制单', name: 'sell_order', component: () => import('@/views/basic-data/good.vue') },
+        { path: 'order', title: '销售制单', name: 'sell_order', component: () => import('@/views/sell/make.vue') },
         { path: 'review', title: '销售单审核', name: 'sell_review', component: () => import('@/views/basic-data/factory.vue') },
     ]
 },
