@@ -3,6 +3,7 @@
 <mapper namespace="com.yiban.erp.dao.BuyOrderMapper" >
   <resultMap id="BaseResultMap" type="com.yiban.erp.entities.BuyOrder" >
     <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="order_number" property="orderNumber" jdbcType="VARCHAR" />
     <result column="supplier_id" property="supplierId" jdbcType="BIGINT" />
     <result column="supplier_contact_id" property="supplierContactId" jdbcType="BIGINT" />
     <result column="buyer_id" property="buyerId" jdbcType="BIGINT" />
@@ -21,7 +22,7 @@
     <result column="updated_time" property="updatedTime" jdbcType="TIMESTAMP" />
   </resultMap>
   <sql id="Base_Column_List" >
-    id, supplier_id, supplier_contact_id, buyer_id, status, ship_method_id, ship_tool_id, 
+    id, order_number, supplier_id, supplier_contact_id, buyer_id, status, ship_method_id, ship_tool_id,
     temper_control_id, warehouse_id, eta, ref_no, comment, company_id, created_by, updated_by, 
     created_time, updated_time
   </sql>
@@ -36,13 +37,13 @@
     where id = #{id,jdbcType=BIGINT}
   </delete>
   <insert id="insert" parameterType="com.yiban.erp.entities.BuyOrder" useGeneratedKeys="true" keyProperty="id">
-    insert into buy_order (supplier_id, supplier_contact_id,
+    insert into buy_order (order_number, supplier_id, supplier_contact_id,
       buyer_id, status, ship_method_id, 
       ship_tool_id, temper_control_id, warehouse_id, 
       eta, ref_no, comment, 
       company_id, created_by, updated_by, 
       created_time, updated_time)
-    values (#{supplierId,jdbcType=BIGINT}, #{supplierContactId,jdbcType=BIGINT},
+    values (#{orderNumber, jdbcType=VARCHAR}, #{supplierId,jdbcType=BIGINT}, #{supplierContactId,jdbcType=BIGINT},
       #{buyerId,jdbcType=BIGINT}, #{status,jdbcType=VARCHAR}, #{shipMethodId,jdbcType=INTEGER}, 
       #{shipToolId,jdbcType=INTEGER}, #{temperControlId,jdbcType=INTEGER}, #{warehouseId,jdbcType=INTEGER}, 
       #{eta,jdbcType=TIMESTAMP}, #{refNo,jdbcType=VARCHAR}, #{comment,jdbcType=VARCHAR}, 
@@ -52,7 +53,9 @@
   <insert id="insertSelective" parameterType="com.yiban.erp.entities.BuyOrder" useGeneratedKeys="true" keyProperty="id">
     insert into buy_order
     <trim prefix="(" suffix=")" suffixOverrides="," >
-
+      <if test="orderNumber != null">
+        order_number,
+      </if>
       <if test="supplierId != null" >
         supplier_id,
       </if>
@@ -103,7 +106,9 @@
       </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides="," >
-
+      <if test="orderNumber != null">
+        #{orderNumber,jdbcType=VARCHAR},
+      </if>
       <if test="supplierId != null" >
         #{supplierId,jdbcType=BIGINT},
       </if>
@@ -157,6 +162,9 @@
   <update id="updateByPrimaryKeySelective" parameterType="com.yiban.erp.entities.BuyOrder" >
     update buy_order
     <set >
+      <if test="orderNumber != null">
+        order_number = #{orderNumber,jdbcType=VARCHAR},
+      </if>
       <if test="supplierId != null" >
         supplier_id = #{supplierId,jdbcType=BIGINT},
       </if>
@@ -210,7 +218,9 @@
   </update>
   <update id="updateByPrimaryKey" parameterType="com.yiban.erp.entities.BuyOrder" >
     update buy_order
-    set supplier_id = #{supplierId,jdbcType=BIGINT},
+    set
+      order_number = #{orderNumber,jdbcType=VARCHAR},
+      supplier_id = #{supplierId,jdbcType=BIGINT},
       supplier_contact_id = #{supplierContactId,jdbcType=BIGINT},
       buyer_id = #{buyerId,jdbcType=BIGINT},
       status = #{status,jdbcType=VARCHAR},

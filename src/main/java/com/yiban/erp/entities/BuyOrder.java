@@ -10,6 +10,8 @@ import java.util.List;
 public class BuyOrder {
     private Long id;
 
+    private String orderNumber;
+
     private Long supplierId;
 
     private Long supplierContactId;
@@ -52,6 +54,14 @@ public class BuyOrder {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public String getOrderNumber() {
+        return orderNumber;
+    }
+
+    public void setOrderNumber(String orderNumber) {
+        this.orderNumber = orderNumber;
     }
 
     public Long getSupplierId() {

@@ -157,7 +157,14 @@
 
 			</Form>
 		</Card>
+		<Modal v-model="closeConfirm"
+			   title="是否继续下单"
+			   @on-ok="clearData"
+		       @on-cancel="closeTab">
+			<p>是否继续添加下一笔订单?</p>
+		</Modal>
 	</Row>
+
 </template>
 
 <script>
@@ -183,6 +190,7 @@
 				warehouseOptions: [],
             	totalAmount: 0,
             	edittingRow: {},
+				closeConfirm: false,
             	fapiaoTypes: [
             		{ value: 'PP', label:'普通发票'},
             		{ value: 'ZZS', label: '增值税发票'}
@@ -405,7 +413,10 @@
 					{ required: true, type: 'number',message: '请选择采购员', trigger: 'blur' }
 				],
 				warehouseId: [
-					{ required: true, type: 'number',message: '请选择采购员', trigger: 'blur' }
+					{ required: true, type: 'number',message: '请选择仓库点', trigger: 'blur' }
+				],
+				orderItems: [
+					{ required: true, type: 'array', range: {min:1}, message: '请添加商品', trigger: 'blur' }
 				],
 			}
         };
@@ -415,6 +426,9 @@
 			this.queryCommonOptions();
 			this.queryWarehouseList();
         },
+		activated() {
+			this.clearData();
+		},
         watch: {
         	orderItems: function () {
         		this.totalAmount = this.orderItems.reduce(function(total, item) { return total + parseFloat(item.amount); }, 0);
@@ -566,29 +580,49 @@
 							console.log(error);
 						});
 			},
-			saveBuyOrder() {
+			doSave() {
 				var self = this;
 				this.saving = true;
-				this.buyOrder.orderItems = this.orderItems;
-
-				this.$refs.buyOrderForm.validate((valid) => {
-					if (!valid) {
-						this.$Message.error('请检查输入!');
-					}
-				});
 				util.ajax.post('/buy/add', this.buyOrder)
 						.then(function (response) {
 							if (response.status === 200 && response.data) {
 								self.buyOrder.id = response.data.orderId;
 								self.buyOrder.status = response.data.status;
 								self.$Message.info('采购入库订单保存成功');
+								self.closeConfirm = true;
 							}
 							self.saving = false;
 						})
 						.catch(function (error) {
-							self.$Message.error('保存采购订单错误!');
+							console.log(error);
 							self.saving = false;
+							self.$Message.error('保存采购订单错误');
+//							self.$Message.error('保存采购订单错误 ' + error.data.message);
 						});
+			},
+			clearData() {
+				this.buyOrder = {
+						supplierId: null,
+						eta: moment().add(1,'d').format('YYYY-MM-DD'),
+						orderItemIds: []
+				}
+			},
+			closeTab() {
+				this.clearData();
+				let pageName = util.closeCurrentTab(this);
+				this.$router.push({
+					name: pageName,
+				});
+			},
+			saveBuyOrder() {
+				this.buyOrder.orderItems = this.orderItems;
+				this.$refs.buyOrderForm.validate((valid) => {
+					if (!valid) {
+						this.$Message.error('请检查输入!');
+					} else {
+						this.doSave();
+					}
+				});
 			}
         }
     };

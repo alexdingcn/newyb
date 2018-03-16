@@ -8,6 +8,7 @@ import com.yiban.erp.entities.BuyOrder;
 import com.yiban.erp.entities.BuyOrderDetail;
 import com.yiban.erp.entities.User;
 import com.yiban.erp.exception.ErrorCode;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,8 +21,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.List;
 
 @RestController
 @RequestMapping("/buy")
@@ -40,8 +41,14 @@ public class BuyOrderController {
                                       @RequestBody BuyOrder buyOrder) {
         logger.info("ADD new buy order, userId={}", user.getId());
 
+        // TODO: add validate
+        if (!validateBuyOrder(buyOrder)) {
+            return ResponseEntity.badRequest().body(ErrorCode.BUY_ORDER_PARAMS_INVALID.toString());
+        }
+
         int result = 0;
         if (buyOrder.getId() == null) {
+            buyOrder.setOrderNumber(new SimpleDateFormat("yyyyMMddHHmmss").format(new Date()) + RandomStringUtils.randomNumeric(5));
             buyOrder.setCompanyId(user.getCompanyId());
             buyOrder.setCreatedBy(user.getNickname());
             buyOrder.setStatus(BuyOrderStatus.INIT);
@@ -81,6 +88,19 @@ public class BuyOrderController {
         }
 
         return ResponseEntity.badRequest().body("Failed to insert/update");
+    }
+
+    private boolean validateBuyOrder(BuyOrder buyOrder) {
+        if (buyOrder == null) {
+            return false;
+        }
+        if (buyOrder.getOrderItems() == null || buyOrder.getOrderItems().isEmpty()) {
+            return false;
+        }
+        if (buyOrder.getSupplierId() == null) {
+            return false;
+        }
+        return true;
     }
 
     private int saveOrderDetails(BuyOrder buyOrder, User operator) {

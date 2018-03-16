@@ -283,6 +283,18 @@ util.openNewPage = function (vm, name, argu, query) {
     vm.$store.commit('setCurrentPageName', name);
 };
 
+util.closeCurrentTab = function (vm) {
+    let pageOpenedList = vm.$store.state.app.pageOpenedList;
+    let name = vm.$store.state.app.currentPageName;
+    vm.$store.commit('removeTag', name);
+    vm.$store.commit('closePage', name);
+    pageOpenedList = vm.$store.state.app.pageOpenedList;
+    localStorage.pageOpenedList = JSON.stringify(pageOpenedList);
+    let pageName = pageOpenedList[pageOpenedList.length - 1].name;
+    vm.$store.commit('setCurrentPageName', pageName);
+    return pageName;
+};
+
 util.toDefaultPage = function (routers, name, route, next) {
     let len = routers.length;
     let i = 0;

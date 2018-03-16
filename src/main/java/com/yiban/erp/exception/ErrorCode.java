@@ -22,7 +22,8 @@ public enum ErrorCode {
 
     // 13xx - 采购
     BUY_ORDER_NOT_EXISTED(1300, "采购订单不存在"),
-    BUY_ORDER_IS_CHECKED(1301, "采购订单已审核不可修改"),
+    BUY_ORDER_PARAMS_INVALID(1301, "采购订单参数错误"),
+    BUY_ORDER_IS_CHECKED(1302, "采购订单已审核不可修改"),
 
     CUSTOMER_GET_FAIL(2000, "获取客户信息失败"),
     CUSTOMER_DEL_PARAMS_EMPTY(2001, "请选择需要删除的客户"),
