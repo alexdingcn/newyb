@@ -15,7 +15,7 @@
             </div>
           </Row>
           <Row>
-            <Col span="11">
+            <Col span="10">
                 <Card>
                     <p slot="title">
                         <Icon type="ios-paper"></Icon> 档案信息 
@@ -46,7 +46,7 @@
                         :page-size="fileInfoTabPageSize" @on-change="fileInfoTabPageChange"></Page>
                 </Card>
             </Col>
-            <Col span="13">
+            <Col span="14">
                 <Card>
                     <p slot="title">
                         <Icon type="document"></Icon> {{fileInforCardTitleName}}
@@ -90,6 +90,7 @@
                         :columns="uploadTabColumns" :data="uploadTabData" size="small">
                     </Table>
                 </Card>
+                <file-view :fileInfo="fileInfoFormItem"></file-view>
             </Col>
           </Row>
       </Row>
@@ -162,9 +163,13 @@
 <script>
 import util from '@/libs/util.js';
 import dataConver from '@/libs/data-conver.js';
+import fileView from "./file-view.vue";
 
 export default {
     name: "basic_data_file",
+    components: {
+        fileView
+    },
     data() {
         return {
             fileTypeList: [],

@@ -364,12 +364,20 @@
           </div>
       </Modal>
 
+      <Modal v-model="imageShowModal" :width="70" title="档案展示" :closable="true">
+        <file-view :fileNo="showImageNo"></file-view>
+        <div slot="footer">
+
+        </div>
+      </Modal>
+
   </div>
 </template>
 
 <script>
 import util from "@/libs/util.js";
 import dataConver from "@/libs/data-conver.js";
+import fileView from "@/views/basic-data/file-view.vue";
 
 export default {
   name: "customer-info",
@@ -390,6 +398,9 @@ export default {
       type: Object,
       default: null,
     }
+  },
+  components: {
+    fileView
   },
   data() {
     return {
@@ -438,6 +449,8 @@ export default {
       certTabLoading: false,
       certTabData: [],
       certTabSelectedData: [],
+      imageShowModal: false,
+      showImageNo: '',
       certTabColumns: [
         {
           type: "selection",
@@ -454,7 +467,7 @@ export default {
           key: "licenseExp",
           align: "center",
           render: (h, params) => {
-            let date = params.licenseExp;
+            let date = params.row.licenseExp;
             if (!date || isNaN(date)) {
               return h('span', '');
             }else {
@@ -465,7 +478,27 @@ export default {
         {
           title: "档案编号",
           key: "imageNo",
-          align: "center"
+          width: 170,
+          align: "center",
+          render: (h, params) => {
+            let imageNo = params.row.imageNo;
+            if (!imageNo) {
+              return h('span', '');
+            }else {
+              return h('Button', {
+                props: {
+                  type: 'text',
+                  size: 'small',
+                  icon: 'eye'
+                },
+                on: {
+                  click: () => {
+                    this.showImageModal(params.row.imageNo);
+                  }
+                }
+              }, params.row.imageNo);
+            }
+          }
         },
         {
           title: "备注",
@@ -482,7 +515,7 @@ export default {
           key: "updateTime",
           align: "center",
           render: (h, params) => {
-            let date = params.updateTime;
+            let date = params.row.updateTime;
             if (!date || isNaN(date)) {
               return h('span', '');
             }else {
@@ -933,6 +966,11 @@ export default {
 
     repCancelBtnClick() {
       this.repModalShow = false;
+    },
+
+    showImageModal(imageNo) {
+      this.imageShowModal = true;
+      this.showImageNo = imageNo;
     }
 
 
