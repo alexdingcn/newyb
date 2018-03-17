@@ -33,7 +33,7 @@
                     </Col>
                 </Row>
                 <Row type="flex" justify="center" style="margin-top:-10px;">
-                    <Button icon="ios-search" class="margin-let-10" @click="searchBtnClicked">查询</Button>
+                    <Button type="primary" icon="ios-search" class="margin-let-10" @click="searchBtnClicked">查询</Button>
                 </Row>
             </Form>
 

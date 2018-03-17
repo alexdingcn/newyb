@@ -29,5 +29,6 @@
         <mapper resource="mapping/WarehouseMapper.xml"/>
         <mapper resource="mapping/BuyOrderMapper.xml"/>
         <mapper resource="mapping/BuyOrderDetailMapper.xml"/>
+        <mapper resource="mapping/SellOrderMapper.xml"/>
     </mappers>
 </configuration>

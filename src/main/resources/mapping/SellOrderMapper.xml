@@ -1,0 +1,345 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.yiban.erp.dao.SellOrderMapper" >
+  <resultMap id="BaseResultMap" type="com.yiban.erp.entities.SellOrder" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="company_id" property="companyId" jdbcType="INTEGER" />
+    <result column="order_number" property="orderNumber" jdbcType="VARCHAR" />
+    <result column="ref_no" property="refNo" jdbcType="VARCHAR" />
+    <result column="status" property="status" jdbcType="VARCHAR" />
+    <result column="customer_id" property="customerId" jdbcType="INTEGER" />
+    <result column="customer_rep_id" property="customerRepId" jdbcType="INTEGER" />
+    <result column="saler_id" property="salerId" jdbcType="INTEGER" />
+    <result column="temper_control_id" property="temperControlId" jdbcType="INTEGER" />
+    <result column="create_order_date" property="createOrderDate" jdbcType="DATE" />
+    <result column="take_goods_user" property="takeGoodsUser" jdbcType="VARCHAR" />
+    <result column="pay_order_date" property="payOrderDate" jdbcType="DATE" />
+    <result column="pay_method" property="payMethod" jdbcType="INTEGER" />
+    <result column="pay_file_no" property="payFileNo" jdbcType="VARCHAR" />
+    <result column="mark_up_rate" property="markUpRate" jdbcType="DECIMAL" />
+    <result column="pay_amount" property="payAmount" jdbcType="DECIMAL" />
+    <result column="not_small_amount" property="notSmallAmount" jdbcType="DECIMAL" />
+    <result column="ship_method" property="shipMethod" jdbcType="INTEGER" />
+    <result column="ship_tool" property="shipTool" jdbcType="INTEGER" />
+    <result column="comment" property="comment" jdbcType="VARCHAR" />
+    <result column="create_by" property="createBy" jdbcType="VARCHAR" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_by" property="updateBy" jdbcType="VARCHAR" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, company_id, order_number, ref_no, status, customer_id, customer_rep_id, saler_id, 
+    temper_control_id, create_order_date, take_goods_user, pay_order_date, pay_method, pay_file_no, mark_up_rate,
+    pay_amount, not_small_amount, ship_method, ship_tool, comment, create_by, create_time, 
+    update_by, update_time
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select 
+    <include refid="Base_Column_List" />
+    from sell_order
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
+    delete from sell_order
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="com.yiban.erp.entities.SellOrder" keyProperty="id" useGeneratedKeys="true" >
+    insert into sell_order (company_id, order_number,
+      ref_no, status, customer_id, 
+      customer_rep_id, saler_id, temper_control_id, 
+      create_order_date, take_goods_user, pay_order_date, pay_method,
+      pay_file_no, mark_up_rate, pay_amount, 
+      not_small_amount, ship_method, ship_tool, 
+      comment, create_by, create_time, 
+      update_by, update_time)
+    values (#{companyId,jdbcType=INTEGER}, #{orderNumber,jdbcType=VARCHAR},
+      #{refNo,jdbcType=VARCHAR}, #{status,jdbcType=VARCHAR}, #{customerId,jdbcType=INTEGER}, 
+      #{customerRepId,jdbcType=INTEGER}, #{salerId,jdbcType=INTEGER}, #{temperControlId,jdbcType=INTEGER}, 
+      #{createOrderDate,jdbcType=DATE}, #{takeGoodsUser,jdbcType=VARCHAR}, #{payOrderDate,jdbcType=DATE},
+      #{payMethod,jdbcType=INTEGER}, #{payFileNo,jdbcType=VARCHAR}, #{markUpRate,jdbcType=DECIMAL}, #{payAmount,jdbcType=DECIMAL},
+      #{notSmallAmount,jdbcType=DECIMAL}, #{shipMethod,jdbcType=INTEGER}, #{shipTool,jdbcType=INTEGER}, 
+      #{comment,jdbcType=VARCHAR}, #{createBy,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, 
+      #{updateBy,jdbcType=VARCHAR}, #{updateTime,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" parameterType="com.yiban.erp.entities.SellOrder" keyProperty="id" useGeneratedKeys="true" >
+    insert into sell_order
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="companyId != null" >
+        company_id,
+      </if>
+      <if test="orderNumber != null" >
+        order_number,
+      </if>
+      <if test="refNo != null" >
+        ref_no,
+      </if>
+      <if test="status != null" >
+        status,
+      </if>
+      <if test="customerId != null" >
+        customer_id,
+      </if>
+      <if test="customerRepId != null" >
+        customer_rep_id,
+      </if>
+      <if test="salerId != null" >
+        saler_id,
+      </if>
+      <if test="temperControlId != null" >
+        temper_control_id,
+      </if>
+      <if test="createOrderDate != null" >
+        create_order_date,
+      </if>
+      <if test="takeGoodsUser != null">
+        take_goods_user,
+      </if>
+      <if test="payOrderDate != null" >
+        pay_order_date,
+      </if>
+      <if test="payMethod != null" >
+        pay_method,
+      </if>
+      <if test="payFileNo != null" >
+        pay_file_no,
+      </if>
+      <if test="markUpRate != null" >
+        mark_up_rate,
+      </if>
+      <if test="payAmount != null" >
+        pay_amount,
+      </if>
+      <if test="notSmallAmount != null" >
+        not_small_amount,
+      </if>
+      <if test="shipMethod != null" >
+        ship_method,
+      </if>
+      <if test="shipTool != null" >
+        ship_tool,
+      </if>
+      <if test="comment != null" >
+        comment,
+      </if>
+      <if test="createBy != null" >
+        create_by,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+      <if test="updateBy != null" >
+        update_by,
+      </if>
+      <if test="updateTime != null" >
+        update_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="companyId != null" >
+        #{companyId,jdbcType=INTEGER},
+      </if>
+      <if test="orderNumber != null" >
+        #{orderNumber,jdbcType=VARCHAR},
+      </if>
+      <if test="refNo != null" >
+        #{refNo,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=VARCHAR},
+      </if>
+      <if test="customerId != null" >
+        #{customerId,jdbcType=INTEGER},
+      </if>
+      <if test="customerRepId != null" >
+        #{customerRepId,jdbcType=INTEGER},
+      </if>
+      <if test="salerId != null" >
+        #{salerId,jdbcType=INTEGER},
+      </if>
+      <if test="temperControlId != null" >
+        #{temperControlId,jdbcType=INTEGER},
+      </if>
+      <if test="createOrderDate != null" >
+        #{createOrderDate,jdbcType=DATE},
+      </if>
+      <if test="takeGoodsUser != null">
+        #{takeGoodsUser,jdbcType=VARCHAR},
+      </if>
+      <if test="payOrderDate != null" >
+        #{payOrderDate,jdbcType=DATE},
+      </if>
+      <if test="payMethod != null" >
+        #{payMethod,jdbcType=INTEGER},
+      </if>
+      <if test="payFileNo != null" >
+        #{payFileNo,jdbcType=VARCHAR},
+      </if>
+      <if test="markUpRate != null" >
+        #{markUpRate,jdbcType=DECIMAL},
+      </if>
+      <if test="payAmount != null" >
+        #{payAmount,jdbcType=DECIMAL},
+      </if>
+      <if test="notSmallAmount != null" >
+        #{notSmallAmount,jdbcType=DECIMAL},
+      </if>
+      <if test="shipMethod != null" >
+        #{shipMethod,jdbcType=INTEGER},
+      </if>
+      <if test="shipTool != null" >
+        #{shipTool,jdbcType=INTEGER},
+      </if>
+      <if test="comment != null" >
+        #{comment,jdbcType=VARCHAR},
+      </if>
+      <if test="createBy != null" >
+        #{createBy,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateBy != null" >
+        #{updateBy,jdbcType=VARCHAR},
+      </if>
+      <if test="updateTime != null" >
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.yiban.erp.entities.SellOrder" >
+    update sell_order
+    <set >
+      <if test="refNo != null" >
+        ref_no = #{refNo,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null" >
+        status = #{status,jdbcType=VARCHAR},
+      </if>
+      <if test="customerId != null" >
+        customer_id = #{customerId,jdbcType=INTEGER},
+      </if>
+      <if test="customerRepId != null" >
+        customer_rep_id = #{customerRepId,jdbcType=INTEGER},
+      </if>
+      <if test="salerId != null" >
+        saler_id = #{salerId,jdbcType=INTEGER},
+      </if>
+      <if test="temperControlId != null" >
+        temper_control_id = #{temperControlId,jdbcType=INTEGER},
+      </if>
+      <if test="createOrderDate != null" >
+        create_order_date = #{createOrderDate,jdbcType=DATE},
+      </if>
+      <if test="takeGoodsUser != null">
+        take_goods_user = #{takeGoodsUser,jdbcType=VARCHAR},
+      </if>
+      <if test="payOrderDate != null" >
+        pay_order_date = #{payOrderDate,jdbcType=DATE},
+      </if>
+      <if test="payMethod != null" >
+        pay_method = #{payMethod,jdbcType=INTEGER},
+      </if>
+      <if test="payFileNo != null" >
+        pay_file_no = #{payFileNo,jdbcType=VARCHAR},
+      </if>
+      <if test="markUpRate != null" >
+        mark_up_rate = #{markUpRate,jdbcType=DECIMAL},
+      </if>
+      <if test="payAmount != null" >
+        pay_amount = #{payAmount,jdbcType=DECIMAL},
+      </if>
+      <if test="notSmallAmount != null" >
+        not_small_amount = #{notSmallAmount,jdbcType=DECIMAL},
+      </if>
+      <if test="shipMethod != null" >
+        ship_method = #{shipMethod,jdbcType=INTEGER},
+      </if>
+      <if test="shipTool != null" >
+        ship_tool = #{shipTool,jdbcType=INTEGER},
+      </if>
+      <if test="comment != null" >
+        comment = #{comment,jdbcType=VARCHAR},
+      </if>
+      <if test="createBy != null" >
+        create_by = #{createBy,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateBy != null" >
+        update_by = #{updateBy,jdbcType=VARCHAR},
+      </if>
+      <if test="updateTime != null" >
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.yiban.erp.entities.SellOrder" >
+    update sell_order
+    set
+      ref_no = #{refNo,jdbcType=VARCHAR},
+      status = #{status,jdbcType=VARCHAR},
+      customer_id = #{customerId,jdbcType=INTEGER},
+      customer_rep_id = #{customerRepId,jdbcType=INTEGER},
+      saler_id = #{salerId,jdbcType=INTEGER},
+      temper_control_id = #{temperControlId,jdbcType=INTEGER},
+      create_order_date = #{createOrderDate,jdbcType=DATE},
+      take_goods_user = #{takeGoodsUser,jdbcType=VARCHAR},
+      pay_order_date = #{payOrderDate,jdbcType=DATE},
+      pay_method = #{payMethod,jdbcType=INTEGER},
+      pay_file_no = #{payFileNo,jdbcType=VARCHAR},
+      mark_up_rate = #{markUpRate,jdbcType=DECIMAL},
+      pay_amount = #{payAmount,jdbcType=DECIMAL},
+      not_small_amount = #{notSmallAmount,jdbcType=DECIMAL},
+      ship_method = #{shipMethod,jdbcType=INTEGER},
+      ship_tool = #{shipTool,jdbcType=INTEGER},
+      comment = #{comment,jdbcType=VARCHAR},
+      create_by = #{createBy,jdbcType=VARCHAR},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_by = #{updateBy,jdbcType=VARCHAR},
+      update_time = #{updateTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+
+  <select id="getListCount" parameterType="map" resultType="java.lang.Integer">
+    select count(1)
+    from sell_order
+    where company_id = #{companyId}
+      <if test="customerId != null" >
+        and customer_id = #{customerId}
+      </if>
+      <if test="salerId != null">
+        and saler_id = #{salerId}
+      </if>
+      <if test="status != null" >
+        and status = #{status}
+      </if>
+      <if test="refNo != null">
+        <bind name="refNoVal" value="refNo + '%'"/>
+        and ref_no like #{refNoVal}
+      </if>
+  </select>
+
+  <select id="getList" parameterType="map" resultMap="BaseResultMap">
+    select <include refid="Base_Column_List"/>
+    from sell_order
+    where company_id = #{companyId}
+    <if test="customerId != null" >
+      and customer_id = #{customerId}
+    </if>
+    <if test="salerId != null">
+      and saler_id = #{salerId}
+    </if>
+    <if test="status != null" >
+      and status = #{status}
+    </if>
+    <if test="refNo != null">
+      <bind name="refNoVal" value="refNo + '%'"/>
+      and ref_no like #{refNoVal}
+    </if>
+    order by id desc
+    limit #{offset}, #{limit};
+  </select>
+
+</mapper>

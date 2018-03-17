@@ -10,31 +10,30 @@
                 销售订单制单
             </p> 
             <ButtonGroup slot="extra" size="small">
-                <Button type="success" icon="ios-checkmark"> 保存 </Button>
-                <Button type="primary" icon="bookmark"> 暂挂 </Button>
-                <Button type="info" icon="filing"> 暂挂提取 </Button>
+                <Button type="success" icon="ios-checkmark" :loading="sellOrderSaveBtnLoading" @click="sellOrderSaveBtnClick"> 保存 </Button>
+                <Button type="info" icon="filing"> 修改提取 </Button>
                 <Button type="ghost" icon="ios-printer">打印</Button>
             </ButtonGroup>
 
             <Row type="flex" justify="center">
-                <Form ref="sellOrderForm" :model="sellOrderFormData" :label-width="100">
+                <Form ref="sellOrderForm" :model="sellOrderFormData" :label-width="100" :rules="sellOrderFormValidate">
                     <Row type="flex" justify="center">
                         <Col span="8">
-                            <FormItem label="客户" >
+                            <FormItem label="客户" prop="customerName">
                                 <Input type="text" readonly v-model="sellOrderFormData.customerName" placeholder="请输入客户名称">
                                     <Button slot="append" icon="ios-search" @click="searchCustomerBtn"></Button>
                                 </Input>
                             </FormItem>
                         </Col>
                         <Col span="8">
-                            <FormItem label="客户代表" >
+                            <FormItem label="客户代表" prop="customerRepId">
                                 <Select v-model="sellOrderFormData.customerRepId" filterable clearable placeholder="请选择客户代表" @on-change="customerRepSelChange">
                                     <Option v-for="item in customerRepList" :value="item.id" :key="item.id">{{ item.name }}</Option>
                                 </Select>
                             </FormItem>
                         </Col>
                         <Col span="8">
-                            <FormItem label="销售人员" >
+                            <FormItem label="销售人员" prop="salerId">
                                 <Select v-model="sellOrderFormData.salerId" filterable clearable placeholder="请选择销售人员">
                                     <Option v-for="item in salerList" :value="item.id" :key="item.id">{{ item.name }}</Option>
                                 </Select>
@@ -44,28 +43,60 @@
 
                     <Row type="flex" justify="center">
                         <Col span="8">
-                            <FormItem label="收货电话" >
+                            <FormItem label="收货电话" prop="contactPhone">
                                 <Input type="text" readonly v-model="sellOrderFormData.contactPhone" ></Input>
                             </FormItem>
                         </Col>
-                        <Col span="8">
-                            <FormItem label="收货地址" >
+                        <Col span="16">
+                            <FormItem label="收货地址" prop="repertoryAddress">
                                 <Input type="text" readonly v-model="sellOrderFormData.repertoryAddress" ></Input>
-                            </FormItem>
-                        </Col>
-                        <Col span="8">
-                            <FormItem label="湿控方式" >
-                                <Input type="text" v-model="sellOrderFormData.wetMode" placeholder="请输入湿控方式"></Input>
                             </FormItem>
                         </Col>
                     </Row>
 
                     <Row type="flex" justify="center">
                         <Col span="8">
+                            <FormItem label="自定单号" >
+                                <Input type="text" v-model="sellOrderFormData.refNo" ></Input>
+                            </FormItem>
+                        </Col>
+                        <Col span="8">
                             <FormItem label="制单日期" >
                                 <DatePicker v-model="sellOrderFormData.createOrderDate" type="date" placeholder="请选择制单日期" ></DatePicker>
                             </FormItem>
                         </Col>
+                        <Col span="8">
+                            <FormItem label="提货人" >
+                                <Input type="text" v-model="sellOrderFormData.takeGoodsUser" placeholder="请输入提货人"></Input>
+                            </FormItem>
+                        </Col>
+                    </Row>
+
+                    <Row type="flex" justify="center">
+                        <Col span="8">
+                            <FormItem label="湿控方式" >
+                                <Select v-model="sellOrderFormData.temperControlId" filterable clearable placeholder="请选择湿控方式">
+                                    <Option v-for="item in temperControlList" :value="item.id" :key="item.id">{{ item.value }}</Option>
+                                </Select>
+                            </FormItem>
+                        </Col>
+                        <Col span="8">
+                            <FormItem label="运输方式" >
+                                <Select v-model="sellOrderFormData.shipMethod" filterable clearable placeholder="请选择运输方式">
+                                    <Option v-for="item in shipMethodList" :value="item.id" :key="item.id">{{ item.value }}</Option>
+                                </Select>
+                            </FormItem>
+                        </Col>
+                        <Col span="8">
+                            <FormItem label="运输工具" >
+                                <Select v-model="sellOrderFormData.shipTool" filterable clearable placeholder="请选择运输工具">
+                                    <Option v-for="item in shipToolList" :value="item.id" :key="item.id">{{ item.value }}</Option>
+                                </Select>
+                            </FormItem>
+                        </Col>
+                    </Row>
+
+                    <Row type="flex" justify="center">
                         <Col span="8">
                             <FormItem label="收款日期" >
                                 <DatePicker v-model="sellOrderFormData.payOrderDate" type="date" placeholder="请选择收款日期" ></DatePicker>
@@ -73,9 +104,14 @@
                         </Col>
                         <Col span="8">
                             <FormItem label="收款方式" >
-                                <Select v-model="sellOrderFormData.payMode" filterable clearable placeholder="请选择收款方式">
-                                    <Option v-for="item in payModeList" :value="item.value" :key="item.value">{{ item.desc }}</Option>
+                                <Select v-model="sellOrderFormData.payMethod" filterable clearable placeholder="请选择收款方式">
+                                    <Option v-for="item in payMethodList" :value="item.id" :key="item.id">{{ item.value }}</Option>
                                 </Select>
+                            </FormItem>
+                        </Col>
+                        <Col span="8">
+                            <FormItem label="收款档案编号" >
+                                <Input type="text" v-model="sellOrderFormData.payFileNo" ></Input>
                             </FormItem>
                         </Col>
                     </Row>
@@ -88,10 +124,7 @@
                         </Col>
                         <Col span="8">
                             <FormItem label="收款金额" >
-                                <InputNumber v-model="sellOrderFormData.payAmount" :precision="2" style="width:100%"
-                                    :formatter="value => `$ ${value}`.replace(/B(?=(d{3})+(?!d))/g, ',')" 
-                                    :parser="value => value.replace(/$s?|(,*)/g, '')"
-                                     placeholder="请输入收款金额"></InputNumber>
+                                <InputNumber v-model="sellOrderFormData.payAmount" :precision="2" style="width:100%"></InputNumber>
                             </FormItem>
                         </Col>
                         <Col span="8">
@@ -102,14 +135,7 @@
                     </Row>
 
                     <Row type="flex" justify="center">
-                        <Col span="8">
-                            <FormItem label="提货人" >
-                                <Select v-model="sellOrderFormData.consignee" filterable clearable placeholder="请选择提货人">
-                                    <Option v-for="item in consigneeList" :value="item.id" :key="item.id">{{ item.name }}</Option>
-                                </Select>
-                            </FormItem>
-                        </Col>
-                        <Col span="16">
+                        <Col span="24">
                             <FormItem label="备注" >
                                 <Input type="text" v-model="sellOrderFormData.comment" placeholder="请输入备注"></Input>
                             </FormItem>
@@ -260,6 +286,7 @@
 
 <script>
 import util from "@/libs/util.js";
+import dataConver from "@/libs/data-conver.js";
 import customerSearch from "@/views/customer/customer-search.vue";
 
 export default {
@@ -269,29 +296,50 @@ export default {
   },
   data() {
       return {
-          payModeList: [
-              {value: 'CASH', desc: '现金'},
-              {value: 'REMIT', desc: '汇款'},
-              {value: 'ONLINE', desc: '在线支付'}
-          ],
-          consigneeList: [],
+          payMethodList: [],
+          temperControlList: [],
+          shipMethodList: [],
+          shipToolList: [],
           sellOrderFormData: {
+              id: '',
               customerId: '',
               customerName: '',
               customerRepId: -1,
               contactPhone: '',
               repertoryAddress: '',
               salerId: '',
-              wetMode: '',
+              refNo: '',
+              temperControlId: '',
+              shipMethod: '',
+              shipTool: '',
               createOrderDate: '',
+              takeGoodsUser: '',
               payOrderDate: '',
-              payMode: '',
+              payMethod: '',
+              payFileNo: '',
               markUpRate: 0,
               payAmount: 0,
               notSmallAmount: 0,
-              consignee: '',
               comment: ''
           },
+          sellOrderFormValidate: {
+              customerName: [
+                  {required: true, message: '客户必输', trigger: 'change'}
+              ],
+              customerRepId: [
+                  {required: true, type: 'number', message: '客户代表人必输', trigger: 'change'}
+              ],
+              salerId: [
+                  {required: true, type: 'number', message: '销售员必输', trigger: 'change'}
+              ],
+              contactPhone: [
+                  {required: true, message: '客户代表人联系方式缺失', trigger: 'blur'}
+              ],
+              repertoryAddress: [
+                  {required: true, message: '客户代表人收货地址缺失', trigger: 'blur'}
+              ]
+          },
+          sellOrderSaveBtnLoading: false,
           sellOrderGoodTableData:[],
           sellOrderGoodTableColumn: [
               {
@@ -403,6 +451,7 @@ export default {
                   align: 'center'
               }
           ],
+          currChooseCustomer: null,
           customerSearchModal: false,
           customerRepList: [],
           salerList: [],
@@ -429,7 +478,50 @@ export default {
           }
       }
   },
+  mounted() {
+      this.initData();
+  },
   methods: {
+      initData() {
+          this.initOptions();
+          this.getSalserList();
+      },
+
+      initOptions() {
+          let reqData = ['TEMPER_CONTROL', 'PAY_METHOD', 'SHIP_METHOD', 'SHIP_TOOL'];
+          util.ajax.post("/options/list", reqData)
+            .then((response) => {
+              let data = response.data;
+              if (data && data.TEMPER_CONTROL) {
+                  this.temperControlList = data.TEMPER_CONTROL;
+              }
+              if (data && data.PAY_METHOD) {
+                  this.payMethodList = data.PAY_METHOD;
+              }
+              if (data && data.SHIP_METHOD) {
+                  this.shipMethodList = data.SHIP_METHOD;
+              }
+              if (data && data.SHIP_TOOL) {
+                  this.shipToolList = data.SHIP_TOOL;
+              }
+          })
+          .catch((error) => {
+              util.errorProcessor(this, error);
+          })
+      },
+      getSalserList() {
+          let result = [
+              {
+                  id: 1,
+                  name: '销售员1'
+              },
+              {
+                  id: 2,
+                  name: '销售员2'
+              }
+          ];
+          this.salerList = result;
+      },
       searchCustomerBtn() {
           this.customerSearchModal = true;
       },
@@ -437,6 +529,7 @@ export default {
         this.customerSearchModal = false;
       },
       customerSearchChoosed(data) {
+          this.currChooseCustomer = data;
           if (data && data.id) {
               this.sellOrderFormData.customerId = data.id;
               this.sellOrderFormData.customerName = data.name;
@@ -452,22 +545,98 @@ export default {
           util.ajax.get("/customer/rep/list", {params: reqData})
             .then((response) => {
                 this.customerRepList = response.data;
+                let defaultItem = this.getCustomerRepDefault();
+                if (defaultItem && defaultItem.id) {
+                    this.setCustomerRepInfo(defaultItem);
+                }
             })
             .catch((error) => {
                 util.errorProcessor(this, error);
             });
       },
+      getCustomerRepDefault() {
+          if (!this.customerRepList || this.customerRepList.length <= 0) {
+              return null;
+          }
+          for (let i=0; i<this.customerRepList.length; i++) {
+              let item = this.customerRepList[i];
+              if (item.isDefault) {
+                  return item;
+              }
+          }
+      },
       customerRepSelChange(data) {
-          if(data && data.id) {
-              this.sellOrderFormData.customerRepId = data.id;
-              this.sellOrderFormData.contactPhone = data.contactPhone;
-              this.sellOrderGoodTableData.repertoryAddress = data.repertoryAddress;
+          let customerRep = dataConver.selectObjectById(data, this.customerRepList);
+          this.setCustomerRepInfo(customerRep);
+      },
+      setCustomerRepInfo(customerRep) {
+          if(customerRep && customerRep.id) {
+              this.sellOrderFormData.customerRepId = customerRep.id;
+              this.sellOrderFormData.contactPhone = customerRep.contactPhone;
+              this.sellOrderFormData.repertoryAddress = customerRep.repertoryAddress;
           }else {
               this.sellOrderFormData.customerRepId = -1;
               this.sellOrderFormData.contactPhone = '';
-              this.sellOrderGoodTableData.repertoryAddress = '';
+              this.sellOrderFormData.repertoryAddress = '';
+          }
+      },
+
+      sellOrderSaveBtnClick() {
+          this.sellOrderSaveBtnLoading = true;
+          this.$refs.sellOrderForm.validate(valid => {
+              if (!valid) {
+                  this.$Message.warning("请检查表单必输项是否完整");
+                  this.sellOrderSaveBtnLoading = false;
+                  return;
+              }
+              if (!this.sellOrderFormData.customerId) {
+                this.$Message.warning("获取客户信息失败，请重新选择用户");
+                this.sellOrderSaveBtnLoading = false;
+                return;
+              }
+              if (!this.sellOrderFormData.customerRepId || this.sellOrderFormData.customerRepId < 0) {
+                  this.$Message.warning("请选择客户代表人信息");
+                  this.sellOrderSaveBtnLoading = false;
+                  return;
+              }
+              let isEdit = (this.sellOrderFormData.id && this.sellOrderFormData.id > 0); //编辑模式
+              if (isEdit) {
+                  util.ajax.post("/sell/order/update", this.sellOrderFormData)
+                    .then((response) => {
+                        this.$Message.success('保存成功');
+                        this.orderFormChangeToEditModel(response.data);
+                    })
+                    .catch((error) => {
+                        util.errorProcessor(this, error);
+                    });
+              }else {
+                  util.ajax.post("/sell/order/add", this.sellOrderFormData)
+                    .then((response) => {
+                        this.$Message.success('保存成功');
+                        this.orderFormChangeToEditModel(response.data);
+                    })
+                    .catch((error) => {
+                        util.errorProcessor(this, error);
+                    });
+              }
+              this.sellOrderSaveBtnLoading = false;
+          });
+      },
+      orderFormChangeToEditModel(data) {
+          this.sellOrderFormData = data;
+          console.log("change to edit model");
+          console.log(data);
+          console.log(this.currChooseCustomer);
+          if (data.customerId !== this.currChooseCustomer.id) {
+              this.$Notice.error({title: '系统异常', desc: '获取客户信息错误, 请确认选择的客户正确'});
+          }
+          this.sellOrderFormData.customerName = this.currChooseCustomer.name; //设置customerName
+          if (data.customerRepId) {
+              this.customerRepSelChange(data.customerRepId); //触发下显示客户代表的收货地址和联系方式
           }
       }
+
+
 
   }
 }
