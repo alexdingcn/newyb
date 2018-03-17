@@ -4,6 +4,7 @@ import com.yiban.erp.entities.SellOrder;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.Date;
 import java.util.List;
 
 @Mapper
@@ -24,13 +25,15 @@ public interface SellOrderMapper {
                             @Param("customerId") Integer customerId,
                             @Param("salerId") Integer salerId,
                             @Param("refNo") String refNo,
-                            @Param("status") String status);
+                            @Param("status") String status,
+                         @Param("createOrderDate") Date createOrderDate);
 
     List<SellOrder> getList(@Param("companyId") Integer companyId,
                             @Param("customerId") Integer customerId,
                             @Param("salerId") Integer salerId,
                             @Param("refNo") String refNo,
                             @Param("status") String status,
+                            @Param("createOrderDate") Date createOrderDate,
                             @Param("limit") int limit,
                             @Param("offset") int offset);
 }

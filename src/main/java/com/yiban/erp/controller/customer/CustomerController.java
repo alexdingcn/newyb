@@ -170,5 +170,12 @@ public class CustomerController {
         return ResponseEntity.ok().body(result.toJSONString());
     }
 
+    @RequestMapping(value = "/search/name", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> searchByName(@RequestParam("name") String name,
+                                               @AuthenticationPrincipal User user) throws Exception {
+        List<Customer> customers = customerMapper.searchByName(user.getCompanyId(), name);
+        return ResponseEntity.ok().body(JSON.toJSONString(customers));
+    }
+
 
 }

@@ -319,24 +319,70 @@
         <bind name="refNoVal" value="refNo + '%'"/>
         and ref_no like #{refNoVal}
       </if>
+      <if test="createOrderDate != null">
+        and create_order_date = #{createOrderDate}
+      </if>
   </select>
 
-  <select id="getList" parameterType="map" resultMap="BaseResultMap">
-    select <include refid="Base_Column_List"/>
-    from sell_order
-    where company_id = #{companyId}
+  <resultMap id="ListMap" type="com.yiban.erp.entities.SellOrder" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="company_id" property="companyId" jdbcType="INTEGER" />
+    <result column="order_number" property="orderNumber" jdbcType="VARCHAR" />
+    <result column="ref_no" property="refNo" jdbcType="VARCHAR" />
+    <result column="status" property="status" jdbcType="VARCHAR" />
+    <result column="customer_id" property="customerId" jdbcType="INTEGER" />
+    <result column="customer_rep_id" property="customerRepId" jdbcType="INTEGER" />
+    <result column="saler_id" property="salerId" jdbcType="INTEGER" />
+    <result column="temper_control_id" property="temperControlId" jdbcType="INTEGER" />
+    <result column="create_order_date" property="createOrderDate" jdbcType="DATE" />
+    <result column="take_goods_user" property="takeGoodsUser" jdbcType="VARCHAR" />
+    <result column="pay_order_date" property="payOrderDate" jdbcType="DATE" />
+    <result column="pay_method" property="payMethod" jdbcType="INTEGER" />
+    <result column="pay_file_no" property="payFileNo" jdbcType="VARCHAR" />
+    <result column="mark_up_rate" property="markUpRate" jdbcType="DECIMAL" />
+    <result column="pay_amount" property="payAmount" jdbcType="DECIMAL" />
+    <result column="not_small_amount" property="notSmallAmount" jdbcType="DECIMAL" />
+    <result column="ship_method" property="shipMethod" jdbcType="INTEGER" />
+    <result column="ship_tool" property="shipTool" jdbcType="INTEGER" />
+    <result column="comment" property="comment" jdbcType="VARCHAR" />
+    <result column="create_by" property="createBy" jdbcType="VARCHAR" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_by" property="updateBy" jdbcType="VARCHAR" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+    <association property="customer" javaType="com.yiban.erp.entities.Customer">
+      <id column="customer_id" property="id" jdbcType="INTEGER" />
+      <result column="cust_name" property="name" jdbcType="VARCHAR"/>
+    </association>
+  </resultMap>
+
+  <sql id="ListColumn" >
+    s.id, s.company_id, s.order_number, s.ref_no, s.status, s.customer_id, s.customer_rep_id, s.saler_id,
+    s.temper_control_id, s.create_order_date, s.take_goods_user, s.pay_order_date, s.pay_method, s.pay_file_no, s.mark_up_rate,
+    s.pay_amount, s.not_small_amount, s.ship_method, s.ship_tool, s.comment, s.create_by, s.create_time,
+    s.update_by, s.update_time, c.name as cust_name
+  </sql>
+
+  <select id="getList" parameterType="map" resultMap="ListMap">
+    select
+      <include refid="ListColumn" />
+    from sell_order s, customer c
+    where s.customer_id = c.id
+      and s.company_id = #{companyId}
     <if test="customerId != null" >
-      and customer_id = #{customerId}
+      and s.customer_id = #{customerId}
     </if>
     <if test="salerId != null">
-      and saler_id = #{salerId}
+      and s.saler_id = #{salerId}
     </if>
     <if test="status != null" >
-      and status = #{status}
+      and s.status = #{status}
     </if>
     <if test="refNo != null">
       <bind name="refNoVal" value="refNo + '%'"/>
-      and ref_no like #{refNoVal}
+      and s.ref_no like #{refNoVal}
+    </if>
+    <if test="createOrderDate != null">
+      and s.create_order_date = #{createOrderDate}
     </if>
     order by id desc
     limit #{offset}, #{limit};

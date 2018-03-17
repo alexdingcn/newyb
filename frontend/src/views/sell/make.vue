@@ -11,7 +11,7 @@
             </p> 
             <ButtonGroup slot="extra" size="small">
                 <Button type="success" icon="ios-checkmark" :loading="sellOrderSaveBtnLoading" @click="sellOrderSaveBtnClick"> 保存 </Button>
-                <Button type="info" icon="filing"> 修改提取 </Button>
+                <Button type="info" icon="filing" @click="getOldSellOrderBtnClick"> 修改提取 </Button>
                 <Button type="ghost" icon="ios-printer">打印</Button>
             </ButtonGroup>
 
@@ -281,6 +281,13 @@
             @choosed="customerSearchChoosed">
         </customer-search>
 
+        <sell-order-search 
+            :showModal="sellOrderSearchModal" 
+            status="INIT" 
+            @modal-close="orderSearchModalClose"
+            @choosed="orderSearchChoosed">
+        </sell-order-search>
+
     </div>
 </template>
 
@@ -288,11 +295,13 @@
 import util from "@/libs/util.js";
 import dataConver from "@/libs/data-conver.js";
 import customerSearch from "@/views/customer/customer-search.vue";
+import sellOrderSearch from "@/views/sell/sell-order-search.vue";
 
 export default {
   name: 'sell_order_make',
   components: {
-      customerSearch
+      customerSearch,
+      sellOrderSearch
   },
   data() {
       return {
@@ -340,6 +349,8 @@ export default {
               ]
           },
           sellOrderSaveBtnLoading: false,
+          sellOrderSearchModal: false,
+
           sellOrderGoodTableData:[],
           sellOrderGoodTableColumn: [
               {
@@ -536,6 +547,10 @@ export default {
               this.sellOrderFormData.customerRepId = -1;
               this.customerRepList = [];
               this.refreshCustomerRepList(data.id);
+              let defaultItem = this.getCustomerRepDefault();
+              if (defaultItem && defaultItem.id) {
+                  this.setCustomerRepInfo(defaultItem);
+              }
           }
       },
       refreshCustomerRepList(customerId) {
@@ -545,10 +560,6 @@ export default {
           util.ajax.get("/customer/rep/list", {params: reqData})
             .then((response) => {
                 this.customerRepList = response.data;
-                let defaultItem = this.getCustomerRepDefault();
-                if (defaultItem && defaultItem.id) {
-                    this.setCustomerRepInfo(defaultItem);
-                }
             })
             .catch((error) => {
                 util.errorProcessor(this, error);
@@ -579,6 +590,19 @@ export default {
               this.sellOrderFormData.contactPhone = '';
               this.sellOrderFormData.repertoryAddress = '';
           }
+      },
+      orderSearchModalClose() {
+          this.sellOrderSearchModal = false;
+      },
+      orderSearchChoosed(data) {
+          if (data && data.id && data.id > 0) {
+              this.currChooseCustomer = data.customer;
+              this.refreshCustomerRepList(this.currChooseCustomer.id);
+              this.orderFormChangeToEditModel(data);
+          }
+      },
+      getOldSellOrderBtnClick() {
+        this.sellOrderSearchModal = true;
       },
 
       sellOrderSaveBtnClick() {
@@ -625,8 +649,6 @@ export default {
       orderFormChangeToEditModel(data) {
           this.sellOrderFormData = data;
           console.log("change to edit model");
-          console.log(data);
-          console.log(this.currChooseCustomer);
           if (data.customerId !== this.currChooseCustomer.id) {
               this.$Notice.error({title: '系统异常', desc: '获取客户信息错误, 请确认选择的客户正确'});
           }

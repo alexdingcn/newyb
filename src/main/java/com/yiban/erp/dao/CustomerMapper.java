@@ -45,4 +45,7 @@ public interface CustomerMapper {
                              @Param("shorName") String shorName,
                              @Param("limit") Integer limit,
                              @Param("offset") Integer offset);
+
+    List<Customer> searchByName(@Param("companyId") Integer companyId,
+                                @Param("name") String name);
 }

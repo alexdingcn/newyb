@@ -15,6 +15,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -33,13 +34,14 @@ public class SellOrderController {
                                                @RequestParam(name = "salerId", required = false) Integer salerId,
                                                @RequestParam(name = "refNo", required = false) String refNo,
                                                @RequestParam(name = "status", required = false) String status,
+                                               @RequestParam(name = "createOrderDate", required = false) Date createOrderDate,
                                                @RequestParam(name = "page", required = false) Integer page,
                                                @RequestParam(name = "size", required = false) Integer size,
                                                @AuthenticationPrincipal User user) throws Exception {
-        List<SellOrder> sellOrders = sellOrderService.getList(user.getCompanyId(), customerId, salerId, refNo, status, page, size);
+        List<SellOrder> sellOrders = sellOrderService.getList(user.getCompanyId(), customerId, salerId, refNo, status, createOrderDate, page, size);
         JSONObject result = new JSONObject();
         if (!sellOrders.isEmpty()) {
-            Integer count = sellOrderMapper.getListCount(user.getCompanyId(), customerId, salerId, refNo, status);
+            Integer count = sellOrderMapper.getListCount(user.getCompanyId(), customerId, salerId, refNo, status, createOrderDate);
             result.put("count", count == null ? 0 : count);
             result.put("data", sellOrders);
         }else {

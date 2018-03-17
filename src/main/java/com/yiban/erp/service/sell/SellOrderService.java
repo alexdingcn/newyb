@@ -26,10 +26,10 @@ public class SellOrderService {
     private SellOrderMapper sellOrderMapper;
 
     public List<SellOrder> getList(Integer companyId, Integer customerId, Integer salerId,
-                                            String refNo, String status, Integer page, Integer size) {
+                                            String refNo, String status, Date createOrderDate, Integer page, Integer size) {
         int limit = (size == null || size <= 0) ? 10 : size;
         int offset = (page == null || page <= 0 ? 0 : page - 1) * limit;
-        return sellOrderMapper.getList(companyId, customerId, salerId, refNo, status, limit, offset);
+        return sellOrderMapper.getList(companyId, customerId, salerId, refNo, status,createOrderDate, limit, offset);
     }
 
     public SellOrder orderAdd(User user, SellOrder sellOrder) throws BizException{

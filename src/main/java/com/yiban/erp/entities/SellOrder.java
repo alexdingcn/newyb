@@ -52,6 +52,8 @@ public class SellOrder {
 
     private Date updateTime;
 
+    private Customer customer;
+
     public Long getId() {
         return id;
     }
@@ -242,5 +244,13 @@ public class SellOrder {
 
     public void setUpdateTime(Date updateTime) {
         this.updateTime = updateTime;
+    }
+
+    public Customer getCustomer() {
+        return customer;
+    }
+
+    public void setCustomer(Customer customer) {
+        this.customer = customer;
     }
 }
