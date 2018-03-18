@@ -53,6 +53,7 @@ public enum ErrorCode {
 
     // 22xx - 销售
     SELL_ORDER_PARAM_ERROR(2201, "必输项参数校验失败"),
+    SELL_ORDER_DETAIL_EMPTY(2202, "没有需要保存的详情信息"),
 
 
 

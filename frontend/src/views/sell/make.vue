@@ -149,6 +149,8 @@
                     <Row type="flex" justify="start">
                         <ButtonGroup size="small">
                             <Button type="primary" :disabled="!editeOnlyDisable" @click="addGoodBtnClick">添加商品</Button>
+                            <Button type="success" :disabled="!editeOnlyDisable" :loading="saveGoodBtnLoading" @click="saveGoodBtnClick">保存数据</Button>
+                            <Button type="ghost" :disabled="!editeOnlyDisable" :loading="saveGoodBtnLoading" @click="refreshGoodBtnClick">刷新数据</Button>
                         </ButtonGroup>
                     </Row>
                     <Row type="flex" justify="start">
@@ -305,6 +307,7 @@ import dataConver from "@/libs/data-conver.js";
 import customerSearch from "@/views/customer/customer-search.vue";
 import sellOrderSearch from "@/views/sell/sell-order-search.vue";
 import goodSearch from "@/views/good/good-search.vue";
+import goodExpand from "@/views/good/good-expand.vue";
 import canEditTable from '@/views/tables/components/canEditTable.vue';
 
 export default {
@@ -313,6 +316,7 @@ export default {
       customerSearch,
       sellOrderSearch,
       goodSearch,
+      goodExpand,
       canEditTable
   },
   data() {
@@ -365,13 +369,26 @@ export default {
           sellOrderSearchModal: false,
 
           goodSearchModal: false,
+          saveGoodBtnLoading: false,
           goodTableData:[],
           goodTableColumn: [
               {
-                  key: 'orderNumber',
-                  title: '订单编号',
+                  type: 'expand',
+                  width: 50,
+                  fixed: 'left',
+                  render: (h, params) => {
+                    return h(goodExpand, {
+                        props: {
+                            detail: params.row.goods
+                        }
+                    });
+                  }
+              },
+              {
+                  key: 'sellOrderId',
+                  title: '订单ID',
                   align: 'center',
-                  width: 150,
+                  width: 100,
                   fixed: 'left'
               },
               {
@@ -405,7 +422,7 @@ export default {
               },
               {
                   title: '赠送',
-                  key: 'isFree',
+                  key: 'free',
                   align: 'center',
                   editable: true,
                   width: 150
@@ -650,6 +667,7 @@ export default {
           this.editeOnlyDisable = true; //编辑模式下的客户信息不能修改
           this.sellOrderFormData.customerName = this.currChooseCustomer.name; //设置customerName
           this.refreshCustomerRepList(data.customerId, data.customerRepId);
+          this.refreshGoodsData(data.id);
       },
       
       addGoodBtnClick() {
@@ -659,17 +677,15 @@ export default {
           this.goodSearchModal = false;
       },
       goodSearchChoosed(goodDetail) {
-          console.log('choose goods.');
-          console.log(goodDetail);
           let item = {
               id: '',
-              orderId: this.sellOrderFormData.id,
-              orderNumber: this.sellOrderFormData.orderNumber,
+              sellOrderId: this.sellOrderFormData.id,
+              goodId: goodDetail.id,
               goodName: goodDetail.name,
               quantity: 0,
               fixPrice: 0,
               disPrice: 0,
-              isFree: 0,
+              free: 0,
               realPrice: 0,
               singlePrice: 0,
               amount: 0,
@@ -678,14 +694,56 @@ export default {
           };
           this.goodTableData.push(item);
       },
+
+      refreshGoodsData(sellOrderId) {
+          if (sellOrderId && sellOrderId > 0) {
+              let reqData = {sellOrderId: sellOrderId};
+              util.ajax.get("/sell/detail/list", {params: reqData})
+                .then((response) => {
+                    this.goodTableData = response.data;
+                })
+                .catch((error) => {
+                    util.errorProcessor(this, error);
+                });
+          }
+      },
       goodRemoveItem(data, index) {
-          console.log('remove good click');
-          console.log(index);
+          console.log("remoe order good. index=" + index);
           console.log(data);
+          if (data && data.id && data.id > 0) {
+              //联动删除数据库中的值
+              util.ajax.delete("/sell/detail/remove/" + data.id)
+                .then((response) => {
+                    let count = response.data.count;
+                    this.$Message.success('成功删除' + (count ? count : 0) + '条记录');
+                })
+                .catch((error) => {
+                    util.errorProcessor(this, error);
+                });
+          }
+      },
+      saveGoodBtnClick() {
+          if (!this.goodTableData || this.goodTableData.length <= 0) {
+              this.$Message.warning('请先新增商品信息');
+              return;
+          }
+          this.saveGoodBtnLoading = true;
+          util.ajax.post("/sell/detail/save", this.goodTableData)
+            .then((response) => {
+                let success = response.data.success;
+                let fail = response.data.fail;
+                let detais = response.data.detailList;
+                this.$Message.success('成功保存' + success + '条记录, 失败' + fail + '条');
+                this.goodTableData = detais;
+            })
+            .catch((error) => {
+                util.errorProcessor(this, error);
+            });
+          this.saveGoodBtnLoading = false;
+      },
+      refreshGoodBtnClick(){
+          this.refreshGoodsData(this.sellOrderFormData.id);
       }
-
-
-
 
   }
 }

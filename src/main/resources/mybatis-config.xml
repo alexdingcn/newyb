@@ -30,5 +30,6 @@
         <mapper resource="mapping/BuyOrderMapper.xml"/>
         <mapper resource="mapping/BuyOrderDetailMapper.xml"/>
         <mapper resource="mapping/SellOrderMapper.xml"/>
+        <mapper resource="mapping/SellOrderDetailMapper.xml"/>
     </mappers>
 </configuration>

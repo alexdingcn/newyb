@@ -1,8 +1,12 @@
 package com.yiban.erp.service.sell;
 
 import com.yiban.erp.constant.SellOrderStatus;
+import com.yiban.erp.dao.GoodsMapper;
+import com.yiban.erp.dao.SellOrderDetailMapper;
 import com.yiban.erp.dao.SellOrderMapper;
+import com.yiban.erp.entities.Goods;
 import com.yiban.erp.entities.SellOrder;
+import com.yiban.erp.entities.SellOrderDetail;
 import com.yiban.erp.entities.User;
 import com.yiban.erp.exception.BizException;
 import com.yiban.erp.exception.BizRuntimeException;
@@ -14,8 +18,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class SellOrderService {
@@ -24,6 +28,10 @@ public class SellOrderService {
 
     @Autowired
     private SellOrderMapper sellOrderMapper;
+    @Autowired
+    private SellOrderDetailMapper sellOrderDetailMapper;
+    @Autowired
+    private GoodsMapper goodsMapper;
 
     public List<SellOrder> getList(Integer companyId, Integer customerId, Integer salerId,
                                             String refNo, String status, Date createOrderDate, Integer page, Integer size) {
@@ -112,6 +120,81 @@ public class SellOrderService {
             return false;
         }
         return true;
+    }
+
+    public List<SellOrderDetail> getDetailList(Long sellOrderId) {
+        if (sellOrderId == null) {
+            logger.warn("get sell order detail by sell order id is null.");
+            return Collections.emptyList();
+        }
+        List<SellOrderDetail> details = sellOrderDetailMapper.getDetailList(sellOrderId);
+        //如果存在，把对应的产品信息查询出来关联到对应的订单详情中
+        if (details == null || details.isEmpty()) {
+            return Collections.emptyList();
+        }
+        List<Long> goodsIdList = new ArrayList<>();
+        details.stream().forEach(item -> goodsIdList.add(item.getGoodId()));
+        List<Goods> goods = goodsMapper.selectByIdList(goodsIdList);
+        Map<Long, List<Goods>> map = goods.stream().collect(Collectors.groupingBy(Goods::getId));
+        details.stream().forEach(item -> {
+            List<Goods> tempList = map.get(item.getGoodId());
+            Goods goodsItem =  (tempList == null ? null : tempList.get(0));
+            item.setGoods(goodsItem);
+            item.setGoodName(goodsItem.getName());
+        });
+
+        return details;
+    }
+
+    public int detailSave(final User user, final List<SellOrderDetail> details) throws BizException {
+        int count = 0;
+        for (SellOrderDetail detail : details) {
+            try {
+                int result = saveOneDetail(user, detail);
+                if (result > 0) {
+                    logger.info("user:{} success save one sell order detail record.", user.getId());
+                    count ++; //保存成功的笔数
+                }
+            }catch (Exception e) {
+                logger.error("user:{} save sell order detail have exception", user.getId(), e);
+            }
+        }
+        return count;
+    }
+
+    private int saveOneDetail(User user, SellOrderDetail detail) {
+        if (detail == null) {
+            return -1;
+        }
+        Long goodId = detail.getGoodId();
+        Long orderId = detail.getSellOrderId();
+        if (goodId == null) {
+            logger.warn("user:{} save sell order detail but good id is null.", user.getId());
+            return -1;
+        }
+        if (orderId == null) {
+            logger.warn("user:{} save sell order detail but order id is null.", user.getId());
+            return -1;
+        }
+        if (detail.getId() != null && detail.getId() > 0) {
+            logger.info("user:{} save sell order detail is update id:{}", user.getId(), detail.getId());
+            detail.setUpdateBy(user.getNickname());
+            detail.setUpdateTime(new Date());
+            return sellOrderDetailMapper.updateByPrimaryKeySelective(detail);
+        }else {
+            logger.info("user:{} save sell order detail is add", user.getId());
+            detail.setCreateBy(user.getNickname());
+            detail.setCreateTime(new Date());
+            return sellOrderDetailMapper.insertSelective(detail);
+        }
+    }
+
+    public int removeSellOrderDetail(User user, Long detailId) {
+        if (detailId == null || detailId <= 0) {
+            return 0;
+        }
+        logger.info("user:{} request to remove sell order detail by id:{}", user.getId(), detailId);
+        return sellOrderDetailMapper.deleteByPrimaryKey(detailId);
     }
 
 

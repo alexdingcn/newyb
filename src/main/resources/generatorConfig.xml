@@ -78,6 +78,7 @@
         <!--<table tableName="buy_order" domainObjectName="BuyOrder" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false"></table>-->
         <!--<table tableName="buy_order_detail" domainObjectName="BuyOrderDetail" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false"></table>-->
         <!--<table tableName="sell_order" domainObjectName="SellOrder" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false"></table>-->
+        <!--<table tableName="sell_order_detail" domainObjectName="SellOrderDetail" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false"></table>-->
 
     </context>
 </generatorConfiguration>

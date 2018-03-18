@@ -4,7 +4,10 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.yiban.erp.dao.SellOrderMapper;
 import com.yiban.erp.entities.SellOrder;
+import com.yiban.erp.entities.SellOrderDetail;
 import com.yiban.erp.entities.User;
+import com.yiban.erp.exception.BizException;
+import com.yiban.erp.exception.ErrorCode;
 import com.yiban.erp.service.sell.SellOrderService;
 import com.yiban.erp.util.UtilTool;
 import org.apache.commons.lang3.StringUtils;
@@ -34,13 +37,6 @@ public class SellOrderController {
 
     @RequestMapping(value = "/order/list", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> getOrderList(HttpServletRequest request,
-//                @RequestParam(name = "customerId", required = false) Integer customerId,
-//                                               @RequestParam(name = "salerId", required = false) Integer salerId,
-//                                               @RequestParam(name = "refNo", required = false) String refNo,
-//                                               @RequestParam(name = "status", required = false) String status,
-//                                               @RequestParam(name = "createOrderDate", required = false) Date createOrderDate,
-//                                               @RequestParam(name = "page", required = false) Integer page,
-//                                               @RequestParam(name = "size", required = false) Integer size,
                                                @AuthenticationPrincipal User user) throws Exception {
 
         String reqCustomerId = request.getParameter("customerId");
@@ -86,6 +82,40 @@ public class SellOrderController {
         return ResponseEntity.ok().body(JSON.toJSONString(result));
     }
 
+    @RequestMapping(value = "/detail/list", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> detailList(@RequestParam("sellOrderId") Long sellOrderId) throws Exception {
+        List<SellOrderDetail> details = sellOrderService.getDetailList(sellOrderId);
+        return ResponseEntity.ok().body(JSON.toJSONString(details));
+    }
+
+    @RequestMapping(value = "/detail/save", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> detailSave(@RequestBody List<SellOrderDetail> details,
+                                            @AuthenticationPrincipal User user) throws Exception {
+        logger.info("user:{} request save sell order detail:{}", user.getId(), JSON.toJSONString(details));
+        if (details == null || details.isEmpty()) {
+            logger.warn("request save sell order detail but params is empty.");
+            throw new BizException(ErrorCode.SELL_ORDER_DETAIL_EMPTY);
+        }
+        int count = sellOrderService.detailSave(user, details);
+        Long sellOrderId = details.get(0) == null ? null : details.get(0).getSellOrderId();
+        List<SellOrderDetail> saveAfterList = sellOrderService.getDetailList(sellOrderId);
+        JSONObject result = new JSONObject();
+        result.put("success", count); //保存成功的笔数
+        result.put("fail", (details.size() - count)); //保存失败的笔数
+        result.put("detailList", saveAfterList);
+        return ResponseEntity.ok().body(result.toJSONString());
+    }
+
+    @RequestMapping(value = "/detail/remove/{detailId}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> removeDetail(@PathVariable Long detailId,
+                                               @AuthenticationPrincipal User user) throws Exception {
+        logger.info("user:{} request to delete sell order detail by id:{}", user.getId(), detailId);
+        int count = sellOrderService.removeSellOrderDetail(user, detailId);
+        logger.info("user:{} success remove sell order detail count:{}", user, count);
+        JSONObject result = new JSONObject();
+        result.put("count", result);
+        return ResponseEntity.ok().body(result.toJSONString());
+    }
 
 
 }
