@@ -22,5 +22,5 @@ public interface GoodCategoryMapper {
 
     int updateByPrimaryKey(GoodCategory record);
 
-    List<GoodCategory> selectAll();
+    List<GoodCategory> selectAll(Integer companyId);
 }

@@ -22,5 +22,7 @@ public interface FactoryMapper {
 
     List<Factory> selectAll();
 
-    List<Factory> searchByNameOrContact(@Param(value = "searchStr") String searchStr);
+    List<Factory> searchByNameOrContact(
+            @Param(value = "companyId") Integer companyId,
+            @Param(value = "searchStr") String searchStr);
 }

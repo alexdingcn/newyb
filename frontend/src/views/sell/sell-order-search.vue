@@ -4,7 +4,7 @@
 
 <template>
     <div>
-        <Modal v-model="isShowModal" :width="75" :closable="false" title="查询获取销售订单">
+        <Modal v-model="isShowModal" :width="65" :mask-closable="false" :closable="false" title="查询获取销售订单">
             <Row type="flex" justify="center">
                 <Col span="18" offset="1">
                     <Form ref="searchForm" :model="formItem" :label-width="100" >
@@ -16,13 +16,13 @@
                             </Col>
                             <Col span="12">
                                 <FormItem label="销售员">
-                                    <Select v-model="formItem.salerId" clearable filterable>
+                                    <Select v-model="formItem.salerId" clearable filterable >
                                         <Option v-for="item in salerList" :value="item.id" :key="item.id">{{ item.name }}</Option>
                                     </Select>
                                 </FormItem>
                             </Col>
                         </Row>
-                        <Row type="flex" justify="center" style="margin-top:-20px;">
+                        <Row type="flex" justify="center" >
                             <Col span="12">
                                 <FormItem label="自定订号">
                                     <Input type="text" v-model="formItem.refNo" ></Input>
@@ -34,8 +34,8 @@
                                 </FormItem>
                             </Col>
                         </Row>
-                        <Row type="flex" justify="center" style="margin-top:-10px;">
-                            <Button type="primary" icon="ios-search" class="margin-let-10" @click="searchBtnClicked">查询</Button>
+                        <Row type="flex" justify="center" >
+                            <Button size="small" type="primary" icon="ios-search" class="margin-let-10" @click="searchBtnClicked">查询</Button>
                         </Row>
                     </Form>
                 </Col>
@@ -50,7 +50,7 @@
                 </Table>
             </Row>
             <Row type="flex" justify="end">
-                <Page :total="totalCount" :current="currentPage" :page-size="tableCurrPageSize" show-total
+                <Page size="small" :total="totalCount" :current="currentPage" :page-size="tableCurrPageSize" show-total
                     @on-change="pageChange">
                 </Page>
             </Row>
@@ -60,13 +60,13 @@
 
             <div slot="footer">
                 <Row >
-                    <Col span="6" offset="6">
-                        <Button type="primary" @click="ok" long>
+                    <Col span="5" offset="6">
+                        <Button size="small" type="primary" @click="ok" long>
                             <span >确定</span>
                         </Button>
                     </Col>
-                    <Col span=6 class="padding-left-10">
-                        <Button @click="closedModal" long>取消</Button>
+                    <Col span=5 class="padding-left-10">
+                        <Button size="small" @click="closedModal" long>取消</Button>
                     </Col>
                 </Row>
             </div>
@@ -194,15 +194,21 @@ export default {
         },
 
         searchBtnClicked() {
-            let reqData = this.formItem;
+            let reqData = {
+                customerId: this.formItem.customerId,
+                salerId: this.formItem.salerId,
+                refNo: this.formItem.refNo
+            };
             reqData.page = this.currentPage;
             reqData.size = this.tableCurrPageSize;
             reqData.status = this.status;
             this.tableLoading = true;
-            if (reqData.createOrderDate === "") {
+            let searchDate = this.formItem.createOrderDate;
+            if ( searchDate === "" || !(searchDate instanceof Date)) {
                 reqData.createOrderDate = null;
+            }else {
+                reqData.createOrderDate = searchDate.getTime();
             }
-            console.log(reqData);
             util.ajax.get('/sell/order/list', {params: reqData})
                 .then((response) => {
                     this.tabData = response.data.data;
@@ -241,6 +247,9 @@ export default {
 </script>
 
 <style>
+.ivu-form-item {
+    margin-bottom: 5px;
+}
 
 </style>
 

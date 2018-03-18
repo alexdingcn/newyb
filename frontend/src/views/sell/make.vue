@@ -1,5 +1,6 @@
 <style lang="less">
 @import "../../styles/common.less";
+@import "./make.less";
 </style>
 
 <template>
@@ -21,7 +22,7 @@
                         <Col span="8">
                             <FormItem label="客户" prop="customerName">
                                 <Input type="text" readonly v-model="sellOrderFormData.customerName" placeholder="请输入客户名称">
-                                    <Button slot="append" icon="ios-search" @click="searchCustomerBtn"></Button>
+                                    <Button slot="append" icon="ios-search" @click="searchCustomerBtn" :disabled="editeOnlyDisable"></Button>
                                 </Input>
                             </FormItem>
                         </Col>
@@ -147,46 +148,47 @@
                 <TabPane label="商品信息" name="goodInfo">
                     <Row type="flex" justify="start">
                         <ButtonGroup size="small">
-                            <Button type="primary" >添加商品</Button>
-                            <Button type="info"> 修改商品 </Button>
-                            <Button type="error"> 删除商品 </Button>
+                            <Button type="primary" :disabled="!editeOnlyDisable" @click="addGoodBtnClick">添加商品</Button>
                         </ButtonGroup>
-                    
-                        <Table ref="sellOrderGoodTable" border highlight-row style="width:100%"
-                            :columns="sellOrderGoodTableColumn" size="small" 
-                            :data="sellOrderGoodTableData" 
-                            >
-                        </Table>
+                    </Row>
+                    <Row type="flex" justify="start">
+                        <can-edit-table refs="sellOrderGoodTable" 
+                            v-model="goodTableData" 
+                            :hover-show="true" 
+                            :edit-incell="true" width="1000"
+                            :columns-list="goodTableColumn" 
+                            @on-delete="goodRemoveItem">
+                        </can-edit-table>
                     </Row>
                 </TabPane>
-                <TabPane label="运输登记" name="transportRecord">
-                    <Form ref="transportRecordForm" :model="transportRecordFormItem" :label-width="100">
+                <TabPane label="运输登记" name="shipRecord">
+                    <Form ref="shipForm" :model="shipFormItem" :label-width="100">
                         <Row type="flex" justify="start">
                             <Col span="6">
                                 <FormItem label="发货日期">
-                                    <DatePicker v-model="transportRecordFormItem.issuanceDate" type="date" placeholder="请选择发货日期" ></DatePicker>
+                                    <DatePicker v-model="shipFormItem.issuanceDate" type="date" placeholder="请选择发货日期" ></DatePicker>
                                 </FormItem>
                             </Col>
                             <Col span="6">
                                 <FormItem label="货单号">
-                                    <Input type="text" v-model="transportRecordFormItem.transportNo" placeholder="请输入货单号"></Input>
+                                    <Input type="text" v-model="shipFormItem.transportNo" placeholder="请输入货单号"></Input>
                                 </FormItem>
                             </Col>
                             <Col span="12">
                                 <FormItem label="发货地址">
-                                    <Input type="text" v-model="transportRecordFormItem.issuanceAddress" placeholder="请输入发货地址"></Input>
+                                    <Input type="text" v-model="shipFormItem.issuanceAddress" placeholder="请输入发货地址"></Input>
                                 </FormItem>
                             </Col>
                         </Row>
                         <Row type="flex" justify="start">
                             <Col span="6">
                                 <FormItem label="存储条件">
-                                    <Input type="text" v-model="transportRecordFormItem.storageCondition" placeholder="请输入存储条件"></Input>
+                                    <Input type="text" v-model="shipFormItem.storageCondition" placeholder="请输入存储条件"></Input>
                                 </FormItem>
                             </Col>
                             <Col span="6">
                                 <FormItem label="运输工具">
-                                    <Input type="text" v-model="transportRecordFormItem.conveyance" placeholder="请输入运输工具"></Input>
+                                    <Input type="text" v-model="shipFormItem.conveyance" placeholder="请输入运输工具"></Input>
                                 </FormItem>
                             </Col>
                             <Col span="12">
@@ -200,17 +202,17 @@
                         <Row type="flex" justify="start">
                             <Col span="6">
                                 <FormItem label="车牌号">
-                                    <Input type="text" v-model="transportRecordFormItem.carNumber" placeholder="请输入车牌号"></Input>
+                                    <Input type="text" v-model="shipFormItem.carNumber" placeholder="请输入车牌号"></Input>
                                 </FormItem>
                             </Col>
                             <Col span="6">
                                 <FormItem label="运输方式">
-                                    <Input type="text" v-model="transportRecordFormItem.transportMode" placeholder="请输入运输方式"></Input>
+                                    <Input type="text" v-model="shipFormItem.transportMode" placeholder="请输入运输方式"></Input>
                                 </FormItem>
                             </Col>
                             <Col span="6">
                                 <FormItem label="承运电话">
-                                    <Input type="text" v-model="transportRecordFormItem.bearPhone" placeholder="请输入承运电话"></Input>
+                                    <Input type="text" v-model="shipFormItem.bearPhone" placeholder="请输入承运电话"></Input>
                                 </FormItem>
                             </Col>
                             <Col span="5">
@@ -227,43 +229,43 @@
                         <Row type="flex" justify="start">
                             <Col span="6">
                                 <FormItem label="起运温度(℃)">
-                                    <InputNumber v-model="transportRecordFormItem.transTemperature" :precision="2" style="width: 100%"></InputNumber>
+                                    <InputNumber v-model="shipFormItem.transTemperature" :precision="2" style="width: 100%"></InputNumber>
                                 </FormItem>
                             </Col>
                             <Col span="6">
                                 <FormItem label="件数">
-                                    <InputNumber v-model="transportRecordFormItem.goodsCount" :min="0" style="width: 100%"></InputNumber>
+                                    <InputNumber v-model="shipFormItem.goodsCount" :min="0" style="width: 100%"></InputNumber>
                                 </FormItem>
                             </Col>
                             <Col span="6">
                                 <FormItem label="委托经办人">
-                                    <Input type="text" v-model="transportRecordFormItem.operatorName" placeholder="请输入委托经办人"></Input>
+                                    <Input type="text" v-model="shipFormItem.operatorName" placeholder="请输入委托经办人"></Input>
                                 </FormItem>
                             </Col>
                             <Col span="6">
                                 <FormItem label="运行里程(km)">
-                                    <InputNumber v-model="transportRecordFormItem.runMileage" :precision="2" :min="0" style="width: 100%"></InputNumber>
+                                    <InputNumber v-model="shipFormItem.runMileage" :precision="2" :min="0" style="width: 100%"></InputNumber>
                                 </FormItem>
                             </Col>
                         </Row>
                         <Row type="flex" justify="start">
                             <Col span="6">
                                 <FormItem label="计划启运时间">
-                                    <DatePicker v-model="transportRecordFormItem.planStartTime" placement="top" 
+                                    <DatePicker v-model="shipFormItem.planStartTime" placement="top" 
                                         type="datetime" format="yyyy-MM-dd HH:mm" placeholder="请选择计划启运时间" >
                                     </DatePicker>
                                 </FormItem>
                             </Col>
                             <Col span="6">
                                 <FormItem label="计划到货时间">
-                                    <DatePicker v-model="transportRecordFormItem.planEndTime" placement="top" 
+                                    <DatePicker v-model="shipFormItem.planEndTime" placement="top" 
                                         type="datetime" format="yyyy-MM-dd HH:mm" placeholder="请选择计划到货时间" >
                                     </DatePicker>
                                 </FormItem>
                             </Col>
                             <Col span="12">
                                 <FormItem label="备注">
-                                    <Input type="text" v-model="transportRecordFormItem.comment" ></Input>
+                                    <Input type="text" v-model="shipFormItem.comment" ></Input>
                                 </FormItem>
                             </Col>
                         </Row>
@@ -288,6 +290,12 @@
             @choosed="orderSearchChoosed">
         </sell-order-search>
 
+        <good-search 
+            :showModal="goodSearchModal" 
+            @modal-close="goodSearchModalClose" 
+            @choosed="goodSearchChoosed">
+        </good-search>
+
     </div>
 </template>
 
@@ -296,12 +304,16 @@ import util from "@/libs/util.js";
 import dataConver from "@/libs/data-conver.js";
 import customerSearch from "@/views/customer/customer-search.vue";
 import sellOrderSearch from "@/views/sell/sell-order-search.vue";
+import goodSearch from "@/views/good/good-search.vue";
+import canEditTable from '@/views/tables/components/canEditTable.vue';
 
 export default {
   name: 'sell_order_make',
   components: {
       customerSearch,
-      sellOrderSearch
+      sellOrderSearch,
+      goodSearch,
+      canEditTable
   },
   data() {
       return {
@@ -309,6 +321,7 @@ export default {
           temperControlList: [],
           shipMethodList: [],
           shipToolList: [],
+          editeOnlyDisable: false,
           sellOrderFormData: {
               id: '',
               customerId: '',
@@ -351,115 +364,86 @@ export default {
           sellOrderSaveBtnLoading: false,
           sellOrderSearchModal: false,
 
-          sellOrderGoodTableData:[],
-          sellOrderGoodTableColumn: [
+          goodSearchModal: false,
+          goodTableData:[],
+          goodTableColumn: [
               {
-                  type: 'index',
-                  width: 80,
-                  title: '序号',
-                  align: 'center'
-              },
-              {
-                  title: '货号',
-                  key: 'goodNo',
+                  key: 'orderNumber',
+                  title: '订单编号',
                   align: 'center',
-                  sortable: true
+                  width: 150,
+                  fixed: 'left'
               },
               {
                   title: '药名',
                   key: 'goodName',
                   align: 'center',
-                  sortable: true
-              },
-              {
-                  title: '剂型',
-                  key: 'goodType',
-                  align: 'center'
-              },
-              {
-                  title: '规格',
-                  key: 'goodguige',
-                  align: 'center'
-              },
-              {
-                  title: '生产企业',
-                  key: 'shengchange',
-                  align: 'center'
-              },
-              {
-                  title: '基药',
-                  key: 'jiyao',
-                  align: 'center'
-              },
-              {
-                  title: '单位',
-                  key: 'danwei',
-                  align: 'center'
-              },
-              {
-                  title: '件装量',
-                  key: 'jiangNumber',
-                  align: 'center'
-              },
-              {
-                  title: '监管',
-                  key: 'jianguan',
-                  align: 'center'
-              },
-              {
-                  title: '批次号',
-                  key: 'jianguan',
-                  align: 'center'
-              },
-              {
-                  title: '有效期至',
-                  key: 'expiration',
-                  align: 'center'
-              },
-              {
-                  title: '存储条件',
-                  key: 'cunxu',
-                  align: 'center'
+                  sortable: true,
+                  width: 150,
+                  fixed: 'left'
               },
               {
                   title: '数量',
-                  key: 'shuliang',
-                  align: 'center'
+                  key: 'quantity',
+                  align: 'center',
+                  editable: true,
+                  width: 150
               },
               {
                   title: '定价',
-                  key: 'dingjia',
-                  align: 'center'
+                  key: 'fixPrice',
+                  align: 'center',
+                  editable: true,
+                  width: 150
               },
               {
                   title: '折扣',
-                  key: 'zhekou',
-                  align: 'center'
+                  key: 'disPrice',
+                  align: 'center',
+                  editable: true,
+                  width: 150
               },
               {
                   title: '赠送',
-                  key: 'zengsong',
-                  align: 'center'
+                  key: 'isFree',
+                  align: 'center',
+                  editable: true,
+                  width: 150
               },
               {
                   title: '实价',
-                  key: 'shijian',
-                  align: 'center'
+                  key: 'realPrice',
+                  align: 'center',
+                  editable: true,
+                  width: 150
               },
               {
                   title: '件单价',
-                  key: 'jiandanjia',
-                  align: 'center'
+                  key: 'singlePrice',
+                  align: 'center',
+                  editable: true,
+                  width: 150
               },
               {
                   title: '金额',
                   key: 'amount',
-                  align: 'center'
+                  align: 'center',
+                  editable: true,
+                  width: 150
               },
               {
                   title: '税率',
-                  key: 'shuili',
-                  align: 'center'
+                  key: 'taxRate',
+                  align: 'center',
+                  editable: true,
+                  width: 150
+              },
+              {
+                  title: '操作',
+                  align: 'center',
+                  width: 150,
+                  key: 'handle',
+                  handle: ['delete']
               }
           ],
           currChooseCustomer: null,
@@ -468,7 +452,7 @@ export default {
           salerList: [],
           bearCompanyList: [],
           carDriverList: [],
-          transportRecordFormItem: {
+          shipFormItem: {
               issuanceDate: '',
               transportNo: '',
               issuanceAddress: '',
@@ -547,23 +531,40 @@ export default {
               this.sellOrderFormData.customerRepId = -1;
               this.customerRepList = [];
               this.refreshCustomerRepList(data.id);
-              let defaultItem = this.getCustomerRepDefault();
-              if (defaultItem && defaultItem.id) {
-                  this.setCustomerRepInfo(defaultItem);
-              }
           }
       },
-      refreshCustomerRepList(customerId) {
+      refreshCustomerRepList(customerId, customerRepId) {
           let reqData = {
               customerId: customerId
           };
+          console.log('get customer rep list.');
           util.ajax.get("/customer/rep/list", {params: reqData})
             .then((response) => {
                 this.customerRepList = response.data;
+                console.log('already get customer list.');
+                if (this.customerRepList && this.customerRepList.length > 0) {
+                    this.chooseCustomerRep(customerRepId);
+                }
             })
             .catch((error) => {
                 util.errorProcessor(this, error);
             });
+      },
+      customerRepSelChange(data) {
+          if (data) {
+              this.chooseCustomerRep(data);
+          }
+      },
+      chooseCustomerRep(customerRepId) {
+          if (customerRepId && customerRepId > 0) {
+            let customerRep = dataConver.selectObjectById(customerRepId, this.customerRepList);
+            this.setCustomerRepInfo(customerRep);
+          }else {
+            let defaultItem = this.getCustomerRepDefault();
+            if (defaultItem && defaultItem.id) {
+                  this.setCustomerRepInfo(defaultItem);
+              }
+          }
       },
       getCustomerRepDefault() {
           if (!this.customerRepList || this.customerRepList.length <= 0) {
@@ -575,10 +576,6 @@ export default {
                   return item;
               }
           }
-      },
-      customerRepSelChange(data) {
-          let customerRep = dataConver.selectObjectById(data, this.customerRepList);
-          this.setCustomerRepInfo(customerRep);
       },
       setCustomerRepInfo(customerRep) {
           if(customerRep && customerRep.id) {
@@ -597,7 +594,6 @@ export default {
       orderSearchChoosed(data) {
           if (data && data.id && data.id > 0) {
               this.currChooseCustomer = data.customer;
-              this.refreshCustomerRepList(this.currChooseCustomer.id);
               this.orderFormChangeToEditModel(data);
           }
       },
@@ -648,15 +644,46 @@ export default {
       },
       orderFormChangeToEditModel(data) {
           this.sellOrderFormData = data;
-          console.log("change to edit model");
           if (data.customerId !== this.currChooseCustomer.id) {
               this.$Notice.error({title: '系统异常', desc: '获取客户信息错误, 请确认选择的客户正确'});
           }
+          this.editeOnlyDisable = true; //编辑模式下的客户信息不能修改
           this.sellOrderFormData.customerName = this.currChooseCustomer.name; //设置customerName
-          if (data.customerRepId) {
-              this.customerRepSelChange(data.customerRepId); //触发下显示客户代表的收货地址和联系方式
-          }
+          this.refreshCustomerRepList(data.customerId, data.customerRepId);
+      },
+      
+      addGoodBtnClick() {
+          this.goodSearchModal = true;
+      },
+      goodSearchModalClose() {
+          this.goodSearchModal = false;
+      },
+      goodSearchChoosed(goodDetail) {
+          console.log('choose goods.');
+          console.log(goodDetail);
+          let item = {
+              id: '',
+              orderId: this.sellOrderFormData.id,
+              orderNumber: this.sellOrderFormData.orderNumber,
+              goodName: goodDetail.name,
+              quantity: 0,
+              fixPrice: 0,
+              disPrice: 0,
+              isFree: 0,
+              realPrice: 0,
+              singlePrice: 0,
+              amount: 0,
+              taxRate: 0,
+              goods: goodDetail
+          };
+          this.goodTableData.push(item);
+      },
+      goodRemoveItem(data, index) {
+          console.log('remove good click');
+          console.log(index);
+          console.log(data);
       }
+
 
 
 

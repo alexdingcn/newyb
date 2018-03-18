@@ -6,12 +6,14 @@ import com.alibaba.fastjson.JSONObject;
 import com.yiban.erp.dao.GoodCategoryMapper;
 import com.yiban.erp.dao.GoodsMapper;
 import com.yiban.erp.entities.GoodCategory;
+import com.yiban.erp.entities.User;
 import com.yiban.erp.exception.ErrorCode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -36,8 +38,8 @@ public class GoodCategoryController {
      * @return
      */
     @RequestMapping(value = "/tree", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> tree() {
-        List<GoodCategory> goodCategoryList = goodCategoryMapper.selectAll();
+    public ResponseEntity<String> tree(@AuthenticationPrincipal User user) {
+        List<GoodCategory> goodCategoryList = goodCategoryMapper.selectAll(user.getCompanyId());
         JSONArray arr = new JSONArray();
         int i = 0;
         for (GoodCategory category : goodCategoryList) {
@@ -51,6 +53,12 @@ public class GoodCategoryController {
             i++;
         }
         return ResponseEntity.ok().body(arr.toString());
+    }
+
+    @RequestMapping(value = "/list", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> list(@AuthenticationPrincipal User user) throws Exception {
+        List<GoodCategory> goodCategoryList = goodCategoryMapper.selectAll(user.getCompanyId());
+        return ResponseEntity.ok().body(JSON.toJSONString(goodCategoryList));
     }
 
     @RequestMapping(value = "/add", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)

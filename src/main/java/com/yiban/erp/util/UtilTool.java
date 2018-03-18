@@ -5,6 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Field;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.logging.SimpleFormatter;
@@ -50,6 +51,20 @@ public class UtilTool {
         String ft = StringUtils.isBlank(pattern) ? DEFAULT_DATE_TIME_PATTERN : pattern;
         SimpleDateFormat formatter = new SimpleDateFormat(ft);
         return formatter.format(date);
+    }
+
+    public static Date DateParse(String dateStr, String pattern) {
+        if (StringUtils.isBlank(dateStr)) {
+            return null;
+        }
+        String ft = StringUtils.isBlank(pattern) ? DEFAULT_DATE_TIME_PATTERN : pattern;
+        SimpleDateFormat formatter = new SimpleDateFormat(ft);
+        try {
+            return formatter.parse(dateStr);
+        } catch (ParseException e) {
+            logger.error("parse date string field get an ParseException.", e);
+            return null;
+        }
     }
 
 }

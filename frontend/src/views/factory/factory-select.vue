@@ -4,11 +4,11 @@
 
 <template>
     <div>
-        <Select v-model="customerId" 
-                filterable clearabel remote :remote-method="searchByName" 
+        <Select v-model="id" placeholder="企业名称/联系人/拼音简称搜索"
+                filterable clearabel remote :remote-method="searchMethod" 
                 :loading="searchLoading" 
                 @on-change="onChange" :size="selectSize">
-            <Option v-for="item in customerList" :value="item.id" :key="item.id"> {{item.name}} </Option>
+            <Option v-for="item in resultList" :value="item.id" :key="item.id"> {{item.name}} </Option>
         </Select>
     </div>
 </template>
@@ -17,39 +17,31 @@
 import util from "@/libs/util.js"
 
 export default {
-    name: 'customer-select',
+    name: 'factory-select',
     props:['value', 'size'],
     data() {
         return {
             selectSize: this.size,
-            customerId: null,
-            customerList: [
-                {
-                    id: '',
-                    name: '清除'
-                }
-            ],
+            id: null,
+            resultList: [{id: '', name: '清除'}],
             searchLoading: false
         }
     },
-    watch:{
-        
-    },
+
     methods: {
-        searchByName(name) {
-            if(!name || name === '' || name.trim() === '') {
-                this.customerList = [{id: '', name: '清除'}];
+        searchMethod(searchStr) {
+            if (!searchStr) {
+                this.resultList = [{id: '', name: '清除'}];
                 return;
             }
             this.searchLoading = true;
-            let reqData = {name: name};
-            util.ajax.get("/customer/search/name", {params: reqData})
+            util.ajax.post("/factory/search", {search: searchStr})
                 .then((response) => {
-                    this.customerList = [{id: '', name: '清除'}, ...response.data];
+                    this.resultList = [{id: '', name: '清除'}, ...response.data];
                 })
                 .catch((error) => {
                     util.errorProcessor(this, error);
-                });
+                })
             this.searchLoading = false;
         },
 
@@ -58,7 +50,10 @@ export default {
             this.$emit("on-change", data);
         }
     }
-  
 }
 </script>
+
+<style>
+
+</style>
 

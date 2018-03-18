@@ -4,7 +4,7 @@
 
 <template>
     <div>
-        <Modal v-model="isShowModal" :width="60" :closable="false" title="查询获取客户">
+        <Modal v-model="isShowModal" :width="60" :mask-closable="false" :closable="false" title="查询获取客户">
             <Form ref="searchForm" :model="formItem" :label-width="100">
                 <Row type="flex" justify="center">
                     <Col span="12">
@@ -20,7 +20,7 @@
                         </FormItem>
                     </Col>
                 </Row>
-                <Row type="flex" justify="center" style="margin-top:-20px;">
+                <Row type="flex" justify="center" >
                     <Col span="12">
                         <FormItem label="客户名称">
                             <Input type="text" v-model="formItem.customerName" ></Input>
@@ -32,20 +32,20 @@
                         </FormItem>
                     </Col>
                 </Row>
-                <Row type="flex" justify="center" style="margin-top:-10px;">
-                    <Button type="primary" icon="ios-search" class="margin-let-10" @click="searchBtnClicked">查询</Button>
+                <Row type="flex" justify="center" >
+                    <Button type="primary" size="small" icon="ios-search" class="margin-let-10" @click="searchBtnClicked">查询</Button>
                 </Row>
             </Form>
 
             <Row type="flex" justify="center" align="middle" class="margin-top-20">
                 <Table border highlight-row :columns="orderColumns" :data="customersData" 
                     :loading="customerTableLoading" 
-                    @on-row-click="tableRowClick"  
+                    @on-row-click="tableRowClick" 
                     ref="customersTable" style="width: 100%;" size="small">
                 </Table>
             </Row>
             <Row type="flex" justify="end">
-                <Page :total="customersCount" :current="currentPage" :page-size="tableCurrPageSize" show-total
+                <Page size="small" :total="customersCount" :current="currentPage" :page-size="tableCurrPageSize" show-total
                     @on-change="pageChange">
                 </Page>
             </Row>
@@ -56,12 +56,12 @@
             <div slot="footer">
                 <Row >
                     <Col span="6" offset="6">
-                        <Button type="primary" @click="ok" long>
+                        <Button size="small" type="primary" @click="ok" long>
                             <span >确定</span>
                         </Button>
                     </Col>
                     <Col span=6 class="padding-left-10">
-                        <Button @click="closedModal" long>取消</Button>
+                        <Button size="small" @click="closedModal" long>取消</Button>
                     </Col>
                 </Row>
             </div>
@@ -263,7 +263,9 @@ export default {
 </script>
 
 <style>
-
+.ivu-form-item {
+    margin-bottom: 5px;
+}
 </style>
 
 
