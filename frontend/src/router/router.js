@@ -119,7 +119,7 @@ export const appRouter = [
     component: Main,
     children: [
         { path: 'order', title: '销售制单', name: 'sell_order', component: () => import('@/views/sell/make.vue') },
-        { path: 'review', title: '销售单审核', name: 'sell_review', component: () => import('@/views/basic-data/factory.vue') },
+        { path: 'review', title: '销售单审核', name: 'sell_review', component: () => import('@/views/sell/review.vue') },
     ]
 },
 {

@@ -2,6 +2,7 @@ package com.yiban.erp.entities;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
 public class SellOrder {
     private Long id;
@@ -53,6 +54,15 @@ public class SellOrder {
     private Date updateTime;
 
     private Customer customer;
+
+    private CustomerRep customerRep;
+
+    private List<SellOrderDetail> details;
+
+    private String customerName;
+    private String customerRepName;
+    private String customerRepContactPhone;
+    private String customerRepRepertoryAddress;
 
     public Long getId() {
         return id;
@@ -252,5 +262,65 @@ public class SellOrder {
 
     public void setCustomer(Customer customer) {
         this.customer = customer;
+    }
+
+    public CustomerRep getCustomerRep() {
+        return customerRep;
+    }
+
+    public void setCustomerRep(CustomerRep customerRep) {
+        this.customerRep = customerRep;
+    }
+
+    public String getCustomerName() {
+        if (customer != null) {
+            return customer.getName();
+        }
+        return customerName;
+    }
+
+    public void setCustomerName(String customerName) {
+        this.customerName = customerName;
+    }
+
+    public String getCustomerRepName() {
+        if (customerRep != null) {
+            return customerRep.getName();
+        }
+        return customerRepName;
+    }
+
+    public void setCustomerRepName(String customerRepName) {
+        this.customerRepName = customerRepName;
+    }
+
+    public String getCustomerRepContactPhone() {
+        if (customerRep != null) {
+            return customerRep.getContactPhone();
+        }
+        return customerRepContactPhone;
+    }
+
+    public void setCustomerRepContactPhone(String customerRepContactPhone) {
+        this.customerRepContactPhone = customerRepContactPhone;
+    }
+
+    public String getCustomerRepRepertoryAddress() {
+        if (customerRep != null) {
+            return customerRep.getRepertoryAddress();
+        }
+        return customerRepRepertoryAddress;
+    }
+
+    public void setCustomerRepRepertoryAddress(String customerRepRepertoryAddress) {
+        this.customerRepRepertoryAddress = customerRepRepertoryAddress;
+    }
+
+    public List<SellOrderDetail> getDetails() {
+        return details;
+    }
+
+    public void setDetails(List<SellOrderDetail> details) {
+        this.details = details;
     }
 }

@@ -4,7 +4,7 @@
 
 <template>
     <div>
-        <Table :width="width" :ref="refs" :columns="columnsList" :data="thisTableData" border disabled-hover></Table>
+        <Table :loading="loading" :width="width" :ref="refs" :columns="columnsList" :data="thisTableData" border disabled-hover></Table>
     </div>
 </template>
 
@@ -54,7 +54,7 @@ const deleteButton = (vm, h, currentRow, index) => {
             'on-ok': () => {
                 vm.thisTableData.splice(index, 1);
                 vm.$emit('input', vm.handleBackdata(vm.thisTableData));
-                vm.$emit('on-delete', vm.handleBackdata(vm.thisTableData), index);
+                vm.$emit('on-delete', vm.handleBackdata(vm.thisTableData), index, currentRow);
             }
         }
     }, [
@@ -149,7 +149,11 @@ export default {
             type: Boolean,
             default: false
         },
-        width: String
+        width: String,
+        loading: {
+            type: Boolean,
+            default: false
+        }
     },
     data () {
         return {

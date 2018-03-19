@@ -6,6 +6,7 @@ import org.apache.ibatis.annotations.Param;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 @Mapper
 public interface SellOrderMapper {
@@ -36,4 +37,11 @@ public interface SellOrderMapper {
                             @Param("createOrderDate") Date createOrderDate,
                             @Param("limit") int limit,
                             @Param("offset") int offset);
+
+    List<SellOrder> getReviewList(Map<String, Object> params);
+
+    List<SellOrder> getListById(@Param("idList") List<Long> idList);
+
+    SellOrder getReviewDetailById(Long id);
+
 }

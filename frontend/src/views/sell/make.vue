@@ -155,6 +155,7 @@
                     </Row>
                     <Row type="flex" justify="start">
                         <can-edit-table refs="sellOrderGoodTable" 
+                            :loading="saveGoodBtnLoading" 
                             v-model="goodTableData" 
                             :hover-show="true" 
                             :edit-incell="true" width="1000"
@@ -698,6 +699,7 @@ export default {
       refreshGoodsData(sellOrderId) {
           if (sellOrderId && sellOrderId > 0) {
               let reqData = {sellOrderId: sellOrderId};
+              this.saveGoodBtnLoading = true;
               util.ajax.get("/sell/detail/list", {params: reqData})
                 .then((response) => {
                     this.goodTableData = response.data;
@@ -705,14 +707,13 @@ export default {
                 .catch((error) => {
                     util.errorProcessor(this, error);
                 });
+            this.saveGoodBtnLoading = false;
           }
       },
-      goodRemoveItem(data, index) {
-          console.log("remoe order good. index=" + index);
-          console.log(data);
-          if (data && data.id && data.id > 0) {
+      goodRemoveItem(data, index, removeItem) {
+          if (removeItem && removeItem.id && removeItem.id > 0) {
               //联动删除数据库中的值
-              util.ajax.delete("/sell/detail/remove/" + data.id)
+              util.ajax.delete("/sell/detail/remove/" + removeItem.id)
                 .then((response) => {
                     let count = response.data.count;
                     this.$Message.success('成功删除' + (count ? count : 0) + '条记录');

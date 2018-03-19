@@ -54,6 +54,13 @@ public enum ErrorCode {
     // 22xx - 销售
     SELL_ORDER_PARAM_ERROR(2201, "必输项参数校验失败"),
     SELL_ORDER_DETAIL_EMPTY(2202, "没有需要保存的详情信息"),
+    SELL_ORDER_DETAIL_GET_FAIL(2203, "获取订单详情失败"),
+    SELL_ORDER_DETAIL_CAN_NOT_UPDATE(2204, "订单详情在订单审批过后不能修改"),
+    SELL_ORDER_DETAIL_CAN_NOT_REMOVE(2205, "订单详情在订单审批过后不能删除"),
+    SELL_ORDER_REVIEW_SUBMIT_PARAMS(2206, "获取审核参数失败"),
+    SELL_ORDER_REVIEW_SUBMIT_ID_ERROR(2207, "存在获取不到需要审核的订单信息"),
+    SELL_ORDER_REVIEW_STATUS_ERROR(2208, "存在审批状态错误的数据", ErrorDisplay.NOTICE),
+
 
 
 

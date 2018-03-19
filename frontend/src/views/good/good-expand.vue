@@ -4,7 +4,7 @@
 
 <template>
     <div>
-        <Row class="margin-bottom-10">
+        <Row >
             <Col span="4">
                 <span class="label-key">通用名称: </span>
                 <span class="label-value">{{detail.name}}</span>
@@ -23,7 +23,7 @@
             </Col>
             <Col span="8"></Col>
         </Row>
-        <Row class="margin-bottom-10">
+        <Row >
             <Col span="4">
                 <span class="label-key">商品名称: </span>
                 <span class="label-value">{{detail.fullName}}</span>
@@ -38,7 +38,7 @@
             </Col>
             <Col span="8"></Col>
         </Row>
-        <Row class="margin-bottom-10">
+        <Row >
             <Col span="4">
                 <span class="label-key">剂型: </span>
                 <span class="label-value">{{detail.jx}}</span>
@@ -57,7 +57,7 @@
             </Col>
             <Col span="8"></Col>
         </Row>
-        <Row class="margin-bottom-10">
+        <Row >
             <Col span="4">
                 <span class="label-key">储藏条件: </span>
                 <span class="label-value">{{detail.storageCondition}}</span>
@@ -76,7 +76,7 @@
             </Col>
             <Col span="8"></Col>
         </Row>
-        <Row class="margin-bottom-10">
+        <Row >
             <Col span="4">
                 <span class="label-key">批准文号: </span>
                 <span class="label-value">{{detail.permitId}}</span>

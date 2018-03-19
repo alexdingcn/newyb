@@ -13,6 +13,7 @@ import com.yiban.erp.exception.BizRuntimeException;
 import com.yiban.erp.exception.ErrorCode;
 import com.yiban.erp.util.UtilTool;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -148,6 +149,13 @@ public class SellOrderService {
 
     public int detailSave(final User user, final List<SellOrderDetail> details) throws BizException {
         int count = 0;
+        //获取订单信息，去第一个
+        SellOrder sellOrder = sellOrderMapper.selectByPrimaryKey(details.get(0).getSellOrderId());
+        if (sellOrder == null || !SellOrderStatus.INIT.name().equalsIgnoreCase(sellOrder.getStatus())) {
+            logger.warn("user:{} save sell order detail but sell order is not init status. sell id:{}",
+                    user.getId(), details.get(0).getSellOrderId());
+            throw new BizException(ErrorCode.SELL_ORDER_DETAIL_CAN_NOT_UPDATE);
+        }
         for (SellOrderDetail detail : details) {
             try {
                 int result = saveOneDetail(user, detail);
@@ -189,12 +197,85 @@ public class SellOrderService {
         }
     }
 
-    public int removeSellOrderDetail(User user, Long detailId) {
+    public int removeSellOrderDetail(User user, Long detailId) throws BizException{
         if (detailId == null || detailId <= 0) {
             return 0;
         }
+        SellOrderDetail detail = sellOrderDetailMapper.selectByPrimaryKey(detailId);
+        if (detail == null) {
+            logger.warn("user:{} get sell order detail by id:{} fail.", user.getId(), detailId);
+            throw new BizException(ErrorCode.SELL_ORDER_DETAIL_GET_FAIL);
+        }
+        //验证是否初始状态，如果审批过了，不能进行删除
+        SellOrder sellOrder = sellOrderMapper.selectByPrimaryKey(detail.getSellOrderId());
+        if (sellOrder == null || !SellOrderStatus.INIT.name().equalsIgnoreCase(sellOrder.getStatus())) {
+            logger.warn("user:{} remove sell order detail but sell order is null or status is not init. id:{}", user.getId(), detailId);
+            throw new BizException(ErrorCode.SELL_ORDER_DETAIL_CAN_NOT_REMOVE);
+        }
         logger.info("user:{} request to remove sell order detail by id:{}", user.getId(), detailId);
         return sellOrderDetailMapper.deleteByPrimaryKey(detailId);
+    }
+
+
+    public List<SellOrder> getReviewList(Integer companyId, String reviewType, String orderNumber,
+                                         Integer salerId, Date startDate, Date endDate) throws BizException{
+        Map<String, Object> map = new HashMap<>();
+        map.put("companyId", companyId);
+        map.put("status", reviewType);
+        map.put("orderNumber", orderNumber);
+        map.put("salerId", salerId);
+        map.put("startDate", startDate);
+        map.put("endDate", endDate);
+        return sellOrderMapper.getReviewList(map);
+    }
+
+    public void submitOrderReview(User user, String reviewType, List<Long> idList) throws BizException {
+        if (StringUtils.isBlank(reviewType) || idList == null || idList.isEmpty()) {
+            logger.warn("submit order review info but params is null.");
+            throw new BizException(ErrorCode.SELL_ORDER_REVIEW_SUBMIT_PARAMS);
+        }
+        if (!SellOrderStatus.INIT.name().equalsIgnoreCase(reviewType)
+                && !SellOrderStatus.QUALITY_CHECKED.name().equalsIgnoreCase(reviewType)) {
+            logger.error("sell order review type error. userId:{}, reviewType:{}", user.getId(), reviewType);
+            //审核流程错误
+            throw new BizException(ErrorCode.SELL_ORDER_REVIEW_STATUS_ERROR);
+        }
+        List<SellOrder> orders = sellOrderMapper.getListById(idList);
+        if (orders.isEmpty() || orders.size() != idList.size()) {
+            logger.warn("submit order review get order by id but size is error.");
+            throw new BizException(ErrorCode.SELL_ORDER_REVIEW_SUBMIT_ID_ERROR);
+        }
+        for (SellOrder order : orders) {
+            if (!reviewType.equalsIgnoreCase(order.getStatus())) {
+                logger.warn("submit order review but status is error. id:{} reviewType:{}", order.getId(), reviewType);
+                throw new BizException(ErrorCode.SELL_ORDER_REVIEW_STATUS_ERROR);
+            }
+        }
+        for (SellOrder order : orders) {
+            if (SellOrderStatus.INIT.name().equalsIgnoreCase(order.getStatus())) {
+                //出库质量审核
+                order.setStatus(SellOrderStatus.QUALITY_CHECKED.name());
+                order.setUpdateBy(user.getNickname());
+                order.setUpdateTime(new Date());
+                sellOrderMapper.updateByPrimaryKeySelective(order);
+            }else {
+                //销售审核
+                order.setStatus(SellOrderStatus.SALE_CHECKED.name());
+                order.setUpdateBy(user.getNickname());
+                order.setUpdateTime(new Date());
+                sellOrderMapper.updateByPrimaryKeySelective(order);
+            }
+        }
+    }
+
+    public SellOrder reviewDetai(Long orderId) {
+        SellOrder order = sellOrderMapper.getReviewDetailById(orderId);
+        if (order == null) {
+            return null;
+        }
+        List<SellOrderDetail> details = getDetailList(orderId);
+        order.setDetails(details);
+        return order;
     }
 
 

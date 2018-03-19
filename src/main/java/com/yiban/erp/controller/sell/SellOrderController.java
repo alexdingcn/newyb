@@ -64,6 +64,7 @@ public class SellOrderController {
         return ResponseEntity.ok().body(result.toJSONString());
     }
 
+
     @RequestMapping(value = "/order/add", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> orderAdd(@RequestBody SellOrder sellOrder,
                                            @AuthenticationPrincipal User user) throws Exception {
@@ -117,5 +118,45 @@ public class SellOrderController {
         return ResponseEntity.ok().body(result.toJSONString());
     }
 
+    @RequestMapping(value = "/order/review/list", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> reviewList(HttpServletRequest request,
+                                             @AuthenticationPrincipal User user) throws Exception {
+        String reviewType = request.getParameter("reviewType");
+        String orderNumber = request.getParameter("orderNumber");
+        String salerIdStr = request.getParameter("salerId");
+        String startDateStr = request.getParameter("startDate");
+        String endDateStr = request.getParameter("endDate");
+        logger.debug("user:{} get review list by params:{}, {}, {}, {}, {}", user.getId(),
+                reviewType, orderNumber, salerIdStr, startDateStr, endDateStr);
+        Integer salerId = StringUtils.isBlank(salerIdStr) ? null : Integer.parseInt(salerIdStr);
+        Date startDate = StringUtils.isBlank(startDateStr) ? null : new Date(Long.valueOf(startDateStr));
+        Date endDate = StringUtils.isBlank(endDateStr) ? null : new Date(Long.valueOf(endDateStr));
+        List<SellOrder> result = sellOrderService.getReviewList(user.getCompanyId(), reviewType, orderNumber, salerId,
+                startDate, endDate);
+        return ResponseEntity.ok().body(JSON.toJSONString(result));
+    }
+
+    @RequestMapping(value = "/order/review/submit", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> submitReview(@RequestBody String reqJson,
+                                               @AuthenticationPrincipal User user) throws Exception {
+        logger.info("user:{} submit sell order review, params:{}", user.getId(), reqJson);
+        JSONObject params = JSON.parseObject(reqJson);
+        String reviewType = params.getString("reviewType");
+        String idStr = params.getString("orderIdList");
+        List<Long> idList = JSON.parseArray(idStr, Long.class);
+        sellOrderService.submitOrderReview(user, reviewType, idList);
+        return ResponseEntity.ok().build();
+    }
+
+    @RequestMapping(value = "/order/review/detail", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> reviewDetail(@RequestParam("orderId") Long orderId) throws Exception {
+        SellOrder order = sellOrderService.reviewDetai(orderId);
+        if (order == null) {
+            logger.warn("get order detail fail by id:{}", orderId);
+            throw new BizException(ErrorCode.SELL_ORDER_DETAIL_GET_FAIL);
+        }else {
+            return ResponseEntity.ok().body(JSON.toJSONString(order));
+        }
+    }
 
 }
