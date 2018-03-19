@@ -7,10 +7,23 @@
 	<Row>
 		<Card>
 			<p slot="title" >
-				<Icon type="document"></Icon> 采购入库制单
+				<Icon type="document"></Icon> 采购单审核
 			</p>
+			<Table border highlight-row
+				   class="margin-top-8"
+				   :columns="orderColumns" :data="orderItems"
+				   ref="buyOrderTable" style="width: 100%;" size="small"
+				   no-data-text="在商品输入框选择后添加"
+				   @on-row-dblclick="handleRowDbClick">
+				<div slot="footer">
+					<h3 class="padding-left-20" >
+						<b>合计金额:</b> ￥{{ totalAmount }}
+					</h3>
+				</div>
+			</Table>
+		</Card>
+		<Card>
 			<div slot="extra">
-
 				<ButtonGroup class="padding-left-20">
 					<Button type="primary" icon="android-add-circle" @click="saveBuyOrder" :loading="saving">保存</Button>
 				</ButtonGroup>
