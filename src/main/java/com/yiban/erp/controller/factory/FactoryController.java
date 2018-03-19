@@ -5,11 +5,13 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.yiban.erp.dao.FactoryMapper;
 import com.yiban.erp.entities.Factory;
+import com.yiban.erp.entities.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
@@ -37,10 +39,11 @@ public class FactoryController {
     }
 
     @RequestMapping(value = "/search", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> search(@RequestBody Map requestMap) {
+    public ResponseEntity<String> search(@RequestBody Map requestMap,
+                                         @AuthenticationPrincipal User user) {
         String searchStr = (String) requestMap.get("search");
-        if (!searchStr.isEmpty()) {
-            List<Factory> factoryList = factoryMapper.searchByNameOrContact(searchStr);
+        if (searchStr != null && !searchStr.isEmpty()) {
+            List<Factory> factoryList = factoryMapper.searchByNameOrContact(user.getCompanyId(), searchStr);
             return ResponseEntity.ok().body(JSON.toJSONString(factoryList));
         } else {
             return list();

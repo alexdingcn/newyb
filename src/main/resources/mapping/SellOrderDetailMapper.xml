@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.yiban.erp.dao.SellOrderDetailMapper" >
+  <resultMap id="BaseResultMap" type="com.yiban.erp.entities.SellOrderDetail" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="sell_order_id" property="sellOrderId" jdbcType="BIGINT" />
+    <result column="good_id" property="goodId" jdbcType="BIGINT" />
+    <result column="quantity" property="quantity" jdbcType="INTEGER" />
+    <result column="fix_price" property="fixPrice" jdbcType="DECIMAL" />
+    <result column="dis_price" property="disPrice" jdbcType="DECIMAL" />
+    <result column="free" property="free" jdbcType="DECIMAL" />
+    <result column="real_price" property="realPrice" jdbcType="DECIMAL" />
+    <result column="single_price" property="singlePrice" jdbcType="DECIMAL" />
+    <result column="amount" property="amount" jdbcType="DECIMAL" />
+    <result column="tax_rate" property="taxRate" jdbcType="DECIMAL" />
+    <result column="create_by" property="createBy" jdbcType="VARCHAR" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_by" property="updateBy" jdbcType="VARCHAR" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, sell_order_id, good_id, quantity, fix_price, dis_price, free, real_price, single_price, 
+    amount, tax_rate, create_by, create_time, update_by, update_time
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select 
+    <include refid="Base_Column_List" />
+    from sell_order_detail
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
+    delete from sell_order_detail
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="com.yiban.erp.entities.SellOrderDetail" keyProperty="id" useGeneratedKeys="true" >
+    insert into sell_order_detail (sell_order_id, good_id,
+      quantity, fix_price, dis_price, 
+      free, real_price, single_price, 
+      amount, tax_rate, create_by, 
+      create_time, update_by, update_time
+      )
+    values (#{sellOrderId,jdbcType=BIGINT}, #{goodId,jdbcType=BIGINT},
+      #{quantity,jdbcType=INTEGER}, #{fixPrice,jdbcType=DECIMAL}, #{disPrice,jdbcType=DECIMAL}, 
+      #{free,jdbcType=DECIMAL}, #{realPrice,jdbcType=DECIMAL}, #{singlePrice,jdbcType=DECIMAL}, 
+      #{amount,jdbcType=DECIMAL}, #{taxRate,jdbcType=DECIMAL}, #{createBy,jdbcType=VARCHAR}, 
+      #{createTime,jdbcType=TIMESTAMP}, #{updateBy,jdbcType=VARCHAR}, #{updateTime,jdbcType=TIMESTAMP}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.yiban.erp.entities.SellOrderDetail" keyProperty="id" useGeneratedKeys="true" >
+    insert into sell_order_detail
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="sellOrderId != null" >
+        sell_order_id,
+      </if>
+      <if test="goodId != null" >
+        good_id,
+      </if>
+      <if test="quantity != null" >
+        quantity,
+      </if>
+      <if test="fixPrice != null" >
+        fix_price,
+      </if>
+      <if test="disPrice != null" >
+        dis_price,
+      </if>
+      <if test="free != null" >
+        free,
+      </if>
+      <if test="realPrice != null" >
+        real_price,
+      </if>
+      <if test="singlePrice != null" >
+        single_price,
+      </if>
+      <if test="amount != null" >
+        amount,
+      </if>
+      <if test="taxRate != null" >
+        tax_rate,
+      </if>
+      <if test="createBy != null" >
+        create_by,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+      <if test="updateBy != null" >
+        update_by,
+      </if>
+      <if test="updateTime != null" >
+        update_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="sellOrderId != null" >
+        #{sellOrderId,jdbcType=BIGINT},
+      </if>
+      <if test="goodId != null" >
+        #{goodId,jdbcType=BIGINT},
+      </if>
+      <if test="quantity != null" >
+        #{quantity,jdbcType=INTEGER},
+      </if>
+      <if test="fixPrice != null" >
+        #{fixPrice,jdbcType=DECIMAL},
+      </if>
+      <if test="disPrice != null" >
+        #{disPrice,jdbcType=DECIMAL},
+      </if>
+      <if test="free != null" >
+        #{free,jdbcType=DECIMAL},
+      </if>
+      <if test="realPrice != null" >
+        #{realPrice,jdbcType=DECIMAL},
+      </if>
+      <if test="singlePrice != null" >
+        #{singlePrice,jdbcType=DECIMAL},
+      </if>
+      <if test="amount != null" >
+        #{amount,jdbcType=DECIMAL},
+      </if>
+      <if test="taxRate != null" >
+        #{taxRate,jdbcType=DECIMAL},
+      </if>
+      <if test="createBy != null" >
+        #{createBy,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateBy != null" >
+        #{updateBy,jdbcType=VARCHAR},
+      </if>
+      <if test="updateTime != null" >
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.yiban.erp.entities.SellOrderDetail" >
+    update sell_order_detail
+    <set >
+      <if test="sellOrderId != null" >
+        sell_order_id = #{sellOrderId,jdbcType=BIGINT},
+      </if>
+      <if test="goodId != null" >
+        good_id = #{goodId,jdbcType=BIGINT},
+      </if>
+      <if test="quantity != null" >
+        quantity = #{quantity,jdbcType=INTEGER},
+      </if>
+      <if test="fixPrice != null" >
+        fix_price = #{fixPrice,jdbcType=DECIMAL},
+      </if>
+      <if test="disPrice != null" >
+        dis_price = #{disPrice,jdbcType=DECIMAL},
+      </if>
+      <if test="free != null" >
+        free = #{free,jdbcType=DECIMAL},
+      </if>
+      <if test="realPrice != null" >
+        real_price = #{realPrice,jdbcType=DECIMAL},
+      </if>
+      <if test="singlePrice != null" >
+        single_price = #{singlePrice,jdbcType=DECIMAL},
+      </if>
+      <if test="amount != null" >
+        amount = #{amount,jdbcType=DECIMAL},
+      </if>
+      <if test="taxRate != null" >
+        tax_rate = #{taxRate,jdbcType=DECIMAL},
+      </if>
+      <if test="createBy != null" >
+        create_by = #{createBy,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateBy != null" >
+        update_by = #{updateBy,jdbcType=VARCHAR},
+      </if>
+      <if test="updateTime != null" >
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.yiban.erp.entities.SellOrderDetail" >
+    update sell_order_detail
+    set sell_order_id = #{sellOrderId,jdbcType=BIGINT},
+      good_id = #{goodId,jdbcType=BIGINT},
+      quantity = #{quantity,jdbcType=INTEGER},
+      fix_price = #{fixPrice,jdbcType=DECIMAL},
+      dis_price = #{disPrice,jdbcType=DECIMAL},
+      free = #{free,jdbcType=DECIMAL},
+      real_price = #{realPrice,jdbcType=DECIMAL},
+      single_price = #{singlePrice,jdbcType=DECIMAL},
+      amount = #{amount,jdbcType=DECIMAL},
+      tax_rate = #{taxRate,jdbcType=DECIMAL},
+      create_by = #{createBy,jdbcType=VARCHAR},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_by = #{updateBy,jdbcType=VARCHAR},
+      update_time = #{updateTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+
+  <select id="getDetailList" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select
+      <include refid="Base_Column_List"/>
+    from sell_order_detail
+    where sell_order_id = #{sellOrderId,jdbcType=BIGINT}
+  </select>
+
+</mapper>

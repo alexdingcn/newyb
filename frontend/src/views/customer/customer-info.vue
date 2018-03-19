@@ -11,7 +11,7 @@
                   {{titleDispayName || '客户详情'}}
               </p>
 
-              <ButtonGroup slot="extra">
+              <ButtonGroup v-if="!isReadOnly" slot="extra">
                   <Button type="primary" :loading="submitBtnLoading" @click="submitCustomer">
                     <span v-if="!submitBtnLoading">提交</span>
                     <span v-else>正在提交...</span>
@@ -240,7 +240,7 @@
                   </TabPane>
                   <TabPane label="证件信息" name="certInfo">
                     <Row type="flex" justify="start">
-                        <ButtonGroup size="small" >
+                        <ButtonGroup v-if="!isReadOnly" size="small" >
                           <Button style="width: 90px;" @click="certAddBtnClick">
                             <Icon type="plus-round" color="green"></Icon>
                             添加
@@ -260,7 +260,7 @@
                   </TabPane>
                   <TabPane label="代表人信息" name="repInfo">
                     <Row type="flex" justify="start">
-                        <ButtonGroup size="small" >
+                        <ButtonGroup v-if="!isReadOnly" size="small" >
                           <Button style="width: 90px;" @click="repAddBtnClick">
                             <Icon type="plus-round" color="green"></Icon>
                             添加
@@ -386,7 +386,7 @@ export default {
       type: String,
       required: true,
       validator: function(value) {
-        return value === "add" || value === "edit";
+        return value === "add" || value === "edit" || value === "see";
       }
     },
     categorys: {
@@ -405,6 +405,7 @@ export default {
   data() {
     return {
       showView: 'add',
+      isReadOnly: false,
       showTitle: '新建客户信息',
       editId: '',
       submitBtnLoading: false,
@@ -679,8 +680,12 @@ export default {
   },
   watch: {
     editCustomer(data) {
-      if (data && data.id > 0 && this.action === 'edit') {
-        this.changeToEditModal(this.editCustomer)
+      if (data && data.id > 0 ){
+        if (this.action === 'edit') {
+          this.changeToEditModal(this.editCustomer);
+        }else if (this.action === 'see') {
+          this.changeToSeeModal(this.editCustomer);
+        }
       }
     },
     action(data) {
@@ -697,6 +702,7 @@ export default {
       this.repTabData = [];
       this.editId = '';
       this.showView = 'add';
+      this.isReadOnly = false;
       this.showTitle = '新建客户信息';
     },
 
@@ -707,11 +713,27 @@ export default {
       }
       this.formItem = data;
       this.editId = data.id;
+      this.isReadOnly = false;
       this.showView = 'edit';
       this.showTitle = data.name;
       if (this.action === 'add') {
         this.$emit("add-to-edit");
       }
+      this.refreshCertData(this.editId);
+      this.refreshRepData(this.editId);
+    },
+
+    changeToSeeModal(data) {
+      console.log('see');
+      if (!data || !data.id) {
+        this.$Notice.warn({title: '系统异常', desc: '获取编辑模式下的客户标识失败'});
+        return;
+      }
+      this.isReadOnly = true;
+      this.formItem = data;
+      this.editId = data.id;
+      this.showView = 'see';
+      this.showTitle = data.name;
       this.refreshCertData(this.editId);
       this.refreshRepData(this.editId);
     },

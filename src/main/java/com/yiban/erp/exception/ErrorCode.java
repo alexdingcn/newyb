@@ -25,6 +25,7 @@ public enum ErrorCode {
     BUY_ORDER_PARAMS_INVALID(1301, "采购订单参数错误"),
     BUY_ORDER_IS_CHECKED(1302, "采购订单已审核不可修改"),
 
+    // 20xx - 客户
     CUSTOMER_GET_FAIL(2000, "获取客户信息失败"),
     CUSTOMER_DEL_PARAMS_EMPTY(2001, "请选择需要删除的客户"),
     CUSTOMER_CAT_HAVE_CUST(2002, "分组下存在有客户信息, 不能删除", ErrorDisplay.NOTICE),
@@ -37,6 +38,7 @@ public enum ErrorCode {
     CUSTOMER_REP_PARAMS_ERROR(2009, "验证客户代表人信息必输项失败"),
     CUSTOMER_REP_REMOVE_PARAMS(2010, "请选择需要删除的代表人信息"),
 
+    // 21xx - 档案
     FILE_TYPE_CREATE_FAIL(2101, "新增档案类型失败"),
     FILE_TYPE_CREATE_PARAMS_ERROR(2102, "类型名称不能为空"),
     FILE_TYPE_EXIST(2103, "文档类型已经存在"),
@@ -48,6 +50,11 @@ public enum ErrorCode {
     FILE_UPLOAD_FILE_TYPE_ERROR(2109, "上传的文件类型错误"),
     FILE_UPLOAD_REMOVE_PARAMS(2110, "请选择需要删除的文件"),
     FILE_GET_INFO_FAIL(2111, "获取档案信息失败"),
+
+    // 22xx - 销售
+    SELL_ORDER_PARAM_ERROR(2201, "必输项参数校验失败"),
+    SELL_ORDER_DETAIL_EMPTY(2202, "没有需要保存的详情信息"),
+
 
 
     ACCESS_PERMISSION(9001, "无访问权限", ErrorDisplay.MODAL);

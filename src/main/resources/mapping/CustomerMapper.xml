@@ -646,6 +646,10 @@
       <bind name="customerNoVal" value="customerNo + '%'" />
       and customer_no like #{customerNoVal}
     </if>
+    <if test="shorName != null" >
+      <bind name="shorNameVal" value="'%' + shorName + '%'" />
+      and shor_name like #{shorNameVal}
+    </if>
   </select>
 
   <select id="selectAll" parameterType="map" resultMap="BaseResultMap">
@@ -665,6 +669,10 @@
       <bind name="customerNoVal" value="customerNo + '%'" />
       and customer_no like #{customerNoVal}
     </if>
+    <if test="shorName != null" >
+      <bind name="shorNameVal" value="'%' + shorName + '%'" />
+      and shor_name like #{shorNameVal}
+    </if>
     <if test="offset != null and limit != null">
       limit #{offset}, #{limit}
     </if>
@@ -682,5 +690,16 @@
         #{item}
       </foreach>
   </update>
+
+  <select id="searchByName" parameterType="map" resultMap="BaseResultMap">
+    select
+      <include refid="Base_Column_List"/>
+    from customer
+    where status != 'delete'
+      and company_id = #{companyId}
+      <bind name="nameVal" value="name + '%'"/>
+      and name like #{nameVal}
+      order by id desc;
+  </select>
 
 </mapper>

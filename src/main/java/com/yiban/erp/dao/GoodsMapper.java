@@ -29,4 +29,6 @@ public interface GoodsMapper {
     Long selectCount(@Param("categoryId") Integer catId,
                      @Param("factoryId") Integer factoryId,
                      @Param("search") String search);
+
+    List<Goods> selectByIdList(@Param("idList") List<Long> idList);
 }
