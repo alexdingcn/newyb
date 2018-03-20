@@ -1,14 +1,17 @@
 package com.yiban.erp.controller.buy;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.yiban.erp.constant.BuyOrderStatus;
 import com.yiban.erp.dao.BuyOrderDetailMapper;
 import com.yiban.erp.dao.BuyOrderMapper;
 import com.yiban.erp.entities.BuyOrder;
 import com.yiban.erp.entities.BuyOrderDetail;
+import com.yiban.erp.entities.BuyOrderQuery;
 import com.yiban.erp.entities.User;
 import com.yiban.erp.exception.ErrorCode;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.apache.commons.lang3.time.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +25,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 @RestController
 @RequestMapping("/buy")
@@ -34,6 +39,21 @@ public class BuyOrderController {
 
     @Autowired
     private BuyOrderDetailMapper buyOrderDetailMapper;
+
+    @RequestMapping(value = "/list", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> list(@AuthenticationPrincipal User user, @RequestBody BuyOrderQuery buyOrderQuery) {
+        buyOrderQuery.setCompanyId(user.getCompanyId());
+        if (buyOrderQuery.getStartDate() != null) {
+            // get start of day
+            buyOrderQuery.setStartDate(DateUtils.truncate(buyOrderQuery.getStartDate(), Calendar.DATE));
+        }
+        if (buyOrderQuery.getEndDate() != null) {
+            // get end of day
+            buyOrderQuery.setEndDate(DateUtils.truncate(DateUtils.addDays(buyOrderQuery.getEndDate(), 1), Calendar.DATE));
+        }
+        List<BuyOrder> buyOrderList = buyOrderMapper.queryOrders(buyOrderQuery);
+        return ResponseEntity.ok().body(JSON.toJSONString(buyOrderList));
+    }
 
     @Transactional
     @RequestMapping(value = "/add", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
