@@ -38,7 +38,9 @@ public interface SellOrderMapper {
                             @Param("limit") int limit,
                             @Param("offset") int offset);
 
-    List<SellOrder> getReviewList(Map<String, Object> params);
+    List<SellOrder> getAllList(Map<String, Object> params);
+
+    Integer getAllCount(Map<String, Object> params);
 
     List<SellOrder> getListById(@Param("idList") List<Long> idList);
 

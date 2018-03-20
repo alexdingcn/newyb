@@ -3,26 +3,24 @@
 </style>
 
 <template>
-    <div>
-
+  <div>
         <div class="search-div">
             <Row >
-                <Form ref="searchForm" :model="searchFormItem" :rules="searchFormValidate" :label-width="90">
+                <Form ref="searchForm" :model="searchFormItem" :label-width="90">
                     <Row type="flex" justify="center">
-                        <Col span="8" >
-                            <FormItem label="审批类型" prop="reviewType">
-                                <Select size="small" v-model="searchFormItem.reviewType" clearable filterable >
-                                    <Option v-for="item in reviewTypeList" :value="item.value" :key="item.value">{{ item.description }}</Option>
-                                </Select> 
-                            </FormItem>
-                        </Col>
-                        <Col span="16" >
+                        <Col span="12" >
                             <FormItem label="制单日期">
                                 <DatePicker  size="small" v-model="searchFormItem.startDate" type="date" placeholder="请选择制单日期" ></DatePicker> 
                                 至 
                                 <DatePicker  size="small" v-model="searchFormItem.endDate" type="date" placeholder="请选择制单日期" ></DatePicker> 
                             </FormItem>
                         </Col>
+                        <Col span="8" >
+                            <FormItem label="客户">
+                                <customer-select size="small" v-model="searchFormItem.customerId" ></customer-select>
+                            </FormItem>
+                        </Col>
+                        <Col span="4"></Col>
                     </Row>
                     <Row type="flex" justify="center">
                         <Col span="8" >
@@ -46,15 +44,16 @@
             </Row>
         </div>
         <div class="table-div">
-            <Row type="flex" justify="start">
-                <Button size="small" type="success" icon="checkmark" :loading="searching" @click="submitBtnClick" >审核通过</Button>
-            </Row>
             <Row type="flex" justify="center" align="middle" >
                 <Table border highlight-row :columns="tabColumns" :data="tabData" 
                         :loading="searching" 
-                        @on-selection-change="tableSelectDataChange"
                         ref="table" style="width: 100%;" size="small">
                 </Table>
+            </Row>
+            <Row type="flex" justify="end">
+                <Page size="small" :total="totalCount" :current="currentPage" :page-size="pageSize" show-total
+                    @on-change="pageChange">
+                </Page>
             </Row>
         </div>
 
@@ -62,40 +61,47 @@
             <review-detail :sellOrderId="showDetailViewId" @on-cancel="showOrderDetailViewClose"></review-detail>
             <div slot="footer"></div>
         </Modal>
+
+        <Modal v-model="showShipDetailView" :width="75" :mask-closable="false" :title="shipDetailTitle" @on-cancel="ShowShipDetailViewClose">
+            <sell-order-ship :orderId="shipOrderId" ></sell-order-ship>
+            <div slot="footer"></div>
+        </Modal>
+
     </div>
 </template>
 
 <script>
 import util from "@/libs/util.js";
+import dataConver from "@/libs/data-conver.js";
 import reviewDetail from "./review-detail.vue";
+import sellOrderShip from "./sell-order-ship.vue";
+import customerSelect from "@/views/customer/customer-select.vue";
 
 export default {
-    name: 'sell-review',
+    name: 'sell-order-all',
     components: {
-        reviewDetail
+        reviewDetail,
+        sellOrderShip,
+        customerSelect
     },
+        
     data() {
         return {
-            reviewTypeList: [],
-            salerList: [],
             searchFormItem: {
-                reviewType: '',
                 startDate: '',
                 endDate: '',
+                customerId: '',
                 orderNumber: '',
                 salerId: ''
             },
-            searchFormValidate: {
-                reviewType: [
-                    {required: true, message: '审批类型必须选择', trigger: 'change'}
-                ]
-            },
+            salerList: [],
             searching: false,
             tabData: [],
             tabColumns: [
                 {
                   title: '查看',
                   width: 70,
+                  fixed: 'left',
                   render: (h, params) => {
                       return h('Button', {
                           props: {
@@ -112,88 +118,137 @@ export default {
                   }
                 },
                 {
-                    type: "selection",
-                    width: 60,
-                    align: "center",
-                },
-                {
                     title: '订单编号',
+                    width: 170,
                     key: 'orderNumber',
                     align: "center",
-                    sortable: true
+                    sortable: true,
+                    fixed: 'left',
                 },
                 {
                     title: '制单日',
                     key: 'createOrderDate',
+                    width: 100,
                     align: "center",
-                    sortable: true
+                    sortable: true,
+                    render: (h, params) => {
+                        return h('span', this.dateFormat(params.row.createOrderDate));
+                    }
                 },
                 {
                     title: '客户',
                     key: 'customerName',
+                    width: 170,
                     align: "center"
+                },
+                {
+                    title: '状态',
+                    key: 'status',
+                    width: 150,
+                    align: 'center',
+                    render: (h, params) => {
+                        return h('span', this.statusDescription(params.row.status));
+                    }
                 },
                 {
                     title: '销售员',
                     key: 'salerId',
+                    width: 100,
                     align: "center"
                 },
                 {
                     title: '制单人',
                     key: 'createBy',
+                    width: 100,
                     align: "center"
                 },
                 {
                     title: '提货员',
                     key: 'takeGoodsUser',
+                    width: 100,
                     align: "center"
                 },
                 {
                     title: '收款金额',
                     key: 'payAmount',
+                    width: 100,
                     align: 'center'
                 },
                 {
                     title: '收货人',
                     key: 'customerRepName',
+                    width: 100,
                     align: "center"
                 },
                 {
                     title: '收货电话',
                     key: 'customerRepContactPhone',
+                    width: 120,
                     align: "center"
                 },
                 {
                     title: '收货地址',
                     key: 'customerRepRepertoryAddress',
+                    width: 220,
                     align: "center"
+                },
+                {
+                    title: '补录运输记录',
+                    align: 'center',
+                    width: 100,
+                    fixed: 'right',
+                    render: (h, params) => {
+                        return h('Button', {
+                            props: {
+                                type: 'primary',
+                                size: 'small',
+                            },
+                            on: {
+                                click: () => {
+                                    this.openShowShipDetailView(params.row.id, params.row.orderNumber);
+                                }
+                            }
+                        }, '运输记录');
+                    }
                 }
             ],
-            tabSelectData: [],
             showOrderDetailView: false,
-            showDetailViewId: -1
+            showDetailViewId: -1,
+            totalCount: 0,
+            currentPage: 1,
+            pageSize: 20,
+            showShipDetailView: false,
+            shipOrderId: -1,
+            shipDetailTitle: ''
         }
     },
-    mounted() {
-        this.initData();
-    },
     methods: {
-        initData() {
-            this.getOptions();
-            this.getSalerList();
+        dateFormat(data) {
+          if (!data && isNaN(data)) {
+              return '';
+          }
+          return dataConver.formatDate(new Date(data), 'yyyy-MM-dd');
         },
-        getOptions() {
-          let reqData = ['SELL_ORDER_REVIEW'];
-          util.ajax.post("/options/list", reqData)
-            .then((response) => {
-              let data = response.data;
-              if (data && data.SELL_ORDER_REVIEW) {
-                  this.reviewTypeList = data.SELL_ORDER_REVIEW;
-              }
-          })
-          .catch((error) => {
-              util.errorProcessor(this, error);
-          })
+        statusDescription(data) {
+            let result = '';
+            switch(data) {
+                case 'INIT': 
+                    result = '制单初始';
+                    break;
+                case 'QUALITY_CHECKED':
+                    result = '出库质量审核完成';
+                    break;
+                case 'SALE_CHECKED': 
+                    result = '销售审核完成';
+                    break;
+                default: 
+                    result = '';
+                    break;
+            }
+            return result;
+        },
+        initData() {
+            this.getSalerList();
         },
         getSalerList() {
           let result = [
@@ -209,20 +264,16 @@ export default {
           this.salerList = result;
         },
         searchBtnClick() {
-            this.$refs.searchForm.validate(valid => {
-                if(!valid) {
-                    this.$Message.warning('审批类型必须选择');
-                    return;
-                }else {
-                    this.refreshTableData();
-                }
-            });
+            this.currentPage = 1;
+            this.refreshTableData();
         },
         refreshTableData() {
             let reqData = {
-                status: this.searchFormItem.reviewType,
+                customerId: this.searchFormItem.customerId,
                 orderNumber: this.searchFormItem.orderNumber,
-                salerId: this.searchFormItem.salerId
+                salerId: this.searchFormItem.salerId,
+                page: this.currentPage,
+                size: this.pageSize
             };
             let startDate = this.searchFormItem.startDate;
             let endDate = this.searchFormItem.endDate;
@@ -236,6 +287,7 @@ export default {
             util.ajax.get("/sell/order/all/list", {params: reqData})
                 .then((response) => {
                     this.tabData = response.data.data;
+                    this.totalCount = response.data.count;
                 })
                 .catch((error) => {
                     util.errorProcessor(this, error);
@@ -249,35 +301,20 @@ export default {
         showOrderDetailViewClose() {
             this.showOrderDetailView = false;
         },
-        tableSelectDataChange(data) {
-            this.tabSelectData = data;
+        pageChange(data) {
+            this.currentPage = data;
+            this.refreshTableData();
         },
-        submitBtnClick() {
-            if (!this.tabSelectData || this.tabSelectData.length <= 0 || !this.searchFormItem.reviewType) {
-                this.$Message.warning('请确认审批类型和选择需要审批通过的数据');
-                return;
-            }
-            this.searching = true;
-            let orderIdList = [];
-            for (let i=0; i< this.tabSelectData.length; i++) {
-                orderIdList.push(this.tabSelectData[i].id);
-            }
-            let reqData = {
-                reviewType: this.searchFormItem.reviewType,
-                orderIdList: orderIdList
-            };
-            console.log(reqData);
-            util.ajax.post("/sell/order/review/submit", reqData)
-                .then((response) => {
-                    this.$Message.success('审核提交成功');
-                    this.refreshTableData();
-                })
-                .catch((error) => {
-                    util.errorProcessor(this, error);
-                });
-            this.searching = false;
+        openShowShipDetailView(orderId, orderNumber) {
+            this.shipOrderId = orderId;
+            this.shipDetailTitle = '订单运输记录 ->' + orderNumber;
+            this.showShipDetailView = true;
+        },
+        ShowShipDetailViewClose() {
+            this.showShipDetailView = false;
         }
     }
+  
 }
 </script>
 
@@ -292,6 +329,5 @@ export default {
     background-color: #fff;
     margin-top: 10px;
 }
-
 </style>
 
