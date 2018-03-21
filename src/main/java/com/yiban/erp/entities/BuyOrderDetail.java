@@ -12,6 +12,17 @@ public class BuyOrderDetail {
 
     private String goodsName;
 
+    private String origin;              // 来源
+    private String jx;                  // 剂型
+    private String spec;                // 规格
+    private Long factoryId;             // 生产商ID
+    private String factory;             // 生产商
+    private String storageCondition;    // 存储条件
+    private Integer goodsUnit;          // 商品单位ID
+    private String unitName;            // 商品单位名称
+    private Integer mediumPack;         // 中件装量
+    private Integer bigPack;            // 大件装量
+
     private BigDecimal quantity;
 
     private BigDecimal buyPrice;
@@ -152,5 +163,85 @@ public class BuyOrderDetail {
 
     public void setUpdatedTime(Date updatedTime) {
         this.updatedTime = updatedTime;
+    }
+
+    public String getOrigin() {
+        return origin;
+    }
+
+    public void setOrigin(String origin) {
+        this.origin = origin;
+    }
+
+    public String getJx() {
+        return jx;
+    }
+
+    public void setJx(String jx) {
+        this.jx = jx;
+    }
+
+    public String getSpec() {
+        return spec;
+    }
+
+    public void setSpec(String spec) {
+        this.spec = spec;
+    }
+
+    public String getFactory() {
+        return factory;
+    }
+
+    public void setFactory(String factory) {
+        this.factory = factory;
+    }
+
+    public String getUnitName() {
+        return unitName;
+    }
+
+    public void setUnitName(String unitName) {
+        this.unitName = unitName;
+    }
+
+    public Long getFactoryId() {
+        return factoryId;
+    }
+
+    public void setFactoryId(Long factoryId) {
+        this.factoryId = factoryId;
+    }
+
+    public String getStorageCondition() {
+        return storageCondition;
+    }
+
+    public void setStorageCondition(String storageCondition) {
+        this.storageCondition = storageCondition;
+    }
+
+    public Integer getGoodsUnit() {
+        return goodsUnit;
+    }
+
+    public void setGoodsUnit(Integer goodsUnit) {
+        this.goodsUnit = goodsUnit;
+    }
+
+    public Integer getMediumPack() {
+        return mediumPack;
+    }
+
+    public void setMediumPack(Integer mediumPack) {
+        this.mediumPack = mediumPack;
+    }
+
+    public Integer getBigPack() {
+        return bigPack;
+    }
+
+    public void setBigPack(Integer bigPack) {
+        this.bigPack = bigPack;
     }
 }

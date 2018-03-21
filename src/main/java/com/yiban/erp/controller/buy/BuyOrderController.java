@@ -19,10 +19,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -51,8 +48,34 @@ public class BuyOrderController {
             // get end of day
             buyOrderQuery.setEndDate(DateUtils.truncate(DateUtils.addDays(buyOrderQuery.getEndDate(), 1), Calendar.DATE));
         }
+        if (buyOrderQuery.getStatus().equals(BuyOrderStatus.ALL)) {
+            buyOrderQuery.setStatus(null);
+        }
         List<BuyOrder> buyOrderList = buyOrderMapper.queryOrders(buyOrderQuery);
         return ResponseEntity.ok().body(JSON.toJSONString(buyOrderList));
+    }
+
+    @RequestMapping(value = "/orderdetail/{orderId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> list(@AuthenticationPrincipal User user, @PathVariable Long orderId) {
+        List<BuyOrderDetail> buyDetailList = buyOrderDetailMapper.findByOrderId(orderId, user.getCompanyId());
+        return ResponseEntity.ok().body(JSON.toJSONString(buyDetailList));
+    }
+
+    @RequestMapping(value = "/status", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> updateStatus(@AuthenticationPrincipal User user, @RequestBody BuyOrderQuery query) {
+        BuyOrder order = buyOrderMapper.selectByPrimaryKey(query.getOrderId());
+        if (order == null) {
+            return ResponseEntity.badRequest().body(ErrorCode.BUY_ORDER_NOT_EXISTED.toString());
+        }
+        if (!order.getCompanyId().equals(user.getCompanyId())) {
+            return ResponseEntity.badRequest().body(ErrorCode.ACCESS_PERMISSION.toString());
+        }
+        order.setStatus(query.getOrderStatus());
+        int result = buyOrderMapper.updateByPrimaryKey(order);
+        if (result > 0) {
+            return ResponseEntity.ok().build();
+        }
+        return ResponseEntity.badRequest().body(ErrorCode.FAILED_UPDATE_FROM_DB.toString());
     }
 
     @Transactional

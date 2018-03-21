@@ -20,7 +20,9 @@ public interface BuyOrderDetailMapper {
 
     int updateByPrimaryKey(BuyOrderDetail record);
 
-    List<BuyOrderDetail> findByOrderId(@Param("buyOrderId") Long buyOrderId);
+    List<BuyOrderDetail> findByOrderId(@Param("buyOrderId") Long buyOrderId,
+                                       @Param("companyId") Integer companyId);
 
     int deleteByBuyOrderId(@Param("buyOrderId") Long buyOrderId);
+
 }

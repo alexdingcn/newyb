@@ -30,9 +30,21 @@
   </select>
   <select id="findByOrderId" resultMap="BaseResultMap" parameterType="java.lang.Long" >
     select
-    <include refid="Base_Column_List" />
-    from buy_order_detail
-    where buy_order_id = #{buyOrderId,jdbcType=BIGINT}
+    bd.*,
+      g.origin, g.jx, g.spec,
+      g.factory_id as factoryId, f.name as factory, g.storage_condition as storageCondition,
+      g.unit as goodsUnit, un.name as unitName, g.big_pack as bigPack, g.medium_pack as mediumPack
+    from factory f, buy_order_detail bd, buy_order bo, goods g
+      left join unit un on g.unit = un.id
+    where
+      g.id = bd.goods_id
+      and bd.buy_order_id = bo.id
+      and f.id = g.factory_id
+      and un.id = g.unit
+      and bd.buy_order_id = #{buyOrderId,jdbcType=BIGINT}
+      <if test="companyId != null" >
+          and bo.company_id = #{companyId, jdbcType=INTEGER}
+      </if>
   </select>
 
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >

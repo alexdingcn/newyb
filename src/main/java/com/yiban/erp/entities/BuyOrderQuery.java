@@ -6,6 +6,10 @@ import java.util.Date;
 
 public class BuyOrderQuery {
 
+    private Long orderId;
+
+    private BuyOrderStatus orderStatus;
+
     private Long supplierId;
 
     private Date startDate;
@@ -13,6 +17,8 @@ public class BuyOrderQuery {
     private Date endDate;
 
     private BuyOrderStatus status;
+
+    private String checkResult;
 
     private Integer companyId;
 
@@ -54,5 +60,29 @@ public class BuyOrderQuery {
 
     public void setCompanyId(Integer companyId) {
         this.companyId = companyId;
+    }
+
+    public Long getOrderId() {
+        return orderId;
+    }
+
+    public void setOrderId(Long orderId) {
+        this.orderId = orderId;
+    }
+
+    public BuyOrderStatus getOrderStatus() {
+        return orderStatus;
+    }
+
+    public void setOrderStatus(BuyOrderStatus orderStatus) {
+        this.orderStatus = orderStatus;
+    }
+
+    public String getCheckResult() {
+        return checkResult;
+    }
+
+    public void setCheckResult(String checkResult) {
+        this.checkResult = checkResult;
     }
 }
