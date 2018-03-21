@@ -33,7 +33,7 @@
                         <Col span="8" >
                             <FormItem label="销售员" >
                                 <Select  size="small" v-model="searchFormItem.salerId" clearable filterable >
-                                    <Option v-for="item in salerList" :value="item.id" :key="item.id">{{ item.name }}</Option>
+                                    <Option v-for="item in salerList" :value="item.userId" :key="item.userId">{{ item.nickname }}{{item.realname ? (' - [' + item.realname + ']') : ''}}</Option>
                                 </Select> 
                             </FormItem>
                         </Col>
@@ -196,17 +196,13 @@ export default {
           })
         },
         getSalerList() {
-          let result = [
-              {
-                  id: 1,
-                  name: '销售员1'
-              },
-              {
-                  id: 2,
-                  name: '销售员2'
-              }
-          ];
-          this.salerList = result;
+          util.ajax.get('/userrole/list', {params: {roleQuery: 'ROLE_SALER'}})
+            .then((response) => {
+                this.salerList = response.data;
+            })
+            .catch((error) => {
+                util.errorProcessor(this, error);
+            });
         },
         searchBtnClick() {
             this.$refs.searchForm.validate(valid => {

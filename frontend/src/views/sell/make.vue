@@ -36,7 +36,7 @@
                         <Col span="8">
                             <FormItem label="销售人员" prop="salerId">
                                 <Select v-model="sellOrderFormData.salerId" filterable clearable placeholder="请选择销售人员">
-                                    <Option v-for="item in salerList" :value="item.id" :key="item.id">{{ item.name }}</Option>
+                                    <Option v-for="item in salerList" :value="item.userId" :key="item.userId">{{ item.nickname }}{{item.realname ? (' - [' + item.realname + ']') : ''}}</Option>
                                 </Select>
                             </FormItem>
                         </Col>
@@ -389,17 +389,13 @@ export default {
           })
       },
       getSalserList() {
-          let result = [
-              {
-                  id: 1,
-                  name: '销售员1'
-              },
-              {
-                  id: 2,
-                  name: '销售员2'
-              }
-          ];
-          this.salerList = result;
+          util.ajax.get('/userrole/list', {params: {roleQuery: 'ROLE_SALER'}})
+            .then((response) => {
+                this.salerList = response.data;
+            })
+            .catch((error) => {
+                util.errorProcessor(this, error);
+            });
       },
       searchCustomerBtn() {
           this.customerSearchModal = true;
