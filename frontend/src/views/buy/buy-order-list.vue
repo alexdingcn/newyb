@@ -18,7 +18,6 @@
 								filterable
 								clearable
 								remote
-								@on-change="onSelectSupplier"
 								placeholder="供应商"
 								:remote-method="querySupplier"
 								:loading="supplierLoading">
@@ -31,28 +30,26 @@
 						</Select>
                     </Col>
                     <Col span="5">
-                        <ButtonGroup>
                             <Button type="primary" icon="ios-search" @click="queryOrderList"></Button>
-                            <Button type="success" icon="checkmark-round">审核</Button>
-                        </ButtonGroup>
+                            <Button  icon="checkmark-round" @click="showCheckModal">审核</Button>
 					</Col>
 				</Row>
 			</div>
-			<Table border highlight-row
-				   :columns="orderListColumns" :data="orderList"
+			<Table border highlight-row disabled-hover height="250"
+                   :columns="orderListColumns" :data="orderList"
 				   ref="buyOrderListTable" size="small"
+                   @on-row-click="handleSelectBuyOrder"
 				   no-data-text="使用右上方输入搜索条件">
 			</Table>
 		</Card>
 
 		<Card class="margin-top-8">
-            <Table border highlight-row
+            <Table border highlight-row height="300"
                    class="margin-top-8"
                    :columns="orderColumns" :data="orderItems"
                    ref="buyOrderTable" style="width: 100%;" size="small"
-                   no-data-text="在商品输入框选择后添加"
-                   @on-row-dblclick="handleRowDbClick">
-                <div slot="footer">
+                   no-data-text="点击上方订单后查看采购明细">
+                <div slot="header">
                     <h3 class="padding-left-20" >
                         <b>合计金额:</b> ￥{{ totalAmount }}
                     </h3>
@@ -60,6 +57,19 @@
             </Table>
 		</Card>
 
+        <Modal v-model="checkModalShow" width="360">
+            <p slot="header">
+                <Icon type="checkmark"></Icon>
+                <span>审核 {{ orderTitle }} </span>
+            </p>
+            <div style="text-align:center">
+                <Input v-model="checkResult" placeholder="审核意见" style="width: 200px"/>
+            </div>
+            <div slot="footer">
+                <Button type="success" @click="setChecked(true)">审核通过</Button>
+                <Button type="error" @click="setChecked(false)">审核拒绝</Button>
+            </div>
+        </Modal>
 	</Row>
 
 </template>
@@ -77,33 +87,25 @@
                 query: {
                     status: 'CHECKING',
                 },
-                dateRange: [],
+                dateRange: [
+                    moment().add(-1,'w').format('YYYY-MM-DD'),
+                    moment().format('YYYY-MM-DD'),
+                ],
                 orderList: [],
-				saving: false,
             	supplierLoading: false,
             	supplierOptions: [],
             	goodsLoading: false,
-            	goodsOptions: [],
-				buyerOptions: [],
-				supplierContactLoading: false,
-				supplierContactOptions: [],
-				shipMethodOptions: [],
-				shipToolOptions: [],
-				temperControlOptions: [],
-				warehouseOptions: [],
             	totalAmount: 0,
-            	edittingRow: {},
-            	fapiaoTypes: [
-            		{ value: 'PP', label:'普通发票'},
-            		{ value: 'ZZS', label: '增值税发票'}
-            	],
-                searchFactoryVal: '',
                 orderItems: [],
-                buyOrder: {
-					supplierId: null,
-                	orderItemIds: []
-                },
+                checkResult: '',
+                orderTitle: '',
+                checkModalShow: false,
                 orderListColumns: [
+                    {
+                        type: 'selection',
+                        width: 60,
+                        align: 'center'
+                    },
                     {
                         key: 'id',
                         title: '#',
@@ -116,7 +118,6 @@
                         key: 'createdTime',
                         width: 80,
                         render:(h, params) => {
-                            console.log(params);
                             return moment(params.row.createdTime).format('YYYY-MM-DD');
                         }
                     },
@@ -143,6 +144,24 @@
                         align: 'center',
                         key: 'createdBy',
                         width: 80
+                    },
+                    {
+                        title: '状态',
+                        align: 'center',
+                        key: 'status',
+                        width: 90,
+                        render: (h, params) => {
+                            const row = params.row;
+                            const color = row.status === 'CHECKING' ? 'blue' : row.status === 'CHECKED' ? 'green' : 'red';
+                            const text = row.status === 'CHECKING' ? '待审' : row.status === 'CHECKED' ? '已审' : '拒绝';
+
+                            return h('Tag', {
+                                props: {
+                                    type: 'dot',
+                                    color: color
+                                }
+                            }, text);
+                        }
                     },
                     {
                         title: '审核结论',
@@ -216,12 +235,12 @@
                     {
 						title: '货号',
 						align: 'center',
-						key: 'id',
+						key: 'goodsId',
 						width: 50
 					},
                     {
                         title: '商品名称',
-                        key: 'name',
+                        key: 'goodsName',
                         align: 'center',
                         width: 150,
                         sortable: true,
@@ -233,14 +252,14 @@
 								},
 								on: {
 									click: () => {
-										let argu = { goods_id: params.row.id };
+										let argu = { goods_id: params.row.goodsId };
 										this.$router.push({
 											name: 'goods-info',
 											params: argu
 										});
 									}
 								}
-							}, params.row.name);
+							}, params.row.goodsName);
 						}
 					},
 					{
@@ -279,95 +298,18 @@
                         key: 'quantity',
                         align: 'center',
                         width: 80,
-                        render: (h, params) => {
-                        	var self = this;
-							return h('Input', {
-								props: {
-								  	value: self.orderItems[params.index][params.column.key]
-								},
-								on: {
-									'on-change' (event) {
-										var row = self.orderItems[params.index];
-										row[params.column.key] = event.target.value;
-									},
- 									'on-blur' (event) {
- 										var row = self.orderItems[params.index];
- 										var price = row['price'];
- 										var qty = event.target.value;
-										if (!isNaN(qty) && !isNaN(price)) {
-											row.amount = (qty * price).toFixed(2);
-											self.$set(self.orderItems, params.index, row);
-										}
- 									},
-									'on-enter' (event) {
-										var index = params.index * 2;
-										var inputList = self.$refs.buyOrderTable.$el.querySelectorAll('input');
-										if (inputList && index+2 <= inputList.length) {
-											// move to next
-											inputList[index + 1].focus();
-										}
-									}
-								}
-							});
-						}
 					},
 					{
                         title: '单价',
-                        key: 'price',
+                        key: 'buyPrice',
                         align: 'center',
                         width: 80,
-                        render: (h, params) => {
-                        	var self = this;
-							return h('Input', {
-								props: {
-								  	value: self.orderItems[params.index][params.column.key]
-								},
-								on: {
-									'on-change' (event) {
-										var row = self.orderItems[params.index];
-										row[params.column.key] = event.target.value;	
-									},
- 									'on-blur' (event) {
- 										var row = self.orderItems[params.index];
- 										var qty = row['quantity'];
- 										var price = event.target.value;
-										if (!isNaN(qty) && !isNaN(price)) {
-											row.amount = (qty * price).toFixed(2);
-											self.$set(self.orderItems, params.index, row);
-										}
- 									},
-									'on-enter' (event) {
-										var index = params.index * 2 + 1;
-										var inputList = self.$refs.buyOrderTable.$el.querySelectorAll('input');
-										if (inputList && index+2 <= inputList.length) {
-											// move to next line
-											inputList[index + 1].focus();
-										}
-										if (index+2 >= inputList.length) {
-											var row = self.orderItems[params.index];
-											var qty = row['quantity'];
-											var price = event.target.value;
-											if (!isNaN(qty) && !isNaN(price)) {
-												row.amount = (qty * price).toFixed(2);
-												self.$set(self.orderItems, params.index, row);
-											}
-										}
-									},
-								}
-							});
-						}
 					},
 					{
                         title: '金额',
                         key: 'amount',
                         align: 'center',
                         width: 80
-					},
-					{
-						title: '整件单位',
-						key: 'packUnitName',
-						align: 'center',
-						width: 60
 					},
 					{
 						title: '大件装量',
@@ -381,56 +323,20 @@
                         align: 'center',
                         width: 100
 					},
-					{
-                        title: '在单数',
-                        key: 'ongoing',
+                    {
+                        title: '零售价',
+                        key: 'retailPrice',
                         align: 'center',
-                        width: 100,
-					},
-					{
-                        title: '最近采购价',
-                        key: 'last',
-                        align: 'center',
-                        width: 100,
-					},
-					{
-                        title: '批号',
-                        key: 'batch',
-                        align: 'center',
-                        width: 100,
-					},
-					{
-                        title: '有效期',
-                        key: 'exp',
-                        align: 'center',
-                        width: 100,
-					},
+                        width: 100
+                    },
         	],
-			ruleValidate: {
-				supplierId: [
-					{ required: true, type: 'number', message: '请选择供应商', trigger: 'blur' }
-				],
-				supplierContactId: [
-					{ required: true, type: 'number',message: '请选择供应商代表', trigger: 'blur' },
-				],
-				buyerId: [
-					{ required: true, type: 'number',message: '请选择采购员', trigger: 'blur' }
-				],
-				warehouseId: [
-					{ required: true, type: 'number',message: '请选择仓库点', trigger: 'blur' }
-				],
-				orderItems: [
-					{ required: true, type: 'array', array: {min:1}, message: '请添加商品', trigger: 'blur' }
-				],
-			}
         };
         },
         mounted() {
-			this.queryBuyers();
-			this.queryCommonOptions();
-			this.queryWarehouseList();
+            this.queryOrderList();
         },
 		activated() {
+
 		},
         watch: {
         	orderItems: function () {
@@ -438,33 +344,34 @@
         	}
         },
         methods: {
+            rowClassName(row, index) {
+                if (row.status) {
+                    return 'table-row-' + row.status.toLowerCase();
+                }
+                return '';
+            },
             queryOrderList() {
                 var self = this;
+                this.orderList = [];
+                this.orderItems = [];
                 if (this.dateRange && this.dateRange.length == 2) {
                     this.query['startDate'] = this.dateRange[0];
                     this.query['endDate'] = this.dateRange[1];
                 }
                 util.ajax.post('/buy/list', this.query)
                         .then(function (response) {
-                            self.orderList = response.data;
+                            if (response.status === 200 && response.data) {
+                                self.orderList = response.data;
+                                if (self.orderList && self.orderList.length > 0) {
+                                    self.handleSelectBuyOrder(self.orderList[0]);
+                                }
+                            }
                         })
                         .catch(function (error) {
                             console.log(error);
                         });
             },
-			queryWarehouseList() {
-				var self = this;
-				util.ajax.get('/warehouse/list')
-						.then(function (response) {
-							self.warehouseOptions = response.data;
-							if (self.warehouseOptions.length === 1) {
-								self.buyOrder.warehouseId = self.warehouseOptions[0].id;
-							}
-						})
-						.catch(function (error) {
-							console.log(error);
-						});
-			},
+
 			querySupplier (query) {
 				var self = this;
                 if (query !== '') {
@@ -481,125 +388,61 @@
                     this.supplierOptions = [];
                 }
             },
-			queryBuyers() {
-				var self = this;
-				util.ajax.get('/userrole/list', {params: {roleQuery: 'ROLE_BUYER;ROLE_BUYER_SPECIAL'} })
-						.then(function (response) {
-							if (response.status === 200 && response.data) {
-								self.buyerOptions = response.data;
-							}
-						})
-						.catch(function (error) {
-							console.log(error);
-						})
-			},
-			onSelectSupplier(item) {
-				this.$refs.supplierContactSelect.clearSingleSelect();
-				this.querySupplierContact(item);
-			},
-			querySupplierContact(supplierId) {
-				var self = this;
-				if (supplierId) {
-					this.supplierContactLoading = true;
-					util.ajax.get('/supplier/contact/list', {params: {supplierId: supplierId}})
-						.then(function (response) {
-							self.supplierContactLoading = false;
-							self.supplierContactOptions = response.data;
-                            if (self.supplierContactOptions.length === 1) {
-                                self.buyOrder.supplierContactId = self.supplierContactOptions[0].id;
-                            }
-						})
-						.catch(function (error) {
-							console.log(error);
-						});
-				} else {
-					this.supplierContactOptions = [];
-				}
-			},
-            queryGoods (query) {
-				var self = this;
-                if (query !== '') {
-                    this.goodsLoading = true;
-                    util.ajax.get('/goods/list', 
-                    	{ params: 
-                    		{search: query, page: 1, size: 10}
-                    	})
-                        .then(function (response) {
-                        	self.goodsLoading = false;
-                            self.goodsOptions = response.data.data;
-                        })
-                        .catch(function (error) {
-                            console.log(error);
-                        });
+            handleSelectBuyOrder(row) {
+                var self = this;
+                util.ajax.get('/buy/orderdetail/' + row.id)
+                    .then(function (response) {
+                        if (response.status === 200 && response.data) {
+                            self.orderItems = response.data;
+                        }
+                    })
+                    .catch(function (error) {
+                        console.log(error);
+                    })
+            },
+            showCheckModal() {
+                var rows = this.$refs.buyOrderListTable.getSelection();
+                if (!rows || rows.length === 0) {
+                    this.$Message.warning('请选择订单');
+                } else if (rows.length > 1) {
+                    this.$Message.warning('请一次选择一条订单');
                 } else {
-                    this.goodsOptions = [];
+                    this.orderTitle = '订单ID:' + rows[0].id + ' 供应商:' + rows[0].supplier;
+                    this.checkModalShow = true;
                 }
             },
-            handleRowDbClick(row) {
-            	this.$Modal.confirm({
-                    title: '确认删除商品？',
-                    content: '<p>确认删除商品 ' + row.name + '?</p>',
-                    onOk: () => {
-                        for (var i=0; i< this.orderItems.length; i++) {
-							if (row.id === this.orderItems[i].id) {
-								this.orderItems.splice(i, 1);
-								this.buyOrder.orderItemIds.splice(i, 1);
-							}
-						}
-                    },
-                    onCancel: () => {
-                        
-                    }
-                });
-            },
-            onSelectGoods(goodsId) {
-            	var goods = this.goodsOptions.filter( o => o.id === goodsId );
-            	if (goods && goods.length == 1) {
-            		var index = this.buyOrder.orderItemIds.indexOf(goodsId);
-            		if (index < 0) {
-            			var obj = goods[0];
-            			obj['amount'] = 0;
-            			this.orderItems.push(goods[0]);
-            			this.buyOrder.orderItemIds.push(goodsId);
-            			var self = this;
-            			setTimeout(function() {
-            				self.$refs.buyOrderTable.$el.querySelector(".ivu-table-body tr:last-child input").focus();
-            			}, 400);
-            		} else {
-            			this.$Message.warning("该商品已经添加");
-            		}
-				}
-				this.$refs.goodsSelect.clearSingleSelect();
-            },
-			queryCommonOptions() {
-				var self = this;
-				util.ajax.post('/options/list', ['SHIP_METHOD', 'SHIP_TOOL', 'TEMPER_CONTROL'])
-						.then(function (response) {
-							if (response.status === 200) {
-								self.shipMethodOptions = response.data['SHIP_METHOD'];
-								self.shipToolOptions = response.data['SHIP_TOOL'];
-								self.temperControlOptions = response.data['TEMPER_CONTROL'];
-								if (self.shipMethodOptions.length == 1) {
-									self.buyOrder.shipMethodId = self.shipMethodOptions[0].id;
-								}
-								if (self.shipToolOptions.length == 1) {
-									self.buyOrder.shipToolId = self.shipToolOptions[0].id;
-								}
-								if (self.temperControlOptions.length == 1) {
-									self.buyOrder.temperControlId = self.temperControlOptions[0].id;
-								}
-							}
-						})
-						.catch(function (error) {
-							console.log(error);
-						});
-			},
-
-
+            setChecked(result) {
+                var self = this;
+                var rows = this.$refs.buyOrderListTable.getSelection();
+                if (!rows || rows.length === 0) {
+                    this.$Message.warning('请选择订单');
+                } else if (rows.length > 1) {
+                    this.$Message.warning('请一次选择一条订单');
+                } else if (rows.length == 1) {
+                    util.ajax.post('/buy/status', {
+                            orderId: rows[0].id,
+                            orderStatus: result ? 'CHECKED':'REJECTED',
+                            checkResult: this.checkResult
+                        })
+                        .then(function (response) {
+                            self.checkModalShow = false;
+                            if (response.status === 200) {
+                                self.queryOrderList();
+                            }
+                        })
+                        .catch(function (error) {
+                            self.checkModalShow = false;
+                            console.log(error);
+                        })
+                }
+            }
         }
     };
 </script>
 
 <style>
-
+    .ivu-table .table-row-checking {
+        background-color: #2db7f5;
+        color: #fff;
+    }
 </style>

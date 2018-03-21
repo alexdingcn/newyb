@@ -4,8 +4,9 @@ public enum BuyOrderStatus {
     INIT,
     CHECKING,
     CHECKED,
+    REJECTED,
     SHIPPING,
     SHIPPED,
-    UNKNOWN;
-
+    UNKNOWN,
+    ALL;
 }
