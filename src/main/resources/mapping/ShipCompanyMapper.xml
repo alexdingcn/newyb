@@ -17,6 +17,7 @@
     <result column="contact_phone" jdbcType="VARCHAR" property="contactPhone" />
     <result column="posecode" jdbcType="VARCHAR" property="posecode" />
     <result column="address" jdbcType="VARCHAR" property="address" />
+    <result column="comment" jdbcType="VARCHAR" property="comment" />
     <result column="create_by" jdbcType="VARCHAR" property="createBy" />
     <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
     <result column="update_by" jdbcType="VARCHAR" property="updateBy" />
@@ -24,7 +25,7 @@
   </resultMap>
   <sql id="Base_Column_List">
     id, company_id, name, disabled, license, license_exp, license_file_no, employee, 
-    phone, fax, email, contact_user, contact_phone, posecode, address, create_by, create_time, 
+    phone, fax, email, contact_user, contact_phone, posecode, address, comment, create_by, create_time,
     update_by, update_time
   </sql>
   <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
@@ -42,14 +43,14 @@
       disabled, license, license_exp, 
       license_file_no, employee, phone, 
       fax, email, contact_user, 
-      contact_phone, posecode, address, 
+      contact_phone, posecode, address, comment,
       create_by, create_time, update_by, 
       update_time)
     values (#{companyId,jdbcType=INTEGER}, #{name,jdbcType=VARCHAR},
       #{disabled,jdbcType=BIT}, #{license,jdbcType=VARCHAR}, #{licenseExp,jdbcType=DATE}, 
       #{licenseFileNo,jdbcType=VARCHAR}, #{employee,jdbcType=VARCHAR}, #{phone,jdbcType=VARCHAR}, 
       #{fax,jdbcType=VARCHAR}, #{email,jdbcType=VARCHAR}, #{contactUser,jdbcType=VARCHAR}, 
-      #{contactPhone,jdbcType=VARCHAR}, #{posecode,jdbcType=VARCHAR}, #{address,jdbcType=VARCHAR}, 
+      #{contactPhone,jdbcType=VARCHAR}, #{posecode,jdbcType=VARCHAR}, #{address,jdbcType=VARCHAR}, #{comment,jdbcType=VARCHAR},
       #{createBy,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, #{updateBy,jdbcType=VARCHAR}, 
       #{updateTime,jdbcType=TIMESTAMP})
   </insert>
@@ -97,6 +98,9 @@
       </if>
       <if test="address != null">
         address,
+      </if>
+      <if test="comment != null">
+        comment,
       </if>
       <if test="createBy != null">
         create_by,
@@ -154,6 +158,9 @@
       <if test="address != null">
         #{address,jdbcType=VARCHAR},
       </if>
+      <if test="comment != null">
+        #{comment,jdbcType=VARCHAR},
+      </if>
       <if test="createBy != null">
         #{createBy,jdbcType=VARCHAR},
       </if>
@@ -210,6 +217,9 @@
       <if test="address != null">
         address = #{address,jdbcType=VARCHAR},
       </if>
+      <if test="comment != null">
+        comment = #{comment,jdbcType=VARCHAR},
+      </if>
       <if test="createBy != null">
         create_by = #{createBy,jdbcType=VARCHAR},
       </if>
@@ -241,6 +251,7 @@
       contact_phone = #{contactPhone,jdbcType=VARCHAR},
       posecode = #{posecode,jdbcType=VARCHAR},
       address = #{address,jdbcType=VARCHAR},
+      comment = #{comment,jdbcType=VARCHAR},
       create_by = #{createBy,jdbcType=VARCHAR},
       create_time = #{createTime,jdbcType=TIMESTAMP},
       update_by = #{updateBy,jdbcType=VARCHAR},

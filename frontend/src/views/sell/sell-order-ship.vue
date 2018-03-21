@@ -367,7 +367,7 @@ export default {
         getShipCompanyList() {
             util.ajax.get("/ship/list")
             .then((response) => {
-                this.shipCompanyList = response.data;
+                this.shipCompanyList = response.data.data;
             })
             .catch((error) => {
               util.errorProcessor(this, error);

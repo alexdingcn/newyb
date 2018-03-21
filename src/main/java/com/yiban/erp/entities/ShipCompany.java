@@ -33,6 +33,8 @@ public class ShipCompany {
 
     private String address;
 
+    private String comment;
+
     private String createBy;
 
     private Date createTime;
@@ -191,5 +193,13 @@ public class ShipCompany {
 
     public void setUpdateTime(Date updateTime) {
         this.updateTime = updateTime;
+    }
+
+    public String getComment() {
+        return comment;
+    }
+
+    public void setComment(String comment) {
+        this.comment = comment;
     }
 }

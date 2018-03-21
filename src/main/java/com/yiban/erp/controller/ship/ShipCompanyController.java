@@ -8,6 +8,7 @@ import com.yiban.erp.entities.User;
 import com.yiban.erp.exception.BizException;
 import com.yiban.erp.exception.ErrorCode;
 import com.yiban.erp.util.UtilTool;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,10 +37,12 @@ public class ShipCompanyController {
                                        @AuthenticationPrincipal User user) {
         Integer limit = pageSize == null || pageSize <= 0 ? null : pageSize;
         Integer offset = (pageSize != null && page != null && page > 0) ? (page -1) * limit : null;
-        List<ShipCompany> shipCompanies = shipCompanyMapper.getList(user.getCompanyId(), name, license, offset, limit);
+        String reqName = StringUtils.isBlank(name) ? null : name;
+        String reqLicense = StringUtils.isBlank(license) ? null : license;
+        List<ShipCompany> shipCompanies = shipCompanyMapper.getList(user.getCompanyId(), reqName, reqLicense, offset, limit);
         int count = 0;
         if (!shipCompanies.isEmpty()) {
-            count = shipCompanyMapper.getListCount(user.getCompanyId(), name, license);
+            count = shipCompanyMapper.getListCount(user.getCompanyId(), reqName, reqLicense);
         }
         JSONObject response = new JSONObject();
         response.put("data", shipCompanies);
