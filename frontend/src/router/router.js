@@ -97,7 +97,8 @@ export const appRouter = [
             { path: 'buyer', title: '采购员', name: 'basic_data_buyer', component: () => import('@/views/basic-data/buyer.vue') },
             { path: 'sale', title: '销售员', name: 'basic_data_sale', component: () => import('@/views/basic-data/sale.vue') },
             { path: 'price', title: '价格设置', name: 'basic_data_price', component: () => import('@/views/basic-data/price.vue') },
-            { path: 'file', title: '档案管理', name: 'basic_data_file', component: () => import('@/views/basic-data/file.vue') }
+            { path: 'file', title: '档案管理', name: 'basic_data_file', component: () => import('@/views/basic-data/file.vue') },
+            { path: 'file', title: '运输公司档案', name: 'basic_data_ship', component: () => import('@/views/basic-data/ship.vue') }
         ]
     },
 {
