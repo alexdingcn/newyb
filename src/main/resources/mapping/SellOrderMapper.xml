@@ -396,12 +396,42 @@
     limit #{offset}, #{limit};
   </select>
 
-  <select id="getReviewList" parameterType="map" resultMap="ListMap">
+  <select id="getAllCount" parameterType="map" resultType="java.lang.Integer">
+    select count(1)
+    from sell_order s
+    where s.company_id = #{companyId}
+    <if test="status != null" >
+      and s.status = #{status}
+    </if>
+    <if test="customerId != null" >
+      and s.customer_id = #{customerId}
+    </if>
+    <if test="orderNumber != null" >
+      <bind name="orderNumberVal" value="orderNumber + '%'"/>
+      and s.order_number like #{orderNumberVal}
+    </if>
+    <if test="salerId != null">
+      and s.saler_id = #{salerId}
+    </if>
+    <if test="startDate != null" >
+      and s.create_order_date >= #{startDate}
+    </if>
+    <if test="endDate != null" >
+      and s.create_order_date &lt;= #{endDate}
+    </if>
+  </select>
+
+  <select id="getAllList" parameterType="map" resultMap="ListMap">
     select <include refid="ListColumn" />
     from sell_order s, customer c, customer_rep r
     where s.customer_id = c.id and s.customer_rep_id = r.id
       and s.company_id = #{companyId}
-      and s.status = #{status}
+      <if test="status != null" >
+        and s.status = #{status}
+      </if>
+      <if test="customerId != null" >
+        and s.customer_id = #{customerId}
+      </if>
       <if test="orderNumber != null" >
         <bind name="orderNumberVal" value="orderNumber + '%'"/>
         and s.order_number like #{orderNumberVal}
@@ -410,10 +440,14 @@
         and s.saler_id = #{salerId}
       </if>
       <if test="startDate != null" >
-        and s.create_order_date &lt;= #{startDate}
+        and s.create_order_date >= #{startDate}
       </if>
       <if test="endDate != null" >
-        and s.create_order_date >= #{endDate}
+        and s.create_order_date &lt;= #{endDate}
+      </if>
+      order by id desc
+      <if test="offset != null and limit!= null" >
+        limit #{offset}, #{limit} ;
       </if>
   </select>
 

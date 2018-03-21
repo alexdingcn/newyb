@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.yiban.erp.dao.SellOrderMapper;
 import com.yiban.erp.entities.SellOrder;
 import com.yiban.erp.entities.SellOrderDetail;
+import com.yiban.erp.entities.SellOrderShip;
 import com.yiban.erp.entities.User;
 import com.yiban.erp.exception.BizException;
 import com.yiban.erp.exception.ErrorCode;
@@ -20,9 +21,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 @RestController
 @RequestMapping("/sell")
@@ -118,24 +117,6 @@ public class SellOrderController {
         return ResponseEntity.ok().body(result.toJSONString());
     }
 
-    @RequestMapping(value = "/order/review/list", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> reviewList(HttpServletRequest request,
-                                             @AuthenticationPrincipal User user) throws Exception {
-        String reviewType = request.getParameter("reviewType");
-        String orderNumber = request.getParameter("orderNumber");
-        String salerIdStr = request.getParameter("salerId");
-        String startDateStr = request.getParameter("startDate");
-        String endDateStr = request.getParameter("endDate");
-        logger.debug("user:{} get review list by params:{}, {}, {}, {}, {}", user.getId(),
-                reviewType, orderNumber, salerIdStr, startDateStr, endDateStr);
-        Integer salerId = StringUtils.isBlank(salerIdStr) ? null : Integer.parseInt(salerIdStr);
-        Date startDate = StringUtils.isBlank(startDateStr) ? null : new Date(Long.valueOf(startDateStr));
-        Date endDate = StringUtils.isBlank(endDateStr) ? null : new Date(Long.valueOf(endDateStr));
-        List<SellOrder> result = sellOrderService.getReviewList(user.getCompanyId(), reviewType, orderNumber, salerId,
-                startDate, endDate);
-        return ResponseEntity.ok().body(JSON.toJSONString(result));
-    }
-
     @RequestMapping(value = "/order/review/submit", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> submitReview(@RequestBody String reqJson,
                                                @AuthenticationPrincipal User user) throws Exception {
@@ -157,6 +138,64 @@ public class SellOrderController {
         }else {
             return ResponseEntity.ok().body(JSON.toJSONString(order));
         }
+    }
+
+    @RequestMapping(value = "/order/ship/list", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> getShipList(@RequestParam("orderId") Long orderId) throws Exception {
+        List<SellOrderShip> ships = sellOrderService.getOrderShipRecords(orderId);
+        return ResponseEntity.ok().body(JSON.toJSONString(ships));
+    }
+
+    @RequestMapping(value = "/order/ship/save", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> saveShipRecord(@RequestBody SellOrderShip ship,
+                                                 @AuthenticationPrincipal User user) throws Exception {
+        logger.info("user:{} request save ship record.", user.getId());
+        SellOrderShip result = sellOrderService.saveOrderShip(user, ship);
+        return ResponseEntity.ok().body(JSON.toJSONString(result));
+    }
+
+    @RequestMapping(value = "/order/ship/remove/{id}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> removeShip(@PathVariable Long id,
+                                             @AuthenticationPrincipal User user) throws Exception {
+        logger.info("user:{} request remove ship record by id:{}", user.getId(), id);
+        sellOrderService.removeOrderShip(user, id);
+        return ResponseEntity.ok().build();
+    }
+
+    @RequestMapping(value = "/order/all/list", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> allList(HttpServletRequest request,
+                                          @AuthenticationPrincipal User user) throws Exception {
+        String status = request.getParameter("status");
+        String customerIdStr = request.getParameter("customerId");
+        String orderNumber = request.getParameter("orderNumber");
+        String salerIdStr = request.getParameter("salerId");
+        String startDateStr = request.getParameter("startDate");
+        String endDateStr = request.getParameter("endDate");
+        String page = request.getParameter("page");
+        String size = request.getParameter("size");
+
+        Map<String, Object> map = new HashMap<>();
+        map.put("status", status);
+        map.put("companyId", user.getCompanyId());
+        map.put("orderNumber", orderNumber);
+        map.put("customerId", StringUtils.isBlank(customerIdStr) ? null : Integer.parseInt(customerIdStr));
+        map.put("salerId", StringUtils.isBlank(salerIdStr) ? null : Integer.parseInt(salerIdStr));
+        map.put("startDate", StringUtils.isBlank(startDateStr) ? null : new Date(Long.valueOf(startDateStr)));
+        map.put("endDate", StringUtils.isBlank(endDateStr) ? null : new Date(Long.valueOf(endDateStr)));
+        Integer limit = StringUtils.isBlank(size) ? null : Integer.parseInt(size);
+        Integer pageNum = StringUtils.isBlank(page) || limit == null ? null : Integer.parseInt(page);
+        Integer offset = pageNum != null && limit != null ? ((pageNum -1) * limit) : null;
+        map.put("offset", offset);
+        map.put("limit", limit);
+        List<SellOrder> result = sellOrderMapper.getAllList(map);
+        int count = 0;
+        if (result.size() > 0) {
+            count = sellOrderMapper.getAllCount(map);
+        }
+        JSONObject response = new JSONObject();
+        response.put("data", result);
+        response.put("count", count);
+        return ResponseEntity.ok().body(response.toJSONString());
     }
 
 }

@@ -1,13 +1,12 @@
 package com.yiban.erp.service.sell;
 
+import com.alibaba.fastjson.JSON;
 import com.yiban.erp.constant.SellOrderStatus;
 import com.yiban.erp.dao.GoodsMapper;
 import com.yiban.erp.dao.SellOrderDetailMapper;
 import com.yiban.erp.dao.SellOrderMapper;
-import com.yiban.erp.entities.Goods;
-import com.yiban.erp.entities.SellOrder;
-import com.yiban.erp.entities.SellOrderDetail;
-import com.yiban.erp.entities.User;
+import com.yiban.erp.dao.SellOrderShipMapper;
+import com.yiban.erp.entities.*;
 import com.yiban.erp.exception.BizException;
 import com.yiban.erp.exception.BizRuntimeException;
 import com.yiban.erp.exception.ErrorCode;
@@ -33,6 +32,8 @@ public class SellOrderService {
     private SellOrderDetailMapper sellOrderDetailMapper;
     @Autowired
     private GoodsMapper goodsMapper;
+    @Autowired
+    private SellOrderShipMapper sellOrderShipMapper;
 
     public List<SellOrder> getList(Integer companyId, Integer customerId, Integer salerId,
                                             String refNo, String status, Date createOrderDate, Integer page, Integer size) {
@@ -217,18 +218,6 @@ public class SellOrderService {
     }
 
 
-    public List<SellOrder> getReviewList(Integer companyId, String reviewType, String orderNumber,
-                                         Integer salerId, Date startDate, Date endDate) throws BizException{
-        Map<String, Object> map = new HashMap<>();
-        map.put("companyId", companyId);
-        map.put("status", reviewType);
-        map.put("orderNumber", orderNumber);
-        map.put("salerId", salerId);
-        map.put("startDate", startDate);
-        map.put("endDate", endDate);
-        return sellOrderMapper.getReviewList(map);
-    }
-
     public void submitOrderReview(User user, String reviewType, List<Long> idList) throws BizException {
         if (StringUtils.isBlank(reviewType) || idList == null || idList.isEmpty()) {
             logger.warn("submit order review info but params is null.");
@@ -279,4 +268,46 @@ public class SellOrderService {
     }
 
 
+    public List<SellOrderShip> getOrderShipRecords(Long orderId) {
+        if (orderId == null || orderId <= 0) {
+            return Collections.emptyList();
+        }
+        return sellOrderShipMapper.getBySellOrderId(orderId);
+    }
+
+    public SellOrderShip saveOrderShip(User user, SellOrderShip sellOrderShip) throws BizException  {
+        SellOrderShip reqShip = UtilTool.trimString(sellOrderShip);
+        if (reqShip == null || reqShip.getSellOrderId() == null ||reqShip.getShipCompanyId() == null) {
+            logger.warn("user:{} save ship info but sell order id or ship company id is null", user.getId());
+            throw new BizException(ErrorCode.SELL_ORDER_SHIP_PARAMS);
+        }
+        SellOrder order = sellOrderMapper.selectByPrimaryKey(reqShip.getSellOrderId());
+        if (order == null) {
+            logger.warn("user:{} save ship record info but sell order get fail by id:{}", user.getId(), reqShip.getSellOrderId());
+            throw new BizException(ErrorCode.SELL_ORDER_SHIP_PARAMS);
+        }
+        if (reqShip.getId() != null) {
+            reqShip.setUpdateBy(user.getNickname());
+            reqShip.setUpdateTime(new Date());
+            sellOrderShipMapper.updateByPrimaryKeySelective(reqShip);
+            return reqShip;
+        }else {
+            reqShip.setCreateBy(user.getNickname());
+            reqShip.setCreateTime(new Date());
+            sellOrderShipMapper.insertSelective(reqShip);
+            return reqShip;
+        }
+    }
+
+    public int removeOrderShip(User user, Long id) throws BizException {
+        if (id == null) {
+            throw new BizException(ErrorCode.SELL_ORDER_SHIP_NOT_FUND);
+        }
+        SellOrderShip sellOrderShip = sellOrderShipMapper.selectByPrimaryKey(id);
+        if (sellOrderShip == null) {
+            throw new BizException(ErrorCode.SELL_ORDER_SHIP_NOT_FUND);
+        }
+        logger.info("user:{} remove sell ship record:{}", user.getId(), JSON.toJSONString(sellOrderShip));
+        return sellOrderShipMapper.deleteByPrimaryKey(id);
+    }
 }

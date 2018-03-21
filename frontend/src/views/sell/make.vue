@@ -144,7 +144,7 @@
                     </Row>
                 </Form>
             </Row>
-            <Tabs type="card">
+            <Tabs type="line">
                 <TabPane label="商品信息" name="goodInfo">
                     <Row type="flex" justify="start">
                         <ButtonGroup size="small">
@@ -162,119 +162,6 @@
                             :columns-list="goodTableColumn" 
                             @on-delete="goodRemoveItem">
                         </can-edit-table>
-                    </Row>
-                </TabPane>
-                <TabPane label="运输登记" name="shipRecord">
-                    <Form ref="shipForm" :model="shipFormItem" :label-width="100">
-                        <Row type="flex" justify="start">
-                            <Col span="6">
-                                <FormItem label="发货日期">
-                                    <DatePicker v-model="shipFormItem.issuanceDate" type="date" placeholder="请选择发货日期" ></DatePicker>
-                                </FormItem>
-                            </Col>
-                            <Col span="6">
-                                <FormItem label="货单号">
-                                    <Input type="text" v-model="shipFormItem.transportNo" placeholder="请输入货单号"></Input>
-                                </FormItem>
-                            </Col>
-                            <Col span="12">
-                                <FormItem label="发货地址">
-                                    <Input type="text" v-model="shipFormItem.issuanceAddress" placeholder="请输入发货地址"></Input>
-                                </FormItem>
-                            </Col>
-                        </Row>
-                        <Row type="flex" justify="start">
-                            <Col span="6">
-                                <FormItem label="存储条件">
-                                    <Input type="text" v-model="shipFormItem.storageCondition" placeholder="请输入存储条件"></Input>
-                                </FormItem>
-                            </Col>
-                            <Col span="6">
-                                <FormItem label="运输工具">
-                                    <Input type="text" v-model="shipFormItem.conveyance" placeholder="请输入运输工具"></Input>
-                                </FormItem>
-                            </Col>
-                            <Col span="12">
-                                <FormItem label="承运单位">
-                                    <Select v-model="sellOrderFormData.bearCompany" filterable clearable placeholder="请选择承运单位">
-                                        <Option v-for="item in bearCompanyList" :value="item.id" :key="item.id">{{ item.name }}</Option>
-                                    </Select>
-                                </FormItem>
-                            </Col>
-                        </Row>
-                        <Row type="flex" justify="start">
-                            <Col span="6">
-                                <FormItem label="车牌号">
-                                    <Input type="text" v-model="shipFormItem.carNumber" placeholder="请输入车牌号"></Input>
-                                </FormItem>
-                            </Col>
-                            <Col span="6">
-                                <FormItem label="运输方式">
-                                    <Input type="text" v-model="shipFormItem.transportMode" placeholder="请输入运输方式"></Input>
-                                </FormItem>
-                            </Col>
-                            <Col span="6">
-                                <FormItem label="承运电话">
-                                    <Input type="text" v-model="shipFormItem.bearPhone" placeholder="请输入承运电话"></Input>
-                                </FormItem>
-                            </Col>
-                            <Col span="5">
-                                <FormItem label="驾驶员">
-                                    <Select v-model="sellOrderFormData.carDriver" filterable clearable placeholder="请选择承运单位">
-                                        <Option v-for="item in carDriverList" :value="item.id" :key="item.id">{{ item.name }}</Option>
-                                    </Select>
-                                </FormItem>
-                            </Col>
-                            <Col span="1">
-                                <Button type="info" size="small">驾照</Button>
-                            </Col>
-                        </Row>
-                        <Row type="flex" justify="start">
-                            <Col span="6">
-                                <FormItem label="起运温度(℃)">
-                                    <InputNumber v-model="shipFormItem.transTemperature" :precision="2" style="width: 100%"></InputNumber>
-                                </FormItem>
-                            </Col>
-                            <Col span="6">
-                                <FormItem label="件数">
-                                    <InputNumber v-model="shipFormItem.goodsCount" :min="0" style="width: 100%"></InputNumber>
-                                </FormItem>
-                            </Col>
-                            <Col span="6">
-                                <FormItem label="委托经办人">
-                                    <Input type="text" v-model="shipFormItem.operatorName" placeholder="请输入委托经办人"></Input>
-                                </FormItem>
-                            </Col>
-                            <Col span="6">
-                                <FormItem label="运行里程(km)">
-                                    <InputNumber v-model="shipFormItem.runMileage" :precision="2" :min="0" style="width: 100%"></InputNumber>
-                                </FormItem>
-                            </Col>
-                        </Row>
-                        <Row type="flex" justify="start">
-                            <Col span="6">
-                                <FormItem label="计划启运时间">
-                                    <DatePicker v-model="shipFormItem.planStartTime" placement="top" 
-                                        type="datetime" format="yyyy-MM-dd HH:mm" placeholder="请选择计划启运时间" >
-                                    </DatePicker>
-                                </FormItem>
-                            </Col>
-                            <Col span="6">
-                                <FormItem label="计划到货时间">
-                                    <DatePicker v-model="shipFormItem.planEndTime" placement="top" 
-                                        type="datetime" format="yyyy-MM-dd HH:mm" placeholder="请选择计划到货时间" >
-                                    </DatePicker>
-                                </FormItem>
-                            </Col>
-                            <Col span="12">
-                                <FormItem label="备注">
-                                    <Input type="text" v-model="shipFormItem.comment" ></Input>
-                                </FormItem>
-                            </Col>
-                        </Row>
-                    </Form>
-                    <Row type="flex" justify="center">
-                        <Button type="success" >保存</Button>
                     </Row>
                 </TabPane>
             </Tabs>
@@ -467,28 +354,7 @@ export default {
           currChooseCustomer: null,
           customerSearchModal: false,
           customerRepList: [],
-          salerList: [],
-          bearCompanyList: [],
-          carDriverList: [],
-          shipFormItem: {
-              issuanceDate: '',
-              transportNo: '',
-              issuanceAddress: '',
-              storageCondition: '',
-              conveyance: '',
-              bearCompany: '',
-              carNumber: '',
-              transportMode: '',
-              bearPhone: '',
-              carDriver: '',
-              transTemperature: 20,
-              goodsCount: 0,
-              operatorName: '',
-              runMileage: 0,
-              planStartTime: '',
-              planEndTime: '',
-              comment: ''
-          }
+          salerList: []
       }
   },
   mounted() {

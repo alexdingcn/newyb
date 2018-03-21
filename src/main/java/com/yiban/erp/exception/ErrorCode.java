@@ -60,6 +60,8 @@ public enum ErrorCode {
     SELL_ORDER_REVIEW_SUBMIT_PARAMS(2206, "获取审核参数失败"),
     SELL_ORDER_REVIEW_SUBMIT_ID_ERROR(2207, "存在获取不到需要审核的订单信息"),
     SELL_ORDER_REVIEW_STATUS_ERROR(2208, "存在审批状态错误的数据", ErrorDisplay.NOTICE),
+    SELL_ORDER_SHIP_PARAMS(2209, "运输记录必输项信息缺失"),
+    SELL_ORDER_SHIP_NOT_FUND(2210, "获取运输记录失败"),
 
 
 
