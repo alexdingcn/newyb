@@ -63,6 +63,9 @@ public enum ErrorCode {
     SELL_ORDER_SHIP_PARAMS(2209, "运输记录必输项信息缺失"),
     SELL_ORDER_SHIP_NOT_FUND(2210, "获取运输记录失败"),
 
+    // 23xx -承运公司
+    SHIP_SAVE_PARAMS_ERROR(2301, "必输参数校验失败"),
+
 
 
 

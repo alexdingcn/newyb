@@ -11,11 +11,29 @@ public class ShipCompany {
 
     private Boolean disabled;
 
+    private String license;
+
+    private Date licenseExp;
+
+    private String licenseFileNo;
+
+    private String employee;
+
+    private String phone;
+
+    private String fax;
+
+    private String email;
+
     private String contactUser;
 
     private String contactPhone;
 
+    private String posecode;
+
     private String address;
+
+    private String comment;
 
     private String createBy;
 
@@ -57,6 +75,62 @@ public class ShipCompany {
         this.disabled = disabled;
     }
 
+    public String getLicense() {
+        return license;
+    }
+
+    public void setLicense(String license) {
+        this.license = license == null ? null : license.trim();
+    }
+
+    public Date getLicenseExp() {
+        return licenseExp;
+    }
+
+    public void setLicenseExp(Date licenseExp) {
+        this.licenseExp = licenseExp;
+    }
+
+    public String getLicenseFileNo() {
+        return licenseFileNo;
+    }
+
+    public void setLicenseFileNo(String licenseFileNo) {
+        this.licenseFileNo = licenseFileNo == null ? null : licenseFileNo.trim();
+    }
+
+    public String getEmployee() {
+        return employee;
+    }
+
+    public void setEmployee(String employee) {
+        this.employee = employee == null ? null : employee.trim();
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone == null ? null : phone.trim();
+    }
+
+    public String getFax() {
+        return fax;
+    }
+
+    public void setFax(String fax) {
+        this.fax = fax == null ? null : fax.trim();
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email == null ? null : email.trim();
+    }
+
     public String getContactUser() {
         return contactUser;
     }
@@ -71,6 +145,14 @@ public class ShipCompany {
 
     public void setContactPhone(String contactPhone) {
         this.contactPhone = contactPhone == null ? null : contactPhone.trim();
+    }
+
+    public String getPosecode() {
+        return posecode;
+    }
+
+    public void setPosecode(String posecode) {
+        this.posecode = posecode == null ? null : posecode.trim();
     }
 
     public String getAddress() {
@@ -111,5 +193,13 @@ public class ShipCompany {
 
     public void setUpdateTime(Date updateTime) {
         this.updateTime = updateTime;
+    }
+
+    public String getComment() {
+        return comment;
+    }
+
+    public void setComment(String comment) {
+        this.comment = comment;
     }
 }
