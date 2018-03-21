@@ -115,7 +115,11 @@
                 for (var key in this.buyers) {
                     params.push(this.buyers[key]);
                 }
-                util.ajax.post('/userrole/save', params)
+                let reqData = {
+                    roleTypes:  ['ROLE_BUYER', 'ROLE_BUYER_SPECIAL'],
+                    roles: params
+                };
+                util.ajax.post('/userrole/save', reqData)
                     .then(function (response) {
                         if (response.status === 200 && response.data) {
                             self.$Message.info("保存采购员列表成功");

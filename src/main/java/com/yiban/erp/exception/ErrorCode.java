@@ -15,6 +15,7 @@ public enum ErrorCode {
     LOGIN_PASSWORD_MISSING(1103, "请输入密码"),
     USER_REGISTER_FAIL(1104, "用户创建失败"),
     USER_GET_FAIL(1105, "获取当前客户信息失败", ErrorDisplay.NOTICE),
+    USER_ROLE_SAVE_PARAMS(1106, "保存用户角色信息参数错误", ErrorDisplay.NOTICE),
 
     // 12xx - 商品
     GOODS_CATEGORY_ID_MISSING(1201, "缺失商品分类ID"),

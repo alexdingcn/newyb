@@ -1,9 +1,13 @@
 package com.yiban.erp.controller.user;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.yiban.erp.dao.UserRoleMapper;
+import com.yiban.erp.dto.SaveUserRoleReq;
 import com.yiban.erp.entities.User;
 import com.yiban.erp.entities.UserRole;
+import com.yiban.erp.exception.BizException;
+import com.yiban.erp.exception.ErrorCode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,10 +52,17 @@ public class UserRoleController {
      * @return
      */
     @RequestMapping(value = "/save", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> saveBuyers(@AuthenticationPrincipal User user,
-                                             @RequestBody List<UserRole> roles) {
+    public ResponseEntity<String> saveUserRoles(@AuthenticationPrincipal User user,
+                                                @RequestBody SaveUserRoleReq roleReq) throws Exception {
+
+        if (roleReq == null || roleReq.getRoles() == null || roleReq.getRoleTypes() == null
+                || roleReq.getRoleTypes().isEmpty()) {
+            logger.warn("update user roles params is error. params:{}", JSON.toJSONString(roleReq));
+            throw new BizException(ErrorCode.USER_ROLE_SAVE_PARAMS);
+        }
+        List<UserRole> roles = roleReq.getRoles();
         logger.info("update user roles");
-        List<UserRole> userRoleList = userRoleMapper.findByRoles(null, user.getCompanyId());
+        List<UserRole> userRoleList = userRoleMapper.findByRoles(roleReq.getRoleTypes(), user.getCompanyId());
         Map<String, UserRole> roleMap = new HashMap<>();
         Map<Long, UserRole> idRoleMap = new HashMap<>();
 
