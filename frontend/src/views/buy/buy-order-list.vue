@@ -7,175 +7,59 @@
 	<Row>
 		<Card>
 			<p slot="title" >
-				<Icon type="document"></Icon> 采购单审核
 			</p>
-			<Table border highlight-row
-				   class="margin-top-8"
-				   :columns="orderColumns" :data="orderItems"
-				   ref="buyOrderTable" style="width: 100%;" size="small"
-				   no-data-text="在商品输入框选择后添加"
-				   @on-row-dblclick="handleRowDbClick">
-				<div slot="footer">
-					<h3 class="padding-left-20" >
-						<b>合计金额:</b> ￥{{ totalAmount }}
-					</h3>
-				</div>
-			</Table>
-		</Card>
-		<Card>
-			<div slot="extra">
-				<ButtonGroup class="padding-left-20">
-					<Button type="primary" icon="android-add-circle" @click="saveBuyOrder" :loading="saving">保存</Button>
-				</ButtonGroup>
-			</div>
-
-			<Form :label-width="85" :rules="ruleValidate" :model="buyOrder" ref="buyOrderForm">
+			<div slot="extra" style="width:600px">
 				<Row>
-					<Col span="6">
-					<FormItem label="供应商" prop="supplierId" >
-						<Select
-								v-model="buyOrder.supplierId"
+					<Col span="8">
+						<DatePicker v-model="dateRange" type="daterange" placement="bottom-end" placeholder="订单日期" style="width:180px"></DatePicker>
+					</Col>
+					<Col span="6" class="padding-2">
+						<Select v-model="query.supplierId"
 								filterable
 								clearable
 								remote
-								size="small"
 								@on-change="onSelectSupplier"
-								placeholder="供应商名称/拼音"
+								placeholder="供应商"
 								:remote-method="querySupplier"
 								:loading="supplierLoading">
 							<Option v-for="option in supplierOptions" :value="option.id" :label="option.name" :key="option.id">{{option.name}}</Option>
 						</Select>
-					</FormItem>
 					</Col>
-					<Col span="5">
-					<FormItem label="供应商代表" prop="supplierContactId" >
-						<Select ref="supplierContactSelect"
-								v-model="buyOrder.supplierContactId"
-								clearable
-								size="small"
-								placeholder="供应商代表"
-								:disabled="supplierContactOptions.length === 0"
-								:loading="supplierContactLoading">
-							<Option v-for="option in supplierContactOptions" :value="option.id" :label="option.name" :key="option.id">{{option.name}}</Option>
+					<Col span="5" class="padding-2">
+						<Select v-model="query.status" placeholder="状态">
+							<Option v-for="option in statusOptions" :value="option.key" :label="option.name" :key="option.key">{{option.name}}</Option>
 						</Select>
-					</FormItem>
-					</Col>
-					<Col span="6">
-					<FormItem label="采购员" prop="buyerId">
-						<Select
-								v-model="buyOrder.buyerId"
-								clearable
-								size="small"
-								placeholder="采购员">
-							<Option v-for="option in buyerOptions" :value="option.userId" :label="option.nickname" :key="option.userId">
-								{{option.nickname}}
-								{{option.realname||''}}
-							</Option>
-						</Select>
-					</FormItem>
-					</Col>
-					<Col span="6">
-					<FormItem label="自定单号" prop="refNo">
-						<Input v-model="buyOrder.refNo" size="small"/>
-					</FormItem>
-					</Col>
-				</Row>
-				<Row>
-					<Col span="6">
-					<FormItem label="运输方式" prop="shipMethodId">
-						<Select v-model="buyOrder.shipMethodId" size="small" placeholder="运输方式" clearable>
-							<Option v-for="option in shipMethodOptions" :value="option.id" :label="option.value" :key="option.id">
-								{{option.value}}
-							</Option>
-						</Select>
-					</FormItem>
-					</Col>
-					<Col span="5">
-					<FormItem label="运输工具" prop="shipToolId">
-						<Select v-model="buyOrder.shipToolId" size="small" placeholder="运输工具" clearable>
-							<Option v-for="option in shipToolOptions" :value="option.id" :label="option.value" :key="option.id">
-								{{option.value}}
-							</Option>
-						</Select>
-					</FormItem>
-					</Col>
-					<Col span="6">
-					<FormItem label="温控方式" prop="temperControlId">
-						<Select v-model="buyOrder.temperControlId" size="small" placeholder="温控方式" clearable>
-							<Option v-for="option in temperControlOptions" :value="option.id" :label="option.value" :key="option.id">
-								{{option.value}}
-							</Option>
-						</Select>
-					</FormItem>
-					</Col>
-					<Col span="6">
-					<FormItem label="仓库点" prop="warehouseId">
-						<Select v-model="buyOrder.warehouseId" size="small" placeholder="仓库点" clearable>
-							<Option v-for="option in warehouseOptions" :value="option.id" :label="option.name" :key="option.id">
-								{{option.name}}
-							</Option>
-						</Select>
-					</FormItem>
-					</Col>
-				</Row>
-				<Row>
-					<Col span="6">
-						<FormItem label="选择商品">
-							<Select
-									ref="goodsSelect"
-									filterable
-									clearable
-									remote
-									placeholder="商品名称/拼音"
-									size="small"
-									@on-change="onSelectGoods"
-									:remote-method="queryGoods"
-									:loading="goodsLoading">
-								<Option v-for="option in goodsOptions" :value="option.id" :label="option.name" :key="option.id">
-									<span class="option-goods-name">{{ option.name }}</span>
-									<span class="option-goods-spec">{{ option.spec }} | {{option.factory}}</span>
-								</Option>
-							</Select>
-						</FormItem>
-					</Col>
-					<Col span="5">
-						<FormItem label="预到货日期" prop="eta">
-							<DatePicker type="date" v-model="buyOrder.eta" size="small"/>
-						</FormItem>
-					</Col>
-					<Col span="12">
-						<FormItem label="备注" prop="comment">
-							<Input v-model="buyOrder.comment" size="small"/>
-						</FormItem>
-					</Col>
-					<!--
-                    <Col span="6">
-                        <Button type="primary" icon="ios-list-outline" class="margin-left-5"></Button>
                     </Col>
-                    -->
+                    <Col span="5">
+                        <ButtonGroup>
+                            <Button type="primary" icon="ios-search" @click="queryOrderList"></Button>
+                            <Button type="success" icon="checkmark-round">审核</Button>
+                        </ButtonGroup>
+					</Col>
 				</Row>
-
-				<Table border highlight-row
-					   class="margin-top-8"
-					   :columns="orderColumns" :data="orderItems"
-					   ref="buyOrderTable" style="width: 100%;" size="small"
-					   no-data-text="在商品输入框选择后添加"
-					   @on-row-dblclick="handleRowDbClick">
-					<div slot="footer">
-						<h3 class="padding-left-20" >
-							<b>合计金额:</b> ￥{{ totalAmount }}
-						</h3>
-					</div>
-				</Table>
-
-			</Form>
+			</div>
+			<Table border highlight-row
+				   :columns="orderListColumns" :data="orderList"
+				   ref="buyOrderListTable" size="small"
+				   no-data-text="使用右上方输入搜索条件">
+			</Table>
 		</Card>
-		<Modal v-model="closeConfirm"
-			   title="是否继续下单"
-			   @on-ok="clearData"
-		       @on-cancel="closeTab">
-			<p>是否继续添加下一笔订单?</p>
-		</Modal>
+
+		<Card class="margin-top-8">
+            <Table border highlight-row
+                   class="margin-top-8"
+                   :columns="orderColumns" :data="orderItems"
+                   ref="buyOrderTable" style="width: 100%;" size="small"
+                   no-data-text="在商品输入框选择后添加"
+                   @on-row-dblclick="handleRowDbClick">
+                <div slot="footer">
+                    <h3 class="padding-left-20" >
+                        <b>合计金额:</b> ￥{{ totalAmount }}
+                    </h3>
+                </div>
+            </Table>
+		</Card>
+
 	</Row>
 
 </template>
@@ -189,6 +73,12 @@
         name: 'buy_order',
         data () {
             return {
+				statusOptions: [{key: 'ALL', name:'所有'},{key: 'CHECKING', name:'未审批'},{key: 'CHECKED', name:'已审批'}],
+                query: {
+                    status: 'CHECKING',
+                },
+                dateRange: [],
+                orderList: [],
 				saving: false,
             	supplierLoading: false,
             	supplierOptions: [],
@@ -203,7 +93,6 @@
 				warehouseOptions: [],
             	totalAmount: 0,
             	edittingRow: {},
-				closeConfirm: false,
             	fapiaoTypes: [
             		{ value: 'PP', label:'普通发票'},
             		{ value: 'ZZS', label: '增值税发票'}
@@ -212,9 +101,111 @@
                 orderItems: [],
                 buyOrder: {
 					supplierId: null,
-                	eta: moment().add(1,'d').format('YYYY-MM-DD'),
                 	orderItemIds: []
                 },
+                orderListColumns: [
+                    {
+                        key: 'id',
+                        title: '#',
+                        align: 'center',
+                        width: 30
+                    },
+                    {
+                        title: '订单日期',
+                        align: 'center',
+                        key: 'createdTime',
+                        width: 80,
+                        render:(h, params) => {
+                            console.log(params);
+                            return moment(params.row.createdTime).format('YYYY-MM-DD');
+                        }
+                    },
+                    {
+                        title: '仓库点',
+                        align: 'center',
+                        key: 'warehouse',
+                        width: 80
+                    },
+                    {
+                        title: '供应商',
+                        align: 'center',
+                        key: 'supplier',
+                        width: 100
+                    },
+                    {
+                        title: '供应商代表',
+                        align: 'center',
+                        key: 'supplierContact',
+                        width: 80
+                    },
+                    {
+                        title: '制单人',
+                        align: 'center',
+                        key: 'createdBy',
+                        width: 80
+                    },
+                    {
+                        title: '审核结论',
+                        align: 'center',
+                        key: 'checkResult',
+                        width: 100
+                    },
+                    {
+                        title: '审核人',
+                        align: 'center',
+                        key: 'checkedBy',
+                        width: 80
+                    },
+                    {
+                        title: '审核日期',
+                        align: 'center',
+                        key: 'checkTime',
+                        width: 80,
+                        render:(h, params) => {
+                            return moment(params.row.checkTime).format('YYYY-MM-DD');
+                        }
+                    },
+                    {
+                        title: '订单号',
+                        align: 'center',
+                        key: 'orderNumber',
+                        width: 100
+                    },
+                    {
+                        title: '预计到货日',
+                        align: 'center',
+                        key: 'eta',
+                        width: 80,
+                        render:(h, params) => {
+                            return moment(params.row.eta).format('YYYY-MM-DD');
+                        }
+                    },
+                    {
+                        title: '备注',
+                        align: 'center',
+                        key: 'comment',
+                        width: 100
+                    },
+                    {
+                        title: '温控方式',
+                        align: 'center',
+                        key: 'temperControl',
+                        width: 80
+                    },
+                    {
+                        title: '运输工具',
+                        align: 'center',
+                        key: 'shipTools',
+                        width: 80
+                    },
+                    {
+                        title: '运输方式',
+                        align: 'center',
+                        key: 'shipMethod',
+                        width: 80
+                    },
+                ],
+
                 orderColumns: [
                     {
                         type: 'index',
@@ -440,7 +431,6 @@
 			this.queryWarehouseList();
         },
 		activated() {
-			this.clearData();
 		},
         watch: {
         	orderItems: function () {
@@ -448,9 +438,20 @@
         	}
         },
         methods: {
-			moment: function () {
-				return moment();
-			},
+            queryOrderList() {
+                var self = this;
+                if (this.dateRange && this.dateRange.length == 2) {
+                    this.query['startDate'] = this.dateRange[0];
+                    this.query['endDate'] = this.dateRange[1];
+                }
+                util.ajax.post('/buy/list', this.query)
+                        .then(function (response) {
+                            self.orderList = response.data;
+                        })
+                        .catch(function (error) {
+                            console.log(error);
+                        });
+            },
 			queryWarehouseList() {
 				var self = this;
 				util.ajax.get('/warehouse/list')
@@ -593,50 +594,8 @@
 							console.log(error);
 						});
 			},
-			doSave() {
-				var self = this;
-				this.saving = true;
-				util.ajax.post('/buy/add', this.buyOrder)
-						.then(function (response) {
-							if (response.status === 200 && response.data) {
-								self.buyOrder.id = response.data.orderId;
-								self.buyOrder.status = response.data.status;
-								self.$Message.info('采购入库订单保存成功');
-								self.closeConfirm = true;
-							}
-							self.saving = false;
-						})
-						.catch(function (error) {
-							console.log(error);
-							self.saving = false;
-							self.$Message.error('保存采购订单错误');
-//							self.$Message.error('保存采购订单错误 ' + error.data.message);
-						});
-			},
-			clearData() {
-				this.buyOrder = {
-						supplierId: null,
-						eta: moment().add(1,'d').format('YYYY-MM-DD'),
-						orderItemIds: []
-				}
-			},
-			closeTab() {
-				this.clearData();
-				let pageName = util.closeCurrentTab(this);
-				this.$router.push({
-					name: pageName,
-				});
-			},
-			saveBuyOrder() {
-				this.buyOrder.orderItems = this.orderItems;
-				this.$refs.buyOrderForm.validate((valid) => {
-					if (!valid) {
-						this.$Message.error('请检查输入!');
-					} else {
-						this.doSave();
-					}
-				});
-			}
+
+
         }
     };
 </script>

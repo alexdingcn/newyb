@@ -32,6 +32,35 @@
     from buy_order
     where id = #{id,jdbcType=BIGINT}
   </select>
+    <select id="queryOrders" resultMap="BaseResultMap" parameterType="com.yiban.erp.entities.BuyOrderQuery" >
+        select
+        bo.*, su.name as supplier, sc.name as supplierContact, w.name as warehouse,
+        o.value as shipMethod, o1.value as shipTool, o2.value as temperControl
+        from buy_order bo
+            left join supplier su on bo.supplier_id = su.id
+            left join supplier_contact sc on bo.supplier_contact_id = sc.id
+            left join warehouse w on w.id=bo.warehouse_id
+            left join options o on o.id = bo.ship_method_id
+            left join options o1 on o1.id = bo.ship_tool_id
+            left join options o2 on o2.id = bo.temper_control_id
+        where 1=1
+        <if test="supplierId != null" >
+          and bo.supplier_id = #{supplierId, jdbcType=BIGINT}
+        </if>
+        <if test="status != null" >
+          and bo.status = #{status,jdbcType=VARCHAR}
+        </if>
+        <if test="startDate != null" >
+            and bo.created_time >= #{startDate,jdbcType=TIMESTAMP}
+        </if>
+        <if test="endDate != null" >
+            and #{endDate,jdbcType=TIMESTAMP} > bo.created_time
+        </if>
+        <if test="companyId != null" >
+          and bo.company_id = #{companyId,jdbcType=VARCHAR}
+        </if>
+    </select>
+
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
     delete from buy_order
     where id = #{id,jdbcType=BIGINT}

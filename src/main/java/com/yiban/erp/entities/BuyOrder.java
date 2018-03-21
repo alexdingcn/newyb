@@ -48,6 +48,18 @@ public class BuyOrder {
 
     private List<BuyOrderRequest> orderItems;
 
+    private String supplier;
+
+    private String supplierContact;
+
+    private String shipTool;
+
+    private String shipMethod;
+
+    private String temperControl;
+
+    private String warehouse;
+
     public Long getId() {
         return id;
     }
@@ -246,5 +258,53 @@ public class BuyOrder {
             return true;
         }
         return false;
+    }
+
+    public String getSupplierContact() {
+        return supplierContact;
+    }
+
+    public void setSupplierContact(String supplierContact) {
+        this.supplierContact = supplierContact;
+    }
+
+    public String getSupplier() {
+        return supplier;
+    }
+
+    public void setSupplier(String supplier) {
+        this.supplier = supplier;
+    }
+
+    public String getShipTool() {
+        return shipTool;
+    }
+
+    public void setShipTool(String shipTool) {
+        this.shipTool = shipTool;
+    }
+
+    public String getShipMethod() {
+        return shipMethod;
+    }
+
+    public void setShipMethod(String shipMethod) {
+        this.shipMethod = shipMethod;
+    }
+
+    public String getTemperControl() {
+        return temperControl;
+    }
+
+    public void setTemperControl(String temperControl) {
+        this.temperControl = temperControl;
+    }
+
+    public String getWarehouse() {
+        return warehouse;
+    }
+
+    public void setWarehouse(String warehouse) {
+        this.warehouse = warehouse;
     }
 }
