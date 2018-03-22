@@ -173,8 +173,13 @@ public class CustomerController {
     @RequestMapping(value = "/search/name", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> searchByName(@RequestParam("name") String name,
                                                @AuthenticationPrincipal User user) throws Exception {
-        List<Customer> customers = customerMapper.searchByName(user.getCompanyId(), name);
+        List<Customer> customers = customerMapper.searchLike(user.getCompanyId(), name);
         return ResponseEntity.ok().body(JSON.toJSONString(customers));
+    }
+    @RequestMapping(value = "/search/id", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> searchById(@RequestParam("customerId") Integer id) {
+        Customer customer = customerMapper.selectByPrimaryKey(id);
+        return ResponseEntity.ok().body(JSON.toJSONString(customer));
     }
 
 

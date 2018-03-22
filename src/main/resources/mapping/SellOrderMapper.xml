@@ -26,12 +26,13 @@
     <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
     <result column="update_by" property="updateBy" jdbcType="VARCHAR" />
     <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+    <result column="warehouse_id" property="warehouseId" jdbcType="INTEGER" />
   </resultMap>
   <sql id="Base_Column_List" >
     id, company_id, order_number, ref_no, status, customer_id, customer_rep_id, saler_id, 
     temper_control_id, create_order_date, take_goods_user, pay_order_date, pay_method, pay_file_no, mark_up_rate,
     pay_amount, not_small_amount, ship_method, ship_tool, comment, create_by, create_time, 
-    update_by, update_time
+    update_by, update_time, warehouse_id
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
     select 
@@ -51,7 +52,7 @@
       pay_file_no, mark_up_rate, pay_amount, 
       not_small_amount, ship_method, ship_tool, 
       comment, create_by, create_time, 
-      update_by, update_time)
+      update_by, update_time, warehouse_id)
     values (#{companyId,jdbcType=INTEGER}, #{orderNumber,jdbcType=VARCHAR},
       #{refNo,jdbcType=VARCHAR}, #{status,jdbcType=VARCHAR}, #{customerId,jdbcType=INTEGER}, 
       #{customerRepId,jdbcType=INTEGER}, #{salerId,jdbcType=INTEGER}, #{temperControlId,jdbcType=INTEGER}, 
@@ -59,7 +60,7 @@
       #{payMethod,jdbcType=INTEGER}, #{payFileNo,jdbcType=VARCHAR}, #{markUpRate,jdbcType=DECIMAL}, #{payAmount,jdbcType=DECIMAL},
       #{notSmallAmount,jdbcType=DECIMAL}, #{shipMethod,jdbcType=INTEGER}, #{shipTool,jdbcType=INTEGER}, 
       #{comment,jdbcType=VARCHAR}, #{createBy,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, 
-      #{updateBy,jdbcType=VARCHAR}, #{updateTime,jdbcType=TIMESTAMP})
+      #{updateBy,jdbcType=VARCHAR}, #{updateTime,jdbcType=TIMESTAMP}, #{warehouseId,jdbcType=INTEGER})
   </insert>
   <insert id="insertSelective" parameterType="com.yiban.erp.entities.SellOrder" keyProperty="id" useGeneratedKeys="true" >
     insert into sell_order
@@ -133,6 +134,9 @@
       <if test="updateTime != null" >
         update_time,
       </if>
+      <if test="warehouseId != null">
+        warehouse_id,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides="," >
       <if test="companyId != null" >
@@ -204,6 +208,9 @@
       <if test="updateTime != null" >
         #{updateTime,jdbcType=TIMESTAMP},
       </if>
+      <if test="warehouseId != null">
+        #{warehouseId, jdbcType=INTEGER},
+      </if>
     </trim>
   </insert>
   <update id="updateByPrimaryKeySelective" parameterType="com.yiban.erp.entities.SellOrder" >
@@ -272,6 +279,9 @@
       <if test="updateTime != null" >
         update_time = #{updateTime,jdbcType=TIMESTAMP},
       </if>
+      <if test="warehouseId != null">
+        warehouse_id = #{warehouseId, jdbcType=INTEGER},
+      </if>
     </set>
     where id = #{id,jdbcType=BIGINT}
   </update>
@@ -298,7 +308,8 @@
       create_by = #{createBy,jdbcType=VARCHAR},
       create_time = #{createTime,jdbcType=TIMESTAMP},
       update_by = #{updateBy,jdbcType=VARCHAR},
-      update_time = #{updateTime,jdbcType=TIMESTAMP}
+      update_time = #{updateTime,jdbcType=TIMESTAMP},
+      warehouse_id = #{warehouseId, jdbcType=INTEGER}
     where id = #{id,jdbcType=BIGINT}
   </update>
 
@@ -349,6 +360,7 @@
     <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
     <result column="update_by" property="updateBy" jdbcType="VARCHAR" />
     <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+    <result column="warehouse_id" property="warehouseId" jdbcType="INTEGER" />
     <association property="customer" javaType="com.yiban.erp.entities.Customer">
       <id column="customer_id" property="id" jdbcType="INTEGER" />
       <result column="cust_name" property="name" jdbcType="VARCHAR"/>
@@ -365,7 +377,7 @@
     s.id, s.company_id, s.order_number, s.ref_no, s.status, s.customer_id, s.customer_rep_id, s.saler_id,
     s.temper_control_id, s.create_order_date, s.take_goods_user, s.pay_order_date, s.pay_method, s.pay_file_no, s.mark_up_rate,
     s.pay_amount, s.not_small_amount, s.ship_method, s.ship_tool, s.comment, s.create_by, s.create_time,
-    s.update_by, s.update_time, c.name as cust_name,
+    s.update_by, s.update_time, s.warehouse_id, c.name as cust_name,
     r.id as rep_id, r.name as rep_name, r.contact_phone as rep_contact_phone,
     r.repertory_address as rep_repertory_address
   </sql>

@@ -1,0 +1,318 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.yiban.erp.dao.RepertoryInfoMapper" >
+  <resultMap id="BaseResultMap" type="com.yiban.erp.entities.RepertoryInfo" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="warehouse_id" property="warehouseId" jdbcType="INTEGER" />
+    <result column="good_id" property="goodId" jdbcType="BIGINT" />
+    <result column="in_quantity" property="inQuantity" jdbcType="INTEGER" />
+    <result column="quantity" property="quantity" jdbcType="INTEGER" />
+    <result column="buy_price" property="buyPrice" jdbcType="DECIMAL" />
+    <result column="sale_price" property="salePrice" jdbcType="DECIMAL" />
+    <result column="code" property="code" jdbcType="VARCHAR" />
+    <result column="batch_code" property="batchCode" jdbcType="VARCHAR" />
+    <result column="is_exp" property="isExp" jdbcType="TINYINT" />
+    <result column="sale_enable" property="saleEnable" jdbcType="TINYINT" />
+    <result column="product_date" property="productDate" jdbcType="DATE" />
+    <result column="exp_date" property="expDate" jdbcType="DATE" />
+    <result column="location" property="location" jdbcType="VARCHAR" />
+    <result column="create_by" property="createBy" jdbcType="VARCHAR" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_by" property="updateBy" jdbcType="VARCHAR" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, warehouse_id, good_id, in_quantity, quantity, buy_price, sale_price, code, batch_code, 
+    is_exp, sale_enable, product_date, exp_date, location, create_by, create_time, update_by, 
+    update_time
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from repertory_info
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from repertory_info
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.yiban.erp.entities.RepertoryInfo" keyProperty="id" useGeneratedKeys="true">
+    insert into repertory_info (id, warehouse_id, good_id, 
+      in_quantity, quantity, buy_price, 
+      sale_price, code, batch_code, 
+      is_exp, sale_enable, product_date, 
+      exp_date, location, create_by, 
+      create_time, update_by, update_time
+      )
+    values (#{id,jdbcType=INTEGER}, #{warehouseId,jdbcType=INTEGER}, #{goodId,jdbcType=BIGINT}, 
+      #{inQuantity,jdbcType=INTEGER}, #{quantity,jdbcType=INTEGER}, #{buyPrice,jdbcType=DECIMAL}, 
+      #{salePrice,jdbcType=DECIMAL}, #{code,jdbcType=VARCHAR}, #{batchCode,jdbcType=VARCHAR}, 
+      #{isExp,jdbcType=TINYINT}, #{saleEnable,jdbcType=TINYINT}, #{productDate,jdbcType=DATE}, 
+      #{expDate,jdbcType=DATE}, #{location,jdbcType=VARCHAR}, #{createBy,jdbcType=VARCHAR}, 
+      #{createTime,jdbcType=TIMESTAMP}, #{updateBy,jdbcType=VARCHAR}, #{updateTime,jdbcType=TIMESTAMP}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.yiban.erp.entities.RepertoryInfo" keyProperty="id" useGeneratedKeys="true">
+    insert into repertory_info
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="warehouseId != null" >
+        warehouse_id,
+      </if>
+      <if test="goodId != null" >
+        good_id,
+      </if>
+      <if test="inQuantity != null" >
+        in_quantity,
+      </if>
+      <if test="quantity != null" >
+        quantity,
+      </if>
+      <if test="buyPrice != null" >
+        buy_price,
+      </if>
+      <if test="salePrice != null" >
+        sale_price,
+      </if>
+      <if test="code != null" >
+        code,
+      </if>
+      <if test="batchCode != null" >
+        batch_code,
+      </if>
+      <if test="isExp != null" >
+        is_exp,
+      </if>
+      <if test="saleEnable != null" >
+        sale_enable,
+      </if>
+      <if test="productDate != null" >
+        product_date,
+      </if>
+      <if test="expDate != null" >
+        exp_date,
+      </if>
+      <if test="location != null" >
+        location,
+      </if>
+      <if test="createBy != null" >
+        create_by,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+      <if test="updateBy != null" >
+        update_by,
+      </if>
+      <if test="updateTime != null" >
+        update_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="warehouseId != null" >
+        #{warehouseId,jdbcType=INTEGER},
+      </if>
+      <if test="goodId != null" >
+        #{goodId,jdbcType=BIGINT},
+      </if>
+      <if test="inQuantity != null" >
+        #{inQuantity,jdbcType=INTEGER},
+      </if>
+      <if test="quantity != null" >
+        #{quantity,jdbcType=INTEGER},
+      </if>
+      <if test="buyPrice != null" >
+        #{buyPrice,jdbcType=DECIMAL},
+      </if>
+      <if test="salePrice != null" >
+        #{salePrice,jdbcType=DECIMAL},
+      </if>
+      <if test="code != null" >
+        #{code,jdbcType=VARCHAR},
+      </if>
+      <if test="batchCode != null" >
+        #{batchCode,jdbcType=VARCHAR},
+      </if>
+      <if test="isExp != null" >
+        #{isExp,jdbcType=TINYINT},
+      </if>
+      <if test="saleEnable != null" >
+        #{saleEnable,jdbcType=TINYINT},
+      </if>
+      <if test="productDate != null" >
+        #{productDate,jdbcType=DATE},
+      </if>
+      <if test="expDate != null" >
+        #{expDate,jdbcType=DATE},
+      </if>
+      <if test="location != null" >
+        #{location,jdbcType=VARCHAR},
+      </if>
+      <if test="createBy != null" >
+        #{createBy,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateBy != null" >
+        #{updateBy,jdbcType=VARCHAR},
+      </if>
+      <if test="updateTime != null" >
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.yiban.erp.entities.RepertoryInfo" >
+    update repertory_info
+    <set >
+      <if test="warehouseId != null" >
+        warehouse_id = #{warehouseId,jdbcType=INTEGER},
+      </if>
+      <if test="goodId != null" >
+        good_id = #{goodId,jdbcType=BIGINT},
+      </if>
+      <if test="inQuantity != null" >
+        in_quantity = #{inQuantity,jdbcType=INTEGER},
+      </if>
+      <if test="quantity != null" >
+        quantity = #{quantity,jdbcType=INTEGER},
+      </if>
+      <if test="buyPrice != null" >
+        buy_price = #{buyPrice,jdbcType=DECIMAL},
+      </if>
+      <if test="salePrice != null" >
+        sale_price = #{salePrice,jdbcType=DECIMAL},
+      </if>
+      <if test="code != null" >
+        code = #{code,jdbcType=VARCHAR},
+      </if>
+      <if test="batchCode != null" >
+        batch_code = #{batchCode,jdbcType=VARCHAR},
+      </if>
+      <if test="isExp != null" >
+        is_exp = #{isExp,jdbcType=TINYINT},
+      </if>
+      <if test="saleEnable != null" >
+        sale_enable = #{saleEnable,jdbcType=TINYINT},
+      </if>
+      <if test="productDate != null" >
+        product_date = #{productDate,jdbcType=DATE},
+      </if>
+      <if test="expDate != null" >
+        exp_date = #{expDate,jdbcType=DATE},
+      </if>
+      <if test="location != null" >
+        location = #{location,jdbcType=VARCHAR},
+      </if>
+      <if test="createBy != null" >
+        create_by = #{createBy,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateBy != null" >
+        update_by = #{updateBy,jdbcType=VARCHAR},
+      </if>
+      <if test="updateTime != null" >
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.yiban.erp.entities.RepertoryInfo" >
+    update repertory_info
+    set warehouse_id = #{warehouseId,jdbcType=INTEGER},
+      good_id = #{goodId,jdbcType=BIGINT},
+      in_quantity = #{inQuantity,jdbcType=INTEGER},
+      quantity = #{quantity,jdbcType=INTEGER},
+      buy_price = #{buyPrice,jdbcType=DECIMAL},
+      sale_price = #{salePrice,jdbcType=DECIMAL},
+      code = #{code,jdbcType=VARCHAR},
+      batch_code = #{batchCode,jdbcType=VARCHAR},
+      is_exp = #{isExp,jdbcType=TINYINT},
+      sale_enable = #{saleEnable,jdbcType=TINYINT},
+      product_date = #{productDate,jdbcType=DATE},
+      exp_date = #{expDate,jdbcType=DATE},
+      location = #{location,jdbcType=VARCHAR},
+      create_by = #{createBy,jdbcType=VARCHAR},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_by = #{updateBy,jdbcType=VARCHAR},
+      update_time = #{updateTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+
+  <select id="getDetailList" parameterType="map" resultType="com.yiban.erp.entities.RepertoryInfo">
+    select
+      r.id as id, r.warehouse_id as warehouseId, r.good_id as goodId, r.in_quantity as inQuantiry,
+      r.quantity as quantity, r.buy_price as buyPrice, r.sale_price as salePrice, r.code as code,
+      r.batch_code as batchCode, r.is_exp as isExp, r.sale_enable as saleEnable,
+      r.product_date as productDate, r.exp_date as expDate, r.location as location,
+      r.create_by as createBy, r.create_time as createTime, r.update_by as updateBy,
+      r.update_time as updateTime,
+      w.name as warehouseName
+    from repertory_info r , warehouse w, goods g
+      left join factory f on g.factory_id = f.id
+    where r.warehouse_id = w.id and r.good_id = g.id
+      and w.company_id = #{companyId}
+      and r.warehouse_id = #{warehouseId}
+      and r.is_exp = 0
+      <if test="saleEnable != null" >
+        and r.sale_enable = #{saleEnable}
+      </if>
+      <if test="goodId != null" >
+        r.good_id = #{goodId}
+      </if>
+      <if test="goodSearch != null">
+        <bind name="pattern" value="'%' + goodSearch + '%'" />
+        and ( g.name like #{pattern} or lower(g.pinyin) like lower(#{pattern}) )
+      </if>
+      <if test="factoryId != null">
+        and f.id = #{factoryId}
+      </if>
+      order by r.code desc
+      <if test="offset != null and limit !=null">
+        limit #{offset}, #{limit}
+      </if>
+  </select>
+
+  <select id="getDetailListCount" parameterType="map" resultType="java.lang.Integer">
+    select
+      count(1)
+    from repertory_info r , warehouse w, goods g
+    left join factory f on g.factory_id = f.id
+    left join unit u1 on g.unit = u1.id
+    where r.warehouse_id = w.id and r.good_id = g.id
+    and w.company_id = #{companyId}
+    and r.warehouse_id = #{warehouseId}
+    and r.is_exp = 0
+    <if test="saleEnable != null" >
+      and r.sale_enable = #{saleEnable}
+    </if>
+    <if test="goodId != null" >
+      r.good_id = #{goodId}
+    </if>
+    <if test="goodSearch != null">
+      <bind name="pattern" value="'%' + goodSearch + '%'" />
+      and ( g.name like #{pattern} or lower(g.pinyin) like lower(#{pattern}) )
+    </if>
+    <if test="factoryId != null">
+      and f.id = #{factoryId}
+    </if>
+  </select>
+
+  <select id="getByWarehouseIdAndGoodIds" parameterType="map" resultMap="BaseResultMap">
+    select <include refid="Base_Column_List"/>
+    from repertory_info
+    where warehouse_id = #{warehouseId}
+    and good_id in
+    <foreach collection="goodIdList" item="item" separator="," open="(" close=")">
+      #{item}
+    </foreach>
+  </select>
+
+</mapper>

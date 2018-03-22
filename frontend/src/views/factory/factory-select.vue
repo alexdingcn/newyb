@@ -3,14 +3,12 @@
 </style>
 
 <template>
-    <div>
-        <Select v-model="id" placeholder="企业名称/联系人/拼音简称搜索"
-                filterable clearabel remote :remote-method="searchMethod" 
-                :loading="searchLoading" 
-                @on-change="onChange" :size="selectSize">
-            <Option v-for="item in resultList" :value="item.id" :key="item.id"> {{item.name}} </Option>
-        </Select>
-    </div>
+    <Select v-model="id" placeholder="企业名称/联系人/拼音简称搜索"
+            filterable clearable remote :remote-method="searchMethod" 
+            :loading="searchLoading" 
+            @on-change="onChange" :size="selectSize">
+        <Option v-for="item in resultList" :value="item.id" :key="item.id"> {{item.name}} </Option>
+    </Select>
 </template>
 
 <script>
@@ -23,7 +21,7 @@ export default {
         return {
             selectSize: this.size,
             id: null,
-            resultList: [{id: '', name: '清除'}],
+            resultList: [],
             searchLoading: false
         }
     },
@@ -31,13 +29,13 @@ export default {
     methods: {
         searchMethod(searchStr) {
             if (!searchStr) {
-                this.resultList = [{id: '', name: '清除'}];
+                this.resultList = [];
                 return;
             }
             this.searchLoading = true;
             util.ajax.post("/factory/search", {search: searchStr})
                 .then((response) => {
-                    this.resultList = [{id: '', name: '清除'}, ...response.data];
+                    this.resultList = response.data;
                 })
                 .catch((error) => {
                     util.errorProcessor(this, error);
@@ -46,8 +44,9 @@ export default {
         },
 
         onChange(data) {
+            let factory = this.resultList.filter(item => item.id === data);
             this.$emit("input", data);
-            this.$emit("on-change", data);
+            this.$emit("on-change", data, factory);
         }
     }
 }

@@ -4,36 +4,30 @@
 
 <template>
   <div>
-      <Modal v-model="isShowModal" :width="60" :mask-closable="false" :closable="false" title="查询获取商品">
+      <Modal v-model="isShowModal" :width="75" :mask-closable="false" :closable="false" :title="showTitle">
           <Form ref="searchForm" :model="formItem" :label-width="100">
                 <Row type="flex" justify="center">
                     <Col span="8">
-                        <FormItem label="商品分组">
-                            <Select v-model="formItem.catId" clearable >
-                                <Option v-for="item in categorys" :value="item.id" :key="item.id">{{ item.name }}</Option>
-                            </Select>
-                        </FormItem>
-                    </Col>
-                    <Col span="8">
                         <FormItem label="名称/拼音">
-                            <Input type="text" v-model="formItem.search" clearable ></Input>
+                            <Input size="small" type="text" v-model="formItem.search" clearable ></Input>
                         </FormItem>
                     </Col>
                     <Col span="8">
                         <FormItem label="厂商">
-                            <factory-select v-model="formItem.factoryId"></factory-select>
+                            <factory-select size="small" v-model="formItem.factoryId" ></factory-select>
                         </FormItem>
                     </Col>
-                </Row>
-                <Row type="flex" justify="center" >
-                    <Button type="primary" size="small" icon="ios-search" @click="searchBtnClicked">查询</Button>
+                    <Col span="2" offset="1">
+                        <Button type="primary" size="small" icon="ios-search" @click="searchBtnClicked">查询</Button>
+                    </Col>
+                    <Col span="5"></Col>
                 </Row>
             </Form>
 
             <Row type="flex" justify="center" align="middle" class="margin-top-20">
                 <Table border highlight-row :columns="tabColumns" :data="tabData" 
-                    :loading="tableLoading" 
-                    @on-row-click="tableRowClick" 
+                    :loading="tableLoading" height="340" 
+                    @on-selection-change="tabSelectChange" 
                     ref="goodSearchTable" style="width: 100%;" size="small">
                 </Table>
             </Row>
@@ -42,8 +36,8 @@
                     @on-change="pageChange">
                 </Page>
             </Row>
-            <Row type="flex" justify="center" align="middle">
-                <div>当前选择的商品: <strong style="color: red;">{{currChooseShow}}</strong></div>
+            <Row type="flex" justify="center" >
+                <span>已选择: <strong style="color: red;">{{choonseNumber}} </strong>种商品</span> 
             </Row>
 
             <div slot="footer">
@@ -64,6 +58,7 @@
 
 <script>
 import util from "@/libs/util.js";
+import dataConver from "@/libs/data-conver.js";
 import factorySelect from "@/views/factory/factory-select.vue";
 
 export default {
@@ -75,96 +70,127 @@ export default {
         showModal: {
             type: Boolean,
             default: false
+        },
+        warehouse: {
+            type: Object,
+            required: true
         }
    },
   data() {
       return {
           isShowModal: false,
+          showTitle: '',
           formItem: {
-              catId: '',
               search: '',
               factoryId: ''
           },
-          categorys: [],
           tabData: [],
           tableLoading: false,
           tabColumns: [
               {
+                  type: "selection",
+                  width: 60,
+                  fixed: "left"
+              },
+              {
                   title: '货号',
                   key: 'code',
-                  align: 'center'
+                  width: 120,
+                  sortable: true,
+                  fixed: 'left'
               },
               {
                   title: '商品名称',
-                  key: 'name',
-                  align: 'center',
+                  key: 'goodName',
+                  width: 200,
                   sortable: true,
-              },
-              {
-                  title: '类别',
-                  key: 'categoryName',
-                  align: 'center'
+                  fixed: 'left'
               },
               {
                   title: '剂型',
                   key: 'jx',
-                  align: 'center'
+                  width: 100
               },
               {
                   title: '规格',
                   key: 'spec',
-                  align: 'center'
+                  width: 100
               },
               {
                   title: '生产企业',
-                  key: 'factory',
-                  align: 'center'
+                  key: 'factoryName',
+                  width: 200
+              },
+              {
+                  title: '单位',
+                  key: 'unitName',
+                  width: 80
+              }, 
+              {
+                  title: '数量',
+                  key: 'quantity',
+                  width: 120
+              },
+              {
+                  title: '有效期至',
+                  key: 'expDate',
+                  width: 120, 
+                  render: (h, params) => {
+                    return h('span', this.dateFormat(params.row.expDate));
+                  }
+              },
+              {
+                  title: '生产日期',
+                  key: 'productDate',
+                  width: 120, 
+                  render: (h, params) => {
+                    return h('span', this.dateFormat(params.row.productDate));
+                  }
+              },
+              {
+                  title: '批次号',
+                  key: 'batchCode',
+                  width: 120
               }
           ],
           totalCount: 0,
           currentPage: 1,
           tableCurrPageSize: 10,
-          currChooseShow: '',
-          currChooseItem: null
+          tabCurrChooseList: [],
+          choonseNumber: 0,
       }
   },
   watch: {
         showModal(data) {
             if(data) {
                 this.isShowModal = data;
+            }
+        },
+        warehouse(data) {
+            if(data) {
+                 this.showTitle = "选取仓库:" + data.name + "商品";
                 this.initData();
             }
         },
-        currChooseItem(data) {
-            if (!data || data === null) {
-                this.currChooseShow = '';
-            }else {
-                this.currChooseShow = data.name + " " + (data.code ? data.code : '');
-            }
-        }
   },
   methods: {
+      dateFormat(data) {
+          if (!data && isNaN(data)) {
+              return '';
+          }
+          return dataConver.formatDate(new Date(data), 'yyyy-MM-dd');
+        },
       initData() {
-          this.getGoodCategoryList();
-      },
-      getGoodCategoryList() {
-          util.ajax.get("/good/category/list")
-            .then((response) => {
-                this.categorys = response.data;
-            })
-            .catch((error) => {
-                util.errorProcessor(this, error);
-            });
       },
       searchBtnClicked() {
           let reqData = {
-              catId: this.formItem.catId,
-              search: this.formItem.search,
+              warehouseId: this.warehouse.id,
+              goodSearch: this.formItem.search,
               factoryId: this.formItem.factoryId,
               page: this.currentPage,
               size: this.tableCurrPageSize
           };
-          util.ajax.get("/goods/list", {params: reqData})
+          util.ajax.get("/repertory/list", {params: reqData})
             .then((response) => {
                 this.totalCount = response.data.total;
                 this.tabData = response.data.data;
@@ -177,20 +203,26 @@ export default {
           this.currentPage = data;
           this.searchBtnClicked();
       },
-      tableRowClick(data) {
-          this.currChooseItem = data;
+      tabSelectChange(data) {
+          this.tabCurrChooseList = data;
+          if (this.tabCurrChooseList) {
+              this.choonseNumber = this.tabCurrChooseList.length;
+          }else {
+              this.choonseNumber = 0;
+          }
       },
 
       ok() {
             this.isShowModal = false;
             this.$emit('modal-close');
-            this.$emit('choosed', this.currChooseItem);
+            this.$emit('choosed', this.tabCurrChooseList);
       },
 
       closedModal() {
           this.isShowModal = false;
           this.$emit('modal-close');
-      }
+      },
+      
   }
 }
 </script>

@@ -36,6 +36,8 @@ public class SellOrderDetail {
 
     private Date updateTime;
 
+    private Integer repetoryQuantity; //当前库存量
+
     private Goods goods; //与商品是1对1的映射
 
     public Long getId() {
@@ -172,5 +174,13 @@ public class SellOrderDetail {
 
     public void setGoods(Goods goods) {
         this.goods = goods;
+    }
+
+    public Integer getRepetoryQuantity() {
+        return repetoryQuantity;
+    }
+
+    public void setRepetoryQuantity(Integer repetoryQuantity) {
+        this.repetoryQuantity = repetoryQuantity;
     }
 }

@@ -2,10 +2,7 @@ package com.yiban.erp.service.sell;
 
 import com.alibaba.fastjson.JSON;
 import com.yiban.erp.constant.SellOrderStatus;
-import com.yiban.erp.dao.GoodsMapper;
-import com.yiban.erp.dao.SellOrderDetailMapper;
-import com.yiban.erp.dao.SellOrderMapper;
-import com.yiban.erp.dao.SellOrderShipMapper;
+import com.yiban.erp.dao.*;
 import com.yiban.erp.entities.*;
 import com.yiban.erp.exception.BizException;
 import com.yiban.erp.exception.BizRuntimeException;
@@ -34,6 +31,8 @@ public class SellOrderService {
     private GoodsMapper goodsMapper;
     @Autowired
     private SellOrderShipMapper sellOrderShipMapper;
+    @Autowired
+    private RepertoryInfoMapper repertoryInfoMapper;
 
     public List<SellOrder> getList(Integer companyId, Integer customerId, Integer salerId,
                                             String refNo, String status, Date createOrderDate, Integer page, Integer size) {
@@ -129,6 +128,11 @@ public class SellOrderService {
             logger.warn("get sell order detail by sell order id is null.");
             return Collections.emptyList();
         }
+        SellOrder sellOrder = sellOrderMapper.selectByPrimaryKey(sellOrderId);
+        if (sellOrder == null) {
+            logger.warn("get sell order detail but sell order id is error. id:{}", sellOrderId);
+            return Collections.emptyList();
+        }
         List<SellOrderDetail> details = sellOrderDetailMapper.getDetailList(sellOrderId);
         //如果存在，把对应的产品信息查询出来关联到对应的订单详情中
         if (details == null || details.isEmpty()) {
@@ -138,11 +142,17 @@ public class SellOrderService {
         details.stream().forEach(item -> goodsIdList.add(item.getGoodId()));
         List<Goods> goods = goodsMapper.selectByIdList(goodsIdList);
         Map<Long, List<Goods>> map = goods.stream().collect(Collectors.groupingBy(Goods::getId));
+        //获取当前订单对应仓库点中对应产品的库存量
+        List<RepertoryInfo> repertoryInfos = repertoryInfoMapper
+                .getByWarehouseIdAndGoodIds(sellOrder.getWarehouseId(), goodsIdList);
+        final Map<Long, Integer> repNumberMap = new HashMap<>();
+        repertoryInfos.stream().forEach(item -> repNumberMap.put(item.getGoodId(), item.getQuantity()));
         details.stream().forEach(item -> {
             List<Goods> tempList = map.get(item.getGoodId());
             Goods goodsItem =  (tempList == null ? null : tempList.get(0));
             item.setGoods(goodsItem);
             item.setGoodName(goodsItem.getName());
+            item.setRepetoryQuantity(repNumberMap.get(goodsItem.getId()));
         });
 
         return details;

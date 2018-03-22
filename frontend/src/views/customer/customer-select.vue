@@ -3,14 +3,12 @@
 </style>
 
 <template>
-    <div>
-        <Select v-model="customerId" 
-                filterable clearabel remote :remote-method="searchByName" 
-                :loading="searchLoading" 
-                @on-change="onChange" :size="selectSize">
-            <Option v-for="item in customerList" :value="item.id" :key="item.id"> {{item.name}} </Option>
-        </Select>
-    </div>
+    <Select ref="custSelect" v-model="customerIdValue" :disabled="selectDisable" :placeholder="placeholderShow"
+            filterable clearable remote :remote-method="searchByName" 
+            :loading="searchLoading" 
+            @on-change="onChange" :size="selectSize">
+        <Option v-for="item in customerList" :value="item.id" :key="item.id"> {{item.name}} </Option>
+    </Select>
 </template>
 
 <script>
@@ -18,34 +16,37 @@ import util from "@/libs/util.js"
 
 export default {
     name: 'customer-select',
-    props:['value', 'size'],
+    props:['value', 'size', 'disabled'],
     data() {
         return {
             selectSize: this.size,
-            customerId: null,
-            customerList: [
-                {
-                    id: '',
-                    name: '清除'
-                }
-            ],
-            searchLoading: false
+            customerIdValue: '',
+            selectDisable: false,
+            customerList: [],
+            searchLoading: false,
+            placeholderShow: '输入姓名/简称/拼音搜索'
         }
     },
     watch:{
-        
+        disabled(data) {
+            if (data) {
+                this.selectDisable = true;
+            }else {
+                this.selectDisable = false;
+            }
+        }
     },
     methods: {
         searchByName(name) {
             if(!name || name === '' || name.trim() === '') {
-                this.customerList = [{id: '', name: '清除'}];
+                this.customerList = [];
                 return;
             }
             this.searchLoading = true;
             let reqData = {name: name};
             util.ajax.get("/customer/search/name", {params: reqData})
                 .then((response) => {
-                    this.customerList = [{id: '', name: '清除'}, ...response.data];
+                    this.customerList = response.data;
                 })
                 .catch((error) => {
                     util.errorProcessor(this, error);
@@ -54,8 +55,13 @@ export default {
         },
 
         onChange(data) {
+            let customers = this.customerList.filter(item => item.id === data);
+            let customer = {};
+            if(customers && customers.length > 0) {
+                customer = customers[0];
+            }
             this.$emit("input", data);
-            this.$emit("on-change", data);
+            this.$emit("on-change", data, customer);
         }
     }
   

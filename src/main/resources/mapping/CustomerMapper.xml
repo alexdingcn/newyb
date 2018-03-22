@@ -691,14 +691,14 @@
       </foreach>
   </update>
 
-  <select id="searchByName" parameterType="map" resultMap="BaseResultMap">
+  <select id="searchLike" parameterType="map" resultMap="BaseResultMap">
     select
       <include refid="Base_Column_List"/>
     from customer
     where status != 'delete'
       and company_id = #{companyId}
-      <bind name="nameVal" value="name + '%'"/>
-      and name like #{nameVal}
+      <bind name="nameVal" value="'%' + name + '%'"/>
+      and (name like #{nameVal} or shor_name like #{nameVal} or pinyin like #{nameVal} )
       order by id desc;
   </select>
 

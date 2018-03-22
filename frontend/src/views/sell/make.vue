@@ -20,10 +20,9 @@
                 <Form ref="sellOrderForm" :model="sellOrderFormData" :label-width="100" :rules="sellOrderFormValidate">
                     <Row type="flex" justify="center">
                         <Col span="8">
-                            <FormItem label="客户" prop="customerName">
-                                <Input type="text" readonly v-model="sellOrderFormData.customerName" placeholder="请输入客户名称">
-                                    <Button slot="append" icon="ios-search" @click="searchCustomerBtn" :disabled="editeOnlyDisable"></Button>
-                                </Input>
+                            <FormItem label="客户" prop="customerId">
+                                <customer-select v-if="!editeOnlyDisable" :disabled="editeOnlyDisable" v-model="sellOrderFormData.customerId" @on-change="customerChange"></customer-select>
+                                <Input v-else type="text" :disabled="editeOnlyDisable" v-model="sellOrderFormData.customerName"></Input>
                             </FormItem>
                         </Col>
                         <Col span="8">
@@ -136,7 +135,15 @@
                     </Row>
 
                     <Row type="flex" justify="center">
-                        <Col span="24">
+                        <Col span="8">
+                            <FormItem label="仓库点" prop="warehouseId">
+                                <Select v-model="sellOrderFormData.warehouseId" filterable clearable 
+                                    placeholder="请选择仓库点" >
+                                    <Option v-for="item in warehouseList" :value="item.id" :key="item.id">{{ item.name }}</Option>
+                                </Select>
+                            </FormItem>
+                        </Col>
+                        <Col span="16">
                             <FormItem label="备注" >
                                 <Input type="text" v-model="sellOrderFormData.comment" placeholder="请输入备注"></Input>
                             </FormItem>
@@ -153,25 +160,19 @@
                             <Button type="ghost" :disabled="!editeOnlyDisable" :loading="saveGoodBtnLoading" @click="refreshGoodBtnClick">刷新数据</Button>
                         </ButtonGroup>
                     </Row>
-                    <Row type="flex" justify="start">
-                        <can-edit-table refs="sellOrderGoodTable" 
-                            :loading="saveGoodBtnLoading" 
-                            v-model="goodTableData" 
-                            :hover-show="true" 
-                            :edit-incell="true" width="1000"
-                            :columns-list="goodTableColumn" 
-                            @on-delete="goodRemoveItem">
-                        </can-edit-table>
-                    </Row>
+                    <Table border highlight-row :loading="saveGoodBtnLoading" 
+                        :columns="goodTableColumn" :data="goodTableData"
+                        ref="sellOrderGoodTable" style="width: 100%;" size="small"
+                        @on-row-dblclick="handleRowDbClick">
+                        <div slot="footer">
+                            <h3 class="padding-left-20" >
+                                <b>合计数量: {{totalQuantity}}</b>  <b class="margin-left-50">合计金额:</b> ￥{{ totalAmount }}
+                            </h3>
+                        </div>
+                    </Table>
                 </TabPane>
             </Tabs>
         </Card>
-
-        <customer-search 
-            :showModal="customerSearchModal" 
-            @modal-close="customerSearchModalClose" 
-            @choosed="customerSearchChoosed">
-        </customer-search>
 
         <sell-order-search 
             :showModal="sellOrderSearchModal" 
@@ -182,6 +183,7 @@
 
         <good-search 
             :showModal="goodSearchModal" 
+            :warehouse="chooseWarehouse" 
             @modal-close="goodSearchModalClose" 
             @choosed="goodSearchChoosed">
         </good-search>
@@ -192,20 +194,18 @@
 <script>
 import util from "@/libs/util.js";
 import dataConver from "@/libs/data-conver.js";
-import customerSearch from "@/views/customer/customer-search.vue";
+import customerSelect from "@/views/customer/customer-select.vue";
 import sellOrderSearch from "@/views/sell/sell-order-search.vue";
 import goodSearch from "@/views/good/good-search.vue";
 import goodExpand from "@/views/good/good-expand.vue";
-import canEditTable from '@/views/tables/components/canEditTable.vue';
 
 export default {
   name: 'sell_order_make',
   components: {
-      customerSearch,
+      customerSelect,
       sellOrderSearch,
       goodSearch,
-      goodExpand,
-      canEditTable
+      goodExpand
   },
   data() {
       return {
@@ -213,6 +213,7 @@ export default {
           temperControlList: [],
           shipMethodList: [],
           shipToolList: [],
+          warehouseList: [],
           editeOnlyDisable: false,
           sellOrderFormData: {
               id: '',
@@ -234,11 +235,12 @@ export default {
               markUpRate: 0,
               payAmount: 0,
               notSmallAmount: 0,
+              warehouseId: '',
               comment: ''
           },
           sellOrderFormValidate: {
-              customerName: [
-                  {required: true, message: '客户必输', trigger: 'change'}
+              customerId: [
+                  {required: true, type: 'number', message: '客户必输', trigger: 'change'}
               ],
               customerRepId: [
                   {required: true, type: 'number', message: '客户代表人必输', trigger: 'change'}
@@ -251,11 +253,14 @@ export default {
               ],
               repertoryAddress: [
                   {required: true, message: '客户代表人收货地址缺失', trigger: 'blur'}
+              ],
+              warehouseId: [
+                  {required: true, type: 'number', message: '仓库点必输', trigger: 'change'}
               ]
           },
           sellOrderSaveBtnLoading: false,
           sellOrderSearchModal: false,
-
+          chooseWarehouse: {},
           goodSearchModal: false,
           saveGoodBtnLoading: false,
           goodTableData:[],
@@ -273,86 +278,103 @@ export default {
                   }
               },
               {
-                  key: 'sellOrderId',
-                  title: '订单ID',
-                  align: 'center',
-                  width: 100,
-                  fixed: 'left'
-              },
-              {
                   title: '药名',
                   key: 'goodName',
                   align: 'center',
                   sortable: true,
-                  width: 150,
                   fixed: 'left'
+              },
+              {
+                  title: '库存量',
+                  key: 'repetoryQuantity',
+                  align: 'center',
               },
               {
                   title: '数量',
                   key: 'quantity',
                   align: 'center',
-                  editable: true,
-                  width: 150
+                  render: (h, params) => {
+                      let self = this;
+                      return h('Input', {
+                          props: {
+                              value: self.goodTableData[params.index][params.column.key]
+                          }
+                      });
+                  }
               },
               {
                   title: '定价',
                   key: 'fixPrice',
-                  align: 'center',
-                  editable: true,
-                  width: 150
+                  align: 'center'
               },
               {
                   title: '折扣',
                   key: 'disPrice',
                   align: 'center',
-                  editable: true,
-                  width: 150
+                  render: (h, params) => {
+                      let self = this;
+                      return h('Input', {
+                          props: {
+                              value: self.goodTableData[params.index][params.column.key]
+                          }
+                      });
+                  }
               },
               {
                   title: '赠送',
                   key: 'free',
                   align: 'center',
-                  editable: true,
-                  width: 150
+                  render: (h, params) => {
+                      let self = this;
+                      return h('Input', {
+                          props: {
+                              value: self.goodTableData[params.index][params.column.key]
+                          }
+                      });
+                  }
               },
               {
                   title: '实价',
                   key: 'realPrice',
                   align: 'center',
-                  editable: true,
-                  width: 150
+                  width: 150,
+                  render: (h, params) => {
+                      let self = this;
+                      return h('Input', {
+                            props: {
+                                value: self.goodTableData[params.index][params.column.key],
+                                icon: 'eye'
+                            }
+                      });
+                  }
               },
               {
                   title: '件单价',
                   key: 'singlePrice',
                   align: 'center',
-                  editable: true,
-                  width: 150
               },
               {
                   title: '金额',
                   key: 'amount',
                   align: 'center',
-                  editable: true,
-                  width: 150
               },
               {
                   title: '税率',
                   key: 'taxRate',
                   align: 'center',
-                  editable: true,
-                  width: 150
-              },
-              {
-                  title: '操作',
-                  align: 'center',
-                  width: 150,
-                  key: 'handle',
-                  handle: ['delete']
+                  render: (h, params) => {
+                      let self = this;
+                      return h('Input', {
+                          props: {
+                              value: self.goodTableData[params.index][params.column.key],
+                          }
+                      });
+                  }
               }
           ],
+          totalQuantity: 0,
+          totalAmount: 0,
           currChooseCustomer: null,
-          customerSearchModal: false,
           customerRepList: [],
           salerList: []
       }
@@ -364,8 +386,8 @@ export default {
       initData() {
           this.initOptions();
           this.getSalserList();
+          this.getWarehouseList();
       },
-
       initOptions() {
           let reqData = ['TEMPER_CONTROL', 'PAY_METHOD', 'SHIP_METHOD', 'SHIP_TOOL'];
           util.ajax.post("/options/list", reqData)
@@ -397,20 +419,22 @@ export default {
                 util.errorProcessor(this, error);
             });
       },
-      searchCustomerBtn() {
-          this.customerSearchModal = true;
+      getWarehouseList() {
+          util.ajax.get("/warehouse/list")
+            .then(response => {
+                this.warehouseList = response.data;
+            })
+            .catch(error => {
+                util.errorProcessor(this, error);
+            });
       },
-      customerSearchModalClose() {
-        this.customerSearchModal = false;
-      },
-      customerSearchChoosed(data) {
-          this.currChooseCustomer = data;
-          if (data && data.id) {
-              this.sellOrderFormData.customerId = data.id;
-              this.sellOrderFormData.customerName = data.name;
+      customerChange(customerId, customer) {
+          this.currChooseCustomer = customer;
+          if (customer && customer.id) {
+              this.sellOrderFormData.customerId = customer.id;
               this.sellOrderFormData.customerRepId = -1;
               this.customerRepList = [];
-              this.refreshCustomerRepList(data.id);
+              this.refreshCustomerRepList(customer.id);
           }
       },
       refreshCustomerRepList(customerId, customerRepId) {
@@ -489,16 +513,6 @@ export default {
                   this.sellOrderSaveBtnLoading = false;
                   return;
               }
-              if (!this.sellOrderFormData.customerId) {
-                this.$Message.warning("获取客户信息失败，请重新选择用户");
-                this.sellOrderSaveBtnLoading = false;
-                return;
-              }
-              if (!this.sellOrderFormData.customerRepId || this.sellOrderFormData.customerRepId < 0) {
-                  this.$Message.warning("请选择客户代表人信息");
-                  this.sellOrderSaveBtnLoading = false;
-                  return;
-              }
               let isEdit = (this.sellOrderFormData.id && this.sellOrderFormData.id > 0); //编辑模式
               if (isEdit) {
                   util.ajax.post("/sell/order/update", this.sellOrderFormData)
@@ -528,34 +542,60 @@ export default {
               this.$Notice.error({title: '系统异常', desc: '获取客户信息错误, 请确认选择的客户正确'});
           }
           this.editeOnlyDisable = true; //编辑模式下的客户信息不能修改
-          this.sellOrderFormData.customerName = this.currChooseCustomer.name; //设置customerName
           this.refreshCustomerRepList(data.customerId, data.customerRepId);
           this.refreshGoodsData(data.id);
       },
       
       addGoodBtnClick() {
           this.goodSearchModal = true;
+          let temp = this.warehouseList.filter(item => item.id === this.sellOrderFormData.warehouseId);
+          console.log(temp);
+          if (temp) {
+              this.chooseWarehouse = temp[0];
+          }
       },
       goodSearchModalClose() {
           this.goodSearchModal = false;
       },
-      goodSearchChoosed(goodDetail) {
-          let item = {
-              id: '',
-              sellOrderId: this.sellOrderFormData.id,
-              goodId: goodDetail.id,
-              goodName: goodDetail.name,
-              quantity: 0,
-              fixPrice: 0,
-              disPrice: 0,
-              free: 0,
-              realPrice: 0,
-              singlePrice: 0,
-              amount: 0,
-              taxRate: 0,
-              goods: goodDetail
-          };
-          this.goodTableData.push(item);
+      goodSearchChoosed(goodList) {
+          if(!goodList || goodList.length <= 0){
+              return;
+          }
+          let self = this;
+          let chooseList = goodList.filter(item => {
+              if(self.goodTableData) {
+                  for (let i=0; i<self.goodTableData.length; i++) {
+                      let temp = self.goodTableData[i];
+                      if(temp.goodId === item.goodId) {
+                          return fasel;
+                      }
+                  }
+                  return true;
+              }
+          });
+          if (!chooseList || chooseList.length <= 0) {
+              return;
+          }
+          let addList = chooseList.map(item => {
+              let temp = {
+                    id: '',
+                    sellOrderId: self.sellOrderFormData.id,
+                    goodId: item.goodId,
+                    goodName: item.goodName,
+                    repetoryQuantity: item.quantity,
+                    quantity: 0,
+                    fixPrice: item.salePrice,
+                    disPrice: 0,
+                    free: 0,
+                    realPrice: item.salePrice,
+                    singlePrice: item.salePrice,
+                    amount: 0,
+                    taxRate: 0,
+                    goods: item.goods
+                };
+                return temp;
+          });
+          addList.map(item => this.goodTableData.push(item));
       },
 
       refreshGoodsData(sellOrderId) {
@@ -571,6 +611,9 @@ export default {
                 });
             this.saveGoodBtnLoading = false;
           }
+      },
+      handleRowDbClick(data){
+          console.log(data);
       },
       goodRemoveItem(data, index, removeItem) {
           if (removeItem && removeItem.id && removeItem.id > 0) {

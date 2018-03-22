@@ -118,7 +118,7 @@ export default {
                 },
                 {
                     title: '客户名称',
-                    key: "customer.name",
+                    key: "customerName",
                     align: "center",
                     sortable: true
                 },

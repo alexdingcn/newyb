@@ -53,6 +53,8 @@ public class SellOrder {
 
     private Date updateTime;
 
+    private Integer warehouseId;
+
     private Customer customer;
 
     private CustomerRep customerRep;
@@ -254,6 +256,14 @@ public class SellOrder {
 
     public void setUpdateTime(Date updateTime) {
         this.updateTime = updateTime;
+    }
+
+    public Integer getWarehouseId() {
+        return warehouseId;
+    }
+
+    public void setWarehouseId(Integer warehouseId) {
+        this.warehouseId = warehouseId;
     }
 
     public Customer getCustomer() {
