@@ -11,12 +11,12 @@
                         <Row type="flex" justify="center">
                             <Col span="12">
                                 <FormItem label="客户">
-                                    <customer-select v-model="formItem.customerId" ></customer-select>
+                                    <customer-select size="small" v-model="formItem.customerId" ></customer-select>
                                 </FormItem>
                             </Col>
                             <Col span="12">
                                 <FormItem label="销售员">
-                                    <Select v-model="formItem.salerId" clearable filterable >
+                                    <Select size="small" v-model="formItem.salerId" clearable filterable >
                                         <Option v-for="item in salerList" :value="item.userId" :key="item.userId">{{ item.nickname }}{{item.realname ? (' - [' + item.realname + ']') : ''}}</Option>
                                     </Select>
                                 </FormItem>
@@ -25,12 +25,12 @@
                         <Row type="flex" justify="center" >
                             <Col span="12">
                                 <FormItem label="自定订号">
-                                    <Input type="text" v-model="formItem.refNo" ></Input>
+                                    <Input size="small" type="text" v-model="formItem.refNo" ></Input>
                                 </FormItem>
                             </Col>
                             <Col span="12">
                                 <FormItem label="制单日期">
-                                    <DatePicker v-model="formItem.createOrderDate" type="date" placeholder="请选择制单日期" ></DatePicker>
+                                    <DatePicker size="small" v-model="formItem.createOrderDate" type="date" placeholder="请选择制单日期" ></DatePicker>
                                 </FormItem>
                             </Col>
                         </Row>

@@ -49,11 +49,13 @@ public class SellOrderController {
         Integer salerId = StringUtils.isBlank(reqSalerId) ? null : Integer.parseInt(reqSalerId);
         Integer page = StringUtils.isBlank(reqPage) ? 1 : Integer.parseInt(reqPage);
         Integer size = StringUtils.isBlank(reqSize) ? 10 : Integer.parseInt(reqSize);
+        String reqRefNo = StringUtils.isBlank(refNo) ? null : refNo.trim();
+        String reqStatus = StringUtils.isBlank(status) ? null : status;
         Date createOrderDate = StringUtils.isBlank(reqDate) ? null : new Date(Long.valueOf(reqDate));
-        List<SellOrder> sellOrders = sellOrderService.getList(user.getCompanyId(), customerId, salerId, refNo, status, createOrderDate, page, size);
+        List<SellOrder> sellOrders = sellOrderService.getList(user.getCompanyId(), customerId, salerId, reqRefNo, reqStatus, createOrderDate, page, size);
         JSONObject result = new JSONObject();
         if (!sellOrders.isEmpty()) {
-            Integer count = sellOrderMapper.getListCount(user.getCompanyId(), customerId, salerId, refNo, status, createOrderDate);
+            Integer count = sellOrderMapper.getListCount(user.getCompanyId(), customerId, salerId, reqRefNo, reqStatus, createOrderDate);
             result.put("count", count == null ? 0 : count);
             result.put("data", sellOrders);
         }else {
@@ -86,6 +88,23 @@ public class SellOrderController {
     public ResponseEntity<String> detailList(@RequestParam("sellOrderId") Long sellOrderId) throws Exception {
         List<SellOrderDetail> details = sellOrderService.getDetailList(sellOrderId);
         return ResponseEntity.ok().body(JSON.toJSONString(details));
+    }
+
+    @RequestMapping(value = "/detail/history", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<JSON> getDetailHistory(HttpServletRequest request,
+                                                   @AuthenticationPrincipal User user) throws Exception {
+        String customerIdStr = request.getParameter("customerId");
+        String goodIdStr = request.getParameter("goodIds");
+        Integer customerId = null;
+        List<Long> goodIds = new ArrayList<>();
+        if (StringUtils.isNotBlank(customerIdStr)) {
+            customerId = Integer.parseInt(customerIdStr);
+        }
+        if (StringUtils.isNotBlank(goodIdStr)) {
+            goodIds = JSON.parseArray(goodIdStr, Long.class);
+        }
+        Map<Long, List<SellOrderDetail>> details = sellOrderService.getDetailHistory(user.getCompanyId(), customerId, goodIds);
+        return ResponseEntity.ok().body((JSON) JSON.toJSON(details));
     }
 
     @RequestMapping(value = "/detail/save", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)

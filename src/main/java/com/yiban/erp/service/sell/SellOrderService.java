@@ -152,10 +152,18 @@ public class SellOrderService {
             Goods goodsItem =  (tempList == null ? null : tempList.get(0));
             item.setGoods(goodsItem);
             item.setGoodName(goodsItem.getName());
-            item.setRepetoryQuantity(repNumberMap.get(goodsItem.getId()));
+            item.setRepertoryQuantity(repNumberMap.get(goodsItem.getId()));
         });
 
         return details;
+    }
+
+    public Map<Long,List<SellOrderDetail>> getDetailHistory(Integer companyId, Integer customerId, List<Long> goodIds) {
+        if (companyId == null || customerId == null || goodIds == null || goodIds.isEmpty()) {
+            return null;
+        }
+        List<SellOrderDetail> details = sellOrderDetailMapper.getDetailHistory(companyId, customerId, goodIds, 0, 20);
+        return details.stream().collect(Collectors.groupingBy(SellOrderDetail::getGoodId));
     }
 
     public int detailSave(final User user, final List<SellOrderDetail> details) throws BizException {
@@ -320,4 +328,6 @@ public class SellOrderService {
         logger.info("user:{} remove sell ship record:{}", user.getId(), JSON.toJSONString(sellOrderShip));
         return sellOrderShipMapper.deleteByPrimaryKey(id);
     }
+
+
 }

@@ -188,6 +188,11 @@
             @choosed="goodSearchChoosed">
         </good-search>
 
+        <Modal v-model="goodHistoryModal" width="75" :mask-closable="false" title="商品销售历史价格">
+            <sell-good-history :excludedOrderId="historyExcludeId" :detailList="historyDetails"></sell-good-history>
+            <div slot="footer"></div>
+        </Modal>
+
     </div>
 </template>
 
@@ -198,461 +203,618 @@ import customerSelect from "@/views/customer/customer-select.vue";
 import sellOrderSearch from "@/views/sell/sell-order-search.vue";
 import goodSearch from "@/views/good/good-search.vue";
 import goodExpand from "@/views/good/good-expand.vue";
+import sellGoodHistory from "./sell-good-history.vue";
 
 export default {
-  name: 'sell_order_make',
+  name: "sell_order_make",
   components: {
-      customerSelect,
-      sellOrderSearch,
-      goodSearch,
-      goodExpand
+    customerSelect,
+    sellOrderSearch,
+    goodSearch,
+    goodExpand,
+    sellGoodHistory
   },
   data() {
-      return {
-          payMethodList: [],
-          temperControlList: [],
-          shipMethodList: [],
-          shipToolList: [],
-          warehouseList: [],
-          editeOnlyDisable: false,
-          sellOrderFormData: {
-              id: '',
-              customerId: '',
-              customerName: '',
-              customerRepId: -1,
-              contactPhone: '',
-              repertoryAddress: '',
-              salerId: '',
-              refNo: '',
-              temperControlId: '',
-              shipMethod: '',
-              shipTool: '',
-              createOrderDate: '',
-              takeGoodsUser: '',
-              payOrderDate: '',
-              payMethod: '',
-              payFileNo: '',
-              markUpRate: 0,
-              payAmount: 0,
-              notSmallAmount: 0,
-              warehouseId: '',
-              comment: ''
-          },
-          sellOrderFormValidate: {
-              customerId: [
-                  {required: true, type: 'number', message: '客户必输', trigger: 'change'}
-              ],
-              customerRepId: [
-                  {required: true, type: 'number', message: '客户代表人必输', trigger: 'change'}
-              ],
-              salerId: [
-                  {required: true, type: 'number', message: '销售员必输', trigger: 'change'}
-              ],
-              contactPhone: [
-                  {required: true, message: '客户代表人联系方式缺失', trigger: 'blur'}
-              ],
-              repertoryAddress: [
-                  {required: true, message: '客户代表人收货地址缺失', trigger: 'blur'}
-              ],
-              warehouseId: [
-                  {required: true, type: 'number', message: '仓库点必输', trigger: 'change'}
-              ]
-          },
-          sellOrderSaveBtnLoading: false,
-          sellOrderSearchModal: false,
-          chooseWarehouse: {},
-          goodSearchModal: false,
-          saveGoodBtnLoading: false,
-          goodTableData:[],
-          goodTableColumn: [
-              {
-                  type: 'expand',
-                  width: 50,
-                  fixed: 'left',
-                  render: (h, params) => {
-                    return h(goodExpand, {
-                        props: {
-                            detail: params.row.goods
-                        }
-                    });
-                  }
-              },
-              {
-                  title: '药名',
-                  key: 'goodName',
-                  align: 'center',
-                  sortable: true,
-                  fixed: 'left'
-              },
-              {
-                  title: '库存量',
-                  key: 'repetoryQuantity',
-                  align: 'center',
-              },
-              {
-                  title: '数量',
-                  key: 'quantity',
-                  align: 'center',
-                  render: (h, params) => {
-                      let self = this;
-                      return h('Input', {
-                          props: {
-                              value: self.goodTableData[params.index][params.column.key]
-                          }
-                      });
-                  }
-              },
-              {
-                  title: '定价',
-                  key: 'fixPrice',
-                  align: 'center'
-              },
-              {
-                  title: '折扣',
-                  key: 'disPrice',
-                  align: 'center',
-                  render: (h, params) => {
-                      let self = this;
-                      return h('Input', {
-                          props: {
-                              value: self.goodTableData[params.index][params.column.key]
-                          }
-                      });
-                  }
-              },
-              {
-                  title: '赠送',
-                  key: 'free',
-                  align: 'center',
-                  render: (h, params) => {
-                      let self = this;
-                      return h('Input', {
-                          props: {
-                              value: self.goodTableData[params.index][params.column.key]
-                          }
-                      });
-                  }
-              },
-              {
-                  title: '实价',
-                  key: 'realPrice',
-                  align: 'center',
-                  width: 150,
-                  render: (h, params) => {
-                      let self = this;
-                      return h('Input', {
-                            props: {
-                                value: self.goodTableData[params.index][params.column.key],
-                                icon: 'eye'
-                            }
-                      });
-                  }
-              },
-              {
-                  title: '件单价',
-                  key: 'singlePrice',
-                  align: 'center',
-              },
-              {
-                  title: '金额',
-                  key: 'amount',
-                  align: 'center',
-              },
-              {
-                  title: '税率',
-                  key: 'taxRate',
-                  align: 'center',
-                  render: (h, params) => {
-                      let self = this;
-                      return h('Input', {
-                          props: {
-                              value: self.goodTableData[params.index][params.column.key],
-                          }
-                      });
-                  }
+    return {
+      payMethodList: [],
+      temperControlList: [],
+      shipMethodList: [],
+      shipToolList: [],
+      warehouseList: [],
+      editeOnlyDisable: false,
+      sellOrderFormData: {
+        id: "",
+        customerId: "",
+        customerName: "",
+        customerRepId: -1,
+        contactPhone: "",
+        repertoryAddress: "",
+        salerId: "",
+        refNo: "",
+        temperControlId: "",
+        shipMethod: "",
+        shipTool: "",
+        createOrderDate: "",
+        takeGoodsUser: "",
+        payOrderDate: "",
+        payMethod: "",
+        payFileNo: "",
+        markUpRate: 0,
+        payAmount: 0,
+        notSmallAmount: 0,
+        warehouseId: "",
+        comment: ""
+      },
+      sellOrderFormValidate: {
+        customerId: [
+          {
+            required: true,
+            type: "number",
+            message: "客户必输",
+            trigger: "change"
+          }
+        ],
+        customerRepId: [
+          {
+            required: true,
+            type: "number",
+            message: "客户代表人必输",
+            trigger: "change"
+          }
+        ],
+        salerId: [
+          {
+            required: true,
+            type: "number",
+            message: "销售员必输",
+            trigger: "change"
+          }
+        ],
+        contactPhone: [
+          { required: true, message: "客户代表人联系方式缺失", trigger: "blur" }
+        ],
+        repertoryAddress: [
+          { required: true, message: "客户代表人收货地址缺失", trigger: "blur" }
+        ],
+        warehouseId: [
+          {
+            required: true,
+            type: "number",
+            message: "仓库点必输",
+            trigger: "change"
+          }
+        ]
+      },
+      sellOrderSaveBtnLoading: false,
+      sellOrderSearchModal: false,
+      chooseWarehouse: {},
+      goodSearchModal: false,
+      saveGoodBtnLoading: false,
+      goodTableData: [],
+      goodTableColumn: [
+        {
+          type: "expand",
+          width: 50,
+          fixed: "left",
+          render: (h, params) => {
+            return h(goodExpand, {
+              props: {
+                detail: params.row.goods
               }
-          ],
-          totalQuantity: 0,
-          totalAmount: 0,
-          currChooseCustomer: null,
-          customerRepList: [],
-          salerList: []
-      }
+            });
+          }
+        },
+        {
+          title: "药名",
+          key: "goodName",
+          align: "center",
+          sortable: true,
+          fixed: "left"
+        },
+        {
+          title: "库存量",
+          key: "repetoryQuantity",
+          align: "center"
+        },
+        {
+          title: "数量",
+          key: "quantity",
+          align: "center",
+          render: (h, params) => {
+            let self = this;
+            return h("Input", {
+              props: {
+                value: self.goodTableData[params.index][params.column.key]
+              },
+              on: {
+                "on-blur"(event) {
+                  let row = self.goodTableData[params.index];
+                  row[params.column.key] = event.target.value;
+                  self.resetGoodSDataAmount(params.index);
+                }
+              }
+            });
+          }
+        },
+        {
+          title: "定价",
+          key: "fixPrice",
+          align: "center"
+        },
+        {
+          title: "折扣",
+          key: "disPrice",
+          align: "center",
+          render: (h, params) => {
+            let self = this;
+            return h("Input", {
+              props: {
+                value: self.goodTableData[params.index][params.column.key]
+              },
+              on: {
+                "on-blur"(event) {
+                  let row = self.goodTableData[params.index];
+                  row[params.column.key] = event.target.value;
+                  self.resetGoodSDataAmount(params.index);
+                }
+              }
+            });
+          }
+        },
+        {
+          title: "赠送",
+          key: "free",
+          align: "center",
+          render: (h, params) => {
+            let self = this;
+            return h("Input", {
+              props: {
+                value: self.goodTableData[params.index][params.column.key]
+              },
+              on: {
+                "on-blur"(event) {
+                  let row = self.goodTableData[params.index];
+                  row[params.column.key] = event.target.value;
+                  self.resetGoodSDataAmount(params.index);
+                }
+              }
+            });
+          }
+        },
+        {
+          title: "实价",
+          key: "realPrice",
+          align: "center",
+          width: 150,
+          render: (h, params) => {
+            let self = this;
+            return h("Input", {
+              props: {
+                value: self.goodTableData[params.index][params.column.key],
+                icon: "eye"
+              },
+              on: {
+                "on-blur"(event) {
+                  let row = self.goodTableData[params.index];
+                  row[params.column.key] = event.target.value;
+                  row["singlePrice"] = event.target.value;
+                  self.resetGoodSDataAmount(params.index);
+                },
+                "on-click"(event) {
+                  let goodId = params.row.goodId;
+                  self.openRealPriceHistory(goodId);
+                }
+              }
+            });
+          }
+        },
+        {
+          title: "件单价",
+          key: "singlePrice",
+          align: "center"
+        },
+        {
+          title: "金额",
+          key: "amount",
+          align: "center"
+        },
+        {
+          title: "税率",
+          key: "taxRate",
+          align: "center",
+          render: (h, params) => {
+            let self = this;
+            return h("Input", {
+              props: {
+                value: self.goodTableData[params.index][params.column.key]
+              },
+              on: {
+                "on-blur"(event) {
+                  let row = self.goodTableData[params.index];
+                  row[params.column.key] = event.target.value;
+                }
+              }
+            });
+          }
+        }
+      ],
+      totalQuantity: 0,
+      totalAmount: 0,
+      currChooseCustomer: null,
+      customerRepList: [],
+      salerList: [],
+      goodHistory: {},
+      historyExcludeId: "",
+      historyDetails: [],
+      goodHistoryModal: false
+    };
   },
   mounted() {
-      this.initData();
+    this.initData();
+  },
+  watch: {
+    goodTableData(data) {
+      if (data && data.length > 0) {
+        this.totalQuantity = data.reduce((count, item) => {
+          if (item.quantity && !isNaN(item.quantity)) {
+            return count + parseInt(item.quantity);
+          }
+        }, 0);
+        this.totalAmount = data.reduce((total, item) => {
+          if (item.amount && !isNaN(item.amount)) {
+            return total + parseFloat(item.amount);
+          }
+        }, 0);
+      }
+    }
   },
   methods: {
-      initData() {
-          this.initOptions();
-          this.getSalserList();
-          this.getWarehouseList();
-      },
-      initOptions() {
-          let reqData = ['TEMPER_CONTROL', 'PAY_METHOD', 'SHIP_METHOD', 'SHIP_TOOL'];
-          util.ajax.post("/options/list", reqData)
-            .then((response) => {
-              let data = response.data;
-              if (data && data.TEMPER_CONTROL) {
-                  this.temperControlList = data.TEMPER_CONTROL;
-              }
-              if (data && data.PAY_METHOD) {
-                  this.payMethodList = data.PAY_METHOD;
-              }
-              if (data && data.SHIP_METHOD) {
-                  this.shipMethodList = data.SHIP_METHOD;
-              }
-              if (data && data.SHIP_TOOL) {
-                  this.shipToolList = data.SHIP_TOOL;
-              }
-          })
-          .catch((error) => {
-              util.errorProcessor(this, error);
-          })
-      },
-      getSalserList() {
-          util.ajax.get('/userrole/list', {params: {roleQuery: 'ROLE_SALER'}})
-            .then((response) => {
-                this.salerList = response.data;
-            })
-            .catch((error) => {
-                util.errorProcessor(this, error);
-            });
-      },
-      getWarehouseList() {
-          util.ajax.get("/warehouse/list")
+    initData() {
+      this.initOptions();
+      this.getSalserList();
+      this.getWarehouseList();
+    },
+    initOptions() {
+      let reqData = [
+        "TEMPER_CONTROL",
+        "PAY_METHOD",
+        "SHIP_METHOD",
+        "SHIP_TOOL"
+      ];
+      util.ajax
+        .post("/options/list", reqData)
+        .then(response => {
+          let data = response.data;
+          if (data && data.TEMPER_CONTROL) {
+            this.temperControlList = data.TEMPER_CONTROL;
+          }
+          if (data && data.PAY_METHOD) {
+            this.payMethodList = data.PAY_METHOD;
+          }
+          if (data && data.SHIP_METHOD) {
+            this.shipMethodList = data.SHIP_METHOD;
+          }
+          if (data && data.SHIP_TOOL) {
+            this.shipToolList = data.SHIP_TOOL;
+          }
+        })
+        .catch(error => {
+          util.errorProcessor(this, error);
+        });
+    },
+    getSalserList() {
+      util.ajax
+        .get("/userrole/list", { params: { roleQuery: "ROLE_SALER" } })
+        .then(response => {
+          this.salerList = response.data;
+        })
+        .catch(error => {
+          util.errorProcessor(this, error);
+        });
+    },
+    getWarehouseList() {
+      util.ajax
+        .get("/warehouse/list")
+        .then(response => {
+          this.warehouseList = response.data;
+        })
+        .catch(error => {
+          util.errorProcessor(this, error);
+        });
+    },
+    customerChange(customerId, customer) {
+      this.currChooseCustomer = customer;
+      if (customer && customer.id) {
+        this.sellOrderFormData.customerId = customer.id;
+        this.sellOrderFormData.customerRepId = -1;
+        this.customerRepList = [];
+        this.refreshCustomerRepList(customer.id);
+      }
+    },
+    refreshCustomerRepList(customerId, customerRepId) {
+      let reqData = {
+        customerId: customerId
+      };
+      console.log("get customer rep list.");
+      util.ajax
+        .get("/customer/rep/list", { params: reqData })
+        .then(response => {
+          this.customerRepList = response.data;
+          console.log("already get customer list.");
+          if (this.customerRepList && this.customerRepList.length > 0) {
+            this.chooseCustomerRep(customerRepId);
+          }
+        })
+        .catch(error => {
+          util.errorProcessor(this, error);
+        });
+    },
+    customerRepSelChange(data) {
+      if (data) {
+        this.chooseCustomerRep(data);
+      }
+    },
+    chooseCustomerRep(customerRepId) {
+      if (customerRepId && customerRepId > 0) {
+        let customerRep = dataConver.selectObjectById(
+          customerRepId,
+          this.customerRepList
+        );
+        this.setCustomerRepInfo(customerRep);
+      } else {
+        let defaultItem = this.getCustomerRepDefault();
+        if (defaultItem && defaultItem.id) {
+          this.setCustomerRepInfo(defaultItem);
+        }
+      }
+    },
+    getCustomerRepDefault() {
+      if (!this.customerRepList || this.customerRepList.length <= 0) {
+        return null;
+      }
+      for (let i = 0; i < this.customerRepList.length; i++) {
+        let item = this.customerRepList[i];
+        if (item.isDefault) {
+          return item;
+        }
+      }
+    },
+    setCustomerRepInfo(customerRep) {
+      if (customerRep && customerRep.id) {
+        this.sellOrderFormData.customerRepId = customerRep.id;
+        this.sellOrderFormData.contactPhone = customerRep.contactPhone;
+        this.sellOrderFormData.repertoryAddress = customerRep.repertoryAddress;
+      } else {
+        this.sellOrderFormData.customerRepId = -1;
+        this.sellOrderFormData.contactPhone = "";
+        this.sellOrderFormData.repertoryAddress = "";
+      }
+    },
+    orderSearchModalClose() {
+      this.sellOrderSearchModal = false;
+    },
+    orderSearchChoosed(data) {
+      if (data && data.id && data.id > 0) {
+        this.currChooseCustomer = data.customer;
+        this.orderFormChangeToEditModel(data);
+      }
+    },
+    getOldSellOrderBtnClick() {
+      this.sellOrderSearchModal = true;
+    },
+
+    sellOrderSaveBtnClick() {
+      this.sellOrderSaveBtnLoading = true;
+      this.$refs.sellOrderForm.validate(valid => {
+        if (!valid) {
+          this.$Message.warning("请检查表单必输项是否完整");
+          this.sellOrderSaveBtnLoading = false;
+          return;
+        }
+        let isEdit = this.sellOrderFormData.id && this.sellOrderFormData.id > 0; //编辑模式
+        if (isEdit) {
+          util.ajax
+            .post("/sell/order/update", this.sellOrderFormData)
             .then(response => {
-                this.warehouseList = response.data;
+              this.$Message.success("保存成功");
+              this.orderFormChangeToEditModel(response.data);
             })
             .catch(error => {
-                util.errorProcessor(this, error);
+              util.errorProcessor(this, error);
             });
-      },
-      customerChange(customerId, customer) {
-          this.currChooseCustomer = customer;
-          if (customer && customer.id) {
-              this.sellOrderFormData.customerId = customer.id;
-              this.sellOrderFormData.customerRepId = -1;
-              this.customerRepList = [];
-              this.refreshCustomerRepList(customer.id);
-          }
-      },
-      refreshCustomerRepList(customerId, customerRepId) {
-          let reqData = {
-              customerId: customerId
-          };
-          console.log('get customer rep list.');
-          util.ajax.get("/customer/rep/list", {params: reqData})
-            .then((response) => {
-                this.customerRepList = response.data;
-                console.log('already get customer list.');
-                if (this.customerRepList && this.customerRepList.length > 0) {
-                    this.chooseCustomerRep(customerRepId);
-                }
+        } else {
+          util.ajax
+            .post("/sell/order/add", this.sellOrderFormData)
+            .then(response => {
+              this.$Message.success("保存成功");
+              this.orderFormChangeToEditModel(response.data);
             })
-            .catch((error) => {
-                util.errorProcessor(this, error);
+            .catch(error => {
+              util.errorProcessor(this, error);
             });
-      },
-      customerRepSelChange(data) {
-          if (data) {
-              this.chooseCustomerRep(data);
-          }
-      },
-      chooseCustomerRep(customerRepId) {
-          if (customerRepId && customerRepId > 0) {
-            let customerRep = dataConver.selectObjectById(customerRepId, this.customerRepList);
-            this.setCustomerRepInfo(customerRep);
-          }else {
-            let defaultItem = this.getCustomerRepDefault();
-            if (defaultItem && defaultItem.id) {
-                  this.setCustomerRepInfo(defaultItem);
-              }
-          }
-      },
-      getCustomerRepDefault() {
-          if (!this.customerRepList || this.customerRepList.length <= 0) {
-              return null;
-          }
-          for (let i=0; i<this.customerRepList.length; i++) {
-              let item = this.customerRepList[i];
-              if (item.isDefault) {
-                  return item;
-              }
-          }
-      },
-      setCustomerRepInfo(customerRep) {
-          if(customerRep && customerRep.id) {
-              this.sellOrderFormData.customerRepId = customerRep.id;
-              this.sellOrderFormData.contactPhone = customerRep.contactPhone;
-              this.sellOrderFormData.repertoryAddress = customerRep.repertoryAddress;
-          }else {
-              this.sellOrderFormData.customerRepId = -1;
-              this.sellOrderFormData.contactPhone = '';
-              this.sellOrderFormData.repertoryAddress = '';
-          }
-      },
-      orderSearchModalClose() {
-          this.sellOrderSearchModal = false;
-      },
-      orderSearchChoosed(data) {
-          if (data && data.id && data.id > 0) {
-              this.currChooseCustomer = data.customer;
-              this.orderFormChangeToEditModel(data);
-          }
-      },
-      getOldSellOrderBtnClick() {
-        this.sellOrderSearchModal = true;
-      },
-
-      sellOrderSaveBtnClick() {
-          this.sellOrderSaveBtnLoading = true;
-          this.$refs.sellOrderForm.validate(valid => {
-              if (!valid) {
-                  this.$Message.warning("请检查表单必输项是否完整");
-                  this.sellOrderSaveBtnLoading = false;
-                  return;
-              }
-              let isEdit = (this.sellOrderFormData.id && this.sellOrderFormData.id > 0); //编辑模式
-              if (isEdit) {
-                  util.ajax.post("/sell/order/update", this.sellOrderFormData)
-                    .then((response) => {
-                        this.$Message.success('保存成功');
-                        this.orderFormChangeToEditModel(response.data);
-                    })
-                    .catch((error) => {
-                        util.errorProcessor(this, error);
-                    });
-              }else {
-                  util.ajax.post("/sell/order/add", this.sellOrderFormData)
-                    .then((response) => {
-                        this.$Message.success('保存成功');
-                        this.orderFormChangeToEditModel(response.data);
-                    })
-                    .catch((error) => {
-                        util.errorProcessor(this, error);
-                    });
-              }
-              this.sellOrderSaveBtnLoading = false;
-          });
-      },
-      orderFormChangeToEditModel(data) {
-          this.sellOrderFormData = data;
-          if (data.customerId !== this.currChooseCustomer.id) {
-              this.$Notice.error({title: '系统异常', desc: '获取客户信息错误, 请确认选择的客户正确'});
-          }
-          this.editeOnlyDisable = true; //编辑模式下的客户信息不能修改
-          this.refreshCustomerRepList(data.customerId, data.customerRepId);
-          this.refreshGoodsData(data.id);
-      },
-      
-      addGoodBtnClick() {
-          this.goodSearchModal = true;
-          let temp = this.warehouseList.filter(item => item.id === this.sellOrderFormData.warehouseId);
-          console.log(temp);
-          if (temp) {
-              this.chooseWarehouse = temp[0];
-          }
-      },
-      goodSearchModalClose() {
-          this.goodSearchModal = false;
-      },
-      goodSearchChoosed(goodList) {
-          if(!goodList || goodList.length <= 0){
-              return;
-          }
-          let self = this;
-          let chooseList = goodList.filter(item => {
-              if(self.goodTableData) {
-                  for (let i=0; i<self.goodTableData.length; i++) {
-                      let temp = self.goodTableData[i];
-                      if(temp.goodId === item.goodId) {
-                          return fasel;
-                      }
-                  }
-                  return true;
-              }
-          });
-          if (!chooseList || chooseList.length <= 0) {
-              return;
-          }
-          let addList = chooseList.map(item => {
-              let temp = {
-                    id: '',
-                    sellOrderId: self.sellOrderFormData.id,
-                    goodId: item.goodId,
-                    goodName: item.goodName,
-                    repetoryQuantity: item.quantity,
-                    quantity: 0,
-                    fixPrice: item.salePrice,
-                    disPrice: 0,
-                    free: 0,
-                    realPrice: item.salePrice,
-                    singlePrice: item.salePrice,
-                    amount: 0,
-                    taxRate: 0,
-                    goods: item.goods
-                };
-                return temp;
-          });
-          addList.map(item => this.goodTableData.push(item));
-      },
-
-      refreshGoodsData(sellOrderId) {
-          if (sellOrderId && sellOrderId > 0) {
-              let reqData = {sellOrderId: sellOrderId};
-              this.saveGoodBtnLoading = true;
-              util.ajax.get("/sell/detail/list", {params: reqData})
-                .then((response) => {
-                    this.goodTableData = response.data;
-                })
-                .catch((error) => {
-                    util.errorProcessor(this, error);
-                });
-            this.saveGoodBtnLoading = false;
-          }
-      },
-      handleRowDbClick(data){
-          console.log(data);
-      },
-      goodRemoveItem(data, index, removeItem) {
-          if (removeItem && removeItem.id && removeItem.id > 0) {
-              //联动删除数据库中的值
-              util.ajax.delete("/sell/detail/remove/" + removeItem.id)
-                .then((response) => {
-                    let count = response.data.count;
-                    this.$Message.success('成功删除' + (count ? count : 0) + '条记录');
-                })
-                .catch((error) => {
-                    util.errorProcessor(this, error);
-                });
-          }
-      },
-      saveGoodBtnClick() {
-          if (!this.goodTableData || this.goodTableData.length <= 0) {
-              this.$Message.warning('请先新增商品信息');
-              return;
-          }
-          this.saveGoodBtnLoading = true;
-          util.ajax.post("/sell/detail/save", this.goodTableData)
-            .then((response) => {
-                let success = response.data.success;
-                let fail = response.data.fail;
-                let detais = response.data.detailList;
-                this.$Message.success('成功保存' + success + '条记录, 失败' + fail + '条');
-                this.goodTableData = detais;
-            })
-            .catch((error) => {
-                util.errorProcessor(this, error);
-            });
-          this.saveGoodBtnLoading = false;
-      },
-      refreshGoodBtnClick(){
-          this.refreshGoodsData(this.sellOrderFormData.id);
+        }
+        this.sellOrderSaveBtnLoading = false;
+      });
+    },
+    orderFormChangeToEditModel(data) {
+      this.sellOrderFormData = data;
+      if (data.customerId !== this.currChooseCustomer.id) {
+        this.$Notice.error({
+          title: "系统异常",
+          desc: "获取客户信息错误, 请确认选择的客户正确"
+        });
       }
+      this.editeOnlyDisable = true; //编辑模式下的客户信息不能修改
+      this.refreshCustomerRepList(data.customerId, data.customerRepId);
+      this.refreshGoodsData(data.id);
+    },
 
+    addGoodBtnClick() {
+      this.goodSearchModal = true;
+      let temp = this.warehouseList.filter(
+        item => item.id === this.sellOrderFormData.warehouseId
+      );
+      console.log(temp);
+      if (temp) {
+        this.chooseWarehouse = temp[0];
+      }
+    },
+    goodSearchModalClose() {
+      this.goodSearchModal = false;
+    },
+    goodSearchChoosed(goodList) {
+      if (!goodList || goodList.length <= 0) {
+        return;
+      }
+      let self = this;
+      let chooseList = goodList.filter(item => {
+        if (self.goodTableData) {
+          for (let i = 0; i < self.goodTableData.length; i++) {
+            let temp = self.goodTableData[i];
+            if (temp.goodId === item.goodId) {
+              return fasel;
+            }
+          }
+          return true;
+        }
+      });
+      if (!chooseList || chooseList.length <= 0) {
+        return;
+      }
+      let addList = chooseList.map(item => {
+        let temp = {
+          id: "",
+          sellOrderId: self.sellOrderFormData.id,
+          goodId: item.goodId,
+          goodName: item.goodName,
+          repetoryQuantity: item.quantity,
+          quantity: 0,
+          fixPrice: item.salePrice,
+          disPrice: 0,
+          free: 0,
+          realPrice: item.salePrice,
+          singlePrice: item.salePrice,
+          amount: 0,
+          taxRate: 0,
+          goods: item.goods
+        };
+        return temp;
+      });
+      addList.map(item => this.goodTableData.push(item));
+      this.getGoodHistoryPrice();
+    },
+    getGoodHistoryPrice() {
+      let list = this.goodTableData;
+      if (!list || list.length <= 0) {
+        return;
+      }
+      let goodIds = [];
+      for (let i = 0; i < list.length; i++) {
+        if (list[i] && list[i].goodId) {
+          goodIds.push(list[i].goodId);
+        }
+      }
+      let customerId = this.sellOrderFormData.customerId;
+      let reqData = {
+        goodIds: JSON.stringify(goodIds),
+        customerId: customerId
+      };
+      util.ajax
+        .get("/sell/detail/history", { params: reqData })
+        .then(response => {
+          this.goodHistory = response.data;
+        })
+        .catch(error => {
+          util.errorProcessor(this, error);
+        });
+    },
+    openRealPriceHistory(goodId) {
+      this.historyExcludeId = this.sellOrderFormData.id;
+      if (!goodId || !this.goodHistory || !this.goodHistory[goodId]) {
+        this.historyDetails = [];
+      } else {
+        let details = this.goodHistory[goodId];
+        if (details && details.length > 0) {
+          this.historyDetails = details;
+        } else {
+          this.historyDetails = [];
+        }
+      }
+      this.goodHistoryModal = true;
+    },
+    resetGoodSDataAmount(index) {
+      let row = this.goodTableData[index];
+      let realPrice =
+        row["realPrice"] && !isNaN(row["realPrice"]) ? row["realPrice"] : 0;
+      let disPrice =
+        row["disPrice"] && !isNaN(row["disPrice"]) ? row["disPrice"] : 0;
+      let free = row["free"] && !isNaN(row["free"]) ? row["free"] : 0;
+      let quantity =
+        row["quantity"] && !isNaN(row["quantity"]) ? row["quantity"] : 0;
+      let num = quantity - free > 0 ? quantity - free : 0;
+      row.amount = (num * realPrice * (1 - disPrice / 100)).toFixed(2);
+      this.$set(this.goodTableData, index, row);
+    },
+
+    refreshGoodsData(sellOrderId) {
+      if (sellOrderId && sellOrderId > 0) {
+        let reqData = { sellOrderId: sellOrderId };
+        this.saveGoodBtnLoading = true;
+        util.ajax
+          .get("/sell/detail/list", { params: reqData })
+          .then(response => {
+            this.goodTableData = response.data;
+          })
+          .catch(error => {
+            util.errorProcessor(this, error);
+          });
+        this.saveGoodBtnLoading = false;
+      }
+    },
+    handleRowDbClick(data) {
+      console.log(data);
+    },
+    goodRemoveItem(data, index, removeItem) {
+      if (removeItem && removeItem.id && removeItem.id > 0) {
+        //联动删除数据库中的值
+        util.ajax
+          .delete("/sell/detail/remove/" + removeItem.id)
+          .then(response => {
+            let count = response.data.count;
+            this.$Message.success("成功删除" + (count ? count : 0) + "条记录");
+          })
+          .catch(error => {
+            util.errorProcessor(this, error);
+          });
+      }
+    },
+    saveGoodBtnClick() {
+      if (!this.goodTableData || this.goodTableData.length <= 0) {
+        this.$Message.warning("请先新增商品信息");
+        return;
+      }
+      this.saveGoodBtnLoading = true;
+      util.ajax
+        .post("/sell/detail/save", this.goodTableData)
+        .then(response => {
+          let success = response.data.success;
+          let fail = response.data.fail;
+          let detais = response.data.detailList;
+          this.$Message.success(
+            "成功保存" + success + "条记录, 失败" + fail + "条"
+          );
+          this.goodTableData = detais;
+        })
+        .catch(error => {
+          util.errorProcessor(this, error);
+        });
+      this.saveGoodBtnLoading = false;
+    },
+    refreshGoodBtnClick() {
+      this.refreshGoodsData(this.sellOrderFormData.id);
+    }
   }
-}
+};
 </script>
 
 <style>

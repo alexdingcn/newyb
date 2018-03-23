@@ -211,4 +211,30 @@
     where sell_order_id = #{sellOrderId,jdbcType=BIGINT}
   </select>
 
+  <select id="getDetailHistory" parameterType="map" resultType="com.yiban.erp.entities.SellOrderDetail">
+    select
+      t.id as id, t.sell_order_id as sellOrderId, t.good_id as goodId, t.quantity as quantity,
+      t.fix_price as fixPrice, t.dis_price as disPrice, t.free as free, t.real_price as realPrice,
+      t.single_price as singlePrice, t.amount as amount, t.tax_rate as taxRate,
+      t.create_by as createBy, t.create_time as createTime, t.update_by as updateBy, t.update_time as updateTime,
+      c.name as customerName,
+      g.name as goodName,
+      s.create_order_date as createOrderDate,
+      u.nickname as salerNickName,
+      u.realname as salerRealName
+    from sell_order_detail t, sell_order s, users u, customer c, goods g
+    where t.sell_order_id = s.id and s.customer_id = c.id
+    and s.saler_id = u.id and t.good_id = g.id
+    and s.company_id = #{companyId}
+    and s.customer_id = #{customerId}
+    and g.id in
+    <foreach collection="goodIds" separator="," item="item" close=")" open="(">
+      #{item}
+    </foreach>
+    order by s.create_order_date desc
+    <if test="offset != null and limit != null">
+      limit #{offset}, #{limit}
+    </if>
+  </select>
+
 </mapper>

@@ -36,7 +36,12 @@ public class SellOrderDetail {
 
     private Date updateTime;
 
-    private Integer repetoryQuantity; //当前库存量
+    private Integer repertoryQuantity; //当前库存量
+
+    private Date createOrderDate;
+    private String salerNickName;
+    private String salerRealName;
+    private String customerName;
 
     private Goods goods; //与商品是1对1的映射
 
@@ -176,11 +181,43 @@ public class SellOrderDetail {
         this.goods = goods;
     }
 
-    public Integer getRepetoryQuantity() {
-        return repetoryQuantity;
+    public Integer getRepertoryQuantity() {
+        return repertoryQuantity;
     }
 
-    public void setRepetoryQuantity(Integer repetoryQuantity) {
-        this.repetoryQuantity = repetoryQuantity;
+    public void setRepertoryQuantity(Integer repertoryQuantity) {
+        this.repertoryQuantity = repertoryQuantity;
+    }
+
+    public Date getCreateOrderDate() {
+        return createOrderDate;
+    }
+
+    public void setCreateOrderDate(Date createOrderDate) {
+        this.createOrderDate = createOrderDate;
+    }
+
+    public String getSalerNickName() {
+        return salerNickName;
+    }
+
+    public void setSalerNickName(String salerNickName) {
+        this.salerNickName = salerNickName;
+    }
+
+    public String getSalerRealName() {
+        return salerRealName;
+    }
+
+    public void setSalerRealName(String salerRealName) {
+        this.salerRealName = salerRealName;
+    }
+
+    public String getCustomerName() {
+        return customerName;
+    }
+
+    public void setCustomerName(String customerName) {
+        this.customerName = customerName;
     }
 }

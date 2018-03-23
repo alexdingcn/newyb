@@ -2,6 +2,7 @@ package com.yiban.erp.dao;
 
 import com.yiban.erp.entities.SellOrderDetail;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -20,4 +21,10 @@ public interface SellOrderDetailMapper {
     int updateByPrimaryKey(SellOrderDetail record);
 
     List<SellOrderDetail> getDetailList(Long sellOrderId);
+
+    List<SellOrderDetail> getDetailHistory(@Param("companyId") Integer companyId,
+                                           @Param("customerId") Integer customerId,
+                                           @Param("goodIds") List<Long> goodIds,
+                                           @Param("offset") Integer offset,
+                                           @Param("limit") Integer limit);
 }
