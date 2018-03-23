@@ -313,7 +313,7 @@ export default {
         },
         {
           title: "库存量",
-          key: "repetoryQuantity",
+          key: "repertoryQuantity",
           align: "center"
         },
         {
@@ -535,12 +535,10 @@ export default {
       let reqData = {
         customerId: customerId
       };
-      console.log("get customer rep list.");
       util.ajax
         .get("/customer/rep/list", { params: reqData })
         .then(response => {
           this.customerRepList = response.data;
-          console.log("already get customer list.");
           if (this.customerRepList && this.customerRepList.length > 0) {
             this.chooseCustomerRep(customerRepId);
           }
