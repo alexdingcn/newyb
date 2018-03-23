@@ -84,6 +84,14 @@ public class SellOrderController {
         return ResponseEntity.ok().body(JSON.toJSONString(result));
     }
 
+    @RequestMapping(value = "/order/remove/{id}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> orderRemove(@PathVariable Long id,
+                                              @AuthenticationPrincipal User user) throws Exception {
+        logger.info("user:{} request remove sell order, id:{}", user.getId(), id);
+        sellOrderService.removeSellOrder(user, id);
+        return ResponseEntity.ok().build();
+    }
+
     @RequestMapping(value = "/detail/list", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> detailList(@RequestParam("sellOrderId") Long sellOrderId) throws Exception {
         List<SellOrderDetail> details = sellOrderService.getDetailList(sellOrderId);

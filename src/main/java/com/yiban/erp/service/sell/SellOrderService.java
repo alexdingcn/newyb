@@ -123,6 +123,16 @@ public class SellOrderService {
         return true;
     }
 
+    public int removeSellOrder(User user, Long id) throws BizException {
+        logger.info("user:{} remove sell order id:{}, set to delete status.", user.getId(), id);
+        SellOrder order = new SellOrder();
+        order.setId(id);
+        order.setStatus(SellOrderStatus.DELETE.name());
+        order.setUpdateBy(user.getNickname());
+        order.setUpdateTime(new Date());
+        return sellOrderMapper.updateByPrimaryKeySelective(order);
+    }
+
     public List<SellOrderDetail> getDetailList(Long sellOrderId) {
         if (sellOrderId == null) {
             logger.warn("get sell order detail by sell order id is null.");

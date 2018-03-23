@@ -14,6 +14,8 @@
                 <Button type="success" icon="ios-checkmark" :loading="sellOrderSaveBtnLoading" @click="sellOrderSaveBtnClick"> 保存 </Button>
                 <Button type="info" icon="filing" @click="getOldSellOrderBtnClick"> 修改提取 </Button>
                 <Button type="ghost" icon="ios-printer">打印</Button>
+                <Button type="error" icon="trash-a" :disabled="!editeOnlyDisable" 
+                  :loading="removeSellOrderLoading" @click="removeSellOrderClick">删除订单</Button>
             </ButtonGroup>
 
             <Row type="flex" justify="center">
@@ -286,6 +288,7 @@ export default {
         ]
       },
       sellOrderSaveBtnLoading: false,
+      removeSellOrderLoading: false,
       sellOrderSearchModal: false,
       chooseWarehouse: {},
       goodSearchModal: false,
@@ -642,9 +645,34 @@ export default {
           desc: "获取客户信息错误, 请确认选择的客户正确"
         });
       }
+      this.sellOrderFormData.customerName = this.currChooseCustomer.name;
       this.editeOnlyDisable = true; //编辑模式下的客户信息不能修改
       this.refreshCustomerRepList(data.customerId, data.customerRepId);
       this.refreshGoodsData(data.id);
+    },
+    orderFormChangeToAddModel() {
+      this.editeOnlyDisable = false;
+      this.sellOrderFormData = {};
+      this.goodTableData = [];
+    },
+
+    removeSellOrderClick() {
+      let id = this.sellOrderFormData.id;
+      if(!id) {
+        this.$Message.warning('获取需要删除的订单失败，请刷新页面');
+        return;
+      }
+      this.removeSellOrderLoading = true;
+      util.ajax.delete("/sell/order/remove/" + id)
+        .then(response => {
+          this.$Message.success('删除成功');
+          this.removeSellOrderLoading = false;
+          this.orderFormChangeToAddModel();
+        })
+        .catch(error => {
+          this.removeSellOrderLoading = false;
+          util.errorProcessor(this, error);
+        });
     },
 
     addGoodBtnClick() {
@@ -685,7 +713,7 @@ export default {
           sellOrderId: self.sellOrderFormData.id,
           goodId: item.goodId,
           goodName: item.goodName,
-          repetoryQuantity: item.quantity,
+          repertoryQuantity: item.quantity,
           quantity: 0,
           fixPrice: item.salePrice,
           disPrice: 0,
@@ -699,6 +727,7 @@ export default {
         return temp;
       });
       addList.map(item => this.goodTableData.push(item));
+      console.log(this.goodTableData);
       this.getGoodHistoryPrice();
     },
     getGoodHistoryPrice() {
@@ -769,17 +798,28 @@ export default {
         this.saveGoodBtnLoading = false;
       }
     },
-    handleRowDbClick(data) {
-      console.log(data);
+    handleRowDbClick(data, index) {
+      this.$Modal.confirm({
+          title: '确认删除商品？',
+          content: '<p>确认删除商品 ' + data.goodName + '?</p>',
+          onOk: () => {
+            if (data.id) {
+              this.goodRemoveItem(data.id);
+            }
+            this.goodTableData.splice(index, 1);
+          },
+          onCancel: () => {
+              
+          }
+      });
     },
-    goodRemoveItem(data, index, removeItem) {
-      if (removeItem && removeItem.id && removeItem.id > 0) {
+    goodRemoveItem(removeId) {
+      if (removeId) {
         //联动删除数据库中的值
         util.ajax
-          .delete("/sell/detail/remove/" + removeItem.id)
+          .delete("/sell/detail/remove/" + removeId)
           .then(response => {
-            let count = response.data.count;
-            this.$Message.success("成功删除" + (count ? count : 0) + "条记录");
+            this.$Message.success("删除成功");
           })
           .catch(error => {
             util.errorProcessor(this, error);

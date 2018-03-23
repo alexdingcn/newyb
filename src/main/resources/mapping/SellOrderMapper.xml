@@ -316,7 +316,7 @@
   <select id="getListCount" parameterType="map" resultType="java.lang.Integer">
     select count(1)
     from sell_order
-    where company_id = #{companyId}
+    where company_id = #{companyId} and status != 'DELETE'
       <if test="customerId != null" >
         and customer_id = #{customerId}
       </if>
@@ -387,7 +387,7 @@
       <include refid="ListColumn" />
     from sell_order s, customer c, customer_rep r
     where s.customer_id = c.id and s.customer_rep_id = r.id
-      and s.company_id = #{companyId}
+      and s.company_id = #{companyId} and s.status != 'DELETE'
     <if test="customerId != null" >
       and s.customer_id = #{customerId}
     </if>
@@ -411,7 +411,7 @@
   <select id="getAllCount" parameterType="map" resultType="java.lang.Integer">
     select count(1)
     from sell_order s
-    where s.company_id = #{companyId}
+    where s.company_id = #{companyId} and s.status != 'DELETE'
     <if test="status != null" >
       and s.status = #{status}
     </if>
@@ -437,7 +437,7 @@
     select <include refid="ListColumn" />
     from sell_order s, customer c, customer_rep r
     where s.customer_id = c.id and s.customer_rep_id = r.id
-      and s.company_id = #{companyId}
+      and s.company_id = #{companyId} and s.status != 'DELETE'
       <if test="status != null" >
         and s.status = #{status}
       </if>
@@ -470,13 +470,14 @@
     <foreach collection="idList" item="id" open="(" close=")" separator=", " >
       #{id}
     </foreach>
+    and s.status != 'DELETE'
   </select>
 
   <select id="getReviewDetailById" parameterType="java.lang.Long" resultMap="ListMap">
     select <include refid="ListColumn" />
     from sell_order s, customer c, customer_rep r
     where s.customer_id = c.id and s.customer_rep_id = r.id
-    and s.id = #{id}
+    and s.id = #{id} and s.status != 'DELETE'
   </select>
 
 </mapper>
