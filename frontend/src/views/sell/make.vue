@@ -163,7 +163,8 @@
                         </ButtonGroup>
                     </Row>
                     <Table border highlight-row :loading="saveGoodBtnLoading" 
-                        :columns="goodTableColumn" :data="goodTableData"
+                        :columns="goodTableColumn" :data="goodTableData" 
+                        no-data-text="在保存订单信息后点击添加商品按钮添加"
                         ref="sellOrderGoodTable" style="width: 100%;" size="small"
                         @on-row-dblclick="handleRowDbClick">
                         <div slot="footer">
