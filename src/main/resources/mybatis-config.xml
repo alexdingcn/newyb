@@ -32,6 +32,7 @@
         <mapper resource="mapping/SellOrderMapper.xml"/>
         <mapper resource="mapping/SellOrderDetailMapper.xml"/>
         <mapper resource="mapping/SellOrderShipMapper.xml"/>
+        <mapper resource="mapping/SellReviewOptionMapper.xml"/>
         <mapper resource="mapping/ShipCompanyMapper.xml"/>
         <mapper resource="mapping/RepertoryInfoMapper.xml"/>
     </mappers>

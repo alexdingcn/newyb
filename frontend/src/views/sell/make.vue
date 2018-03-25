@@ -169,7 +169,8 @@
                         @on-row-dblclick="handleRowDbClick">
                         <div slot="footer">
                             <h3 class="padding-left-20" >
-                                <b>合计数量: {{totalQuantity}}</b>  <b class="margin-left-50">合计金额:</b> ￥{{ totalAmount }}
+                                <b>合计数量: {{totalQuantity}}</b>  <b class="margin-left-50">合计金额:</b> ￥{{ totalAmount }} 
+                                <span class="margin-left-50"> 提示: 金额 = (数量 - 赠送) x 实价 x (1 - 折扣%) </span>
                             </h3>
                         </div>
                     </Table>
@@ -201,6 +202,7 @@
 
 <script>
 import util from "@/libs/util.js";
+import moment from 'moment';
 import dataConver from "@/libs/data-conver.js";
 import customerSelect from "@/views/customer/customer-select.vue";
 import sellOrderSearch from "@/views/sell/sell-order-search.vue";
@@ -301,11 +303,27 @@ export default {
           width: 50,
           fixed: "left",
           render: (h, params) => {
+            let repertoryInfo = params.row.repertoryInfo;
+            let good = {};
+            if (repertoryInfo) {
+              good = repertoryInfo.goods;
+            }
+            let productDate = '';
+            if (repertoryInfo.productDate) {
+                productDate = moment(repertoryInfo.productDate).format('YYYY-MM-DD');
+            }
+            let expDate = '';
+            if (repertoryInfo.expDate) {
+                expDate = moment(repertoryInfo.expDate).format('YYYY-MM-DD');
+            }
             return h(goodExpand, {
               props: {
-                detail: params.row.goods
+                good: good,
+                repertoryInfo: repertoryInfo,
+                productDate: productDate,
+                expDate: expDate
               }
-            });
+            })
           }
         },
         {
@@ -681,7 +699,6 @@ export default {
       let temp = this.warehouseList.filter(
         item => item.id === this.sellOrderFormData.warehouseId
       );
-      console.log(temp);
       if (temp) {
         this.chooseWarehouse = temp[0];
       }
@@ -689,17 +706,17 @@ export default {
     goodSearchModalClose() {
       this.goodSearchModal = false;
     },
-    goodSearchChoosed(goodList) {
-      if (!goodList || goodList.length <= 0) {
+    goodSearchChoosed(repertoryList) {
+      if (!repertoryList || repertoryList.length <= 0) {
         return;
       }
       let self = this;
-      let chooseList = goodList.filter(item => {
+      let chooseList = repertoryList.filter(item => {
         if (self.goodTableData) {
           for (let i = 0; i < self.goodTableData.length; i++) {
             let temp = self.goodTableData[i];
-            if (temp.goodId === item.goodId) {
-              return fasel;
+            if (temp.repertoryId === item.id) {
+              return false;
             }
           }
           return true;
@@ -712,6 +729,7 @@ export default {
         let temp = {
           id: "",
           sellOrderId: self.sellOrderFormData.id,
+          repertoryId: item.id,
           goodId: item.goodId,
           goodName: item.goodName,
           repertoryQuantity: item.quantity,
@@ -723,12 +741,11 @@ export default {
           singlePrice: item.salePrice,
           amount: 0,
           taxRate: 0,
-          goods: item.goods
+          repertoryInfo: item
         };
         return temp;
       });
       addList.map(item => this.goodTableData.push(item));
-      console.log(this.goodTableData);
       this.getGoodHistoryPrice();
     },
     getGoodHistoryPrice() {
@@ -739,7 +756,10 @@ export default {
       let goodIds = [];
       for (let i = 0; i < list.length; i++) {
         if (list[i] && list[i].goodId) {
-          goodIds.push(list[i].goodId);
+          let record = list[i].repertoryInfo;
+          if (record && record.goodId) {
+            goodIds.push(record.goodId);
+          }
         }
       }
       let customerId = this.sellOrderFormData.customerId;
@@ -792,6 +812,7 @@ export default {
           .get("/sell/detail/list", { params: reqData })
           .then(response => {
             this.goodTableData = response.data;
+            this.getGoodHistoryPrice();
           })
           .catch(error => {
             util.errorProcessor(this, error);
@@ -832,6 +853,21 @@ export default {
         this.$Message.warning("请先新增商品信息");
         return;
       }
+      //检查客户是否是可经营特殊管控的商品的，如果不是，需要检查选择的商品列表中是否存在特殊管控的商品
+      if (!this.currChooseCustomer || !this.currChooseCustomer.canSaleSpecial) {
+        for (let i=0; i<this.goodTableData.length; i++) {
+          let goodItem = this.goodTableData[i].repertoryInfo ? this.goodTableData[i].repertoryInfo.goods : null;
+          if (goodItem && goodItem !== null && goodItem.SpecialManaged) {
+              this.$Modal.error(
+                {
+                  title: '客户商品选择限制', 
+                  content: this.currChooseCustomer.name + '不能经营特殊管控商品, 但是商品列表中存在管控商品:' + goodItem.name
+                });
+              return;
+          }
+        }
+      }
+
       this.saveGoodBtnLoading = true;
       util.ajax
         .post("/sell/detail/save", this.goodTableData)

@@ -55,6 +55,8 @@ public class SellOrder {
 
     private Integer warehouseId;
 
+    private String warehouseName;
+
     private Customer customer;
 
     private CustomerRep customerRep;
@@ -264,6 +266,14 @@ public class SellOrder {
 
     public void setWarehouseId(Integer warehouseId) {
         this.warehouseId = warehouseId;
+    }
+
+    public String getWarehouseName() {
+        return warehouseName;
+    }
+
+    public void setWarehouseName(String warehouseName) {
+        this.warehouseName = warehouseName;
     }
 
     public Customer getCustomer() {

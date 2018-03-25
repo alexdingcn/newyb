@@ -2,15 +2,14 @@ package com.yiban.erp.entities;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
 public class SellOrderDetail {
     private Long id;
 
     private Long sellOrderId;
 
-    private Long goodId;
-
-    private String goodName;
+    private Long repertoryId;
 
     private Integer quantity;
 
@@ -36,14 +35,18 @@ public class SellOrderDetail {
 
     private Date updateTime;
 
-    private Integer repertoryQuantity; //当前库存量
+    private RepertoryInfo repertoryInfo;
+    private Long goodId;  //在设置repertoryInfo时设置, 辅助前端展示
+    private String goodName; //在设置repertoryInfo时设置, 辅助前端展示
+    private Integer repertoryQuantity; //在设置repertoryInfo时设置, 辅助前端展示
+    private String factoryName; //在设置repertoryInfo时设置, 辅助前端展示
 
     private Date createOrderDate;
     private String salerNickName;
     private String salerRealName;
     private String customerName;
 
-    private Goods goods; //与商品是1对1的映射
+    private List<SellReviewOption> reviewOptions;
 
     public Long getId() {
         return id;
@@ -61,20 +64,12 @@ public class SellOrderDetail {
         this.sellOrderId = sellOrderId;
     }
 
-    public Long getGoodId() {
-        return goodId;
+    public Long getRepertoryId() {
+        return repertoryId;
     }
 
-    public void setGoodId(Long goodId) {
-        this.goodId = goodId;
-    }
-
-    public String getGoodName() {
-        return goodName;
-    }
-
-    public void setGoodName(String goodName) {
-        this.goodName = goodName;
+    public void setRepertoryId(Long repertoryId) {
+        this.repertoryId = repertoryId;
     }
 
     public Integer getQuantity() {
@@ -173,22 +168,6 @@ public class SellOrderDetail {
         this.updateTime = updateTime;
     }
 
-    public Goods getGoods() {
-        return goods;
-    }
-
-    public void setGoods(Goods goods) {
-        this.goods = goods;
-    }
-
-    public Integer getRepertoryQuantity() {
-        return repertoryQuantity;
-    }
-
-    public void setRepertoryQuantity(Integer repertoryQuantity) {
-        this.repertoryQuantity = repertoryQuantity;
-    }
-
     public Date getCreateOrderDate() {
         return createOrderDate;
     }
@@ -219,5 +198,60 @@ public class SellOrderDetail {
 
     public void setCustomerName(String customerName) {
         this.customerName = customerName;
+    }
+
+    public RepertoryInfo getRepertoryInfo() {
+        return repertoryInfo;
+    }
+
+    public void setRepertoryInfo(RepertoryInfo repertoryInfo) {
+        this.repertoryInfo = repertoryInfo;
+        if (repertoryInfo != null && repertoryInfo.getGoods() != null) {
+            Goods goods = repertoryInfo.getGoods();
+            this.goodId = goods.getId();
+            this.goodName = goods.getName();
+            this.repertoryQuantity = repertoryInfo.getQuantity();
+            this.factoryName = goods.getFactory();
+        }
+    }
+
+    public Long getGoodId() {
+        return goodId;
+    }
+
+    public void setGoodId(Long goodId) {
+        this.goodId = goodId;
+    }
+
+    public String getGoodName() {
+        return goodName;
+    }
+
+    public void setGoodName(String goodName) {
+        this.goodName = goodName;
+    }
+
+    public Integer getRepertoryQuantity() {
+        return repertoryQuantity;
+    }
+
+    public void setRepertoryQuantity(Integer repertoryQuantity) {
+        this.repertoryQuantity = repertoryQuantity;
+    }
+
+    public String getFactoryName() {
+        return factoryName;
+    }
+
+    public void setFactoryName(String factoryName) {
+        this.factoryName = factoryName;
+    }
+
+    public List<SellReviewOption> getReviewOptions() {
+        return reviewOptions;
+    }
+
+    public void setReviewOptions(List<SellReviewOption> reviewOptions) {
+        this.reviewOptions = reviewOptions;
     }
 }

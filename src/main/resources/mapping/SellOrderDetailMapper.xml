@@ -4,7 +4,7 @@
   <resultMap id="BaseResultMap" type="com.yiban.erp.entities.SellOrderDetail" >
     <id column="id" property="id" jdbcType="BIGINT" />
     <result column="sell_order_id" property="sellOrderId" jdbcType="BIGINT" />
-    <result column="good_id" property="goodId" jdbcType="BIGINT" />
+    <result column="repertory_id" property="repertoryId" jdbcType="BIGINT" />
     <result column="quantity" property="quantity" jdbcType="INTEGER" />
     <result column="fix_price" property="fixPrice" jdbcType="DECIMAL" />
     <result column="dis_price" property="disPrice" jdbcType="DECIMAL" />
@@ -19,7 +19,7 @@
     <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
   </resultMap>
   <sql id="Base_Column_List" >
-    id, sell_order_id, good_id, quantity, fix_price, dis_price, free, real_price, single_price, 
+    id, sell_order_id, repertory_id, quantity, fix_price, dis_price, free, real_price, single_price,
     amount, tax_rate, create_by, create_time, update_by, update_time
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
@@ -33,13 +33,13 @@
     where id = #{id,jdbcType=BIGINT}
   </delete>
   <insert id="insert" parameterType="com.yiban.erp.entities.SellOrderDetail" keyProperty="id" useGeneratedKeys="true" >
-    insert into sell_order_detail (sell_order_id, good_id,
+    insert into sell_order_detail (sell_order_id, repertory_id,
       quantity, fix_price, dis_price, 
       free, real_price, single_price, 
       amount, tax_rate, create_by, 
       create_time, update_by, update_time
       )
-    values (#{sellOrderId,jdbcType=BIGINT}, #{goodId,jdbcType=BIGINT},
+    values (#{sellOrderId,jdbcType=BIGINT}, #{repertoryId,jdbcType=BIGINT},
       #{quantity,jdbcType=INTEGER}, #{fixPrice,jdbcType=DECIMAL}, #{disPrice,jdbcType=DECIMAL}, 
       #{free,jdbcType=DECIMAL}, #{realPrice,jdbcType=DECIMAL}, #{singlePrice,jdbcType=DECIMAL}, 
       #{amount,jdbcType=DECIMAL}, #{taxRate,jdbcType=DECIMAL}, #{createBy,jdbcType=VARCHAR}, 
@@ -52,8 +52,8 @@
       <if test="sellOrderId != null" >
         sell_order_id,
       </if>
-      <if test="goodId != null" >
-        good_id,
+      <if test="repertoryId != null" >
+        repertory_id,
       </if>
       <if test="quantity != null" >
         quantity,
@@ -96,8 +96,8 @@
       <if test="sellOrderId != null" >
         #{sellOrderId,jdbcType=BIGINT},
       </if>
-      <if test="goodId != null" >
-        #{goodId,jdbcType=BIGINT},
+      <if test="repertoryId != null" >
+        #{repertoryId,jdbcType=BIGINT},
       </if>
       <if test="quantity != null" >
         #{quantity,jdbcType=INTEGER},
@@ -143,8 +143,8 @@
       <if test="sellOrderId != null" >
         sell_order_id = #{sellOrderId,jdbcType=BIGINT},
       </if>
-      <if test="goodId != null" >
-        good_id = #{goodId,jdbcType=BIGINT},
+      <if test="repertoryId != null" >
+        repertory_id = #{repertoryId,jdbcType=BIGINT},
       </if>
       <if test="quantity != null" >
         quantity = #{quantity,jdbcType=INTEGER},
@@ -188,7 +188,7 @@
   <update id="updateByPrimaryKey" parameterType="com.yiban.erp.entities.SellOrderDetail" >
     update sell_order_detail
     set sell_order_id = #{sellOrderId,jdbcType=BIGINT},
-      good_id = #{goodId,jdbcType=BIGINT},
+      repertory_id = #{repertoryId,jdbcType=BIGINT},
       quantity = #{quantity,jdbcType=INTEGER},
       fix_price = #{fixPrice,jdbcType=DECIMAL},
       dis_price = #{disPrice,jdbcType=DECIMAL},
@@ -213,21 +213,20 @@
 
   <select id="getDetailHistory" parameterType="map" resultType="com.yiban.erp.entities.SellOrderDetail">
     select
-      t.id as id, t.sell_order_id as sellOrderId, t.good_id as goodId, t.quantity as quantity,
+      t.id as id, t.sell_order_id as sellOrderId, t.repertory_id as repertoryId, t.quantity as quantity,
       t.fix_price as fixPrice, t.dis_price as disPrice, t.free as free, t.real_price as realPrice,
       t.single_price as singlePrice, t.amount as amount, t.tax_rate as taxRate,
       t.create_by as createBy, t.create_time as createTime, t.update_by as updateBy, t.update_time as updateTime,
       c.name as customerName,
-      g.name as goodName,
       s.create_order_date as createOrderDate,
       u.nickname as salerNickName,
       u.realname as salerRealName
-    from sell_order_detail t, sell_order s, users u, customer c, goods g
+    from sell_order_detail t, sell_order s, users u, customer c, repertory_info r
     where t.sell_order_id = s.id and s.customer_id = c.id
-    and s.saler_id = u.id and t.good_id = g.id
+    and s.saler_id = u.id and t.repertory_id = r.id
     and s.company_id = #{companyId}
     and s.customer_id = #{customerId}
-    and g.id in
+    and r.good_id in
     <foreach collection="goodIds" separator="," item="item" close=")" open="(">
       #{item}
     </foreach>

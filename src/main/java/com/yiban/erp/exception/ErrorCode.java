@@ -63,6 +63,7 @@ public enum ErrorCode {
     SELL_ORDER_REVIEW_STATUS_ERROR(2208, "存在审批状态错误的数据", ErrorDisplay.NOTICE),
     SELL_ORDER_SHIP_PARAMS(2209, "运输记录必输项信息缺失"),
     SELL_ORDER_SHIP_NOT_FUND(2210, "获取运输记录失败"),
+    SELL_ORDER_CUSTOMER_CANNOT_SELL_GOOD(2211, "客户不允许经营特殊管控商品, 而列表中存在特殊管控商品", ErrorDisplay.NOTICE),
 
     // 23xx -承运公司
     SHIP_SAVE_PARAMS_ERROR(2301, "必输参数校验失败"),

@@ -361,6 +361,7 @@
     <result column="update_by" property="updateBy" jdbcType="VARCHAR" />
     <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
     <result column="warehouse_id" property="warehouseId" jdbcType="INTEGER" />
+    <result column="warehouse_name" property="warehouseName" jdbcType="VARCHAR" />
     <association property="customer" javaType="com.yiban.erp.entities.Customer">
       <id column="customer_id" property="id" jdbcType="INTEGER" />
       <result column="cust_name" property="name" jdbcType="VARCHAR"/>
@@ -377,7 +378,7 @@
     s.id, s.company_id, s.order_number, s.ref_no, s.status, s.customer_id, s.customer_rep_id, s.saler_id,
     s.temper_control_id, s.create_order_date, s.take_goods_user, s.pay_order_date, s.pay_method, s.pay_file_no, s.mark_up_rate,
     s.pay_amount, s.not_small_amount, s.ship_method, s.ship_tool, s.comment, s.create_by, s.create_time,
-    s.update_by, s.update_time, s.warehouse_id, c.name as cust_name,
+    s.update_by, s.update_time, s.warehouse_id, w.name as warehoustName, c.name as cust_name,
     r.id as rep_id, r.name as rep_name, r.contact_phone as rep_contact_phone,
     r.repertory_address as rep_repertory_address
   </sql>
@@ -385,8 +386,8 @@
   <select id="getList" parameterType="map" resultMap="ListMap">
     select
       <include refid="ListColumn" />
-    from sell_order s, customer c, customer_rep r
-    where s.customer_id = c.id and s.customer_rep_id = r.id
+    from sell_order s, customer c, customer_rep r, warehouse w
+    where s.customer_id = c.id and s.customer_rep_id = r.id and s.warehouse_id = w.id
       and s.company_id = #{companyId} and s.status != 'DELETE'
     <if test="customerId != null" >
       and s.customer_id = #{customerId}
@@ -435,8 +436,8 @@
 
   <select id="getAllList" parameterType="map" resultMap="ListMap">
     select <include refid="ListColumn" />
-    from sell_order s, customer c, customer_rep r
-    where s.customer_id = c.id and s.customer_rep_id = r.id
+    from sell_order s, customer c, customer_rep r, warehouse w
+    where s.customer_id = c.id and s.customer_rep_id = r.id and s.warehouse_id = w.id
       and s.company_id = #{companyId} and s.status != 'DELETE'
       <if test="status != null" >
         and s.status = #{status}
@@ -473,10 +474,35 @@
     and s.status != 'DELETE'
   </select>
 
+  <select id="getReviewOrderList" parameterType="com.yiban.erp.dto.SellReviewOrderQuery" resultMap="ListMap">
+    select <include refid="ListColumn"/>
+    from sell_order s, customer c, customer_rep r, warehouse w
+    where s.customer_id = c.id and s.customer_rep_id = r.id and s.warehouse_id = w.id
+    and s.company_id = #{companyId} and s.status != 'DELETE'
+    <if test="customerId != null">
+      and s.customer_id = #{customerId}
+    </if>
+    <if test="salerId != null" >
+      and s.saler_id = #{salerId}
+    </if>
+    <if test="startDate != null">
+      and s.create_order_date >= #{startDate}
+    </if>
+    <if test="endDate != null">
+      and s.create_order_date &lt;= #{endDate}
+    </if>
+    <if test="statusList != null" >
+      and s.status in
+      <foreach collection="statusList" item="item" open="(" close=")" separator=",">
+        #{item}
+      </foreach>
+    </if>
+  </select>
+
   <select id="getReviewDetailById" parameterType="java.lang.Long" resultMap="ListMap">
     select <include refid="ListColumn" />
-    from sell_order s, customer c, customer_rep r
-    where s.customer_id = c.id and s.customer_rep_id = r.id
+    from sell_order s, customer c, customer_rep r, warehouse w
+    where s.customer_id = c.id and s.customer_rep_id = r.id and s.warehouse_id = w.id
     and s.id = #{id} and s.status != 'DELETE'
   </select>
 

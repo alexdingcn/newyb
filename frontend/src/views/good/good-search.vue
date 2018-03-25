@@ -58,7 +58,7 @@
 
 <script>
 import util from "@/libs/util.js";
-import dataConver from "@/libs/data-conver.js";
+import moment from 'moment';
 import factorySelect from "@/views/factory/factory-select.vue";
 
 export default {
@@ -104,27 +104,67 @@ export default {
                   key: 'goodName',
                   width: 200,
                   sortable: true,
-                  fixed: 'left'
+                  fixed: 'left',
+                  render: (h, params) => {
+                      let good = params.row.goods;
+                      if (good) {
+                          return h('span', good.name);
+                      }else {
+                          return h('span', '获取产品信息失败');
+                      }
+                  }
               },
               {
                   title: '剂型',
                   key: 'jx',
-                  width: 100
+                  width: 100,
+                  render: (h, params) => {
+                      let good = params.row.goods;
+                      if (good) {
+                          return h('span', good.jx);
+                      }else {
+                          return h('span', '');
+                      }
+                  }
               },
               {
                   title: '规格',
                   key: 'spec',
-                  width: 100
+                  width: 100,
+                  render: (h, params) => {
+                      let good = params.row.goods;
+                      if (good) {
+                          return h('span', good.spec);
+                      }else {
+                          return h('span', '');
+                      }
+                  }
               },
               {
                   title: '生产企业',
                   key: 'factoryName',
-                  width: 200
+                  width: 200,
+                  render: (h, params) => {
+                      let good = params.row.goods;
+                      if (good) {
+                          return h('span', good.factory);
+                      }else {
+                          return h('span', '');
+                      }
+                  }
               },
               {
                   title: '单位',
                   key: 'unitName',
-                  width: 80
+                  width: 80,
+                  render: (h, params) => {
+                      let good = params.row.goods;
+                      if (good) {
+                          return h('span', good.unitName);
+                      }else {
+                          return h('span', '');
+                      }
+                  }
               }, 
               {
                   title: '数量',
@@ -136,7 +176,7 @@ export default {
                   key: 'expDate',
                   width: 120, 
                   render: (h, params) => {
-                    return h('span', this.dateFormat(params.row.expDate));
+                    return moment(params.row.expDate).format('YYYY-MM-DD');
                   }
               },
               {
@@ -144,7 +184,7 @@ export default {
                   key: 'productDate',
                   width: 120, 
                   render: (h, params) => {
-                    return h('span', this.dateFormat(params.row.productDate));
+                    return moment(params.row.productDate).format('YYYY-MM-DD');
                   }
               },
               {

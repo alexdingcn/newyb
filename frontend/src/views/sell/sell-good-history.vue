@@ -8,7 +8,7 @@
 </template>
 
 <script>
-import dataConver from "@/libs/data-conver.js";
+import moment from 'moment';
 
 export default {
   name: 'sell-good-history',
@@ -36,7 +36,7 @@ export default {
                   title: '制单日',
                   key: 'createOrderDate',
                   render: (h, params) => {
-                      return h('span', this.dateFormat(params.row.createOrderDate));
+                      return moment(params.row.createOrderDate).format('YYYY-MM-DD');
                   }
               },
               {
@@ -71,7 +71,23 @@ export default {
               {
                   title: '金额',
                   key: 'amount'
-              }
+              },
+              {
+                  title: '生产企业',
+                  key: 'factoryName',
+              },
+              {
+                  title: '剂型',
+                  key: 'jx'
+              },
+              {
+                  title: '规格',
+                  key: 'spec'
+              },
+              {
+                  title: '货号',
+                  key: 'code'
+              },
           ]
       }
   },
@@ -81,12 +97,6 @@ export default {
       }
   },
   methods: {
-      dateFormat(data) {
-          if (!data && isNaN(data)) {
-              return '';
-          }
-          return dataConver.formatDate(new Date(data), 'yyyy-MM-dd');
-        },
       refsetData(data) {
           if (!data || data.length <=0 ) {
               this.tabData = [];
@@ -99,9 +109,36 @@ export default {
                       list.push(item);
                   }
               }
-              this.tabData = list;
+              this.setShowTableData(list);
           }else {
-              this.tabData = data;
+              this.setShowTableData(data);
+          }
+      },
+      setShowTableData(sellDetailList) {
+          this.tabData = [];
+          for (let i=0; i<sellDetailList.length; i++) {
+              let detail = sellDetailList[i];
+              let repertoryInfo = detail.repertoryInfo;
+              if (repertoryInfo) {
+                  let good = repertoryInfo.goods;
+                  let tabItem = {
+                      customerName: detail.customerName,
+                      goodName: repertoryInfo.goodName,
+                      createOrderDate: detail.createOrderDate,
+                      salerNickName: detail.salerNickName,
+                      salerRealName: detail.salerRealName,
+                      quantity: detail.quantity,
+                      realPrice: detail.realPrice,
+                      fixPrice: detail.fixPrice,
+                      disPrice: detail.disPrice,
+                      amount: detail.amount,
+                      factoryName: good ? good.factory : '',
+                      jx: good ? good.jx : '',
+                      spec: good ? good.spec : '',
+                      code: repertoryInfo.code
+                  }
+                  this.tabData.push(tabItem);
+              }
           }
       }
   }

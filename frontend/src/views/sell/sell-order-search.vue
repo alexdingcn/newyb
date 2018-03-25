@@ -76,7 +76,7 @@
 
 <script>
 import util from "@/libs/util.js";
-import dataConver from "@/libs/data-conver.js";
+import moment from 'moment';
 import customerSelect from "@/views/customer/customer-select.vue";
 
 export default {
@@ -142,7 +142,7 @@ export default {
                         if (!date || isNaN(date)) {
                             return h('span', '');
                         }else {
-                            return h('span', dataConver.formatDate(new Date(date), 'yyyy-MM-dd'));
+                            return moment(date).format('YYYY-MM-DD');
                         }
                     }
                 },
@@ -156,7 +156,7 @@ export default {
                         if (!date || isNaN(date)) {
                             return h('span', '');
                         }else {
-                            return h('span', dataConver.formatDate(new Date(date), 'yyyy-MM-dd'));
+                            return moment(date).format('YYYY-MM-DD');
                         }
                     }
                 }

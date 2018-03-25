@@ -5,6 +5,7 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+import java.util.Map;
 
 @Mapper
 public interface RepertoryInfoMapper {
@@ -20,22 +21,9 @@ public interface RepertoryInfoMapper {
 
     int updateByPrimaryKey(RepertoryInfo record);
 
-    Integer getDetailListCount(@Param("companyId") Integer companyId,
-                               @Param("warehouseId") Integer warehouseId,
-                               @Param("saleEnable") Boolean saleEnable,
-                               @Param("goodId") Long goodId,
-                               @Param("goodSearch") String goodSearch,
-                               @Param("factoryId") Integer factoryId);
+    Integer getDetailListCount(Map<String, Object> paramMap);
 
-    List<RepertoryInfo> getDetailList(@Param("companyId") Integer companyId,
-                                      @Param("warehouseId") Integer warehouseId,
-                                      @Param("saleEnable") Boolean saleEnable,
-                                      @Param("goodId") Long goodId,
-                                      @Param("goodSearch") String goodSearch,
-                                      @Param("factoryId") Integer factoryId,
-                                      @Param("offset") Integer offset,
-                                      @Param("limit") Integer limit);
+    List<RepertoryInfo> getDetailList(Map<String, Object> paramMap);
 
-    List<RepertoryInfo> getByWarehouseIdAndGoodIds(@Param("warehouseId") Integer warehouseId,
-                                                   @Param("goodIdList") List<Long> goodsIdList);
+    List<RepertoryInfo> getListByIdList(@Param("idList") List<Long> repertoryIdList);
 }

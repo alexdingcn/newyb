@@ -9,8 +9,8 @@
                         </FormItem>
                     </Col>
                     <Col span="8">
-                        <FormItem label="商品">
-                            <good-select v-model="query.goodId"></good-select>
+                        <FormItem label="客户">
+                            <customer-select v-model="query.customerId"></customer-select>
                         </FormItem>
                     </Col>
                     <Col span="8"></Col>
@@ -30,8 +30,8 @@
                             </Select>
                         </FormItem>
                     </Col>
-                    <Col span="8">
-                            <Button type="primary" icon="ios-search" @click="querySellOrderList"></Button>
+                    <Col span="7" offset="1">
+                        <Button type="primary" icon="ios-search" :loading="sellOrderLoading" @click="querySellOrderList"></Button>
                     </Col>
                 </Row>
             </Form>
@@ -40,6 +40,7 @@
             <Table border highlight-row disabled-hover height="250" style="width: 100%" 
                    :columns="orderListColumns" :data="orderList"
 				   ref="sellOrderListTable" size="small"
+                   :loading="sellOrderLoading" 
                    @on-row-click="handleSelectBuyOrder"
 				   no-data-text="使用右上方输入搜索条件">
 			</Table>
@@ -48,13 +49,14 @@
         <div class="table-div">
             <Row type="flex" justify="start">
                 <ButtonGroup size="small">
-                    <Button type="success" icon="checkmark-round">审核通过</Button>
-                    <Button type="error" icon="close-round">取消审核</Button>
+                    <Button type="success" icon="checkmark-round" :loading="detailLoading" @click="reviewOkBtnClick">审核通过</Button>
+                    <Button type="error" icon="close-round" :loading="detailLoading" @click="reviewCancelBtnClick">取消审核</Button>
                 </ButtonGroup>
             </Row>
-            <Table border highlight-row height="300"
+            <Table border highlight-row height="300" :loading="detailLoading" 
                    :columns="sellGoodColumns" :data="sellGoodList"
                    ref="sellGoodTable" style="width: 100%;" size="small"
+                   @on-selection-change="detailSelectionChange"
                    no-data-text="点击上方订单后查看销售明细">
                 <div slot="header">
                     <h3 class="padding-left-20" >
@@ -63,19 +65,29 @@
                 </div>
             </Table>
         </div>
+
+        <Modal v-model="reviewOkModal" width="50" :mask-closable="false" title="审批通过意见登记">
+            <div style="text-align:center">
+                <Input v-model="checkComment" placeholder="审核意见" />
+            </div>
+            <div slot="footer">
+                <Button type="success" @click="setCheckedOk">审核通过</Button>
+            </div>
+        </Modal>
+
     </div>
 </template>
 
 <script>
 import util from "@/libs/util.js";
 import moment from 'moment';
-import goodSelect from "@/views/good/good-select.vue";
+import customerSelect from "@/views/customer/customer-select.vue";
 import goodExpand from "@/views/good/good-expand.vue";
 
 export default {
     name: 'sell-quality-review',
     components: {
-        goodSelect,
+        customerSelect,
         goodExpand
     },
     data() {
@@ -87,10 +99,11 @@ export default {
                 moment().format('YYYY-MM-DD'),
             ],
             query: {
-                goodId: '',
+                customerId: '',
                 status: 'INIT',
                 salerId: ''
             },
+            sellOrderLoading: false,
             orderList: [],
             orderListColumns: [
                 {
@@ -127,7 +140,7 @@ export default {
                     width: 90,
                     align: "center",
                     render: (h, params) => {
-                        let itemArr = this.salerList.filters(item => item.id === params.row.salerId);
+                        let itemArr = this.salerList.filter(item => item.id === params.row.salerId);
                         if (itemArr && itemArr[0]) {
                             let saler = itemArr[0];
                             return saler.nickname + (saler.realname ? ' - [' + saler.realname + ']' : ''); 
@@ -177,30 +190,36 @@ export default {
                     key: 'customerRepRepertoryAddress',
                     align: "center",
                     width: 150
-                },
-                {
-                    title: '运输方式',
-                    key: 'shipMethodName',
-                    align: "center",
-                    width: 90
-                },
-                {
-                    title: '运输工具',
-                    key: 'shipToolName',
-                    align: "center",
-                    width: 90
                 }
             ],
+            detailLoading: false,
             sellGoodList: [],
+            detailChooseItems: [],
             sellGoodColumns: [
                 {
                     type: "expand",
                     width: 50,
                     render: (h, params) => {
-                        return h(goodExpand, {
-                        props: {
-                            detail: params.row.goods
+                        let repertoryInfo = params.row.repertoryInfo;
+                        let good = {};
+                        if (repertoryInfo) {
+                        good = repertoryInfo.goods;
                         }
+                        let productDate = '';
+                        if (repertoryInfo.productDate) {
+                            productDate = moment(repertoryInfo.productDate).format('YYYY-MM-DD');
+                        }
+                        let expDate = '';
+                        if (repertoryInfo.expDate) {
+                            expDate = moment(repertoryInfo.expDate).format('YYYY-MM-DD');
+                        }
+                        return h(goodExpand, {
+                            props: {
+                                good: good,
+                                repertoryInfo: repertoryInfo,
+                                productDate: productDate,
+                                expDate: expDate
+                            }
                         });
                     }
                 },
@@ -222,19 +241,34 @@ export default {
                 {
                     title: '剂型',
                     key: 'jx',
-                    width: 100
+                    width: 100,
+                    render: (h, params) => {
+                        let repertoryInfo = params.row.repertoryInfo;
+                        if (repertoryInfo) {
+                            return h('span', repertoryInfo.jx);
+                        }
+                    }
                 },
                 {
                     title: '规格',
                     key: 'spec',
-                    width: 100
+                    width: 100,
+                    render: (h, params) => {
+                        let repertoryInfo = params.row.repertoryInfo;
+                        if (repertoryInfo) {
+                            return h('span', repertoryInfo.spec);
+                        }
+                    }
                 },
                 {
                     title: '生产日期',
                     width: 120,
                     key: 'productData',
                     render: (h, params) => {
-                        return moment(params.row.productData).format('YYYY-MM-DD');
+                        let repertoryInfo = params.row.repertoryInfo;
+                        if (repertoryInfo && repertoryInfo.productDate) {
+                            return moment(repertoryInfo.productDate).format('YYYY-MM-DD');
+                        }
                     }
                 },
                 {
@@ -242,13 +276,22 @@ export default {
                     key: 'expDate',
                     width: 120,
                     render: (h, params) => {
-                        return moment(params.row.expDate).format('YYYY-MM-DD');
+                        let repertoryInfo = params.row.repertoryInfo;
+                        if (repertoryInfo && repertoryInfo.expDate) {
+                            return moment(repertoryInfo.expDate).format('YYYY-MM-DD');
+                        }
                     }
                 },
                 {
                     title: '单位',
                     key: 'unitName',
-                    width: 90
+                    width: 90,
+                    render: (h, params) => {
+                        let repertoryInfo = params.row.repertoryInfo;
+                        if (repertoryInfo) {
+                            return h('span', repertoryInfo.unitName);
+                        }
+                    }
                 },
                 {
                     title: '数量',
@@ -268,26 +311,68 @@ export default {
                 {
                     title: '审核状态',
                     width: 100,
-                    key: 'status'
+                    key: 'status',
+                    render: (h, params) => {
+                        let reviewOptions = params.row.reviewOptions;
+                        if(reviewOptions && reviewOptions.length > 0) {
+                            let items = reviewOptions.filter(item => item.reviewType === 'QUALITY_REVIEW');
+                            if(items && items[0]) {
+                                let itemStatus = items[0].reviewStatus;
+                                return h('span', itemStatus === 'OK' ? '审核通过' : '');
+                            }
+                        }
+                    }
                 },
                 {
                     title: '审核人',
                     width: 100,
-                    key: 'reviewUserName'
+                    key: 'reviewUserName',
+                    render: (h, params) => {
+                        let reviewOptions = params.row.reviewOptions;
+                        if(reviewOptions && reviewOptions.length > 0) {
+                            let items = reviewOptions.filter(item => item.reviewType === 'QUALITY_REVIEW');
+                            if(items && items[0]) {
+                                let updateBy = items[0].updateBy;
+                                return h('span', updateBy ? updateBy : '');
+                            }
+                        }
+                    }
                 },
                 {
                     title: '审核日期',
                     width: 120,
-                    key: 'reviewDate'
+                    key: 'reviewDate',
+                    render: (h, params) => {
+                        let reviewOptions = params.row.reviewOptions;
+                        if(reviewOptions && reviewOptions.length > 0) {
+                            let items = reviewOptions.filter(item => item.reviewType === 'QUALITY_REVIEW');
+                            if(items && items[0]) {
+                                let updateTime = items[0].updateTime;
+                                return h('span', updateTime ? moment(updateTime).format('YYYY-MM-DD HH:mm') : '');
+                            }
+                        }
+                    }
                 },
                 {
                     title: '审核结论',
                     width: 180,
-                    key: 'reviewComment'
+                    key: 'reviewComment',
+                    render: (h, params) => {
+                        let reviewOptions = params.row.reviewOptions;
+                        if(reviewOptions && reviewOptions.length > 0) {
+                            let items = reviewOptions.filter(item => item.reviewType === 'QUALITY_REVIEW');
+                            if(items && items[0]) {
+                                let reviewComment = items[0].reviewComment;
+                                return h('span', reviewComment ? reviewComment : '');
+                            }
+                        }
+                    }
                 }
             ],
             totalCount: 0,
-            totalAmount: 0
+            totalAmount: 0,
+            reviewOkModal: false,
+            checkComment: ''
         }
     },
     mounted() {
@@ -308,11 +393,116 @@ export default {
                 });
         },
         querySellOrderList() {
-
+            let reqData = {
+                goodId: this.query.goodId,
+                salerId: this.query.salerId
+            };
+            let statusList = [];
+            if (this.query.status === 'ALL') {
+                statusList = ['INIT', 'QUALITY_CHECKED'];
+            }else {
+                statusList = [this.query.status];
+            }
+            reqData['statusList'] = statusList;
+            reqData['startDate'] = this.dateRange[0];
+            reqData['endDate'] = this.dateRange[1];
+            this.sellOrderLoading = true;
+            util.ajax.post("/sell/order/review/list", reqData)
+                .then((response) => {
+                    this.orderList = response.data;
+                    this.sellOrderLoading = false;
+                })
+                .catch((error) => {
+                    this.sellOrderLoading = false;
+                    util.errorProcessor(this, error);
+                })
         },
         handleSelectBuyOrder(data) {
-            console.log(data);
+            if (!data || !data.id) {
+                return;
+            }
+            let sellOrderId = data.id;
+            this.detailLoading = true;
+            util.ajax.get("sell/order/review/detail", {params: {orderId: sellOrderId}})
+                .then((response) => {
+                    this.detailLoading = false;
+                    let order = response.data;
+                    if (order && order.details) {
+                        this.sellGoodList = order.details;
+                    }else {
+                        this.sellGoodList = [];
+                    }
+                })
+                .catch((error) => {
+                    this.detailLoading = false;
+                    util.errorProcessor(this, error);
+                })
         },
+
+        detailSelectionChange(data) {
+            this.detailChooseItems = data;
+        },
+
+        reviewOkBtnClick() {
+            if (!this.detailChooseItems || this.detailChooseItems.length <= 0) {
+                this.$Message.warning("请先选择需要审核的产品信息");
+                return;
+            }
+            this.reviewOkModal = true;
+            this.checkComment = '';
+        },
+
+        setCheckedOk() {
+            let reqData = {
+                reviewType: 'QUALITY_REVIEW',
+                detailList: this.detailChooseItems,
+                reviewStatus: 'OK',
+                reviewComment: this.checkComment
+            }
+            this.detailLoading = true;
+            util.ajax.post("/sell/order/review/ok", reqData)
+                .then((response) => {
+                    this.detailLoading = false;
+                    let order = response.data;
+                    if (order && order.details) {
+                        this.sellGoodList = order.details;
+                    }else {
+                        this.sellGoodList = [];
+                    }
+                    this.$Message.success("审核成功");
+                    this.reviewOkModal = false;
+                })
+                .catch((error) => {
+                    this.detailLoading = false;
+                    util.errorProcessor(this, error);
+                })
+        },
+
+        reviewCancelBtnClick() {
+            if (!this.detailChooseItems || this.detailChooseItems.length <= 0) {
+                return;
+            }
+            let reqData = {
+                reviewType: 'QUALITY_REVIEW',
+                detailList: this.detailChooseItems
+            };
+            this.detailLoading = true;
+            util.ajax.post("/sell/order/review/cancel", reqData)
+                .then((response) => {
+                    this.detailLoading = false;
+                    let order = response.data;
+                    if (order && order.details) {
+                        this.sellGoodList = order.details;
+                    }else {
+                        this.sellGoodList = [];
+                    }
+                    this.$Message.success("取消成功");
+                })
+                .catch((error) => {
+                    this.detailLoading = false;
+                    util.errorProcessor(this, error);
+                })
+        }
     }
   
 }
