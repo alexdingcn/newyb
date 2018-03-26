@@ -68,6 +68,8 @@ public enum ErrorCode {
     SHIP_SAVE_PARAMS_ERROR(2301, "必输参数校验失败"),
 
 
+    // 41xx - 贷款
+    GET_FACEID_TOKEN_FAIL(4100, "无法获得token"),
 
 
     ACCESS_PERMISSION(9001, "无访问权限", ErrorDisplay.MODAL);

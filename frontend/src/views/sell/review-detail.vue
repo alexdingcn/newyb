@@ -134,52 +134,52 @@
 </template>
 
 <script>
-import util from "@/libs/util.js";
-import dataConver from "@/libs/data-conver.js";
-import goodExpand from "@/views/good/good-expand.vue";
+import util from '@/libs/util.js';
+import dataConver from '@/libs/data-conver.js';
+import goodExpand from '@/views/good/good-expand.vue';
 
 export default {
-  name: 'review-detail',
-  props: {
-      sellOrderId: Number
-  },
-  components: {
-      goodExpand
-  },
-  data() {
-      return {
-          orderDetail: '',
-          goodTableData: [],
-      }
-  },
-  watch: {
-      sellOrderId(id) {
-          this.initData(id);
-      }
-  },
-  filters: {
-      dateFormat(data) {
-          if (!data && isNaN(data)) {
-              return '';
-          }
-          return dataConver.formatDate(new Date(data), 'yyyy-MM-dd');
-      }
-  },
-  methods: {
-      initData(id) {
-          util.ajax.get("/sell/order/review/detail", {params: {orderId: id}})
-            .then((response) => {
-                this.orderDetail = response.data;
-                if (this.orderDetail && this.orderDetail.details) {
-                    this.goodTableData = this.orderDetail.details;
-                }
-            })
-            .catch(error => {
-                util.errorProcessor(this, error);
-            });
-      }
-  }
-}
+    name: 'review-detail',
+    props: {
+        sellOrderId: Number
+    },
+    components: {
+        goodExpand
+    },
+    data () {
+        return {
+            orderDetail: '',
+            goodTableData: []
+        };
+    },
+    watch: {
+        sellOrderId (id) {
+            this.initData(id);
+        }
+    },
+    filters: {
+        dateFormat (data) {
+            if (!data && isNaN(data)) {
+                return '';
+            }
+            return dataConver.formatDate(new Date(data), 'yyyy-MM-dd');
+        }
+    },
+    methods: {
+        initData (id) {
+            util.ajax.get('/sell/order/review/detail', {params: {orderId: id}})
+                .then((response) => {
+                    this.orderDetail = response.data;
+                    if (this.orderDetail && this.orderDetail.details) {
+                        this.goodTableData = this.orderDetail.details;
+                    }
+                })
+                .catch(error => {
+                    util.errorProcessor(this, error);
+                });
+        }
+    }
+};
 </script>
 
 <style>

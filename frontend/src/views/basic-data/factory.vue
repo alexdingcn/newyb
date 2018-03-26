@@ -47,8 +47,8 @@
                     {
                         type: 'index',
                         title: '',
-                        width: 40,
-//                    fixed: 'left'
+                        width: 40
+                    //                    fixed: 'left'
                     },
                     {
                         title: '名称',
@@ -56,7 +56,7 @@
                         align: 'center',
                         width: 200,
                         sortable: true,
-//                    fixed: 'left',
+                        //                    fixed: 'left',
                         render: (h, params) => {
                             return h('Button', {
                                 props: {
@@ -77,91 +77,91 @@
                     },
                     {
                         title: '产地',
-                         key: 'origin',
-                            width: 100,
-                            align: 'center',
-                            sortable: true
+                        key: 'origin',
+                        width: 100,
+                        align: 'center',
+                        sortable: true
                     },
                     {
                         title: '拼音简称',
-                                key: 'pinyin',
-                            width: 120,
-                            align: 'center',
-                            sortable: true
+                        key: 'pinyin',
+                        width: 120,
+                        align: 'center',
+                        sortable: true
                     },
                     {
                         title: '负责人',
-                                key: 'employee',
-                            width: 80,
-                            align: 'center',
+                        key: 'employee',
+                        width: 80,
+                        align: 'center'
                     },
                     {
                         title: '联系人',
-                                key: 'contact',
-                            width: 200,
-                            align: 'center',
-                            sortable: true
+                        key: 'contact',
+                        width: 200,
+                        align: 'center',
+                        sortable: true
                     },
                     {
                         title: '联系人电话',
-                                key: 'contactPhone',
-                            width: 200,
-                            align: 'center'
+                        key: 'contactPhone',
+                        width: 200,
+                        align: 'center'
                     }
                 ]
             };
         },
-        mounted() {
+        mounted () {
             this.loadFactoryList();
         },
         computed: {
 
         },
         methods: {
-            validateSearch: function(e) {
+            validateSearch: function (e) {
                 this.searchFactory();
             },
-            searchFactory() {
+            searchFactory () {
                 var self = this;
                 util.ajax.post('/factory/search', {search: this.searchFactoryVal})
-                        .then(function (response) {
-                            self.factoryData = response.data;
-                        })
-                        .catch(function (error) {
-                            console.log(error);
-                        });
+                    .then(function (response) {
+                        self.factoryData = response.data;
+                    })
+                    .catch(function (error) {
+                        console.log(error);
+                    });
             },
             loadFactoryList () {
                 var self = this;
                 util.ajax.get('/factory/list')
-                        .then(function (response) {
-                            self.factoryData = response.data;
-                        })
-                        .catch(function (error) {
-                            console.log(error);
-                        });
+                    .then(function (response) {
+                        self.factoryData = response.data;
+                    })
+                    .catch(function (error) {
+                        console.log(error);
+                    });
             },
-            addFactory() {
+            addFactory () {
                 this.$router.push({ name: 'factory-info' });
             },
-            delFactory() {
+            delFactory () {
                 // TODO add confirm
                 var row = this.$refs.factoryTable.getSelection();
                 if (row && row.length > 0) {
                     var self = this;
                     var delArr = [];
-                    for (var i=0; i< row.length; i++) {
+                    for (var i = 0; i < row.length; i++) {
                         delArr.push(row[i].id);
                     }
-                    util.ajax.post('/factory/remove', {ids: delArr} )
-                            .then(function (response) {
-                                self.loadFactoryList();
-                            })
-                            .catch(function (error) {
-                                console.log(error);
-                            })
+                    util.ajax.post('/factory/remove', {ids: delArr})
+                        .then(function (response) {
+                            self.loadFactoryList();
+                        })
+                        .catch(function (error) {
+                            console.log(error);
+                        });
                 } else {
-                    this.$Message.warning("请选择一个生产企业后操作");
+                    this.$Message.warning('请选择一个生产企业后操作');
                 }
             }
         }

@@ -104,7 +104,7 @@ export default {
     props: {
         detail: Object
     }
-}
+};
 </script>
 
 <style>

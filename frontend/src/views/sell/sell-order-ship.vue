@@ -137,8 +137,8 @@
 </template>
 
 <script>
-import util from "@/libs/util.js";
-import dataConver from "@/libs/data-conver.js";
+import util from '@/libs/util.js';
+import dataConver from '@/libs/data-conver.js';
 
 export default {
     name: 'sell-order-ship',
@@ -148,7 +148,7 @@ export default {
             required: true
         }
     },
-    data() {
+    data () {
         return {
             storageMethodList: [],
             shipToolList: [],
@@ -188,14 +188,14 @@ export default {
                     title: '货单号',
                     key: 'shipNumber',
                     width: 120,
-                    align: "center",
+                    align: 'center',
                     fixed: 'left'
                 },
                 {
                     title: '发货时间',
                     key: 'issuanceDate',
                     width: 120,
-                    align: "center",
+                    align: 'center',
                     fixed: 'left',
                     render: (h, params) => {
                         return h('span', this.dateFormat(params.row.issuanceDate));
@@ -205,85 +205,85 @@ export default {
                     title: '承运公司',
                     key: 'shipCompanyName',
                     width: 200,
-                    align: "center"
+                    align: 'center'
                 },
                 {
                     title: '发货地址',
                     key: 'shipAddress',
                     width: 200,
-                    align: "center"
+                    align: 'center'
                 },
                 {
                     title: '存储条件',
                     key: 'storageMethodName',
                     width: 150,
-                    align: "center"
+                    align: 'center'
                 },
                 {
                     title: '运输工具',
                     key: 'shipToolName',
                     width: 100,
-                    align: "center"
+                    align: 'center'
                 },
                 {
                     title: '运输方式',
                     key: 'shipMethodName',
                     width: 100,
-                    align: "center"
+                    align: 'center'
                 },
                 {
                     title: '承运电话',
                     key: 'shipPhone',
                     width: 100,
-                    align: "center"
+                    align: 'center'
                 },
                 {
                     title: '经办人',
                     key: 'operator',
                     width: 100,
-                    align: "center"
+                    align: 'center'
                 },
                 {
                     title: '车牌号',
                     key: 'carNumber',
                     width: 100,
-                    align: "center"
+                    align: 'center'
                 },
                 {
                     title: '驾驶员',
                     key: 'driverName',
                     width: 100,
-                    align: "center"
+                    align: 'center'
                 },
                 {
                     title: '驾驶员档案',
                     key: 'driverFileNo',
                     width: 120,
-                    align: "center"
+                    align: 'center'
                 },
                 {
                     title: '起运温度',
                     key: 'shipTemper',
                     width: 100,
-                    align: "center"
+                    align: 'center'
                 },
                 {
                     title: '数量',
                     key: 'shipQuantity',
                     width: 100,
-                    align: "center"
+                    align: 'center'
                 },
                 {
                     title: '运行里程(km)',
                     key: 'mileage',
                     width: 100,
-                    align: "center"
+                    align: 'center'
                 },
                 {
                     title: '计划启运时间',
                     key: 'shipStartTime',
                     width: 120,
-                    align: "center",
+                    align: 'center',
                     render: (h, params) => {
                         return this.dateFormat(params.row.shipStartTime);
                     }
@@ -292,7 +292,7 @@ export default {
                     title: '计划到货时间',
                     key: 'shipEndTime',
                     width: 120,
-                    align: "center",
+                    align: 'center',
                     render: (h, params) => {
                         return this.dateFormat(params.row.shipEndTime);
                     }
@@ -301,12 +301,12 @@ export default {
                     title: '备注',
                     key: 'comment',
                     width: 120,
-                    align: "center"
+                    align: 'center'
                 },
                 {
                     title: '操作',
                     width: 100,
-                    align: "center",
+                    align: 'center',
                     fixed: 'right',
                     render: (h, params) => {
                         return h('Button', {
@@ -319,83 +319,83 @@ export default {
                                     this.removeShipRecord(params.row.id);
                                 }
                             }
-                        }, '删除')
+                        }, '删除');
                     }
-                },
+                }
             ]
-        }
+        };
     },
-    mounted() {
+    mounted () {
         this.initData();
     },
     watch: {
-        orderId(data) {
+        orderId (data) {
             this.refreshTableData();
         }
     },
     methods: {
-        dateFormat(data) {
-          if (!data && isNaN(data)) {
-              return '';
-          }
-          return dataConver.formatDate(new Date(data), 'yyyy-MM-dd hh:mm');
+        dateFormat (data) {
+            if (!data && isNaN(data)) {
+                return '';
+            }
+            return dataConver.formatDate(new Date(data), 'yyyy-MM-dd hh:mm');
         },
-        initData() {
+        initData () {
             this.getOptions();
             this.getShipCompanyList();
         },
-        getOptions() {
-          let reqData = ['TEMPER_CONTROL', 'SHIP_METHOD', 'SHIP_TOOL'];
-          util.ajax.post("/options/list", reqData)
-            .then((response) => {
-              let data = response.data;
-              if (data && data.TEMPER_CONTROL) {
-                  this.storageMethodList = data.TEMPER_CONTROL;
-              }
-              if (data && data.SHIP_METHOD) {
-                  this.shipMethodList = data.SHIP_METHOD;
-              }
-              if (data && data.SHIP_TOOL) {
-                  this.shipToolList = data.SHIP_TOOL;
-              }
-          })
-          .catch((error) => {
-              util.errorProcessor(this, error);
-          })
+        getOptions () {
+            let reqData = ['TEMPER_CONTROL', 'SHIP_METHOD', 'SHIP_TOOL'];
+            util.ajax.post('/options/list', reqData)
+                .then((response) => {
+                    let data = response.data;
+                    if (data && data.TEMPER_CONTROL) {
+                        this.storageMethodList = data.TEMPER_CONTROL;
+                    }
+                    if (data && data.SHIP_METHOD) {
+                        this.shipMethodList = data.SHIP_METHOD;
+                    }
+                    if (data && data.SHIP_TOOL) {
+                        this.shipToolList = data.SHIP_TOOL;
+                    }
+                })
+                .catch((error) => {
+                    util.errorProcessor(this, error);
+                });
         },
 
-        getShipCompanyList() {
-            util.ajax.get("/ship/list")
-            .then((response) => {
-                this.shipCompanyList = response.data.data;
-            })
-            .catch((error) => {
-              util.errorProcessor(this, error);
-          })
+        getShipCompanyList () {
+            util.ajax.get('/ship/list')
+                .then((response) => {
+                    this.shipCompanyList = response.data.data;
+                })
+                .catch((error) => {
+                    util.errorProcessor(this, error);
+                });
         },
 
-        addShipRecord() {
+        addShipRecord () {
             this.$refs.form.validate(valid => {
-                if(!valid) {
+                if (!valid) {
                     this.$Message.warning('请检查必输项信息');
                     return;
                 }
                 this.tabLoading = true;
                 this.formItem.sellOrderId = this.orderId;
-                util.ajax.post("/sell/order/ship/save", this.formItem)
-                .then((response) => {
-                    this.$Message.success("新建成功");
-                    this.refreshTableData();
-                    this.initFormItem();
-                })
-                .catch((error) => {
-                    util.errorProcessor(this, error);
-                })
+                util.ajax.post('/sell/order/ship/save', this.formItem)
+                    .then((response) => {
+                        this.$Message.success('新建成功');
+                        this.refreshTableData();
+                        this.initFormItem();
+                    })
+                    .catch((error) => {
+                        util.errorProcessor(this, error);
+                    });
                 this.tabLoading = false;
             });
         },
 
-        initFormItem() {
+        initFormItem () {
             this.formItem = {
                 id: '',
                 sellOrderId: this.orderId,
@@ -417,15 +417,15 @@ export default {
                 shipStartTime: '',
                 shipEndTime: '',
                 comment: ''
-            }
+            };
         },
 
-        refreshTableData() {
+        refreshTableData () {
             if (!this.orderId || this.orderId < 0) {
                 return;
             }
             this.tabLoading = true;
-            util.ajax.get("/sell/order/ship/list", {params: {orderId: this.orderId}})
+            util.ajax.get('/sell/order/ship/list', {params: {orderId: this.orderId}})
                 .then((response) => {
                     console.log(response.data);
                     this.tabData = response.data;
@@ -436,11 +436,11 @@ export default {
             this.tabLoading = false;
         },
 
-        removeShipRecord(id) {
-            if(!id) {
+        removeShipRecord (id) {
+            if (!id) {
                 return;
             }
-            util.ajax.delete("/sell/order/ship/remove/" + id)
+            util.ajax.delete('/sell/order/ship/remove/' + id)
                 .then((reponse) => {
                     this.$Message.success('删除成功');
                     this.refreshTableData();
@@ -450,8 +450,8 @@ export default {
                 });
         }
     }
-  
-}
+
+};
 </script>
 
 <style>

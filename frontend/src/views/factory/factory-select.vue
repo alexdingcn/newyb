@@ -12,44 +12,44 @@
 </template>
 
 <script>
-import util from "@/libs/util.js"
+import util from '@/libs/util.js';
 
 export default {
     name: 'factory-select',
-    props:['value', 'size'],
-    data() {
+    props: ['value', 'size'],
+    data () {
         return {
             selectSize: this.size,
             id: null,
             resultList: [],
             searchLoading: false
-        }
+        };
     },
 
     methods: {
-        searchMethod(searchStr) {
+        searchMethod (searchStr) {
             if (!searchStr) {
                 this.resultList = [];
                 return;
             }
             this.searchLoading = true;
-            util.ajax.post("/factory/search", {search: searchStr})
+            util.ajax.post('/factory/search', {search: searchStr})
                 .then((response) => {
                     this.resultList = response.data;
                 })
                 .catch((error) => {
                     util.errorProcessor(this, error);
-                })
+                });
             this.searchLoading = false;
         },
 
-        onChange(data) {
+        onChange (data) {
             let factory = this.resultList.filter(item => item.id === data);
-            this.$emit("input", data);
-            this.$emit("on-change", data, factory);
+            this.$emit('input', data);
+            this.$emit('on-change', data, factory);
         }
     }
-}
+};
 </script>
 
 <style>

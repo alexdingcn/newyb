@@ -5,9 +5,9 @@ const user = {
         token: null
     },
     mutations: {
-        setToken(state, data) {
+        setToken (state, data) {
             localStorage.token = data;
-            state.token = data
+            state.token = data;
         },
         logout (state, vm) {
             // Cookies.remove('user');

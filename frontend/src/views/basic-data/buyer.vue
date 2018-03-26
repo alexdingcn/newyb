@@ -38,7 +38,7 @@
                     width: '300px',
                     height: '400px'
                 }
-            }
+            };
         },
         methods: {
             getUserList () {
@@ -52,10 +52,10 @@
                             for (let i = 0; i < list.length; i++) {
                                 uList.push({
                                     key: list[i].id,
-                                    label: "<b>" + list[i].nickname + "</b>",
-                                    description: '[ ' + (list[i].realname ? '姓名:'
-                                                     + list[i].realname + ' ': '')
-                                                     + '手机:' + list[i].mobile + ' ]',
+                                    label: '<b>' + list[i].nickname + '</b>',
+                                    description: '[ ' + (list[i].realname ? '姓名:' +
+                                                 list[i].realname + ' ' : '') +
+                                                 '手机:' + list[i].mobile + ' ]',
                                     disabled: false
                                 });
                             }
@@ -65,39 +65,39 @@
                     })
                     .catch(function (error) {
                         console.log(error);
-                    })
+                    });
             },
             getBuyerList () {
                 var self = this;
                 util.ajax.get('/userrole/list', {params: {roleQuery: 'ROLE_BUYER;ROLE_BUYER_SPECIAL'} })
-                        .then(function (response) {
-                            if (response.status === 200 && response.data) {
-                                var list = response.data;
-                                let uList = [];
-                                for (let i = 0; i < list.length; i++) {
-                                    uList.push(list[i].userId);
-                                    self.buyers[list[i].userId] = list[i];
-                                }
-                                self.buyerKeys = self.allUsers
-                                                .filter(item => uList.indexOf(item.key) >= 0)
-                                                .map(item => item.key);
+                    .then(function (response) {
+                        if (response.status === 200 && response.data) {
+                            var list = response.data;
+                            let uList = [];
+                            for (let i = 0; i < list.length; i++) {
+                                uList.push(list[i].userId);
+                                self.buyers[list[i].userId] = list[i];
                             }
-                        })
-                        .catch(function (error) {
-                            console.log(error);
-                        })
+                            self.buyerKeys = self.allUsers
+                                .filter(item => uList.indexOf(item.key) >= 0)
+                                .map(item => item.key);
+                        }
+                    })
+                    .catch(function (error) {
+                        console.log(error);
+                    });
             },
             handleMove (newTargetKeys) {
                 this.buyerKeys = newTargetKeys;
                 if (this.buyers) {
                     var newBuyers = {};
-                    for (let i=0; i< newTargetKeys.length; i++) {
+                    for (let i = 0; i < newTargetKeys.length; i++) {
                         var userId = newTargetKeys[i];
                         var existed = this.buyers[userId];
                         if (existed) {
                             newBuyers[userId] = existed;
                         } else {
-                            newBuyers[userId] = {userId: userId, name:'ROLE_BUYER'}
+                            newBuyers[userId] = {userId: userId, name: 'ROLE_BUYER'};
                         }
                     }
                     this.buyers = newBuyers;
@@ -109,30 +109,30 @@
             reloadData () {
                 this.getUserList();
             },
-            saveBuyer() {
+            saveBuyer () {
                 var params = new Array();
                 var self = this;
                 for (var key in this.buyers) {
                     params.push(this.buyers[key]);
                 }
                 let reqData = {
-                    roleTypes:  ['ROLE_BUYER', 'ROLE_BUYER_SPECIAL'],
+                    roleTypes: ['ROLE_BUYER', 'ROLE_BUYER_SPECIAL'],
                     roles: params
                 };
                 util.ajax.post('/userrole/save', reqData)
                     .then(function (response) {
                         if (response.status === 200 && response.data) {
-                            self.$Message.info("保存采购员列表成功");
+                            self.$Message.info('保存采购员列表成功');
                             self.getUserList();
                         }
                     })
                     .catch(function (error) {
                         console.log(error);
-                    })
+                    });
             }
         },
         mounted () {
             this.getUserList();
-        },
-    }
+        }
+    };
 </script>

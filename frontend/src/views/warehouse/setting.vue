@@ -66,81 +66,81 @@
                     {
                         type: 'index',
                         title: '',
-                        width: 40,
+                        width: 40
                     },
                     {
                         title: '名称',
                         key: 'name',
                         align: 'center',
-                        width: 150,
+                        width: 150
                     },
                     {
                         title: '描述',
                         key: 'description',
                         align: 'center',
-                        width: 250,
+                        width: 250
                     },
                     {
                         title: '创建时间',
                         key: 'createdTime',
                         align: 'center',
-                        render:(h, params) => {
+                        render: (h, params) => {
                             return moment(params.row.createdTime).format('YYYY-MM-DD hh:mm:ss');
                         }
                     }
-        ]
-        };
+                ]
+            };
         },
-        mounted() {
+        mounted () {
             this.loadWarehouseList();
         },
         computed: {
 
         },
         methods: {
-            validateSearch: function(e) {
+            validateSearch: function (e) {
                 this.searchSupplier();
             },
             loadWarehouseList () {
                 var self = this;
                 util.ajax.get('/warehouse/list')
-                        .then(function (response) {
-                            self.warehouseData = response.data;
-                        })
-                        .catch(function (error) {
-                            console.log(error);
-                        });
+                    .then(function (response) {
+                        self.warehouseData = response.data;
+                    })
+                    .catch(function (error) {
+                        console.log(error);
+                    });
             },
-            handleAddWarehouse() {
+            handleAddWarehouse () {
                 var self = this;
                 util.ajax.post('/warehouse/add', this.newWarehouse)
-                        .then(function (response) {
-                            self.loadWarehouseList();
-                            self.warehouseModalShow = false;
-                            self.newWarehouse = {};
-                        })
-                        .catch(function (error) {
-                            console.log(error);
-                        })
+                    .then(function (response) {
+                        self.loadWarehouseList();
+                        self.warehouseModalShow = false;
+                        self.newWarehouse = {};
+                    })
+                    .catch(function (error) {
+                        console.log(error);
+                    });
             },
-            delWarehouse() {
+            delWarehouse () {
                 // TODO add confirm
                 var row = this.$refs.warehouseTable.getSelection();
                 if (row && row.length > 0) {
                     var self = this;
                     var delArr = [];
-                    for (var i=0; i< row.length; i++) {
+                    for (var i = 0; i < row.length; i++) {
                         delArr.push(row[i].id);
                     }
-                    util.ajax.post('/warehouse/remove', {ids: delArr} )
-                            .then(function (response) {
-                                self.loadWarehouseList();
-                            })
-                            .catch(function (error) {
-                                console.log(error);
-                            })
+                    util.ajax.post('/warehouse/remove', {ids: delArr})
+                        .then(function (response) {
+                            self.loadWarehouseList();
+                        })
+                        .catch(function (error) {
+                            console.log(error);
+                        });
                 } else {
-                    this.$Message.warning("请选择一个仓库后操作");
+                    this.$Message.warning('请选择一个仓库后操作');
                 }
             }
         }

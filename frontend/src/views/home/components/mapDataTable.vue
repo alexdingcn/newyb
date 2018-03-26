@@ -15,7 +15,7 @@ export default {
                     key: 'name'
                 },
                 {
-                    title: '流量(k)',
+                    title: '销量',
                     key: 'value',
                     sortable: true
                 }

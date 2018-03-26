@@ -7,11 +7,12 @@
 	<Row>
 		<Card>
 			<p slot="title" >
-				<Icon type="document"></Icon> 采购入库制单
+				<Icon type="document"></Icon> 采购收货单
 			</p>
 			<div slot="extra">
 
 				<ButtonGroup class="padding-left-20">
+                    <Button type="primary" icon="android-add-circle" @click="importBuyOrder" :loading="saving">载入采购单</Button>
 					<Button type="primary" icon="android-add-circle" @click="saveBuyOrder" :loading="saving">保存</Button>
 				</ButtonGroup>
 			</div>
@@ -168,7 +169,6 @@
 </template>
 
 <script>
-    import axios from 'axios';
     import moment from 'moment';
     import util from '@/libs/util.js';
 
@@ -177,10 +177,10 @@
         data () {
             return {
                 saving: false,
-            	supplierLoading: false,
-            	supplierOptions: [],
-            	goodsLoading: false,
-            	goodsOptions: [],
+                supplierLoading: false,
+                supplierOptions: [],
+                goodsLoading: false,
+                goodsOptions: [],
                 buyerOptions: [],
                 supplierContactLoading: false,
                 supplierContactOptions: [],
@@ -534,7 +534,7 @@
                         }
                     },
                     onCancel: () => {
-    
+
                     }
                 });
             },

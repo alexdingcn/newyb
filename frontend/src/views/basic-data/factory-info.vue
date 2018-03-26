@@ -163,7 +163,7 @@
 </template>
 
 <script>
-import axios from 'axios'
+import axios from 'axios';
 import Vue from 'vue';
 import iviewArea from 'iview-area';
 import util from '@/libs/util.js';
@@ -182,7 +182,7 @@ export default {
                 ],
                 address: [
                     {required: true, message: '地址不能为空', trigger: 'blur'}
-                ],
+                ]
             }
         };
     },
@@ -215,18 +215,18 @@ export default {
                 };
             }
         },
-        submitFactory() {
+        submitFactory () {
             var self = this;
             util.ajax.post('/factory/add', this.formItem)
-                    .then(function (response) {
-                        self.formItem.id = response.data;
-                        self.$Message.info("生产企业" + self.formItem.name + "保存成功");
-                    })
-                    .catch(function (error) {
-                        console.log(error);
-                    })
+                .then(function (response) {
+                    self.formItem.id = response.data;
+                    self.$Message.info('生产企业' + self.formItem.name + '保存成功');
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
         },
-        onChangeName() {
+        onChangeName () {
             if (this.formItem.name !== '') {
                 util.setCurrentPageTitle(this, this.formItem.name, true);
                 var self = this;
@@ -236,10 +236,10 @@ export default {
                     })
                     .catch(function (error) {
                         console.log(error);
-                    })
+                    });
             }
         },
-        searchRelatedGoods() {
+        searchRelatedGoods () {
             let argu = { factory_id: this.$route.params.factory_id };
             this.$router.push({
                 name: 'basic_data_good',

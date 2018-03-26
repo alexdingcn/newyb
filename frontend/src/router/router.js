@@ -21,6 +21,17 @@ export const registerRouter = {
         component: () => import('@/views/register.vue')
 };
 
+
+export const loanApplyRouter = {
+        path: '/loan/apply',
+        name: 'loan_apply',
+        meta: {
+            title: '融资申请-医伴金服',
+            noAuth: true
+        },
+        component: () => import('@/views/loan/apply.vue')
+};
+
 export const page404 = {
         path: '/*',
         name: 'error-404',
@@ -77,7 +88,7 @@ export const otherRouter = {
 { path: 'ownspace', title: '个人中心', name: 'ownspace_index', component: () => import('@/views/own-space/own-space.vue') },
 { path: 'order/:order_id', title: '订单详情', name: 'order-info', component: () => import('@/views/advanced-router/component/order-info.vue') }, // 用于展示动态路由
 { path: 'shopping', title: '购物详情', name: 'shopping', component: () => import('@/views/advanced-router/component/shopping-info.vue') }, // 用于展示带参路由
-{ path: 'message', title: '消息中心', name: 'message_index', component: () => import('@/views/message/message.vue') }
+{ path: 'message', title: '消息中心', name: 'message_index', component: () => import('@/views/message/message.vue') },
 ]
 };
 
@@ -110,6 +121,7 @@ export const appRouter = [
     children: [
         { path: 'order', title: '采购制单', name: 'buy_order', component: () => import('@/views/buy/buy-order.vue') },
         { path: 'review', title: '采购单审核', name: 'buy_order_review', component: () => import('@/views/buy/buy-order-list.vue') },
+        { path: 'receive', title: '采购收货', name: 'buy_receive', component: () => import('@/views/buy/buy-receive.vue') },
     ]
 },
 {
@@ -153,8 +165,8 @@ export const appRouter = [
     access: 0,
     component: Main,
     children: [
-    { path: 'index', title: '权限测试页', name: 'accesstest_index', access: 0, component: () => import('@/views/access/access-test.vue') }
-]
+        { path: 'index', title: '权限测试页', name: 'accesstest_index', access: 0, component: () => import('@/views/access/access-test.vue') }
+    ]
 },
 {
     path: '/international',
@@ -297,6 +309,7 @@ export const appRouter = [
 export const routers = [
         loginRouter,
         registerRouter,
+        loanApplyRouter,
         otherRouter,
         preview,
         locking,

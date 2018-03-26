@@ -83,13 +83,13 @@
         name: 'buy_order',
         data () {
             return {
-				statusOptions: [{key: 'ALL', name:'所有'},{key: 'CHECKING', name:'未审批'},{key: 'CHECKED', name:'已审批'}],
+                statusOptions: [{key: 'ALL', name: '所有'}, {key: 'CHECKING', name: '未审批'}, {key: 'CHECKED', name: '已审批'}],
                 query: {
-                    status: 'CHECKING',
+                    status: 'CHECKING'
                 },
                 dateRange: [
-                    moment().add(-1,'w').format('YYYY-MM-DD'),
-                    moment().format('YYYY-MM-DD'),
+                    moment().add(-1, 'w').format('YYYY-MM-DD'),
+                    moment().format('YYYY-MM-DD')
                 ],
                 orderList: [],
             	supplierLoading: false,
@@ -117,7 +117,7 @@
                         align: 'center',
                         key: 'createdTime',
                         width: 80,
-                        render:(h, params) => {
+                        render: (h, params) => {
                             return moment(params.row.createdTime).format('YYYY-MM-DD');
                         }
                     },
@@ -180,7 +180,7 @@
                         align: 'center',
                         key: 'checkTime',
                         width: 80,
-                        render:(h, params) => {
+                        render: (h, params) => {
                             return moment(params.row.checkTime).format('YYYY-MM-DD');
                         }
                     },
@@ -195,7 +195,7 @@
                         align: 'center',
                         key: 'eta',
                         width: 80,
-                        render:(h, params) => {
+                        render: (h, params) => {
                             return moment(params.row.eta).format('YYYY-MM-DD');
                         }
                     },
@@ -222,7 +222,7 @@
                         align: 'center',
                         key: 'shipMethod',
                         width: 80
-                    },
+                    }
                 ],
 
                 orderColumns: [
@@ -233,11 +233,11 @@
                         width: 30
                     },
                     {
-						title: '货号',
-						align: 'center',
-						key: 'goodsId',
-						width: 50
-					},
+                        title: '货号',
+                        align: 'center',
+                        key: 'goodsId',
+                        width: 50
+                    },
                     {
                         title: '商品名称',
                         key: 'goodsName',
@@ -245,112 +245,112 @@
                         width: 150,
                         sortable: true,
                         render: (h, params) => {
-							return h('Button', {
-								props: {
-									type: 'text',
-									size: 'small'
-								},
-								on: {
-									click: () => {
-										let argu = { goods_id: params.row.goodsId };
-										this.$router.push({
-											name: 'goods-info',
-											params: argu
-										});
-									}
-								}
-							}, params.row.goodsName);
-						}
-					},
-					{
-						title: '产地',
-						key: 'origin',
-						align: 'center',
-						width: 60
-					},
-					{
-						title: '剂型',
-						key: 'jx',
-						align: 'center',
-						width: 60
-					},
-					{
-						title: '规格',
-						key: 'spec',
-						align: 'center',
-						width: 80
-					},
-					{
-						title: '生产企业',
-						key: 'factory',
-						align: 'center',
-						width: 120
-					},
-					{
-						title: '单位',
-						key: 'unitName',
-						align: 'center',
-						width: 50
-					},
+                            return h('Button', {
+                                props: {
+                                    type: 'text',
+                                    size: 'small'
+                                },
+                                on: {
+                                    click: () => {
+                                        let argu = { goods_id: params.row.goodsId };
+                                        this.$router.push({
+                                            name: 'goods-info',
+                                            params: argu
+                                        });
+                                    }
+                                }
+                            }, params.row.goodsName);
+                        }
+                    },
+                    {
+                        title: '产地',
+                        key: 'origin',
+                        align: 'center',
+                        width: 60
+                    },
+                    {
+                        title: '剂型',
+                        key: 'jx',
+                        align: 'center',
+                        width: 60
+                    },
+                    {
+                        title: '规格',
+                        key: 'spec',
+                        align: 'center',
+                        width: 80
+                    },
+                    {
+                        title: '生产企业',
+                        key: 'factory',
+                        align: 'center',
+                        width: 120
+                    },
+                    {
+                        title: '单位',
+                        key: 'unitName',
+                        align: 'center',
+                        width: 50
+                    },
 
-					{
+                    {
                         title: '数量',
                         key: 'quantity',
                         align: 'center',
-                        width: 80,
-					},
-					{
+                        width: 80
+                    },
+                    {
                         title: '单价',
                         key: 'buyPrice',
                         align: 'center',
-                        width: 80,
-					},
-					{
+                        width: 80
+                    },
+                    {
                         title: '金额',
                         key: 'amount',
                         align: 'center',
                         width: 80
-					},
-					{
-						title: '大件装量',
-						key: 'bigPack',
-						align: 'center',
-						width: 60
-					},
-					{
+                    },
+                    {
+                        title: '大件装量',
+                        key: 'bigPack',
+                        align: 'center',
+                        width: 60
+                    },
+                    {
                         title: '库存',
                         key: 'balance',
                         align: 'center',
                         width: 100
-					},
+                    },
                     {
                         title: '零售价',
                         key: 'retailPrice',
                         align: 'center',
                         width: 100
-                    },
-        	],
-        };
+                    }
+        	]
+            };
         },
-        mounted() {
+        mounted () {
             this.queryOrderList();
         },
-		activated() {
+    activated () {
 
-		},
+    },
         watch: {
         	orderItems: function () {
-        		this.totalAmount = this.orderItems.reduce(function(total, item) { return total + parseFloat(item.amount); }, 0);
+        		this.totalAmount = this.orderItems.reduce(function (total, item) { return total + parseFloat(item.amount); }, 0);
         	}
         },
         methods: {
-            rowClassName(row, index) {
+            rowClassName (row, index) {
                 if (row.status) {
                     return 'table-row-' + row.status.toLowerCase();
                 }
                 return '';
             },
-            queryOrderList() {
+            queryOrderList () {
                 var self = this;
                 this.orderList = [];
                 this.orderItems = [];
@@ -359,21 +359,21 @@
                     this.query['endDate'] = this.dateRange[1];
                 }
                 util.ajax.post('/buy/list', this.query)
-                        .then(function (response) {
-                            if (response.status === 200 && response.data) {
-                                self.orderList = response.data;
-                                if (self.orderList && self.orderList.length > 0) {
-                                    self.handleSelectBuyOrder(self.orderList[0]);
-                                }
+                    .then(function (response) {
+                        if (response.status === 200 && response.data) {
+                            self.orderList = response.data;
+                            if (self.orderList && self.orderList.length > 0) {
+                                self.handleSelectBuyOrder(self.orderList[0]);
                             }
-                        })
-                        .catch(function (error) {
-                            console.log(error);
-                        });
+                        }
+                    })
+                    .catch(function (error) {
+                        console.log(error);
+                    });
             },
 
-			querySupplier (query) {
-				var self = this;
+            querySupplier (query) {
+                var self = this;
                 if (query !== '') {
                     this.supplierLoading = true;
                     util.ajax.post('/supplier/search', {search: query})
@@ -388,7 +388,7 @@
                     this.supplierOptions = [];
                 }
             },
-            handleSelectBuyOrder(row) {
+            handleSelectBuyOrder (row) {
                 var self = this;
                 util.ajax.get('/buy/orderdetail/' + row.id)
                     .then(function (response) {
@@ -398,9 +398,9 @@
                     })
                     .catch(function (error) {
                         console.log(error);
-                    })
+                    });
             },
-            showCheckModal() {
+            showCheckModal () {
                 var rows = this.$refs.buyOrderListTable.getSelection();
                 if (!rows || rows.length === 0) {
                     this.$Message.warning('请选择订单');
@@ -411,7 +411,7 @@
                     this.checkModalShow = true;
                 }
             },
-            setChecked(result) {
+            setChecked (result) {
                 var self = this;
                 var rows = this.$refs.buyOrderListTable.getSelection();
                 if (!rows || rows.length === 0) {
@@ -420,10 +420,10 @@
                     this.$Message.warning('请一次选择一条订单');
                 } else if (rows.length == 1) {
                     util.ajax.post('/buy/status', {
-                            orderId: rows[0].id,
-                            orderStatus: result ? 'CHECKED':'REJECTED',
-                            checkResult: this.checkResult
-                        })
+                        orderId: rows[0].id,
+                        orderStatus: result ? 'CHECKED' : 'REJECTED',
+                        checkResult: this.checkResult
+                    })
                         .then(function (response) {
                             self.checkModalShow = false;
                             if (response.status === 200) {
@@ -433,7 +433,7 @@
                         .catch(function (error) {
                             self.checkModalShow = false;
                             console.log(error);
-                        })
+                        });
                 }
             }
         }

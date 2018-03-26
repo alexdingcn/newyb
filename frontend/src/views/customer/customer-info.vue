@@ -375,628 +375,621 @@
 </template>
 
 <script>
-import util from "@/libs/util.js";
-import dataConver from "@/libs/data-conver.js";
-import fileView from "@/views/basic-data/file-view.vue";
+import util from '@/libs/util.js';
+import dataConver from '@/libs/data-conver.js';
+import fileView from '@/views/basic-data/file-view.vue';
 
 export default {
-  name: "customer-info",
-  props: {
-    action: {
-      type: String,
-      required: true,
-      validator: function(value) {
-        return value === "add" || value === "edit" || value === "see";
-      }
-    },
-    categorys: {
-      type: Array,
-      required: true,
-      default: []
-    },
-    editCustomer: {
-      type: Object,
-      default: null,
-    }
-  },
-  components: {
-    fileView
-  },
-  data() {
-    return {
-      showView: 'add',
-      isReadOnly: false,
-      showTitle: '新建客户信息',
-      editId: '',
-      submitBtnLoading: false,
-      formItem: {
-        id: '',
-        categoryId: '',
-        customerNo: '',
-        name: '',
-        shorName: '',
-        pinyin: '',
-        disable: 0,
-        canSaleSpecial: 0,
-        limitSpecial: 0,
-        direction: 0,
-        city: '',
-        address: '',
-        legalPersion: '',
-        postcode: '',
-        contactPhone: '',
-        employee: '',
-        contactFax: '',
-        email: '',
-        saleArea: '',
-        salesman: '',
-        memberLevel: '',
-        classAttOne: '',
-        classAttTwo: '',
-        sealModel: '',
-        billModel: '',
-        accountPeriod: '',
-        businessScope: '',
-        comment: '',
-        accountName: '',
-        bankName: '',
-        bankAccount: '',
-        dutyAccount: '',
-        quaCheck: '',
-        fileNo: '',
-        superviseNo: ''
-      },
-      certDelBtnLoading: false,
-      certTabLoading: false,
-      certTabData: [],
-      certTabSelectedData: [],
-      imageShowModal: false,
-      showImageNo: '',
-      certTabColumns: [
-        {
-          type: "selection",
-          width: 60,
-          align: "center"
-        },
-        {
-          title: "证书名称",
-          key: "licenseName",
-          align: "center"
-        },
-        {
-          title: "有效期至",
-          key: "licenseExp",
-          align: "center",
-          render: (h, params) => {
-            let date = params.row.licenseExp;
-            if (!date || isNaN(date)) {
-              return h('span', '');
-            }else {
-              return h('span', dataConver.formatDate(new Date(date), 'yyyy-MM-dd'));
+    name: 'customer-info',
+    props: {
+        action: {
+            type: String,
+            required: true,
+            validator: function (value) {
+                return value === 'add' || value === 'edit' || value === 'see';
             }
-          }
         },
-        {
-          title: "档案编号",
-          key: "imageNo",
-          width: 170,
-          align: "center",
-          render: (h, params) => {
-            let imageNo = params.row.imageNo;
-            if (!imageNo) {
-              return h('span', '');
-            }else {
-              return h('Button', {
-                props: {
-                  type: 'text',
-                  size: 'small',
-                  icon: 'eye'
+        categorys: {
+            type: Array,
+            required: true,
+            default: []
+        },
+        editCustomer: {
+            type: Object,
+            default: null
+        }
+    },
+    components: {
+        fileView
+    },
+    data () {
+        return {
+            showView: 'add',
+            isReadOnly: false,
+            showTitle: '新建客户信息',
+            editId: '',
+            submitBtnLoading: false,
+            formItem: {
+                id: '',
+                categoryId: '',
+                customerNo: '',
+                name: '',
+                shorName: '',
+                pinyin: '',
+                disable: 0,
+                canSaleSpecial: 0,
+                limitSpecial: 0,
+                direction: 0,
+                city: '',
+                address: '',
+                legalPersion: '',
+                postcode: '',
+                contactPhone: '',
+                employee: '',
+                contactFax: '',
+                email: '',
+                saleArea: '',
+                salesman: '',
+                memberLevel: '',
+                classAttOne: '',
+                classAttTwo: '',
+                sealModel: '',
+                billModel: '',
+                accountPeriod: '',
+                businessScope: '',
+                comment: '',
+                accountName: '',
+                bankName: '',
+                bankAccount: '',
+                dutyAccount: '',
+                quaCheck: '',
+                fileNo: '',
+                superviseNo: ''
+            },
+            certDelBtnLoading: false,
+            certTabLoading: false,
+            certTabData: [],
+            certTabSelectedData: [],
+            imageShowModal: false,
+            showImageNo: '',
+            certTabColumns: [
+                {
+                    type: 'selection',
+                    width: 60,
+                    align: 'center'
                 },
-                on: {
-                  click: () => {
-                    this.showImageModal(params.row.imageNo);
-                  }
-                }
-              }, params.row.imageNo);
-            }
-          }
-        },
-        {
-          title: "备注",
-          key: "comment",
-          align: "center"
-        },
-        {
-          title: "操作人",
-          key: "updateBy",
-          align: "center"
-        },
-        {
-          title: "操作时间",
-          key: "updateTime",
-          align: "center",
-          render: (h, params) => {
-            let date = params.row.updateTime;
-            if (!date || isNaN(date)) {
-              return h('span', '');
-            }else {
-              return h('span', dataConver.formatDate(new Date(date), 'yyyy-MM-dd'));
-            }
-          }
-        }
-      ],
-      certModalShow: false,
-      certFormItem: {
-        customerId: '',
-        licenseName: '',
-        licenseExp: '',
-        imageNo: '',
-        comment: ''
-      },
-      certSubmitBtnLoading: false,
-      repTabLoading: false,
-      repTabData: [],
-      repTabSelectedData: [],
-      repTabColumns: [
-        {
-          type: "selection",
-          width: 60,
-          align: "center",
-        },
-        {
-          title: "代表人姓名",
-          key: "name",
-          align: "center", 
-          render: (h, params) => {
-            return h(
-              "Button",
-              {
-                props: {
-                  type: "text",
+                {
+                    title: '证书名称',
+                    key: 'licenseName',
+                    align: 'center'
                 },
-                on: {
-                  click: () => {
-                    this.repEditBtnClick(params.row);
-                  }
+                {
+                    title: '有效期至',
+                    key: 'licenseExp',
+                    align: 'center',
+                    render: (h, params) => {
+                        let date = params.row.licenseExp;
+                        if (!date || isNaN(date)) {
+                            return h('span', '');
+                        } else {
+                            return h('span', dataConver.formatDate(new Date(date), 'yyyy-MM-dd'));
+                        }
+                    }
+                },
+                {
+                    title: '档案编号',
+                    key: 'imageNo',
+                    width: 170,
+                    align: 'center',
+                    render: (h, params) => {
+                        let imageNo = params.row.imageNo;
+                        if (!imageNo) {
+                            return h('span', '');
+                        } else {
+                            return h('Button', {
+                                props: {
+                                    type: 'text',
+                                    size: 'small',
+                                    icon: 'eye'
+                                },
+                                on: {
+                                    click: () => {
+                                        this.showImageModal(params.row.imageNo);
+                                    }
+                                }
+                            }, params.row.imageNo);
+                        }
+                    }
+                },
+                {
+                    title: '备注',
+                    key: 'comment',
+                    align: 'center'
+                },
+                {
+                    title: '操作人',
+                    key: 'updateBy',
+                    align: 'center'
+                },
+                {
+                    title: '操作时间',
+                    key: 'updateTime',
+                    align: 'center',
+                    render: (h, params) => {
+                        let date = params.row.updateTime;
+                        if (!date || isNaN(date)) {
+                            return h('span', '');
+                        } else {
+                            return h('span', dataConver.formatDate(new Date(date), 'yyyy-MM-dd'));
+                        }
+                    }
                 }
-              },
-              params.row.name
-            );
-          }
-        },
-        {
-          title: "联系电话",
-          key: "contactPhone",
-          align: "center"
-        },
-        {
-          title: "收货地址",
-          key: "repertoryAddress",
-          align: "center"
-        },
-        {
-          title: "是否禁用",
-          key: "disable",
-          align: "center",
-          sortable: true,
-          render: (h, params) => {
-            let disableVal = params.row.disable;
-            return h("div", [
-              h("Icon", {
-                props: {
-                  type: disableVal ? "close-circled" : "checkmark-circled",
-                  color: disableVal ? "#e96500" : "#00a854"
+            ],
+            certModalShow: false,
+            certFormItem: {
+                customerId: '',
+                licenseName: '',
+                licenseExp: '',
+                imageNo: '',
+                comment: ''
+            },
+            certSubmitBtnLoading: false,
+            repTabLoading: false,
+            repTabData: [],
+            repTabSelectedData: [],
+            repTabColumns: [
+                {
+                    type: 'selection',
+                    width: 60,
+                    align: 'center'
+                },
+                {
+                    title: '代表人姓名',
+                    key: 'name',
+                    align: 'center',
+                    render: (h, params) => {
+                        return h(
+                            'Button',
+                            {
+                                props: {
+                                    type: 'text'
+                                },
+                                on: {
+                                    click: () => {
+                                        this.repEditBtnClick(params.row);
+                                    }
+                                }
+                            },
+                            params.row.name
+                        );
+                    }
+                },
+                {
+                    title: '联系电话',
+                    key: 'contactPhone',
+                    align: 'center'
+                },
+                {
+                    title: '收货地址',
+                    key: 'repertoryAddress',
+                    align: 'center'
+                },
+                {
+                    title: '是否禁用',
+                    key: 'disable',
+                    align: 'center',
+                    sortable: true,
+                    render: (h, params) => {
+                        let disableVal = params.row.disable;
+                        return h('div', [
+                            h('Icon', {
+                                props: {
+                                    type: disableVal ? 'close-circled' : 'checkmark-circled',
+                                    color: disableVal ? '#e96500' : '#00a854'
+                                }
+                            }),
+                            h('strong', disableVal ? '已禁用' : '启用')
+                        ]);
+                    }
+                },
+                {
+                    title: '是否默认使用',
+                    key: 'isDefault',
+                    align: 'center',
+                    sortable: true,
+                    render: (h, params) => {
+                        let isTrue = params.row.isDefault;
+                        return h('div', [
+                            h('Icon', {
+                                props: {
+                                    type: isTrue ? 'checkmark-circled' : 'minus-circled',
+                                    color: isTrue ? '#00a854' : ''
+                                }
+                            }),
+                            h('strong', isTrue ? '是' : '否')
+                        ]);
+                    }
+                },
+                {
+                    title: '备注',
+                    key: 'comment',
+                    align: 'center'
                 }
-              }),
-              h("strong", disableVal ? "已禁用" : "启用")
-            ]);
-          }
+            ],
+            repDelBtnLoading: false,
+            repModalShow: false,
+            repModalType: '',
+            repFormItem: {
+                id: '',
+                customerId: '',
+                name: '',
+                contactPhone: '',
+                repertoryAddress: '',
+                postcode: '',
+                disable: 0,
+                isDefault: 1,
+                comment: ''
+            },
+            repSubmitBtnLoading: false,
+            ruleValidate: {
+                categoryId: [
+                    {required: true, type: 'number', message: '客户分组必输', trigger: 'change'}
+                ],
+                customerNo: [
+                    {required: true, message: '客户编码必输', trigger: 'blur'}
+                ],
+                name: [
+                    {required: true, message: '客户名称必输', trigger: 'blur'}
+                ]
+            },
+            certFormValidate: {
+                licenseName: [
+                    {required: true, message: '证件名称必输', trigger: 'blur'}
+                ],
+                licenseExp: [
+                    {required: true, type: 'date', message: '证件有效期必输', trigger: 'change'}
+                ],
+                imageNo: [
+                    {required: true, message: '证件档案编号必输', trigger: 'blur'}
+                ]
+            },
+            repFormValidate: {
+                name: [
+                    {required: true, message: '代表人姓名必输', trigger: 'blur'}
+                ],
+                contactPhone: [
+                    {required: true, message: '联系方式必输', trigger: 'blur'}
+                ],
+                repertoryAddress: [
+                    {required: true, message: '收货地址必输', trigger: 'blur'}
+                ]
+            }
+        };
+    },
+    computed: {
+        titleDispayIcon () {
+            if (this.showView === 'add') {
+                return 'plus-round';
+            } else {
+                return 'compose';
+            }
         },
-        {
-          title: "是否默认使用",
-          key: "isDefault",
-          align: "center",
-          sortable: true,
-          render: (h, params) => {
-            let isTrue = params.row.isDefault;
-            return h("div", [
-              h("Icon", {
-                props: {
-                  type: isTrue ? "checkmark-circled" : "minus-circled",
-                  color: isTrue ? "#00a854" : ''
+        titleDispayName () {
+            return this.showTitle;
+        }
+    },
+    watch: {
+        editCustomer (data) {
+            if (data && data.id > 0) {
+                if (this.action === 'edit') {
+                    this.changeToEditModal(this.editCustomer);
+                } else if (this.action === 'see') {
+                    this.changeToSeeModal(this.editCustomer);
                 }
-              }),
-              h("strong", isTrue ? "是" : "否")
-            ]);
-          }
+            }
         },
-        {
-          title: "备注",
-          key: "comment",
-          align: "center"
+        action (data) {
+            if (data === 'add') {
+                this.changeToAddModal();
+            }
         }
-      ],
-      repDelBtnLoading: false,
-      repModalShow: false,
-      repModalType: '',
-      repFormItem: {
-        id: '',
-        customerId: '',
-        name: '',
-        contactPhone: '',
-        repertoryAddress: '',
-        postcode: '',
-        disable: 0,
-        isDefault: 1,
-        comment: ''
-      },
-      repSubmitBtnLoading: false,
-      ruleValidate: {
-        categoryId: [
-          {required: true, type:'number', message: '客户分组必输', trigger: 'change'}
-        ],
-        customerNo: [
-          {required: true, message: '客户编码必输', trigger: 'blur'}
-        ],
-        name: [
-          {required: true, message: '客户名称必输', trigger: 'blur'}
-        ]
-      },
-      certFormValidate: {
-        licenseName: [
-          {required: true, message: '证件名称必输', trigger: 'blur'}
-        ],
-        licenseExp: [
-          {required: true, type:'date', message: '证件有效期必输', trigger: 'change'}
-        ],
-        imageNo: [
-          {required: true, message: '证件档案编号必输', trigger: 'blur'}
-        ]
-      },
-      repFormValidate: {
-        name: [
-          {required: true, message: '代表人姓名必输', trigger: 'blur'}
-        ],
-        contactPhone: [
-          {required: true, message: '联系方式必输', trigger: 'blur'}
-        ],
-        repertoryAddress: [
-          {required: true, message: '收货地址必输', trigger: 'blur'}
-        ]
-      }
-    };
-  },
-  computed: {
-    titleDispayIcon() {
-      if (this.showView === "add") {
-        return "plus-round";
-      } else {
-        return "compose";
-      }
     },
-    titleDispayName() {
-      return this.showTitle;
-    }
-  },
-  watch: {
-    editCustomer(data) {
-      if (data && data.id > 0 ){
-        if (this.action === 'edit') {
-          this.changeToEditModal(this.editCustomer);
-        }else if (this.action === 'see') {
-          this.changeToSeeModal(this.editCustomer);
-        }
-      }
-    },
-    action(data) {
-      if (data === 'add') {
-        this.changeToAddModal();
-      }
-    }
-  },
-  methods: {
-    changeToAddModal() {
-      this.$refs.customerForm.resetFields();
-      this.formItem = {};
-      this.certTabData = [];
-      this.repTabData = [];
-      this.editId = '';
-      this.showView = 'add';
-      this.isReadOnly = false;
-      this.showTitle = '新建客户信息';
-    },
+    methods: {
+        changeToAddModal () {
+            this.$refs.customerForm.resetFields();
+            this.formItem = {};
+            this.certTabData = [];
+            this.repTabData = [];
+            this.editId = '';
+            this.showView = 'add';
+            this.isReadOnly = false;
+            this.showTitle = '新建客户信息';
+        },
 
-    changeToEditModal(data) {
-      if (!data || !data.id) {
-        this.$Notice.warn({title: '系统异常', desc: '获取编辑模式下的客户标识失败'});
-        return;
-      }
-      this.formItem = data;
-      this.editId = data.id;
-      this.isReadOnly = false;
-      this.showView = 'edit';
-      this.showTitle = data.name;
-      if (this.action === 'add') {
-        this.$emit("add-to-edit");
-      }
-      this.refreshCertData(this.editId);
-      this.refreshRepData(this.editId);
-    },
-
-    changeToSeeModal(data) {
-      console.log('see');
-      if (!data || !data.id) {
-        this.$Notice.warn({title: '系统异常', desc: '获取编辑模式下的客户标识失败'});
-        return;
-      }
-      this.isReadOnly = true;
-      this.formItem = data;
-      this.editId = data.id;
-      this.showView = 'see';
-      this.showTitle = data.name;
-      this.refreshCertData(this.editId);
-      this.refreshRepData(this.editId);
-    },
-
-    submitCustomer() {
-      this.submitBtnLoading = true;
-      this.$refs.customerForm.validate(valid => {
-        if (!valid) {
-          this.submitBtnLoading = false;
-          this.$Message.warning("请检查必输项是否输入");
-          return;
-        }else {
-          if (this.showView === 'add') {
-            this.doAddCustomer();
-          }else {
-            this.doUpdateCustomer();
-          }
-          this.submitBtnLoading = false;
-        }
-      });
-    },
-
-    doAddCustomer() {
-      let reqData = this.formItem;
-      util.ajax.post("/customer/add", reqData, {headers:{'Content-Type': 'application/json'}})
-        .then((response) => {
-          this.$Message.success("新建客户成功");
-          this.$emit("add-success", response.data);
-          this.changeToEditModal(response.data);
-        })
-        .catch((error) => {
-          util.errorProcessor(this, error);
-        });
-    },
-
-    doUpdateCustomer() {
-      let reqData = this.formItem;
-      if(!reqData || !reqData.id || reqData.id === '') {
-        this.$Notice.error({
-          ttile: '系统异常',
-          desc: '获取修改客户ID失败'
-        });
-        return;
-      }
-      util.ajax.post("/customer/update", reqData, {headers:{'Content-Type': 'application/json'}})
-        .then((response) => {
-          this.$Message.success("修改客户成功");
-          this.$emit("update-success", response.data);
-          this.changeToEditModal(response.data);
-        })
-        .catch((error) => {
-          util.errorProcessor(this, error);
-        });
-    },
-
-    certAddBtnClick() {
-      this.certModalShow = true;
-      this.certSubmitBtnLoading = false; 
-    },
-
-    refreshCertData(customerId) {
-      if (!customerId || customerId === '') {
-        return;
-      }
-      this.certTabLoading = true;
-      let reqData = {customerId: customerId};
-      util.ajax.get("/customer/cert/list", {params: reqData})
-        .then((response) => {
-          this.certTabData = response.data;
-        })
-        .catch((error) => {
-          util.errorProcessor(this, error);
-        })
-      this.certTabLoading = false;
-    },
-
-    certSubmitBtnClick() {
-      this.certSubmitBtnLoading = true;
-      this.$refs.certForm.validate(valid => {
-        if (!valid) {
-          this.$Message.warning('请检查证件必输项');
-          this.certSubmitBtnLoading = false;
-          return;
-        }else {
-          let addCustomerId = this.editId;
-          console.log('addCustomerId:' + addCustomerId);
-          if (!addCustomerId || addCustomerId === '') {
-            this.$Notice.info({title: '操作提醒', desc: '请先提交客户基本信息建立客户'});
-            this.certSubmitBtnLoading = false;
-            return;
-          }else {
-            this.certFormItem.customerId = addCustomerId;
-            util.ajax.post("/customer/cert/add", this.certFormItem)
-              .then((response) => {
-                this.$Message.success('新建客户证件信息成功');
-                this.refreshCertData(addCustomerId);
-                this.certModalShow = false;
-              })
-              .catch((error) => {
-                util.errorProcessor(this, error);
-              });
-            this.certSubmitBtnLoading = false;
-          }
-        }
-      });
-    },
-
-    certCancelBtnClick() {
-      this.certModalShow = false;
-      this.certSubmitBtnLoading = false;
-    },
-
-    certDelBtnClick() {
-      this.certDelBtnLoading = true;
-      let delCertIds = [];
-      if (!this.certTabSelectedData || this.certTabSelectedData.length <= 0) {
-        this.$Message.warning('请先选择需要删除的证件信息');
-        this.certDelBtnLoading = false;
-        return;
-      }
-      for (let i=0; i<this.certTabSelectedData.length; i++) {
-        delCertIds.push(this.certTabSelectedData[i].id);
-      }
-      util.ajax.post("/customer/cert/delete", delCertIds, {headers:{'Content-Type': 'application/json'}})
-        .then((response) => {
-          this.$Message.success('删除客户证件信息成功');
-          this.refreshCertData(this.editId);
-        })
-        .catch((error) => {
-          util.errorProcessor(this, error);
-        });
-      this.certDelBtnLoading = false;
-    },
-
-    certTabSelecttionChange(data) {
-      this.certTabSelectedData = data;
-    },
-
-    repTabSelecttionChange(data) {
-      this.repTabSelectedData = data;
-    },
-
-    refreshRepData(customerId) {
-      if (!customerId || customerId === '') {
-        return;
-      }
-      this.repTabLoading = true;
-      let reqData = {customerId: customerId};
-      util.ajax.get("/customer/rep/list", {params: reqData})
-        .then((response) => {
-          this.repTabData = response.data;
-        })
-        .catch((error) => {
-          util.errorProcessor(this, error)
-        });
-      this.repTabLoading = false;
-    },
-
-    repDelBtnClick() {
-      this.repDelBtnLoading = true;
-      if (!this.repTabSelectedData || this.repTabSelectedData.length <= 0) {
-        this.$Message.warning('请先选择需要删除的代表人信息');
-        this.repDelBtnLoading = false;
-        return;
-      }else {
-        let delIds = [];
-        for (let i=0; i<this.repTabSelectedData.length; i++) {
-          delIds.push(this.repTabSelectedData[i].id);
-        }
-        util.ajax.post("/customer/rep/delete", delIds, {headers:{'Content-Type': 'application/json'}})
-          .then((respose) => {
-            this.$Message.success('删除客户代表人成功');
+        changeToEditModal (data) {
+            if (!data || !data.id) {
+                this.$Notice.warn({title: '系统异常', desc: '获取编辑模式下的客户标识失败'});
+                return;
+            }
+            this.formItem = data;
+            this.editId = data.id;
+            this.isReadOnly = false;
+            this.showView = 'edit';
+            this.showTitle = data.name;
+            if (this.action === 'add') {
+                this.$emit('add-to-edit');
+            }
+            this.refreshCertData(this.editId);
             this.refreshRepData(this.editId);
-          })
-          .catch((error) => {
-            util.errorProcessor(this, error);
-          });
-        this.repDelBtnLoading = false;
-      }
-    },
+        },
 
-    repAddBtnClick() {
-      this.repModalShow = true;
-      this.repModalType = 'add';
-    },
+        changeToSeeModal (data) {
+            console.log('see');
+            if (!data || !data.id) {
+                this.$Notice.warn({title: '系统异常', desc: '获取编辑模式下的客户标识失败'});
+                return;
+            }
+            this.isReadOnly = true;
+            this.formItem = data;
+            this.editId = data.id;
+            this.showView = 'see';
+            this.showTitle = data.name;
+            this.refreshCertData(this.editId);
+            this.refreshRepData(this.editId);
+        },
 
-    repEditBtnClick(data) {
-      this.repFormItem = data;
-      this.repModalShow = true;
-      this.repModalType = 'edit';
-    },
-
-    repSubmitBtnClick() {
-      if (this.editId && this.repModalType === 'add') {
-        this.doAddCustomerRep();
-      }else if (this.editId && this.repModalType === 'edit') {
-        this.doEditCustomerRep();
-      }else {
-        this.$Notice.info({title: '操作提醒', desc: '请先提交客户基本信息建立客户'});
-        return;
-      }
-    },
-
-    doAddCustomerRep() {
-      let customerId = this.editId;
-      this.repSubmitBtnLoading = true;
-      this.$refs.repForm.validate(valid => {
-        if (!valid) {
-          this.$Message.warning('请检查表单必输项信息');
-          this.repSubmitBtnLoading = false;
-          return;
-        }else {
-          this.repFormItem.customerId = customerId;
-          util.ajax.post("/customer/rep/add", this.repFormItem, {headers:{'Content-Type': 'application/json'}})
-            .then((response) => {
-              this.$Message.success('新建客户代表人信息成功');
-              this.refreshRepData(customerId);
-              this.repModalShow = false;
-            })
-            .catch((error) => {
-              util.errorProcessor(this, error);
+        submitCustomer () {
+            this.submitBtnLoading = true;
+            this.$refs.customerForm.validate(valid => {
+                if (!valid) {
+                    this.submitBtnLoading = false;
+                    this.$Message.warning('请检查必输项是否输入');
+                } else {
+                    if (this.showView === 'add') {
+                        this.doAddCustomer();
+                    } else {
+                        this.doUpdateCustomer();
+                    }
+                    this.submitBtnLoading = false;
+                }
             });
-          this.repSubmitBtnLoading = false;
+        },
+
+        doAddCustomer () {
+            let reqData = this.formItem;
+            util.ajax.post('/customer/add', reqData, {headers: {'Content-Type': 'application/json'}})
+                .then((response) => {
+                    this.$Message.success('新建客户成功');
+                    this.$emit('add-success', response.data);
+                    this.changeToEditModal(response.data);
+                })
+                .catch((error) => {
+                    util.errorProcessor(this, error);
+                });
+        },
+
+        doUpdateCustomer () {
+            let reqData = this.formItem;
+            if (!reqData || !reqData.id || reqData.id === '') {
+                this.$Notice.error({
+                    ttile: '系统异常',
+                    desc: '获取修改客户ID失败'
+                });
+                return;
+            }
+            util.ajax.post('/customer/update', reqData, {headers: {'Content-Type': 'application/json'}})
+                .then((response) => {
+                    this.$Message.success('修改客户成功');
+                    this.$emit('update-success', response.data);
+                    this.changeToEditModal(response.data);
+                })
+                .catch((error) => {
+                    util.errorProcessor(this, error);
+                });
+        },
+
+        certAddBtnClick () {
+            this.certModalShow = true;
+            this.certSubmitBtnLoading = false;
+        },
+
+        refreshCertData (customerId) {
+            if (!customerId || customerId === '') {
+                return;
+            }
+            this.certTabLoading = true;
+            let reqData = {customerId: customerId};
+            util.ajax.get('/customer/cert/list', {params: reqData})
+                .then((response) => {
+                    this.certTabData = response.data;
+                })
+                .catch((error) => {
+                    util.errorProcessor(this, error);
+                });
+            this.certTabLoading = false;
+        },
+
+        certSubmitBtnClick () {
+            this.certSubmitBtnLoading = true;
+            this.$refs.certForm.validate(valid => {
+                if (!valid) {
+                    this.$Message.warning('请检查证件必输项');
+                    this.certSubmitBtnLoading = false;
+                } else {
+                    let addCustomerId = this.editId;
+                    console.log('addCustomerId:' + addCustomerId);
+                    if (!addCustomerId || addCustomerId === '') {
+                        this.$Notice.info({title: '操作提醒', desc: '请先提交客户基本信息建立客户'});
+                        this.certSubmitBtnLoading = false;
+                    } else {
+                        this.certFormItem.customerId = addCustomerId;
+                        util.ajax.post('/customer/cert/add', this.certFormItem)
+                            .then((response) => {
+                                this.$Message.success('新建客户证件信息成功');
+                                this.refreshCertData(addCustomerId);
+                                this.certModalShow = false;
+                            })
+                            .catch((error) => {
+                                util.errorProcessor(this, error);
+                            });
+                        this.certSubmitBtnLoading = false;
+                    }
+                }
+            });
+        },
+
+        certCancelBtnClick () {
+            this.certModalShow = false;
+            this.certSubmitBtnLoading = false;
+        },
+
+        certDelBtnClick () {
+            this.certDelBtnLoading = true;
+            let delCertIds = [];
+            if (!this.certTabSelectedData || this.certTabSelectedData.length <= 0) {
+                this.$Message.warning('请先选择需要删除的证件信息');
+                this.certDelBtnLoading = false;
+                return;
+            }
+            for (let i = 0; i < this.certTabSelectedData.length; i++) {
+                delCertIds.push(this.certTabSelectedData[i].id);
+            }
+            util.ajax.post('/customer/cert/delete', delCertIds, {headers: {'Content-Type': 'application/json'}})
+                .then((response) => {
+                    this.$Message.success('删除客户证件信息成功');
+                    this.refreshCertData(this.editId);
+                })
+                .catch((error) => {
+                    util.errorProcessor(this, error);
+                });
+            this.certDelBtnLoading = false;
+        },
+
+        certTabSelecttionChange (data) {
+            this.certTabSelectedData = data;
+        },
+
+        repTabSelecttionChange (data) {
+            this.repTabSelectedData = data;
+        },
+
+        refreshRepData (customerId) {
+            if (!customerId || customerId === '') {
+                return;
+            }
+            this.repTabLoading = true;
+            let reqData = {customerId: customerId};
+            util.ajax.get('/customer/rep/list', {params: reqData})
+                .then((response) => {
+                    this.repTabData = response.data;
+                })
+                .catch((error) => {
+                    util.errorProcessor(this, error);
+                });
+            this.repTabLoading = false;
+        },
+
+        repDelBtnClick () {
+            this.repDelBtnLoading = true;
+            if (!this.repTabSelectedData || this.repTabSelectedData.length <= 0) {
+                this.$Message.warning('请先选择需要删除的代表人信息');
+                this.repDelBtnLoading = false;
+            } else {
+                let delIds = [];
+                for (let i = 0; i < this.repTabSelectedData.length; i++) {
+                    delIds.push(this.repTabSelectedData[i].id);
+                }
+                util.ajax.post('/customer/rep/delete', delIds, {headers: {'Content-Type': 'application/json'}})
+                    .then((respose) => {
+                        this.$Message.success('删除客户代表人成功');
+                        this.refreshRepData(this.editId);
+                    })
+                    .catch((error) => {
+                        util.errorProcessor(this, error);
+                    });
+                this.repDelBtnLoading = false;
+            }
+        },
+
+        repAddBtnClick () {
+            this.repModalShow = true;
+            this.repModalType = 'add';
+        },
+
+        repEditBtnClick (data) {
+            this.repFormItem = data;
+            this.repModalShow = true;
+            this.repModalType = 'edit';
+        },
+
+        repSubmitBtnClick () {
+            if (this.editId && this.repModalType === 'add') {
+                this.doAddCustomerRep();
+            } else if (this.editId && this.repModalType === 'edit') {
+                this.doEditCustomerRep();
+            } else {
+                this.$Notice.info({title: '操作提醒', desc: '请先提交客户基本信息建立客户'});
+            }
+        },
+
+        doAddCustomerRep () {
+            let customerId = this.editId;
+            this.repSubmitBtnLoading = true;
+            this.$refs.repForm.validate(valid => {
+                if (!valid) {
+                    this.$Message.warning('请检查表单必输项信息');
+                    this.repSubmitBtnLoading = false;
+                } else {
+                    this.repFormItem.customerId = customerId;
+                    util.ajax.post('/customer/rep/add', this.repFormItem, {headers: {'Content-Type': 'application/json'}})
+                        .then((response) => {
+                            this.$Message.success('新建客户代表人信息成功');
+                            this.refreshRepData(customerId);
+                            this.repModalShow = false;
+                        })
+                        .catch((error) => {
+                            util.errorProcessor(this, error);
+                        });
+                    this.repSubmitBtnLoading = false;
+                }
+            });
+        },
+
+        doEditCustomerRep () {
+            let customerId = this.editId;
+            this.repSubmitBtnLoading = true;
+            if (!customerId) {
+                this.$Notice.info({title: '操作提醒', desc: '请先提交客户基本信息建立客户'});
+                this.repSubmitBtnLoading = false;
+                return;
+            }
+            if (!this.repFormItem.id || this.repFormItem.id === '') {
+                this.$$Notice.warn({title: '系统异常', desc: '获取需要修改的代表人编号失败，请重新选择'});
+                this.repSubmitBtnLoading = false;
+                return;
+            }
+            util.ajax.post('/customer/rep/update', this.repFormItem, {headers: {'Content-Type': 'application/json'}})
+                .then((response) => {
+                    this.$Message.success('修改代表人信息成功');
+                    this.refreshRepData(customerId);
+                    this.repModalShow = false;
+                })
+                .catch((error) => {
+                    util.errorProcessor(this, error);
+                });
+            this.repSubmitBtnLoading = false;
+        },
+
+        repCancelBtnClick () {
+            this.repModalShow = false;
+        },
+
+        showImageModal (imageNo) {
+            this.imageShowModal = true;
+            this.showImageNo = imageNo;
         }
-      });
-    },
 
-    doEditCustomerRep() {
-      let customerId = this.editId;
-      this.repSubmitBtnLoading = true;
-      if (!customerId) {
-        this.$Notice.info({title: '操作提醒', desc: '请先提交客户基本信息建立客户'});
-        this.repSubmitBtnLoading = false;
-        return;
-      }
-      if (!this.repFormItem.id || this.repFormItem.id === '') {
-        this.$$Notice.warn({title:'系统异常', desc:'获取需要修改的代表人编号失败，请重新选择'});
-        this.repSubmitBtnLoading = false;
-        return;
-      }
-      util.ajax.post("/customer/rep/update", this.repFormItem, {headers:{'Content-Type': 'application/json'}})
-        .then((response) => {
-          this.$Message.success('修改代表人信息成功');
-          this.refreshRepData(customerId);
-          this.repModalShow = false;
-        })
-        .catch((error) => {
-          util.errorProcessor(this, error);
-        });
-      this.repSubmitBtnLoading = false;
-    },
-
-    repCancelBtnClick() {
-      this.repModalShow = false;
-    },
-
-    showImageModal(imageNo) {
-      this.imageShowModal = true;
-      this.showImageNo = imageNo;
     }
-
-
-  }
 };
 </script>
 

@@ -3,14 +3,14 @@ import iView from 'iview';
 import Util from '../libs/util';
 import VueRouter from 'vue-router';
 import Cookies from 'js-cookie';
-import store from '../store'
+import store from '../store';
 import {routers, otherRouter, appRouter} from './router';
 
 Vue.use(VueRouter);
 
 // 页面刷新时，重新赋值token
 if (window.localStorage.getItem('token')) {
-    store.commit('setToken', window.localStorage.getItem('token'))
+    store.commit('setToken', window.localStorage.getItem('token'));
 }
 
 // 路由配置
@@ -25,17 +25,15 @@ router.beforeEach((to, from, next) => {
     iView.LoadingBar.start();
     Util.title(to.meta.title);
 
-    if (!to.meta.noAuth) {  // 判断该路由是否需要登录权限
-        if (store.state.user && store.state.user.token) {  // 通过vuex state获取当前的token是否存在
+    if (!to.meta.noAuth) { // 判断该路由是否需要登录权限
+        if (store.state.user && store.state.user.token) { // 通过vuex state获取当前的token是否存在
             next();
-        }
-        else {
+        } else {
             next({
                 name: 'login'
-            })
+            });
         }
-    }
-    else {
+    } else {
         next();
     }
 /*
@@ -73,7 +71,6 @@ router.beforeEach((to, from, next) => {
         }
     }
 */
-
 });
 
 router.afterEach((to) => {

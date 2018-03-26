@@ -37,178 +37,177 @@
 </template>
 
 <script>
-import util from "@/libs/util.js";
+import util from '@/libs/util.js';
 
 export default {
-  name: "customer-category",
-  props: {
-    action: {
-      type: String,
-      required: true,
-      validator: function(value) {
-        return value === "add" || value === "edit";
-      }
-    },
-    categorys: {
-      type: Array,
-      default: []
-    },
-    editeData: {
-      type: Object,
-      default: null
-    },
-    showModal: {
-      type: Boolean,
-      default: false
-    }
-  },
-  data() {
-    const validCategoryNoExist = (rule, value, callback) => {
-      let categoryNoVal = this.custCatFormData.categoryNo;
-      if (isNaN(categoryNoVal)) {
-        callback(new Error("分类编码格式为数字"));
-      } else {
-        callback();
-      }
-    };
-    const validNameExist = (rule, value, callback) => {
-      if (this.custCatFormData.name && this.custCatFormData.name.toString().trim() != "") {
-        callback();
-      } else {
-        this.custCatFormData.name = "";
-        callback(new Error("类别名称不能为空"));
-      }
-    };
-
-    return {
-      isShowModal: false,
-      loading: false,
-      custCatFormData: {
-        id: "",
-        categoryNo: '',
-        name: "",
-        parentId: -1,
-        comment: ""
-      },
-      ruleValidate: {
-        name: [
-          { required: true, message: "类别名称不能为空", trigger: 'blur' },
-          { validator: validNameExist, trigger: 'blur' }
-        ],
-        categoryNo: [
-          { required: true,  message: "分类编码不能为空", trigger: 'blur' },
-          { validator: validCategoryNoExist, trigger: 'blur' }
-        ]
-      }
-    };
-  },
-  computed: {
-    parentCateList() {
-      return [
-        {
-          id: -1,
-          name: "顶级"
+    name: 'customer-category',
+    props: {
+        action: {
+            type: String,
+            required: true,
+            validator: function (value) {
+                return value === 'add' || value === 'edit';
+            }
         },
-        ...this.categorys
-      ];
-    },
-    modalTitle() {
-      let updName = "";
-      if (this.action === "edit" && this.editeData) {
-        updName =
-          "修改 " +
-          this.editeData.name +
-          "(" +
-          this.editeData.id +
-          ")" +
-          "信息";
-      }
-      return this.action === "add" ? "新建客户分组" : updName;
-    }
-  },
-  watch: {
-    showModal(data) {
-      this.isShowModal = data;
-    },
-    isShowModal(data) {
-      if (!data) {
-        this.$emit("dialog-closed");
-      } else {
-        this.initUpdData();
-      }
-    }
-  },
-  methods: {
-    initUpdData() {
-      if (this.action === "edit" && this.editeData) {
-        this.custCatFormData.id = this.editeData.id;
-        this.custCatFormData.categoryNo = this.editeData.categoryNo;
-        this.custCatFormData.name = this.editeData.name;
-        this.custCatFormData.parentId = this.editeData.parentId;
-        this.custCatFormData.comment = this.editeData.comment;
-      }
-    },
-
-    ok() {
-      this.loading = true;
-      this.$refs.custCatForm.validate(valid => {
-        if (!valid) {
-          this.loading = false;
-          return;
-        } else {
-          let actionVal = this.action;
-          let categoryData = this.custCatFormData;
-          if (actionVal === "add") {
-            this.doAddCategory(categoryData);
-          } else if (actionVal === "edit") {
-            this.doUpdateCategory(categoryData);
-          } else {
-            this.$Message.error("系统异常, 操作类型错误");
-          }
-          this.loading = false;
+        categorys: {
+            type: Array,
+            default: []
+        },
+        editeData: {
+            type: Object,
+            default: null
+        },
+        showModal: {
+            type: Boolean,
+            default: false
         }
-      });
     },
+    data () {
+        const validCategoryNoExist = (rule, value, callback) => {
+            let categoryNoVal = this.custCatFormData.categoryNo;
+            if (isNaN(categoryNoVal)) {
+                callback(new Error('分类编码格式为数字'));
+            } else {
+                callback();
+            }
+        };
+        const validNameExist = (rule, value, callback) => {
+            if (this.custCatFormData.name && this.custCatFormData.name.toString().trim() != '') {
+                callback();
+            } else {
+                this.custCatFormData.name = '';
+                callback(new Error('类别名称不能为空'));
+            }
+        };
 
-    closedModal() {
-      this.$refs.custCatForm.resetFields();
-      this.isShowModal = false;
+        return {
+            isShowModal: false,
+            loading: false,
+            custCatFormData: {
+                id: '',
+                categoryNo: '',
+                name: '',
+                parentId: -1,
+                comment: ''
+            },
+            ruleValidate: {
+                name: [
+                    { required: true, message: '类别名称不能为空', trigger: 'blur' },
+                    { validator: validNameExist, trigger: 'blur' }
+                ],
+                categoryNo: [
+                    { required: true, message: '分类编码不能为空', trigger: 'blur' },
+                    { validator: validCategoryNoExist, trigger: 'blur' }
+                ]
+            }
+        };
     },
-
-    submitSuccessEvent() {
-      let resultData = {
-        action: this.action,
-        formData: this.custCatFormData
-      };
-      this.$emit("category-submit", resultData);
+    computed: {
+        parentCateList () {
+            return [
+                {
+                    id: -1,
+                    name: '顶级'
+                },
+                ...this.categorys
+            ];
+        },
+        modalTitle () {
+            let updName = '';
+            if (this.action === 'edit' && this.editeData) {
+                updName =
+          '修改 ' +
+          this.editeData.name +
+          '(' +
+          this.editeData.id +
+          ')' +
+          '信息';
+            }
+            return this.action === 'add' ? '新建客户分组' : updName;
+        }
     },
-
-    doAddCategory(data) {
-      util.ajax
-        .post("/customer/category/add", data)
-        .then((respones) => {
-          this.$Message.success("新建客户类成功");
-          this.submitSuccessEvent();
-          this.isShowModal = false;
-        })
-        .catch((error) => {
-          util.errorProcessor(this, error);
-        });
+    watch: {
+        showModal (data) {
+            this.isShowModal = data;
+        },
+        isShowModal (data) {
+            if (!data) {
+                this.$emit('dialog-closed');
+            } else {
+                this.initUpdData();
+            }
+        }
     },
+    methods: {
+        initUpdData () {
+            if (this.action === 'edit' && this.editeData) {
+                this.custCatFormData.id = this.editeData.id;
+                this.custCatFormData.categoryNo = this.editeData.categoryNo;
+                this.custCatFormData.name = this.editeData.name;
+                this.custCatFormData.parentId = this.editeData.parentId;
+                this.custCatFormData.comment = this.editeData.comment;
+            }
+        },
 
-    doUpdateCategory(data) {
-      util.ajax
-        .post("/customer/category/update", data)
-        .then((respones) => {
-          this.$Message.success("客户类信息修改成功");
-          this.submitSuccessEvent();
-          this.isShowModal = false;
-        })
-        .catch((error) => {
-          util.errorProcessor(this, error);
-        });
+        ok () {
+            this.loading = true;
+            this.$refs.custCatForm.validate(valid => {
+                if (!valid) {
+                    this.loading = false;
+                } else {
+                    let actionVal = this.action;
+                    let categoryData = this.custCatFormData;
+                    if (actionVal === 'add') {
+                        this.doAddCategory(categoryData);
+                    } else if (actionVal === 'edit') {
+                        this.doUpdateCategory(categoryData);
+                    } else {
+                        this.$Message.error('系统异常, 操作类型错误');
+                    }
+                    this.loading = false;
+                }
+            });
+        },
+
+        closedModal () {
+            this.$refs.custCatForm.resetFields();
+            this.isShowModal = false;
+        },
+
+        submitSuccessEvent () {
+            let resultData = {
+                action: this.action,
+                formData: this.custCatFormData
+            };
+            this.$emit('category-submit', resultData);
+        },
+
+        doAddCategory (data) {
+            util.ajax
+                .post('/customer/category/add', data)
+                .then((respones) => {
+                    this.$Message.success('新建客户类成功');
+                    this.submitSuccessEvent();
+                    this.isShowModal = false;
+                })
+                .catch((error) => {
+                    util.errorProcessor(this, error);
+                });
+        },
+
+        doUpdateCategory (data) {
+            util.ajax
+                .post('/customer/category/update', data)
+                .then((respones) => {
+                    this.$Message.success('客户类信息修改成功');
+                    this.submitSuccessEvent();
+                    this.isShowModal = false;
+                })
+                .catch((error) => {
+                    util.errorProcessor(this, error);
+                });
+        }
     }
-  }
 };
 </script>
 

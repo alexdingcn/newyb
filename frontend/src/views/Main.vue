@@ -148,14 +148,14 @@
                     this.$store.commit('clearOpenedSubmenu');
                     var self = this;
                     util.ajax.get('/logoff')
-                            .then(function (response) {
-                                if (response.status === 200) {
-                                    self.$Notice.info({ title: "成功退出登录", duration: 2});
-                                }
-                            })
-                            .catch(function (error) {
-                                console.log(error);
-                            })
+                        .then(function (response) {
+                            if (response.status === 200) {
+                                self.$Notice.info({ title: '成功退出登录', duration: 2});
+                            }
+                        })
+                        .catch(function (error) {
+                            console.log(error);
+                        });
                     this.$router.push({
                         name: 'login'
                     });

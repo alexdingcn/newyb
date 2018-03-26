@@ -12,12 +12,12 @@
 </template>
 
 <script>
-import util from "@/libs/util.js"
+import util from '@/libs/util.js';
 
 export default {
     name: 'customer-select',
-    props:['value', 'size', 'disabled'],
-    data() {
+    props: ['value', 'size', 'disabled'],
+    data () {
         return {
             selectSize: this.size,
             customerIdValue: '',
@@ -25,26 +25,26 @@ export default {
             customerList: [],
             searchLoading: false,
             placeholderShow: '输入姓名/简称/拼音搜索'
-        }
+        };
     },
-    watch:{
-        disabled(data) {
+    watch: {
+        disabled (data) {
             if (data) {
                 this.selectDisable = true;
-            }else {
+            } else {
                 this.selectDisable = false;
             }
         }
     },
     methods: {
-        searchByName(name) {
-            if(!name || name === '' || name.trim() === '') {
+        searchByName (name) {
+            if (!name || name === '' || name.trim() === '') {
                 this.customerList = [];
                 return;
             }
             this.searchLoading = true;
             let reqData = {name: name};
-            util.ajax.get("/customer/search/name", {params: reqData})
+            util.ajax.get('/customer/search/name', {params: reqData})
                 .then((response) => {
                     this.customerList = response.data;
                 })
@@ -54,17 +54,17 @@ export default {
             this.searchLoading = false;
         },
 
-        onChange(data) {
+        onChange (data) {
             let customers = this.customerList.filter(item => item.id === data);
             let customer = {};
-            if(customers && customers.length > 0) {
+            if (customers && customers.length > 0) {
                 customer = customers[0];
             }
-            this.$emit("input", data);
-            this.$emit("on-change", data, customer);
+            this.$emit('input', data);
+            this.$emit('on-change', data, customer);
         }
     }
-  
-}
+
+};
 </script>
 

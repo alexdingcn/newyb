@@ -23,7 +23,7 @@ export default {
                 legend: {
                     orient: 'vertical',
                     left: 'right',
-                    data: ['ios', 'android', 'pc', 'web', 'others']
+                    data: ['德伦', '张章', '艾众', '刘意翔', '其他']
                 },
                 series: [
                     {
@@ -32,11 +32,11 @@ export default {
                         radius: '66%',
                         center: ['50%', '60%'],
                         data: [
-                            {value: 2103456, name: 'ios', itemStyle: {normal: {color: '#9bd598'}}},
-                            {value: 1305923, name: 'android', itemStyle: {normal: {color: '#ffd58f'}}},
-                            {value: 543250, name: 'pc', itemStyle: {normal: {color: '#abd5f2'}}},
-                            {value: 798403, name: 'web', itemStyle: {normal: {color: '#ab8df2'}}},
-                            {value: 302340, name: 'others', itemStyle: {normal: {color: '#e14f60'}}}
+                            {value: 2103456, name: '德伦', itemStyle: {normal: {color: '#9bd598'}}},
+                            {value: 1305923, name: '张章', itemStyle: {normal: {color: '#ffd58f'}}},
+                            {value: 543250, name: '艾众', itemStyle: {normal: {color: '#abd5f2'}}},
+                            {value: 798403, name: '刘意翔', itemStyle: {normal: {color: '#ab8df2'}}},
+                            {value: 302340, name: '其他', itemStyle: {normal: {color: '#e14f60'}}}
                         ],
                         itemStyle: {
                             emphasis: {

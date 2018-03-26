@@ -37,13 +37,13 @@ export default {
                     bottom: '3%',
                     containLabel: true
                 },
-                xAxis: {
+                yAxis: {
                     type: 'value',
                     boundaryGap: [0, 0.01]
                 },
-                yAxis: {
+                xAxis: {
                     type: 'category',
-                    data: ['Mon', 'Tues', 'Wed', 'Thur', 'Fri', 'Sat', 'Sun'],
+                    data: ['周一', '周二', '周三', '周四', '周五', '周六', '周日'],
                     nameTextStyle: {
                         color: '#c3c3c3'
                     }
@@ -53,13 +53,13 @@ export default {
                         name: '访问量',
                         type: 'bar',
                         data: [
-                            {value: 453682, name: 'Mon', itemStyle: {normal: {color: '#2d8cf0'}}},
-                            {value: 879545, name: 'Tues', itemStyle: {normal: {color: '#2d8cf0'}}},
-                            {value: 2354678, name: 'Wed', itemStyle: {normal: {color: '#2d8cf0'}}},
-                            {value: 1598403, name: 'Thur', itemStyle: {normal: {color: '#2d8cf0'}}},
-                            {value: 543250, name: 'Fri', itemStyle: {normal: {color: '#2d8cf0'}}},
-                            {value: 1305923, name: 'Sat', itemStyle: {normal: {color: '#2d8cf0'}}},
-                            {value: 1103456, name: 'Sun', itemStyle: {normal: {color: '#2d8cf0'}}}
+                            {value: 45682, name: '周一', itemStyle: {normal: {color: '#2d8cf0'}}},
+                            {value: 87545, name: '周二', itemStyle: {normal: {color: '#2d8cf0'}}},
+                            {value: 234678, name: '周三', itemStyle: {normal: {color: '#2d8cf0'}}},
+                            {value: 158403, name: '周四', itemStyle: {normal: {color: '#2d8cf0'}}},
+                            {value: 54350, name: '周五', itemStyle: {normal: {color: '#2d8cf0'}}},
+                            {value: 130923, name: '周六', itemStyle: {normal: {color: '#2d8cf0'}}},
+                            {value: 110456, name: '周日', itemStyle: {normal: {color: '#2d8cf0'}}}
                         ]
                     }
                 ]

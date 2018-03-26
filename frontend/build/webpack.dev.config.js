@@ -26,8 +26,8 @@ module.exports = merge(webpackBaseConfig, {
             allChunks: true
         }),
         new webpack.optimize.CommonsChunkPlugin({
-            name: ['vender-exten', 'vender-base'],
-            minChunks: Infinity
+            names: ['vendor'],
+            // minChunks: Infinity
         }),
         new HtmlWebpackPlugin({
             title: '医站通ERP v' + package.version,

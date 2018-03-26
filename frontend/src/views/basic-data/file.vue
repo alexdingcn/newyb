@@ -163,14 +163,14 @@
 <script>
 import util from '@/libs/util.js';
 import dataConver from '@/libs/data-conver.js';
-import fileView from "./file-view.vue";
+import fileView from './file-view.vue';
 
 export default {
-    name: "basic_data_file",
+    name: 'basic_data_file',
     components: {
         fileView
     },
-    data() {
+    data () {
         return {
             fileTypeList: [],
             fileTypeModalVisible: false,
@@ -182,7 +182,7 @@ export default {
             },
             fileTypeRuleValidate: {
                 typeName: [
-                    { required: true, message: "档案类型名称必输", trigger: 'blur' }
+                    { required: true, message: '档案类型名称必输', trigger: 'blur' }
                 ]
             },
             fileTypeSubmitLoading: false,
@@ -201,7 +201,7 @@ export default {
                     type: 'index',
                     title: '序号',
                     align: 'center',
-                    width: 70,
+                    width: 70
                 },
                 {
                     title: '档案编号',
@@ -232,16 +232,16 @@ export default {
             },
             fileInfoFormValidate: {
                 fileType: [
-                    { required: true, message: "档案类型必输", trigger: 'blur' }
+                    { required: true, message: '档案类型必输', trigger: 'blur' }
                 ],
                 fileName: [
-                    { required: true, message: "档案名称必输", trigger: 'blur' }
+                    { required: true, message: '档案名称必输', trigger: 'blur' }
                 ]
             },
             fileInfoFormView: 'add',
             fileInfoSubmitLoading: false,
-            uploadTabData:[],
-            uploadTabColumns:[
+            uploadTabData: [],
+            uploadTabColumns: [
                 {
                     title: '描述',
                     key: 'comment',
@@ -259,17 +259,17 @@ export default {
                     align: 'center',
                     render: (h, params) => {
                         return h('Button', {
-                                    props: {
-                                        type: 'error',
-                                        size: 'small',
-                                        icon: 'close-circled'
-                                    },
-                                    on: {
-                                        click: () => {
-                                            this.removeFileUpload(params.row.id, params.row.index);
-                                        }
-                                    }
-                            }, '删除');
+                            props: {
+                                type: 'error',
+                                size: 'small',
+                                icon: 'close-circled'
+                            },
+                            on: {
+                                click: () => {
+                                    this.removeFileUpload(params.row.id, params.row.index);
+                                }
+                            }
+                        }, '删除');
                     }
                 }
             ],
@@ -283,34 +283,34 @@ export default {
             uploadFormat: ['png', 'jpg', 'jpeg', 'git', 'tiff', 'pdf', 'doc', 'docx', 'xlsx', 'xls', 'csv', 'txt', 'zip', 'rar', 'tar'],
             chooseUploadFiles: [],
             uploadAction: `${util.baseUrl}/file/upload/add`
-        }
+        };
     },
-    mounted() {
-            this.getUploadFormat();
-            this.loadFileTypeList();
-            this.fileInfoFormChangeToAddView();
+    mounted () {
+        this.getUploadFormat();
+        this.loadFileTypeList();
+        this.fileInfoFormChangeToAddView();
     },
     computed: {
-        fileInfoFormEditDisable() {
+        fileInfoFormEditDisable () {
             if (this.fileInfoFormView === 'add') {
                 return false;
-            }else {
+            } else {
                 return true;
             }
         }
     },
     watch: {
-        fileInfoTabSelectedData() {
+        fileInfoTabSelectedData () {
             if (this.fileInfoTabSelectedData && this.fileInfoTabSelectedData.length > 0) {
                 this.delFileInfoBtnDisable = false;
-            }else {
+            } else {
                 this.delFileInfoBtnDisable = true;
             }
         }
     },
-    methods:{
-        
-        getUploadFormat() {
+    methods: {
+
+        getUploadFormat () {
             util.ajax.get('/file/upload/format')
                 .then((response) => {
                     if (response.data) {
@@ -322,28 +322,27 @@ export default {
                 });
         },
 
-        loadFileTypeList() {
-            util.ajax.get("/file/filetype/list")
+        loadFileTypeList () {
+            util.ajax.get('/file/filetype/list')
                 .then((response) => {
                     this.fileTypeList = response.data;
                 })
                 .catch((error) => {
                     util.errorProcessor(this, error);
-                })
+                });
         },
 
-        addFileTypeBtnClick() {
+        addFileTypeBtnClick () {
             this.fileTypeModalVisible = true;
         },
 
-        fileTypeSubmit() {
+        fileTypeSubmit () {
             this.$refs.fileTypeForm.validate(valid => {
                 if (!valid) {
                     this.$Message.info('档案类型名称必输');
-                    return;
-                }else {
+                } else {
                     this.fileTypeSubmitLoading = true;
-                    util.ajax.post("/file/filetype/add", this.fileTypeFormItem)
+                    util.ajax.post('/file/filetype/add', this.fileTypeFormItem)
                         .then((response) => {
                             this.fileTypeList = response.data;
                             this.fileTypeModalVisible = false;
@@ -351,23 +350,23 @@ export default {
                         })
                         .catch((error) => {
                             util.errorProcessor(this, error);
-                    });
+                        });
                     this.fileTypeSubmitLoading = false;
                 }
             });
         },
 
-        closedfileTypeModal() {
+        closedfileTypeModal () {
             this.$refs.fileTypeForm.resetFields();
             this.fileTypeModalVisible = false;
         },
 
-        fileTypeSelectChange(data) {
+        fileTypeSelectChange (data) {
             this.fileTypeSelVal = data;
             this.loadFileInfoList();
         },
 
-        loadFileInfoList() {
+        loadFileInfoList () {
             let reqData = {
                 page: this.fileInfoTabCurrPage,
                 size: this.fileInfoTabPageSize
@@ -382,7 +381,7 @@ export default {
                 reqData.fileNo = this.searchValue;
             }
             this.fileInfoTabLoading = true;
-            util.ajax.get("/file/list", {params: reqData})
+            util.ajax.get('/file/list', {params: reqData})
                 .then((response) => {
                     this.fileTabData = response.data.data;
                     this.fileInfoTotalCount = response.data.count;
@@ -393,28 +392,28 @@ export default {
             this.fileInfoTabLoading = false;
         },
 
-        searchBtnClick() {
+        searchBtnClick () {
             this.loadFileInfoList();
         },
 
-        fileInfoTabPageChange(data) {
+        fileInfoTabPageChange (data) {
             this.fileInfoTabCurrPage = data;
             this.loadFileInfoList();
         },
 
-        addFileInfoBtnClick() {
+        addFileInfoBtnClick () {
             this.fileInfoFormChangeToAddView();
         },
 
-        delFileInfoBtnClick() {
+        delFileInfoBtnClick () {
             if (this.fileInfoTabSelectedData && this.fileInfoTabSelectedData.length > 0) {
                 this.delFileInfoBtnLoading = true;
                 this.fileInfoTabLoading = true;
                 let delIds = [];
-                for (let i=0; i<this.fileInfoTabSelectedData.length; i++) {
+                for (let i = 0; i < this.fileInfoTabSelectedData.length; i++) {
                     delIds.push(this.fileInfoTabSelectedData[i].id);
                 }
-                util.ajax.post("/file/remove", delIds)
+                util.ajax.post('/file/remove', delIds)
                     .then((response) => {
                         this.$Message.success('成功删除' + response.data.count + '条记录');
                         this.loadFileInfoList();
@@ -426,33 +425,33 @@ export default {
                 this.fileInfoTabLoading = false;
                 this.delFileInfoBtnDisable = true;
                 this.fileInfoFormChangeToAddView();
-            }else {
+            } else {
                 this.$Message.info('请先选择需要删除的档案信息');
             }
         },
 
-        fileInfoTabRowClick(data) {
+        fileInfoTabRowClick (data) {
             this.fileInfoTabCurrClickData = data;
             if (data && data.id && data.id > 0) {
                 this.fileInfoFormChangeToEditView(data.id);
             }
         },
 
-        fileInfoTabSelecttionChange(data) {
+        fileInfoTabSelecttionChange (data) {
             this.fileInfoTabSelectedData = data;
         },
 
-        fileInfoFormChangeToEditView(fileId) {
+        fileInfoFormChangeToEditView (fileId) {
             if (!fileId) {
                 this.$Message.warning('获取档案标识失败');
                 return;
             }
             let reqData = {fileId: fileId};
-            util.ajax.get("/file/fileid", {params: reqData})
+            util.ajax.get('/file/fileid', {params: reqData})
                 .then((response) => {
                     let result = response.data;
                     this.fileInforCardTitleName = result.fileName;
-                    this.fileInfoFormItem =  result;
+                    this.fileInfoFormItem = result;
                     this.uploadTabData = result.fileUploads;
                     this.fileInfoFormView = 'edit';
                 })
@@ -461,23 +460,22 @@ export default {
                 });
         },
 
-        fileInfoFormChangeToAddView() {
+        fileInfoFormChangeToAddView () {
             this.fileInforCardTitleName = '新增档案信息';
             this.fileInfoFormItem = {},
             this.uploadTabData = [],
             this.fileInfoFormView = 'add';
         },
 
-        submitFileInfoBtnClick() {
+        submitFileInfoBtnClick () {
             this.fileInfoSubmitLoading = true;
             this.$refs.fileInfoForm.validate(valid => {
                 if (!valid) {
                     this.$Message.info('请检查必输项');
                     this.fileInfoSubmitLoading = false;
-                    return;
-                }else {
+                } else {
                     let reqData = this.fileInfoFormItem;
-                    util.ajax.post("/file/add", reqData)
+                    util.ajax.post('/file/add', reqData)
                         .then((response) => {
                             this.$Message.success('新建档案信息成功');
                             this.loadFileInfoList();
@@ -485,13 +483,13 @@ export default {
                         })
                         .catch((error) => {
                             util.errorProcessor(this, error);
-                        })
+                        });
                     this.fileInfoSubmitLoading = false;
                 }
             });
         },
 
-        addFileUploadBtnClick() {
+        addFileUploadBtnClick () {
             this.fileUploadModalVisible = true;
             this.fileUploadFormData = {
                 fileId: this.fileInfoFormItem.id,
@@ -499,7 +497,7 @@ export default {
             };
         },
 
-        handleBeforeUpload(file) {
+        handleBeforeUpload (file) {
             let item = {
                 name: file.name,
                 icon: 'close-circled',
@@ -512,18 +510,18 @@ export default {
             return false;
         },
 
-        removeChooseUploadFile(data) {
+        removeChooseUploadFile (data) {
             this.chooseUploadFiles.splice(data, 1);
             this.$refs.uploadModal.fileList.splice(data, 1);
         },
 
-        fileUploadSubmit() {
+        fileUploadSubmit () {
             if (!this.chooseUploadFiles || this.chooseUploadFiles.length <= 0) {
                 this.$Message.info('请先选择需要上传的文件');
                 return;
             }
             this.fileUploadSubmitLoading = true;
-            for (let i=0; i<this.chooseUploadFiles.length; i++) {
+            for (let i = 0; i < this.chooseUploadFiles.length; i++) {
                 let chooseItem = this.chooseUploadFiles[i];
                 if (chooseItem.isUpload) {
                     continue;
@@ -534,7 +532,7 @@ export default {
                 reqData.append('fileId', this.fileUploadFormData.fileId);
                 reqData.append('comment', this.fileUploadFormData.comment);
                 reqData.append('file', chooseItem.file);
-                util.ajax.post('/file/upload/add', reqData, {headers:{'Content-Type': 'multipart/form-data'}})
+                util.ajax.post('/file/upload/add', reqData, {headers: {'Content-Type': 'multipart/form-data'}})
                     .then((response) => {
                         chooseItem.icon = 'checkmark';
                         chooseItem.color = 'green';
@@ -548,23 +546,23 @@ export default {
             this.fileUploadSubmitLoading = false;
         },
 
-        closedfileUploadModal() {
-            this.fileInfoFormChangeToEditView(this.fileUploadFormData.fileId); //刷新
+        closedfileUploadModal () {
+            this.fileInfoFormChangeToEditView(this.fileUploadFormData.fileId); // 刷新
             this.chooseUploadFiles = [];
             this.$refs.uploadModal.clearFiles();
             this.fileUploadModalVisible = false;
             this.fileUploadFormData = {};
         },
 
-        removeFileUpload(data, index) {
+        removeFileUpload (data, index) {
             if (!data) {
                 this.$Message.warning('获取需要删除的附件标识失败');
                 return;
             }
-            util.ajax.delete("/file/upload/remove/" + data)
+            util.ajax.delete('/file/upload/remove/' + data)
                 .then((response) => {
                     this.$Message.success('删除成功');
-                    this.fileInfoFormChangeToEditView(this.fileInfoFormItem.id); //刷新
+                    this.fileInfoFormChangeToEditView(this.fileInfoFormItem.id); // 刷新
                 })
                 .catch((error) => {
                     util.errorProcessor(this, error);
@@ -573,8 +571,7 @@ export default {
 
     }
 
-  
-}
+};
 </script>
 
 <style>

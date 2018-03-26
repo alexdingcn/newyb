@@ -19,17 +19,17 @@
 </template>
 
 <script>
-import util from "@/libs/util.js";
+import util from '@/libs/util.js';
 
 export default {
     name: 'good-select',
-    props:['value', 'size'],
-    data() {
+    props: ['value', 'size'],
+    data () {
         return {
             selectSize: this.size,
             goodsLoading: false,
             goodsOptions: []
-        }
+        };
     },
 
     methods: {
@@ -37,8 +37,8 @@ export default {
             var self = this;
             if (query !== '') {
                 this.goodsLoading = true;
-                util.ajax.get('/goods/list', 
-                    { params: 
+                util.ajax.get('/goods/list',
+                    { params:
                         {search: query, page: 1, size: 50}
                     })
                     .then(function (response) {
@@ -53,14 +53,14 @@ export default {
                 this.goodsOptions = [];
             }
         },
-        onChange(data) {
+        onChange (data) {
             let good = this.goodsOptions.filter(item => item.id === data);
-            this.$emit("input", data);
-            this.$emit("on-change", data, good);
+            this.$emit('input', data);
+            this.$emit('on-change', data, good);
         }
     }
-  
-}
+
+};
 </script>
 <style>
 .option-goods-spec {

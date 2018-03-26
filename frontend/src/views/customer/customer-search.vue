@@ -77,8 +77,8 @@
 </template>
 
 <script>
-import util from "@/libs/util.js";
-import customerInfo from "@/views/customer/customer-info.vue";
+import util from '@/libs/util.js';
+import customerInfo from '@/views/customer/customer-info.vue';
 
 export default {
     name: 'customer-search',
@@ -91,7 +91,7 @@ export default {
     components: {
         customerInfo
     },
-    data() {
+    data () {
         return {
             isShowModal: false,
             categorys: [],
@@ -117,20 +117,20 @@ export default {
                 },
                 {
                     title: '客户编号',
-                    key: "customerNo",
-                    align: "center",
+                    key: 'customerNo',
+                    align: 'center',
                     sortable: true
                 },
                 {
                     title: '客户名称',
-                    key: "name",
-                    align: "center",
+                    key: 'name',
+                    align: 'center',
                     sortable: true
                 },
                 {
                     title: '是否禁用',
-                    key: "disable",
-                    align: "center",
+                    key: 'disable',
+                    align: 'center',
                     render: (h, params) => {
                         let isTrue = params.row.disable;
                         return h('div', [
@@ -146,8 +146,8 @@ export default {
                 },
                 {
                     title: '可经营特殊管理药品',
-                    key: "canSaleSpecial",
-                    align: "center",
+                    key: 'canSaleSpecial',
+                    align: 'center',
                     render: (h, params) => {
                         let isTrue = params.row.canSaleSpecial;
                         return h('strong', isTrue ? '可以' : '禁止');
@@ -155,8 +155,8 @@ export default {
                 },
                 {
                     title: '含麻黄碱药品限购',
-                    key: "limitSpecial",
-                    align: "center",
+                    key: 'limitSpecial',
+                    align: 'center',
                     render: (h, params) => {
                         return h('strong', params.row.limitSpecial ? '是' : '否');
                     }
@@ -178,40 +178,40 @@ export default {
                             }
                         }, '详情');
                     }
-                },
+                }
             ],
             showCustomerDetailModal: false,
-            seeCustomer: null,
-        }
+            seeCustomer: null
+        };
     },
     watch: {
-        showModal(data) {
-            if(data) {
+        showModal (data) {
+            if (data) {
                 this.isShowModal = data;
                 this.initData();
             }
         },
-        currChooseItem(data) {
+        currChooseItem (data) {
             if (!data || data === null) {
                 this.currChooseShow = '';
-            }else {
-                this.currChooseShow = data.name + " " + data.customerNo;
+            } else {
+                this.currChooseShow = data.name + ' ' + data.customerNo;
             }
         }
     },
     methods: {
-        initData() {
-            util.ajax.get("/customer/category/list")
+        initData () {
+            util.ajax.get('/customer/category/list')
                 .then((res) => {
                     this.categorys = res.data;
                 })
                 .catch((error) => {
                     util.errorProcessor(this, error);
                 }
-            );
+                );
         },
 
-        searchBtnClicked() {
+        searchBtnClicked () {
             let reqData = this.formItem;
             reqData.page = this.currentPage;
             reqData.size = this.tableCurrPageSize;
@@ -225,41 +225,41 @@ export default {
                 .catch((error) => {
                     util.errorProcessor(this, error);
                 }
-            );
+                );
             this.customerTableLoading = false;
         },
 
-        showCustomerDetail(data) {
+        showCustomerDetail (data) {
             this.showCustomerDetailModal = true;
             this.seeCustomer = data;
         },
-        showCustomerDetailModalCancel() {
+        showCustomerDetailModalCancel () {
             this.showCustomerDetailModal = false;
             this.seeCustomer = null;
         },
 
-        pageChange(data) {
+        pageChange (data) {
             this.currentPage = data;
             this.searchBtnClicked();
         },
 
-        tableRowClick(data) {
+        tableRowClick (data) {
             this.currChooseItem = data;
         },
 
-        ok() {
+        ok () {
             this.isShowModal = false;
             this.$emit('modal-close');
             this.$emit('choosed', this.currChooseItem);
         },
 
-        closedModal() {
+        closedModal () {
             this.isShowModal = false;
             this.$emit('modal-close');
         }
     }
-  
-}
+
+};
 </script>
 
 <style>

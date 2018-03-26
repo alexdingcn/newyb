@@ -10,11 +10,14 @@ function resolve (dir) {
 module.exports = {
     entry: {
         main: '@/main',
-        'vender-base': '@/vendors/vendors.base.js',
-        'vender-exten': '@/vendors/vendors.exten.js'
+
+        vendor: ['vue', 'iview', 'vue-router', 'vuex', 'axios', 'js-cookie', 'clipboard', 'html2canvas', 'rasterizehtml']
+        // 'vender-base': '@/vendors/vendors.base.js',
+        // 'vender-exten': '@/vendors/vendors.exten.js'
     },
     output: {
-        path: path.resolve(__dirname, '../dist/dist')
+        path: path.resolve(__dirname, '../dist/dist'),
+        filename: "[name].[chunkhash].js"
     },
     module: {
         rules: [

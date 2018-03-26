@@ -212,24 +212,24 @@ export default {
                     title: '操作',
                     render: (h, params) => {
                         return h('Button', {
-                        props: {
-                            type: 'error',
-                            size: 'small'
-                        },
-                        on: {
-                            click: () => {
-                                var self = this;
-                                util.ajax.post('/unit/remove/' + params.row.id)
-                                    .then(function (response) {
-                                        self.loadUnitList();
-                                    })
-                                    .catch(function (error) {
-                                        console.log(error);
-                                    });
+                            props: {
+                                type: 'error',
+                                size: 'small'
+                            },
+                            on: {
+                                click: () => {
+                                    var self = this;
+                                    util.ajax.post('/unit/remove/' + params.row.id)
+                                        .then(function (response) {
+                                            self.loadUnitList();
+                                        })
+                                        .catch(function (error) {
+                                            console.log(error);
+                                        });
+                                }
                             }
-                        }
-                            }, '删除');
-                        }
+                        }, '删除');
+                    }
                 }
             ],
             ruleValidate: {
@@ -241,50 +241,50 @@ export default {
                 ],
                 factoryId: [
                     {required: true, message: '生产企业不能为空', trigger: 'blur'}
-                ],
+                ]
             }
         };
     },
     methods: {
-        loadUnitList() {
+        loadUnitList () {
             var self = this;
             util.ajax.get('/unit/list')
-                    .then(function (response) {
-                        self.unitList = response.data;
-                    })
-                    .catch(function (error) {
-                        console.log(error);
-                    });
+                .then(function (response) {
+                    self.unitList = response.data;
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
         },
         init () {
             var self = this;
             this.loadUnitList();
 
             util.ajax.get('/good/category/tree')
-                    .then(function (response) {
-                        self.categoryList = response.data;
-                    })
-                    .catch(function (error) {
-                        console.log(error);
-                    });
+                .then(function (response) {
+                    self.categoryList = response.data;
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
             util.ajax.get('/factory/list')
-                    .then(function (response) {
-                        var factoryArr = [];
-                        if (response.data) {
-                            for (var i = 0; i<response.data.length; i++) {
-                                var factory = response.data[i];
-                                factoryArr.push({
-                                    name: factory.name,
-                                    id: factory.id
-                                });
-                                self.factoryMap[factory.id] = factory.name;
-                            }
+                .then(function (response) {
+                    var factoryArr = [];
+                    if (response.data) {
+                        for (var i = 0; i < response.data.length; i++) {
+                            var factory = response.data[i];
+                            factoryArr.push({
+                                name: factory.name,
+                                id: factory.id
+                            });
+                            self.factoryMap[factory.id] = factory.name;
                         }
-                        self.factoryList = factoryArr;
-                    })
-                    .catch(function (error) {
-                        console.log(error);
-                    });
+                    }
+                    self.factoryList = factoryArr;
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
 
             if (this.$route.params && this.$route.params.goods_id) {
                 util.ajax.get('/goods/' + this.$route.params.goods_id)
@@ -299,22 +299,22 @@ export default {
                 this.formItem = {};
             }
         },
-        submitGoods() {
+        submitGoods () {
             var self = this;
             util.ajax.post('/goods/add', this.formItem)
-                    .then(function (response) {
-                        self.$Message.info("保存商品成功");
-                    })
-                    .catch(function (error) {
-                        console.log(error);
-                    })
+                .then(function (response) {
+                    self.$Message.info('保存商品成功');
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
         },
-        clickNewFactory() {
+        clickNewFactory () {
             this.$router.push({
-                name: 'factory-info',
+                name: 'factory-info'
             });
         },
-        onChangeName() {
+        onChangeName () {
             if (this.formItem.name !== '') {
                 if (!this.formItem.fullName) {
                     this.formItem.fullName = this.formItem.name;
@@ -322,38 +322,38 @@ export default {
                 util.setCurrentPageTitle(this, this.formItem.name, true);
                 var self = this;
                 util.ajax.post('/util/pinyinAbbr', { name: this.formItem.name })
-                        .then(function (response) {
-                            self.formItem.pinyin = response.data;
-                        })
-                        .catch(function (error) {
-                            console.log(error);
-                        });
+                    .then(function (response) {
+                        self.formItem.pinyin = response.data;
+                    })
+                    .catch(function (error) {
+                        console.log(error);
+                    });
             }
         },
-        onChangeUnit(item) {
+        onChangeUnit (item) {
             if (item && item === 'newUnit') {
                 this.newUnitName = '';
                 this.unitModalShow = true;
                 this.formItem.unit = -1;
             }
         },
-        onChangeBigUnit(item) {
+        onChangeBigUnit (item) {
             if (item && item === 'newUnit') {
                 this.newUnitName = '';
                 this.unitModalShow = true;
                 this.formItem.packUnit = -1;
             }
         },
-        handleAddUnit() {
+        handleAddUnit () {
             var self = this;
             util.ajax.post('/unit/add', { name: this.newUnitName })
-                    .then(function (response) {
-                        self.unitModalShow = false;
-                        self.loadUnitList();
-                    })
-                    .catch(function (error) {
-                        console.log(error);
-                    });
+                .then(function (response) {
+                    self.unitModalShow = false;
+                    self.loadUnitList();
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
         }
     },
     mounted () {

@@ -50,11 +50,11 @@
         data () {
             const validatebusinessLicense = (rule, value, callback) => {
                 if (value.toString().length !== 15 && value.toString().length !== 18) {
-                    callback(new Error('请输入正确的营业执照注册号'))
+                    callback(new Error('请输入正确的营业执照注册号'));
                 } else {
-                    callback()
+                    callback();
                 }
-            }
+            };
             return {
                 token: true,
                 loading: false,
@@ -69,12 +69,12 @@
                 },
                 ruleCustom: {
                     company: [
-                        {message: '企业名称不能为空', trigger: 'blur'},
-//                        {validator: validatebusinessLicense, trigger: 'blur'}
+                        {message: '企业名称不能为空', trigger: 'blur'}
+                    //                        {validator: validatebusinessLicense, trigger: 'blur'}
                     ],
                     businessLicense: [
-                        {message: '营业执照注册号不能为空', trigger: 'blur'},
-//                        {validator: validatebusinessLicense, trigger: 'blur'}
+                        {message: '营业执照注册号不能为空', trigger: 'blur'}
+                    //                        {validator: validatebusinessLicense, trigger: 'blur'}
                     ],
                     userName: [
                         {required: true, message: '用户名不能为空', trigger: 'blur'}
@@ -95,7 +95,7 @@
                         {message: '手机号格式不正确', len: 11, trigger: 'blur', pattern: /^[1][3,4,5,7,8][0-9]{9}$/}
                     ]
                 }
-            }
+            };
         },
         methods: {
             handleSubmit (name) {
@@ -104,23 +104,23 @@
                     if (valid) {
                         var self = this;
                         util.ajax.post('/register', this.formCustom)
-                                .then(function (response) {
-                                    self.loading = false;
-                                    Cookies.set('user', self.formCustom.userName);
-                                    self.$router.replace({
-                                        name: 'login'
-                                    });
-                                })
-                                .catch(function (error) {
-                                    console.log(error);
-                                    self.loginResponse = error.message;
-                                    self.loading = false;
+                            .then(function (response) {
+                                self.loading = false;
+                                Cookies.set('user', self.formCustom.userName);
+                                self.$router.replace({
+                                    name: 'login'
                                 });
+                            })
+                            .catch(function (error) {
+                                console.log(error);
+                                self.loginResponse = error.message;
+                                self.loading = false;
+                            });
                     } else {
                         this.loading = false;
-                        this.$Message.error('表单验证失败!')
+                        this.$Message.error('表单验证失败!');
                     }
-                })
+                });
             },
             save () {
 
@@ -129,5 +129,5 @@
         created () {
 
         }
-    }
+    };
 </script>

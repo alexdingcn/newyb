@@ -29,7 +29,7 @@
 </template>
 
 <script>
-import util from "@/libs/util.js";
+import util from '@/libs/util.js';
 
 export default {
     name: 'file-view',
@@ -45,7 +45,7 @@ export default {
             default: null
         }
     },
-    data() {
+    data () {
         return {
             currCarousel: 0,
             showTitle: '',
@@ -54,29 +54,29 @@ export default {
             currCarouselItem: {},
             fileDetail: {},
             fileList: []
-        }
+        };
     },
     watch: {
-        fileId() {
+        fileId () {
             this.initDate();
         },
-        fileNo() {
+        fileNo () {
             this.initDate();
         },
-        fileInfo() {
+        fileInfo () {
             this.initDate();
         },
-        fileDetail() {
-            if(this.fileDetail && this.fileDetail.id) {
+        fileDetail () {
+            if (this.fileDetail && this.fileDetail.id) {
                 this.fileList = this.fileDetail.fileUploads;
                 this.getcurrCarouselItem(0);
                 this.currCarousel = 0;
             }
         },
-        currCarousel() {
+        currCarousel () {
             this.getcurrCarouselItem(this.currCarousel);
         },
-        currCarouselItem() {
+        currCarouselItem () {
             let item = this.currCarouselItem;
             console.log('currCarouselItem change');
             console.log(item);
@@ -88,18 +88,18 @@ export default {
             this.showTitle = this.fileDetail.fileName + ' ' + item.location;
             if (this.isImageFile(item.location)) {
                 this.uploadBtnDisabled = true;
-            }else {
+            } else {
                 this.uploadBtnDisabled = false;
             }
         }
     },
     methods: {
-        isImageFile(key) {
+        isImageFile (key) {
             if (!key && (typeof key) !== 'string') {
                 return false;
             }
             let endStr = key.substring(key.lastIndexOf('.'));
-            for (let i=0; i<this.imageTypeList.length; i++) {
+            for (let i = 0; i < this.imageTypeList.length; i++) {
                 if (endStr === this.imageTypeList[i]) {
                     return true;
                 }
@@ -107,11 +107,11 @@ export default {
             return false;
         },
 
-        carouselChange(oldValue, value) {
+        carouselChange (oldValue, value) {
             this.currCarousel = value;
         },
 
-        initDate() {
+        initDate () {
             console.log(this.fileId);
             console.log(this.fileNo);
             console.log(this.fileInfo);
@@ -124,15 +124,15 @@ export default {
             }
             if (this.fileInfo) {
                 this.fileDetail = this.fileInfo;
-            }else if (this.fileId) {
+            } else if (this.fileId) {
                 this.getFileInfoById(this.fileId);
-            }else {
+            } else {
                 this.getFileInfoByFileNo(this.fileNo);
             }
         },
 
-        getFileInfoById(id) {
-            util.ajax.get("/file/fileid", {params: {fileId: id}})
+        getFileInfoById (id) {
+            util.ajax.get('/file/fileid', {params: {fileId: id}})
                 .then((response) => {
                     this.fileDetail = response.data;
                 })
@@ -141,9 +141,9 @@ export default {
                 });
         },
 
-        getFileInfoByFileNo(fileNo) {
+        getFileInfoByFileNo (fileNo) {
             console.log(fileNo);
-            util.ajax.get("/file/fileno", {params: {fileNo: fileNo}})
+            util.ajax.get('/file/fileno', {params: {fileNo: fileNo}})
                 .then((response) => {
                     this.fileDetail = response.data;
                 })
@@ -152,30 +152,30 @@ export default {
                 });
         },
 
-        getcurrCarouselItem(index) {
+        getcurrCarouselItem (index) {
             if (!this.fileList || this.fileList.length <= 0) {
                 this.currCarouselItem = {};
-            }else {
+            } else {
                 this.currCarouselItem = this.fileList[index];
             }
         },
 
-        uploadBtnClick() {
+        uploadBtnClick () {
             if (this.currCarouselItem && this.currCarouselItem.loadUrl) {
                 let iframe = document.createElement('iframe');
                 iframe.style.display = 'none';
                 iframe.src = this.currCarouselItem.loadUrl;
-                iframe.onload = function() {
+                iframe.onload = function () {
                     document.body.removeChild(iframe);
-                }
+                };
                 document.body.appendChild(iframe);
-            }else {
+            } else {
                 this.$Message.warning('获取文件下载链接失败');
             }
         }
     }
 
-}
+};
 </script>
 
 <style>

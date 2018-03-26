@@ -53,7 +53,7 @@
 <script>
 import Cookies from 'js-cookie';
 import util from '@/libs/util.js';
-import Qs from 'qs'
+import Qs from 'qs';
 
 export default {
     data () {
@@ -82,31 +82,30 @@ export default {
                     var data = Qs.stringify(this.form);
                     this.loading = true;
                     util.ajax.post('/login', data, {
-                                headers:{'Content-Type':'application/x-www-form-urlencoded'}
-                            })
-                            .then(function (response) {
-                                self.loading = false;
-                                self.$store.commit('setToken', response.data);
-                                Cookies.set('user', self.form.username);
-                                self.$store.commit('setAvator', 'https://ss1.bdstatic.com/70cFvXSh_Q1YnxGkpoWK1HF6hhy/it/u=3448484253,3685836170&fm=27&gp=0.jpg');
-                                if (self.form.username === 'iview_admin') {
-                                    Cookies.set('access', 0);
-                                } else {
-                                    Cookies.set('access', 1);
-                                }
-                                self.$router.push({
-                                    name: 'home_index'
-                                });
-
-                            })
-                            .catch(function (error) {
-                                self.loading = false;
-                                self.loginResponse = error.message;
+                        headers: {'Content-Type': 'application/x-www-form-urlencoded'}
+                    })
+                        .then(function (response) {
+                            self.loading = false;
+                            self.$store.commit('setToken', response.data);
+                            Cookies.set('user', self.form.username);
+                            self.$store.commit('setAvator', 'https://ss1.bdstatic.com/70cFvXSh_Q1YnxGkpoWK1HF6hhy/it/u=3448484253,3685836170&fm=27&gp=0.jpg');
+                            if (self.form.username === 'iview_admin') {
+                                Cookies.set('access', 0);
+                            } else {
+                                Cookies.set('access', 1);
+                            }
+                            self.$router.push({
+                                name: 'home_index'
                             });
+                        })
+                        .catch(function (error) {
+                            self.loading = false;
+                            self.loginResponse = error.message;
+                        });
                 }
             });
         },
-        toRegister() {
+        toRegister () {
             this.$router.push('/register');
         }
     }

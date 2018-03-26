@@ -136,12 +136,12 @@
 </template>
 
 <script>
-import util from "@/libs/util.js";
-import dataConver from "@/libs/data-conver.js";
+import util from '@/libs/util.js';
+import dataConver from '@/libs/data-conver.js';
 
 export default {
     name: 'ship',
-    data() {
+    data () {
         return {
             searchForm: {
                 name: '',
@@ -173,17 +173,17 @@ export default {
                     align: 'center',
                     render: (h, params) => {
                         let disableVal = params.row.disabled;
-                        return h("div", [
-                            h("Icon", {
+                        return h('div', [
+                            h('Icon', {
                                 props: {
-                                type: disableVal ? "close-circled" : "checkmark-circled",
-                                color: disableVal ? "#e96500" : "#00a854"
+                                    type: disableVal ? 'close-circled' : 'checkmark-circled',
+                                    color: disableVal ? '#e96500' : '#00a854'
                                 }
                             }),
-                            h("strong", disableVal ? "已禁用" : "启用")
+                            h('strong', disableVal ? '已禁用' : '启用')
                         ]);
                     }
-                }, 
+                },
                 {
                     title: '营业执照',
                     key: 'license',
@@ -275,7 +275,7 @@ export default {
                                     this.updateShipBtnClick(params.row);
                                 }
                             }
-                        }, '修改')
+                        }, '修改');
                     }
                 }
             ],
@@ -304,25 +304,25 @@ export default {
                 ]
             },
             saveLoading: false
-        }
+        };
     },
     methods: {
-        dateFormat(data) {
-          if (!data && isNaN(data)) {
-              return '';
-          }
-          return dataConver.formatDate(new Date(data), 'yyyy-MM-dd');
+        dateFormat (data) {
+            if (!data && isNaN(data)) {
+                return '';
+            }
+            return dataConver.formatDate(new Date(data), 'yyyy-MM-dd');
         },
 
-        searchBtnClick() {
+        searchBtnClick () {
             this.currentPage = 1;
             this.refreshShipList();
         },
-        pageChange(data) {
+        pageChange (data) {
             this.currentPage = data;
             this.refreshShipList();
         },
-        refreshShipList() {
+        refreshShipList () {
             let reqData = {
                 name: this.searchForm.name,
                 license: this.searchForm.license,
@@ -330,7 +330,7 @@ export default {
                 size: this.pageSize
             };
             this.searching = true;
-            util.ajax.get("/ship/list", {params: reqData})
+            util.ajax.get('/ship/list', {params: reqData})
                 .then((response) => {
                     this.tabData = response.data.data;
                     this.totalCount = response.data.count;
@@ -341,17 +341,17 @@ export default {
             this.searching = false;
         },
 
-        updateShipBtnClick(data) {
+        updateShipBtnClick (data) {
             this.showShipModal = true;
             this.shipModalTitle = '维护' + data.name + '信息';
             this.shipFormItem = data;
         },
-        addBtnClick() {
+        addBtnClick () {
             this.showShipModal = true;
-            this.shipModalTitle = "新建承运公司信息";
+            this.shipModalTitle = '新建承运公司信息';
             this.initShipFormData();
         },
-        initShipFormData() {
+        initShipFormData () {
             this.shipFormItem = {
                 id: '',
                 name: '',
@@ -370,17 +370,17 @@ export default {
                 comment: ''
             };
         },
-        shipModalClose() {
+        shipModalClose () {
             this.showShipModal = false;
         },
-        saveShipInfo() {
+        saveShipInfo () {
             this.$refs.shipForm.validate(valid => {
-                if(!valid) {
+                if (!valid) {
                     this.$Message.warning('请检查必输项信息');
                     return;
                 }
                 this.saveLoading = true;
-                util.ajax.post("/ship/save", this.shipFormItem)
+                util.ajax.post('/ship/save', this.shipFormItem)
                     .then((response) => {
                         this.$Message.success('保存成功');
                         this.showShipModal = false;
@@ -394,8 +394,8 @@ export default {
         }
 
     }
-  
-}
+
+};
 </script>
 
 <style>

@@ -66,15 +66,15 @@
 </template>
 
 <script>
-import util from "@/libs/util.js";
-import reviewDetail from "./review-detail.vue";
+import util from '@/libs/util.js';
+import reviewDetail from './review-detail.vue';
 
 export default {
     name: 'sell-review',
     components: {
         reviewDetail
     },
-    data() {
+    data () {
         return {
             reviewTypeList: [],
             salerList: [],
@@ -94,59 +94,59 @@ export default {
             tabData: [],
             tabColumns: [
                 {
-                  title: '查看',
-                  width: 70,
-                  render: (h, params) => {
-                      return h('Button', {
-                          props: {
-                            type: 'text',
-                            size: 'small',
-                            icon: 'eye'
-                          },
-                          on: {
-                              click: () => {
-                                  this.showReviewDetail(params.row.id);
-                              }
-                          }
-                      });
-                  }
+                    title: '查看',
+                    width: 70,
+                    render: (h, params) => {
+                        return h('Button', {
+                            props: {
+                                type: 'text',
+                                size: 'small',
+                                icon: 'eye'
+                            },
+                            on: {
+                                click: () => {
+                                    this.showReviewDetail(params.row.id);
+                                }
+                            }
+                        });
+                    }
                 },
                 {
-                    type: "selection",
+                    type: 'selection',
                     width: 60,
-                    align: "center",
+                    align: 'center'
                 },
                 {
                     title: '订单编号',
                     key: 'orderNumber',
-                    align: "center",
+                    align: 'center',
                     sortable: true
                 },
                 {
                     title: '制单日',
                     key: 'createOrderDate',
-                    align: "center",
+                    align: 'center',
                     sortable: true
                 },
                 {
                     title: '客户',
                     key: 'customerName',
-                    align: "center"
+                    align: 'center'
                 },
                 {
                     title: '销售员',
                     key: 'salerId',
-                    align: "center"
+                    align: 'center'
                 },
                 {
                     title: '制单人',
                     key: 'createBy',
-                    align: "center"
+                    align: 'center'
                 },
                 {
                     title: '提货员',
                     key: 'takeGoodsUser',
-                    align: "center"
+                    align: 'center'
                 },
                 {
                     title: '收款金额',
@@ -156,65 +156,64 @@ export default {
                 {
                     title: '收货人',
                     key: 'customerRepName',
-                    align: "center"
+                    align: 'center'
                 },
                 {
                     title: '收货电话',
                     key: 'customerRepContactPhone',
-                    align: "center"
+                    align: 'center'
                 },
                 {
                     title: '收货地址',
                     key: 'customerRepRepertoryAddress',
-                    align: "center"
+                    align: 'center'
                 }
             ],
             tabSelectData: [],
             showOrderDetailView: false,
             showDetailViewId: -1
-        }
+        };
     },
-    mounted() {
+    mounted () {
         this.initData();
     },
     methods: {
-        initData() {
+        initData () {
             this.getOptions();
             this.getSalerList();
         },
-        getOptions() {
-          let reqData = ['SELL_ORDER_REVIEW'];
-          util.ajax.post("/options/list", reqData)
-            .then((response) => {
-              let data = response.data;
-              if (data && data.SELL_ORDER_REVIEW) {
-                  this.reviewTypeList = data.SELL_ORDER_REVIEW;
-              }
-          })
-          .catch((error) => {
-              util.errorProcessor(this, error);
-          })
+        getOptions () {
+            let reqData = ['SELL_ORDER_REVIEW'];
+            util.ajax.post('/options/list', reqData)
+                .then((response) => {
+                    let data = response.data;
+                    if (data && data.SELL_ORDER_REVIEW) {
+                        this.reviewTypeList = data.SELL_ORDER_REVIEW;
+                    }
+                })
+                .catch((error) => {
+                    util.errorProcessor(this, error);
+                });
         },
-        getSalerList() {
-          util.ajax.get('/userrole/list', {params: {roleQuery: 'ROLE_SALER'}})
-            .then((response) => {
-                this.salerList = response.data;
-            })
-            .catch((error) => {
-                util.errorProcessor(this, error);
-            });
+        getSalerList () {
+            util.ajax.get('/userrole/list', {params: {roleQuery: 'ROLE_SALER'}})
+                .then((response) => {
+                    this.salerList = response.data;
+                })
+                .catch((error) => {
+                    util.errorProcessor(this, error);
+                });
         },
-        searchBtnClick() {
+        searchBtnClick () {
             this.$refs.searchForm.validate(valid => {
-                if(!valid) {
+                if (!valid) {
                     this.$Message.warning('审批类型必须选择');
-                    return;
-                }else {
+                } else {
                     this.refreshTableData();
                 }
             });
         },
-        refreshTableData() {
+        refreshTableData () {
             let reqData = {
                 status: this.searchFormItem.reviewType,
                 orderNumber: this.searchFormItem.orderNumber,
@@ -222,14 +221,14 @@ export default {
             };
             let startDate = this.searchFormItem.startDate;
             let endDate = this.searchFormItem.endDate;
-            if (startDate && startDate !== "" && (startDate instanceof Date)) {
+            if (startDate && startDate !== '' && (startDate instanceof Date)) {
                 reqData.startDate = startDate.getTime();
             }
-            if (endDate && endDate !== "" && (endDate instanceof Date)) {
+            if (endDate && endDate !== '' && (endDate instanceof Date)) {
                 reqData.endDate = endDate.getTime();
             }
             this.searching = true;
-            util.ajax.get("/sell/order/all/list", {params: reqData})
+            util.ajax.get('/sell/order/all/list', {params: reqData})
                 .then((response) => {
                     this.tabData = response.data.data;
                 })
@@ -238,24 +237,24 @@ export default {
                 });
             this.searching = false;
         },
-        showReviewDetail(orderId) {
+        showReviewDetail (orderId) {
             this.showOrderDetailView = true;
             this.showDetailViewId = orderId;
         },
-        showOrderDetailViewClose() {
+        showOrderDetailViewClose () {
             this.showOrderDetailView = false;
         },
-        tableSelectDataChange(data) {
+        tableSelectDataChange (data) {
             this.tabSelectData = data;
         },
-        submitBtnClick() {
+        submitBtnClick () {
             if (!this.tabSelectData || this.tabSelectData.length <= 0 || !this.searchFormItem.reviewType) {
                 this.$Message.warning('请确认审批类型和选择需要审批通过的数据');
                 return;
             }
             this.searching = true;
             let orderIdList = [];
-            for (let i=0; i< this.tabSelectData.length; i++) {
+            for (let i = 0; i < this.tabSelectData.length; i++) {
                 orderIdList.push(this.tabSelectData[i].id);
             }
             let reqData = {
@@ -263,7 +262,7 @@ export default {
                 orderIdList: orderIdList
             };
             console.log(reqData);
-            util.ajax.post("/sell/order/review/submit", reqData)
+            util.ajax.post('/sell/order/review/submit', reqData)
                 .then((response) => {
                     this.$Message.success('审核提交成功');
                     this.refreshTableData();
@@ -274,7 +273,7 @@ export default {
             this.searching = false;
         }
     }
-}
+};
 </script>
 
 <style>

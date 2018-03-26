@@ -56,7 +56,7 @@
 <script>
 import axios from 'axios';
 import util from '@/libs/util.js';
-import _ from 'lodash'
+import _ from 'lodash';
 
 export default {
     name: 'goods',
@@ -67,7 +67,7 @@ export default {
             searchGoodsVal: '',
             totalGoodsCount: 0,
             currentPage: 1,
-            goodCat: [ {title:'全部', id:0, selected:true} ],
+            goodCat: [ {title: '全部', id: 0, selected: true} ],
             selectedCategory: {},
             disableDelCategory: true,
             goodsTableLoading: false,
@@ -125,13 +125,13 @@ export default {
                     title: '计量单位',
                     key: 'unitName',
                     width: 80,
-                    align: 'center',
+                    align: 'center'
                 },
                 {
                     title: '剂型',
                     key: 'jx',
                     width: 80,
-                    align: 'center',
+                    align: 'center'
                 },
                 {
                     title: '规格',
@@ -149,23 +149,23 @@ export default {
                 {
                     title: '库存',
                     key: 'factory',
-                    width:100,
+                    width: 100,
                     align: 'center'
                 },
                 {
                     title: '在单数',
                     key: 'factory',
-                    width:100,
+                    width: 100,
                     align: 'center'
-                },
+                }
             ],
             goodsData: []
         };
     },
-    activated() {
+    activated () {
         this.loadTree();
     },
-    mounted() {
+    mounted () {
         this.loadTree();
         this.loadGoodsData();
     },
@@ -176,13 +176,13 @@ export default {
         loadTree () {
             var self = this;
             util.ajax.get('/good/category/tree')
-                    .then(function (response) {
-                        self.goodCat = self.goodCat.slice(0,1);
-                        self.goodCat = self.goodCat.concat(response.data);
-                    })
-                    .catch(function (error) {
-                        console.log(error);
-                    });
+                .then(function (response) {
+                    self.goodCat = self.goodCat.slice(0, 1);
+                    self.goodCat = self.goodCat.concat(response.data);
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
         },
         loadGoodsData () {
             var self = this;
@@ -192,12 +192,12 @@ export default {
                 this.searchFactoryId = this.$route.params.factory_id;
                 this.sidebarVisible = false;
             }
-            util.ajax.get('/goods/list', { params : {
-                    page: this.currentPage,
-                    search: this.searchGoodsVal,
-                    factoryId: this.searchFactoryId,
-                    catId: this.selectedCategory.id
-                }})
+            util.ajax.get('/goods/list', { params: {
+                page: this.currentPage,
+                search: this.searchGoodsVal,
+                factoryId: this.searchFactoryId,
+                catId: this.selectedCategory.id
+            }})
                 .then(function (response) {
                     self.goodsTableLoading = false;
                     self.goodsData = response.data.data;
@@ -220,7 +220,7 @@ export default {
         doAddCategory (newCategory) {
             var self = this;
             if (!newCategory) {
-                this.$Message.warning("商品分类名称不能为空");
+                this.$Message.warning('商品分类名称不能为空');
                 return;
             }
 
@@ -230,7 +230,7 @@ export default {
                 })
                 .catch(function (error) {
                     console.log(error);
-                })
+                });
         },
         addCategory () {
             var inputVal = '';
@@ -250,57 +250,57 @@ export default {
                                 inputVal = val;
                             }
                         }
-                    })
+                    });
                 }
             });
         },
         delCategory () {
             var self = this;
             util.ajax.post('/good/category/remove', { id: this.selectedCategory.id })
-                    .then(function (response) {
-                        self.loadTree();
-                    })
-                    .catch(function (error) {
-                        self.$Message.warning(error.response.data.message);
-                    })
-        },
-		exportData() {
-			this.$refs.goodsTable.exportCsv({
-                    filename: '商品数据'
+                .then(function (response) {
+                    self.loadTree();
+                })
+                .catch(function (error) {
+                    self.$Message.warning(error.response.data.message);
                 });
-		},
-        addGoods() {
+        },
+        exportData () {
+            this.$refs.goodsTable.exportCsv({
+                filename: '商品数据'
+            });
+        },
+        addGoods () {
             let argu = { goods_category: this.selectedCategory.id };
             this.$router.push({
                 name: 'goods-info',
                 params: argu
             });
         },
-        delGoods() {
+        delGoods () {
             var row = this.$refs.goodsTable.getSelection();
             if (row && row.length > 0) {
                 var self = this;
                 util.ajax.post('/goods/remove/' + row[0].id)
-                        .then(function (response) {
-                            self.loadTree();
-                        })
-                        .catch(function (error) {
-                            console.log(error);
-                        })
+                    .then(function (response) {
+                        self.loadTree();
+                    })
+                    .catch(function (error) {
+                        console.log(error);
+                    });
             } else {
-                this.$Message.warning("请选择一个商品后操作");
+                this.$Message.warning('请选择一个商品后操作');
             }
         },
-        changePage(pageNumber) {
+        changePage (pageNumber) {
             this.currentPage = pageNumber;
             this.loadGoodsData();
         },
-        handleSearchGoods(value) {
+        handleSearchGoods (value) {
             console.log(value);
         }
     },
     watch: {
-        searchGoodsVal: _.debounce(function() {
+        searchGoodsVal: _.debounce(function () {
             this.loadGoodsData();
         }, 1000)
     }

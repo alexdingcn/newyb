@@ -57,16 +57,16 @@
 </template>
 
 <script>
-import util from "@/libs/util.js";
-import dataConver from "@/libs/data-conver.js";
-import factorySelect from "@/views/factory/factory-select.vue";
+import util from '@/libs/util.js';
+import dataConver from '@/libs/data-conver.js';
+import factorySelect from '@/views/factory/factory-select.vue';
 
 export default {
-  name: 'good-search',
-  components: {
-      factorySelect
-  },
-  props: {
+    name: 'good-search',
+    components: {
+        factorySelect
+    },
+    props: {
         showModal: {
             type: Boolean,
             default: false
@@ -75,156 +75,156 @@ export default {
             type: Object,
             required: true
         }
-   },
-  data() {
-      return {
-          isShowModal: false,
-          showTitle: '',
-          formItem: {
-              search: '',
-              factoryId: ''
-          },
-          tabData: [],
-          tableLoading: false,
-          tabColumns: [
-              {
-                  type: "selection",
-                  width: 60,
-                  fixed: "left"
-              },
-              {
-                  title: '货号',
-                  key: 'code',
-                  width: 120,
-                  sortable: true,
-                  fixed: 'left'
-              },
-              {
-                  title: '商品名称',
-                  key: 'goodName',
-                  width: 200,
-                  sortable: true,
-                  fixed: 'left'
-              },
-              {
-                  title: '剂型',
-                  key: 'jx',
-                  width: 100
-              },
-              {
-                  title: '规格',
-                  key: 'spec',
-                  width: 100
-              },
-              {
-                  title: '生产企业',
-                  key: 'factoryName',
-                  width: 200
-              },
-              {
-                  title: '单位',
-                  key: 'unitName',
-                  width: 80
-              }, 
-              {
-                  title: '数量',
-                  key: 'quantity',
-                  width: 120
-              },
-              {
-                  title: '有效期至',
-                  key: 'expDate',
-                  width: 120, 
-                  render: (h, params) => {
-                    return h('span', this.dateFormat(params.row.expDate));
-                  }
-              },
-              {
-                  title: '生产日期',
-                  key: 'productDate',
-                  width: 120, 
-                  render: (h, params) => {
-                    return h('span', this.dateFormat(params.row.productDate));
-                  }
-              },
-              {
-                  title: '批次号',
-                  key: 'batchCode',
-                  width: 120
-              }
-          ],
-          totalCount: 0,
-          currentPage: 1,
-          tableCurrPageSize: 10,
-          tabCurrChooseList: [],
-          choonseNumber: 0,
-      }
-  },
-  watch: {
-        showModal(data) {
-            if(data) {
+    },
+    data () {
+        return {
+            isShowModal: false,
+            showTitle: '',
+            formItem: {
+                search: '',
+                factoryId: ''
+            },
+            tabData: [],
+            tableLoading: false,
+            tabColumns: [
+                {
+                    type: 'selection',
+                    width: 60,
+                    fixed: 'left'
+                },
+                {
+                    title: '货号',
+                    key: 'code',
+                    width: 120,
+                    sortable: true,
+                    fixed: 'left'
+                },
+                {
+                    title: '商品名称',
+                    key: 'goodName',
+                    width: 200,
+                    sortable: true,
+                    fixed: 'left'
+                },
+                {
+                    title: '剂型',
+                    key: 'jx',
+                    width: 100
+                },
+                {
+                    title: '规格',
+                    key: 'spec',
+                    width: 100
+                },
+                {
+                    title: '生产企业',
+                    key: 'factoryName',
+                    width: 200
+                },
+                {
+                    title: '单位',
+                    key: 'unitName',
+                    width: 80
+                },
+                {
+                    title: '数量',
+                    key: 'quantity',
+                    width: 120
+                },
+                {
+                    title: '有效期至',
+                    key: 'expDate',
+                    width: 120,
+                    render: (h, params) => {
+                        return h('span', this.dateFormat(params.row.expDate));
+                    }
+                },
+                {
+                    title: '生产日期',
+                    key: 'productDate',
+                    width: 120,
+                    render: (h, params) => {
+                        return h('span', this.dateFormat(params.row.productDate));
+                    }
+                },
+                {
+                    title: '批次号',
+                    key: 'batchCode',
+                    width: 120
+                }
+            ],
+            totalCount: 0,
+            currentPage: 1,
+            tableCurrPageSize: 10,
+            tabCurrChooseList: [],
+            choonseNumber: 0
+        };
+    },
+    watch: {
+        showModal (data) {
+            if (data) {
                 this.isShowModal = data;
             }
         },
-        warehouse(data) {
-            if(data) {
-                 this.showTitle = "选取仓库:" + data.name + "商品";
+        warehouse (data) {
+            if (data) {
+                this.showTitle = '选取仓库:' + data.name + '商品';
                 this.initData();
             }
+        }
+    },
+    methods: {
+        dateFormat (data) {
+            if (!data && isNaN(data)) {
+                return '';
+            }
+            return dataConver.formatDate(new Date(data), 'yyyy-MM-dd');
         },
-  },
-  methods: {
-      dateFormat(data) {
-          if (!data && isNaN(data)) {
-              return '';
-          }
-          return dataConver.formatDate(new Date(data), 'yyyy-MM-dd');
+        initData () {
         },
-      initData() {
-      },
-      searchBtnClicked() {
-          let reqData = {
-              warehouseId: this.warehouse.id,
-              goodSearch: this.formItem.search,
-              factoryId: this.formItem.factoryId,
-              page: this.currentPage,
-              size: this.tableCurrPageSize
-          };
-          util.ajax.get("/repertory/list", {params: reqData})
-            .then((response) => {
-                this.totalCount = response.data.total;
-                this.tabData = response.data.data;
-            })
-            .catch((error) => {
-                util.errorProcessor(this, error);
-            });
-      },
-      pageChange(data) {
-          this.currentPage = data;
-          this.searchBtnClicked();
-      },
-      tabSelectChange(data) {
-          this.tabCurrChooseList = data;
-          if (this.tabCurrChooseList) {
-              this.choonseNumber = this.tabCurrChooseList.length;
-          }else {
-              this.choonseNumber = 0;
-          }
-      },
+        searchBtnClicked () {
+            let reqData = {
+                warehouseId: this.warehouse.id,
+                goodSearch: this.formItem.search,
+                factoryId: this.formItem.factoryId,
+                page: this.currentPage,
+                size: this.tableCurrPageSize
+            };
+            util.ajax.get('/repertory/list', {params: reqData})
+                .then((response) => {
+                    this.totalCount = response.data.total;
+                    this.tabData = response.data.data;
+                })
+                .catch((error) => {
+                    util.errorProcessor(this, error);
+                });
+        },
+        pageChange (data) {
+            this.currentPage = data;
+            this.searchBtnClicked();
+        },
+        tabSelectChange (data) {
+            this.tabCurrChooseList = data;
+            if (this.tabCurrChooseList) {
+                this.choonseNumber = this.tabCurrChooseList.length;
+            } else {
+                this.choonseNumber = 0;
+            }
+        },
 
-      ok() {
+        ok () {
             this.isShowModal = false;
             this.$emit('modal-close');
             this.$emit('choosed', this.tabCurrChooseList);
-      },
+        },
 
-      closedModal() {
-          this.isShowModal = false;
-          this.$emit('modal-close');
-      },
-      
-  }
-}
+        closedModal () {
+            this.isShowModal = false;
+            this.$emit('modal-close');
+        }
+
+    }
+};
 </script>
 
 <style>

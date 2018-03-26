@@ -230,7 +230,7 @@
 </template>
 
 <script>
-import axios from 'axios'
+import axios from 'axios';
 import Vue from 'vue';
 import iviewArea from 'iview-area';
 import util from '@/libs/util.js';
@@ -250,63 +250,63 @@ export default {
                 {
                     key: 'name',
                     title: '姓名',
-                    align: 'center',
+                    align: 'center'
                 },
                 {
                     key: 'phone',
                     title: '电话',
-                    align: 'center',
+                    align: 'center'
                 },
                 {
                     key: 'idcard',
                     title: '身份证号',
-                    align: 'center',
+                    align: 'center'
                 },
                 {
                     key: 'enable',
                     title: '启用',
                     align: 'center',
-                    width: 100,
+                    width: 100
                 },
                 {
                     key: 'comment',
                     title: '备注',
                     align: 'center',
-                    width: 200,
+                    width: 200
                 },
                 {
                     title: '操作',
                     align: 'center',
                     width: 200,
                     render: (h, params) => {
-                            return h('div', [
-                                h('Button', {
-                                    props: {
-                                        type: 'text',
-                                        size: 'small'
+                        return h('div', [
+                            h('Button', {
+                                props: {
+                                    type: 'text',
+                                    size: 'small'
+                                }
+                            }, '修改'),
+                            h('Button', {
+                                props: {
+                                    type: 'text',
+                                    size: 'small'
+                                },
+                                on: {
+                                    click: () => {
+                                        var self = this;
+                                        util.ajax.post('/supplier/contact/remove/' + params.row.id)
+                                            .then(function (response) {
+                                                self.loadContacts();
+                                            })
+                                            .catch(function (error) {
+                                                console.log(error);
+                                            });
                                     }
-                                }, '修改'),
-                                h('Button', {
-                                    props: {
-                                        type: 'text',
-                                        size: 'small'
-                                    },
-                                    on: {
-										click: () => {
-											var self = this;
-											util.ajax.post('/supplier/contact/remove/' + params.row.id)
-												.then(function (response) {
-													self.loadContacts();
-												})
-												.catch(function (error) {
-													console.log(error);
-												});
-										}
-									}
-                                }, '删除')
-                            ]);
-                        }
-                },
+                                }
+                            }, '删除')
+                        ]);
+                    }
+                }
             ],
             ruleValidate: {
                 name: [
@@ -314,7 +314,7 @@ export default {
                 ],
                 address: [
                     {required: true, message: '地址不能为空', trigger: 'blur'}
-                ],
+                ]
             }
         };
     },
@@ -347,20 +347,20 @@ export default {
                 };
             }
         },
-        mounted() {
+        mounted () {
         },
-        submitSupplier() {
+        submitSupplier () {
             var self = this;
             util.ajax.post('/supplier/add', this.formItem)
-                    .then(function (response) {
-                        self.formItem.id = response.data;
-                        self.$Message.info("供应商" + self.formItem.name + "保存成功");
-                    })
-                    .catch(function (error) {
-                        console.log(error);
-                    })
+                .then(function (response) {
+                    self.formItem.id = response.data;
+                    self.$Message.info('供应商' + self.formItem.name + '保存成功');
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
         },
-        onChangeName() {
+        onChangeName () {
             if (this.formItem.name !== '') {
                 util.setCurrentPageTitle(this, this.formItem.name, true);
                 var self = this;
@@ -370,26 +370,26 @@ export default {
                     })
                     .catch(function (error) {
                         console.log(error);
-                    })
+                    });
             }
         },
-        searchRelatedGoods() {
+        searchRelatedGoods () {
             let argu = { supplier_id: this.$route.params.supplier_id };
             this.$router.push({
                 name: 'basic_data_good',
                 params: argu
             });
         },
-        addContact() {
-			this.addContactModal = true;
+        addContact () {
+            this.addContactModal = true;
         },
-        changeTabs(tabName) {
+        changeTabs (tabName) {
         	console.log(this.formItem.id);
         	if (tabName === 'agent') {
         		this.loadContacts();
         	}
         },
-        loadContacts() {
+        loadContacts () {
         	var self = this;
         	if (this.formItem.id) {
         		util.ajax.get('/supplier/contact/list', { params: {supplierId: this.formItem.id} })
@@ -398,24 +398,24 @@ export default {
                     })
                     .catch(function (error) {
                         console.log(error);
-                    })
+                    });
         	}
         },
-        saveContact() {
+        saveContact () {
         	var self = this;
         	if (this.formItem.id) {
         		this.contact.supplierId = this.formItem.id;
         		util.ajax.post('/supplier/contact/add', this.contact)
         			.then(function (response) {
-                        self.$Message.info("供应商业务代表" + self.contact.name + "保存成功");
+                        self.$Message.info('供应商业务代表' + self.contact.name + '保存成功');
                         self.addContactModal = false;
                         self.loadContacts();
                     })
                     .catch(function (error) {
                         console.log(error);
-                    })
+                    });
         	} else {
-        		this.$Message.warning("请先保存供应商");
+        		this.$Message.warning('请先保存供应商');
         	}
         }
     },

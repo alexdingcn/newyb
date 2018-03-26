@@ -71,11 +71,11 @@
 </template>
 
 <script>
-import util from "@/libs/util.js";
-import dataConver from "@/libs/data-conver.js";
-import reviewDetail from "./review-detail.vue";
-import sellOrderShip from "./sell-order-ship.vue";
-import customerSelect from "@/views/customer/customer-select.vue";
+import util from '@/libs/util.js';
+import dataConver from '@/libs/data-conver.js';
+import reviewDetail from './review-detail.vue';
+import sellOrderShip from './sell-order-ship.vue';
+import customerSelect from '@/views/customer/customer-select.vue';
 
 export default {
     name: 'sell-order-all',
@@ -84,8 +84,8 @@ export default {
         sellOrderShip,
         customerSelect
     },
-        
-    data() {
+
+    data () {
         return {
             searchFormItem: {
                 startDate: '',
@@ -99,37 +99,37 @@ export default {
             tabData: [],
             tabColumns: [
                 {
-                  title: '查看',
-                  width: 70,
-                  fixed: 'left',
-                  render: (h, params) => {
-                      return h('Button', {
-                          props: {
-                            type: 'text',
-                            size: 'small',
-                            icon: 'eye'
-                          },
-                          on: {
-                              click: () => {
-                                  this.showReviewDetail(params.row.id);
-                              }
-                          }
-                      });
-                  }
+                    title: '查看',
+                    width: 70,
+                    fixed: 'left',
+                    render: (h, params) => {
+                        return h('Button', {
+                            props: {
+                                type: 'text',
+                                size: 'small',
+                                icon: 'eye'
+                            },
+                            on: {
+                                click: () => {
+                                    this.showReviewDetail(params.row.id);
+                                }
+                            }
+                        });
+                    }
                 },
                 {
                     title: '订单编号',
                     width: 170,
                     key: 'orderNumber',
-                    align: "center",
+                    align: 'center',
                     sortable: true,
-                    fixed: 'left',
+                    fixed: 'left'
                 },
                 {
                     title: '制单日',
                     key: 'createOrderDate',
                     width: 100,
-                    align: "center",
+                    align: 'center',
                     sortable: true,
                     render: (h, params) => {
                         return h('span', this.dateFormat(params.row.createOrderDate));
@@ -139,7 +139,7 @@ export default {
                     title: '客户',
                     key: 'customerName',
                     width: 170,
-                    align: "center"
+                    align: 'center'
                 },
                 {
                     title: '状态',
@@ -154,19 +154,19 @@ export default {
                     title: '销售员',
                     key: 'salerId',
                     width: 100,
-                    align: "center"
+                    align: 'center'
                 },
                 {
                     title: '制单人',
                     key: 'createBy',
                     width: 100,
-                    align: "center"
+                    align: 'center'
                 },
                 {
                     title: '提货员',
                     key: 'takeGoodsUser',
                     width: 100,
-                    align: "center"
+                    align: 'center'
                 },
                 {
                     title: '收款金额',
@@ -178,19 +178,19 @@ export default {
                     title: '收货人',
                     key: 'customerRepName',
                     width: 100,
-                    align: "center"
+                    align: 'center'
                 },
                 {
                     title: '收货电话',
                     key: 'customerRepContactPhone',
                     width: 120,
-                    align: "center"
+                    align: 'center'
                 },
                 {
                     title: '收货地址',
                     key: 'customerRepRepertoryAddress',
                     width: 220,
-                    align: "center"
+                    align: 'center'
                 },
                 {
                     title: '补录运输记录',
@@ -201,7 +201,7 @@ export default {
                         return h('Button', {
                             props: {
                                 type: 'primary',
-                                size: 'small',
+                                size: 'small'
                             },
                             on: {
                                 click: () => {
@@ -220,53 +220,53 @@ export default {
             showShipDetailView: false,
             shipOrderId: -1,
             shipDetailTitle: ''
-        }
+        };
     },
-    mounted() {
+    mounted () {
         this.initData();
     },
     methods: {
-        dateFormat(data) {
-          if (!data && isNaN(data)) {
-              return '';
-          }
-          return dataConver.formatDate(new Date(data), 'yyyy-MM-dd');
+        dateFormat (data) {
+            if (!data && isNaN(data)) {
+                return '';
+            }
+            return dataConver.formatDate(new Date(data), 'yyyy-MM-dd');
         },
-        statusDescription(data) {
+        statusDescription (data) {
             let result = '';
-            switch(data) {
-                case 'INIT': 
+            switch (data) {
+                case 'INIT':
                     result = '制单初始';
                     break;
                 case 'QUALITY_CHECKED':
                     result = '出库质量审核完成';
                     break;
-                case 'SALE_CHECKED': 
+                case 'SALE_CHECKED':
                     result = '销售审核完成';
                     break;
-                default: 
+                default:
                     result = '';
                     break;
             }
             return result;
         },
-        initData() {
+        initData () {
             this.getSalerList();
         },
-        getSalerList() {
-          util.ajax.get('/userrole/list', {params: {roleQuery: 'ROLE_SALER'}})
-            .then((response) => {
-                this.salerList = response.data;
-            })
-            .catch((error) => {
-                util.errorProcessor(this, error);
-            });
+        getSalerList () {
+            util.ajax.get('/userrole/list', {params: {roleQuery: 'ROLE_SALER'}})
+                .then((response) => {
+                    this.salerList = response.data;
+                })
+                .catch((error) => {
+                    util.errorProcessor(this, error);
+                });
         },
-        searchBtnClick() {
+        searchBtnClick () {
             this.currentPage = 1;
             this.refreshTableData();
         },
-        refreshTableData() {
+        refreshTableData () {
             let reqData = {
                 customerId: this.searchFormItem.customerId,
                 orderNumber: this.searchFormItem.orderNumber,
@@ -276,14 +276,14 @@ export default {
             };
             let startDate = this.searchFormItem.startDate;
             let endDate = this.searchFormItem.endDate;
-            if (startDate && startDate !== "" && (startDate instanceof Date)) {
+            if (startDate && startDate !== '' && (startDate instanceof Date)) {
                 reqData.startDate = startDate.getTime();
             }
-            if (endDate && endDate !== "" && (endDate instanceof Date)) {
+            if (endDate && endDate !== '' && (endDate instanceof Date)) {
                 reqData.endDate = endDate.getTime();
             }
             this.searching = true;
-            util.ajax.get("/sell/order/all/list", {params: reqData})
+            util.ajax.get('/sell/order/all/list', {params: reqData})
                 .then((response) => {
                     this.tabData = response.data.data;
                     this.totalCount = response.data.count;
@@ -293,28 +293,28 @@ export default {
                 });
             this.searching = false;
         },
-        showReviewDetail(orderId) {
+        showReviewDetail (orderId) {
             this.showOrderDetailView = true;
             this.showDetailViewId = orderId;
         },
-        showOrderDetailViewClose() {
+        showOrderDetailViewClose () {
             this.showOrderDetailView = false;
         },
-        pageChange(data) {
+        pageChange (data) {
             this.currentPage = data;
             this.refreshTableData();
         },
-        openShowShipDetailView(orderId, orderNumber) {
+        openShowShipDetailView (orderId, orderNumber) {
             this.shipOrderId = orderId;
             this.shipDetailTitle = '订单运输记录 ->' + orderNumber;
             this.showShipDetailView = true;
         },
-        ShowShipDetailViewClose() {
+        ShowShipDetailViewClose () {
             this.showShipDetailView = false;
         }
     }
-  
-}
+
+};
 </script>
 
 <style>

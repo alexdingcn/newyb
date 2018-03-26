@@ -1,9 +1,9 @@
 export default [
-    {name: '海门', value: 45},
-    {name: '鄂尔多斯', value: 34},
-    {name: '招远', value: 47},
+    {name: '珠海', value: 45},
+    {name: '郑州', value: 34},
+    {name: '宁波', value: 47},
     {name: '舟山', value: 22},
-    {name: '齐齐哈尔', value: 74},
+    {name: '温州', value: 74},
     {name: '广州', value: 138},
     {name: '盐城', value: 15},
     {name: '北京', value: 250},

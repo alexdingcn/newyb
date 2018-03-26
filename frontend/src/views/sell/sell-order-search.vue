@@ -75,9 +75,9 @@
 </template>
 
 <script>
-import util from "@/libs/util.js";
-import dataConver from "@/libs/data-conver.js";
-import customerSelect from "@/views/customer/customer-select.vue";
+import util from '@/libs/util.js';
+import dataConver from '@/libs/data-conver.js';
+import customerSelect from '@/views/customer/customer-select.vue';
 
 export default {
     name: 'sell-order-search',
@@ -93,7 +93,7 @@ export default {
     components: {
         customerSelect
     },
-    data() {
+    data () {
         return {
             isShowModal: false,
             formItem: {
@@ -102,7 +102,7 @@ export default {
                 refNo: '',
                 createOrderDate: ''
             },
-            salerList:[],
+            salerList: [],
             currentPage: 1,
             totalCount: 0,
             tableCurrPageSize: 10,
@@ -113,86 +113,86 @@ export default {
             tabColumns: [
                 {
                     title: '订单编号',
-                    key: "orderNumber",
-                    align: "center"
+                    key: 'orderNumber',
+                    align: 'center'
                 },
                 {
                     title: '客户名称',
-                    key: "customerName",
-                    align: "center",
+                    key: 'customerName',
+                    align: 'center',
                     sortable: true
                 },
                 {
                     title: '销售人员',
-                    key: "salerId",
-                    align: "center",
+                    key: 'salerId',
+                    align: 'center'
                 },
                 {
                     title: '自定单号',
-                    key: "refNo",
-                    align: "center"
+                    key: 'refNo',
+                    align: 'center'
                 },
                 {
                     title: '制单日期',
-                    key: "createOrderDate",
-                    align: "center",
+                    key: 'createOrderDate',
+                    align: 'center',
                     sortable: true,
                     render: (h, params) => {
                         let date = params.row.createOrderDate;
                         if (!date || isNaN(date)) {
                             return h('span', '');
-                        }else {
+                        } else {
                             return h('span', dataConver.formatDate(new Date(date), 'yyyy-MM-dd'));
                         }
                     }
                 },
                 {
                     title: '收款日期',
-                    key: "payOrderDate",
-                    align: "center",
+                    key: 'payOrderDate',
+                    align: 'center',
                     sortable: true,
                     render: (h, params) => {
                         let date = params.row.payOrderDate;
                         if (!date || isNaN(date)) {
                             return h('span', '');
-                        }else {
+                        } else {
                             return h('span', dataConver.formatDate(new Date(date), 'yyyy-MM-dd'));
                         }
                     }
                 }
             ]
-        }
+        };
     },
     watch: {
-        showModal(data) {
-            if(data) {
+        showModal (data) {
+            if (data) {
                 this.isShowModal = data;
                 this.initData();
             }
         },
-        currChooseItem(data) {
+        currChooseItem (data) {
             if (!data || data === null) {
                 this.currChooseShow = '';
-            }else {
+            } else {
                 this.currChooseShow = '订单编号=' + data.orderNumber;
             }
         }
     },
     methods: {
-        initData() {
+        initData () {
             this.getSalserList();
         },
-        getSalserList() {
-          util.ajax.get('/userrole/list', {params: {roleQuery: 'ROLE_SALER'}})
-            .then((response) => {
-                this.salerList = response.data;
-            })
-            .catch((error) => {
-                util.errorProcessor(this, error);
-            });
-      },
+        getSalserList () {
+            util.ajax.get('/userrole/list', {params: {roleQuery: 'ROLE_SALER'}})
+                .then((response) => {
+                    this.salerList = response.data;
+                })
+                .catch((error) => {
+                    util.errorProcessor(this, error);
+                });
+        },
 
-        searchBtnClicked() {
+        searchBtnClicked () {
             let reqData = {
                 customerId: this.formItem.customerId,
                 salerId: this.formItem.salerId,
@@ -203,9 +203,9 @@ export default {
             reqData.status = this.status;
             this.tableLoading = true;
             let searchDate = this.formItem.createOrderDate;
-            if ( searchDate === "" || !(searchDate instanceof Date)) {
+            if (searchDate === '' || !(searchDate instanceof Date)) {
                 reqData.createOrderDate = null;
-            }else {
+            } else {
                 reqData.createOrderDate = searchDate.getTime();
             }
             util.ajax.get('/sell/order/list', {params: reqData})
@@ -217,32 +217,32 @@ export default {
                 .catch((error) => {
                     util.errorProcessor(this, error);
                 }
-            );
+                );
             this.tableLoading = false;
         },
 
-        pageChange(data) {
+        pageChange (data) {
             this.currentPage = data;
             this.searchBtnClicked();
         },
 
-        tableRowClick(data) {
+        tableRowClick (data) {
             this.currChooseItem = data;
         },
 
-        ok() {
+        ok () {
             this.isShowModal = false;
             this.$emit('modal-close');
             this.$emit('choosed', this.currChooseItem);
         },
 
-        closedModal() {
+        closedModal () {
             this.isShowModal = false;
             this.$emit('modal-close');
         }
     }
-  
-}
+
+};
 </script>
 
 <style>

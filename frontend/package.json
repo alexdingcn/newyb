@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "init": "webpack --progress --config build/webpack.dev.config.js",
-    "dev": "webpack-dev-server --content-base ./ --open --inline --hot --compress --config build/webpack.dev.config.js",
+    "dev": "webpack-dev-server --content-base ./ --open --inline --hot --host 0.0.0.0 --compress --config build/webpack.dev.config.js",
     "build": "webpack --progress --hide-modules --config build/webpack.prod.config.js",
     "lint": "eslint --fix --ext .js,.vue src",
     "test": "npm run lint"
@@ -23,6 +23,7 @@
     "countup": "^1.8.2",
     "cropperjs": "^1.2.2",
     "echarts": "^3.8.5",
+    "es6-promise": "^4.2.4",
     "html2canvas": "^0.5.0-beta4",
     "iview": "^2.9.1",
     "iview-area": "^1.5.16",
@@ -82,7 +83,7 @@
     "vue-style-loader": "^3.0.3",
     "vue-template-compiler": "^2.5.13",
     "webpack": "^3.10.0",
-    "webpack-dev-server": "^2.10.1",
+    "webpack-dev-server": "^2.11.2",
     "webpack-merge": "^4.1.1",
     "webpack-uglify-parallel": "^0.1.4"
   }
