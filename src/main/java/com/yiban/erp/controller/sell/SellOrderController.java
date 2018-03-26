@@ -3,6 +3,8 @@ package com.yiban.erp.controller.sell;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.yiban.erp.dao.SellOrderMapper;
+import com.yiban.erp.dto.SellReviewAction;
+import com.yiban.erp.dto.SellReviewOrderQuery;
 import com.yiban.erp.entities.SellOrder;
 import com.yiban.erp.entities.SellOrderDetail;
 import com.yiban.erp.entities.SellOrderShip;
@@ -10,7 +12,6 @@ import com.yiban.erp.entities.User;
 import com.yiban.erp.exception.BizException;
 import com.yiban.erp.exception.ErrorCode;
 import com.yiban.erp.service.sell.SellOrderService;
-import com.yiban.erp.util.UtilTool;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,11 +50,13 @@ public class SellOrderController {
         Integer salerId = StringUtils.isBlank(reqSalerId) ? null : Integer.parseInt(reqSalerId);
         Integer page = StringUtils.isBlank(reqPage) ? 1 : Integer.parseInt(reqPage);
         Integer size = StringUtils.isBlank(reqSize) ? 10 : Integer.parseInt(reqSize);
+        String reqRefNo = StringUtils.isBlank(refNo) ? null : refNo.trim();
+        String reqStatus = StringUtils.isBlank(status) ? null : status;
         Date createOrderDate = StringUtils.isBlank(reqDate) ? null : new Date(Long.valueOf(reqDate));
-        List<SellOrder> sellOrders = sellOrderService.getList(user.getCompanyId(), customerId, salerId, refNo, status, createOrderDate, page, size);
+        List<SellOrder> sellOrders = sellOrderService.getList(user.getCompanyId(), customerId, salerId, reqRefNo, reqStatus, createOrderDate, page, size);
         JSONObject result = new JSONObject();
         if (!sellOrders.isEmpty()) {
-            Integer count = sellOrderMapper.getListCount(user.getCompanyId(), customerId, salerId, refNo, status, createOrderDate);
+            Integer count = sellOrderMapper.getListCount(user.getCompanyId(), customerId, salerId, reqRefNo, reqStatus, createOrderDate);
             result.put("count", count == null ? 0 : count);
             result.put("data", sellOrders);
         }else {
@@ -82,10 +85,35 @@ public class SellOrderController {
         return ResponseEntity.ok().body(JSON.toJSONString(result));
     }
 
+    @RequestMapping(value = "/order/remove/{id}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> orderRemove(@PathVariable Long id,
+                                              @AuthenticationPrincipal User user) throws Exception {
+        logger.info("user:{} request remove sell order, id:{}", user.getId(), id);
+        sellOrderService.removeSellOrder(user, id);
+        return ResponseEntity.ok().build();
+    }
+
     @RequestMapping(value = "/detail/list", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> detailList(@RequestParam("sellOrderId") Long sellOrderId) throws Exception {
         List<SellOrderDetail> details = sellOrderService.getDetailList(sellOrderId);
         return ResponseEntity.ok().body(JSON.toJSONString(details));
+    }
+
+    @RequestMapping(value = "/detail/history", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<JSON> getDetailHistory(HttpServletRequest request,
+                                                   @AuthenticationPrincipal User user) throws Exception {
+        String customerIdStr = request.getParameter("customerId");
+        String goodIdStr = request.getParameter("goodIds");
+        Integer customerId = null;
+        List<Long> goodIds = new ArrayList<>();
+        if (StringUtils.isNotBlank(customerIdStr)) {
+            customerId = Integer.parseInt(customerIdStr);
+        }
+        if (StringUtils.isNotBlank(goodIdStr)) {
+            goodIds = JSON.parseArray(goodIdStr, Long.class);
+        }
+        Map<Long, List<SellOrderDetail>> details = sellOrderService.getDetailHistory(user.getCompanyId(), customerId, goodIds);
+        return ResponseEntity.ok().body((JSON) JSON.toJSON(details));
     }
 
     @RequestMapping(value = "/detail/save", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -117,21 +145,45 @@ public class SellOrderController {
         return ResponseEntity.ok().body(result.toJSONString());
     }
 
-    @RequestMapping(value = "/order/review/submit", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> submitReview(@RequestBody String reqJson,
+    @RequestMapping(value = "/order/review/list", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> reviewOrderList(@RequestBody SellReviewOrderQuery query,
+                                                  @AuthenticationPrincipal User user) {
+        query.setCompanyId(user.getCompanyId());
+        List<SellOrder> result = sellOrderService.getReviewOrderList(query);
+        return ResponseEntity.ok().body(JSON.toJSONString(result));
+    }
+
+    @RequestMapping(value = "/order/review/ok", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> submitReview(@RequestBody SellReviewAction reviewAction,
                                                @AuthenticationPrincipal User user) throws Exception {
-        logger.info("user:{} submit sell order review, params:{}", user.getId(), reqJson);
-        JSONObject params = JSON.parseObject(reqJson);
-        String reviewType = params.getString("reviewType");
-        String idStr = params.getString("orderIdList");
-        List<Long> idList = JSON.parseArray(idStr, Long.class);
-        sellOrderService.submitOrderReview(user, reviewType, idList);
-        return ResponseEntity.ok().build();
+        logger.info("user:{} submit sell order review, params:{}", user.getId(), JSON.toJSONString(reviewAction));
+        Long sellOrderId = reviewAction.getSellOrderId();
+        if (sellOrderId == null) {
+            throw new BizException(ErrorCode.SELL_ORDER_DETAIL_GET_FAIL);
+        }
+        sellOrderService.reviewOrderOk(user, reviewAction);
+        //如果没有报错，则重新根据sellOrderId 获取详情列表
+        SellOrder order = sellOrderService.reviewDetail(sellOrderId);
+        return ResponseEntity.ok().body(JSON.toJSONString(order));
+    }
+
+    @RequestMapping(value = "/order/review/cancel", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> reviewCancel(@RequestBody SellReviewAction reviewAction,
+                                               @AuthenticationPrincipal User user) throws Exception {
+        logger.info("user:{} request cancel review options.", user.getId());
+        Long sellOrderId = reviewAction.getSellOrderId();
+        if (sellOrderId == null) {
+            throw new BizException(ErrorCode.SELL_ORDER_DETAIL_GET_FAIL);
+        }
+        sellOrderService.reviewCancel(user, reviewAction);
+        //如果没有报错，则重新根据sellOrderId 获取详情列表
+        SellOrder order = sellOrderService.reviewDetail(sellOrderId);
+        return ResponseEntity.ok().body(JSON.toJSONString(order));
     }
 
     @RequestMapping(value = "/order/review/detail", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> reviewDetail(@RequestParam("orderId") Long orderId) throws Exception {
-        SellOrder order = sellOrderService.reviewDetai(orderId);
+        SellOrder order = sellOrderService.reviewDetail(orderId);
         if (order == null) {
             logger.warn("get order detail fail by id:{}", orderId);
             throw new BizException(ErrorCode.SELL_ORDER_DETAIL_GET_FAIL);

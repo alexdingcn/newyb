@@ -6,6 +6,7 @@ import com.yiban.erp.dao.RepertoryInfoMapper;
 import com.yiban.erp.entities.Goods;
 import com.yiban.erp.entities.RepertoryInfo;
 import com.yiban.erp.entities.User;
+import com.yiban.erp.service.warehouse.RepertoryService;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -30,9 +32,7 @@ public class RepertoryController {
     private static final Logger logger = LoggerFactory.getLogger(RepertoryController.class);
 
     @Autowired
-    private RepertoryInfoMapper repertoryInfoMapper;
-    @Autowired
-    private GoodsMapper goodsMapper;
+    private RepertoryService repertoryService;
 
     @RequestMapping(value = "list", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> list(@AuthenticationPrincipal User user,
@@ -45,20 +45,19 @@ public class RepertoryController {
         Integer limit = size == null || size <= 0 ? 10 : size;
         Integer offset = (page == null || page <= 0) ? 0 : (page - 1) * limit;
         String search = StringUtils.isBlank(goodSearch) ? null: goodSearch.trim();
-        List<RepertoryInfo> list = repertoryInfoMapper.getDetailList(user.getCompanyId(), warehouseId, true,
-                goodId, search, factoryId, offset, limit);
+        Map<String, Object> requestMap = new HashMap<>();
+        requestMap.put("companyId", user.getCompanyId());
+        requestMap.put("warehouseId", warehouseId);
+        requestMap.put("saleEnable", true);
+        requestMap.put("goodId", goodId);
+        requestMap.put("goodSearch", search);
+        requestMap.put("factoryId", factoryId);
+        requestMap.put("offset", offset);
+        requestMap.put("limit", limit);
+        List<RepertoryInfo> list = repertoryService.getSearchList(requestMap);
         int count = 0;
         if (!list.isEmpty()) {
-            List<Long> goodIdList = new ArrayList<>();
-            list.stream().forEach(item -> goodIdList.add(item.getGoodId()));
-            List<Goods> goodsList = goodsMapper.selectByIdList(goodIdList);
-            Map<Long, List<Goods>> map = goodsList.stream().collect(Collectors.groupingBy(Goods::getId));
-            list.stream().forEach(item -> {
-                List<Goods> goodItem = map.get(item.getGoodId());
-                item.setGoods(goodItem != null ? goodItem.get(0) : null);
-            });
-            count = repertoryInfoMapper.getDetailListCount(user.getCompanyId(), warehouseId, true,
-                    goodId, search, factoryId);
+            count = repertoryService.getSearchCount(requestMap);
         }
         JSONObject result = new JSONObject();
         result.put("data", list);

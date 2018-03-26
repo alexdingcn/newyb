@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.yiban.erp.dao.RepertoryInfoMapper" >
   <resultMap id="BaseResultMap" type="com.yiban.erp.entities.RepertoryInfo" >
-    <id column="id" property="id" jdbcType="INTEGER" />
+    <id column="id" property="id" jdbcType="BIGINT" />
     <result column="warehouse_id" property="warehouseId" jdbcType="INTEGER" />
     <result column="good_id" property="goodId" jdbcType="BIGINT" />
     <result column="in_quantity" property="inQuantity" jdbcType="INTEGER" />
@@ -30,11 +30,11 @@
     select 
     <include refid="Base_Column_List" />
     from repertory_info
-    where id = #{id,jdbcType=INTEGER}
+    where id = #{id,jdbcType=BIGINT}
   </select>
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
     delete from repertory_info
-    where id = #{id,jdbcType=INTEGER}
+    where id = #{id,jdbcType=BIGINT}
   </delete>
   <insert id="insert" parameterType="com.yiban.erp.entities.RepertoryInfo" keyProperty="id" useGeneratedKeys="true">
     insert into repertory_info (id, warehouse_id, good_id, 
@@ -44,7 +44,7 @@
       exp_date, location, create_by, 
       create_time, update_by, update_time
       )
-    values (#{id,jdbcType=INTEGER}, #{warehouseId,jdbcType=INTEGER}, #{goodId,jdbcType=BIGINT}, 
+    values (#{id,jdbcType=BIGINT}, #{warehouseId,jdbcType=INTEGER}, #{goodId,jdbcType=BIGINT},
       #{inQuantity,jdbcType=INTEGER}, #{quantity,jdbcType=INTEGER}, #{buyPrice,jdbcType=DECIMAL}, 
       #{salePrice,jdbcType=DECIMAL}, #{code,jdbcType=VARCHAR}, #{batchCode,jdbcType=VARCHAR}, 
       #{isExp,jdbcType=TINYINT}, #{saleEnable,jdbcType=TINYINT}, #{productDate,jdbcType=DATE}, 
@@ -112,7 +112,7 @@
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides="," >
       <if test="id != null" >
-        #{id,jdbcType=INTEGER},
+        #{id,jdbcType=BIGINT},
       </if>
       <if test="warehouseId != null" >
         #{warehouseId,jdbcType=INTEGER},
@@ -222,7 +222,7 @@
         update_time = #{updateTime,jdbcType=TIMESTAMP},
       </if>
     </set>
-    where id = #{id,jdbcType=INTEGER}
+    where id = #{id,jdbcType=BIGINT}
   </update>
   <update id="updateByPrimaryKey" parameterType="com.yiban.erp.entities.RepertoryInfo" >
     update repertory_info
@@ -243,7 +243,7 @@
       create_time = #{createTime,jdbcType=TIMESTAMP},
       update_by = #{updateBy,jdbcType=VARCHAR},
       update_time = #{updateTime,jdbcType=TIMESTAMP}
-    where id = #{id,jdbcType=INTEGER}
+    where id = #{id,jdbcType=BIGINT}
   </update>
 
   <select id="getDetailList" parameterType="map" resultType="com.yiban.erp.entities.RepertoryInfo">
@@ -285,7 +285,6 @@
       count(1)
     from repertory_info r , warehouse w, goods g
     left join factory f on g.factory_id = f.id
-    left join unit u1 on g.unit = u1.id
     where r.warehouse_id = w.id and r.good_id = g.id
     and w.company_id = #{companyId}
     and r.warehouse_id = #{warehouseId}
@@ -305,12 +304,11 @@
     </if>
   </select>
 
-  <select id="getByWarehouseIdAndGoodIds" parameterType="map" resultMap="BaseResultMap">
+  <select id="getListByIdList" parameterType="map" resultMap="BaseResultMap">
     select <include refid="Base_Column_List"/>
     from repertory_info
-    where warehouse_id = #{warehouseId}
-    and good_id in
-    <foreach collection="goodIdList" item="item" separator="," open="(" close=")">
+    where id in
+    <foreach collection="idList" item="item" open="(" close=")" separator=",">
       #{item}
     </foreach>
   </select>

@@ -1,5 +1,6 @@
 package com.yiban.erp.dao;
 
+import com.yiban.erp.dto.SellReviewOrderQuery;
 import com.yiban.erp.entities.SellOrder;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -46,4 +47,5 @@ public interface SellOrderMapper {
 
     SellOrder getReviewDetailById(Long id);
 
+    List<SellOrder> getReviewOrderList(SellReviewOrderQuery query);
 }
