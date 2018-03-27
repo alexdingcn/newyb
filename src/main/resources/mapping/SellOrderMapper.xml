@@ -409,7 +409,7 @@
     limit #{offset}, #{limit};
   </select>
 
-  <select id="getAllCount" parameterType="map" resultType="java.lang.Integer">
+  <select id="getAllCount" parameterType="com.yiban.erp.dto.SellOrderAllAction" resultType="java.lang.Integer">
     select count(1)
     from sell_order s
     where s.company_id = #{companyId} and s.status != 'DELETE'
@@ -434,7 +434,7 @@
     </if>
   </select>
 
-  <select id="getAllList" parameterType="map" resultMap="ListMap">
+  <select id="getAllList" parameterType="com.yiban.erp.dto.SellOrderAllAction" resultMap="ListMap">
     select <include refid="ListColumn" />
     from sell_order s, customer c, customer_rep r, warehouse w
     where s.customer_id = c.id and s.customer_rep_id = r.id and s.warehouse_id = w.id
