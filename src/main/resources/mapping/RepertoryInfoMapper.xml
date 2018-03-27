@@ -313,4 +313,21 @@
     </foreach>
   </select>
 
+  <select id="getGoodNameWithLessQuantity" parameterType="java.lang.Long" resultType="java.lang.String">
+    select
+      g.`name` as goodName
+    from sell_order_detail d, repertory_info r, goods g
+    where d.repertory_id = r.id and r.good_id = g.id
+    and (r.quantity - d.quantity &lt; 0)
+    and d.sell_order_id = #{sellOrderId};
+  </select>
+
+  <update id="sellOrderConsumeQuantity" parameterType="map" >
+    update sell_order_detail d, repertory_info r
+      set r.quantity = (r.quantity - d.quantity),
+          r.update_time = #{updateTime},
+          r.update_by = #{updateBy}
+    where d.repertory_id = r.id and d.sell_order_id = #{sellOrderId}
+  </update>
+
 </mapper>

@@ -24,10 +24,11 @@
                 </Row>
             </Form>
 
-            <Row type="flex" justify="center" align="middle" class="margin-top-20">
+            <Row type="flex" justify="center" align="middle" class="margin-top-10">
                 <Table border highlight-row :columns="tabColumns" :data="tabData" 
-                    :loading="tableLoading" height="340" 
+                    :loading="tableLoading" height="300" 
                     @on-selection-change="tabSelectChange" 
+                    no-data-text="点击上方查询按钮查询对应数据"
                     ref="goodSearchTable" style="width: 100%;" size="small">
                 </Table>
             </Row>
@@ -62,7 +63,7 @@ import moment from 'moment';
 import factorySelect from "@/views/factory/factory-select.vue";
 
 export default {
-  name: 'good-search',
+  name: 'sell-good-search',
   components: {
       factorySelect
   },
@@ -221,6 +222,8 @@ export default {
           return dataConver.formatDate(new Date(data), 'yyyy-MM-dd');
         },
       initData() {
+          this.totalCount = 0;
+          this.tabData = [];
       },
       searchBtnClicked() {
           let reqData = {

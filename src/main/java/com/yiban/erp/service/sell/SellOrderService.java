@@ -2,7 +2,6 @@ package com.yiban.erp.service.sell;
 
 import com.alibaba.fastjson.JSON;
 import com.yiban.erp.constant.SellOrderStatus;
-import com.yiban.erp.constant.SellReviewType;
 import com.yiban.erp.dao.*;
 import com.yiban.erp.dto.SellReviewAction;
 import com.yiban.erp.dto.SellReviewOrderQuery;
@@ -13,14 +12,12 @@ import com.yiban.erp.exception.ErrorCode;
 import com.yiban.erp.service.warehouse.RepertoryService;
 import com.yiban.erp.util.UtilTool;
 import org.apache.commons.lang3.RandomStringUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 public class SellOrderService {
@@ -36,11 +33,11 @@ public class SellOrderService {
     @Autowired
     private SellOrderShipMapper sellOrderShipMapper;
     @Autowired
-    private SellReviewOptionMapper sellReviewOptionMapper;
-    @Autowired
     private CustomerMapper customerMapper;
     @Autowired
     private GoodsMapper goodsMapper;
+    @Autowired
+    private RepertoryInfoMapper repertoryInfoMapper;
 
     public List<SellOrder> getList(Integer companyId, Integer customerId, Integer salerId,
                                             String refNo, String status, Date createOrderDate, Integer page, Integer size) {
@@ -49,29 +46,62 @@ public class SellOrderService {
         return sellOrderMapper.getList(companyId, customerId, salerId, refNo, status,createOrderDate, limit, offset);
     }
 
-    public SellOrder orderAdd(User user, SellOrder sellOrder) throws BizException{
-        SellOrder reqOrder = UtilTool.trimString(sellOrder);
-        reqOrder.setCompanyId(user.getCompanyId());
-        if (!validateSellOrder(reqOrder)) {
-            logger.warn("user:{} add order but reqOrder can not validate.", user.getId());
+    public SellOrder orderSave(User user, SellOrder sellOrder) throws BizException {
+        if (!validateSellOrder(sellOrder)) {
+            logger.warn("user:{} save order but order validate is error.", user.getId());
             throw new BizException(ErrorCode.SELL_ORDER_PARAM_ERROR);
         }
-        String orderNumber = getOrderNumber(user);
-        logger.info("begin create an sell order by user:{} orderNumber:{}", user.getId(), orderNumber);
-        reqOrder.setOrderNumber(orderNumber);
-        reqOrder.setStatus(SellOrderStatus.INIT.name());
-        reqOrder.setCreateBy(user.getNickname());
-        reqOrder.setCreateTime(new Date());
-
-        int count = sellOrderMapper.insertSelective(reqOrder);
-        if (count > 0 && reqOrder.getId() > 0) {
-            logger.info("user:{} success create add sell order:{}", user.getId(), reqOrder.getId());
-            return reqOrder;
-        }else {
-            logger.warn("orderNumber:{} sell order insert database fail.", orderNumber);
-            throw new BizRuntimeException(ErrorCode.FAILED_INSERT_FROM_DB);
+        List<SellOrderDetail> details = sellOrder.getDetails();
+        //验证客户是否允许经营特殊管理药品
+        List<Long> goodIdList = new ArrayList<>();
+        details.stream().forEach(item -> goodIdList.add(item.getGoodId()));
+        if(!isCustomerCanSellGoods(sellOrder.getCustomerId(), goodIdList)) {
+            logger.warn("user: {} save sell order detail good have special managed but customer:{} can not shell.", user.getId(), sellOrder.getCustomerId());
+            throw new BizException(ErrorCode.SELL_ORDER_CUSTOMER_CANNOT_SELL_GOOD);
         }
+
+        if (sellOrder.getId() == null) {
+            logger.info("new sell order save.");
+            String orderNumber = getOrderNumber(user);
+            sellOrder.setCompanyId(user.getCompanyId());
+            sellOrder.setOrderNumber(orderNumber);
+            sellOrder.setCreateBy(user.getNickname());
+            sellOrder.setCreateTime(new Date());
+            int count = sellOrderMapper.insertSelective(sellOrder);
+            if (count > 0 && sellOrder.getId() > 0) {
+                //保存详情信息
+                details.stream().forEach(item -> {
+                    item.setSellOrderId(sellOrder.getId());
+                    item.setCreateBy(user.getNickname());
+                    item.setCreateTime(new Date());
+                    item.setUpdateBy(user.getNickname());
+                    item.setUpdateTime(new Date());
+                });
+                sellOrderDetailMapper.replaceBatch(details);
+            }
+        }else {
+            sellOrder.setUpdateTime(new Date());
+            sellOrder.setUpdateBy(user.getNickname());
+            int count = sellOrderMapper.updateByPrimaryKeySelective(sellOrder);
+            details.stream().forEach(item -> {
+                item.setUpdateBy(user.getNickname());
+                item.setUpdateTime(new Date());
+                item.setSellOrderId(sellOrder.getId());
+                if (item.getCreateBy() == null) {
+                    item.setCreateBy(user.getNickname());
+                    item.setCreateTime(new Date());
+                }
+            });
+            sellOrderDetailMapper.replaceBatch(details);
+        }
+        logger.info("user:{} save order info success.", user.getId());
+        SellOrder afterOrder = sellOrderMapper.selectByPrimaryKey(sellOrder.getId());
+        List<SellOrderDetail> resultdetails = getDetailList(sellOrder.getId());
+        afterOrder.setDetails(resultdetails);
+        return afterOrder;
     }
+
+
 
     /**
      * 生成一个销售订单号, 格式如下
@@ -85,30 +115,6 @@ public class SellOrderService {
         orderNo.append(UtilTool.DateFormat(new Date(), "yyyyMMddHHmmss"));
         orderNo.append(RandomStringUtils.randomNumeric(4));
         return orderNo.toString();
-    }
-
-    public SellOrder orderUpdate(User user, SellOrder sellOrder) throws BizException {
-        SellOrder reqOrder = UtilTool.trimString(sellOrder);
-        if (!validateSellOrder(reqOrder)) {
-            logger.warn("user:{} request update sell order but params error.", user.getId());
-            throw new BizException(ErrorCode.SELL_ORDER_PARAM_ERROR);
-        }
-        if (reqOrder.getId() == null) {
-            logger.warn("user:{} update sell order by id is null.", user.getId());
-            throw new BizException(ErrorCode.SELL_ORDER_PARAM_ERROR);
-        }
-        logger.info("user:{} begin update sell order:{}", user.getId(), reqOrder.getId());
-        reqOrder.setUpdateBy(user.getNickname());
-        reqOrder.setUpdateTime(new Date());
-        reqOrder.setStatus(null); //当前修改方法不对状态进行修改
-        int count = sellOrderMapper.updateByPrimaryKeySelective(reqOrder);
-        if (count > 0) {
-            logger.info("user:{} update sell order:{} success.", user.getId(), reqOrder.getId());
-            return reqOrder;
-        }else {
-            logger.warn("user:{} sell order:{} update database fail.", user.getId(), reqOrder.getId());
-            throw new BizRuntimeException(ErrorCode.FAILED_UPDATE_FROM_DB);
-        }
     }
 
     private boolean validateSellOrder(SellOrder order) {
@@ -128,11 +134,25 @@ public class SellOrderService {
             logger.warn("saler id is null.");
             return false;
         }
+        if (order.getWarehouseId() == null) {
+            logger.warn("warehouse id is null");
+            return false;
+        }
+        if (order.getDetails() == null || order.getDetails().isEmpty()) {
+            logger.warn("good detail is null.");
+            return false;
+        }
         return true;
     }
 
     public int removeSellOrder(User user, Long id) throws BizException {
         logger.info("user:{} remove sell order id:{}, set to delete status.", user.getId(), id);
+        //验证是否存在质量审核通过的商品，如果存在，不能删除
+        List<Long> checkOkDetailIds = sellOrderDetailMapper.getCheckOkDetailIdList(id);
+        if (checkOkDetailIds != null && !checkOkDetailIds.isEmpty()) {
+            logger.warn("user:{} remove sell order but have quality check ok detail:{}", user.getId(), JSON.toJSONString(checkOkDetailIds));
+            throw new BizException(ErrorCode.SELL_ORDER_REMOVE_HAVE_OK_DETAIL);
+        }
         SellOrder order = new SellOrder();
         order.setId(id);
         order.setStatus(SellOrderStatus.DELETE.name());
@@ -195,35 +215,6 @@ public class SellOrderService {
         return result;
     }
 
-    public int detailSave(final User user, final List<SellOrderDetail> details) throws BizException {
-        int count = 0;
-        //获取订单信息，去第一个
-        SellOrder sellOrder = sellOrderMapper.selectByPrimaryKey(details.get(0).getSellOrderId());
-        if (sellOrder == null || !SellOrderStatus.INIT.name().equalsIgnoreCase(sellOrder.getStatus())) {
-            logger.warn("user:{} save sell order detail but sell order is not init status. sell id:{}",
-                    user.getId(), details.get(0).getSellOrderId());
-            throw new BizException(ErrorCode.SELL_ORDER_DETAIL_CAN_NOT_UPDATE);
-        }
-        //验证客户是否允许经营特殊管理药品
-        List<Long> goodIds = new ArrayList<>();
-        details.stream().forEach(item -> goodIds.add(item.getGoodId()));
-        if(!isCustomerCanSellGoods(sellOrder.getCustomerId(), goodIds)) {
-            logger.warn("user: {} save sell order detail good have special managed but customer:{} can not shell.", user.getId(), sellOrder.getCustomerId());
-            throw new BizException(ErrorCode.SELL_ORDER_CUSTOMER_CANNOT_SELL_GOOD);
-        }
-        for (SellOrderDetail detail : details) {
-            try {
-                int result = saveOneDetail(user, detail);
-                if (result > 0) {
-                    logger.info("user:{} success save one sell order detail record.", user.getId());
-                    count ++; //保存成功的笔数
-                }
-            }catch (Exception e) {
-                logger.error("user:{} save sell order detail have exception", user.getId(), e);
-            }
-        }
-        return count;
-    }
 
     public boolean isCustomerCanSellGoods(Integer customerId, List<Long> goodIds) throws BizException {
         Customer customer = customerMapper.selectByPrimaryKey(customerId);
@@ -243,33 +234,6 @@ public class SellOrderService {
         return true;
     }
 
-    private int saveOneDetail(User user, SellOrderDetail detail) {
-        if (detail == null) {
-            return -1;
-        }
-        Long repertoryId = detail.getRepertoryId();
-        Long orderId = detail.getSellOrderId();
-        if (repertoryId == null) {
-            logger.warn("user:{} save sell order detail but good id is null.", user.getId());
-            return -1;
-        }
-        if (orderId == null) {
-            logger.warn("user:{} save sell order detail but order id is null.", user.getId());
-            return -1;
-        }
-        if (detail.getId() != null && detail.getId() > 0) {
-            logger.info("user:{} save sell order detail is update id:{}", user.getId(), detail.getId());
-            detail.setUpdateBy(user.getNickname());
-            detail.setUpdateTime(new Date());
-            return sellOrderDetailMapper.updateByPrimaryKeySelective(detail);
-        }else {
-            logger.info("user:{} save sell order detail is add", user.getId());
-            detail.setCreateBy(user.getNickname());
-            detail.setCreateTime(new Date());
-            return sellOrderDetailMapper.insertSelective(detail);
-        }
-    }
-
     public int removeSellOrderDetail(User user, Long detailId) throws BizException{
         if (detailId == null || detailId <= 0) {
             return 0;
@@ -281,12 +245,11 @@ public class SellOrderService {
         }
         //验证是否初始状态，如果审批过了，不能进行删除
         SellOrder sellOrder = sellOrderMapper.selectByPrimaryKey(detail.getSellOrderId());
-        if (sellOrder == null || !SellOrderStatus.INIT.name().equalsIgnoreCase(sellOrder.getStatus())) {
+        if (sellOrder == null || !SellOrderStatus.TEMP_STORAGE.name().equalsIgnoreCase(sellOrder.getStatus())) {
             logger.warn("user:{} remove sell order detail but sell order is null or status is not init. id:{}", user.getId(), detailId);
             throw new BizException(ErrorCode.SELL_ORDER_DETAIL_CAN_NOT_REMOVE);
         }
         logger.info("user:{} request to remove sell order detail by id:{}", user.getId(), detailId);
-        sellReviewOptionMapper.deleteByDetailIdList(Arrays.asList(detailId), null); // 如果有审批意见的话，先删除
         return sellOrderDetailMapper.deleteByPrimaryKey(detailId);
     }
 
@@ -297,8 +260,8 @@ public class SellOrderService {
         return sellOrderMapper.getReviewOrderList(query);
     }
 
-    public void reviewOrderOk(User user, SellReviewAction reviewAction) throws BizException {
-        if (reviewAction == null || StringUtils.isBlank(reviewAction.getReviewType())) {
+    public void qualityCheck(User user, SellReviewAction reviewAction) throws BizException {
+        if (reviewAction == null) {
             logger.warn("submit order review info but params is null.");
             throw new BizException(ErrorCode.SELL_ORDER_REVIEW_SUBMIT_PARAMS);
         }
@@ -313,61 +276,25 @@ public class SellOrderService {
             logger.warn("review order but can not get order by id:{}", sellOrderId);
             throw new BizException(ErrorCode.SELL_ORDER_DETAIL_GET_FAIL);
         }
-        List<SellReviewOption> options = sellReviewOptionMapper.getByDetailIdList(detailIdList, reviewAction.getReviewType());
-        Map<Long, SellReviewOption> oldOptionMap = new HashMap<>();
-        if (options != null && !options.isEmpty()) {
-            options.stream().forEach(item -> oldOptionMap.put(item.getSellDetailId(), item));
-        }
-        List<SellReviewOption> newReviewRecordList = new ArrayList<>();
-        for (Long detailId : detailIdList) {
-            if (oldOptionMap.containsKey(detailId)) {
-                SellReviewOption option = oldOptionMap.get(detailId);
-                option.setReviewStatus("OK");
-                option.setReviewComment(reviewAction.getReviewComment());
-                option.setUpdateBy(user.getNickname());
-                option.setUpdateTime(new Date());
-                newReviewRecordList.add(option);
-            }else {
-                SellReviewOption option = new SellReviewOption();
-                option.setSellDetailId(detailId);
-                option.setReviewType(reviewAction.getReviewType());
-                option.setReviewStatus("OK");
-                option.setReviewComment(reviewAction.getReviewComment());
-                option.setCreateBy(user.getNickname());
-                option.setCreateTime(new Date());
-                option.setUpdateBy(user.getNickname());
-                option.setUpdateTime(new Date());
-                newReviewRecordList.add(option);
-            }
-        }
-        sellReviewOptionMapper.replace(newReviewRecordList);
-        List<Long> uncheckIds = sellReviewOptionMapper.getUnCheckDetailIdList(sellOrderId, reviewAction.getReviewType());
+        reviewAction.setCheckUser(user.getNickname());
+        reviewAction.setCheckDate(new Date());
+        sellOrderDetailMapper.updateCheckResult(detailIdList, reviewAction, new Date(), user.getNickname());
+
+        List<Long> uncheckIds = sellOrderDetailMapper.getUnCheckDetailIdList(sellOrderId);
         if (!uncheckIds.isEmpty()) {
             logger.debug("have uncheck detail: {}", JSON.toJSONString(uncheckIds));
             return;
         }
-        //如果完成了，相应修改订单的状态
-        if (SellReviewType.QUALITY_REVIEW.name().equalsIgnoreCase(reviewAction.getReviewType())) {
-            //出库质量审核
-            logger.info("sell order:{} have check quality review ok", sellOrderId);
-            sellOrder.setStatus(SellOrderStatus.QUALITY_CHECKED.name());
-            sellOrder.setUpdateBy(user.getNickname());
-            sellOrder.setUpdateTime(new Date());
-            sellOrderMapper.updateByPrimaryKeySelective(sellOrder);
-        }else if (SellReviewType.SALE_REVIEW.name().equalsIgnoreCase(reviewAction.getReviewType())){
-            //销售审核
-            logger.info("sell order:{} have check sale review ok", sellOrderId);
-            sellOrder.setStatus(SellOrderStatus.SALE_CHECKED.name());
-            sellOrder.setUpdateBy(user.getNickname());
-            sellOrder.setUpdateTime(new Date());
-            sellOrderMapper.updateByPrimaryKeySelective(sellOrder);
-        }
-
-        //TODO 如果是销售审核通过了，需要对库存进行减去
+        //如果完成了，相应修改订单的状态, 出库质量审核
+        logger.info("sell order:{} have check quality review ok", sellOrderId);
+        sellOrder.setStatus(SellOrderStatus.QUALITY_CHECKED.name());
+        sellOrder.setUpdateBy(user.getNickname());
+        sellOrder.setUpdateTime(new Date());
+        sellOrderMapper.updateByPrimaryKeySelective(sellOrder);
     }
 
-    public int reviewCancel(User user, SellReviewAction action) throws BizException {
-        if (action == null || action.getDetailList() == null || StringUtils.isBlank(action.getReviewType())) {
+    public int qualityCheckCancel(User user, SellReviewAction action) throws BizException {
+        if (action == null || action.getDetailList() == null) {
             logger.warn("user:{} review cancel but params error.", user.getId());
             throw new BizException(ErrorCode.SELL_ORDER_REVIEW_SUBMIT_PARAMS);
         }
@@ -377,20 +304,63 @@ public class SellOrderService {
             logger.warn("user:{} review cancel but sell order not found by id:{}", user.getId(), sellOrderId);
             throw new BizException(ErrorCode.SELL_ORDER_DETAIL_GET_FAIL);
         }
+        if (!SellOrderStatus.INIT.name().equalsIgnoreCase(sellOrder.getStatus())
+                && !SellOrderStatus.QUALITY_CHECKED.name().equalsIgnoreCase(sellOrder.getStatus())) {
+            logger.warn("current order status is can not cancel check order id:{}", sellOrderId);
+            throw new BizException(ErrorCode.SELL_ORDER_REVIEW_STATUS_ERROR);
+        }
         //直接根据detailId和type进行删除审批记录信息
         List<Long> detailIdList = action.getDetailIdList();
-        int count = sellReviewOptionMapper.deleteByDetailIdList(detailIdList, action.getReviewType());
+        action.setCheckStatus(null);
+        action.setCheckResult(null);
+        action.setCheckDate(null);
+        action.setCheckUser(null);
+        int count = sellOrderDetailMapper.updateCheckResult(detailIdList, action, new Date(), user.getNickname());
         //如果order的状态是已经审批完成的，改回上一级状态
         if (SellOrderStatus.QUALITY_CHECKED.name().equalsIgnoreCase(sellOrder.getStatus())) {
             sellOrder.setStatus(SellOrderStatus.INIT.name());
             sellOrderMapper.updateByPrimaryKeySelective(sellOrder);
-        }else if (SellOrderStatus.SALE_CHECKED.name().equalsIgnoreCase(sellOrder.getStatus())) {
-            sellOrder.setStatus(SellOrderStatus.QUALITY_CHECKED.name());
-            sellOrderMapper.updateByPrimaryKeySelective(sellOrder);
-
-            //TODO 如果是销售审核撤销了，需要对库存量加回去
         }
         return count;
+    }
+
+    public void sellOrderCheckOk(User user, Long sellOrderId) throws BizException {
+        if (sellOrderId == null) {
+            logger.warn("user:{} check sell order sale but id is null", user.getId());
+            throw new BizException(ErrorCode.SELL_ORDER_DETAIL_GET_FAIL);
+        }
+        SellOrder order = sellOrderMapper.selectByPrimaryKey(sellOrderId);
+        if (order == null) {
+            logger.warn("user:{} check sell order sale but get order result is null", user.getId());
+            throw new BizException(ErrorCode.SELL_ORDER_DETAIL_GET_FAIL);
+        }
+        //验证订单状态是否为质检通过的状态，如果不是，不能进行审批
+        if (!SellOrderStatus.QUALITY_CHECKED.name().equalsIgnoreCase(order.getStatus())) {
+            logger.warn("user:{} check sell order but order status is not QUALITY_CHECKED, order id:{}", user.getId(), sellOrderId);
+            throw new BizException(ErrorCode.SELL_ORDER_SALE_CHECK_STATUS_ERROR);
+        }
+        //验证订单的质量检查是否都已经全部通过，只有全部通过，才能进行审核通过
+        List<Long> detailIds = sellOrderDetailMapper.getUnCheckDetailIdList(sellOrderId);
+        if (detailIds != null && !detailIds.isEmpty()) {
+            logger.warn("user:{} check sell order but have quality check un ok.", user.getId());
+            throw new BizException(ErrorCode.SELL_ORDER_CHECK_SALE_HAVE_UNOK_DETAIL);
+        }
+
+        //先减去库存数据，如果库存不足，不能审批通过
+        //获取库存不足的产品名称
+        List<String> goodNameList = repertoryInfoMapper.getGoodNameWithLessQuantity(sellOrderId);
+        if (goodNameList != null && !goodNameList.isEmpty()) {
+            logger.error("user:{} check sell order:{} but repertory quantity is less then order quantity.", user.getId(), sellOrderId);
+            throw new BizException(ErrorCode.SELL_ORDER_QUANTITY_NOT_ENOUGH, goodNameList);
+        }
+        logger.info("user:{} check sell order and repertory enough quantity. orderId: {}", user.getId(), sellOrderId);
+        //减库存
+        int count = repertoryInfoMapper.sellOrderConsumeQuantity(sellOrderId, user.getNickname(), new Date());
+        logger.info("user:{} consume repertory quantity update record success count:{}, orderId:{}", user.getId(), count, sellOrderId);
+        order.setStatus(SellOrderStatus.SALE_CHECKED.name());
+        order.setUpdateBy(user.getNickname());
+        order.setUpdateTime(new Date());
+        sellOrderMapper.updateByPrimaryKeySelective(order);
     }
 
     public SellOrder reviewDetail(Long orderId) {
@@ -399,26 +369,9 @@ public class SellOrderService {
             return null;
         }
         List<SellOrderDetail> details = getDetailList(orderId);
-        //设置每一笔销售产品的审批意见信息
-        setSellOrderDetailReviewOptions(details);
         order.setDetails(details);
         return order;
     }
-
-    public void setSellOrderDetailReviewOptions(List<SellOrderDetail> details) {
-        if (details == null || details.isEmpty()) {
-            return;
-        }
-        List<Long> detailIdList = new ArrayList<>();
-        details.stream().forEach(item -> detailIdList.add(item.getId()));
-        List<SellReviewOption> options = sellReviewOptionMapper.getByDetailIdList(detailIdList, null);
-        if (options != null && !options.isEmpty()) {
-            Map<Long, List<SellReviewOption>> optionMap = options.stream()
-                    .collect(Collectors.groupingBy(SellReviewOption::getSellDetailId));
-            details.stream().forEach(item -> item.setReviewOptions(optionMap.get(item.getId())));
-        }
-    }
-
 
     public List<SellOrderShip> getOrderShipRecords(Long orderId) {
         if (orderId == null || orderId <= 0) {

@@ -4,6 +4,7 @@ import com.yiban.erp.entities.RepertoryInfo;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -26,4 +27,11 @@ public interface RepertoryInfoMapper {
     List<RepertoryInfo> getDetailList(Map<String, Object> paramMap);
 
     List<RepertoryInfo> getListByIdList(@Param("idList") List<Long> repertoryIdList);
+
+    List<String> getGoodNameWithLessQuantity(Long sellOrderId);
+
+    //减库存
+    int sellOrderConsumeQuantity(@Param("sellOrderId") Long sellOrderId,
+                                 @Param("updateBy") String updateBy,
+                                 @Param("updateTime") Date updateTime);
 }

@@ -11,11 +11,10 @@
                 销售订单制单
             </p> 
             <ButtonGroup slot="extra" size="small">
-                <Button type="success" icon="ios-checkmark" :loading="sellOrderSaveBtnLoading" @click="sellOrderSaveBtnClick"> 保存 </Button>
-                <Button type="info" icon="filing" @click="getOldSellOrderBtnClick"> 修改提取 </Button>
+                <Button type="success" icon="ios-checkmark" :loading="sellOrderSaveLoading" @click="sellOrderSaveBtnClick"> 保存 </Button>
+                <Button icon="bookmark" :loading="sellOrderSaveLoading" @click="tempStorageOrderBtnClick"> 暂挂 </Button>
+                <Button type="info" icon="filing" @click="getOldSellOrderBtnClick"> 暂挂提取 </Button>
                 <Button type="ghost" icon="ios-printer">打印</Button>
-                <Button type="error" icon="trash-a" :disabled="!editeOnlyDisable" 
-                  :loading="removeSellOrderLoading" @click="removeSellOrderClick">删除订单</Button>
             </ButtonGroup>
 
             <Row type="flex" justify="center">
@@ -139,7 +138,7 @@
                     <Row type="flex" justify="center">
                         <Col span="8">
                             <FormItem label="仓库点" prop="warehouseId">
-                                <Select v-model="sellOrderFormData.warehouseId" filterable clearable 
+                                <Select v-model="sellOrderFormData.warehouseId" filterable clearable :disabled="warehouseDisable"
                                     placeholder="请选择仓库点" >
                                     <Option v-for="item in warehouseList" :value="item.id" :key="item.id">{{ item.name }}</Option>
                                 </Select>
@@ -157,9 +156,7 @@
                 <TabPane label="商品信息" name="goodInfo">
                     <Row type="flex" justify="start">
                         <ButtonGroup size="small">
-                            <Button type="primary" :disabled="!editeOnlyDisable" @click="addGoodBtnClick">添加商品</Button>
-                            <Button type="success" :disabled="!editeOnlyDisable" :loading="saveGoodBtnLoading" @click="saveGoodBtnClick">保存数据</Button>
-                            <Button type="ghost" :disabled="!editeOnlyDisable" :loading="saveGoodBtnLoading" @click="refreshGoodBtnClick">刷新数据</Button>
+                            <Button type="primary"  @click="addGoodBtnClick">添加商品</Button>
                         </ButtonGroup>
                     </Row>
                     <Table border highlight-row :loading="saveGoodBtnLoading" 
@@ -180,17 +177,17 @@
 
         <sell-order-search 
             :showModal="sellOrderSearchModal" 
-            status="INIT" 
+            status="TEMP_STORAGE" 
             @modal-close="orderSearchModalClose"
             @choosed="orderSearchChoosed">
         </sell-order-search>
 
-        <good-search 
+        <sell-good-search 
             :showModal="goodSearchModal" 
             :warehouse="chooseWarehouse" 
             @modal-close="goodSearchModalClose" 
             @choosed="goodSearchChoosed">
-        </good-search>
+        </sell-good-search>
 
         <Modal v-model="goodHistoryModal" width="75" :mask-closable="false" title="商品销售历史价格">
             <sell-good-history :excludedOrderId="historyExcludeId" :detailList="historyDetails"></sell-good-history>
@@ -206,7 +203,7 @@ import moment from 'moment';
 import dataConver from "@/libs/data-conver.js";
 import customerSelect from "@/views/customer/customer-select.vue";
 import sellOrderSearch from "@/views/sell/sell-order-search.vue";
-import goodSearch from "@/views/good/good-search.vue";
+import sellGoodSearch from "@/views/sell/sell-good-search.vue";
 import goodExpand from "@/views/good/good-expand.vue";
 import sellGoodHistory from "./sell-good-history.vue";
 
@@ -215,7 +212,7 @@ export default {
   components: {
     customerSelect,
     sellOrderSearch,
-    goodSearch,
+    sellGoodSearch,
     goodExpand,
     sellGoodHistory
   },
@@ -248,7 +245,8 @@ export default {
         payAmount: 0,
         notSmallAmount: 0,
         warehouseId: "",
-        comment: ""
+        comment: "",
+        details: ''
       },
       sellOrderFormValidate: {
         customerId: [
@@ -290,12 +288,13 @@ export default {
           }
         ]
       },
-      sellOrderSaveBtnLoading: false,
+      sellOrderSaveLoading: false,
       removeSellOrderLoading: false,
       sellOrderSearchModal: false,
       chooseWarehouse: {},
       goodSearchModal: false,
       saveGoodBtnLoading: false,
+      warehouseDisable: false,
       goodTableData: [],
       goodTableColumn: [
         {
@@ -477,6 +476,7 @@ export default {
   watch: {
     goodTableData(data) {
       if (data && data.length > 0) {
+        this.warehouseDisable = true;
         this.totalQuantity = data.reduce((count, item) => {
           if (item.quantity && !isNaN(item.quantity)) {
             return count + parseInt(item.quantity);
@@ -487,6 +487,10 @@ export default {
             return total + parseFloat(item.amount);
           }
         }, 0);
+      }else {
+        this.warehouseDisable = false;
+        this.totalQuantity = 0;
+        this.totalAmount = 0;
       }
     }
   },
@@ -610,6 +614,86 @@ export default {
         this.sellOrderFormData.repertoryAddress = "";
       }
     },
+    tempStorageOrderBtnClick() {
+      //暂存订单信息
+      this.$refs.sellOrderForm.validate(valid => {
+        if(!valid) {
+          this.$Message.warning('必输信息需要输入');
+          return;
+        }
+        if (!this.goodTableData || this.goodTableData.length <= 0) {
+          this.$Message.warning('需要添加商品');
+          return;
+        }
+        let saleGoodVidate = this.customerCanSaleGoodValidate();
+        if (!saleGoodVidate) {
+          return; //客户不能经营特殊管理产品
+        }
+        //两步资料完整，可以直接保存
+        this.saveSellOrder('TEMP_STORAGE');
+      });
+    },
+    saveSellOrder(status) {
+      this.sellOrderSaveLoading = true;
+      this.sellOrderFormData.status = status;
+      this.sellOrderFormData.details = this.goodTableData;
+      util.ajax.post("/sell/order/save", this.sellOrderFormData)
+        .then((response) => {
+          this.sellOrderSaveLoading = false;
+          this.$Message.success('操作成功');
+          this.orderFormChangeToAddModel(); //转化到初始状态
+        })
+        .catch((error) => {
+          this.sellOrderSaveLoading = false;
+          util.errorProcessor(this, error);
+        })
+    },
+
+    sellOrderSaveBtnClick() {
+      //保存订单信息
+      this.$refs.sellOrderForm.validate(valid => {
+        if(!valid) {
+          this.$Message.warning('必输信息需要输入');
+          return;
+        }
+        if (!this.goodTableData || this.goodTableData.length <= 0) {
+          this.$$Message.warning('需要添加商品');
+          return;
+        }
+        let saleGoodVidate = this.customerCanSaleGoodValidate();
+        if (!saleGoodVidate) {
+          return; //客户不能经营特殊管理产品
+        }
+        this.$Modal.confirm({
+          title: '保存提交确认',
+          content: '确认数据是否完整正确，提交后不能修改.',
+          onOk: () => {
+            this.saveSellOrder('INIT');
+          },
+          onCancel: () => {
+          }
+        })
+      });
+    },
+
+    customerCanSaleGoodValidate() {
+      //检查客户是否是可经营特殊管控的商品的，如果不是，需要检查选择的商品列表中是否存在特殊管控的商品
+      if (!this.currChooseCustomer || !this.currChooseCustomer.canSaleSpecial) {
+        for (let i=0; i<this.goodTableData.length; i++) {
+          let goodItem = this.goodTableData[i].repertoryInfo ? this.goodTableData[i].repertoryInfo.goods : null;
+          if (goodItem && goodItem !== null && goodItem.SpecialManaged) {
+              this.$Modal.error(
+                {
+                  title: '客户商品选择限制', 
+                  content: this.currChooseCustomer.name + '不能经营特殊管控商品, 但是商品列表中存在管控商品:' + goodItem.name
+                });
+              return false;
+          }
+        }
+      }
+      return true;
+    },
+
     orderSearchModalClose() {
       this.sellOrderSearchModal = false;
     },
@@ -623,39 +707,6 @@ export default {
       this.sellOrderSearchModal = true;
     },
 
-    sellOrderSaveBtnClick() {
-      this.sellOrderSaveBtnLoading = true;
-      this.$refs.sellOrderForm.validate(valid => {
-        if (!valid) {
-          this.$Message.warning("请检查表单必输项是否完整");
-          this.sellOrderSaveBtnLoading = false;
-          return;
-        }
-        let isEdit = this.sellOrderFormData.id && this.sellOrderFormData.id > 0; //编辑模式
-        if (isEdit) {
-          util.ajax
-            .post("/sell/order/update", this.sellOrderFormData)
-            .then(response => {
-              this.$Message.success("保存成功");
-              this.orderFormChangeToEditModel(response.data);
-            })
-            .catch(error => {
-              util.errorProcessor(this, error);
-            });
-        } else {
-          util.ajax
-            .post("/sell/order/add", this.sellOrderFormData)
-            .then(response => {
-              this.$Message.success("保存成功");
-              this.orderFormChangeToEditModel(response.data);
-            })
-            .catch(error => {
-              util.errorProcessor(this, error);
-            });
-        }
-        this.sellOrderSaveBtnLoading = false;
-      });
-    },
     orderFormChangeToEditModel(data) {
       this.sellOrderFormData = data;
       if (data.customerId !== this.currChooseCustomer.id) {
@@ -666,35 +717,61 @@ export default {
       }
       this.sellOrderFormData.customerName = this.currChooseCustomer.name;
       this.editeOnlyDisable = true; //编辑模式下的客户信息不能修改
+      this.warehouseDisable = true;
       this.refreshCustomerRepList(data.customerId, data.customerRepId);
       this.refreshGoodsData(data.id);
     },
     orderFormChangeToAddModel() {
       this.editeOnlyDisable = false;
-      this.sellOrderFormData = {};
+      this.warehouseDisable = false;
+      this.sellOrderFormData = {
+        id: "",
+        customerId: "",
+        customerName: "",
+        customerRepId: '',
+        contactPhone: "",
+        repertoryAddress: "",
+        salerId: "",
+        refNo: "",
+        temperControlId: "",
+        shipMethod: "",
+        shipTool: "",
+        createOrderDate: "",
+        takeGoodsUser: "",
+        payOrderDate: "",
+        payMethod: "",
+        payFileNo: "",
+        markUpRate: 0,
+        payAmount: 0,
+        notSmallAmount: 0,
+        warehouseId: "",
+        comment: "",
+        details: ''
+      };
       this.goodTableData = [];
     },
-
-    removeSellOrderClick() {
-      let id = this.sellOrderFormData.id;
-      if(!id) {
-        this.$Message.warning('获取需要删除的订单失败，请刷新页面');
-        return;
+    refreshGoodsData(sellOrderId) {
+      if (sellOrderId && sellOrderId > 0) {
+        let reqData = { sellOrderId: sellOrderId };
+        this.saveGoodBtnLoading = true;
+        util.ajax
+          .get("/sell/detail/list", { params: reqData })
+          .then(response => {
+            this.goodTableData = response.data;
+            this.getGoodHistoryPrice();
+          })
+          .catch(error => {
+            util.errorProcessor(this, error);
+          });
+        this.saveGoodBtnLoading = false;
       }
-      this.removeSellOrderLoading = true;
-      util.ajax.delete("/sell/order/remove/" + id)
-        .then(response => {
-          this.$Message.success('删除成功');
-          this.removeSellOrderLoading = false;
-          this.orderFormChangeToAddModel();
-        })
-        .catch(error => {
-          this.removeSellOrderLoading = false;
-          util.errorProcessor(this, error);
-        });
     },
 
     addGoodBtnClick() {
+      if(!this.sellOrderFormData.warehouseId || this.sellOrderFormData.warehouseId <= 0) {
+        this.$Message.warning('请先选择对应仓库点');
+        return;
+      }
       this.goodSearchModal = true;
       let temp = this.warehouseList.filter(
         item => item.id === this.sellOrderFormData.warehouseId
@@ -804,22 +881,7 @@ export default {
       this.$set(this.goodTableData, index, row);
     },
 
-    refreshGoodsData(sellOrderId) {
-      if (sellOrderId && sellOrderId > 0) {
-        let reqData = { sellOrderId: sellOrderId };
-        this.saveGoodBtnLoading = true;
-        util.ajax
-          .get("/sell/detail/list", { params: reqData })
-          .then(response => {
-            this.goodTableData = response.data;
-            this.getGoodHistoryPrice();
-          })
-          .catch(error => {
-            util.errorProcessor(this, error);
-          });
-        this.saveGoodBtnLoading = false;
-      }
-    },
+    
     handleRowDbClick(data, index) {
       this.$Modal.confirm({
           title: '确认删除商品？',
@@ -847,47 +909,8 @@ export default {
             util.errorProcessor(this, error);
           });
       }
-    },
-    saveGoodBtnClick() {
-      if (!this.goodTableData || this.goodTableData.length <= 0) {
-        this.$Message.warning("请先新增商品信息");
-        return;
-      }
-      //检查客户是否是可经营特殊管控的商品的，如果不是，需要检查选择的商品列表中是否存在特殊管控的商品
-      if (!this.currChooseCustomer || !this.currChooseCustomer.canSaleSpecial) {
-        for (let i=0; i<this.goodTableData.length; i++) {
-          let goodItem = this.goodTableData[i].repertoryInfo ? this.goodTableData[i].repertoryInfo.goods : null;
-          if (goodItem && goodItem !== null && goodItem.SpecialManaged) {
-              this.$Modal.error(
-                {
-                  title: '客户商品选择限制', 
-                  content: this.currChooseCustomer.name + '不能经营特殊管控商品, 但是商品列表中存在管控商品:' + goodItem.name
-                });
-              return;
-          }
-        }
-      }
-
-      this.saveGoodBtnLoading = true;
-      util.ajax
-        .post("/sell/detail/save", this.goodTableData)
-        .then(response => {
-          let success = response.data.success;
-          let fail = response.data.fail;
-          let detais = response.data.detailList;
-          this.$Message.success(
-            "成功保存" + success + "条记录, 失败" + fail + "条"
-          );
-          this.goodTableData = detais;
-        })
-        .catch(error => {
-          util.errorProcessor(this, error);
-        });
-      this.saveGoodBtnLoading = false;
-    },
-    refreshGoodBtnClick() {
-      this.refreshGoodsData(this.sellOrderFormData.id);
     }
+    
   }
 };
 </script>

@@ -4,7 +4,7 @@
 
 <template>
     <div>
-        <Modal v-model="isShowModal" :width="65" :mask-closable="false" :closable="false" title="查询获取销售订单">
+        <Modal v-model="isShowModal" :width="65" :mask-closable="false" :closable="false" title="查询获取暂挂订单">
             <Row type="flex" justify="center">
                 <Col span="18" offset="1">
                     <Form ref="searchForm" :model="formItem" :label-width="100" >
@@ -40,7 +40,6 @@
                     </Form>
                 </Col>
             </Row>
-            
 
             <Row type="flex" justify="center" align="middle" class="margin-top-20">
                 <Table border highlight-row :columns="tabColumns" :data="tabData" 
@@ -190,7 +189,7 @@ export default {
             .catch((error) => {
                 util.errorProcessor(this, error);
             });
-      },
+        },
 
         searchBtnClicked() {
             let reqData = {
