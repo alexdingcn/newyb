@@ -3,10 +3,10 @@
 
 <template>
     <div>{{ result}}</div>
-
 </template>
 
 <script>
+    import Cookies from 'js-cookie';
     import util from '@/libs/util.js';
 
     export default {
@@ -24,9 +24,9 @@
                 var self = this;
                 util.ajax.post('/loan/face/token')
                     .then(function (response) {
-                        alert(response.data);
                         if (response.status === 200) {
                             self.result = response.data;
+                            Cookies.set('face_token', response.data.biz_id, { expires: 1/96 });
                             window.location = response.data;
                         }
                     })

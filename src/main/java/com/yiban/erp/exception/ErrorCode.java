@@ -71,7 +71,7 @@ public enum ErrorCode {
 
     // 41xx - 贷款
     GET_FACEID_TOKEN_FAIL(4100, "无法获得token"),
-
+    GET_FACEID_RESULT_FAIL(4100, "无法获得FaceID结果"),
 
     ACCESS_PERMISSION(9001, "无访问权限", ErrorDisplay.MODAL);
 
