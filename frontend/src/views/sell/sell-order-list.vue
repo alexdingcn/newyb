@@ -229,17 +229,8 @@ export default {
         this.initData();
     },
     methods: {
-<<<<<<< HEAD
-        dateFormat (data) {
-            if (!data && isNaN(data)) {
-                return '';
-            }
-            return dataConver.formatDate(new Date(data), 'yyyy-MM-dd');
-        },
-        statusDescription (data) {
-=======
+
         statusDescription(data) {
->>>>>>> sell order list
             let result = '';
             switch (data) {
                 case 'INIT':
@@ -281,24 +272,11 @@ export default {
                 page: this.currentPage,
                 size: this.pageSize
             };
-<<<<<<< HEAD
-            let startDate = this.searchFormItem.startDate;
-            let endDate = this.searchFormItem.endDate;
-            if (startDate && startDate !== '' && (startDate instanceof Date)) {
-                reqData.startDate = startDate.getTime();
-            }
-            if (endDate && endDate !== '' && (endDate instanceof Date)) {
-                reqData.endDate = endDate.getTime();
-            }
-            this.searching = true;
-            util.ajax.get('/sell/order/all/list', {params: reqData})
-=======
             reqData['startDate'] = this.dateRange[0];
             reqData['endDate'] = this.dateRange[1];
             this.searching = true;
             let self = this;
             util.ajax.post("/sell/order/all/list", reqData)
->>>>>>> sell order list
                 .then((response) => {
                     self.tabData = response.data.data;
                     self.totalCount = response.data.count;
