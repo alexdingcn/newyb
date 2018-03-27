@@ -4,41 +4,37 @@
 
 <template>
     <div>
-        <Modal v-model="isShowModal" :width="65" :mask-closable="false" :closable="false" title="查询获取暂挂订单">
-            <Row type="flex" justify="center">
-                <Col span="18" offset="1">
-                    <Form ref="searchForm" :model="formItem" :label-width="100" >
-                        <Row type="flex" justify="center">
-                            <Col span="12">
-                                <FormItem label="客户">
-                                    <customer-select size="small" v-model="formItem.customerId" ></customer-select>
-                                </FormItem>
-                            </Col>
-                            <Col span="12">
-                                <FormItem label="销售员">
-                                    <Select size="small" v-model="formItem.salerId" clearable filterable >
-                                        <Option v-for="item in salerList" :value="item.userId" :key="item.userId">{{ item.nickname }}{{item.realname ? (' - [' + item.realname + ']') : ''}}</Option>
-                                    </Select>
-                                </FormItem>
-                            </Col>
-                        </Row>
-                        <Row type="flex" justify="center" >
-                            <Col span="12">
-                                <FormItem label="自定订号">
-                                    <Input size="small" type="text" v-model="formItem.refNo" ></Input>
-                                </FormItem>
-                            </Col>
-                            <Col span="12">
-                                <FormItem label="制单日期">
-                                    <DatePicker size="small" v-model="formItem.createOrderDate" type="date" placeholder="请选择制单日期" ></DatePicker>
-                                </FormItem>
-                            </Col>
-                        </Row>
-                        <Row type="flex" justify="center" >
-                            <Button size="small" type="primary" icon="ios-search" class="margin-let-10" @click="searchBtnClicked">查询</Button>
-                        </Row>
-                    </Form>
-                </Col>
+        <Modal v-model="isShowModal" :width="70" :mask-closable="false" :closable="false" title="查询获取暂挂订单">
+            <Row type="flex" justify="start">
+                <Form ref="searchForm" :model="formItem" :label-width="100" >
+                    <Row type="flex" justify="center">
+                        <Col span="6">
+                            <FormItem label="客户">
+                                <customer-select size="small" v-model="formItem.customerId" ></customer-select>
+                            </FormItem>
+                        </Col>
+                        <Col span="6">
+                            <FormItem label="销售员">
+                                <Select size="small" v-model="formItem.salerId" clearable filterable >
+                                    <Option v-for="item in salerList" :value="item.userId" :key="item.userId">{{ item.nickname }}{{item.realname ? (' - [' + item.realname + ']') : ''}}</Option>
+                                </Select>
+                            </FormItem>
+                        </Col>
+                        <Col span="6">
+                            <FormItem label="自定订号">
+                                <Input size="small" type="text" v-model="formItem.refNo" ></Input>
+                            </FormItem>
+                        </Col>
+                        <Col span="6">
+                            <FormItem label="制单日期">
+                                <DatePicker size="small" v-model="formItem.createOrderDate" type="date" placeholder="请选择制单日期" ></DatePicker>
+                            </FormItem>
+                        </Col>
+                    </Row>
+                    <Row type="flex" justify="center" >
+                        <Button size="small" type="primary" icon="ios-search" class="margin-let-10" @click="searchBtnClicked">查询</Button>
+                    </Row>
+                </Form>
             </Row>
 
             <Row type="flex" justify="center" align="middle" class="margin-top-20">
@@ -59,14 +55,11 @@
 
             <div slot="footer">
                 <Row >
-                    <Col span="5" offset="6">
-                        <Button size="small" type="primary" @click="ok" long>
-                            <span >确定</span>
-                        </Button>
-                    </Col>
-                    <Col span=5 class="padding-left-10">
-                        <Button size="small" @click="closedModal" long>取消</Button>
-                    </Col>
+                    <ButtonGroup>
+                        <Button size="small" icon="checkmark-round" type="primary" @click="ok">确认选取</Button>
+                        <Button size="small" icon="minus-round" @click="closedModal" >取消选取</Button>
+                        <Button size="small" icon="close-round" type="error" @click="removeItem">删除选定</Button>
+                    </ButtonGroup>
                 </Row>
             </div>
         </Modal>
@@ -227,6 +220,31 @@ export default {
 
         tableRowClick(data) {
             this.currChooseItem = data;
+        },
+
+        removeItem() {
+            if(!this.currChooseItem || !this.currChooseItem.id) {
+                this.$Message.warning('请先选取需要删除的记录');
+                return;
+            }
+            let removeId = this.currChooseItem.id;
+            this.$Modal.confirm({
+                title: '删除确认提示',
+                content: '确认删除记录，删除后不可恢复.',
+                onOk: () => {
+                    util.ajax.delete("/sell/order/remove/" + removeId)
+                        .then((response) => {
+                            this.sellOrderLoading = false;
+                            this.searchBtnClicked();
+                            this.$Message.success('删除成功');
+                        })
+                        .catch((error) => {
+                            this.sellOrderLoading = false;
+                            util.errorProcessor(this, error);
+                        });
+                },
+                onCancel: () => {}
+            });
         },
 
         ok() {
