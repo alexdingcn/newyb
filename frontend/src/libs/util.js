@@ -15,7 +15,7 @@ util.title = function (title) {
 };
 
 const ajaxUrl = env === 'development'
-    ? 'http://192.168.1.188:8000'
+    ? 'http://localhost:8000'
     : env === 'production'
         ? 'https://www.yibanjf.com'
         : 'https://debug.yibanjf.com';
