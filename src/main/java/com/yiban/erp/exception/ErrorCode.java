@@ -74,8 +74,12 @@ public enum ErrorCode {
 
 
     // 41xx - 贷款
+    SEND_VERIFY_CODE_FAIL(4104, "发送验证码失败"),
     GET_FACEID_TOKEN_FAIL(4100, "无法获得token"),
-    GET_FACEID_RESULT_FAIL(4100, "无法获得FaceID结果"),
+    GET_FACEID_RESULT_FAIL(4101, "无法获得FaceID结果"),
+    GET_BIZOCR_RESULT_FAIL(4102, "无法获得营业执照OCR结果"),
+    MOBILE_MISSING(4105, "手机号缺失"),
+    MOBILE_VERIFY_CODE_TOO_FREQUENT(4106, "验证码发送太频繁"),
 
     ACCESS_PERMISSION(9001, "无访问权限", ErrorDisplay.MODAL);
 

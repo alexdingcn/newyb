@@ -34,5 +34,7 @@
         <mapper resource="mapping/SellOrderShipMapper.xml"/>
         <mapper resource="mapping/ShipCompanyMapper.xml"/>
         <mapper resource="mapping/RepertoryInfoMapper.xml"/>
+        <mapper resource="mapping/BizWxApplyMapper.xml"/>
+
     </mappers>
 </configuration>

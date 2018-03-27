@@ -2,12 +2,17 @@ package com.yiban.erp.controller.loan;
 
 import com.alibaba.fastjson.JSONObject;
 import com.yiban.erp.controller.good.GoodController;
+import com.yiban.erp.dao.BizWxApplyMapper;
+import com.yiban.erp.entities.BizWxApply;
+import com.yiban.erp.entities.User;
+import com.yiban.erp.exception.BizException;
 import com.yiban.erp.exception.ErrorCode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -16,8 +21,14 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.web.util.UriComponentsBuilder;
+import sun.misc.BASE64Encoder;
 
+import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
+import java.util.Date;
 import java.util.Map;
 import java.util.UUID;
 
@@ -42,6 +53,14 @@ public class LoanController {
 
     private static final String SCENE_ID = "ybidcard";
 
+    @Value("${biz.ocr.url}")
+    private String bizOcrUrl;
+    @Value("${biz.ocr.appcode}")
+    private String bizOcrAppCode;
+
+
+    @Autowired
+    private BizWxApplyMapper bizWxApplyMapper;
 
     @RequestMapping(value = "/face/token", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     private ResponseEntity<String> getFaceIdToken() {
@@ -103,35 +122,54 @@ public class LoanController {
     }
 
     @RequestMapping(value = "/bizlic/ocr", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-    private ResponseEntity<String> getBizLicenseOcrResult(@RequestBody Map requestMap) {
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+    private ResponseEntity<String> getBizLicenseOcrResult(HttpServletRequest request,
+                                                          @AuthenticationPrincipal User user) throws BizException {
+        MultipartHttpServletRequest mtRequest = (MultipartHttpServletRequest) request;
+        MultipartFile file = mtRequest.getFile("file");
+        if (file == null || file.isEmpty()) {
+            logger.warn("user:{} request upload file but file is empty.", user.getId());
+            throw new BizException(ErrorCode.FILE_UPLOAD_PARAMS_ERROR);
+        }
 
-        String host = "https://dm-58.data.aliyun.com";
-        String path = "/rest/160601/ocr/ocr_business_license.json";
+        MultiValueMap<String, String> headers = new LinkedMultiValueMap<>();
+        headers.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_UTF8_VALUE);
+        headers.add(HttpHeaders.AUTHORIZATION, "APPCODE " + bizOcrAppCode);
 
-        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(faceIdResultUrl)
-                .queryParam("api_key", faceIdApiKey)
-                .queryParam("api_secret", faceIdApiSecret)
-                .queryParam("biz_id", (String) requestMap.getOrDefault("bizNo", ""));
+        BASE64Encoder encoder = new BASE64Encoder();
+        String body = "";
+        try {
+            String imgData = encoder.encode(file.getBytes());
+            body = "{\"image\":\"" + imgData + "\"}";
+        } catch (IOException e) {
+            logger.error("Failed to convert to base64, {}", e.getMessage());
+            throw new BizException(ErrorCode.FILE_UPLOAD_PARAMS_ERROR);
+        }
 
-        HttpEntity<?> entity = new HttpEntity<>(headers);
+        HttpEntity<String> postData = new HttpEntity<>(body, headers);
 
         try {
-            JSONObject result = restTemplate.exchange(builder.build().encode().toUri(), HttpMethod.GET, entity, JSONObject.class).getBody();
+            ResponseEntity<String> result = restTemplate.postForEntity(bizOcrUrl, postData, String.class);
             if (result != null) {
-                JSONObject verifyResult = result.getJSONObject("verify_result");
-                if (verifyResult != null && "OK".equalsIgnoreCase(result.getString("status"))) {
-                    JSONObject resultObj = new JSONObject();
-                    resultObj.put("livenessResult", result.getJSONObject("liveness_result").getString("result"));
-                    resultObj.put("idcard", result.getJSONObject("idcard_info"));
-                    return ResponseEntity.ok().body(resultObj.toJSONString());
-                }
+                return ResponseEntity.ok().body(result.getBody());
             }
         } catch (RestClientException ex) {
-            logger.error("Failed to get faceId result, {}", ex.getMessage());
+            logger.error("Failed to get ocr result, {}", ex.getMessage());
         }
-        return ResponseEntity.badRequest().body(ErrorCode.GET_FACEID_RESULT_FAIL.toString());
+        return ResponseEntity.badRequest().body(ErrorCode.GET_BIZOCR_RESULT_FAIL.toString());
     }
 
+
+    @RequestMapping(value = "/wx/apply", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    private ResponseEntity<String> saveWxLoanApply(@RequestBody BizWxApply bizApply) throws BizException {
+        if (bizApply != null) {
+            bizApply.setCreatedBy("weixin");
+            bizApply.setCreatedTime(new Date());
+
+            int result = bizWxApplyMapper.insert(bizApply);
+            if (result > 0) {
+                return ResponseEntity.ok().build();
+            }
+        }
+        return ResponseEntity.badRequest().body(ErrorCode.FAILED_INSERT_FROM_DB.toString());
+    }
 }
