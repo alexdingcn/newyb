@@ -3,6 +3,7 @@ package com.yiban.erp.controller.sell;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.yiban.erp.dao.SellOrderMapper;
+import com.yiban.erp.dto.SellOrderAllAction;
 import com.yiban.erp.dto.SellReviewAction;
 import com.yiban.erp.dto.SellReviewOrderQuery;
 import com.yiban.erp.entities.SellOrder;
@@ -196,35 +197,19 @@ public class SellOrderController {
         return ResponseEntity.ok().build();
     }
 
-    @RequestMapping(value = "/order/all/list", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> allList(HttpServletRequest request,
+    @RequestMapping(value = "/order/all/list", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> allList(@RequestBody SellOrderAllAction allAction,
                                           @AuthenticationPrincipal User user) throws Exception {
-        String status = request.getParameter("status");
-        String customerIdStr = request.getParameter("customerId");
-        String orderNumber = request.getParameter("orderNumber");
-        String salerIdStr = request.getParameter("salerId");
-        String startDateStr = request.getParameter("startDate");
-        String endDateStr = request.getParameter("endDate");
-        String page = request.getParameter("page");
-        String size = request.getParameter("size");
-
-        Map<String, Object> map = new HashMap<>();
-        map.put("status", status);
-        map.put("companyId", user.getCompanyId());
-        map.put("orderNumber", orderNumber);
-        map.put("customerId", StringUtils.isBlank(customerIdStr) ? null : Integer.parseInt(customerIdStr));
-        map.put("salerId", StringUtils.isBlank(salerIdStr) ? null : Integer.parseInt(salerIdStr));
-        map.put("startDate", StringUtils.isBlank(startDateStr) ? null : new Date(Long.valueOf(startDateStr)));
-        map.put("endDate", StringUtils.isBlank(endDateStr) ? null : new Date(Long.valueOf(endDateStr)));
-        Integer limit = StringUtils.isBlank(size) ? null : Integer.parseInt(size);
-        Integer pageNum = StringUtils.isBlank(page) || limit == null ? null : Integer.parseInt(page);
-        Integer offset = pageNum != null && limit != null ? ((pageNum -1) * limit) : null;
-        map.put("offset", offset);
-        map.put("limit", limit);
-        List<SellOrder> result = sellOrderMapper.getAllList(map);
+        Integer limit = allAction.getSize() == null ? 10 : allAction.getSize();
+        Integer pageNum = allAction.getPage() == null ? 1 : allAction.getPage();
+        Integer offset = (pageNum -1) * limit;
+        allAction.setCompanyId(user.getCompanyId());
+        allAction.setOffset(offset);
+        allAction.setLimit(limit);
+        List<SellOrder> result = sellOrderMapper.getAllList(allAction);
         int count = 0;
         if (result.size() > 0) {
-            count = sellOrderMapper.getAllCount(map);
+            count = sellOrderMapper.getAllCount(allAction);
         }
         JSONObject response = new JSONObject();
         response.put("data", result);

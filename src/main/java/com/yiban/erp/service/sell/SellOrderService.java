@@ -2,12 +2,12 @@ package com.yiban.erp.service.sell;
 
 import com.alibaba.fastjson.JSON;
 import com.yiban.erp.constant.SellOrderStatus;
+import com.yiban.erp.constants.OptionsType;
 import com.yiban.erp.dao.*;
 import com.yiban.erp.dto.SellReviewAction;
 import com.yiban.erp.dto.SellReviewOrderQuery;
 import com.yiban.erp.entities.*;
 import com.yiban.erp.exception.BizException;
-import com.yiban.erp.exception.BizRuntimeException;
 import com.yiban.erp.exception.ErrorCode;
 import com.yiban.erp.service.warehouse.RepertoryService;
 import com.yiban.erp.util.UtilTool;
@@ -38,6 +38,8 @@ public class SellOrderService {
     private GoodsMapper goodsMapper;
     @Autowired
     private RepertoryInfoMapper repertoryInfoMapper;
+    @Autowired
+    private OptionsMapper optionsMapper;
 
     public List<SellOrder> getList(Integer companyId, Integer customerId, Integer salerId,
                                             String refNo, String status, Date createOrderDate, Integer page, Integer size) {
@@ -368,6 +370,32 @@ public class SellOrderService {
         if (order == null) {
             return null;
         }
+        List<String> queryOptions = Arrays.asList(
+                OptionsType.TEMPER_CONTROL.name(),
+                OptionsType.SHIP_TOOL.name(),
+                OptionsType.PAY_METHOD.name(),
+                OptionsType.SHIP_METHOD.name());
+        List<Options> options = optionsMapper.findByTypes(order.getCompanyId(), queryOptions);
+        if (options != null && !options.isEmpty()) {
+            Map<Integer, Options> optionsMap = new HashMap<>();
+            options.stream().forEach(item -> optionsMap.put(Long.valueOf(item.getId()).intValue(), item));
+            Options options1 = optionsMap.get(order.getTemperControlId());
+            if (options1 != null) {
+                order.setTemperControlName(options1.getValue());
+            }
+            Options options2 = optionsMap.get(order.getPayMethod());
+            if (options2 != null) {
+                order.setPayMethodName(options2.getValue());
+            }
+            Options options3 = optionsMap.get(order.getShipMethod());
+            if (options3 != null) {
+                order.setShipMethodName(options3.getValue());
+            }
+            Options options4 = optionsMap.get(order.getShipTool());
+            if (options4 != null) {
+                order.setShipToolName(options4.getValue());
+            }
+        }
         List<SellOrderDetail> details = getDetailList(orderId);
         order.setDetails(details);
         return order;
@@ -415,6 +443,5 @@ public class SellOrderService {
         logger.info("user:{} remove sell ship record:{}", user.getId(), JSON.toJSONString(sellOrderShip));
         return sellOrderShipMapper.deleteByPrimaryKey(id);
     }
-
 
 }

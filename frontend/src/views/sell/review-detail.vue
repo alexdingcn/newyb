@@ -7,7 +7,7 @@
         <Row type="flex" justify="center">
             <Col span="24">
                 <Row class="title-show">
-                    <span>订单详情 -> {{orderDetail.orderNumber}}</span>
+                    <span>{{orderDetail.orderNumber}}</span>
                     <hr/>
                 </Row>
                 <Row class="content-row">
@@ -49,7 +49,7 @@
                     </Col>
                     <Col span="6">
                         <span class="label-key">湿控方式:</span>
-                        <span class="label-value">{{orderDetail.temperControlId}}</span>
+                        <span class="label-value">{{orderDetail.temperControlName}}</span>
                     </Col>
                     <Col span="6">
                         <span class="label-key">收款日期:</span>
@@ -57,7 +57,7 @@
                     </Col>
                     <Col span="6">
                         <span class="label-key">收款方式:</span>
-                        <span class="label-value">{{orderDetail.payMethod}}</span>
+                        <span class="label-value">{{orderDetail.payMethodName}}</span>
                     </Col>
                 </Row>
                 <Row class="content-row">
@@ -125,7 +125,10 @@
                             <span class="label-value">{{item.taxRate}}</span>
                         </Col>
                     </Row>
-                    <good-expand :detail="item.goods"></good-expand>
+                    <good-expand :good="getGoodDetail(item)" 
+                        :repertoryInfo="item.repertoryInfo" 
+                        :productDate="getGoodProductDate(item.repertoryInfo)" 
+                        :expDate="getGoodExpDate(item.repertoryInfo)"></good-expand>
                 </div>
 
             </Col>
@@ -134,52 +137,79 @@
 </template>
 
 <script>
-import util from '@/libs/util.js';
-import dataConver from '@/libs/data-conver.js';
-import goodExpand from '@/views/good/good-expand.vue';
+import util from "@/libs/util.js";
+import moment from 'moment';
+import goodExpand from "@/views/good/good-expand.vue";
 
 export default {
-    name: 'review-detail',
-    props: {
-        sellOrderId: Number
-    },
-    components: {
-        goodExpand
-    },
-    data () {
-        return {
-            orderDetail: '',
-            goodTableData: []
-        };
-    },
-    watch: {
-        sellOrderId (id) {
-            this.initData(id);
-        }
-    },
-    filters: {
-        dateFormat (data) {
-            if (!data && isNaN(data)) {
-                return '';
-            }
-            return dataConver.formatDate(new Date(data), 'yyyy-MM-dd');
-        }
-    },
-    methods: {
-        initData (id) {
-            util.ajax.get('/sell/order/review/detail', {params: {orderId: id}})
-                .then((response) => {
-                    this.orderDetail = response.data;
-                    if (this.orderDetail && this.orderDetail.details) {
-                        this.goodTableData = this.orderDetail.details;
-                    }
-                })
-                .catch(error => {
-                    util.errorProcessor(this, error);
-                });
-        }
-    }
-};
+  name: 'review-detail',
+  props: {
+      sellOrderId: Number
+  },
+  components: {
+      goodExpand
+  },
+  data() {
+      return {
+          orderDetail: '',
+          goodTableData: [],
+      }
+  },
+  watch: {
+      sellOrderId(id) {
+          this.initData(id);
+      }
+  },
+  filters: {
+      dateFormat(data) {
+          if (!data && isNaN(data)) {
+              return '';
+          }
+          return moment(data).format('YYYY-MM-DD');
+      }
+  },
+  methods: {
+      initData(id) {
+          util.ajax.get("/sell/order/review/detail", {params: {orderId: id}})
+            .then((response) => {
+                this.orderDetail = response.data;
+                if (this.orderDetail && this.orderDetail.details) {
+                    this.goodTableData = this.orderDetail.details;
+                }
+                console.log(this.orderDetail);
+            })
+            .catch(error => {
+                util.errorProcessor(this, error);
+            });
+      },
+
+      getGoodDetail(sellDetail) {
+          if (!sellDetail) {
+              return {};
+          }
+          let repertoryInfo = sellDetail.repertoryInfo;
+          if (repertoryInfo) {
+              return repertoryInfo.goods;
+          }else {
+              return {};
+          }
+      },
+      getGoodProductDate(repertoryInfo) {
+          if(!repertoryInfo) {
+              return '';
+          }
+          let productDate = repertoryInfo.productDate;
+          return productDate ? moment(productDate).format('YYYY-MM-DD') : '';
+      },
+      getGoodExpDate(repertoryInfo) {
+          if(!repertoryInfo) {
+              return '';
+          }
+          let expDate = repertoryInfo.expDate;
+          return expDate ? moment(expDate).format('YYYY-MM-DD') : '';
+      }
+  }
+}
 </script>
 
 <style>

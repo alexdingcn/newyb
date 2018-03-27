@@ -7,17 +7,16 @@
         <div class="search-div">
             <Row >
                 <Form ref="searchForm" :model="searchFormItem" :label-width="90">
+                    
                     <Row type="flex" justify="center">
-                        <Col span="12" >
-                            <FormItem label="制单日期">
-                                <DatePicker  size="small" v-model="searchFormItem.startDate" type="date" placeholder="请选择制单日期" ></DatePicker> 
-                                至 
-                                <DatePicker  size="small" v-model="searchFormItem.endDate" type="date" placeholder="请选择制单日期" ></DatePicker> 
-                            </FormItem>
-                        </Col>
                         <Col span="8" >
                             <FormItem label="客户">
                                 <customer-select size="small" v-model="searchFormItem.customerId" ></customer-select>
+                            </FormItem>
+                        </Col>
+                        <Col span="12" >
+                            <FormItem label="制单日期">
+                                <DatePicker size="small" v-model="dateRange" type="daterange" placement="bottom-end" placeholder="制单日期" style="width:180px"></DatePicker>
                             </FormItem>
                         </Col>
                         <Col span="4"></Col>
@@ -46,7 +45,8 @@
         <div class="table-div">
             <Row type="flex" justify="center" align="middle" >
                 <Table border highlight-row :columns="tabColumns" :data="tabData" 
-                        :loading="searching" 
+                        :loading="searching"  
+                        no-data-text="点击上方查询按钮获取数据"
                         ref="table" style="width: 100%;" size="small">
                 </Table>
             </Row>
@@ -71,11 +71,11 @@
 </template>
 
 <script>
-import util from '@/libs/util.js';
-import dataConver from '@/libs/data-conver.js';
-import reviewDetail from './review-detail.vue';
-import sellOrderShip from './sell-order-ship.vue';
-import customerSelect from '@/views/customer/customer-select.vue';
+import util from "@/libs/util.js";
+import moment from 'moment';
+import reviewDetail from "./review-detail.vue";
+import sellOrderShip from "./sell-order-ship.vue";
+import customerSelect from "@/views/customer/customer-select.vue";
 
 export default {
     name: 'sell-order-all',
@@ -88,12 +88,14 @@ export default {
     data () {
         return {
             searchFormItem: {
-                startDate: '',
-                endDate: '',
                 customerId: '',
                 orderNumber: '',
                 salerId: ''
             },
+            dateRange: [
+                moment().add(-1,'w').format('YYYY-MM-DD'),
+                moment().format('YYYY-MM-DD'),
+            ],
             salerList: [],
             searching: false,
             tabData: [],
@@ -132,7 +134,8 @@ export default {
                     align: 'center',
                     sortable: true,
                     render: (h, params) => {
-                        return h('span', this.dateFormat(params.row.createOrderDate));
+                        let createOrderDate = params.row.createOrderDate;
+                        return h('span', createOrderDate ? moment(createOrderDate).format('YYYY-MM-DD') : '');
                     }
                 },
                 {
@@ -226,6 +229,7 @@ export default {
         this.initData();
     },
     methods: {
+<<<<<<< HEAD
         dateFormat (data) {
             if (!data && isNaN(data)) {
                 return '';
@@ -233,6 +237,9 @@ export default {
             return dataConver.formatDate(new Date(data), 'yyyy-MM-dd');
         },
         statusDescription (data) {
+=======
+        statusDescription(data) {
+>>>>>>> sell order list
             let result = '';
             switch (data) {
                 case 'INIT':
@@ -274,6 +281,7 @@ export default {
                 page: this.currentPage,
                 size: this.pageSize
             };
+<<<<<<< HEAD
             let startDate = this.searchFormItem.startDate;
             let endDate = this.searchFormItem.endDate;
             if (startDate && startDate !== '' && (startDate instanceof Date)) {
@@ -284,12 +292,19 @@ export default {
             }
             this.searching = true;
             util.ajax.get('/sell/order/all/list', {params: reqData})
+=======
+            reqData['startDate'] = this.dateRange[0];
+            reqData['endDate'] = this.dateRange[1];
+            this.searching = true;
+            let self = this;
+            util.ajax.post("/sell/order/all/list", reqData)
+>>>>>>> sell order list
                 .then((response) => {
-                    this.tabData = response.data.data;
-                    this.totalCount = response.data.count;
+                    self.tabData = response.data.data;
+                    self.totalCount = response.data.count;
                 })
                 .catch((error) => {
-                    util.errorProcessor(this, error);
+                    util.errorProcessor(self, error);
                 });
             this.searching = false;
         },

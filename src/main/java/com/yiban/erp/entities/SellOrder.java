@@ -22,6 +22,7 @@ public class SellOrder {
     private Integer salerId;
 
     private Integer temperControlId;
+    private String temperControlName;
 
     private Date createOrderDate;
 
@@ -30,6 +31,7 @@ public class SellOrder {
     private Date payOrderDate;
 
     private Integer payMethod;
+    private String payMethodName;
 
     private String payFileNo;
 
@@ -40,8 +42,10 @@ public class SellOrder {
     private BigDecimal notSmallAmount;
 
     private Integer shipMethod;
+    private String shipMethodName;
 
     private Integer shipTool;
+    private String shipToolName;
 
     private String comment;
 
@@ -342,5 +346,37 @@ public class SellOrder {
 
     public void setDetails(List<SellOrderDetail> details) {
         this.details = details;
+    }
+
+    public String getTemperControlName() {
+        return temperControlName;
+    }
+
+    public void setTemperControlName(String temperControlName) {
+        this.temperControlName = temperControlName;
+    }
+
+    public String getPayMethodName() {
+        return payMethodName;
+    }
+
+    public void setPayMethodName(String payMethodName) {
+        this.payMethodName = payMethodName;
+    }
+
+    public String getShipMethodName() {
+        return shipMethodName;
+    }
+
+    public void setShipMethodName(String shipMethodName) {
+        this.shipMethodName = shipMethodName;
+    }
+
+    public String getShipToolName() {
+        return shipToolName;
+    }
+
+    public void setShipToolName(String shipToolName) {
+        this.shipToolName = shipToolName;
     }
 }

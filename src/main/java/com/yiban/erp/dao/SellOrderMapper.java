@@ -1,5 +1,6 @@
 package com.yiban.erp.dao;
 
+import com.yiban.erp.dto.SellOrderAllAction;
 import com.yiban.erp.dto.SellReviewOrderQuery;
 import com.yiban.erp.entities.SellOrder;
 import org.apache.ibatis.annotations.Mapper;
@@ -39,9 +40,9 @@ public interface SellOrderMapper {
                             @Param("limit") int limit,
                             @Param("offset") int offset);
 
-    List<SellOrder> getAllList(Map<String, Object> params);
+    List<SellOrder> getAllList(SellOrderAllAction params);
 
-    Integer getAllCount(Map<String, Object> params);
+    Integer getAllCount(SellOrderAllAction params);
 
     List<SellOrder> getListById(@Param("idList") List<Long> idList);
 
