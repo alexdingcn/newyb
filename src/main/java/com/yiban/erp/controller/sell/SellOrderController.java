@@ -66,22 +66,12 @@ public class SellOrderController {
         return ResponseEntity.ok().body(result.toJSONString());
     }
 
-
-    @RequestMapping(value = "/order/add", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> orderAdd(@RequestBody SellOrder sellOrder,
-                                           @AuthenticationPrincipal User user) throws Exception {
-        logger.info("user:{} request add sell order:{}", user.getId(), JSON.toJSONString(sellOrder));
-        SellOrder result = sellOrderService.orderAdd(user, sellOrder);
-        logger.info("user:{} success add a sell order:{}", user.getId(), result.getId());
-        return ResponseEntity.ok().body(JSON.toJSONString(result));
-    }
-
-    @RequestMapping(value = "/order/update", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> orderUpdate(@RequestBody SellOrder sellOrder,
-                                              @AuthenticationPrincipal User user) throws Exception {
-        logger.info("user:{} request update sell order:{}", user.getId(), JSON.toJSONString(sellOrder));
-        SellOrder result = sellOrderService.orderUpdate(user, sellOrder);
-        logger.debug("user:{} success update a sell order:{}", user.getId(), result.getId());
+    @RequestMapping(value = "/order/save", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> orderSave(@RequestBody SellOrder sellOrder,
+                                            @AuthenticationPrincipal User user) throws Exception {
+        logger.info("user:{} save sell order info.", user.getId());
+        SellOrder result = sellOrderService.orderSave(user, sellOrder);
+        logger.info("user:{} success save sell order info.", user.getId());
         return ResponseEntity.ok().body(JSON.toJSONString(result));
     }
 
@@ -116,24 +106,6 @@ public class SellOrderController {
         return ResponseEntity.ok().body((JSON) JSON.toJSON(details));
     }
 
-    @RequestMapping(value = "/detail/save", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> detailSave(@RequestBody List<SellOrderDetail> details,
-                                            @AuthenticationPrincipal User user) throws Exception {
-        logger.info("user:{} request save sell order detail:{}", user.getId(), JSON.toJSONString(details));
-        if (details == null || details.isEmpty()) {
-            logger.warn("request save sell order detail but params is empty.");
-            throw new BizException(ErrorCode.SELL_ORDER_DETAIL_EMPTY);
-        }
-        int count = sellOrderService.detailSave(user, details);
-        Long sellOrderId = details.get(0) == null ? null : details.get(0).getSellOrderId();
-        List<SellOrderDetail> saveAfterList = sellOrderService.getDetailList(sellOrderId);
-        JSONObject result = new JSONObject();
-        result.put("success", count); //保存成功的笔数
-        result.put("fail", (details.size() - count)); //保存失败的笔数
-        result.put("detailList", saveAfterList);
-        return ResponseEntity.ok().body(result.toJSONString());
-    }
-
     @RequestMapping(value = "/detail/remove/{detailId}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> removeDetail(@PathVariable Long detailId,
                                                @AuthenticationPrincipal User user) throws Exception {
@@ -153,21 +125,21 @@ public class SellOrderController {
         return ResponseEntity.ok().body(JSON.toJSONString(result));
     }
 
-    @RequestMapping(value = "/order/review/ok", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> submitReview(@RequestBody SellReviewAction reviewAction,
+    @RequestMapping(value = "/order/review/quality/check", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> qualityCheck(@RequestBody SellReviewAction reviewAction,
                                                @AuthenticationPrincipal User user) throws Exception {
         logger.info("user:{} submit sell order review, params:{}", user.getId(), JSON.toJSONString(reviewAction));
         Long sellOrderId = reviewAction.getSellOrderId();
         if (sellOrderId == null) {
             throw new BizException(ErrorCode.SELL_ORDER_DETAIL_GET_FAIL);
         }
-        sellOrderService.reviewOrderOk(user, reviewAction);
+        sellOrderService.qualityCheck(user, reviewAction);
         //如果没有报错，则重新根据sellOrderId 获取详情列表
         SellOrder order = sellOrderService.reviewDetail(sellOrderId);
         return ResponseEntity.ok().body(JSON.toJSONString(order));
     }
 
-    @RequestMapping(value = "/order/review/cancel", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/order/review/quality/cancel", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> reviewCancel(@RequestBody SellReviewAction reviewAction,
                                                @AuthenticationPrincipal User user) throws Exception {
         logger.info("user:{} request cancel review options.", user.getId());
@@ -175,10 +147,20 @@ public class SellOrderController {
         if (sellOrderId == null) {
             throw new BizException(ErrorCode.SELL_ORDER_DETAIL_GET_FAIL);
         }
-        sellOrderService.reviewCancel(user, reviewAction);
+        sellOrderService.qualityCheckCancel(user, reviewAction);
         //如果没有报错，则重新根据sellOrderId 获取详情列表
         SellOrder order = sellOrderService.reviewDetail(sellOrderId);
         return ResponseEntity.ok().body(JSON.toJSONString(order));
+    }
+
+    @RequestMapping(value = "/order/review/sale/ok", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> sellOrderCheckOk(@RequestBody String reqData,
+                                                   @AuthenticationPrincipal User user) throws Exception {
+        logger.warn("user:{} check sell order sale review ok. id:{}", user.getId(), reqData);
+        JSONObject json = JSON.parseObject(reqData);
+        Long sellOrderId = json.getLong("orderId");
+        sellOrderService.sellOrderCheckOk(user, sellOrderId);
+        return ResponseEntity.ok().build();
     }
 
     @RequestMapping(value = "/order/review/detail", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)

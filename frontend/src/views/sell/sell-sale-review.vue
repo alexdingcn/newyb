@@ -1,6 +1,15 @@
 <template>
     <div>
-        <div class="search-div">
+        <Card >
+            <p slot="title">
+                销售审核
+            </p>
+            <div slot="extra">
+                <ButtonGroup size="small">
+                    <Button type="success" icon="checkmark-round" :loading="sellOrderLoading" @click="reviewOkBtnClick">审核通过</Button>
+                    <Button type="error" icon="close-round" :loading="sellOrderLoading" @click="removeBtnClick">删除订单</Button>
+                </ButtonGroup>
+            </div>
             <Form ref="searchForm" :model="query" :label-width="100">
                 <Row>
                     <Col span="8">
@@ -35,7 +44,7 @@
                     </Col>
                 </Row>
             </Form>
-        </div>
+        </Card>
         <div >
             <Table border highlight-row disabled-hover height="250" style="width: 100%" 
                    :columns="orderListColumns" :data="orderList"
@@ -47,16 +56,9 @@
         </div>
 
         <div class="table-div">
-            <Row type="flex" justify="start">
-                <ButtonGroup size="small">
-                    <Button type="success" icon="checkmark-round" :loading="detailLoading" @click="reviewOkBtnClick">审核通过</Button>
-                    <Button type="error" icon="close-round" :loading="detailLoading" @click="reviewCancelBtnClick">取消审核</Button>
-                </ButtonGroup>
-            </Row>
             <Table border highlight-row height="300" :loading="detailLoading" 
                    :columns="sellGoodColumns" :data="sellGoodList"
                    ref="sellGoodTable" style="width: 100%;" size="small"
-                   @on-selection-change="detailSelectionChange"
                    no-data-text="点击上方订单后查看销售明细">
                 <div slot="header">
                     <h3 class="padding-left-20" >
@@ -65,23 +67,6 @@
                 </div>
             </Table>
         </div>
-
-        <Modal v-model="reviewOkModal" width="50" :mask-closable="false" title="审批通过意见登记">
-            <div style="text-align:left">
-                <span style="width: 100px; margin-right: 10px;">审核意见:</span>
-                <Select v-model="checkStatus" placeholder="审批意见" @on-change="checkStatusChange" style="width: 40%">
-                    <Option v-for="option in checkStatusOptionList" :value="option.key" :label="option.name" :key="option.key">{{option.name}}</Option>
-                </Select>
-            </div>
-            <div style="text-align:left; margin-top: 10px;">
-                <span style="width: 100px; margin-right: 10px;">审核结果描述 </span>
-                <Input v-model="checkResult" placeholder="审核结果描述" />
-            </div>
-            <div slot="footer">
-                <Button type="success" @click="setCheckedOk">提交</Button>
-            </div>
-        </Modal>
-
     </div>
 </template>
 
@@ -92,21 +77,18 @@ import customerSelect from "@/views/customer/customer-select.vue";
 import goodExpand from "@/views/good/good-expand.vue";
 
 export default {
-    name: 'sell-quality-review',
+    name: 'sell-sale-review',
     components: {
         customerSelect,
         goodExpand
     },
     data() {
         return {
-            checkStatusOptionList: [
-                {key: 'OK', name: "通过", defaultResult: "出库质量审核通过"},
-                {key: 'REJECT', name: "拒绝", defaultResult: "出库质量审核未通过"}
-            ],
             statusOptions: [
                 {key: 'ALL', name:'所有'},
-                {key: 'INIT', name:'未审批'},
-                {key: 'QUALITY_CHECKED', name:'已审批'}
+                {key: 'INIT', name:'未质审完成'},
+                {key: 'QUALITY_CHECKED', name:'已质审完成'},
+                {key: 'SALE_CHECKED', name:'销售审核完成'}
             ],
             salerList: [],
             dateRange: [
@@ -115,7 +97,7 @@ export default {
             ],
             query: {
                 customerId: '',
-                status: 'INIT',
+                status: 'QUALITY_CHECKED',
                 salerId: ''
             },
             sellOrderLoading: false,
@@ -239,11 +221,6 @@ export default {
                     }
                 },
                 {
-                    type: 'selection',
-                    width: 60,
-                    align: 'center'
-                },
-                {
                     title: '商品名称',
                     key: 'goodName',
                     width: 150
@@ -324,13 +301,13 @@ export default {
                     key: 'amount'
                 },
                 {
-                    title: '审核状态',
+                    title: '质量审核状态',
                     width: 120,
                     key: 'checkStatus',
                     render: (h, params) => {
                         const checkStatus = params.row.checkStatus;
-                        const color = !checkStatus ? 'blue' : (checkStatus === 'OK' ? 'green' : 'red');
-                        const text = !checkStatus ? '待审' : (checkStatus === 'OK' ? '通过' : '拒绝');
+                        const color = !checkStatus ? 'blue' : checkStatus === 'OK' ? 'green' : 'red';
+                        const text = !checkStatus ? '待审' : checkStatus === 'OK' ? '通过' : '拒绝';
                         return h('Tag', {
                             props: {
                                 type: 'dot',
@@ -340,7 +317,7 @@ export default {
                     }
                 },
                 {
-                    title: '审核人',
+                    title: '质量审核人',
                     width: 100,
                     key: 'checkUser',
                     render: (h, params) => {
@@ -349,7 +326,7 @@ export default {
                     }
                 },
                 {
-                    title: '审核日期',
+                    title: '质量审核日期',
                     width: 120,
                     key: 'checkDate',
                     render: (h, params) => {
@@ -358,7 +335,7 @@ export default {
                     }
                 },
                 {
-                    title: '审核结论',
+                    title: '质量审核结论',
                     width: 180,
                     key: 'checkResult',
                     render: (h, params) => {
@@ -369,9 +346,7 @@ export default {
             ],
             totalCount: 0,
             totalAmount: 0,
-            reviewOkModal: false,
-            checkStatus: '',
-            checkResult: ''
+            chooseOrderItem: ''
         }
     },
     mounted() {
@@ -412,7 +387,7 @@ export default {
             };
             let statusList = [];
             if (this.query.status === 'ALL') {
-                statusList = ['INIT', 'QUALITY_CHECKED'];
+                statusList = ['INIT', 'QUALITY_CHECKED', 'SALE_CHECKED'];
             }else {
                 statusList = [this.query.status];
             }
@@ -420,6 +395,8 @@ export default {
             reqData['startDate'] = this.dateRange[0];
             reqData['endDate'] = this.dateRange[1];
             this.sellOrderLoading = true;
+            this.chooseOrderItem = '';
+            this.sellGoodList = [];
             util.ajax.post("/sell/order/review/list", reqData)
                 .then((response) => {
                     this.orderList = response.data;
@@ -434,6 +411,7 @@ export default {
             if (!data || !data.id) {
                 return;
             }
+            this.chooseOrderItem = data;
             let sellOrderId = data.id;
             this.detailLoading = true;
             util.ajax.get("sell/order/review/detail", {params: {orderId: sellOrderId}})
@@ -452,83 +430,119 @@ export default {
                 })
         },
 
-        detailSelectionChange(data) {
-            this.detailChooseItems = data;
-        },
-
-        checkStatusChange(data) {
-            let items = this.checkStatusOptionList.filter(item => item.key === data);
-            if (items && items[0]) {
-                this.checkResult = items[0].defaultResult;
+        validateAction(action) {
+            let actionLab = action === 'CHECK' ? '审核' : '删除';
+            if (!this.chooseOrderItem || !this.chooseOrderItem.id) {
+                this.$Modal.info({
+                    title: '信息验证提示',
+                    content: '请先选择需要' + actionLab + '的订单信息'
+                });
+                return false;
+            }
+            if (!this.sellGoodList || this.sellGoodList.length <= 0) {
+                this.$Modal.error({
+                    title: '信息验证提示',
+                    content: '订单缺失商品信息,不能' + actionLab
+                });
+                return false;
+            }
+            //如果是审核，需要所有的商品都通过质量审核
+            if (action === 'CHECK') {
+                let items = this.sellGoodList.filter(item => item.checkStatus !== 'OK');
+                if (items && items.length > 0) {
+                    this.$Modal.warning({
+                        title: '信息验证提示',
+                        content: '存在质量审核未通过的商品，不能审核通过'
+                    });
+                    return false;
+                }
+                //检查订单是是否处于质检通过状态，如果不是，不能再次审核
+                let orderStatus = this.chooseOrderItem.status;
+                if (!orderStatus || orderStatus !== 'QUALITY_CHECKED') {
+                    this.$Modal.warning({
+                        title: '信息验证提示',
+                        content: '订单不是质量检查通过的状态，不能进行审核'
+                    });
+                    return false;
+                }
             }else {
-                this.checkResult = '';
+                let items = this.sellGoodList.filter(item => item.checkStatus === 'OK');
+                if (items && items.length > 0) {
+                    this.$Modal.warning({
+                        title: '信息验证提示',
+                        content: '存在质量审核通过的商品，不能删除订单'
+                    });
+                    return false;
+                }
             }
+            return true;
         },
-
         reviewOkBtnClick() {
-            if (!this.detailChooseItems || this.detailChooseItems.length <= 0) {
-                this.$Message.warning("请先选择需要审核的产品信息");
-                return;
-            }
-            this.reviewOkModal = true;
-            this.checkResult = '';
-            this.checkStatus = '';
-            this.checkResult = '';
-        },
-
-        setCheckedOk() {
-            let reqData = {
-                reviewType: 'QUALITY_REVIEW',
-                detailList: this.detailChooseItems,
-                checkStatus: this.checkStatus,
-                checkResult: this.checkResult
-            }
-            this.detailLoading = true;
-            util.ajax.post("/sell/order/review/quality/check", reqData)
-                .then((response) => {
-                    this.detailLoading = false;
-                    let order = response.data;
-                    if (order && order.details) {
-                        this.sellGoodList = order.details;
-                    }else {
-                        this.sellGoodList = [];
-                    }
-                    this.$Message.success("提交成功");
-                    this.reviewOkModal = false;
-                })
-                .catch((error) => {
-                    this.detailLoading = false;
-                    util.errorProcessor(this, error);
-                })
-        },
-
-        reviewCancelBtnClick() {
-            if (!this.detailChooseItems || this.detailChooseItems.length <= 0) {
+            let validate = this.validateAction('CHECK');
+            if (!validate) {
                 return;
             }
             let reqData = {
-                reviewType: 'QUALITY_REVIEW',
-                detailList: this.detailChooseItems
+                orderId: this.chooseOrderItem.id
             };
-            this.detailLoading = true;
-            util.ajax.post("/sell/order/review/quality/cancel", reqData)
+            this.sellOrderLoading = true;
+            util.ajax.post("/sell/order/review/sale/ok", reqData)
                 .then((response) => {
-                    this.detailLoading = false;
-                    let order = response.data;
-                    if (order && order.details) {
-                        this.sellGoodList = order.details;
-                    }else {
-                        this.sellGoodList = [];
-                    }
-                    this.$Message.success("取消成功");
+                    this.sellOrderLoading = false;
+                    this.querySellOrderList();
+                    this.$Message.success('审核成功');
                 })
                 .catch((error) => {
-                    this.detailLoading = false;
-                    util.errorProcessor(this, error);
-                })
+                    this.sellOrderLoading = false;
+                    if (error.response && error.response.data && error.response.data.code === 2214) {
+                        //库存不足问题
+                        let goodNames = error.response.data.data;
+                        let nameLabel = '';
+                        if (goodNames && Array.isArray(goodNames)) {
+                            for(let i=0; i<goodNames.length; i++) {
+                                nameLabel = nameLabel + goodNames[i] + ' ';
+                            }
+                        }
+                        this.$Modal.error({
+                            title: '库存不足提示',
+                            content: '订单下的商品存在库存不足的情况, 请确认, 对应商品:' + nameLabel
+                        });
+                    }else {
+                        util.errorProcessor(this, error);
+                    }
+                });
+        },
+        removeBtnClick() {
+            let validate = this.validateAction('DELETE');
+            if (!validate) {
+                return;
+            }
+            this.$Modal.confirm({
+                title: '删除提示',
+                content: '订单删除后不可恢复，是否确认删除?',
+                onOk: () => {
+                    this.removeOrder();
+                },
+                onCancel: () => {
+
+                }
+            })
+        },
+        removeOrder() {
+        this.sellOrderLoading = true;
+        util.ajax.delete("/sell/order/remove/" + this.chooseOrderItem.id)
+            .then((response) => {
+                this.sellOrderLoading = false;
+                this.querySellOrderList();
+                this.$Message.success('删除成功');
+            })
+            .catch((error) => {
+                this.sellOrderLoading = false;
+                util.errorProcessor(this, error);
+            });
         }
+
     }
-  
 }
 </script>
 

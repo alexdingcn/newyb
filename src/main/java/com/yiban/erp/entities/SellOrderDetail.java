@@ -35,6 +35,11 @@ public class SellOrderDetail {
 
     private Date updateTime;
 
+    private String checkStatus;
+    private String checkResult;
+    private String checkUser;
+    private Date checkDate;
+
     private RepertoryInfo repertoryInfo;
     private Long goodId;  //在设置repertoryInfo时设置, 辅助前端展示
     private String goodName; //在设置repertoryInfo时设置, 辅助前端展示
@@ -45,8 +50,6 @@ public class SellOrderDetail {
     private String salerNickName;
     private String salerRealName;
     private String customerName;
-
-    private List<SellReviewOption> reviewOptions;
 
     public Long getId() {
         return id;
@@ -168,6 +171,38 @@ public class SellOrderDetail {
         this.updateTime = updateTime;
     }
 
+    public String getCheckStatus() {
+        return checkStatus;
+    }
+
+    public void setCheckStatus(String checkStatus) {
+        this.checkStatus = checkStatus;
+    }
+
+    public String getCheckResult() {
+        return checkResult;
+    }
+
+    public void setCheckResult(String checkResult) {
+        this.checkResult = checkResult;
+    }
+
+    public String getCheckUser() {
+        return checkUser;
+    }
+
+    public void setCheckUser(String checkUser) {
+        this.checkUser = checkUser;
+    }
+
+    public Date getCheckDate() {
+        return checkDate;
+    }
+
+    public void setCheckDate(Date checkDate) {
+        this.checkDate = checkDate;
+    }
+
     public Date getCreateOrderDate() {
         return createOrderDate;
     }
@@ -247,11 +282,4 @@ public class SellOrderDetail {
         this.factoryName = factoryName;
     }
 
-    public List<SellReviewOption> getReviewOptions() {
-        return reviewOptions;
-    }
-
-    public void setReviewOptions(List<SellReviewOption> reviewOptions) {
-        this.reviewOptions = reviewOptions;
-    }
 }

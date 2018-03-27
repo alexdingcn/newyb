@@ -60,10 +60,14 @@ public enum ErrorCode {
     SELL_ORDER_DETAIL_CAN_NOT_REMOVE(2205, "订单详情在订单审批过后不能删除"),
     SELL_ORDER_REVIEW_SUBMIT_PARAMS(2206, "获取审核参数失败"),
     SELL_ORDER_REVIEW_SUBMIT_ID_ERROR(2207, "存在获取不到需要审核的订单信息"),
-    SELL_ORDER_REVIEW_STATUS_ERROR(2208, "存在审批状态错误的数据", ErrorDisplay.NOTICE),
+    SELL_ORDER_REVIEW_STATUS_ERROR(2208, "已销售审核的订单状态不能取消质量审核", ErrorDisplay.NOTICE),
     SELL_ORDER_SHIP_PARAMS(2209, "运输记录必输项信息缺失"),
     SELL_ORDER_SHIP_NOT_FUND(2210, "获取运输记录失败"),
     SELL_ORDER_CUSTOMER_CANNOT_SELL_GOOD(2211, "客户不允许经营特殊管控商品, 而列表中存在特殊管控商品", ErrorDisplay.NOTICE),
+    SELL_ORDER_REMOVE_HAVE_OK_DETAIL(2212, "存在质量审核通过的商品，不能进行删除订单", ErrorDisplay.NOTICE),
+    SELL_ORDER_CHECK_SALE_HAVE_UNOK_DETAIL(2213, "存在出库质量检查未通过的商品，不能审核通过", ErrorDisplay.NOTICE),
+    SELL_ORDER_QUANTITY_NOT_ENOUGH(2214, "存在库存不足的商品:", ErrorDisplay.MODAL),
+    SELL_ORDER_SALE_CHECK_STATUS_ERROR(2215, "订单状态不是质检通过状态，不能进行审核通过", ErrorDisplay.NOTICE),
 
     // 23xx -承运公司
     SHIP_SAVE_PARAMS_ERROR(2301, "必输参数校验失败"),

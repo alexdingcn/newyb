@@ -17,10 +17,15 @@
     <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
     <result column="update_by" property="updateBy" jdbcType="VARCHAR" />
     <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+    <result column="check_status" property="checkStatus" jdbcType="VARCHAR" />
+    <result column="check_result" property="checkResult" jdbcType="VARCHAR" />
+    <result column="check_date" property="checkDate" jdbcType="TIMESTAMP" />
+    <result column="check_user" property="checkUser" jdbcType="VARCHAR" />
   </resultMap>
   <sql id="Base_Column_List" >
     id, sell_order_id, repertory_id, quantity, fix_price, dis_price, free, real_price, single_price,
-    amount, tax_rate, create_by, create_time, update_by, update_time
+    amount, tax_rate, create_by, create_time, update_by, update_time, check_status, check_result, check_date,
+    check_user
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
     select 
@@ -37,15 +42,41 @@
       quantity, fix_price, dis_price, 
       free, real_price, single_price, 
       amount, tax_rate, create_by, 
-      create_time, update_by, update_time
+      create_time, update_by, update_time,
+      check_status, check_result, check_date,
+      check_user
       )
     values (#{sellOrderId,jdbcType=BIGINT}, #{repertoryId,jdbcType=BIGINT},
       #{quantity,jdbcType=INTEGER}, #{fixPrice,jdbcType=DECIMAL}, #{disPrice,jdbcType=DECIMAL}, 
       #{free,jdbcType=DECIMAL}, #{realPrice,jdbcType=DECIMAL}, #{singlePrice,jdbcType=DECIMAL}, 
       #{amount,jdbcType=DECIMAL}, #{taxRate,jdbcType=DECIMAL}, #{createBy,jdbcType=VARCHAR}, 
-      #{createTime,jdbcType=TIMESTAMP}, #{updateBy,jdbcType=VARCHAR}, #{updateTime,jdbcType=TIMESTAMP}
+      #{createTime,jdbcType=TIMESTAMP}, #{updateBy,jdbcType=VARCHAR}, #{updateTime,jdbcType=TIMESTAMP},
+      #{checkStatus,jdbcType=VARCHAR}, #{checkResult,jdbcType=VARCHAR}, #{checkDate,jdbcType=TIMESTAMP},
+      #{checkUser,jdbcType=VARCHAR}
       )
   </insert>
+
+  <insert id="replaceBatch" parameterType="map" keyProperty="id" useGeneratedKeys="true">
+    replace into sell_order_detail (sell_order_id, repertory_id,
+      quantity, fix_price, dis_price,
+      free, real_price, single_price,
+      amount, tax_rate, create_by,
+      create_time, update_by, update_time,
+      check_status, check_result, check_date,
+      check_user
+      )
+    values
+    <foreach collection="detailList" item="item" open="(" close=")" separator="), (">
+      #{item.sellOrderId,jdbcType=BIGINT}, #{item.repertoryId,jdbcType=BIGINT},
+      #{item.quantity,jdbcType=INTEGER}, #{item.fixPrice,jdbcType=DECIMAL}, #{item.disPrice,jdbcType=DECIMAL},
+      #{item.free,jdbcType=DECIMAL}, #{item.realPrice,jdbcType=DECIMAL}, #{item.singlePrice,jdbcType=DECIMAL},
+      #{item.amount,jdbcType=DECIMAL}, #{item.taxRate,jdbcType=DECIMAL}, #{item.createBy,jdbcType=VARCHAR},
+      #{item.createTime,jdbcType=TIMESTAMP}, #{item.updateBy,jdbcType=VARCHAR}, #{item.updateTime,jdbcType=TIMESTAMP},
+      #{item.checkStatus,jdbcType=VARCHAR}, #{item.checkResult,jdbcType=VARCHAR}, #{item.checkDate,jdbcType=TIMESTAMP},
+      #{item.checkUser,jdbcType=VARCHAR}
+    </foreach>
+  </insert>
+
   <insert id="insertSelective" parameterType="com.yiban.erp.entities.SellOrderDetail" keyProperty="id" useGeneratedKeys="true" >
     insert into sell_order_detail
     <trim prefix="(" suffix=")" suffixOverrides="," >
@@ -91,6 +122,18 @@
       <if test="updateTime != null" >
         update_time,
       </if>
+      <if test="checkStatus != null" >
+        check_status,
+      </if>
+      <if test="checkResult != null" >
+        check_result,
+      </if>
+      <if test="checkDate != null" >
+        check_date,
+      </if>
+      <if test="checkUser != null" >
+        check_user,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides="," >
       <if test="sellOrderId != null" >
@@ -134,6 +177,18 @@
       </if>
       <if test="updateTime != null" >
         #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="checkStatus != null" >
+        #{checkStatus,jdbcType=VARCHAR},
+      </if>
+      <if test="checkResult != null" >
+        #{checkResult,jdbcType=VARCHAR},
+      </if>
+      <if test="checkDate != null" >
+        #{checkDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="checkUser != null" >
+        #{checkUser,jdbcType=VARCHAR},
       </if>
     </trim>
   </insert>
@@ -182,6 +237,18 @@
       <if test="updateTime != null" >
         update_time = #{updateTime,jdbcType=TIMESTAMP},
       </if>
+      <if test="checkStatus != null" >
+        check_status = #{checkStatus,jdbcType=VARCHAR},
+      </if>
+      <if test="checkResult != null" >
+        check_result = #{checkResult,jdbcType=VARCHAR},
+      </if>
+      <if test="checkDate != null" >
+        check_date = #{checkDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="checkUser != null" >
+        check_user = #{checkUser,jdbcType=VARCHAR},
+      </if>
     </set>
     where id = #{id,jdbcType=BIGINT}
   </update>
@@ -200,7 +267,11 @@
       create_by = #{createBy,jdbcType=VARCHAR},
       create_time = #{createTime,jdbcType=TIMESTAMP},
       update_by = #{updateBy,jdbcType=VARCHAR},
-      update_time = #{updateTime,jdbcType=TIMESTAMP}
+      update_time = #{updateTime,jdbcType=TIMESTAMP},
+      check_status = #{checkStatus,jdbcType=VARCHAR},
+      check_result = #{checkResult,jdbcType=VARCHAR},
+      check_date = #{checkDate,jdbcType=TIMESTAMP},
+      check_user = #{checkUser,jdbcType=VARCHAR}
     where id = #{id,jdbcType=BIGINT}
   </update>
 
@@ -217,6 +288,7 @@
       t.fix_price as fixPrice, t.dis_price as disPrice, t.free as free, t.real_price as realPrice,
       t.single_price as singlePrice, t.amount as amount, t.tax_rate as taxRate,
       t.create_by as createBy, t.create_time as createTime, t.update_by as updateBy, t.update_time as updateTime,
+      t.check_status as checkStatus, t.check_result as checkResult, t.check_date as checkDate, t.check_user as checkUser,
       c.name as customerName,
       s.create_order_date as createOrderDate,
       u.nickname as salerNickName,
@@ -235,5 +307,37 @@
       limit #{offset}, #{limit}
     </if>
   </select>
+
+  <select id="getUnCheckDetailIdList" parameterType="java.lang.Long" resultType="java.lang.Long">
+    select
+      distinct d.id
+    from sell_order s, sell_order_detail d
+    where s.id = d.sell_order_id
+    and s.id = #{sellOrderId}
+    and (d.check_status is null or d.check_status != 'OK');
+  </select>
+
+  <select id="getCheckOkDetailIdList" parameterType="java.lang.Long" resultType="java.lang.Long">
+    select
+    distinct d.id
+    from sell_order s, sell_order_detail d
+    where s.id = d.sell_order_id
+    and s.id = #{sellOrderId}
+    and d.check_status = 'OK';
+  </select>
+
+  <update id="updateCheckResult" parameterType="map" >
+    update sell_order_detail
+      set check_status = #{reviewAction.checkStatus},
+          check_result = #{reviewAction.checkResult},
+          check_user = #{reviewAction.checkUser},
+          check_date = #{reviewAction.checkDate},
+          update_time = #{updateTime},
+          update_by = #{updateBy}
+    where id in
+    <foreach collection="detailIdList" item="item" open="(" close=")" separator="," >
+      #{item}
+    </foreach>
+  </update>
 
 </mapper>

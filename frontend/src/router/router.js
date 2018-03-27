@@ -121,6 +121,7 @@ export const appRouter = [
     children: [
         { path: 'order', title: '销售制单', name: 'sell_order', component: () => import('@/views/sell/make.vue') },
         { path: 'quality-review', title: '销售出库质量审核', name: 'sell-quality-review', component: () => import('@/views/sell/sell-quality-review.vue') },
+        { path: 'sale-review', title: '销售审核', name: 'sell-sale-review', component: () => import('@/views/sell/sell-sale-review.vue') },
         { path: 'list', title: '销售订单列表', name: 'sell_list', component: () => import('@/views/sell/sell-order-list.vue') },
     ]
 },

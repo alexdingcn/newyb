@@ -4,17 +4,21 @@ import com.yiban.erp.entities.SellOrderDetail;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 public class SellReviewAction {
 
     private String reviewType;
     private List<SellOrderDetail> detailList;
-    private String reviewStatus;
-    private String reviewComment;
+    private String checkStatus;
+    private String checkResult;
 
     private Long sellOrderId; //根据detailList取第一个
     private List<Long> detailIdList; //根据detailList获取ID
+
+    private Date checkDate;
+    private String checkUser;
 
     public Long getSellOrderId() {
         if (detailList != null && !detailList.isEmpty()) {
@@ -49,19 +53,35 @@ public class SellReviewAction {
         this.detailList = detailList;
     }
 
-    public String getReviewStatus() {
-        return reviewStatus;
+    public String getCheckStatus() {
+        return checkStatus;
     }
 
-    public void setReviewStatus(String reviewStatus) {
-        this.reviewStatus = reviewStatus;
+    public void setCheckStatus(String checkStatus) {
+        this.checkStatus = checkStatus;
     }
 
-    public String getReviewComment() {
-        return reviewComment;
+    public String getCheckResult() {
+        return checkResult;
     }
 
-    public void setReviewComment(String reviewComment) {
-        this.reviewComment = reviewComment;
+    public void setCheckResult(String checkResult) {
+        this.checkResult = checkResult;
+    }
+
+    public Date getCheckDate() {
+        return checkDate;
+    }
+
+    public void setCheckDate(Date checkDate) {
+        this.checkDate = checkDate;
+    }
+
+    public String getCheckUser() {
+        return checkUser;
+    }
+
+    public void setCheckUser(String checkUser) {
+        this.checkUser = checkUser;
     }
 }
