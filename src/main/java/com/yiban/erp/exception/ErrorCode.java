@@ -72,6 +72,11 @@ public enum ErrorCode {
     // 23xx -承运公司
     SHIP_SAVE_PARAMS_ERROR(2301, "必输参数校验失败"),
 
+    // 24xx -收货入库
+    RECEIVE_SAVE_PRAMS_INVALID(2401, "入库质量检查单参数错误"),
+    RECEIVE_ORDER_NOT_FOUND(2402, "获取入库质量单信息失败"),
+    RECEIVE_ORDER_CANNOT_UPDATE(2403, "当前订单处于不可修改状态"),
+
 
     // 41xx - 贷款
     SEND_VERIFY_CODE_FAIL(4104, "发送验证码失败"),

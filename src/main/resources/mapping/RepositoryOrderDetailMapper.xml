@@ -1,0 +1,271 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.yiban.erp.dao.RepositoryOrderDetailMapper" >
+  <resultMap id="BaseResultMap" type="com.yiban.erp.entities.RepositoryOrderDetail" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="repository_order_id" property="repositoryOrderId" jdbcType="BIGINT" />
+    <result column="goods_id" property="goodsId" jdbcType="BIGINT" />
+    <result column="receive_quality" property="receiveQuality" jdbcType="INTEGER" />
+    <result column="big_quality" property="bigQuality" jdbcType="INTEGER" />
+    <result column="free" property="free" jdbcType="INTEGER" />
+    <result column="price" property="price" jdbcType="DECIMAL" />
+    <result column="exp_date" property="expDate" jdbcType="TIMESTAMP" />
+    <result column="product_date" property="productDate" jdbcType="TIMESTAMP" />
+    <result column="batch_code" property="batchCode" jdbcType="VARCHAR" />
+    <result column="amount" property="amount" jdbcType="DECIMAL" />
+    <result column="warehouse_location" property="warehouseLocation" jdbcType="VARCHAR" />
+    <result column="reject_quality" property="rejectQuality" jdbcType="INTEGER" />
+    <result column="reject_comment" property="rejectComment" jdbcType="VARCHAR" />
+    <result column="create_by" property="createBy" jdbcType="VARCHAR" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_by" property="updateBy" jdbcType="VARCHAR" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, repository_order_id, goods_id, receive_quality, big_quality, free, price, exp_date, 
+    product_date, batch_code, amount, warehouse_location, reject_quality, reject_comment, 
+    create_by, create_time, update_by, update_time
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select 
+    <include refid="Base_Column_List" />
+    from repository_order_detail
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
+    delete from repository_order_detail
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+
+  <delete id="deleteByOrderId" parameterType="java.lang.Long">
+    delete from repository_order_detail where repository_order_id = #{repositoryOrderId,jdbcType=BIGINT}
+  </delete>
+
+  <insert id="insert" parameterType="com.yiban.erp.entities.RepositoryOrderDetail" keyProperty="id" useGeneratedKeys="true" >
+    insert into repository_order_detail (repository_order_id, goods_id,
+      receive_quality, big_quality, free, 
+      price, exp_date, product_date, 
+      batch_code, amount, warehouse_location, 
+      reject_quality, reject_comment, create_by, 
+      create_time, update_by, update_time
+      )
+    values (#{repositoryOrderId,jdbcType=BIGINT}, #{goodsId,jdbcType=BIGINT},
+      #{receiveQuality,jdbcType=INTEGER}, #{bigQuality,jdbcType=INTEGER}, #{free,jdbcType=INTEGER}, 
+      #{price,jdbcType=DECIMAL}, #{expDate,jdbcType=TIMESTAMP}, #{productDate,jdbcType=TIMESTAMP}, 
+      #{batchCode,jdbcType=VARCHAR}, #{amount,jdbcType=DECIMAL}, #{warehouseLocation,jdbcType=VARCHAR}, 
+      #{rejectQuality,jdbcType=INTEGER}, #{rejectComment,jdbcType=VARCHAR}, #{createBy,jdbcType=VARCHAR}, 
+      #{createTime,jdbcType=TIMESTAMP}, #{updateBy,jdbcType=VARCHAR}, #{updateTime,jdbcType=TIMESTAMP}
+      )
+  </insert>
+
+  <insert id="insertBatch" parameterType="map" keyProperty="id" useGeneratedKeys="true" >
+    insert into repository_order_detail (repository_order_id, goods_id,
+    receive_quality, big_quality, free,
+    price, exp_date, product_date,
+    batch_code, amount, warehouse_location,
+    reject_quality, reject_comment, create_by,
+    create_time, update_by, update_time
+    )
+    values
+    <foreach collection="details" item="item" open="(" close=")" separator="), (">
+      #{item.repositoryOrderId,jdbcType=BIGINT}, #{item.goodsId,jdbcType=BIGINT},
+      #{item.receiveQuality,jdbcType=INTEGER}, #{item.bigQuality,jdbcType=INTEGER}, #{item.free,jdbcType=INTEGER},
+      #{item.price,jdbcType=DECIMAL}, #{item.expDate,jdbcType=TIMESTAMP}, #{item.productDate,jdbcType=TIMESTAMP},
+      #{item.batchCode,jdbcType=VARCHAR}, #{item.amount,jdbcType=DECIMAL}, #{item.warehouseLocation,jdbcType=VARCHAR},
+      #{item.rejectQuality,jdbcType=INTEGER}, #{item.rejectComment,jdbcType=VARCHAR}, #{item.createBy,jdbcType=VARCHAR},
+      #{item.createTime,jdbcType=TIMESTAMP}, #{item.updateBy,jdbcType=VARCHAR}, #{item.updateTime,jdbcType=TIMESTAMP}
+    </foreach>
+  </insert>
+
+  <insert id="insertSelective" parameterType="com.yiban.erp.entities.RepositoryOrderDetail"  keyProperty="id" useGeneratedKeys="true">
+    insert into repository_order_detail
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="repositoryOrderId != null" >
+        repository_order_id,
+      </if>
+      <if test="goodsId != null" >
+        goods_id,
+      </if>
+      <if test="receiveQuality != null" >
+        receive_quality,
+      </if>
+      <if test="bigQuality != null" >
+        big_quality,
+      </if>
+      <if test="free != null" >
+        free,
+      </if>
+      <if test="price != null" >
+        price,
+      </if>
+      <if test="expDate != null" >
+        exp_date,
+      </if>
+      <if test="productDate != null" >
+        product_date,
+      </if>
+      <if test="batchCode != null" >
+        batch_code,
+      </if>
+      <if test="amount != null" >
+        amount,
+      </if>
+      <if test="warehouseLocation != null" >
+        warehouse_location,
+      </if>
+      <if test="rejectQuality != null" >
+        reject_quality,
+      </if>
+      <if test="rejectComment != null" >
+        reject_comment,
+      </if>
+      <if test="createBy != null" >
+        create_by,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+      <if test="updateBy != null" >
+        update_by,
+      </if>
+      <if test="updateTime != null" >
+        update_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="repositoryOrderId != null" >
+        #{repositoryOrderId,jdbcType=BIGINT},
+      </if>
+      <if test="goodsId != null" >
+        #{goodsId,jdbcType=BIGINT},
+      </if>
+      <if test="receiveQuality != null" >
+        #{receiveQuality,jdbcType=INTEGER},
+      </if>
+      <if test="bigQuality != null" >
+        #{bigQuality,jdbcType=INTEGER},
+      </if>
+      <if test="free != null" >
+        #{free,jdbcType=INTEGER},
+      </if>
+      <if test="price != null" >
+        #{price,jdbcType=DECIMAL},
+      </if>
+      <if test="expDate != null" >
+        #{expDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="productDate != null" >
+        #{productDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="batchCode != null" >
+        #{batchCode,jdbcType=VARCHAR},
+      </if>
+      <if test="amount != null" >
+        #{amount,jdbcType=DECIMAL},
+      </if>
+      <if test="warehouseLocation != null" >
+        #{warehouseLocation,jdbcType=VARCHAR},
+      </if>
+      <if test="rejectQuality != null" >
+        #{rejectQuality,jdbcType=INTEGER},
+      </if>
+      <if test="rejectComment != null" >
+        #{rejectComment,jdbcType=VARCHAR},
+      </if>
+      <if test="createBy != null" >
+        #{createBy,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateBy != null" >
+        #{updateBy,jdbcType=VARCHAR},
+      </if>
+      <if test="updateTime != null" >
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.yiban.erp.entities.RepositoryOrderDetail" >
+    update repository_order_detail
+    <set >
+      <if test="repositoryOrderId != null" >
+        repository_order_id = #{repositoryOrderId,jdbcType=BIGINT},
+      </if>
+      <if test="goodsId != null" >
+        goods_id = #{goodsId,jdbcType=BIGINT},
+      </if>
+      <if test="receiveQuality != null" >
+        receive_quality = #{receiveQuality,jdbcType=INTEGER},
+      </if>
+      <if test="bigQuality != null" >
+        big_quality = #{bigQuality,jdbcType=INTEGER},
+      </if>
+      <if test="free != null" >
+        free = #{free,jdbcType=INTEGER},
+      </if>
+      <if test="price != null" >
+        price = #{price,jdbcType=DECIMAL},
+      </if>
+      <if test="expDate != null" >
+        exp_date = #{expDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="productDate != null" >
+        product_date = #{productDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="batchCode != null" >
+        batch_code = #{batchCode,jdbcType=VARCHAR},
+      </if>
+      <if test="amount != null" >
+        amount = #{amount,jdbcType=DECIMAL},
+      </if>
+      <if test="warehouseLocation != null" >
+        warehouse_location = #{warehouseLocation,jdbcType=VARCHAR},
+      </if>
+      <if test="rejectQuality != null" >
+        reject_quality = #{rejectQuality,jdbcType=INTEGER},
+      </if>
+      <if test="rejectComment != null" >
+        reject_comment = #{rejectComment,jdbcType=VARCHAR},
+      </if>
+      <if test="createBy != null" >
+        create_by = #{createBy,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateBy != null" >
+        update_by = #{updateBy,jdbcType=VARCHAR},
+      </if>
+      <if test="updateTime != null" >
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.yiban.erp.entities.RepositoryOrderDetail" >
+    update repository_order_detail
+    set repository_order_id = #{repositoryOrderId,jdbcType=BIGINT},
+      goods_id = #{goodsId,jdbcType=BIGINT},
+      receive_quality = #{receiveQuality,jdbcType=INTEGER},
+      big_quality = #{bigQuality,jdbcType=INTEGER},
+      free = #{free,jdbcType=INTEGER},
+      price = #{price,jdbcType=DECIMAL},
+      exp_date = #{expDate,jdbcType=TIMESTAMP},
+      product_date = #{productDate,jdbcType=TIMESTAMP},
+      batch_code = #{batchCode,jdbcType=VARCHAR},
+      amount = #{amount,jdbcType=DECIMAL},
+      warehouse_location = #{warehouseLocation,jdbcType=VARCHAR},
+      reject_quality = #{rejectQuality,jdbcType=INTEGER},
+      reject_comment = #{rejectComment,jdbcType=VARCHAR},
+      create_by = #{createBy,jdbcType=VARCHAR},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_by = #{updateBy,jdbcType=VARCHAR},
+      update_time = #{updateTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+
+
+
+
+</mapper>

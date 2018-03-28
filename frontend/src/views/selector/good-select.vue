@@ -4,7 +4,7 @@
         ref="goodsSelect"
         v-model="id" 
         filterable
-        clearable
+        :clearable="true"
         remote
         placeholder="商品名称/拼音"
         :size="selectSize"
@@ -13,7 +13,7 @@
         :loading="goodsLoading">
         <Option v-for="option in goodsOptions" :value="option.id" :label="option.name" :key="option.id">
             <span class="option-goods-name">{{ option.name }}</span>
-            <span class="option-goods-spec">{{ option.spec }} | {{option.factory}}</span>
+            <span class="option-goods-spec">{{option.jx}} | {{ option.spec }} | {{option.factory}}</span>
         </Option>
     </Select>
 
@@ -58,6 +58,9 @@ export default {
             } else {
                 this.goodsOptions = [];
             }
+        },
+        clearSingleSelect() {
+            this.$refs.goodsSelect.clearSingleSelect();
         },
         onChange (data) {
             let goods = this.goodsOptions.filter(item => item.id === data);

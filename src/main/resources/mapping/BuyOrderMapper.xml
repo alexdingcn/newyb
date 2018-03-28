@@ -269,4 +269,13 @@
       and company_id = #{companyId,jdbcType=INTEGER}
     </if>
   </update>
+
+  <select id="getGoodsOrderCount" parameterType="java.lang.Long" resultType="com.yiban.erp.dto.CurrentBalanceResp">
+      select count(b.id) as buyOrderCount, sum(quantity) as ongoing
+      from buy_order b, buy_order_detail d
+      where b.id = d.buy_order_id
+      and b.status in ('INIT', 'CHECKING')
+      and d.goods_id = #{goodsId}
+  </select>
+
 </mapper>

@@ -1,6 +1,6 @@
 
 <template>
-   <Select v-model="id" filterable clearable :disabled="disabled" placeholder="请选择交通工具" @on-change="onChange">
+   <Select v-model="id" :size="size" filterable clearable :disabled="disabled" placeholder="请选择交通工具" @on-change="onChange">
         <Option v-for="item in optionList" :value="item.id" :key="item.id">{{ item.value }}</Option>
     </Select>
 </template>
@@ -9,7 +9,7 @@
 import util from "@/libs/util.js";
 
 export default {
-    name: "sale-select",
+    name: "ship-tool-select",
     props: ['value', 'size', 'disabled'],
     data() {
         return {

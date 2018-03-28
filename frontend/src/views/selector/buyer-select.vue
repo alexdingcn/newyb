@@ -1,7 +1,9 @@
 
 <template>
-   <Select v-model="id" :size="size" filterable clearable :disabled="disabled" placeholder="请选择承运单位" @on-change="onChange">
-        <Option v-for="item in optionList" :value="item.id" :key="item.id">{{ item.name }}</Option>
+   <Select v-model="id" filterable clearable :disabled="disabled" placeholder="请选择采购员" 
+        :size="size" 
+        @on-change="onChange">
+        <Option v-for="item in optionList" :value="item.userId" :key="item.userId">{{item.nickname}}{{item.realname||''}}</Option>
     </Select>
 </template>
 
@@ -9,7 +11,7 @@
 import util from "@/libs/util.js";
 
 export default {
-    name: "ship-company-select",
+    name: "buyer-select",
     props: ['value', 'size', 'disabled'],
     data() {
         return {
@@ -27,13 +29,16 @@ export default {
     },
     methods: {
         initList() {
-            util.ajax.get('/ship/list')
-            .then((response) => {
-                this.optionList = response.data.data;
-            })
-            .catch((error) => {
-                util.errorProcessor(this, error);
-            });
+            var self = this;
+            util.ajax.get('/userrole/list', {params: {roleQuery: 'ROLE_BUYER;ROLE_BUYER_SPECIAL'} })
+                .then(function (response) {
+                    if (response.status === 200 && response.data) {
+                        self.optionList = response.data;
+                    }
+                })
+                .catch(function (error) {
+                    util.errorProcessor(self, error);
+                });
         },
         onChange (data) {
             let items = this.optionList.filter(item => item.id === data);

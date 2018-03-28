@@ -4,6 +4,7 @@ import com.yiban.erp.entities.RepertoryInfo;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -34,4 +35,9 @@ public interface RepertoryInfoMapper {
     int sellOrderConsumeQuantity(@Param("sellOrderId") Long sellOrderId,
                                  @Param("updateBy") String updateBy,
                                  @Param("updateTime") Date updateTime);
+
+    //获取当前仓库中某一类商品的存量
+    Integer getBalance(@Param("warehouseId") Integer warehouseId, @Param("goodsId") Long goodsId);
+    //获取某一商品最近一次的采购价
+    BigDecimal getLastBuyPrice(@Param("warehouseId") Integer warehouseId, @Param("goodsId") Long goodsId);
 }

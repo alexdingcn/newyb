@@ -9,7 +9,7 @@
 import util from "@/libs/util.js";
 
 export default {
-    name: "sale-select",
+    name: "pay-method-select",
     props: ['value', 'size', 'disabled'],
     data() {
         return {

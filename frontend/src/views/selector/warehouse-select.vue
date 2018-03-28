@@ -1,6 +1,6 @@
 
 <template>
-  <Select v-model="warehouseId" filterable clearable :disabled="disabled"
+  <Select v-model="warehouseId" filterable clearable :disabled="disabled" :size="size" 
         placeholder="请选择仓库点" @on-change="onChange">
         <Option v-for="item in warehouseList" :value="item.id" :key="item.id">{{ item.name }}</Option>
    </Select>

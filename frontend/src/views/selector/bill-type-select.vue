@@ -1,7 +1,7 @@
 
 <template>
-   <Select v-model="id" :size="size" filterable clearable :disabled="disabled" placeholder="请选择承运单位" @on-change="onChange">
-        <Option v-for="item in optionList" :value="item.id" :key="item.id">{{ item.name }}</Option>
+   <Select v-model="id" :size="size" filterable clearable :disabled="disabled" placeholder="请选择发票种类" @on-change="onChange">
+        <Option v-for="item in optionList" :value="item.id" :key="item.id">{{ item.value }}</Option>
     </Select>
 </template>
 
@@ -9,7 +9,7 @@
 import util from "@/libs/util.js";
 
 export default {
-    name: "ship-company-select",
+    name: "bill-type-select",
     props: ['value', 'size', 'disabled'],
     data() {
         return {
@@ -27,13 +27,15 @@ export default {
     },
     methods: {
         initList() {
-            util.ajax.get('/ship/list')
-            .then((response) => {
-                this.optionList = response.data.data;
-            })
-            .catch((error) => {
-                util.errorProcessor(this, error);
-            });
+            let reqData = ["BILL_TYPE"];
+            util.ajax
+                .post("/options/list", reqData)
+                .then(response => {
+                    this.optionList = response.data.BILL_TYPE;
+                })
+                .catch(error => {
+                    util.errorProcessor(this, error);
+                });
         },
         onChange (data) {
             let items = this.optionList.filter(item => item.id === data);

@@ -1,5 +1,6 @@
 package com.yiban.erp.dao;
 
+import com.yiban.erp.dto.CurrentBalanceResp;
 import com.yiban.erp.entities.BuyOrder;
 import com.yiban.erp.entities.BuyOrderQuery;
 import org.apache.ibatis.annotations.Mapper;
@@ -21,4 +22,6 @@ public interface BuyOrderMapper {
     int updateByPrimaryKey(BuyOrder record);
 
     List<BuyOrder> queryOrders(BuyOrderQuery buyOrder);
+
+    CurrentBalanceResp getGoodsOrderCount(Long goodsId);
 }

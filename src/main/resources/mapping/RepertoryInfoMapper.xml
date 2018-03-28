@@ -330,4 +330,19 @@
     where d.repertory_id = r.id and d.sell_order_id = #{sellOrderId}
   </update>
 
+  <select id="getBalance" parameterType="map" resultType="java.lang.Integer">
+    select count(quantity) as count
+    from repertory_info
+    where warehouse_id = #{warehouseId}
+    and good_id = #{goodsId}
+  </select>
+
+  <select id="getLastBuyPrice" parameterType="map" resultType="java.math.BigDecimal" >
+    select buy_price
+    from repertory_info
+    where warehouse_id = #{warehouseId} and good_id = #{goodsId}
+    order by id desc
+    limit 1;
+  </select>
+
 </mapper>
