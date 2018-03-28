@@ -70,38 +70,22 @@
 				<Row>
 					<Col span="6">
 					<FormItem label="运输方式" prop="shipMethodId">
-						<Select v-model="buyOrder.shipMethodId" size="small" placeholder="运输方式" clearable>
-							<Option v-for="option in shipMethodOptions" :value="option.id" :label="option.value" :key="option.id">
-								{{option.value}}
-							</Option>
-						</Select>
+                        <ship-method-select v-model="buyOrder.shipMethodId" size="small" ></ship-method-select>
 					</FormItem>
 					</Col>
 					<Col span="5">
 					<FormItem label="运输工具" prop="shipToolId">
-						<Select v-model="buyOrder.shipToolId" size="small" placeholder="运输工具" clearable>
-							<Option v-for="option in shipToolOptions" :value="option.id" :label="option.value" :key="option.id">
-								{{option.value}}
-							</Option>
-						</Select>
+                        <ship-tool-select v-model="buyOrder.shipToolId" size="small"></ship-tool-select>
 					</FormItem>
 					</Col>
 					<Col span="6">
 					<FormItem label="温控方式" prop="temperControlId">
-						<Select v-model="buyOrder.temperControlId" size="small" placeholder="温控方式" clearable>
-							<Option v-for="option in temperControlOptions" :value="option.id" :label="option.value" :key="option.id">
-								{{option.value}}
-							</Option>
-						</Select>
+                        <temper-control-select v-model="buyOrder.temperControlId" size="small"></temper-control-select>
 					</FormItem>
 					</Col>
 					<Col span="6">
 					<FormItem label="仓库点" prop="warehouseId">
-						<Select v-model="buyOrder.warehouseId" size="small" placeholder="仓库点" clearable>
-							<Option v-for="option in warehouseOptions" :value="option.id" :label="option.name" :key="option.id">
-								{{option.name}}
-							</Option>
-						</Select>
+                        <warehouse-select v-model="buyOrder.warehouseId" size="small"></warehouse-select>
 					</FormItem>
 					</Col>
 				</Row>
@@ -171,9 +155,19 @@
     import axios from 'axios';
     import moment from 'moment';
     import util from '@/libs/util.js';
+    import shipToolSelect from "@/views/selector/ship-tool-select.vue";
+    import shipMethodSelect from "@/views/selector/ship-method-select.vue";
+    import temperControlSelect from "@/views/selector/temper-control-select.vue";
+    import warehouseSelect from "@/views/selector/warehouse-select.vue"
 
     export default {
         name: 'buy_order',
+        components: {
+            shipToolSelect,
+            shipMethodSelect,
+            temperControlSelect,
+            warehouseSelect
+        },
         data () {
             return {
                 saving: false,
@@ -184,10 +178,6 @@
                 buyerOptions: [],
                 supplierContactLoading: false,
                 supplierContactOptions: [],
-                shipMethodOptions: [],
-                shipToolOptions: [],
-                temperControlOptions: [],
-                warehouseOptions: [],
             	totalAmount: 0,
             	edittingRow: {},
                 closeConfirm: false,
@@ -423,8 +413,6 @@
         },
         mounted () {
             this.queryBuyers();
-            this.queryCommonOptions();
-            this.queryWarehouseList();
         },
     activated () {
             this.clearData();
@@ -437,19 +425,6 @@
         methods: {
             moment: function () {
                 return moment();
-            },
-            queryWarehouseList () {
-                var self = this;
-                util.ajax.get('/warehouse/list')
-                    .then(function (response) {
-                        self.warehouseOptions = response.data;
-                        if (self.warehouseOptions.length === 1) {
-                            self.buyOrder.warehouseId = self.warehouseOptions[0].id;
-                        }
-                    })
-                    .catch(function (error) {
-                        console.log(error);
-                    });
             },
             querySupplier (query) {
                 var self = this;
@@ -556,29 +531,6 @@
             		}
                 }
                 this.$refs.goodsSelect.clearSingleSelect();
-            },
-            queryCommonOptions () {
-                var self = this;
-                util.ajax.post('/options/list', ['SHIP_METHOD', 'SHIP_TOOL', 'TEMPER_CONTROL'])
-                    .then(function (response) {
-                        if (response.status === 200) {
-                            self.shipMethodOptions = response.data['SHIP_METHOD'];
-                            self.shipToolOptions = response.data['SHIP_TOOL'];
-                            self.temperControlOptions = response.data['TEMPER_CONTROL'];
-                            if (self.shipMethodOptions.length == 1) {
-                                self.buyOrder.shipMethodId = self.shipMethodOptions[0].id;
-                            }
-                            if (self.shipToolOptions.length == 1) {
-                                self.buyOrder.shipToolId = self.shipToolOptions[0].id;
-                            }
-                            if (self.temperControlOptions.length == 1) {
-                                self.buyOrder.temperControlId = self.temperControlOptions[0].id;
-                            }
-                        }
-                    })
-                    .catch(function (error) {
-                        console.log(error);
-                    });
             },
             doSave () {
                 var self = this;

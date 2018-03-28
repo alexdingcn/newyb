@@ -49,7 +49,7 @@ export default {
             }
         },
         onSelectSupplier (data) {
-            let items = this.goodsOptions.filter(item => item.id === data);
+            let items = this.supplierOptions.filter(item => item.id === data);
             let item = '';
             if(items && items[0]) {
                 item = items[0];

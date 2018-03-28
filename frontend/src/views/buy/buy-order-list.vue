@@ -14,15 +14,7 @@
 						<DatePicker v-model="dateRange" type="daterange" placement="bottom-end" placeholder="订单日期" style="width:180px"></DatePicker>
 					</Col>
 					<Col span="6" class="padding-2">
-						<Select v-model="query.supplierId"
-								filterable
-								clearable
-								remote
-								placeholder="供应商"
-								:remote-method="querySupplier"
-								:loading="supplierLoading">
-							<Option v-for="option in supplierOptions" :value="option.id" :label="option.name" :key="option.id">{{option.name}}</Option>
-						</Select>
+                        <supplier-select v-model="query.supplierId"></supplier-select>
 					</Col>
 					<Col span="5" class="padding-2">
 						<Select v-model="query.status" placeholder="状态">
@@ -78,22 +70,25 @@
     import axios from 'axios';
     import moment from 'moment';
     import util from '@/libs/util.js';
+    import supplierSelect from "@/views/selector/supplier-select.vue";
 
     export default {
         name: 'buy_order',
+        components: {
+            supplierSelect
+        },
         data () {
             return {
                 statusOptions: [{key: 'ALL', name: '所有'}, {key: 'CHECKING', name: '未审批'}, {key: 'CHECKED', name: '已审批'}],
                 query: {
-                    status: 'CHECKING'
+                    status: 'CHECKING',
+                    supplierId: ''
                 },
                 dateRange: [
                     moment().add(-1, 'w').format('YYYY-MM-DD'),
                     moment().format('YYYY-MM-DD')
                 ],
                 orderList: [],
-            	supplierLoading: false,
-            	supplierOptions: [],
             	goodsLoading: false,
             	totalAmount: 0,
                 orderItems: [],
@@ -372,22 +367,6 @@
                     });
             },
 
-            querySupplier (query) {
-                var self = this;
-                if (query !== '') {
-                    this.supplierLoading = true;
-                    util.ajax.post('/supplier/search', {search: query})
-                        .then(function (response) {
-                        	self.supplierLoading = false;
-                            self.supplierOptions = response.data;
-                        })
-                        .catch(function (error) {
-                            console.log(error);
-                        });
-                } else {
-                    this.supplierOptions = [];
-                }
-            },
             handleSelectBuyOrder (row) {
                 var self = this;
                 util.ajax.get('/buy/orderdetail/' + row.id)
