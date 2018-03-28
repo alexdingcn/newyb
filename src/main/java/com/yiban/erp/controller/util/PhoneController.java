@@ -1,5 +1,7 @@
 package com.yiban.erp.controller.util;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.aliyuncs.DefaultAcsClient;
 import com.aliyuncs.IAcsClient;
 import com.aliyuncs.dysmsapi.model.v20170525.SendSmsRequest;
@@ -13,7 +15,7 @@ import com.yiban.erp.exception.ErrorCode;
 import org.apache.commons.lang.time.DateUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -43,7 +45,7 @@ public class PhoneController {
     private String accessKeySecret;
 
     @Resource
-    private RedisTemplate<String, VerifyCode> redisTemplate;
+    private StringRedisTemplate stringRedisTemplate;
 
     @RequestMapping(value = "/verifycode", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> getPhoneVerifyCode(@RequestBody VerifyCodeReq verifyCodeReq) throws Exception {
@@ -53,8 +55,8 @@ public class PhoneController {
 
         // 验证码频繁校验
         String cacheKey = "MOBILE_" + verifyCodeReq.getMobile();
-        ValueOperations<String, VerifyCode> operations = redisTemplate.opsForValue();
-        VerifyCode verifyCodeObj = operations.get(cacheKey);
+        ValueOperations<String, String> operations = stringRedisTemplate.opsForValue();
+        VerifyCode verifyCodeObj = JSONObject.parseObject(operations.get(cacheKey), VerifyCode.class);
         if (verifyCodeObj != null) {
             if (verifyCodeObj.getCount() > 3) {
                 throw new BizException(ErrorCode.MOBILE_VERIFY_CODE_TOO_FREQUENT);
@@ -99,7 +101,7 @@ public class PhoneController {
         if (sendSmsResponse != null && "OK".equalsIgnoreCase(sendSmsResponse.getCode())) {
             verifyCodeObj.setMobile(verifyCodeReq.getMobile());
             verifyCodeObj.setCode(verifyCode);
-            operations.set(cacheKey, verifyCodeObj, 10, TimeUnit.MINUTES);
+            operations.set(cacheKey, JSON.toJSONString(verifyCodeObj), 10, TimeUnit.MINUTES);
 
             return ResponseEntity.ok().build();
         }
