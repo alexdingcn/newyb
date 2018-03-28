@@ -3,7 +3,6 @@
 SpringBoot ＋ 前端MVVM Vue.js 基于Java的微服务全栈快速开发实践
 
 
-
 ### 后端API代码
 
 ~~~~java
@@ -56,7 +55,7 @@ Webpack提供了一整套前端工程自动化的解决方案
 
 ## Demo
 
-一个简单的“上海人员信息查询系统”作为例子
+一个简单的“人员信息查询系统”作为例子
 
 [![demo-image](https://github.com/boylegu/SpringBoot-vue/blob/master/images/demo.gif?raw=true)]()
 
@@ -117,19 +116,19 @@ Webpack提供了一整套前端工程自动化的解决方案
 
 ### 准备工作
 
-- 安装JDK1.7或更新的版本
+- 安装JDK1.8或更新的版本
 - 安装Node.js/NPM
 - 克隆仓库
 
-        git clone https://github.com/boylegu/SpringBoot-vue.git
+        git clone https://github.com/alexdingcn/newyb
         
-        cd springboot_vue
+        cd newyb
 
 ### 安装  
         
 - 编译前端开发环境
 
-        cd springboot_vue/frontend
+        cd newyb/frontend
 
         npm install 
 
@@ -137,21 +136,49 @@ Webpack提供了一整套前端工程自动化的解决方案
 
 - 运行Spring Boot后端服务
 
-        cd springboot_vue/target/
+        cd newyb/target/
 
-        java -jar springboot_vue-0.0.1-SNAPSHOT.jar
+        java -jar erp-1.1.1-SNAPSHOT.jar
 
 
 [![](https://github.com/boylegu/SpringBoot-vue/blob/master/images/spring_run.png?raw=true)]()
 
 - 运行前端服务
 
-        cd springboot_vue/frontend
+        cd newyb/frontend
 
         npm run dev
 
 
-> 你也可以在生产环境中运行`cd springboot_vue/frontend;npm run build`进行编译并配合Nginx
+> 你也可以在生产环境中运行`cd newyb/frontend;npm run build`进行编译并配合Nginx
+
+### 从建表到前端
+
+- MySql建表
+
+        要包含
+        id(自增）
+        created_time(timestamp)
+        created_by(varchar(32))
+        updated_time(timestamp)
+        updated_by(varchar(32))
+        
+- 修改generatorConfig.xml, 用plugin生成Mapper
+
+		 mvn mybatis-generator:generate
+
+- 修改Mapper.xml，更改id生成方式, 添加useGeneratedKeys="true" keyProperty="id"
+
+		<insert id="insertSelective" parameterType="com.yiban.erp.entities.BizWxApply" useGeneratedKeys="true" keyProperty="id">
+		 
+- 修改*Mapper.java文件，增加@Mapper的标注
+- 修改mybatis-config.xml，增加新的mapper文件
+- 创建@RestController，增加CRUD操作
+- 前端通过util.ajax.get或者util.ajax.post调用后端服务
+- 如果api不需要登录保护，修改WebSecurityConfig，添加到ignore列表
+
+		web.ignoring().antMatchers("/register", "/loan/**", "/phone/**");
+		 
 
 
 ### 后台数据接口封装
