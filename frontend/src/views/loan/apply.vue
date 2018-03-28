@@ -25,9 +25,9 @@
                 util.ajax.post('/loan/face/token')
                     .then(function (response) {
                         if (response.status === 200) {
-                            self.result = response.data;
-                            Cookies.set('face_token', response.data.biz_id, { expires: 1/96 });
-                            window.location = response.data;
+                            self.result = response.data.url;
+                            Cookies.set('face_token', response.data.bizNo, { expires: 1/96 });
+                            window.location = response.data.url;
                         }
                     })
                     .catch(function (error) {

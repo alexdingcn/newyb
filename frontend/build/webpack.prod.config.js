@@ -33,7 +33,7 @@ module.exports = merge(webpackBaseConfig, {
         new webpack.optimize.CommonsChunkPlugin({
             // name: 'vendors',
             // filename: 'vendors.[hash].js'
-            name: ['vender-exten', 'vender-base'],
+            names: ['vendor'],
             minChunks: Infinity
         }),
         new webpack.DefinePlugin({
@@ -46,15 +46,15 @@ module.exports = merge(webpackBaseConfig, {
                 warnings: false
             }
         }),
-        // new UglifyJsParallelPlugin({
-        //     workers: os.cpus().length,
-        //     mangle: true,
-        //     compressor: {
-        //       warnings: false,
-        //       drop_console: true,
-        //       drop_debugger: true
-        //      }
-        // }),
+        new UglifyJsParallelPlugin({
+            workers: os.cpus().length,
+            mangle: true,
+            compressor: {
+                  warnings: false,
+                  drop_console: true,
+                  drop_debugger: true
+             }
+        }),
         new CopyWebpackPlugin([
             {
                 from: 'td_icon.ico'
@@ -75,7 +75,7 @@ module.exports = merge(webpackBaseConfig, {
             ]
         }),
         new HtmlWebpackPlugin({
-            title: '医站通ERP v' + package.version,
+            title: '医伴金服' + package.version,
             favicon: './td_icon.ico',
             filename: '../index.html',
             template: '!!ejs-loader!./src/template/index.ejs',
