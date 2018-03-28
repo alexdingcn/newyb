@@ -1,5 +1,8 @@
 <style lang="less">
     @import '../../styles/common.less';
+    body {
+        overflow: auto;
+    }
 </style>
 
 

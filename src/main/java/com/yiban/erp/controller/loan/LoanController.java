@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.util.Base64Utils;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -24,7 +25,6 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.web.util.UriComponentsBuilder;
-import sun.misc.BASE64Encoder;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
@@ -72,7 +72,7 @@ public class LoanController {
         postData.add("api_secret", faceIdApiSecret);
         String bizNo = UUID.randomUUID().toString();
         postData.add("biz_no", bizNo);
-        postData.add("return_url", "http://192.168.1.188:8082/#/loan/bizlicense");
+        postData.add("return_url", "https://wx.yibanmed.com/static/faceresult.html");
         postData.add("notify_url", "https://www.yibanjf.com");
         postData.add("scene_id", SCENE_ID);
         postData.add("comparison_type", String.valueOf(1));
@@ -84,7 +84,10 @@ public class LoanController {
             JSONObject result = restTemplate.postForEntity(faceIdTokenUrl, request, JSONObject.class).getBody();
             logger.info(result.toString());
             String jumpUrl = faceIdVerifyUrl + "?token=" + result.getString("token");
-            return ResponseEntity.ok().body(jumpUrl);
+            JSONObject resultObj = new JSONObject();
+            resultObj.put("url", jumpUrl);
+            resultObj.put("bizNo", result.getString("biz_id"));
+            return ResponseEntity.ok().body(resultObj.toJSONString());
         } catch (RestClientException ex) {
             logger.error("Failed to get faceId token, {}", ex.getMessage());
         }
@@ -101,6 +104,7 @@ public class LoanController {
                 .queryParam("api_key", faceIdApiKey)
                 .queryParam("api_secret", faceIdApiSecret)
                 .queryParam("biz_id", (String) requestMap.getOrDefault("bizNo", ""));
+        logger.info("bizNo:" + requestMap.get("bizNo"));
 
         HttpEntity<?> entity = new HttpEntity<>(headers);
 
@@ -135,10 +139,9 @@ public class LoanController {
         headers.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_UTF8_VALUE);
         headers.add(HttpHeaders.AUTHORIZATION, "APPCODE " + bizOcrAppCode);
 
-        BASE64Encoder encoder = new BASE64Encoder();
         String body = "";
         try {
-            String imgData = encoder.encode(file.getBytes());
+            String imgData = Base64Utils.encodeToString(file.getBytes());
             body = "{\"image\":\"" + imgData + "\"}";
         } catch (IOException e) {
             logger.error("Failed to convert to base64, {}", e.getMessage());
