@@ -17,10 +17,7 @@
                     <DatePicker size="small" v-model="dateRange" type="daterange" placement="bottom-end" placeholder="收货日期" style="width:180px"></DatePicker>
                 </FormItem>
                 <FormItem label="仓库">
-                    <Select size="small"  v-model="query.warehouseId" filterable clearable
-                            placeholder="请选择仓库点" >
-                            <Option v-for="item in warehouseList" :value="item.id" :key="item.id">{{ item.name }}</Option>
-                        </Select>
+                   <warehouse-select v-model="query.warehouseId" size="small"></warehouse-select>
                 </FormItem>
                 <FormItem label="供应商">
                     <supplier-select v-model="query.supplierId" size="small"></supplier-select>
@@ -71,11 +68,13 @@
 import util from "@/libs/util.js";
 import moment from 'moment';
 import supplierSelect from "@/views/selector/supplier-select.vue";
+import warehouseSelect from "@/views/selector/warehouse-select.vue";
 
 export default {
     name: 'buy-quality-check',
     components: {
-        supplierSelect
+        supplierSelect,
+        warehouseSelect
     },
     data() {
         return {
@@ -93,7 +92,6 @@ export default {
                 moment().add(-1,'w').format('YYYY-MM-DD'),
                 moment().format('YYYY-MM-DD')
             ],
-            warehouseList: [],
             orderLoading: false,
             orderList: [],
             orderListColumns: [

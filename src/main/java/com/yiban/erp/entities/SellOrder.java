@@ -20,6 +20,8 @@ public class SellOrder {
     private Integer customerRepId;
 
     private Integer salerId;
+    private String saleNickName;
+    private String saleRealName;
 
     private Integer temperControlId;
     private String temperControlName;
@@ -134,6 +136,22 @@ public class SellOrder {
 
     public void setSalerId(Integer salerId) {
         this.salerId = salerId;
+    }
+
+    public String getSaleNickName() {
+        return saleNickName;
+    }
+
+    public void setSaleNickName(String saleNickName) {
+        this.saleNickName = saleNickName;
+    }
+
+    public String getSaleRealName() {
+        return saleRealName;
+    }
+
+    public void setSaleRealName(String saleRealName) {
+        this.saleRealName = saleRealName;
     }
 
     public Integer getTemperControlId() {

@@ -2,6 +2,7 @@
   
   <Select
         ref="goodsSelect"
+        v-model="id" 
         filterable
         clearable
         remote
@@ -26,12 +27,17 @@ export default {
     props: ['value', 'size'],
     data () {
         return {
+            id: '',
             selectSize: this.size,
             goodsLoading: false,
             goodsOptions: []
         };
     },
-
+    watch: {
+        value(newValue) {
+            this.id = newValue;
+        }
+    },
     methods: {
         queryGoods (query) {
             var self = this;
@@ -54,7 +60,8 @@ export default {
             }
         },
         onChange (data) {
-            let good = this.goodsOptions.filter(item => item.id === data);
+            let goods = this.goodsOptions.filter(item => item.id === data);
+            let good = goods[0] ? goods[0] : '';
             this.$emit('input', data);
             this.$emit('on-change', data, good);
         }

@@ -52,7 +52,7 @@ export default {
             let items = this.goodsOptions.filter(item => item.id === data);
             let item = '';
             if(items && items[0]) {
-                item = item[0];
+                item = items[0];
             }
             this.$emit('input', data);
             this.$emit('on-change', data, item);

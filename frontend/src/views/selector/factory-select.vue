@@ -25,7 +25,11 @@ export default {
             searchLoading: false
         };
     },
-
+    watch: {
+        value(newValue) {
+            this.id = newValue;
+        }
+    },
     methods: {
         searchMethod (searchStr) {
             if (!searchStr) {
@@ -44,7 +48,8 @@ export default {
         },
 
         onChange (data) {
-            let factory = this.resultList.filter(item => item.id === data);
+            let factorys = this.resultList.filter(item => item.id === data);
+            let factory = factorys[0] ? factorys[0] : '';
             this.$emit('input', data);
             this.$emit('on-change', data, factory);
         }

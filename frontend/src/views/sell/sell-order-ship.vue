@@ -27,23 +27,17 @@
 		<Row type="flex" justify="start">
 			<Col span="6">
 				<FormItem label="存储条件">
-                    <Select v-model="formItem.storageMethod" filterable clearable placeholder="请选择存储条件">
-						<Option v-for="item in storageMethodList" :value="item.id" :key="item.id">{{ item.value }}</Option>
-					</Select>
+                    <temper-control-select v-model="formItem.storageMethod"></temper-control-select>
 				</FormItem>
 			</Col>
 			<Col span="6">
 				<FormItem label="运输工具">
-					<Select v-model="formItem.shipToolId" filterable clearable placeholder="请选择运输工具">
-                        <Option v-for="item in shipToolList" :value="item.id" :key="item.id">{{ item.value }}</Option>
-                    </Select>
+                    <ship-tool-select v-model="formItem.shipToolId"></ship-tool-select>
 				</FormItem>
 			</Col>
 			<Col span="12">
 				<FormItem label="承运单位" prop="shipCompanyId">
-					<Select v-model="formItem.shipCompanyId" filterable clearable placeholder="请选择承运单位">
-						<Option v-for="item in shipCompanyList" :value="item.id" :key="item.id">{{ item.name }}</Option>
-					</Select>
+                    <ship-company-select v-model="formItem.shipCompanyId"></ship-company-select>
 				</FormItem>
 			</Col>
 		</Row>
@@ -55,9 +49,7 @@
 			</Col>
 			<Col span="6">
 				<FormItem label="运输方式">
-					<Select v-model="formItem.shipMethod" filterable clearable placeholder="请选择运输方式">
-                        <Option v-for="item in shipMethodList" :value="item.id" :key="item.id">{{ item.value }}</Option>
-                    </Select>
+                    <ship-method-select v-model="formItem.shipMethod"></ship-method-select>
 				</FormItem>
 			</Col>
 			<Col span="6">
@@ -138,7 +130,11 @@
 
 <script>
 import util from '@/libs/util.js';
-import dataConver from '@/libs/data-conver.js';
+import moment from 'moment';
+import temperControlSelect from "@/views/selector/temper-control-select.vue";
+import shipToolSelect from "@/views/selector/ship-tool-select.vue";
+import shipMethodSelect from "@/views/selector/ship-method-select.vue";
+import shipCompanySelect from "@/views/selector/ship-company-select.vue";
 
 export default {
     name: 'sell-order-ship',
@@ -148,12 +144,14 @@ export default {
             required: true
         }
     },
+    components: {
+        temperControlSelect,
+        shipToolSelect,
+        shipMethodSelect,
+        shipCompanySelect
+    },
     data () {
         return {
-            storageMethodList: [],
-            shipToolList: [],
-            shipMethodList: [],
-            shipCompanyList: [],
             formItem: {
                 id: '',
                 sellOrderId: this.orderId,
@@ -198,7 +196,8 @@ export default {
                     align: 'center',
                     fixed: 'left',
                     render: (h, params) => {
-                        return h('span', this.dateFormat(params.row.issuanceDate));
+                        let issuanceDate = params.row.issuanceDate;
+                        return issuanceDate ? moment(issuanceDate).format('YYYY-MM-DD HH:mm') : '';
                     }
                 },
                 {
@@ -285,7 +284,8 @@ export default {
                     width: 120,
                     align: 'center',
                     render: (h, params) => {
-                        return this.dateFormat(params.row.shipStartTime);
+                        let shipStartTime = params.row.shipStartTime;
+                        return shipStartTime ? moment(shipStartTime).format('YYYY-MM-DD HH:mm') : '';
                     }
                 },
                 {
@@ -294,7 +294,8 @@ export default {
                     width: 120,
                     align: 'center',
                     render: (h, params) => {
-                        return this.dateFormat(params.row.shipEndTime);
+                        let shipEndTime = params.row.shipEndTime;
+                        return shipEndTime ? moment(shipEndTime).format('YYYY-MM-DD HH:mm') : '';
                     }
                 },
                 {
@@ -325,55 +326,12 @@ export default {
             ]
         };
     },
-    mounted () {
-        this.initData();
-    },
     watch: {
         orderId (data) {
             this.refreshTableData();
         }
     },
     methods: {
-        dateFormat (data) {
-            if (!data && isNaN(data)) {
-                return '';
-            }
-            return dataConver.formatDate(new Date(data), 'yyyy-MM-dd hh:mm');
-        },
-        initData () {
-            this.getOptions();
-            this.getShipCompanyList();
-        },
-        getOptions () {
-            let reqData = ['TEMPER_CONTROL', 'SHIP_METHOD', 'SHIP_TOOL'];
-            util.ajax.post('/options/list', reqData)
-                .then((response) => {
-                    let data = response.data;
-                    if (data && data.TEMPER_CONTROL) {
-                        this.storageMethodList = data.TEMPER_CONTROL;
-                    }
-                    if (data && data.SHIP_METHOD) {
-                        this.shipMethodList = data.SHIP_METHOD;
-                    }
-                    if (data && data.SHIP_TOOL) {
-                        this.shipToolList = data.SHIP_TOOL;
-                    }
-                })
-                .catch((error) => {
-                    util.errorProcessor(this, error);
-                });
-        },
-
-        getShipCompanyList () {
-            util.ajax.get('/ship/list')
-                .then((response) => {
-                    this.shipCompanyList = response.data.data;
-                })
-                .catch((error) => {
-                    util.errorProcessor(this, error);
-                });
-        },
-
         addShipRecord () {
             this.$refs.form.validate(valid => {
                 if (!valid) {
@@ -427,7 +385,6 @@ export default {
             this.tabLoading = true;
             util.ajax.get('/sell/order/ship/list', {params: {orderId: this.orderId}})
                 .then((response) => {
-                    console.log(response.data);
                     this.tabData = response.data;
                 })
                 .catch((error) => {

@@ -35,9 +35,7 @@
                         </Col>
                         <Col span="8">
                             <FormItem label="销售人员" prop="salerId">
-                                <Select v-model="sellOrderFormData.salerId" filterable clearable placeholder="请选择销售人员">
-                                    <Option v-for="item in salerList" :value="item.userId" :key="item.userId">{{ item.nickname }}{{item.realname ? (' - [' + item.realname + ']') : ''}}</Option>
-                                </Select>
+                              <sale-select v-model="sellOrderFormData.salerId" ></sale-select>
                             </FormItem>
                         </Col>
                     </Row>
@@ -76,23 +74,17 @@
                     <Row type="flex" justify="center">
                         <Col span="8">
                             <FormItem label="湿控方式" >
-                                <Select v-model="sellOrderFormData.temperControlId" filterable clearable placeholder="请选择湿控方式">
-                                    <Option v-for="item in temperControlList" :value="item.id" :key="item.id">{{ item.value }}</Option>
-                                </Select>
+                              <temper-control-select v-model="sellOrderFormData.temperControlId"></temper-control-select>
                             </FormItem>
                         </Col>
                         <Col span="8">
                             <FormItem label="运输方式" >
-                                <Select v-model="sellOrderFormData.shipMethod" filterable clearable placeholder="请选择运输方式">
-                                    <Option v-for="item in shipMethodList" :value="item.id" :key="item.id">{{ item.value }}</Option>
-                                </Select>
+                              <ship-method-select v-model="sellOrderFormData.shipMethod"></ship-method-select>
                             </FormItem>
                         </Col>
                         <Col span="8">
                             <FormItem label="运输工具" >
-                                <Select v-model="sellOrderFormData.shipTool" filterable clearable placeholder="请选择运输工具">
-                                    <Option v-for="item in shipToolList" :value="item.id" :key="item.id">{{ item.value }}</Option>
-                                </Select>
+                              <ship-tool-select v-model="sellOrderFormData.shipTool"></ship-tool-select>
                             </FormItem>
                         </Col>
                     </Row>
@@ -105,9 +97,7 @@
                         </Col>
                         <Col span="8">
                             <FormItem label="收款方式" >
-                                <Select v-model="sellOrderFormData.payMethod" filterable clearable placeholder="请选择收款方式">
-                                    <Option v-for="item in payMethodList" :value="item.id" :key="item.id">{{ item.value }}</Option>
-                                </Select>
+                              <pay-method-select v-model="sellOrderFormData.payMethod"></pay-method-select>
                             </FormItem>
                         </Col>
                         <Col span="8">
@@ -138,10 +128,7 @@
                     <Row type="flex" justify="center">
                         <Col span="8">
                             <FormItem label="仓库点" prop="warehouseId">
-                                <Select v-model="sellOrderFormData.warehouseId" filterable clearable :disabled="warehouseDisable"
-                                    placeholder="请选择仓库点" >
-                                    <Option v-for="item in warehouseList" :value="item.id" :key="item.id">{{ item.name }}</Option>
-                                </Select>
+                                <warehouse-select v-model="sellOrderFormData.warehouseId" :disabled="warehouseDisable" @on-change="warehouseChange"></warehouse-select>
                             </FormItem>
                         </Col>
                         <Col span="16">
@@ -206,6 +193,12 @@ import sellOrderSearch from "@/views/sell/sell-order-search.vue";
 import sellGoodSearch from "@/views/sell/sell-good-search.vue";
 import goodExpand from "@/views/good/good-expand.vue";
 import sellGoodHistory from "./sell-good-history.vue";
+import warehouseSelect from "@/views/selector/warehouse-select.vue";
+import saleSelect from "@/views/selector/sale-select.vue";
+import temperControlSelect from "@/views/selector/temper-control-select.vue";
+import payMethodSelect from "@/views/selector/pay-method-select.vue";
+import shipMethodSelect from "@/views/selector/ship-method-select.vue";
+import shipToolSelect from "@/views/selector/ship-tool-select.vue";
 
 export default {
   name: "sell_order_make",
@@ -214,15 +207,16 @@ export default {
     sellOrderSearch,
     sellGoodSearch,
     goodExpand,
-    sellGoodHistory
+    sellGoodHistory,
+    warehouseSelect,
+    saleSelect,
+    temperControlSelect,
+    payMethodSelect,
+    shipToolSelect,
+    shipMethodSelect
   },
   data() {
     return {
-      payMethodList: [],
-      temperControlList: [],
-      shipMethodList: [],
-      shipToolList: [],
-      warehouseList: [],
       editeOnlyDisable: false,
       sellOrderFormData: {
         id: "",
@@ -463,15 +457,11 @@ export default {
       totalAmount: 0,
       currChooseCustomer: null,
       customerRepList: [],
-      salerList: [],
       goodHistory: {},
       historyExcludeId: "",
       historyDetails: [],
       goodHistoryModal: false
     };
-  },
-  mounted() {
-    this.initData();
   },
   watch: {
     goodTableData(data) {
@@ -495,59 +485,6 @@ export default {
     }
   },
   methods: {
-    initData() {
-      this.initOptions();
-      this.getSalserList();
-      this.getWarehouseList();
-    },
-    initOptions() {
-      let reqData = [
-        "TEMPER_CONTROL",
-        "PAY_METHOD",
-        "SHIP_METHOD",
-        "SHIP_TOOL"
-      ];
-      util.ajax
-        .post("/options/list", reqData)
-        .then(response => {
-          let data = response.data;
-          if (data && data.TEMPER_CONTROL) {
-            this.temperControlList = data.TEMPER_CONTROL;
-          }
-          if (data && data.PAY_METHOD) {
-            this.payMethodList = data.PAY_METHOD;
-          }
-          if (data && data.SHIP_METHOD) {
-            this.shipMethodList = data.SHIP_METHOD;
-          }
-          if (data && data.SHIP_TOOL) {
-            this.shipToolList = data.SHIP_TOOL;
-          }
-        })
-        .catch(error => {
-          util.errorProcessor(this, error);
-        });
-    },
-    getSalserList() {
-      util.ajax
-        .get("/userrole/list", { params: { roleQuery: "ROLE_SALER" } })
-        .then(response => {
-          this.salerList = response.data;
-        })
-        .catch(error => {
-          util.errorProcessor(this, error);
-        });
-    },
-    getWarehouseList() {
-      util.ajax
-        .get("/warehouse/list")
-        .then(response => {
-          this.warehouseList = response.data;
-        })
-        .catch(error => {
-          util.errorProcessor(this, error);
-        });
-    },
     customerChange(customerId, customer) {
       this.currChooseCustomer = customer;
       if (customer && customer.id) {
@@ -766,6 +703,9 @@ export default {
         this.saveGoodBtnLoading = false;
       }
     },
+    warehouseChange(warehouseId, warehouseItem) {
+      this.chooseWarehouse = warehouseItem;
+    },
 
     addGoodBtnClick() {
       if(!this.sellOrderFormData.warehouseId || this.sellOrderFormData.warehouseId <= 0) {
@@ -773,12 +713,6 @@ export default {
         return;
       }
       this.goodSearchModal = true;
-      let temp = this.warehouseList.filter(
-        item => item.id === this.sellOrderFormData.warehouseId
-      );
-      if (temp) {
-        this.chooseWarehouse = temp[0];
-      }
     },
     goodSearchModalClose() {
       this.goodSearchModal = false;

@@ -29,9 +29,7 @@
                         </Col>
                         <Col span="8" >
                             <FormItem label="销售员" >
-                                <Select  size="small" v-model="searchFormItem.salerId" clearable filterable >
-                                    <Option v-for="item in salerList" :value="item.userId" :key="item.userId">{{ item.nickname }}{{item.realname ? (' - [' + item.realname + ']') : ''}}</Option>
-                                </Select> 
+                                <sale-select size="small" v-model="searchFormItem.salerId"></sale-select>
                             </FormItem>
                         </Col>
                         <Col span="3" offset="1" >
@@ -76,13 +74,15 @@ import moment from 'moment';
 import reviewDetail from "./review-detail.vue";
 import sellOrderShip from "./sell-order-ship.vue";
 import customerSelect from "@/views/selector/customer-select.vue";
+import saleSelect from "@/views/selector/sale-select.vue";
 
 export default {
     name: 'sell-order-all',
     components: {
         reviewDetail,
         sellOrderShip,
-        customerSelect
+        customerSelect,
+        saleSelect
     },
 
     data () {
@@ -96,7 +96,6 @@ export default {
                 moment().add(-1,'w').format('YYYY-MM-DD'),
                 moment().format('YYYY-MM-DD'),
             ],
-            salerList: [],
             searching: false,
             tabData: [],
             tabColumns: [
@@ -225,9 +224,6 @@ export default {
             shipDetailTitle: ''
         };
     },
-    mounted () {
-        this.initData();
-    },
     methods: {
 
         statusDescription(data) {
@@ -247,18 +243,6 @@ export default {
                     break;
             }
             return result;
-        },
-        initData () {
-            this.getSalerList();
-        },
-        getSalerList () {
-            util.ajax.get('/userrole/list', {params: {roleQuery: 'ROLE_SALER'}})
-                .then((response) => {
-                    this.salerList = response.data;
-                })
-                .catch((error) => {
-                    util.errorProcessor(this, error);
-                });
         },
         searchBtnClick () {
             this.currentPage = 1;

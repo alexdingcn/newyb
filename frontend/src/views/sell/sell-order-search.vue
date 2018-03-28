@@ -15,9 +15,7 @@
                         </Col>
                         <Col span="6">
                             <FormItem label="销售员">
-                                <Select size="small" v-model="formItem.salerId" clearable filterable >
-                                    <Option v-for="item in salerList" :value="item.userId" :key="item.userId">{{ item.nickname }}{{item.realname ? (' - [' + item.realname + ']') : ''}}</Option>
-                                </Select>
+                                <sale-select size="small" v-model="formItem.salerId"></sale-select>
                             </FormItem>
                         </Col>
                         <Col span="6">
@@ -70,6 +68,7 @@
 import util from "@/libs/util.js";
 import moment from 'moment';
 import customerSelect from "@/views/selector/customer-select.vue";
+import saleSelect from "@/views/selector/sale-select.vue";
 
 export default {
     name: 'sell-order-search',
@@ -83,7 +82,8 @@ export default {
         }
     },
     components: {
-        customerSelect
+        customerSelect,
+        saleSelect
     },
     data() {
         return {
@@ -94,7 +94,6 @@ export default {
                 refNo: '',
                 createOrderDate: ''
             },
-            salerList:[],
             currentPage: 1,
             totalCount: 0,
             tableCurrPageSize: 10,
@@ -159,7 +158,6 @@ export default {
         showModal(data) {
             if(data) {
                 this.isShowModal = data;
-                this.initData();
             }
         },
         currChooseItem(data) {
@@ -171,19 +169,6 @@ export default {
         }
     },
     methods: {
-        initData() {
-            this.getSalserList();
-        },
-        getSalserList() {
-          util.ajax.get('/userrole/list', {params: {roleQuery: 'ROLE_SALER'}})
-            .then((response) => {
-                this.salerList = response.data;
-            })
-            .catch((error) => {
-                util.errorProcessor(this, error);
-            });
-        },
-
         searchBtnClicked() {
             let reqData = {
                 customerId: this.formItem.customerId,

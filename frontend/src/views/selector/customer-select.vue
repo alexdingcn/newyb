@@ -34,6 +34,9 @@ export default {
             } else {
                 this.selectDisable = false;
             }
+        },
+        value(newValue) {
+            this.customerIdValue = newValue;
         }
     },
     methods: {

@@ -215,12 +215,6 @@ export default {
         },
   },
   methods: {
-      dateFormat(data) {
-          if (!data && isNaN(data)) {
-              return '';
-          }
-          return dataConver.formatDate(new Date(data), 'yyyy-MM-dd');
-        },
       initData() {
           this.totalCount = 0;
           this.tabData = [];

@@ -18,9 +18,7 @@
                 <Row>
                     <Col span="8">
                         <FormItem label="销售员">
-                            <Select v-model="query.salerId" clearable filterable placeholder="销售员">
-                                <Option v-for="item in salerList" :value="item.userId" :key="item.userId">{{ item.nickname }}{{item.realname ? (' - [' + item.realname + ']') : ''}}</Option>
-                            </Select>
+                            <sale-select v-model="query.salerId"></sale-select>
                         </FormItem>
                     </Col>
                     <Col span="8" >
@@ -89,12 +87,15 @@
 import util from "@/libs/util.js";
 import moment from 'moment';
 import customerSelect from "@/views/selector/customer-select.vue";
+import saleSelect from "@/views/selector/sale-select.vue";
 import goodExpand from "@/views/good/good-expand.vue";
+
 
 export default {
     name: 'sell-quality-review',
     components: {
         customerSelect,
+        saleSelect,
         goodExpand
     },
     data() {
@@ -108,7 +109,6 @@ export default {
                 {key: 'INIT', name:'未审批'},
                 {key: 'QUALITY_CHECKED', name:'已审批'}
             ],
-            salerList: [],
             dateRange: [
                 moment().add(-1,'w').format('YYYY-MM-DD'),
                 moment().format('YYYY-MM-DD'),
@@ -155,12 +155,14 @@ export default {
                     width: 90,
                     align: "center",
                     render: (h, params) => {
-                        let itemArr = this.salerList.filter(item => item.id === params.row.salerId);
-                        if (itemArr && itemArr[0]) {
-                            let saler = itemArr[0];
-                            return saler.nickname + (saler.realname ? ' - [' + saler.realname + ']' : ''); 
+                        let nickName = params.row.saleNickName;
+                        let realName = params.row.saleRealName;
+                        if (nickName && nickName) {
+                            return h('span', realName + '[' + nickName+']');
+                        }else if(nickName) {
+                            return h('span', nickName);
                         }else {
-                            return params.row.salerId;
+                            return h('span', params.row.salerId);
                         }
                     }
                 },
@@ -374,9 +376,6 @@ export default {
             checkResult: ''
         }
     },
-    mounted() {
-        this.initData();
-    },
     watch: {
         sellGoodList(data) {
             if (data && data.length > 0)  {
@@ -392,19 +391,6 @@ export default {
         }
     },
     methods: {
-        initData() {
-            this.getSalerList();
-        },
-        getSalerList() {
-            util.ajax
-                .get("/userrole/list", { params: { roleQuery: "ROLE_SALER" } })
-                .then(response => {
-                this.salerList = response.data;
-                })
-                .catch(error => {
-                util.errorProcessor(this, error);
-                });
-        },
         querySellOrderList() {
             let reqData = {
                 goodId: this.query.goodId,

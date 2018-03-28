@@ -31,7 +31,7 @@
                 <Row class="content-row">
                     <Col span="6">
                         <span class="label-key">销售员:</span>
-                        <span class="label-value">{{orderDetail.salerId}}</span>
+                        <span class="label-value">{{orderDetail.saleNickName}}</span>
                     </Col>
                     <Col span="6">
                         <span class="label-key">收货电话:</span>
@@ -176,7 +176,6 @@ export default {
                 if (this.orderDetail && this.orderDetail.details) {
                     this.goodTableData = this.orderDetail.details;
                 }
-                console.log(this.orderDetail);
             })
             .catch(error => {
                 util.errorProcessor(this, error);
