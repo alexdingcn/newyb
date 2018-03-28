@@ -75,7 +75,7 @@ import util from "@/libs/util.js";
 import moment from 'moment';
 import reviewDetail from "./review-detail.vue";
 import sellOrderShip from "./sell-order-ship.vue";
-import customerSelect from "@/views/customer/customer-select.vue";
+import customerSelect from "@/views/selector/customer-select.vue";
 
 export default {
     name: 'sell-order-all',

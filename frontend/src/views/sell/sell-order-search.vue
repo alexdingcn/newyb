@@ -69,7 +69,7 @@
 <script>
 import util from "@/libs/util.js";
 import moment from 'moment';
-import customerSelect from "@/views/customer/customer-select.vue";
+import customerSelect from "@/views/selector/customer-select.vue";
 
 export default {
     name: 'sell-order-search',

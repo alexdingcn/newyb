@@ -60,7 +60,7 @@
 <script>
 import util from "@/libs/util.js";
 import moment from 'moment';
-import factorySelect from "@/views/factory/factory-select.vue";
+import factorySelect from "@/views/selector/factory-select.vue";
 
 export default {
   name: 'sell-good-search',

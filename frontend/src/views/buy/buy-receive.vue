@@ -21,22 +21,12 @@
 				<Row>
 					<Col span="6">
 					<FormItem label="供应商" prop="supplierId" >
-						<Select
-								v-model="buyOrder.supplierId"
-								filterable
-								clearable
-								remote
-								size="small"
-								@on-change="onSelectSupplier"
-								placeholder="供应商名称/拼音"
-								:remote-method="querySupplier"
-								:loading="supplierLoading">
-							<Option v-for="option in supplierOptions" :value="option.id" :label="option.name" :key="option.id">{{option.name}}</Option>
-						</Select>
+						<supplier-select v-model="buyOrder.supplierId" size="small"></supplier-select>
 					</FormItem>
 					</Col>
 					<Col span="5">
 					<FormItem label="供应商代表" prop="supplierContactId" >
+                        <supplier-select v-model=""
 						<Select ref="supplierContactSelect"
 								v-model="buyOrder.supplierContactId"
 								clearable
@@ -171,9 +161,13 @@
 <script>
     import moment from 'moment';
     import util from '@/libs/util.js';
+    import supplierSelect from "@/views/selector/supplier-select.vue";
 
     export default {
         name: 'buy_order',
+        components: {
+            supplierSelect
+        },
         data () {
             return {
                 saving: false,
