@@ -130,6 +130,7 @@ export const appRouter = [
         { path: 'order', title: '采购制单', name: 'buy_order', component: () => import('@/views/buy/buy-order.vue') },
         { path: 'review', title: '采购单审核', name: 'buy_order_review', component: () => import('@/views/buy/buy-order-list.vue') },
         { path: 'receive', title: '采购收货', name: 'buy_receive', component: () => import('@/views/buy/buy-receive.vue') },
+        { path: "quality-check", title: '入库质量验收', name: 'buy-quality-check', component: () => import('@/views/buy/buy-quality-check.vue')},
     ]
 },
 {
