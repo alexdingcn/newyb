@@ -69,7 +69,7 @@
 					</Col>
 					<Col span="6">
                         <FormItem label="温控方式" >
-                            <temper-control-select v-model="order.temperControlId" size="small"></temper-control-select>
+                            <temper-control-select v-model="order.tempControlMethod" size="small"></temper-control-select>
                         </FormItem>
 					</Col>
                     <Col span="6">
@@ -95,13 +95,13 @@
                         </FormItem>
 					</Col>
                     <Col span="6">
-                        <FormItem label="运输方式" prop="shipMethodId">
-                            <ship-method-select v-model="order.shipMethodId" size="small"></ship-method-select>
+                        <FormItem label="运输方式" prop="shipMethod">
+                            <ship-method-select v-model="order.shipMethod" size="small"></ship-method-select>
                         </FormItem>
 					</Col>
 					<Col span="6">
-                        <FormItem label="运输工具" prop="shipToolId">
-                            <ship-tool-select v-model="order.shipToolId" size="small" ></ship-tool-select>
+                        <FormItem label="运输工具" prop="shipTool">
+                            <ship-tool-select v-model="order.shipTool" size="small" ></ship-tool-select>
                         </FormItem>
 					</Col>
 				</Row>
@@ -692,10 +692,8 @@
                 util.ajax.post('/receive/save', this.order)
                     .then(function (response) {
                         self.saving = false;
-                        if (response.status === 200 && response.data) {
-                            self.$Message.info('采购入库订单保存成功');
-                            self.closeConfirm = true;
-                        }
+                        self.$Message.info('采购入库订单保存成功');
+                        self.closeConfirm = true;
                     })
                     .catch(function (error) {
                         self.saving = false;

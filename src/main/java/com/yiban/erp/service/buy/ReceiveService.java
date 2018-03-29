@@ -68,7 +68,7 @@ public class ReceiveService {
         if (!saveValidate(order)) {
             throw new BizException(ErrorCode.RECEIVE_SAVE_PRAMS_INVALID);
         }
-        if (order.getId() != null) {
+        if (order.getId() == null) {
             //新建
             order.setCompanyId(user.getCompanyId());
             order.setOrderNumber(getOrderNumber(user));

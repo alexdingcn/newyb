@@ -46,7 +46,7 @@ public class RepositoryOrder {
 
     private Long shipTool;
 
-    private Integer shipCarNo;
+    private String shipCarNo;
 
     private String shipDriverName;
 
@@ -60,11 +60,11 @@ public class RepositoryOrder {
 
     private Integer warehouseId;
 
-    private String buyType;
+    private Integer buyType;
 
     private Integer term;
 
-    private Integer comeFrom;
+    private String comeFrom;
 
     private Long billType;
 
@@ -238,11 +238,11 @@ public class RepositoryOrder {
         this.shipTool = shipTool;
     }
 
-    public Integer getShipCarNo() {
+    public String getShipCarNo() {
         return shipCarNo;
     }
 
-    public void setShipCarNo(Integer shipCarNo) {
+    public void setShipCarNo(String shipCarNo) {
         this.shipCarNo = shipCarNo;
     }
 
@@ -294,12 +294,12 @@ public class RepositoryOrder {
         this.warehouseId = warehouseId;
     }
 
-    public String getBuyType() {
+    public Integer getBuyType() {
         return buyType;
     }
 
-    public void setBuyType(String buyType) {
-        this.buyType = buyType == null ? null : buyType.trim();
+    public void setBuyType(Integer buyType) {
+        this.buyType = buyType;
     }
 
     public Integer getTerm() {
@@ -310,11 +310,11 @@ public class RepositoryOrder {
         this.term = term;
     }
 
-    public Integer getComeFrom() {
+    public String getComeFrom() {
         return comeFrom;
     }
 
-    public void setComeFrom(Integer comeFrom) {
+    public void setComeFrom(String comeFrom) {
         this.comeFrom = comeFrom;
     }
 

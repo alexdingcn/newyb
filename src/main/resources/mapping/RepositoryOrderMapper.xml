@@ -22,16 +22,16 @@
     <result column="ship_company_id" property="shipCompanyId" jdbcType="INTEGER" />
     <result column="ship_method" property="shipMethod" jdbcType="BIGINT" />
     <result column="ship_tool" property="shipTool" jdbcType="BIGINT" />
-    <result column="ship_car_no" property="shipCarNo" jdbcType="INTEGER" />
+    <result column="ship_car_no" property="shipCarNo" jdbcType="VARCHAR" />
     <result column="ship_driver_name" property="shipDriverName" jdbcType="VARCHAR" />
     <result column="ship_start_date" property="shipStartDate" jdbcType="TIMESTAMP" />
     <result column="ship_end_date" property="shipEndDate" jdbcType="TIMESTAMP" />
     <result column="ship_entrust_no" property="shipEntrustNo" jdbcType="VARCHAR" />
     <result column="ship_start_address" property="shipStartAddress" jdbcType="VARCHAR" />
     <result column="warehouse_id" property="warehouseId" jdbcType="INTEGER" />
-    <result column="buy_type" property="buyType" jdbcType="VARCHAR" />
+    <result column="buy_type" property="buyType" jdbcType="BIGINT" />
     <result column="term" property="term" jdbcType="INTEGER" />
-    <result column="come_from" property="comeFrom" jdbcType="INTEGER" />
+    <result column="come_from" property="comeFrom" jdbcType="VARCHAR" />
     <result column="bill_type" property="billType" jdbcType="BIGINT" />
     <result column="create_by" property="createBy" jdbcType="VARCHAR" />
     <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
@@ -76,10 +76,10 @@
       #{payDate,jdbcType=TIMESTAMP}, #{goodBillNo,jdbcType=VARCHAR}, #{tempControlMethod,jdbcType=BIGINT}, 
       #{receiveTemp,jdbcType=INTEGER}, #{checkTemp,jdbcType=INTEGER}, #{tempControlStatus,jdbcType=VARCHAR}, 
       #{shipCompanyId,jdbcType=INTEGER}, #{shipMethod,jdbcType=BIGINT}, #{shipTool,jdbcType=BIGINT}, 
-      #{shipCarNo,jdbcType=INTEGER}, #{shipDriverName,jdbcType=VARCHAR}, #{shipStartDate,jdbcType=TIMESTAMP}, 
+      #{shipCarNo,jdbcType=VARCHAR}, #{shipDriverName,jdbcType=VARCHAR}, #{shipStartDate,jdbcType=TIMESTAMP},
       #{shipEndDate,jdbcType=TIMESTAMP}, #{shipEntrustNo,jdbcType=VARCHAR}, #{shipStartAddress,jdbcType=VARCHAR}, 
-      #{warehouseId,jdbcType=INTEGER}, #{buyType,jdbcType=VARCHAR}, #{term,jdbcType=INTEGER}, 
-      #{comeFrom,jdbcType=INTEGER}, #{billType,jdbcType=BIGINT}, #{createBy,jdbcType=VARCHAR}, 
+      #{warehouseId,jdbcType=INTEGER}, #{buyType,jdbcType=BIGINT}, #{term,jdbcType=INTEGER},
+      #{comeFrom,jdbcType=VARCHAR}, #{billType,jdbcType=BIGINT}, #{createBy,jdbcType=VARCHAR},
       #{createTime,jdbcType=TIMESTAMP}, #{updateBy,jdbcType=VARCHAR}, #{updateTime,jdbcType=TIMESTAMP}
       )
   </insert>
@@ -254,7 +254,7 @@
         #{shipTool,jdbcType=BIGINT},
       </if>
       <if test="shipCarNo != null" >
-        #{shipCarNo,jdbcType=INTEGER},
+        #{shipCarNo,jdbcType=VARCHAR},
       </if>
       <if test="shipDriverName != null" >
         #{shipDriverName,jdbcType=VARCHAR},
@@ -275,13 +275,13 @@
         #{warehouseId,jdbcType=INTEGER},
       </if>
       <if test="buyType != null" >
-        #{buyType,jdbcType=VARCHAR},
+        #{buyType,jdbcType=BIGINT},
       </if>
       <if test="term != null" >
         #{term,jdbcType=INTEGER},
       </if>
       <if test="comeFrom != null" >
-        #{comeFrom,jdbcType=INTEGER},
+        #{comeFrom,jdbcType=VARCHAR},
       </if>
       <if test="billType != null" >
         #{billType,jdbcType=BIGINT},
@@ -355,7 +355,7 @@
         ship_tool = #{shipTool,jdbcType=BIGINT},
       </if>
       <if test="shipCarNo != null" >
-        ship_car_no = #{shipCarNo,jdbcType=INTEGER},
+        ship_car_no = #{shipCarNo,jdbcType=VARCHAR},
       </if>
       <if test="shipDriverName != null" >
         ship_driver_name = #{shipDriverName,jdbcType=VARCHAR},
@@ -376,13 +376,13 @@
         warehouse_id = #{warehouseId,jdbcType=INTEGER},
       </if>
       <if test="buyType != null" >
-        buy_type = #{buyType,jdbcType=VARCHAR},
+        buy_type = #{buyType,jdbcType=BIGINT},
       </if>
       <if test="term != null" >
         term = #{term,jdbcType=INTEGER},
       </if>
       <if test="comeFrom != null" >
-        come_from = #{comeFrom,jdbcType=INTEGER},
+        come_from = #{comeFrom,jdbcType=VARCHAR},
       </if>
       <if test="billType != null" >
         bill_type = #{billType,jdbcType=BIGINT},
@@ -422,16 +422,16 @@
       ship_company_id = #{shipCompanyId,jdbcType=INTEGER},
       ship_method = #{shipMethod,jdbcType=BIGINT},
       ship_tool = #{shipTool,jdbcType=BIGINT},
-      ship_car_no = #{shipCarNo,jdbcType=INTEGER},
+      ship_car_no = #{shipCarNo,jdbcType=VARCHAR},
       ship_driver_name = #{shipDriverName,jdbcType=VARCHAR},
       ship_start_date = #{shipStartDate,jdbcType=TIMESTAMP},
       ship_end_date = #{shipEndDate,jdbcType=TIMESTAMP},
       ship_entrust_no = #{shipEntrustNo,jdbcType=VARCHAR},
       ship_start_address = #{shipStartAddress,jdbcType=VARCHAR},
       warehouse_id = #{warehouseId,jdbcType=INTEGER},
-      buy_type = #{buyType,jdbcType=VARCHAR},
+      buy_type = #{buyType,jdbcType=BIGINT},
       term = #{term,jdbcType=INTEGER},
-      come_from = #{comeFrom,jdbcType=INTEGER},
+      come_from = #{comeFrom,jdbcType=VARCHAR},
       bill_type = #{billType,jdbcType=BIGINT},
       create_by = #{createBy,jdbcType=VARCHAR},
       create_time = #{createTime,jdbcType=TIMESTAMP},
