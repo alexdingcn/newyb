@@ -31,4 +31,6 @@ public interface GoodsMapper {
                      @Param("search") String search);
 
     List<Goods> selectByIdList(@Param("idList") List<Long> idList);
+
+    Goods selectById(Long id);
 }

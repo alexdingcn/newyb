@@ -439,4 +439,39 @@
       update_time = #{updateTime,jdbcType=TIMESTAMP}
     where id = #{id,jdbcType=BIGINT}
   </update>
+
+  <select id="getList" parameterType="com.yiban.erp.dto.ReceiveListReq" resultType="com.yiban.erp.entities.RepositoryOrder">
+    select
+      o.id as id, o.company_id as companyId, o.buy_order_id as buyOrderId, o.order_number as orderNumber,
+      o.ref_no as refNo, o.supplier_id as supplierId, o.supplier_contact_id as supplierContactId, o.buyer_id as buyerId, o.status as status,
+      o.key_word as keyWord, o.receive_date as receiveDate, o.pay_date as payDate, o.good_bill_no as goodBillNo,
+      o.temp_control_method as tempControlMethod, o.receive_temp as receiveTemp,
+      o.check_temp as checkTemp, o.temp_control_status as tempControlStatus, o.ship_company_id as shipCompanyId, o.ship_method as shipMethod,
+      o.ship_tool as shipTool, o.ship_car_no as shipCarNo,
+      o.ship_driver_name as shipDriverName, o.ship_start_date as shipStartDate, o.ship_end_date as shipEndDate,
+      o.ship_entrust_no as shipEntrustNo, o.ship_start_address as shipStartAddress,
+      o.warehouse_id as warehouseId, o.buy_type as buyType, o.term as term, o.come_from as comeFrom, o.bill_type as billType,
+      o.create_by as createBy, o.create_time as createTime, o.update_by as updateBy, o.update_time as updateTime,
+      s.name as supplierName, sc.name as supplierContactName, w.name as warehouseName,
+      u.nickname as saleNickName, u.realname as saleRealName
+    from repository_order o, supplier s, supplier_contact sc, warehouse w, users u
+    where o.supplier_id = s.id and o.supplier_contact_id = sc.id
+      and o.warehouse_id = w.id and o.buyer_id = u.id
+      and o.buyer_id = u.id
+    and o.company_id = #{companyId}
+    and o.status != 'DELETE'
+    <if test="startReceiveDate != null">
+      and o.receive_date >= #{startReceiveDate}
+    </if>
+    <if test="endReceiveDate != null">
+      and o.receive_date &lt;= #{endReceiveDate}
+    </if>
+    <if test="statusList != null" >
+      and o.status in
+      <foreach collection="statusList" item="item" open="(" close=")" separator=", ">
+        #{item}
+      </foreach>
+    </if>
+  </select>
+
 </mapper>

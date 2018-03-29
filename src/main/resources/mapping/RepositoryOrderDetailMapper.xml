@@ -266,6 +266,36 @@
   </update>
 
 
+  <resultMap id="DetailMap" type="com.yiban.erp.entities.RepositoryOrderDetail">
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="repository_order_id" property="repositoryOrderId" jdbcType="BIGINT" />
+    <result column="goods_id" property="goodsId" jdbcType="BIGINT" />
+    <result column="receive_quality" property="receiveQuality" jdbcType="INTEGER" />
+    <result column="big_quality" property="bigQuality" jdbcType="INTEGER" />
+    <result column="free" property="free" jdbcType="INTEGER" />
+    <result column="price" property="price" jdbcType="DECIMAL" />
+    <result column="exp_date" property="expDate" jdbcType="TIMESTAMP" />
+    <result column="product_date" property="productDate" jdbcType="TIMESTAMP" />
+    <result column="batch_code" property="batchCode" jdbcType="VARCHAR" />
+    <result column="amount" property="amount" jdbcType="DECIMAL" />
+    <result column="warehouse_location" property="warehouseLocation" jdbcType="VARCHAR" />
+    <result column="reject_quality" property="rejectQuality" jdbcType="INTEGER" />
+    <result column="reject_comment" property="rejectComment" jdbcType="VARCHAR" />
+    <result column="create_by" property="createBy" jdbcType="VARCHAR" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_by" property="updateBy" jdbcType="VARCHAR" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+    <association property="goods" select="com.yiban.erp.dao.GoodsMapper.selectById" column="goods_id">
+    </association>
+  </resultMap>
+
+  <select id="getByOrderIdList" parameterType="map" resultMap="DetailMap">
+    select * from repository_order_detail
+    where repository_order_id in
+    <foreach collection="orderIdList" separator="," open="(" close=")" item="item">
+      #{item}
+    </foreach>
+  </select>
 
 
 </mapper>

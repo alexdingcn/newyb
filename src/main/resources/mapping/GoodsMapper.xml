@@ -106,6 +106,17 @@
     </foreach>
   </select>
 
+  <select id="selectById" parameterType="java.lang.Long" resultType="com.yiban.erp.entities.Goods">
+    select
+    g.*, c.name as categoryName, f.name as factory, u1.name as unitName, u2.name as packUnitName
+    from goods g
+    left join good_category c on g.category_id = c.id
+    left join factory f on g.factory_id = f.id
+    left join unit u1 on g.unit = u1.id
+    left join unit u2 on g.unit = u2.id
+    where 1 = 1 and g.id = #{id}
+  </select>
+
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
     delete from goods
     where id = #{id,jdbcType=BIGINT}
