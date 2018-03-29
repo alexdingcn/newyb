@@ -1,8 +1,7 @@
 package com.yiban.erp.controller.auth;
 
 
-import com.alibaba.fastjson.JSON;
-import com.yiban.erp.constants.IdentifierType;
+import com.yiban.erp.constant.IdentifierType;
 import com.yiban.erp.dao.UserAuthMapper;
 import com.yiban.erp.dao.UserMapper;
 import com.yiban.erp.entities.User;

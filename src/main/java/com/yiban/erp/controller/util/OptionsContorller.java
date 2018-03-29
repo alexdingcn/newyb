@@ -1,7 +1,7 @@
 package com.yiban.erp.controller.util;
 
 import com.alibaba.fastjson.JSON;
-import com.yiban.erp.constants.OptionsType;
+import com.yiban.erp.constant.OptionsType;
 import com.yiban.erp.dao.OptionsMapper;
 import com.yiban.erp.entities.Options;
 import com.yiban.erp.entities.User;

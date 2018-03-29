@@ -1,7 +1,7 @@
 package com.yiban.erp.entities;
 
 import com.alibaba.fastjson.annotation.JSONField;
-import com.yiban.erp.constants.IdentifierType;
+import com.yiban.erp.constant.IdentifierType;
 
 import java.util.Date;
 

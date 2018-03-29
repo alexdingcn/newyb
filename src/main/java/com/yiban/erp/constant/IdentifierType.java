@@ -1,4 +1,4 @@
-package com.yiban.erp.constants;
+package com.yiban.erp.constant;
 
 public enum IdentifierType {
     USERNAME,
