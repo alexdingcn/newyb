@@ -4,7 +4,6 @@ import com.alibaba.fastjson.JSONObject;
 import com.yiban.erp.controller.good.GoodController;
 import com.yiban.erp.dao.BizWxApplyMapper;
 import com.yiban.erp.entities.BizWxApply;
-import com.yiban.erp.entities.User;
 import com.yiban.erp.exception.BizException;
 import com.yiban.erp.exception.ErrorCode;
 import org.slf4j.Logger;
@@ -12,7 +11,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.util.Base64Utils;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -29,6 +27,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -126,14 +125,13 @@ public class LoanController {
     }
 
     @RequestMapping(value = "/bizlic/ocr", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-    private ResponseEntity<String> getBizLicenseOcrResult(HttpServletRequest request,
-                                                          @AuthenticationPrincipal User user) throws BizException {
+    private ResponseEntity<String> getBizLicenseOcrResult(HttpServletRequest request) throws BizException {
         MultipartHttpServletRequest mtRequest = (MultipartHttpServletRequest) request;
-        MultipartFile file = mtRequest.getFile("file");
-        if (file == null || file.isEmpty()) {
-            logger.warn("user:{} request upload file but file is empty.", user.getId());
+        List<MultipartFile> files = mtRequest.getFiles("imagefile");
+        if (files == null || files.isEmpty()) {
             throw new BizException(ErrorCode.FILE_UPLOAD_PARAMS_ERROR);
         }
+        MultipartFile file = files.get(0);
 
         MultiValueMap<String, String> headers = new LinkedMultiValueMap<>();
         headers.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_UTF8_VALUE);

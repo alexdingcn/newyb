@@ -44,7 +44,8 @@ module.exports = merge(webpackBaseConfig, {
         new webpack.optimize.UglifyJsPlugin({
             compress: {
                 warnings: false
-            }
+            },
+            sourceMap: true
         }),
         new UglifyJsParallelPlugin({
             workers: os.cpus().length,
