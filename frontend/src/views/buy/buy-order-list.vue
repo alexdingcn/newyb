@@ -434,7 +434,7 @@
                     this.$Message.warning('请先选择对应订单信息');
                     return;
                 }
-                this.$emit('on-choose', this.currchooseItem);
+                this.$emit('on-choosed', this.currchooseItem);
             }
 
         }
@@ -446,7 +446,4 @@
         background-color: #2db7f5;
         color: #fff;
     }
-    /* .display-none {
-        display: none;
-    } */
 </style>

@@ -23,7 +23,7 @@ public class RepositoryOrder {
 
     private Long supplierContactId;
 
-    private Integer buyerId;
+    private Long buyerId;
 
     private String status;
 
@@ -229,11 +229,11 @@ public class RepositoryOrder {
         this.supplierContactId = supplierContactId;
     }
 
-    public Integer getBuyerId() {
+    public Long getBuyerId() {
         return buyerId;
     }
 
-    public void setBuyerId(Integer buyerId) {
+    public void setBuyerId(Long buyerId) {
         this.buyerId = buyerId;
     }
 

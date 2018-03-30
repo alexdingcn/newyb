@@ -11,6 +11,7 @@ public enum OrderNumberType {
     DAMAGED("DA", "报损"),
     INVENTORY("IY", "盘点"),
     MOVE_R("MR", "移库"),
+    IN_CHECK("IC", "入库质检")
     ;
 
     private String code;

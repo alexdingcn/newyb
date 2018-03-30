@@ -198,7 +198,7 @@
         </Modal>
 
         <Modal v-model="buyCheckOrder" title="采购单提取" :mask-closable="false" width="70">
-            <buy-order-list @on-choose="buyOrderChoose" :chooseModal="true" ></buy-order-list>
+            <buy-order-list @on-choosed="buyOrderChoose" :chooseModal="true" ></buy-order-list>
             <div slot="footer"></div>
         </Modal>
 
@@ -831,8 +831,36 @@
             },
 
             buyOrderChoose(buyOrder) {
-                console.log(buyOrder);
-                this.buyCheckOrder = false;
+                if(!buyOrder || !buyOrder.id) {
+                    this.$Message.warning('获取选取的订单信息失败');
+                    return;
+                }
+                util.ajax.get("/receive/buy/order/" + buyOrder.id) 
+                    .then((response) => {
+                        let data  = response.data;
+                        if (data) {
+                            this.buyCheckOrder = false;
+                            this.editView = true;
+                            this.order = data;
+                            this.orderItems = data.details ? data.details : [];
+                            let itemIds = [];
+                            if(this.orderItems && this.orderItems.length > 0) {
+                                for (let i=0; i<this.orderItems.length; i++) {
+                                    let item = this.orderItems[i];
+                                    if(item && item.goodsId) {
+                                        itemIds.push(item.goodsId);
+                                    }
+                                }
+                            }
+                            this.order['orderItemIds'] = itemIds;
+                            this.receiveTemp = false;
+                            //设置每一条明细的历史价格和订单数信息
+                            this.setCurrentBalanceRecord(itemIds);
+                        }
+                    })
+                    .catch((error) => {
+                        util.errorProcessor(this, error);
+                    });
             }
         }
     };

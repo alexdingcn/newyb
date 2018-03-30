@@ -1,14 +1,13 @@
 package com.yiban.erp.service.buy;
 
+import com.yiban.erp.constant.BuyOrderStatus;
 import com.yiban.erp.constant.OptionsType;
+import com.yiban.erp.constant.OrderNumberType;
 import com.yiban.erp.constant.RepositoryOrderStatus;
 import com.yiban.erp.dao.*;
 import com.yiban.erp.dto.CurrentBalanceResp;
 import com.yiban.erp.dto.ReceiveListReq;
-import com.yiban.erp.entities.Options;
-import com.yiban.erp.entities.RepositoryOrder;
-import com.yiban.erp.entities.RepositoryOrderDetail;
-import com.yiban.erp.entities.User;
+import com.yiban.erp.entities.*;
 import com.yiban.erp.exception.BizException;
 import com.yiban.erp.exception.BizRuntimeException;
 import com.yiban.erp.exception.ErrorCode;
@@ -37,6 +36,10 @@ public class ReceiveService {
     private RepositoryOrderDetailMapper repositoryOrderDetailMapper;
     @Autowired
     private OptionsMapper optionsMapper;
+    @Autowired
+    private BuyOrderDetailMapper buyOrderDetailMapper;
+    @Autowired
+    private GoodsMapper goodsMapper;
 
     /**
      * 获取某商品当前库存和申购订单信息
@@ -97,7 +100,7 @@ public class ReceiveService {
         if (order.getId() == null) {
             //新建
             order.setCompanyId(user.getCompanyId());
-            order.setOrderNumber(getOrderNumber(user));
+            order.setOrderNumber(UtilTool.makeOrderNumber(user.getCompanyId(), OrderNumberType.IN_CHECK));
             order.setCreateBy(user.getNickname());
             order.setCreateTime(new Date());
             int count = repositoryOrderMapper.insert(order);
@@ -129,6 +132,18 @@ public class ReceiveService {
         }
         logger.info("begin save repository order details.");
         saveOrderDetail(user, order);
+
+        //如果是保存操作，不是暂挂，验证是否存在采购单号，如果存在，修改到已经收货的状态
+        if (RepositoryOrderStatus.INIT.name().equalsIgnoreCase(order.getStatus()) && order.getBuyOrderId() != null) {
+            logger.info("set buy order status to shiped. buyOrderId:{}", order.getBuyOrderId());
+            BuyOrder buyOrder = buyOrderMapper.selectByPrimaryKey(order.getBuyOrderId());
+            if (buyOrder != null) {
+                buyOrder.setStatus(BuyOrderStatus.SHIPPED.name());
+                buyOrder.setUpdatedBy(user.getNickname());
+                buyOrder.setUpdatedTime(new Date());
+                buyOrderMapper.updateByPrimaryKeySelective(buyOrder);
+            }
+        }
     }
 
     private int saveOrderDetail(User user, RepositoryOrder order) {
@@ -145,14 +160,6 @@ public class ReceiveService {
             item.setCreateTime(new Date());
         });
         return repositoryOrderDetailMapper.insertBatch(details);
-    }
-
-    private String getOrderNumber(User user) {
-        StringBuilder orderNo = new StringBuilder("R");
-        orderNo.append(user.getCompanyId());
-        orderNo.append(UtilTool.dateFormat(new Date(), "yyyyMMddHHmmss"));
-        orderNo.append(RandomStringUtils.randomNumeric(4));
-        return orderNo.toString();
     }
 
     private boolean saveValidate(RepositoryOrder order) {
@@ -226,4 +233,93 @@ public class ReceiveService {
         order.setUpdateTime(new Date());
         repositoryOrderMapper.updateByPrimaryKeySelective(order);
     }
+
+    public RepositoryOrder getByBuyOrder(User user, Long buyOrderId) throws BizException {
+        logger.debug("user:{} get receive order by buy order id:{}", user.getId(), buyOrderId);
+        BuyOrder buyOrder = buyOrderMapper.getOrderById(buyOrderId);
+        if (buyOrder == null) {
+            logger.warn("get buy order fail. id:{}", buyOrderId);
+            throw new BizException(ErrorCode.BUY_ORDER_NOT_EXISTED);
+        }
+        if (!user.getCompanyId().equals(buyOrder.getCompanyId())) {
+            logger.warn("user company not equals buy order company: user:{} orderId:{}", user.getId(), buyOrderId);
+            throw new BizRuntimeException(ErrorCode.ACCESS_PERMISSION);
+        }
+        if (!BuyOrderStatus.CHECKED.name().equalsIgnoreCase(buyOrder.getStatus())) {
+            logger.warn("get buy order but status is error. order id:{}", buyOrderId);
+            throw new BizException(ErrorCode.RECEIVE_BUY_ORDER_STATUS);
+        }
+        //查询当前采购收货单中是否存在该笔订单数据，如果存在，直接返回，如果不存在，生成对应数据
+        RepositoryOrder order = repositoryOrderMapper.getByBuyOrder(user.getCompanyId(), buyOrderId);
+        if (order == null) {
+            logger.info("buy order is not exist in receive order. buy order id:{}", buyOrderId);
+            return makeReceiveOrderByBuyOrder(user, buyOrder);
+        }else {
+            //获取option进行设置
+            List<String> queryOptions = Arrays.asList(
+                    OptionsType.TEMPER_CONTROL.name(),
+                    OptionsType.TEMPER_STATUS.name(),
+                    OptionsType.SHIP_TOOL.name(),
+                    OptionsType.PAY_METHOD.name(),
+                    OptionsType.SHIP_METHOD.name(),
+                    OptionsType.BUY_TYPE.name(),
+                    OptionsType.BILL_TYPE.name()
+            );
+            List<Options> options = optionsMapper.findByTypes(user.getCompanyId(), queryOptions);
+            order.setOptions(options);
+            //获取所有订单对应的详情信息
+            List<RepositoryOrderDetail> details = repositoryOrderDetailMapper.getByOrderIdList(Arrays.asList(order.getId()));
+            if (details ==null || details.isEmpty()) {
+                return order;
+            }
+            Map<Long, List<RepositoryOrderDetail>> detailMap = details.stream().collect(Collectors.groupingBy(RepositoryOrderDetail::getRepositoryOrderId));
+            order.setDetails(detailMap.get(order.getId()));
+            return order;
+        }
+    }
+
+    private RepositoryOrder makeReceiveOrderByBuyOrder(User user, BuyOrder buyOrder) {
+        RepositoryOrder order = new RepositoryOrder();
+        order.setCompanyId(buyOrder.getCompanyId());
+        order.setBuyOrderId(buyOrder.getId());
+        order.setSupplierId(buyOrder.getSupplierId());
+        order.setSupplierName(buyOrder.getSupplier());
+        order.setSupplierContactId(buyOrder.getSupplierContactId());
+        order.setSupplierContactName(buyOrder.getSupplierContact());
+        order.setBuyerId(buyOrder.getBuyerId());
+        order.setTempControlMethod(buyOrder.getTemperControlId() == null ? null : Long.valueOf(buyOrder.getTemperControlId()));
+        order.setShipMethod(buyOrder.getShipMethodId() == null ? null : Long.valueOf(buyOrder.getShipMethodId()));
+        order.setShipTool(buyOrder.getShipToolId() == null ? null : Long.valueOf(buyOrder.getShipToolId()));
+        order.setShipEndDate(buyOrder.getEta());
+        order.setWarehouseId(buyOrder.getWarehouseId());
+        order.setWarehouseName(buyOrder.getWarehouse());
+
+        //获取采购单的详情信息
+        List<BuyOrderDetail> buyOrderDetails = buyOrderDetailMapper.findByOrderId(buyOrder.getId(), user.getCompanyId());
+        if (buyOrderDetails == null || buyOrderDetails.isEmpty()) {
+            return order;
+        }
+        List<Long> goodsIdList = new ArrayList<>();
+        buyOrderDetails.stream().forEach(item -> goodsIdList.add(item.getGoodsId()));
+        List<Goods> goodsList = goodsMapper.selectByIdList(goodsIdList);
+        Map<Long, Goods> goodsMap = new HashMap<>();
+        goodsList.stream().forEach(item -> goodsMap.put(item.getId(), item));
+
+        List<RepositoryOrderDetail> details = new ArrayList<>();
+
+        buyOrderDetails.stream().forEach(item -> {
+            RepositoryOrderDetail detail = new RepositoryOrderDetail();
+            detail.setGoodsId(item.getGoodsId());
+            detail.setGoods(goodsMap.get(item.getGoodsId()));
+            detail.setReceiveQuality(item.getQuantity() == null ? 0 : item.getQuantity().intValue());
+            detail.setBigQuality(0);
+            detail.setPrice(item.getBuyPrice());
+            detail.setAmount(item.getAmount());
+            details.add(detail);
+        });
+
+        order.setDetails(details);
+        return order;
+    }
+
 }

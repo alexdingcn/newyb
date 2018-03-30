@@ -76,4 +76,11 @@ public class BuyReceiveController {
         return ResponseEntity.ok().build();
     }
 
+    @RequestMapping(value = "/buy/order/{buyOrderId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> getByBuyOrder(@PathVariable Long buyOrderId,
+                                                @AuthenticationPrincipal User user) throws Exception {
+        RepositoryOrder order = receiveService.getByBuyOrder(user, buyOrderId);
+        return ResponseEntity.ok().body(JSON.toJSONString(order));
+    }
+
 }

@@ -24,5 +24,7 @@ public interface BuyOrderMapper {
 
     List<BuyOrder> queryOrders(BuyOrderQuery buyOrder);
 
+    BuyOrder getOrderById(Long orderId);
+
     List<CurrentBalanceResp> getGoodsOrderCount(@Param("goodsIdList") List<Long> goodsIdList);
 }

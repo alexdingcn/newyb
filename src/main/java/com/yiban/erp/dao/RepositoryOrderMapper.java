@@ -24,4 +24,5 @@ public interface RepositoryOrderMapper {
     List<RepositoryOrder> getList(ReceiveListReq listReq);
 
 
+    RepositoryOrder getByBuyOrder(@Param("companyId") Integer companyId, @Param("buyOrderId") Long buyOrderId);
 }

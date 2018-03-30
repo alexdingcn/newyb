@@ -1,6 +1,7 @@
 package com.yiban.erp.service.sell;
 
 import com.alibaba.fastjson.JSON;
+import com.yiban.erp.constant.OrderNumberType;
 import com.yiban.erp.constant.SellOrderStatus;
 import com.yiban.erp.constant.OptionsType;
 import com.yiban.erp.dao.*;
@@ -64,7 +65,7 @@ public class SellOrderService {
 
         if (sellOrder.getId() == null) {
             logger.info("new sell order save.");
-            String orderNumber = getOrderNumber(user);
+            String orderNumber = UtilTool.makeOrderNumber(user.getCompanyId(), OrderNumberType.SELL);
             sellOrder.setCompanyId(user.getCompanyId());
             sellOrder.setOrderNumber(orderNumber);
             sellOrder.setCreateBy(user.getNickname());
@@ -104,20 +105,6 @@ public class SellOrderService {
     }
 
 
-
-    /**
-     * 生成一个销售订单号, 格式如下
-     * 'S' + companyId + yyyyMMddHHmmss + 4位随机数字
-     * @param user
-     * @return
-     */
-    private String getOrderNumber(User user) {
-        StringBuilder orderNo = new StringBuilder("S");
-        orderNo.append(user.getCompanyId());
-        orderNo.append(UtilTool.dateFormat(new Date(), "yyyyMMddHHmmss"));
-        orderNo.append(RandomStringUtils.randomNumeric(4));
-        return orderNo.toString();
-    }
 
     private boolean validateSellOrder(SellOrder order) {
         if (order == null) {
