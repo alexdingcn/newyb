@@ -31,6 +31,8 @@ public class RepertoryInfo {
 
     private Date productDate;
 
+    private Date inDate;
+
     private Date expDate;
 
     private String location;
@@ -39,11 +41,11 @@ public class RepertoryInfo {
 
     private long factory_id;
 
-    private Integer store_state;
+    private String store_state;
 
-    private Integer counter_state;
+    private String counter_state;
 
-    private Integer sale_sate;
+    private String sale_sate;
 
     private String createBy;
 
@@ -55,14 +57,24 @@ public class RepertoryInfo {
 
     private Goods goods;
 
+
+    //展示字段
     private String warehouseName;
     private String goodName;
+    private String supplier;
     private String factoryName;
     private String in_user_name;
+    private String origin;
     private String jx;
     private String spec;
     private String unitName;
-
+    private String med_type;
+    private long permit_id;
+    private long base_med_id;
+    private Byte enable;
+    private BigDecimal in_tax;
+    private BigDecimal out_tax;
+    private String storage_condition;
 
     public Long getId() {
         return id;
@@ -293,36 +305,116 @@ public class RepertoryInfo {
         this.factory_id = factory_id;
     }
 
-    public Integer getStore_state() {
-        return store_state;
-    }
-
-    public void setStore_state(Integer store_state) {
-        this.store_state = store_state;
-    }
-
-    public Integer getCounter_state() {
-        return counter_state;
-    }
-
-    public void setCounter_state(Integer counter_state) {
-        this.counter_state = counter_state;
-    }
-
-    public Integer getSale_sate() {
-        return sale_sate;
-    }
-
-    public void setSale_sate(Integer sale_sate) {
-        this.sale_sate = sale_sate;
-    }
-
     public String getIn_user_name() {
         return in_user_name;
     }
 
     public void setIn_user_name(String in_user_name) {
         this.in_user_name = in_user_name;
+    }
+
+    public Date getInDate() {
+        return inDate;
+    }
+
+    public void setInDate(Date inDate) {
+        this.inDate = inDate;
+    }
+
+    public String getStore_state() {
+        return store_state;
+    }
+
+    public void setStore_state(String store_state) {
+        this.store_state = store_state;
+    }
+
+    public String getCounter_state() {
+        return counter_state;
+    }
+
+    public void setCounter_state(String counter_state) {
+        this.counter_state = counter_state;
+    }
+
+    public String getSale_sate() {
+        return sale_sate;
+    }
+
+    public void setSale_sate(String sale_sate) {
+        this.sale_sate = sale_sate;
+    }
+
+    public String getSupplier() {
+        return supplier;
+    }
+
+    public void setSupplier(String supplier) {
+        this.supplier = supplier;
+    }
+
+    public String getOrigin() {
+        return origin;
+    }
+
+    public void setOrigin(String origin) {
+        this.origin = origin;
+    }
+
+    public String getMed_type() {
+        return med_type;
+    }
+
+    public void setMed_type(String med_type) {
+        this.med_type = med_type;
+    }
+
+    public long getPermit_id() {
+        return permit_id;
+    }
+
+    public void setPermit_id(long permit_id) {
+        this.permit_id = permit_id;
+    }
+
+    public long getBase_med_id() {
+        return base_med_id;
+    }
+
+    public void setBase_med_id(long base_med_id) {
+        this.base_med_id = base_med_id;
+    }
+
+    public Byte getEnable() {
+        return enable;
+    }
+
+    public void setEnable(Byte enable) {
+        this.enable = enable;
+    }
+
+    public BigDecimal getIn_tax() {
+        return in_tax;
+    }
+
+    public void setIn_tax(BigDecimal in_tax) {
+        this.in_tax = in_tax;
+    }
+
+    public BigDecimal getOut_tax() {
+        return out_tax;
+    }
+
+    public void setOut_tax(BigDecimal out_tax) {
+        this.out_tax = out_tax;
+    }
+
+    public String getStorage_condition() {
+        return storage_condition;
+    }
+
+    public void setStorage_condition(String storage_condition) {
+        this.storage_condition = storage_condition;
     }
 
     public void setGoods(Goods goods) {

@@ -52,7 +52,7 @@
              </Col>
              <Col span="4">
              <FormItem label="零库存品种" >
-                 <checkbox  size="small"/>显示
+                 <checkbox   v-model="storeNow.is_zero_store"  size="small"/>显示
              </FormItem>
              </Col>
 
@@ -68,6 +68,20 @@
                     <factory-select v-model="storeNow.factoryId" size="small"></factory-select>
                 </FormItem>
             </Col>
+
+
+            <Col span="3">
+            <FormItem label="采购员" prop="buyerId">
+                <buyer-select v-model="storeNow.in_user_id" size="small"></buyer-select>
+            </FormItem>
+
+            </Col>
+            <Col span="3">
+            <FormItem label="库龄大于" >
+                <Input  size="small"  v-model="storeNow.keedays" placeholder="天"/>
+            </FormItem>
+            </Col>
+            <!--
             <Col span="3">
                 <FormItem label="商品属性" >
                     <Input  size="small"/>
@@ -77,7 +91,7 @@
                 <FormItem label="采购属性" >
                     <Input  size="small"/>
                 </FormItem>
-                </Col>
+                </Col>-->
             </Row>
 
             <Row>
@@ -86,31 +100,21 @@
                     <good-select v-model="storeNow.good_id" size="small"></good-select>
                 </FormItem>
                 </Col>
-
-                <Col span="3">
-                <FormItem label="采购员" prop="buyerId">
-                    <buyer-select v-model="storeNow.in_user_id" size="small"></buyer-select>
-                </FormItem>
-
-                </Col>
-                <Col span="3">
-                <FormItem label="库龄大于" >
-                    <Input  size="small" placeholder="天"/>
-                </FormItem>
-                </Col>
-
             </Row>
-        <Table border highlight-row
-            class="margin-top-8"
-            :columns="repertoryColumns" :data="repertoryItems"
-            ref="storeNowTable" style="width: 100%;" size="small"
-            no-data-text="当前条件下查询，无库存数据！">
-            <div slot="footer">
-                <h3 class="padding-left-20" >
-                    <b>合计金额:</b> ￥{{ totalAmount }}
-                </h3>
-            </div>
-        </Table>
+
+            <Table border highlight-row
+                class="margin-top-8"
+                :columns="repertoryColumns" :data="repertoryItems"
+                ref="storeNowTable" style="width: 100%;" size="small"
+                no-data-text="当前条件下查询，无库存数据！">
+
+            </Table>
+
+            <Row class="margin-top-8">
+                <div style="float: right;">
+                    <Page :total="totalAmount" :current="currentPage" @on-change="changePage" size="small" show-total></Page>
+                </div>
+            </Row>
         </Form>
     </Card>
     </Row>
@@ -137,10 +141,11 @@
             return {
                 saving: false,
                 totalAmount: 0,
+                currentPage: 1,
                 repertoryItems: [],
-                counterOptions:[{ id: '0', name:'全部'}],
-                storeOptions:[{ id: '0', name:'全部'}],
-                saleOptions:[{ id: '0', name:'全部'}],
+                counterOptions:[{ id: 'ALL', name:'全部'}],
+                storeOptions:[{ id: 'ALL', name:'全部'}],
+                saleOptions:[{ id: 'ALL', name:'全部'}],
                 storeNow: {
                     warehouseId: null,
                     factoryId:null
@@ -148,14 +153,14 @@
                 repertoryColumns: [
                     {
                         type: 'index',
-                        title: '',
+                        title: 'id',
                         align: 'center',
                         width: 30
                     },
                     {
                         title: '货号',
                         align: 'center',
-                        key: '',
+                        key: 'code',
                         width: 50
                     },
                     {
@@ -167,32 +172,32 @@
                     },
                     {
                         title: '产地',
-                        key: '',
+                        key: 'origin',
                         align: 'center',
                         width: 60
                     },
 
                     {
                         title: '规格',
-                        key: '',
+                        key: 'spec',
                         align: 'center',
                         width: 80
                     },
                     {
                         title: '生产企业',
-                        key: 'factory_id',
+                        key: 'factoryName',
                         align: 'center',
                         width: 120
                     },
                     {
                         title: '基药',
-                        key: '',
+                        key: 'base_med_id',
                         align: 'center',
                         width: 60
                     },
                     {
                         title: '批准文号',
-                        key: '',
+                        key: 'permit_id',
                         align: 'center',
                         width: 120
                     },
@@ -206,17 +211,23 @@
                         title: '生产日期',
                         key: 'productDate',
                         align: 'center',
-                        width: 80
+                        width: 80,
+                        render: (h, params) => {
+                            return moment(params.row.eta).format('YYYY-MM-DD');
+                        }
                     },
                     {
                         title: '有效日期',
                         key: 'expDate',
                         align: 'center',
-                        width: 80
+                        width: 80,
+                        render: (h, params) => {
+                            return moment(params.row.eta).format('YYYY-MM-DD');
+                        }
                     },
                     {
                         title: '单位',
-                        key: '',
+                        key: 'unitName',
                         align: 'center',
                         width: 50
                     },
@@ -249,7 +260,7 @@
                     },
                     {
                         title: '税率',
-                        key: '',
+                        key: 'out_tax',
                         align: 'center',
                         width: 60
                     },
@@ -285,13 +296,19 @@
 
                     {
                         title: '最近采购价',
-                        key: '',
+                        key: 'buy_price',
                         align: 'center',
                         width: 100,
                     },
                     {
+                        title: '供应商',
+                        key: 'supplier',
+                        align: 'center',
+                        width: 120
+                    },
+                    {
                         title: '储存条件',
-                        key: '',
+                        key: 'storage_condition',
                         align: 'center',
                         width: 100,
                     },
@@ -318,13 +335,13 @@
             };
         },
         mounted () {
+            this.queryRepertoryList();
         },
         activated () {
            // this.clearData();
         },
         watch: {
             repertoryItems: function () {
-               this.totalAmount = this.repertoryItems.reduce(function (total, item) { return total + parseFloat(item.amount); }, 0);
             }
         },
         methods: {
@@ -334,15 +351,20 @@
             queryRepertoryList () {
                 var self = this;
                 this.repertoryItems = [];
+                this.storeNow.page=this.currentPage;
                 util.ajax.post('/repertory/list', this.storeNow)
                     .then(function (response) {
                         if (response.status === 200 && response.data) {
-                            self.repertoryItems = response.data;
+                            self.repertoryItems = response.data.data;
+                            self.totalAmount = response.data.total;
                         }
                     })
                     .catch(function (error) {
                         console.log(error);
                     });
+            }, changePage (pageNumber) {
+                this.currentPage = pageNumber;
+                this.queryRepertoryList();
             },
             queryRepertoryInfo() {
                 this.queryRepertoryList();

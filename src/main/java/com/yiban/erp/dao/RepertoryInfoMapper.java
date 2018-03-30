@@ -32,9 +32,9 @@ public interface RepertoryInfoMapper {
 
     List<String> getGoodNameWithLessQuantity(Long sellOrderId);
 
-    List<RepertoryInfo> queryRepertory(RepertoryQuery repertoryQuery);
+    Integer  queryRepertoryCount(RepertoryQuery repertoryQuery);
 
-
+    List<RepertoryInfo> queryRepertoryPage(RepertoryQuery repertoryQuery);
 
     //减库存
     int sellOrderConsumeQuantity(@Param("sellOrderId") Long sellOrderId,
