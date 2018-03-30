@@ -2,6 +2,7 @@ package com.yiban.erp.entities;
 
 import com.yiban.erp.constant.RepositoryOrderStatus;
 
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -40,7 +41,7 @@ public class RepositoryOrder {
 
     private Integer checkTemp;
 
-    private String tempControlStatus;
+    private Long tempControlStatus;
 
     private Integer shipCompanyId;
 
@@ -300,12 +301,12 @@ public class RepositoryOrder {
         this.checkTemp = checkTemp;
     }
 
-    public String getTempControlStatus() {
+    public Long getTempControlStatus() {
         return tempControlStatus;
     }
 
-    public void setTempControlStatus(String tempControlStatus) {
-        this.tempControlStatus = tempControlStatus == null ? null : tempControlStatus.trim();
+    public void setTempControlStatus(Long tempControlStatus) {
+        this.tempControlStatus = tempControlStatus;
     }
 
     public Integer getShipCompanyId() {

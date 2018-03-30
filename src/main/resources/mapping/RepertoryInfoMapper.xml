@@ -330,19 +330,26 @@
     where d.repertory_id = r.id and d.sell_order_id = #{sellOrderId}
   </update>
 
-  <select id="getBalance" parameterType="map" resultType="java.lang.Integer">
-    select count(quantity) as count
+  <select id="getBalance" parameterType="map" resultType="com.yiban.erp.dto.CurrentBalanceResp">
+    select good_id as goodsId, count(quantity) as balance
     from repertory_info
     where warehouse_id = #{warehouseId}
-    and good_id = #{goodsId}
+    and good_id in
+    <foreach collection="goodsIdList" open="(" close=")" item="item" separator=",">
+      #{item}
+    </foreach>
+    group by good_id
   </select>
 
-  <select id="getLastBuyPrice" parameterType="map" resultType="java.math.BigDecimal" >
-    select buy_price
-    from repertory_info
-    where warehouse_id = #{warehouseId} and good_id = #{goodsId}
-    order by id desc
-    limit 1;
+  <select id="getLastBuyPrice" parameterType="map" resultType="com.yiban.erp.dto.CurrentBalanceResp" >
+    select t2.good_id as goodsId, t2.buy_price as lastPrice from (
+      select max(id) as id from repertory_info
+        where good_id in
+          <foreach collection="goodsIdList" open="(" close=")" item="item" separator=",">
+            #{item}
+          </foreach>
+        group by good_id) t1, repertory_info t2
+    where t1.id = t2.id;
   </select>
 
 </mapper>

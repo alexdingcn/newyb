@@ -1,5 +1,9 @@
 package com.yiban.erp.util;
 
+import com.yiban.erp.constant.OrderNumberType;
+import com.yiban.erp.exception.BizRuntimeException;
+import com.yiban.erp.exception.ErrorCode;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,6 +20,25 @@ public class UtilTool {
 
     private static final String DEFAULT_DATE_TIME_PATTERN = "yyyy-MM-dd hh:mm:ss";
 
+
+    /**
+     *
+     * @return
+     */
+    public static String makeOrderNumber(Integer companyId, OrderNumberType numberType) {
+        if (companyId == null || numberType == null) {
+            throw new BizRuntimeException(ErrorCode.MAKE_ORDER_NUMBER_PARAMS);
+        }
+        StringBuilder sb = new StringBuilder();
+        String timeStr = dateFormat(new Date(), "yyyyMMddHHmm");
+        sb.append(timeStr);
+        sb.append("-");
+        sb.append(numberType.getCode());
+        sb.append(companyId);
+        sb.append("-");
+        sb.append(RandomStringUtils.randomNumeric(4));
+        return sb.toString();
+    }
 
     /**
      * 对一个对象中的所有String类型的属性进行去空格，如果去除空格后只剩空串，设置为null
@@ -44,7 +67,7 @@ public class UtilTool {
         return body;
     }
 
-    public static String DateFormat(Date date, String pattern) {
+    public static String dateFormat(Date date, String pattern) {
         if (date == null) {
             return null;
         }
@@ -53,7 +76,7 @@ public class UtilTool {
         return formatter.format(date);
     }
 
-    public static Date DateParse(String dateStr, String pattern) {
+    public static Date dateParse(String dateStr, String pattern) {
         if (StringUtils.isBlank(dateStr)) {
             return null;
         }
