@@ -8,6 +8,8 @@ public enum ErrorCode {
     FAILED_UPDATE_FROM_DB(1002, "无法修改", ErrorDisplay.NOTICE),
     FAILED_PINGYIN_EXCEPTION(1003, "获取拼音缩写失败"),
     MAKE_ORDER_NUMBER_PARAMS(1004, "生产订单号参数错误"),
+    FAILED_INSERT_OR_UPDATE_FROM_DB(1005, "无法添加或修改", ErrorDisplay.NOTICE),
+    FAILED_PINGYIN_EXCEPTION(1006, "获取拼音缩写失败"),
 
     // 11xx - 用户
     USER_NAME_NOT_EXISTED(1100, "用户名不存在"),
@@ -91,7 +93,8 @@ public enum ErrorCode {
     MOBILE_MISSING(4105, "手机号缺失"),
     MOBILE_VERIFY_CODE_TOO_FREQUENT(4106, "验证码发送太频繁"),
 
-    ACCESS_PERMISSION(9001, "无访问权限", ErrorDisplay.MODAL);
+    ACCESS_PERMISSION(9001, "无访问权限", ErrorDisplay.MODAL),
+    PARAMETER_MISSING(9002, "缺少必填字段");
 
     private Integer code;
     private String message;

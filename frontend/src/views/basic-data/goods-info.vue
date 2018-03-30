@@ -265,15 +265,8 @@
                             <Row>
                                 <Col span="6">
                                 <FormItem label="特殊管理属性" prop="specialManageId">
-                                    <Select v-model="formItem.factoryId" placeholder="例如 某制药有限公司" filterable>
-                                        <Option v-for="item in factoryList" :value="item.id" :label="item.name" :key="item.id">
-                                            {{ item.name }}
-                                        </Option>
-                                    </Select>
+                                    <option-select optionType="BUY_TYPE"></option-select>
                                 </FormItem>
-                                </Col>
-                                <Col span="2">
-                                <Button type="ghost" icon="ios-settings-strong" @click="clickNewFactory"></Button>
                                 </Col>
 
                                 <Col span="6">
@@ -289,6 +282,9 @@
                                 <Button type="ghost" icon="ios-settings-strong" @click="clickNewFactory"></Button>
                                 </Col>
                             </Row>
+                            <Row>
+                                <Button/>
+                            </Row>
 
                         </TabPane>
                         <TabPane label="证书信息" name="cert" icon="bookmark">证书信息</TabPane>
@@ -303,6 +299,7 @@
                 <Icon type="ios-plus-outline"></Icon>
                 <span>新增单位</span>
             </p>
+
             <div style="text-align:center">
                 <Row>
                     <Input v-model="newUnitName" placeholder="单位名称" style="width: 200px"/>
@@ -320,9 +317,13 @@
 
 <script>
 import util from '@/libs/util.js';
+import optionSelect from "../selector/option-select.vue";
 
 export default {
     name: 'goods-info',
+    components: {
+        optionSelect,
+    },
     data () {
         return {
             newUnitName: '',
