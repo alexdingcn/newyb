@@ -60,7 +60,7 @@ util.ajax.interceptors.response.use(
                     });
             }
         }
-        return Promise.reject(error);  // 返回接口返回的错误信息
+        return Promise.reject(error); // 返回接口返回的错误信息
     }
 );
 
