@@ -345,4 +345,38 @@
     limit 1;
   </select>
 
+
+  <select id="queryRepertory" resultMap="BaseResultMap" parameterType="com.yiban.erp.querybean.RepertoryQuery" >
+    select
+    rp.*,g.name AS goodName,su.name AS supplier, w.name AS warehouseName,f.name AS factoryName,inu.nickname AS in_user_name
+    FROM repertory_info rp
+    LEFT JOIN supplier su ON su.id=rp.supplier_id
+    LEFT JOIN warehouse w ON w.id=rp.warehouse_id
+    LEFT JOIN factory f ON f.id=rp.factory_id
+    LEFT JOIN users  inu ON inu.id=rp.in_user_id
+    LEFT JOIN goods  g ON  g.id=rp.good_id
+    WHERE 1=1
+    <if test="warehouseId != null" >
+      and rp.warehouse_id = #{warehouseId, jdbcType=BIGINT}
+    </if>
+    <if test="store_state != null" >
+      and rp.store_state = #{store_state,jdbcType=INTEGER}
+    </if>
+    <if test="counter_state != null" >
+      and rp.counter_state >= #{counter_state,jdbcType=INTEGER}
+    </if>
+    <if test="sale_state != null" >
+      and rp.sale_state >= #{sale_state,jdbcType=INTEGER}
+    </if>
+    <if test="supplierId != null" >
+      and rp.supplier_id >= #{supplierId,jdbcType=BIGINT}
+    </if>
+    <if test="companyId != null" >
+      and rp.company_id = #{companyId,jdbcType=INTEGER}
+    </if>
+    <if test="buyerId != null" >
+      and rp.in_user_id = #{buyerId,jdbcType=BIGINT}
+    </if>
+  </select>
+
 </mapper>

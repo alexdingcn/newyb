@@ -5,8 +5,11 @@ import java.util.Date;
 
 public class RepertoryInfo {
     private Long id;
+    private Integer company_id;
 
     private Integer warehouseId;
+
+    private Integer in_user_id;
 
     private Long goodId;
 
@@ -32,6 +35,16 @@ public class RepertoryInfo {
 
     private String location;
 
+    private long supplier_id;
+
+    private long factory_id;
+
+    private Integer store_state;
+
+    private Integer counter_state;
+
+    private Integer sale_sate;
+
     private String createBy;
 
     private Date createTime;
@@ -45,6 +58,7 @@ public class RepertoryInfo {
     private String warehouseName;
     private String goodName;
     private String factoryName;
+    private String in_user_name;
     private String jx;
     private String spec;
     private String unitName;
@@ -244,6 +258,71 @@ public class RepertoryInfo {
 
     public Goods getGoods() {
         return goods;
+    }
+
+
+    public Integer getCompany_id() {
+        return company_id;
+    }
+
+    public void setCompany_id(Integer company_id) {
+        this.company_id = company_id;
+    }
+
+    public Integer getIn_user_id() {
+        return in_user_id;
+    }
+
+    public void setIn_user_id(Integer in_user_id) {
+        this.in_user_id = in_user_id;
+    }
+
+    public long getSupplier_id() {
+        return supplier_id;
+    }
+
+    public void setSupplier_id(long supplier_id) {
+        this.supplier_id = supplier_id;
+    }
+
+    public long getFactory_id() {
+        return factory_id;
+    }
+
+    public void setFactory_id(long factory_id) {
+        this.factory_id = factory_id;
+    }
+
+    public Integer getStore_state() {
+        return store_state;
+    }
+
+    public void setStore_state(Integer store_state) {
+        this.store_state = store_state;
+    }
+
+    public Integer getCounter_state() {
+        return counter_state;
+    }
+
+    public void setCounter_state(Integer counter_state) {
+        this.counter_state = counter_state;
+    }
+
+    public Integer getSale_sate() {
+        return sale_sate;
+    }
+
+    public void setSale_sate(Integer sale_sate) {
+        this.sale_sate = sale_sate;
+    }
+
+    public String getIn_user_name() {
+        return in_user_name;
+    }
+
+    public void setIn_user_name(String in_user_name) {
+        this.in_user_name = in_user_name;
     }
 
     public void setGoods(Goods goods) {

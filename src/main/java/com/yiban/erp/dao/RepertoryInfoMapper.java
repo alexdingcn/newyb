@@ -1,6 +1,7 @@
 package com.yiban.erp.dao;
 
 import com.yiban.erp.entities.RepertoryInfo;
+import com.yiban.erp.querybean.RepertoryQuery;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -30,6 +31,10 @@ public interface RepertoryInfoMapper {
     List<RepertoryInfo> getListByIdList(@Param("idList") List<Long> repertoryIdList);
 
     List<String> getGoodNameWithLessQuantity(Long sellOrderId);
+
+    List<RepertoryInfo> queryRepertory(RepertoryQuery repertoryQuery);
+
+
 
     //减库存
     int sellOrderConsumeQuantity(@Param("sellOrderId") Long sellOrderId,
