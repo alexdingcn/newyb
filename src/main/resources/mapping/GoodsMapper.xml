@@ -27,7 +27,7 @@
     <result column="permit_id" property="permitId" jdbcType="BIGINT" />
     <result column="jx_id" property="jxId" jdbcType="INTEGER" />
     <result column="is_foreign" property="isForeign" jdbcType="BIT" />
-    <result column="is_tcm" property="isTcm" jdbcType="BIT" />
+    <result column="med_type" property="medType" jdbcType="INTEGER" />
     <result column="is_prescription" property="isPrescription" jdbcType="BIT" />
     <result column="in_check" property="inCheck" jdbcType="BIT" />
     <result column="first_check" property="firstCheck" jdbcType="BIT" />
@@ -60,7 +60,7 @@
   <sql id="Base_Column_List" >
     id, name, company_id, category_id, full_name, origin, jx, spec, serial, code, enable, 
     factory_id, unit, pack_unit, medium_pack, big_pack, pinyin, storage_condition, storage_description, 
-    comment, cert_id, brand_id, permit_id, jx_id, is_foreign, is_tcm, is_prescription, 
+    comment, cert_id, brand_id, permit_id, jx_id, is_foreign, med_type, is_prescription, 
     in_check, first_check, special_managed, need_care, warning_days, created_time, updated_time, 
     created_by, updated_by, is_shebao, in_tax, out_tax, valid_months, contact, archive_number, 
     cure_range, sale_policy, special_manage_id, medication_id, function_category_id, 
@@ -141,7 +141,7 @@
       pinyin, storage_condition, storage_description, 
       comment, cert_id, brand_id, 
       permit_id, jx_id, is_foreign, 
-      is_tcm, is_prescription, in_check, 
+      med_type, is_prescription, in_check, 
       first_check, special_managed, need_care, 
       warning_days, created_time, updated_time, 
       created_by, updated_by, is_shebao, 
@@ -159,7 +159,7 @@
       #{pinyin,jdbcType=VARCHAR}, #{storageCondition,jdbcType=VARCHAR}, #{storageDescription,jdbcType=VARCHAR}, 
       #{comment,jdbcType=VARCHAR}, #{certId,jdbcType=BIGINT}, #{brandId,jdbcType=INTEGER}, 
       #{permitId,jdbcType=BIGINT}, #{jxId,jdbcType=INTEGER}, #{isForeign,jdbcType=BIT}, 
-      #{isTcm,jdbcType=BIT}, #{isPrescription,jdbcType=BIT}, #{inCheck,jdbcType=BIT}, 
+      #{medType,jdbcType=INTEGER}, #{isPrescription,jdbcType=BIT}, #{inCheck,jdbcType=BIT},
       #{firstCheck,jdbcType=BIT}, #{specialManaged,jdbcType=BIT}, #{needCare,jdbcType=BIT}, 
       #{warningDays,jdbcType=INTEGER}, #{createdTime,jdbcType=TIMESTAMP}, #{updatedTime,jdbcType=TIMESTAMP}, 
       #{createdBy,jdbcType=VARCHAR}, #{updatedBy,jdbcType=VARCHAR}, #{isShebao,jdbcType=BIT}, 
@@ -246,8 +246,8 @@
       <if test="isForeign != null" >
         is_foreign,
       </if>
-      <if test="isTcm != null" >
-        is_tcm,
+      <if test="medType != null" >
+        med_type,
       </if>
       <if test="isPrescription != null" >
         is_prescription,
@@ -408,8 +408,8 @@
       <if test="isForeign != null" >
         #{isForeign,jdbcType=BIT},
       </if>
-      <if test="isTcm != null" >
-        #{isTcm,jdbcType=BIT},
+      <if test="medType != null" >
+        #{medType,jdbcType=INTEGER},
       </if>
       <if test="isPrescription != null" >
         #{isPrescription,jdbcType=BIT},
@@ -572,8 +572,8 @@
       <if test="isForeign != null" >
         is_foreign = #{isForeign,jdbcType=BIT},
       </if>
-      <if test="isTcm != null" >
-        is_tcm = #{isTcm,jdbcType=BIT},
+      <if test="medType != null" >
+        med_type = #{medType,jdbcType=INTEGER},
       </if>
       <if test="isPrescription != null" >
         is_prescription = #{isPrescription,jdbcType=BIT},
@@ -688,7 +688,7 @@
       permit_id = #{permitId,jdbcType=BIGINT},
       jx_id = #{jxId,jdbcType=INTEGER},
       is_foreign = #{isForeign,jdbcType=BIT},
-      is_tcm = #{isTcm,jdbcType=BIT},
+      med_type = #{medType,jdbcType=INTEGER},
       is_prescription = #{isPrescription,jdbcType=BIT},
       in_check = #{inCheck,jdbcType=BIT},
       first_check = #{firstCheck,jdbcType=BIT},
