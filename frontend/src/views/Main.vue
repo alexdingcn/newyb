@@ -83,8 +83,8 @@
             breadcrumbNav,
             fullScreen,
             lockScreen,
-            messageTip,
-//            themeSwitch
+            messageTip
+        //            themeSwitch
         },
         data () {
             return {

@@ -106,8 +106,8 @@
             };
         },
         computed: {
-            verifyText: function() {
-                return this.countDown > 0? this.countDown + 's后重新获取' : '获取验证码';
+            verifyText: function () {
+                return this.countDown > 0 ? this.countDown + 's后重新获取' : '获取验证码';
             }
         },
         mounted () {
@@ -137,14 +137,14 @@
                     setTimeout(this.countDownTimer, 1000);
                 }
             },
-            handleVerifyCode() {
+            handleVerifyCode () {
                 var self = this;
                 this.countDown = 60;
                 this.countDownTimer();
                 util.ajax.post('/phone/verifycode', {
-                        mobile: this.bizLicenseForm.contactMobile,
-                        bizNo: this.bizLicenseForm.license
-                    })
+                    mobile: this.bizLicenseForm.contactMobile,
+                    bizNo: this.bizLicenseForm.license
+                })
                     .then(function (response) {
                         if (response.status === 200) {
                             self.submitEnabled = true;
@@ -168,7 +168,7 @@
                     });
             },
 
-            initFileControl() {
+            initFileControl () {
                 // 100 kb
                 var self = this;
                 var maxSize = 100 * 1024;
@@ -186,7 +186,7 @@
                     var file = files[0];
                     var reader = new FileReader();
                     // ~~用于将字符串转化为整数，MB前的逻辑是为了保留一位小数取整，参考：https://github.com/whxaxes/node-test/issues/11
-                    var fileSize = file.size / 1024 > 1024 ? (~~(10 * file.size / 1024 / 1024) / 10) + 'MB' : ~~(file.size / 1024) + 'KB'
+                    var fileSize = file.size / 1024 > 1024 ? (~~(10 * file.size / 1024 / 1024) / 10) + 'MB' : ~~(file.size / 1024) + 'KB';
                     reader.onload = function () {
                         var result = this.result;
                         var img = new Image();
@@ -210,7 +210,7 @@
                         }
                     };
                     reader.readAsDataURL(file);
-                }, false)
+                }, false);
             },
 
             // compress large image using canvas
@@ -221,7 +221,6 @@
                 // 瓦片canvas
                 var tCanvas = document.createElement('canvas');
                 var tctx = tCanvas.getContext('2d');
-
 
                 var initSize = objImg.src.length;
                 var width = objImg.width;
@@ -285,7 +284,7 @@
                 xhr.onreadystatechange = function () {
                     if (xhr.readyState === 4 && xhr.status === 200) {
                         var jsonData = JSON.parse(xhr.responseText);
-//                        var imageData = jsonData[0] || {};
+                        //                        var imageData = jsonData[0] || {};
 
                         self.bizLicenseForm.license = jsonData.reg_num;
                         self.bizLicenseForm.name = jsonData.name;
@@ -296,31 +295,31 @@
                 };
                 // 数据发送进度，前50%展示该进度
                 xhr.upload.addEventListener('progress', function (e) {
-                    if (loop) { return }
+                    if (loop) { return; }
                     percent = ~~(100 * e.loaded / e.total) / 2;
                     console.log(percent);
                     if (percent === 50) {
-                        mockProgress()
+                        mockProgress();
                     }
                 }, false);
                 function mockProgress () {
-                    if (loop) { return }
+                    if (loop) { return; }
                     loop = setInterval(function () {
-                        percent ++;
+                        percent++;
                         console.log(percent);
                         if (percent >= 99) {
                             clearInterval(loop);
                         }
-                    }, 100)
+                    }, 100);
                 }
                 xhr.send(formData);
             },
             // 获取blob对象的兼容性写法
             getBlob (buffer, format) {
                 try {
-                    return new Blob(buffer, { type: format })
+                    return new Blob(buffer, { type: format });
                 } catch (e) {
-                    var bb = new (window.BlobBuilder || window.WebKitBlobBuilder || window.MSBlobBuilder);
+                    var bb = new (window.BlobBuilder || window.WebKitBlobBuilder || window.MSBlobBuilder)();
                     buffer.forEach(function (buf) {
                         bb.append(buf);
                     });
@@ -340,24 +339,24 @@
             FormDataShim () {
                 console.warn('using dormdata shim');
                 var o = this,
-                        parts = [],
-                        boundary = new Array(21).join('-') + (+new Data() * (1e6 * Math.random())).toString(36),
-                        oldSend = XMLHttpRequest.prototype.send;
+                    parts = [],
+                    boundary = new Array(21).join('-') + (+new Data() * (1e6 * Math.random())).toString(36),
+                    oldSend = XMLHttpRequest.prototype.send;
                 this.append = function (name, value, fileName) {
-                    parts.push('--' + boundary + '\r\nContent-Disposition: form-data; name="' + name + '"')
+                    parts.push('--' + boundary + '\r\nContent-Disposition: form-data; name="' + name + '"');
                     if (value instanceof Blob) {
-                        parts.push('; filename="' + (fileName || 'blob') + '"\r\nContent-Type: ' + value.type + '\r\n\r\n')
-                        parts.push(value)
+                        parts.push('; filename="' + (fileName || 'blob') + '"\r\nContent-Type: ' + value.type + '\r\n\r\n');
+                        parts.push(value);
                     } else {
-                        parts.push('\r\n\r\n' + value)
+                        parts.push('\r\n\r\n' + value);
                     }
-                    parts.push('\r\n')
+                    parts.push('\r\n');
                 };
                 // 重写XHR send()方法
                 XMLHttpRequest.prototype.send = function (val) {
                     var fr,
-                            data,
-                            oXHR = this;
+                        data,
+                        oXHR = this;
                     if (val === o) {
                         // Append the final boundary string
                         parts.push('--' + boundary + '--\r\n');
@@ -365,24 +364,22 @@
                         data = this.getBlob(parts);
                         // Set up and read the blob into an array to be sent
                         fr = new FileReader();
-                        fr.onload = function() {
+                        fr.onload = function () {
                             oldSend.call(oXHR, fr.result);
                         };
-                        fr.onerror = function(err) {
+                        fr.onerror = function (err) {
                             throw err;
                         };
                         fr.readAsArrayBuffer(data);
                         // Set the multipart content type and boudary
                         this.setRequestHeader('Content-Type', 'multipart/form-data; boundary=' + boundary);
                         XMLHttpRequest.prototype.send = oldSend;
-                    }
-                    else {
+                    } else {
                         oldSend.call(this, val);
                     }
-                }
-            },
+                };
+            }
         }
 
     };
-
 </script>

@@ -1,5 +1,6 @@
 package com.yiban.erp.entities;
 
+import java.math.BigDecimal;
 import java.util.Date;
 
 public class Goods {
@@ -27,7 +28,7 @@ public class Goods {
 
     private Boolean enable;
 
-    private Integer factoryId;
+    private Long factoryId;
 
     private String factory;
 
@@ -51,21 +52,32 @@ public class Goods {
 
     private String comment;
 
+    // 注册证
     private Long certId;
 
+    // 商标
     private Integer brandId;
 
+    // 批准文号
     private Long permitId;
 
+    // 剂型属性
     private Integer jxId;
 
+    // 进口/国产
     private Boolean isForeign;
 
-    private Boolean isTcm;
+    // 中西药属性
+    private Integer medType;
 
+    // 处方/非处方
     private Boolean isPrescription;
 
+    // 入库验收
     private Boolean inCheck;
+
+    // 社保目录内
+    private Boolean isShebao;
 
     private Boolean firstCheck;
 
@@ -73,7 +85,43 @@ public class Goods {
 
     private Boolean needCare;
 
+    // 预警天数
     private Integer warningDays;
+    // 进项税率16%
+    private BigDecimal inTax;
+    // 销项税率16%
+    private BigDecimal outTax;
+    // 有效月份
+    private Integer validMonths;
+    // 联系方式
+    private String contact;
+    // 档案号
+    private String archiveNumber;
+    // 主治功能
+    private String cureRange;
+    // 销售策略
+    private String salePolicy;
+    // 特殊管理属性
+    private Integer specialManageId;
+    // 给药途径
+    private Integer medicationId;
+    // 功能分类属性
+    private Integer functionCategoryId;
+    // 新特药
+    private Integer specificMedId;
+    // 养护标记
+    private Integer careTimeId;
+    // GMP属性
+    private Integer gmpTypeId;
+    // 经营范围属性
+    private Integer scopeId;
+    // 基药属性
+    private Integer baseMedId;
+
+    // 价格信息
+    private Long priceConfId;
+    // 库位信息
+    private Long posId;
 
     private Date createdTime;
 
@@ -171,11 +219,11 @@ public class Goods {
         this.enable = enable;
     }
 
-    public Integer getFactoryId() {
+    public Long getFactoryId() {
         return factoryId;
     }
 
-    public void setFactoryId(Integer factoryId) {
+    public void setFactoryId(Long factoryId) {
         this.factoryId = factoryId;
     }
 
@@ -283,12 +331,12 @@ public class Goods {
         this.isForeign = isForeign;
     }
 
-    public Boolean getIsTcm() {
-        return isTcm;
+    public Integer getMedType() {
+        return medType;
     }
 
-    public void setIsTcm(Boolean isTcm) {
-        this.isTcm = isTcm;
+    public void setMedType(Integer medType) {
+        this.medType = medType;
     }
 
     public Boolean getIsPrescription() {
@@ -401,5 +449,149 @@ public class Goods {
 
     public void setPackUnitName(String packUnitName) {
         this.packUnitName = packUnitName;
+    }
+
+    public BigDecimal getInTax() {
+        return inTax;
+    }
+
+    public void setInTax(BigDecimal inTax) {
+        this.inTax = inTax;
+    }
+
+    public BigDecimal getOutTax() {
+        return outTax;
+    }
+
+    public void setOutTax(BigDecimal outTax) {
+        this.outTax = outTax;
+    }
+
+    public Integer getValidMonths() {
+        return validMonths;
+    }
+
+    public void setValidMonths(Integer validMonths) {
+        this.validMonths = validMonths;
+    }
+
+    public String getContact() {
+        return contact;
+    }
+
+    public void setContact(String contact) {
+        this.contact = contact == null ? null : contact.trim();
+    }
+
+    public String getArchiveNumber() {
+        return archiveNumber;
+    }
+
+    public void setArchiveNumber(String archiveNumber) {
+        this.archiveNumber = archiveNumber == null ? null : archiveNumber.trim();
+    }
+
+    public String getCureRange() {
+        return cureRange;
+    }
+
+    public void setCureRange(String cureRange) {
+        this.cureRange = cureRange == null ? null : cureRange.trim();
+    }
+
+    public String getSalePolicy() {
+        return salePolicy;
+    }
+
+    public void setSalePolicy(String salePolicy) {
+        this.salePolicy = salePolicy == null ? null : salePolicy.trim();
+    }
+
+    public Integer getSpecialManageId() {
+        return specialManageId;
+    }
+
+    public void setSpecialManageId(Integer specialManageId) {
+        this.specialManageId = specialManageId;
+    }
+
+    public Integer getMedicationId() {
+        return medicationId;
+    }
+
+    public void setMedicationId(Integer medicationId) {
+        this.medicationId = medicationId;
+    }
+
+    public Integer getFunctionCategoryId() {
+        return functionCategoryId;
+    }
+
+    public void setFunctionCategoryId(Integer functionCategoryId) {
+        this.functionCategoryId = functionCategoryId;
+    }
+
+    public Integer getSpecificMedId() {
+        return specificMedId;
+    }
+
+    public void setSpecificMedId(Integer specificMedId) {
+        this.specificMedId = specificMedId;
+    }
+
+    public Integer getCareTimeId() {
+        return careTimeId;
+    }
+
+    public void setCareTimeId(Integer careTimeId) {
+        this.careTimeId = careTimeId;
+    }
+
+    public Integer getGmpTypeId() {
+        return gmpTypeId;
+    }
+
+    public void setGmpTypeId(Integer gmpTypeId) {
+        this.gmpTypeId = gmpTypeId;
+    }
+
+    public Integer getScopeId() {
+        return scopeId;
+    }
+
+    public void setScopeId(Integer scopeId) {
+        this.scopeId = scopeId;
+    }
+
+    public Integer getBaseMedId() {
+        return baseMedId;
+    }
+
+    public void setBaseMedId(Integer baseMedId) {
+        this.baseMedId = baseMedId;
+    }
+
+    public Long getPriceConfId() {
+        return priceConfId;
+    }
+
+    public void setPriceConfId(Long priceConfId) {
+        this.priceConfId = priceConfId;
+    }
+
+    public Long getPosId() {
+        return posId;
+    }
+
+    public void setPosId(Long posId) {
+        this.posId = posId;
+    }
+
+    public Boolean getShebao() {
+        return isShebao;
+    }
+
+    public void setShebao(Boolean shebao) {
+        isShebao = shebao;
     }
 }
