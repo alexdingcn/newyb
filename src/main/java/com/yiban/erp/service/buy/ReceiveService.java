@@ -1,10 +1,11 @@
 package com.yiban.erp.service.buy;
 
-import com.yiban.erp.dao.BuyOrderMapper;
-import com.yiban.erp.dao.RepertoryInfoMapper;
-import com.yiban.erp.dao.RepositoryOrderDetailMapper;
-import com.yiban.erp.dao.RepositoryOrderMapper;
+import com.yiban.erp.constant.OptionsType;
+import com.yiban.erp.constant.RepositoryOrderStatus;
+import com.yiban.erp.dao.*;
 import com.yiban.erp.dto.CurrentBalanceResp;
+import com.yiban.erp.dto.ReceiveListReq;
+import com.yiban.erp.entities.Options;
 import com.yiban.erp.entities.RepositoryOrder;
 import com.yiban.erp.entities.RepositoryOrderDetail;
 import com.yiban.erp.entities.User;
@@ -19,8 +20,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class ReceiveService {
@@ -35,6 +36,8 @@ public class ReceiveService {
     private RepositoryOrderMapper repositoryOrderMapper;
     @Autowired
     private RepositoryOrderDetailMapper repositoryOrderDetailMapper;
+    @Autowired
+    private OptionsMapper optionsMapper;
 
     /**
      * 获取某商品当前库存和申购订单信息
@@ -151,5 +154,53 @@ public class ReceiveService {
             return false;
         }
         return true;
+    }
+
+    public List<RepositoryOrder> getList(ReceiveListReq listReq) {
+        List<RepositoryOrder> orders = repositoryOrderMapper.getList(listReq);
+        if (orders == null || orders.isEmpty()) {
+            return orders;
+        }
+        List<Long> orderIdList = new ArrayList<>();
+        //获取option进行设置
+        List<String> queryOptions = Arrays.asList(
+                OptionsType.TEMPER_CONTROL.name(),
+                OptionsType.TEMPER_STATUS.name(),
+                OptionsType.SHIP_TOOL.name(),
+                OptionsType.PAY_METHOD.name(),
+                OptionsType.SHIP_METHOD.name(),
+                OptionsType.BUY_TYPE.name(),
+                OptionsType.BILL_TYPE.name()
+        );
+        List<Options> options = optionsMapper.findByTypes(listReq.getCompanyId(), queryOptions);
+        orders.stream().forEach(item -> {item.setOptions(options); orderIdList.add(item.getId());});
+        //获取所有订单对应的详情信息
+        List<RepositoryOrderDetail> details = repositoryOrderDetailMapper.getByOrderIdList(orderIdList);
+        if (details ==null || details.isEmpty()) {
+            return orders;
+        }
+        Map<Long, List<RepositoryOrderDetail>> detailMap = details.stream().collect(Collectors.groupingBy(RepositoryOrderDetail::getRepositoryOrderId));
+        orders.stream().forEach(item -> item.setDetails(detailMap.get(item.getId())));
+        return orders;
+    }
+
+    public void removeById(User user, Long id) throws BizException{
+        if (id == null) {
+            throw new BizException(ErrorCode.RECEIVE_ORDER_GET_FAIL);
+        }
+        RepositoryOrder order = repositoryOrderMapper.selectByPrimaryKey(id);
+        if (order == null) {
+            throw new BizException(ErrorCode.RECEIVE_ORDER_GET_FAIL);
+        }
+        if (!RepositoryOrderStatus.TEMP_STORAGE.name().equalsIgnoreCase(order.getStatus())) {
+            throw new BizException(ErrorCode.RECEIVE_ORDER_CAN_NOT_REMOVE);
+        }
+        if (!user.getCompanyId().equals(order.getCompanyId())) {
+            throw new BizRuntimeException(ErrorCode.ACCESS_PERMISSION);
+        }
+        order.setStatus(RepositoryOrderStatus.DELETE.name());
+        order.setUpdateBy(user.getNickname());
+        order.setUpdateTime(new Date());
+        repositoryOrderMapper.updateByPrimaryKeySelective(order);
     }
 }

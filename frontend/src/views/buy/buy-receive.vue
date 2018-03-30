@@ -14,7 +14,7 @@
                     <Button type="primary" icon="android-add-circle" :loading="saving">载入采购单</Button>
 					<Button type="success" icon="android-add-circle" @click="saveOrderBtnClick" :loading="saving">保存</Button>
                     <Button icon="bookmark" :loading="saving" @click="tempSaveOrderBtnClick"> 暂挂 </Button>
-                    <Button type="info" icon="filing" :loading="saving"> 暂挂提取 </Button>
+                    <Button type="info" icon="filing" @click="getTempOrderBtnClick" > 暂挂提取 </Button>
                     <Button type="ghost" icon="ios-printer" :loading="saving">打印</Button>
 				</ButtonGroup>
 			</div>
@@ -190,6 +190,11 @@
 		       @on-cancel="closeTab">
 			<p>是否继续添加下一笔订单?</p>
 		</Modal>
+
+        <Modal v-model="receiveTemp" title="提取暂挂单" :mask-closable="false" width="70">
+            <buy-receive-temp ></buy-receive-temp>
+            <div slot="footer"></div>
+        </Modal>
 	</Row>
 
 </template>
@@ -209,6 +214,7 @@
     import buyTypeSelect from "@/views/selector/buy-type-select.vue";
     import billTypeSelect from "@/views/selector/bill-type-select.vue";
     import goodSelect from "@/views/selector/good-select.vue";
+    import buyReceiveTemp from "./buy-receive-temp.vue";
 
     export default {
         name: 'buy_order',
@@ -224,7 +230,8 @@
             warehouseSelect,
             buyTypeSelect,
             billTypeSelect,
-            goodSelect
+            goodSelect,
+            buyReceiveTemp
         },
         data () {
             return {
@@ -573,7 +580,9 @@
                     details: [
                         { required: true, type: 'array', array: {min: 1}, message: '请添加商品', trigger: 'blur' }
                     ]
-                }
+                },
+                receiveTemp: false
+
             };
         },
         mounted () {
@@ -743,7 +752,13 @@
                          this.doSave('TEMP_STORAGE');
                     }
                 });
-            }
+            },
+
+            getTempOrderBtnClick() {
+                this.receiveTemp = true;
+            },
+
+
         }
     };
 </script>

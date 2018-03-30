@@ -23,4 +23,6 @@ public interface RepositoryOrderDetailMapper {
     int deleteByOrderId(Long id);
 
     int insertBatch(@Param("details") List<RepositoryOrderDetail> details);
+
+    List<RepositoryOrderDetail> getByOrderIdList(@Param("orderIdList") List<Long> orderIdList);
 }

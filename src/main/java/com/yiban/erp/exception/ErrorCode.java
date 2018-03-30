@@ -76,6 +76,9 @@ public enum ErrorCode {
     RECEIVE_SAVE_PRAMS_INVALID(2401, "入库质量检查单参数错误"),
     RECEIVE_ORDER_NOT_FOUND(2402, "获取入库质量单信息失败"),
     RECEIVE_ORDER_CANNOT_UPDATE(2403, "当前订单处于不可修改状态"),
+    RECEIVE_QUERY_PARAM_ERROR(2404, "查询参数错误"),
+    RECEIVE_ORDER_GET_FAIL(2405, "获取订单失败"),
+    RECEIVE_ORDER_CAN_NOT_REMOVE(2406, "订单处于不可删除状态"),
 
 
     // 41xx - 贷款
