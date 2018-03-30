@@ -6,7 +6,8 @@ public enum ErrorCode {
     FAILED_DELETE_FROM_DB(1000, "无法删除", ErrorDisplay.NOTICE),
     FAILED_INSERT_FROM_DB(1001, "无法添加", ErrorDisplay.NOTICE),
     FAILED_UPDATE_FROM_DB(1002, "无法修改", ErrorDisplay.NOTICE),
-    FAILED_PINGYIN_EXCEPTION(1003, "获取拼音缩写失败"),
+    FAILED_INSERT_OR_UPDATE_FROM_DB(1003, "无法添加或修改", ErrorDisplay.NOTICE),
+    FAILED_PINGYIN_EXCEPTION(1004, "获取拼音缩写失败"),
 
     // 11xx - 用户
     USER_NAME_NOT_EXISTED(1100, "用户名不存在"),
@@ -89,7 +90,8 @@ public enum ErrorCode {
     MOBILE_MISSING(4105, "手机号缺失"),
     MOBILE_VERIFY_CODE_TOO_FREQUENT(4106, "验证码发送太频繁"),
 
-    ACCESS_PERMISSION(9001, "无访问权限", ErrorDisplay.MODAL);
+    ACCESS_PERMISSION(9001, "无访问权限", ErrorDisplay.MODAL),
+    PARAMETER_MISSING(9002, "缺少必填字段");
 
     private Integer code;
     private String message;

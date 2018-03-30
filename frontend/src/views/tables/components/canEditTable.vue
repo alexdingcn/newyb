@@ -4,7 +4,7 @@
 
 <template>
     <div>
-        <Table :loading="loading" :width="width" :ref="refs" :columns="columnsList" :data="thisTableData" border disabled-hover></Table>
+        <Table :loading="loading" size="small" :width="width" :ref="refs" :columns="columnsList" :data="thisTableData" border disabled-hover></Table>
     </div>
 </template>
 
@@ -47,6 +47,7 @@ const deleteButton = (vm, h, currentRow, index) => {
     return h('Poptip', {
         props: {
             confirm: true,
+            size: 'small',
             title: '您确定要删除这条数据吗?',
             transfer: true
         },
@@ -79,7 +80,8 @@ const incellEditBtn = (vm, h, param) => {
             h('Button', {
                 props: {
                     type: 'text',
-                    icon: 'edit'
+                    icon: 'edit',
+                    size: 'small'
                 },
                 on: {
                     click: (event) => {
@@ -93,7 +95,8 @@ const incellEditBtn = (vm, h, param) => {
         return h('Button', {
             props: {
                 type: 'text',
-                icon: 'edit'
+                icon: 'edit',
+                size: 'small'
             },
             on: {
                 click: (event) => {
