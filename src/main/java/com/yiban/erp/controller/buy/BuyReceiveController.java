@@ -18,6 +18,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/receive")
@@ -31,17 +32,21 @@ public class BuyReceiveController {
     /**
      * 获取某一产品当前采购的订单数，当前库存，和最近一次的采购价
      * @param warehouseId
-     * @param goodsId
+     * @param goodsIdListStr
      * @param user
      * @return
      * @throws Exception
      */
     @RequestMapping(value = "/current/balance", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> currentBalance(@RequestParam(name = "warehouseId") Integer warehouseId,
-                                                 @RequestParam(name = "goodsId") Long goodsId,
+    public ResponseEntity<JSON> currentBalance(@RequestParam(name = "warehouseId") Integer warehouseId,
+                                                 @RequestParam(name = "goodsIdList") String goodsIdListStr,
                                                  @AuthenticationPrincipal User user) throws Exception {
-        CurrentBalanceResp resp = receiveService.getCurrentBalance(warehouseId, goodsId);
-        return ResponseEntity.ok().body(JSON.toJSONString(resp));
+        if (StringUtils.isBlank(goodsIdListStr)) {
+            return ResponseEntity.ok().build();
+        }
+        List<Long> goodsIdList = JSON.parseArray(goodsIdListStr, Long.class);
+        Map<Long, CurrentBalanceResp> resp = receiveService.getCurrentBalance(warehouseId, goodsIdList);
+        return ResponseEntity.ok().body((JSON) JSON.toJSON(resp));
     }
 
     @RequestMapping(value = "/save", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)

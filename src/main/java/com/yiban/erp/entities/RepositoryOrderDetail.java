@@ -32,6 +32,8 @@ public class RepositoryOrderDetail {
 
     private String rejectComment;
 
+    private BigDecimal taxRate;
+
     private String createBy;
 
     private Date createTime;
@@ -202,6 +204,14 @@ public class RepositoryOrderDetail {
 
     public void setRejectComment(String rejectComment) {
         this.rejectComment = rejectComment == null ? null : rejectComment.trim();
+    }
+
+    public BigDecimal getTaxRate() {
+        return taxRate;
+    }
+
+    public void setTaxRate(BigDecimal taxRate) {
+        this.taxRate = taxRate;
     }
 
     public String getCreateBy() {

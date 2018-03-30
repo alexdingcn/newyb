@@ -19,7 +19,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -42,22 +41,46 @@ public class ReceiveService {
     /**
      * 获取某商品当前库存和申购订单信息
      * @param warehouseId
-     * @param goodsId
+     * @param goodsIdList
      * @return
      */
-    public CurrentBalanceResp getCurrentBalance(Integer warehouseId, Long goodsId) {
-        if (warehouseId == null || goodsId == null) {
+    public Map<Long, CurrentBalanceResp> getCurrentBalance(Integer warehouseId, List<Long> goodsIdList) {
+        if (warehouseId == null || goodsIdList == null || goodsIdList.isEmpty()) {
             return null;
         }
         //获取当前仓库内的所有数量
-        Integer balance = repertoryInfoMapper.getBalance(warehouseId, goodsId);
-        BigDecimal lastPrice = repertoryInfoMapper.getLastBuyPrice(warehouseId, goodsId);
-        CurrentBalanceResp orderResp = buyOrderMapper.getGoodsOrderCount(goodsId);
-        CurrentBalanceResp resp = new CurrentBalanceResp();
-        resp.setBalance(balance);
-        resp.setBuyOrderCount(orderResp != null ? orderResp.getBuyOrderCount() : 0);
-        resp.setOngoing(orderResp.getOngoing());
-        resp.setLastPrice(lastPrice);
+        List<CurrentBalanceResp> balanceResp = repertoryInfoMapper.getBalance(warehouseId, goodsIdList);
+        List<CurrentBalanceResp> lastPriceResp = repertoryInfoMapper.getLastBuyPrice(warehouseId, goodsIdList);
+        List<CurrentBalanceResp> orderResp = buyOrderMapper.getGoodsOrderCount(goodsIdList);
+
+        //根据goodsId 分组
+        Map<Long, List<CurrentBalanceResp>> balanceMap = balanceResp.stream().collect(Collectors.groupingBy(CurrentBalanceResp::getGoodsId));
+        Map<Long, List<CurrentBalanceResp>> lastPriceMap = lastPriceResp.stream().collect(Collectors.groupingBy(CurrentBalanceResp::getGoodsId));
+        Map<Long, List<CurrentBalanceResp>> orderRespMap = orderResp.stream().collect(Collectors.groupingBy(CurrentBalanceResp::getGoodsId));
+
+        Map<Long, CurrentBalanceResp> resp = new HashMap<>();
+        for (Long goodsId : goodsIdList) {
+            CurrentBalanceResp mapVal = new CurrentBalanceResp();
+            mapVal.setGoodsId(goodsId);
+            List<CurrentBalanceResp> bs = balanceMap.get(goodsId);
+            if (bs != null && !bs.isEmpty()) {
+                CurrentBalanceResp bsItem = bs.get(0);
+                mapVal.setBalance(bsItem != null ? bsItem.getBalance() : null);
+            }
+            List<CurrentBalanceResp> ls = lastPriceMap.get(goodsId);
+            if (ls != null && !ls.isEmpty()) {
+                CurrentBalanceResp lsItem = ls.get(0);
+                mapVal.setLastPrice(lsItem != null ? lsItem.getLastPrice() : null);
+            }
+            List<CurrentBalanceResp> os = orderRespMap.get(goodsId);
+            if (os != null && !os.isEmpty()) {
+                CurrentBalanceResp osItem = os.get(0);
+                mapVal.setBuyOrderCount(osItem != null ? osItem.getBuyOrderCount() : null);
+                mapVal.setOngoingCount(osItem != null ? osItem.getOngoingCount() : null);
+            }
+            resp.put(goodsId, mapVal);
+        }
+
         return resp;
     }
 
@@ -127,7 +150,7 @@ public class ReceiveService {
     private String getOrderNumber(User user) {
         StringBuilder orderNo = new StringBuilder("R");
         orderNo.append(user.getCompanyId());
-        orderNo.append(UtilTool.DateFormat(new Date(), "yyyyMMddHHmmss"));
+        orderNo.append(UtilTool.dateFormat(new Date(), "yyyyMMddHHmmss"));
         orderNo.append(RandomStringUtils.randomNumeric(4));
         return orderNo.toString();
     }

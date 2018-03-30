@@ -11,8 +11,8 @@
 			</p>
 			<div slot="extra">
 				<ButtonGroup class="padding-left-20" size="small">
-                    <Button type="primary" icon="android-add-circle" :loading="saving">载入采购单</Button>
-					<Button type="success" icon="android-add-circle" @click="saveOrderBtnClick" :loading="saving">保存</Button>
+                    <Button type="primary" icon="android-add-circle" @click="buyCheckOrderGetBtnClick" >载入采购单</Button>
+					<Button type="success" icon="checkmark-round" @click="saveOrderBtnClick" :loading="saving">保存</Button>
                     <Button icon="bookmark" :loading="saving" @click="tempSaveOrderBtnClick"> 暂挂 </Button>
                     <Button type="info" icon="filing" @click="getTempOrderBtnClick" > 暂挂提取 </Button>
                     <Button type="ghost" icon="ios-printer" :loading="saving">打印</Button>
@@ -23,7 +23,8 @@
 				<Row>
 					<Col span="6">
                         <FormItem label="供应商" prop="supplierId" >
-                            <supplier-select v-model="order.supplierId" size="small" ></supplier-select>
+                            <Input v-if="editView" v-model="order.supplierName" :disabled="true"></Input>
+                            <supplier-select v-if="!editView" v-model="order.supplierId" size="small" ></supplier-select>
                         </FormItem>
 					</Col>
 					<Col span="6">
@@ -191,10 +192,16 @@
 			<p>是否继续添加下一笔订单?</p>
 		</Modal>
 
-        <Modal v-model="receiveTemp" title="提取暂挂单" :mask-closable="false" width="70">
-            <buy-receive-temp ></buy-receive-temp>
+        <Modal v-model="receiveTemp" title="采购入库单暂挂提取" :mask-closable="false" width="70">
+            <buy-receive-temp :open="receiveTemp" @on-choosed="receiveTempChoose"></buy-receive-temp>
             <div slot="footer"></div>
         </Modal>
+
+        <Modal v-model="buyCheckOrder" title="采购单提取" :mask-closable="false" width="70">
+            <buy-order-list @on-choose="buyOrderChoose" :chooseModal="true" ></buy-order-list>
+            <div slot="footer"></div>
+        </Modal>
+
 	</Row>
 
 </template>
@@ -215,6 +222,7 @@
     import billTypeSelect from "@/views/selector/bill-type-select.vue";
     import goodSelect from "@/views/selector/good-select.vue";
     import buyReceiveTemp from "./buy-receive-temp.vue";
+    import buyOrderList from "./buy-order-list.vue";
 
     export default {
         name: 'buy_order',
@@ -231,7 +239,8 @@
             buyTypeSelect,
             billTypeSelect,
             goodSelect,
-            buyReceiveTemp
+            buyReceiveTemp,
+            buyOrderList
         },
         data () {
             return {
@@ -254,12 +263,12 @@
                     {
                         title: '货号',
                         align: 'center',
-                        key: 'goodId',
+                        key: 'goodsId',
                         width: 100
                     },
                     {
                         title: '商品名称',
-                        key: 'goodName',
+                        key: 'goodsName',
                         align: 'center',
                         width: 150,
                         sortable: true,
@@ -581,8 +590,9 @@
                         { required: true, type: 'array', array: {min: 1}, message: '请添加商品', trigger: 'blur' }
                     ]
                 },
-                receiveTemp: false
-
+                receiveTemp: false,
+                editView: false,
+                buyCheckOrder: false
             };
         },
         mounted () {
@@ -646,11 +656,15 @@
                     //根据当前仓库和商品ID获取最近价格和库存信息
                     let reqDate = {
                         warehouseId: this.order.warehouseId,
-                        goodsId: goodsId
+                        goodsIdList: JSON.stringify([goodsId])
                     };
                     util.ajax.get("/receive/current/balance", {params: reqDate})
                         .then((response) => {
                             let data = response.data;
+                            let record ='';
+                            if(data) {
+                                record = data[goodsId];
+                            }
                             this.addOrdderItem(goodItem, data);
                         })
                         .catch((error) => {
@@ -665,7 +679,7 @@
             addOrdderItem(goodItem, record) {
                 var obj = {
                     goodsId: goodItem.id,
-                    goodName: goodItem.name,
+                    goodsName: goodItem.name,
                     origin: goodItem.origin,
                     jx: goodItem.jx,
                     spec: goodItem.spec,
@@ -715,6 +729,7 @@
                     orderItemIds: []
                 };
                 this.orderItems = [];
+                this.editView = false;
             },
             closeTab () {
                 this.clearData();
@@ -758,7 +773,67 @@
                 this.receiveTemp = true;
             },
 
+            receiveTempChoose(data) {
+                if (!data || !data.id) {
+                    this.receiveTemp = false;
+                    return;
+                }
+                this.editView = true;
+                this.order = data;
+                this.orderItems = data.details;
+                let itemIds = [];
+                if(this.orderItems && this.orderItems.length > 0) {
+                    for (let i=0; i<this.orderItems.length; i++) {
+                        let item = this.orderItems[i];
+                        if(item && item.goodsId) {
+                            itemIds.push(item.goodsId);
+                        }
+                    }
+                }
+                this.order['orderItemIds'] = itemIds;
+                this.receiveTemp = false;
+                //设置每一条明细的历史价格和订单数信息
+                this.setCurrentBalanceRecord(itemIds);
+            },
 
+            setCurrentBalanceRecord(goodsIdList) {
+                if (!goodsIdList || goodsIdList.length <= 0 || !this.order.warehouseId 
+                    || !this.orderItems || this.orderItems.length <= 0) {
+                    return;
+                }
+                let reqDate = {
+                    warehouseId: this.order.warehouseId,
+                    goodsIdList: JSON.stringify(goodsIdList)
+                };
+                let self = this;
+                util.ajax.get("/receive/current/balance", {params: reqDate})
+                    .then((response) => {
+                        let data = response.data;
+                        self.orderItems.forEach((element, index) => {
+                            let record = data[element.goodsId];
+                            if (record) {
+                                element['lastPrice'] = record.lastPrice ? record.lastPrice : '';
+                                element['buyOrderCount'] = record.buyOrderCount ? record.buyOrderCount : '';
+                                element['balance'] = record.balance ? record.balance : '';
+                                element['ongoingCount'] = record.ongoingCount ? record.ongoingCount : '';
+                            }
+                            console.log(element);
+                            self.$set(this.orderItems, index, element)
+                        });
+                    })
+                    .catch((error) => {
+                        util.errorProcessor(self, error);
+                    });
+            },
+
+            buyCheckOrderGetBtnClick() {
+                this.buyCheckOrder = true;
+            },
+
+            buyOrderChoose(buyOrder) {
+                console.log(buyOrder);
+                this.buyCheckOrder = false;
+            }
         }
     };
 </script>

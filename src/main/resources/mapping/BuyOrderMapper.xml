@@ -270,12 +270,16 @@
     </if>
   </update>
 
-  <select id="getGoodsOrderCount" parameterType="java.lang.Long" resultType="com.yiban.erp.dto.CurrentBalanceResp">
-      select count(b.id) as buyOrderCount, sum(quantity) as ongoing
+  <select id="getGoodsOrderCount" parameterType="map" resultType="com.yiban.erp.dto.CurrentBalanceResp">
+      select d.goods_id as goodsId, count(b.id) as buyOrderCount, sum(quantity) as ongoingCount
       from buy_order b, buy_order_detail d
       where b.id = d.buy_order_id
-      and b.status in ('INIT', 'CHECKING')
-      and d.goods_id = #{goodsId}
+      and b.status in ('INIT', 'CHECKING', 'CHECKED')
+      and d.goods_id in
+      <foreach collection="goodsIdList" item="item" open="(" close=")" separator=",">
+        #{item}
+      </foreach>
+      group by d.goods_id
   </select>
 
 </mapper>

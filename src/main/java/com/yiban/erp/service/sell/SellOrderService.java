@@ -114,7 +114,7 @@ public class SellOrderService {
     private String getOrderNumber(User user) {
         StringBuilder orderNo = new StringBuilder("S");
         orderNo.append(user.getCompanyId());
-        orderNo.append(UtilTool.DateFormat(new Date(), "yyyyMMddHHmmss"));
+        orderNo.append(UtilTool.dateFormat(new Date(), "yyyyMMddHHmmss"));
         orderNo.append(RandomStringUtils.randomNumeric(4));
         return orderNo.toString();
     }

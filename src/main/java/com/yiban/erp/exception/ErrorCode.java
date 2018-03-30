@@ -7,6 +7,7 @@ public enum ErrorCode {
     FAILED_INSERT_FROM_DB(1001, "无法添加", ErrorDisplay.NOTICE),
     FAILED_UPDATE_FROM_DB(1002, "无法修改", ErrorDisplay.NOTICE),
     FAILED_PINGYIN_EXCEPTION(1003, "获取拼音缩写失败"),
+    MAKE_ORDER_NUMBER_PARAMS(1004, "生产订单号参数错误"),
 
     // 11xx - 用户
     USER_NAME_NOT_EXISTED(1100, "用户名不存在"),

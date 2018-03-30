@@ -1,5 +1,4 @@
 <template>
-  
     <Select
             v-model="supplierId"
             filterable
@@ -12,7 +11,6 @@
             :loading="supplierLoading">
         <Option v-for="option in supplierOptions" :value="option.id" :label="option.name" :key="option.id">{{option.name}}</Option>
     </Select>
-
 </template>
 
 <script>
@@ -20,7 +18,10 @@ import util from '@/libs/util.js';
 
 export default {
     name: 'supplier-select',
-    props: ['value', 'size'],
+    props: {
+        value: Number|String,
+        size: String
+    },
     data () {
         return {
             supplierId: '',
@@ -29,7 +30,11 @@ export default {
             supplierOptions: []
         };
     },
-
+    watch: {
+        value(data) {
+            this.supplierId = data;
+        }
+    },
     methods: {
         querySupplier (query) {
             var self = this;
@@ -49,6 +54,7 @@ export default {
             }
         },
         onSelectSupplier (data) {
+            this.supplierId = data;
             let items = this.supplierOptions.filter(item => item.id === data);
             let item = '';
             if(items && items[0]) {

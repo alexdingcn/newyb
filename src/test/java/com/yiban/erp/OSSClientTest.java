@@ -11,7 +11,6 @@ import org.junit.Test;
 import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
-import java.net.URLEncoder;
 import java.util.Date;
 import java.util.List;
 
@@ -68,7 +67,7 @@ public class OSSClientTest {
         OSSClient client = getOSSClient();
         StringBuilder key = new StringBuilder();
         key.append("1/test/test_");
-        key.append(UtilTool.DateFormat(new Date(), "yyyyMMdd"));
+        key.append(UtilTool.dateFormat(new Date(), "yyyyMMdd"));
         key.append(RandomStringUtils.randomAlphanumeric(20));
         key.append(".png");
         ObjectMetadata metadata = new ObjectMetadata();

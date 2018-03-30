@@ -1,33 +1,34 @@
 
 <template>
   <div>
-      <Card>
-          <p slot="title">采购入库单暂挂提取</p>
-          <div slot="extra">
-              <ButtonGroup size="small">
-                  <Button type="primary" icon="ios-search" :loading="orderLoading" @click="refreshTempStatusOrder" >查询</Button>
-                  <Button type="success" icon="checkmark-round" :loading="orderLoading" @click="getConfirm" >提取选取</Button>
-                  <Button type="error" icon="close-round" :loading="orderLoading" @click="removeOrder" >删除订单</Button>
-              </ButtonGroup>
-          </div>
-        
-          <Row type="flex" justify="start">
-              <span style="width:100px; margin-right:10px;">收货日期</span>
-              <DatePicker v-model="dateRange" type="daterange" placement="bottom-end" placeholder="收货日期" style="width:200px"></DatePicker>
-          </Row>
-          <Table ref="orderTable" border highlight-row disabled-hover height="250" 
-            size="small" :columns="orderColumns" :data="orderData" :loading="orderLoading" 
-            @on-row-click="handleSelectOrder"
-            no-data-text="使用右上方输入搜索条件">
-          </Table>
+        <Row type="flex" justify="start">
+            <Col span="6">
+                <span style="width:100px; margin-right:10px;">收货日期</span>
+                <DatePicker v-model="dateRange" type="daterange" placement="bottom-end" placeholder="收货日期" style="width:200px"></DatePicker>
+            </Col>
+            <Col span="18">
+                <Row type="flex" justify="end">
+                    <ButtonGroup size="small">
+                        <Button type="primary" icon="ios-search" :loading="orderLoading" @click="refreshTempStatusOrder" >查询</Button>
+                        <Button type="success" icon="checkmark-round" :loading="orderLoading" @click="getConfirm" >提取选取</Button>
+                        <Button type="error" icon="close-round" :loading="orderLoading" @click="removeOrder" >删除订单</Button>
+                    </ButtonGroup>
+                </Row>
+            </Col>
+        </Row>
+        <Table ref="orderTable" border highlight-row disabled-hover height="250" 
+        size="small" :columns="orderColumns" :data="orderData" :loading="orderLoading" 
+        @on-row-click="handleSelectOrder"
+        @on-row-dblclick="handleDbClick" 
+        no-data-text="使用右上方输入搜索条件">
+        </Table>
 
-          <div style="margin-top:10px;">
-             <Table ref="detailTable" border highlight-row disabled-hover height="280" 
-                size="small" :columns="detailColumns" :data="detailData" 
-                no-data-text="点击上方订单数据显示">
+        <div style="margin-top:10px;">
+            <Table ref="detailTable" border highlight-row disabled-hover height="280" 
+            size="small" :columns="detailColumns" :data="detailData" 
+            no-data-text="点击上方订单数据显示">
             </Table> 
-          </div>
-      </Card>
+        </div>
   </div>
 </template>
 
@@ -38,6 +39,12 @@ import moment from 'moment';
 export default {
     name: 'buy-receive-temp',
     components: {},
+    props: {
+        open: {
+            type: Boolean,
+            default: false
+        }
+    },
     data() {
         return {
             dateRange: [
@@ -144,6 +151,13 @@ export default {
             chooseIndex: -1
         }
     },
+    watch: {
+        open(data) {
+            if(data) {
+                this.refreshTempStatusOrder();
+            }
+        }
+    },
     methods: {
         refreshTempStatusOrder() {
             let startDate = this.dateRange[0];
@@ -199,6 +213,13 @@ export default {
                 onCancel: () => {
                 }
             });
+        },
+        handleDbClick(data, index) {
+            this.chooseItem = data;
+            this.chooseIndex = index;
+            this.detailData = data.details;
+
+            this.getConfirm();
         },
 
         getConfirm() {

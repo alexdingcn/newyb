@@ -9,28 +9,30 @@
 			<p slot="title" >
 			</p>
 			<div slot="extra" style="width:600px">
-				<Row>
+				<Row type="flex" justify="end">
 					<Col span="8">
 						<DatePicker v-model="dateRange" type="daterange" placement="bottom-end" placeholder="订单日期" style="width:180px"></DatePicker>
 					</Col>
 					<Col span="6" class="padding-2">
                         <supplier-select v-model="query.supplierId"></supplier-select>
 					</Col>
-					<Col span="5" class="padding-2">
+					<Col span="5" class="padding-2" v-if="!chooseModal">
 						<Select v-model="query.status" placeholder="状态">
 							<Option v-for="option in statusOptions" :value="option.key" :label="option.name" :key="option.key">{{option.name}}</Option>
 						</Select>
                     </Col>
-                    <Col span="5">
+                    <Col span="5" >
                             <Button type="primary" icon="ios-search" @click="queryOrderList"></Button>
-                            <Button  icon="checkmark-round" @click="showCheckModal">审核</Button>
+                            <Button v-if="!chooseModal" icon="checkmark-round" @click="showCheckModal">审核</Button>
+                            <Button v-if="chooseModal" icon="checkmark-round" @click="choosedItem" >选择</Button>
 					</Col>
 				</Row>
 			</div>
 			<Table border highlight-row disabled-hover height="250"
                    :columns="orderListColumns" :data="orderList"
 				   ref="buyOrderListTable" size="small"
-                   @on-row-click="handleSelectBuyOrder"
+                   @on-row-click="handleSelectBuyOrder" 
+                   @on-row-dblclick="choosedItem" 
 				   no-data-text="使用右上方输入搜索条件">
 			</Table>
 		</Card>
@@ -74,14 +76,20 @@
 
     export default {
         name: 'buy_order',
+        props: {
+            chooseModal: {
+                type: Boolean,
+                default: false
+            }
+        },
         components: {
             supplierSelect
         },
         data () {
             return {
-                statusOptions: [{key: 'ALL', name: '所有'}, {key: 'CHECKING', name: '未审批'}, {key: 'CHECKED', name: '已审批'}],
+                statusOptions: [{key: 'ALL', name: '所有'}, {key: 'INIT', name: '未审批'}, {key: 'CHECKED', name: '已审批'}],
                 query: {
-                    status: 'CHECKING',
+                    status: 'INIT',
                     supplierId: ''
                 },
                 dateRange: [
@@ -97,9 +105,9 @@
                 checkModalShow: false,
                 orderListColumns: [
                     {
-                        type: 'selection',
-                        width: 60,
-                        align: 'center'
+                        type: this.chooseModal ? '' : 'selection',
+                        width: this.chooseModal ? 0 : 60,
+                        align: 'center',
                     },
                     {
                         key: 'id',
@@ -111,7 +119,7 @@
                         title: '订单日期',
                         align: 'center',
                         key: 'createdTime',
-                        width: 80,
+                        width: 120,
                         render: (h, params) => {
                             return moment(params.row.createdTime).format('YYYY-MM-DD');
                         }
@@ -120,35 +128,35 @@
                         title: '仓库点',
                         align: 'center',
                         key: 'warehouse',
-                        width: 80
+                        width: 150
                     },
                     {
                         title: '供应商',
                         align: 'center',
                         key: 'supplier',
-                        width: 100
+                        width: 150
                     },
                     {
                         title: '供应商代表',
                         align: 'center',
                         key: 'supplierContact',
-                        width: 80
+                        width: 150
                     },
                     {
                         title: '制单人',
                         align: 'center',
                         key: 'createdBy',
-                        width: 80
+                        width: 100
                     },
                     {
                         title: '状态',
                         align: 'center',
                         key: 'status',
-                        width: 90,
+                        width: 120,
                         render: (h, params) => {
                             const row = params.row;
-                            const color = row.status === 'CHECKING' ? 'blue' : row.status === 'CHECKED' ? 'green' : 'red';
-                            const text = row.status === 'CHECKING' ? '待审' : row.status === 'CHECKED' ? '已审' : '拒绝';
+                            const color = row.status === 'INIT' ? 'blue' : row.status === 'CHECKED' ? 'green' : 'red';
+                            const text = row.status === 'INIT' ? '待审' : row.status === 'CHECKED' ? '已审' : '拒绝';
 
                             return h('Tag', {
                                 props: {
@@ -162,19 +170,19 @@
                         title: '审核结论',
                         align: 'center',
                         key: 'checkResult',
-                        width: 100
+                        width: 150
                     },
                     {
                         title: '审核人',
                         align: 'center',
                         key: 'checkedBy',
-                        width: 80
+                        width: 120
                     },
                     {
                         title: '审核日期',
                         align: 'center',
                         key: 'checkTime',
-                        width: 80,
+                        width: 120,
                         render: (h, params) => {
                             return moment(params.row.checkTime).format('YYYY-MM-DD');
                         }
@@ -183,13 +191,13 @@
                         title: '订单号',
                         align: 'center',
                         key: 'orderNumber',
-                        width: 100
+                        width: 120
                     },
                     {
                         title: '预计到货日',
                         align: 'center',
                         key: 'eta',
-                        width: 80,
+                        width: 120,
                         render: (h, params) => {
                             return moment(params.row.eta).format('YYYY-MM-DD');
                         }
@@ -198,25 +206,25 @@
                         title: '备注',
                         align: 'center',
                         key: 'comment',
-                        width: 100
+                        width: 150
                     },
                     {
                         title: '温控方式',
                         align: 'center',
                         key: 'temperControl',
-                        width: 80
+                        width: 100
                     },
                     {
                         title: '运输工具',
                         align: 'center',
                         key: 'shipTools',
-                        width: 80
+                        width: 100
                     },
                     {
                         title: '运输方式',
                         align: 'center',
                         key: 'shipMethod',
-                        width: 80
+                        width: 100
                     }
                 ],
 
@@ -324,7 +332,8 @@
                         align: 'center',
                         width: 100
                     }
-        	]
+                ],
+                currchooseItem: ''
             };
         },
         mounted () {
@@ -353,6 +362,9 @@
                     this.query['startDate'] = this.dateRange[0];
                     this.query['endDate'] = this.dateRange[1];
                 }
+                if(this.chooseModal) {
+                    this.query['status'] = 'CHECKED'; //选择模式下,只查询审核通过的订单类型
+                }
                 util.ajax.post('/buy/list', this.query)
                     .then(function (response) {
                         if (response.status === 200 && response.data) {
@@ -363,11 +375,12 @@
                         }
                     })
                     .catch(function (error) {
-                        console.log(error);
+                        util.errorProcessor(self, error);
                     });
             },
 
             handleSelectBuyOrder (row) {
+                this.currchooseItem = row;
                 var self = this;
                 util.ajax.get('/buy/orderdetail/' + row.id)
                     .then(function (response) {
@@ -376,7 +389,7 @@
                         }
                     })
                     .catch(function (error) {
-                        console.log(error);
+                        util.errorProcessor(self, error);
                     });
             },
             showCheckModal () {
@@ -411,10 +424,19 @@
                         })
                         .catch(function (error) {
                             self.checkModalShow = false;
-                            console.log(error);
+                            util.errorProcessor(self, error);
                         });
                 }
+            },
+
+            choosedItem() {
+                if (!this.currchooseItem || !this.currchooseItem.id) {
+                    this.$Message.warning('请先选择对应订单信息');
+                    return;
+                }
+                this.$emit('on-choose', this.currchooseItem);
             }
+
         }
     };
 </script>
@@ -424,4 +446,7 @@
         background-color: #2db7f5;
         color: #fff;
     }
+    /* .display-none {
+        display: none;
+    } */
 </style>

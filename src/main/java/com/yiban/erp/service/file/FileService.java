@@ -4,7 +4,6 @@ import com.alibaba.fastjson.JSON;
 import com.aliyun.oss.OSSClient;
 import com.aliyun.oss.model.ObjectMetadata;
 import com.aliyun.oss.model.PutObjectResult;
-import com.yiban.erp.constant.Common;
 import com.yiban.erp.constant.FileStatus;
 import com.yiban.erp.constant.FileUploadType;
 import com.yiban.erp.dao.FileInfoMapper;
@@ -256,7 +255,7 @@ public class FileService {
     private String getFileNo(Integer companyId) {
         StringBuilder sb = new StringBuilder();
         sb.append(String.valueOf(companyId));
-        sb.append(UtilTool.DateFormat(new Date(), "yyMMddHHmmss"));
+        sb.append(UtilTool.dateFormat(new Date(), "yyMMddHHmmss"));
         sb.append(RandomStringUtils.randomNumeric(3));
         return sb.toString();
     }
@@ -432,7 +431,7 @@ public class FileService {
      * @return
      */
     private String getFileName(Integer fileId, String originalName) {
-        String dateStr = UtilTool.DateFormat(new Date(), "yyyyMMdd");
+        String dateStr = UtilTool.dateFormat(new Date(), "yyyyMMdd");
         StringBuilder fileName = new StringBuilder();
         fileName.append(String.valueOf(fileId));
         fileName.append("_");
