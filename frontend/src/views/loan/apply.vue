@@ -26,7 +26,7 @@
                     .then(function (response) {
                         if (response.status === 200) {
                             self.result = response.data.url;
-                            Cookies.set('face_token', response.data.bizNo, { expires: 1/96 });
+                            Cookies.set('face_token', response.data.bizNo, { expires: 1 / 96 });
                             window.location = response.data.url;
                         }
                     })

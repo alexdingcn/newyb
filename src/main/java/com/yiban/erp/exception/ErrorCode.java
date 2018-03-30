@@ -7,6 +7,8 @@ public enum ErrorCode {
     FAILED_INSERT_FROM_DB(1001, "无法添加", ErrorDisplay.NOTICE),
     FAILED_UPDATE_FROM_DB(1002, "无法修改", ErrorDisplay.NOTICE),
     FAILED_PINGYIN_EXCEPTION(1003, "获取拼音缩写失败"),
+    MAKE_ORDER_NUMBER_PARAMS(1004, "生产订单号参数错误"),
+    FAILED_INSERT_OR_UPDATE_FROM_DB(1005, "无法添加或修改", ErrorDisplay.NOTICE),
 
     // 11xx - 用户
     USER_NAME_NOT_EXISTED(1100, "用户名不存在"),
@@ -76,6 +78,10 @@ public enum ErrorCode {
     RECEIVE_SAVE_PRAMS_INVALID(2401, "入库质量检查单参数错误"),
     RECEIVE_ORDER_NOT_FOUND(2402, "获取入库质量单信息失败"),
     RECEIVE_ORDER_CANNOT_UPDATE(2403, "当前订单处于不可修改状态"),
+    RECEIVE_QUERY_PARAM_ERROR(2404, "查询参数错误"),
+    RECEIVE_ORDER_GET_FAIL(2405, "获取订单失败"),
+    RECEIVE_ORDER_CAN_NOT_REMOVE(2406, "订单处于不可删除状态"),
+    RECEIVE_BUY_ORDER_STATUS(2407, "采购订单不处于审核通过状态"),
 
 
     // 41xx - 贷款
@@ -86,7 +92,8 @@ public enum ErrorCode {
     MOBILE_MISSING(4105, "手机号缺失"),
     MOBILE_VERIFY_CODE_TOO_FREQUENT(4106, "验证码发送太频繁"),
 
-    ACCESS_PERMISSION(9001, "无访问权限", ErrorDisplay.MODAL);
+    ACCESS_PERMISSION(9001, "无访问权限", ErrorDisplay.MODAL),
+    PARAMETER_MISSING(9002, "缺少必填字段");
 
     private Integer code;
     private String message;

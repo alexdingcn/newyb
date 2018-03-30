@@ -1,5 +1,6 @@
 package com.yiban.erp.dao;
 
+import com.yiban.erp.dto.CurrentBalanceResp;
 import com.yiban.erp.entities.RepertoryInfo;
 import com.yiban.erp.querybean.RepertoryQuery;
 import org.apache.ibatis.annotations.Mapper;
@@ -42,7 +43,7 @@ public interface RepertoryInfoMapper {
                                  @Param("updateTime") Date updateTime);
 
     //获取当前仓库中某一类商品的存量
-    Integer getBalance(@Param("warehouseId") Integer warehouseId, @Param("goodsId") Long goodsId);
+    List<CurrentBalanceResp> getBalance(@Param("warehouseId") Integer warehouseId, @Param("goodsIdList") List<Long> goodsIdList);
     //获取某一商品最近一次的采购价
-    BigDecimal getLastBuyPrice(@Param("warehouseId") Integer warehouseId, @Param("goodsId") Long goodsId);
+    List<CurrentBalanceResp> getLastBuyPrice(@Param("warehouseId") Integer warehouseId, @Param("goodsIdList") List<Long> goodsIdList);
 }

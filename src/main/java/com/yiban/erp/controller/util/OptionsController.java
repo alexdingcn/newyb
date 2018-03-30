@@ -5,6 +5,9 @@ import com.yiban.erp.constant.OptionsType;
 import com.yiban.erp.dao.OptionsMapper;
 import com.yiban.erp.entities.Options;
 import com.yiban.erp.entities.User;
+import com.yiban.erp.exception.BizException;
+import com.yiban.erp.exception.ErrorCode;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,15 +19,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @RestController
 @RequestMapping("/options")
-public class OptionsContorller {
-    private static final Logger logger = LoggerFactory.getLogger(OptionsContorller.class);
+public class OptionsController {
+    private static final Logger logger = LoggerFactory.getLogger(OptionsController.class);
 
     @Autowired
     private OptionsMapper optionsMapper;
@@ -56,6 +56,29 @@ public class OptionsContorller {
             result.get(option.getType()).add(option);
         }
         return ResponseEntity.ok().body(JSON.toJSONString(result));
+    }
+
+
+    @RequestMapping(value = "/add", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> getPinyinAbbr(@AuthenticationPrincipal User user,
+                                                @RequestBody Options option) throws Exception {
+        if (option == null || StringUtils.isEmpty(option.getValue())) {
+            throw new BizException(ErrorCode.PARAMETER_MISSING);
+        }
+        int result = 0;
+        if (option.getId() == null) {
+            option.setCreatedBy(user.getNickname());
+            option.setCompanyId(user.getCompanyId());
+            option.setCreatedTime(new Date());
+            option.setEnabled(true);
+            result = optionsMapper.insert(option);
+        } else {
+            optionsMapper.updateByPrimaryKey(option);
+        }
+        if (result <= 0) {
+            throw new BizException(ErrorCode.FAILED_INSERT_OR_UPDATE_FROM_DB);
+        }
+        return ResponseEntity.ok().build();
     }
 
 

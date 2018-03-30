@@ -16,6 +16,7 @@
     <result column="warehouse_location" property="warehouseLocation" jdbcType="VARCHAR" />
     <result column="reject_quality" property="rejectQuality" jdbcType="INTEGER" />
     <result column="reject_comment" property="rejectComment" jdbcType="VARCHAR" />
+    <result column="tax_rate" property="taxRate" jdbcType="DECIMAL" />
     <result column="create_by" property="createBy" jdbcType="VARCHAR" />
     <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
     <result column="update_by" property="updateBy" jdbcType="VARCHAR" />
@@ -23,7 +24,7 @@
   </resultMap>
   <sql id="Base_Column_List" >
     id, repository_order_id, goods_id, receive_quality, big_quality, free, price, exp_date, 
-    product_date, batch_code, amount, warehouse_location, reject_quality, reject_comment, 
+    product_date, batch_code, amount, warehouse_location, reject_quality, reject_comment, tax_rate,
     create_by, create_time, update_by, update_time
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
@@ -46,14 +47,14 @@
       receive_quality, big_quality, free, 
       price, exp_date, product_date, 
       batch_code, amount, warehouse_location, 
-      reject_quality, reject_comment, create_by, 
+      reject_quality, reject_comment, tax_rate, create_by,
       create_time, update_by, update_time
       )
     values (#{repositoryOrderId,jdbcType=BIGINT}, #{goodsId,jdbcType=BIGINT},
       #{receiveQuality,jdbcType=INTEGER}, #{bigQuality,jdbcType=INTEGER}, #{free,jdbcType=INTEGER}, 
       #{price,jdbcType=DECIMAL}, #{expDate,jdbcType=TIMESTAMP}, #{productDate,jdbcType=TIMESTAMP}, 
       #{batchCode,jdbcType=VARCHAR}, #{amount,jdbcType=DECIMAL}, #{warehouseLocation,jdbcType=VARCHAR}, 
-      #{rejectQuality,jdbcType=INTEGER}, #{rejectComment,jdbcType=VARCHAR}, #{createBy,jdbcType=VARCHAR}, 
+      #{rejectQuality,jdbcType=INTEGER}, #{rejectComment,jdbcType=VARCHAR}, #{taxRate,jdbcType=DECIMAL}, #{createBy,jdbcType=VARCHAR},
       #{createTime,jdbcType=TIMESTAMP}, #{updateBy,jdbcType=VARCHAR}, #{updateTime,jdbcType=TIMESTAMP}
       )
   </insert>
@@ -63,7 +64,7 @@
     receive_quality, big_quality, free,
     price, exp_date, product_date,
     batch_code, amount, warehouse_location,
-    reject_quality, reject_comment, create_by,
+    reject_quality, reject_comment, tax_rate, create_by,
     create_time, update_by, update_time
     )
     values
@@ -72,7 +73,7 @@
       #{item.receiveQuality,jdbcType=INTEGER}, #{item.bigQuality,jdbcType=INTEGER}, #{item.free,jdbcType=INTEGER},
       #{item.price,jdbcType=DECIMAL}, #{item.expDate,jdbcType=TIMESTAMP}, #{item.productDate,jdbcType=TIMESTAMP},
       #{item.batchCode,jdbcType=VARCHAR}, #{item.amount,jdbcType=DECIMAL}, #{item.warehouseLocation,jdbcType=VARCHAR},
-      #{item.rejectQuality,jdbcType=INTEGER}, #{item.rejectComment,jdbcType=VARCHAR}, #{item.createBy,jdbcType=VARCHAR},
+      #{item.rejectQuality,jdbcType=INTEGER}, #{item.rejectComment,jdbcType=VARCHAR}, #{item.taxRate,jdbcType=DECIMAL}, #{item.createBy,jdbcType=VARCHAR},
       #{item.createTime,jdbcType=TIMESTAMP}, #{item.updateBy,jdbcType=VARCHAR}, #{item.updateTime,jdbcType=TIMESTAMP}
     </foreach>
   </insert>
@@ -118,6 +119,9 @@
       </if>
       <if test="rejectComment != null" >
         reject_comment,
+      </if>
+      <if test="taxRate != null">
+        tax_rate,
       </if>
       <if test="createBy != null" >
         create_by,
@@ -171,6 +175,9 @@
       </if>
       <if test="rejectComment != null" >
         #{rejectComment,jdbcType=VARCHAR},
+      </if>
+      <if test="taxRate != null">
+        #{taxRate,jdbcType=DECIMAL},
       </if>
       <if test="createBy != null" >
         #{createBy,jdbcType=VARCHAR},
@@ -228,6 +235,9 @@
       <if test="rejectComment != null" >
         reject_comment = #{rejectComment,jdbcType=VARCHAR},
       </if>
+      <if test="taxRate != null">
+        tax_rate = #{taxRate,jdbcType=DECIMAL},
+      </if>
       <if test="createBy != null" >
         create_by = #{createBy,jdbcType=VARCHAR},
       </if>
@@ -258,6 +268,7 @@
       warehouse_location = #{warehouseLocation,jdbcType=VARCHAR},
       reject_quality = #{rejectQuality,jdbcType=INTEGER},
       reject_comment = #{rejectComment,jdbcType=VARCHAR},
+      tax_rate = #{taxRate,jdbcType=DECIMAL},
       create_by = #{createBy,jdbcType=VARCHAR},
       create_time = #{createTime,jdbcType=TIMESTAMP},
       update_by = #{updateBy,jdbcType=VARCHAR},
@@ -266,6 +277,79 @@
   </update>
 
 
+  <resultMap id="DetailMap" type="com.yiban.erp.entities.RepositoryOrderDetail">
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="repository_order_id" property="repositoryOrderId" jdbcType="BIGINT" />
+    <result column="goods_id" property="goodsId" jdbcType="BIGINT" />
+    <result column="receive_quality" property="receiveQuality" jdbcType="INTEGER" />
+    <result column="big_quality" property="bigQuality" jdbcType="INTEGER" />
+    <result column="free" property="free" jdbcType="INTEGER" />
+    <result column="price" property="price" jdbcType="DECIMAL" />
+    <result column="exp_date" property="expDate" jdbcType="TIMESTAMP" />
+    <result column="product_date" property="productDate" jdbcType="TIMESTAMP" />
+    <result column="batch_code" property="batchCode" jdbcType="VARCHAR" />
+    <result column="amount" property="amount" jdbcType="DECIMAL" />
+    <result column="warehouse_location" property="warehouseLocation" jdbcType="VARCHAR" />
+    <result column="reject_quality" property="rejectQuality" jdbcType="INTEGER" />
+    <result column="reject_comment" property="rejectComment" jdbcType="VARCHAR" />
+    <result column="tax_rate" property="taxRate" jdbcType="DECIMAL"/>
+    <result column="create_by" property="createBy" jdbcType="VARCHAR" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_by" property="updateBy" jdbcType="VARCHAR" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+    <association property="goods" column="goods_id" javaType="com.yiban.erp.entities.Goods" resultMap="GoodsResultMap"/>
+  </resultMap>
+
+  <resultMap id="GoodsResultMap" type="com.yiban.erp.entities.Goods">
+    <id column="g_id" jdbcType="BIGINT" property="id" />
+    <result column="name" jdbcType="VARCHAR" property="name" />
+    <result column="company_id" jdbcType="INTEGER" property="companyId" />
+    <result column="category_id" jdbcType="INTEGER" property="categoryId" />
+    <result column="full_name" jdbcType="VARCHAR" property="fullName" />
+    <result column="origin" jdbcType="VARCHAR" property="origin" />
+    <result column="jx" jdbcType="VARCHAR" property="jx" />
+    <result column="spec" jdbcType="VARCHAR" property="spec" />
+    <result column="serial" jdbcType="VARCHAR" property="serial" />
+    <result column="code" jdbcType="VARCHAR" property="code" />
+    <result column="factory_id" jdbcType="INTEGER" property="factoryId" />
+    <result column="unit" jdbcType="INTEGER" property="unit" />
+    <result column="pack_unit" jdbcType="INTEGER" property="packUnit" />
+    <result column="medium_pack" jdbcType="INTEGER" property="mediumPack" />
+    <result column="big_pack" jdbcType="INTEGER" property="bigPack" />
+    <result column="pinyin" jdbcType="VARCHAR" property="pinyin" />
+    <result column="storage_condition" jdbcType="VARCHAR" property="storageCondition" />
+    <result column="storage_description" jdbcType="VARCHAR" property="storageDescription" />
+    <result column="permit_id" jdbcType="BIGINT" property="permitId" />
+    <result column="jx_id" jdbcType="INTEGER" property="jxId" />
+    <result column="is_foreign" jdbcType="BIT" property="isForeign" />
+    <result column="is_prescription" jdbcType="BIT" property="isPrescription" />
+    <result column="special_managed" jdbcType="BIT" property="specialManaged" />
+    <result column="categoryName" jdbcType="VARCHAR" property="categoryName"/>
+    <result column="factory" jdbcType="VARCHAR" property="factory"/>
+    <result column="unitName" jdbcType="VARCHAR" property="unitName"/>
+    <result column="packUnitName" jdbcType="VARCHAR" property="packUnitName"/>
+  </resultMap>
+
+  <select id="getByOrderIdList" parameterType="map" resultMap="DetailMap">
+    select
+      *
+    from repository_order_detail r left join (
+      select
+      g.id as g_id, g.name, g.company_id, g.category_id, g.full_name, g.origin, g.jx, g.spec, g.serial, g.code,
+      g.factory_id, g.unit, g.pack_unit, g.medium_pack, g.big_pack, g.pinyin, g.storage_condition, g.storage_description,
+      g.permit_id, g.jx_id, g.is_foreign, g.is_prescription, g.special_managed,
+      c.name as categoryName, f.name as factory, u1.name as unitName, u2.name as packUnitName
+      from goods g
+      left join good_category c on g.category_id = c.id
+      left join factory f on g.factory_id = f.id
+      left join unit u1 on g.unit = u1.id
+      left join unit u2 on g.unit = u2.id
+    ) t on r.goods_id = t.g_id
+    where r.repository_order_id in
+    <foreach collection="orderIdList" separator="," open="(" close=")" item="item">
+      #{item}
+    </foreach>
+  </select>
 
 
 </mapper>

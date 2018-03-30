@@ -123,7 +123,7 @@
                     </Row>
 
                     <Tabs value="general" type="card">
-                        <TabPane label="基本信息" name="general">
+                        <TabPane label="基本信息" name="general" icon="ios-paper">
                             <Row>
                                 <Col span="6">
                                     <FormItem label="入库验收">
@@ -147,7 +147,7 @@
                                 </Col>
                             </Row>
                             <Row>
-                                <Col span="12">
+                                <Col span="8">
                                     <FormItem label="商品名称" prop="fullName">
                                         <Input v-model="formItem.fullName" placeholder=""/>
                                     </FormItem>
@@ -157,11 +157,138 @@
                                         <Input v-model="formItem.pinyin"/>
                                     </FormItem>
                                 </Col>
+                                <Col span="10">
+                                    <FormItem label="批准文号" prop="permit">
+                                        <Input v-model="formItem.permit">
+                                        <Select value="gyz" slot="prepend" style="width: 100px">
+                                            <Option value="gyz">国药准字Z</Option>
+                                            <Option value="gyh">国药准字H</Option>
+                                        </Select>
+                                        </Input>
+                                    </FormItem>
+                                </Col>
+                            </Row>
+                            <Row>
+                                <Col span="6">
+                                    <FormItem label="进项税率" prop="inTax">
+                                        <InputNumber :min="0" v-model="formItem.inTax"/>
+                                    </FormItem>
+                                </Col>
+                                <Col span="6">
+                                    <FormItem label="销项税率" prop="outTax">
+                                        <InputNumber :min="0" v-model="formItem.outTax"/>
+                                    </FormItem>
+                                </Col>
+                                <Col span="6">
+                                    <FormItem label="有效期限(月)" prop="validMonths">
+                                        <InputNumber :min="1" v-model="formItem.validMonths"/>
+                                    </FormItem>
+                                </Col>
+                                <Col span="6">
+                                    <FormItem label="预警天数" prop="warningDays">
+                                        <InputNumber :min="0" v-model="formItem.warningDays"/>
+                                    </FormItem>
+                                </Col>
+                            </Row>
+                            <Row>
+                                <Col span="6">
+                                    <FormItem label="储藏条件" prop="storageCondition">
+                                        <Input v-model="formItem.storageCondition"/>
+                                    </FormItem>
+                                </Col>
+
+                                <Col span="12">
+                                    <FormItem label="联系方式" prop="contact">
+                                        <Input v-model="formItem.contact"/>
+                                    </FormItem>
+                                </Col>
                             </Row>
                         </TabPane>
-                        <TabPane label="扩展信息" name="expanded">标签二的内容</TabPane>
-                        <TabPane label="证书信息" name="cert">证书信息</TabPane>
-                        <TabPane label="价格信息" name="price">价格信息</TabPane>
+                        <TabPane label="扩展信息" name="expanded" icon="paperclip">
+                            <Row>
+                                <Col span="6">
+                                    <FormItem label="注册商标" prop="brand">
+                                        <Input v-model="formItem.brand"/>
+                                    </FormItem>
+                                </Col>
+
+                                <Col span="6">
+                                    <FormItem label="档案号" prop="archiveNumber">
+                                        <Input v-model="formItem.archiveNumber"/>
+                                    </FormItem>
+                                </Col>
+                            </Row>
+                            <Row>
+                                <Col span="20">
+                                    <FormItem label="主治功能" prop="cureRange">
+                                        <Input v-model="formItem.cureRange"/>
+                                    </FormItem>
+                                </Col>
+                            </Row>
+                            <Row>
+                                <Col span="20">
+                                    <FormItem label="销售政策" prop="salePolicy">
+                                        <Input v-model="formItem.salePolicy"/>
+                                    </FormItem>
+                                </Col>
+                            </Row>
+
+                            <Row>
+                                <Col span="4">
+                                <FormItem label="处方药" prop="isPrescription">
+                                    <i-switch v-model="formItem.isPrescription">
+                                        <span slot="open">是</span>
+                                        <span slot="close">否</span>
+                                    </i-switch>
+                                </FormItem>
+                                </Col>
+
+                                <Col span="4">
+                                <FormItem label="进口药" prop="isForeign">
+                                    <i-switch v-model="formItem.isForeign">
+                                        <span slot="open">是</span>
+                                        <span slot="close">否</span>
+                                    </i-switch>
+                                </FormItem>
+                                </Col>
+
+                                <Col span="4">
+                                <FormItem label="中西药" prop="isTcm">
+                                    <i-switch v-model="formItem.isTcm" size="large">
+                                        <span slot="open">中药</span>
+                                        <span slot="close">西药</span>
+                                    </i-switch>
+                                </FormItem>
+                                </Col>
+                            </Row>
+
+                            <Row>
+                                <Col span="6">
+                                <FormItem label="特殊管理属性" prop="specialManageId">
+                                    <option-select optionType="BUY_TYPE"></option-select>
+                                </FormItem>
+                                </Col>
+
+                                <Col span="6">
+                                <FormItem label="剂型属性" prop="specialManageId">
+                                    <Select v-model="formItem.factoryId" placeholder="例如 某制药有限公司" filterable>
+                                        <Option v-for="item in factoryList" :value="item.id" :label="item.name" :key="item.id">
+                                            {{ item.name }}
+                                        </Option>
+                                    </Select>
+                                </FormItem>
+                                </Col>
+                                <Col span="2">
+                                <Button type="ghost" icon="ios-settings-strong" @click="clickNewFactory"></Button>
+                                </Col>
+                            </Row>
+                            <Row>
+                                <Button/>
+                            </Row>
+
+                        </TabPane>
+                        <TabPane label="证书信息" name="cert" icon="bookmark">证书信息</TabPane>
+                        <TabPane label="价格信息" name="price" icon="pricetags">价格信息</TabPane>
                     </Tabs>
                 </Form>
             </Card>
@@ -172,6 +299,7 @@
                 <Icon type="ios-plus-outline"></Icon>
                 <span>新增单位</span>
             </p>
+
             <div style="text-align:center">
                 <Row>
                     <Input v-model="newUnitName" placeholder="单位名称" style="width: 200px"/>
@@ -188,16 +316,22 @@
 </template>
 
 <script>
-import axios from 'axios';
 import util from '@/libs/util.js';
+import optionSelect from "../selector/option-select.vue";
 
 export default {
     name: 'goods-info',
+    components: {
+        optionSelect,
+    },
     data () {
         return {
             newUnitName: '',
             unitModalShow: false,
-            formItem: {},
+            formItem: {
+                inTax: 16,
+                outTax: 16
+            },
             categoryList: [],
             factoryList: [],
             unitList: [],
@@ -310,12 +444,14 @@ export default {
                 });
         },
         clickNewFactory () {
+            let argu = { factory_id: 0, closeOnAdd: true };
             this.$router.push({
-                name: 'factory-info'
+                name: 'factory-info',
+                params: argu
             });
         },
         onChangeName () {
-            if (this.formItem.name !== '') {
+            if (this.formItem.name && this.formItem.name.length > 0) {
                 if (!this.formItem.fullName) {
                     this.formItem.fullName = this.formItem.name;
                 }

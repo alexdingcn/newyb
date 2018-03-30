@@ -32,6 +32,8 @@ public class RepositoryOrderDetail {
 
     private String rejectComment;
 
+    private BigDecimal taxRate;
+
     private String createBy;
 
     private Date createTime;
@@ -39,6 +41,58 @@ public class RepositoryOrderDetail {
     private String updateBy;
 
     private Date updateTime;
+
+    private Goods goods;
+
+    private String goodsName;
+    private String origin;
+    private String jx;
+    private String spec;
+    private String factory;
+    private String unitName;
+    private String packUnitName;
+    private Integer bigPack;
+
+
+    public String getGoodsName() {
+        return this.goods == null ? null : this.goods.getName();
+    }
+
+    public String getOrigin() {
+        return this.goods == null ? null : this.goods.getOrigin();
+    }
+
+    public String getJx() {
+        return this.goods == null ? null : this.goods.getJx();
+    }
+
+    public String getSpec() {
+        return this.goods == null ? null : this.goods.getSpec();
+    }
+
+    public String getFactory() {
+        return this.goods == null ? null : this.goods.getFactory();
+    }
+
+    public String getUnitName() {
+        return this.goods == null ? null : this.goods.getUnitName();
+    }
+
+    public String getPackUnitName() {
+        return this.goods == null ? null : this.goods.getPackUnitName();
+    }
+
+    public Integer getBigPack() {
+        return this.goods == null ? null : this.goods.getBigPack();
+    }
+
+    public Goods getGoods() {
+        return goods;
+    }
+
+    public void setGoods(Goods goods) {
+        this.goods = goods;
+    }
 
     public Long getId() {
         return id;
@@ -150,6 +204,14 @@ public class RepositoryOrderDetail {
 
     public void setRejectComment(String rejectComment) {
         this.rejectComment = rejectComment == null ? null : rejectComment.trim();
+    }
+
+    public BigDecimal getTaxRate() {
+        return taxRate;
+    }
+
+    public void setTaxRate(BigDecimal taxRate) {
+        this.taxRate = taxRate;
     }
 
     public String getCreateBy() {

@@ -1,5 +1,6 @@
 package com.yiban.erp;
 
+import com.yiban.erp.constant.OrderNumberType;
 import com.yiban.erp.entities.Customer;
 import com.yiban.erp.util.UtilTool;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -20,5 +21,14 @@ public class UtilToolTest {
         System.out.println("the same:" + (customer.equals(result)));
     }
 
+
+    @Test
+    public void testOrderNumber() {
+        System.out.println(UtilTool.makeOrderNumber(1, OrderNumberType.BUY));
+        System.out.println(UtilTool.makeOrderNumber(1, OrderNumberType.BUY));
+        System.out.println(UtilTool.makeOrderNumber(1, OrderNumberType.BUY));
+        System.out.println(UtilTool.makeOrderNumber(1, OrderNumberType.BUY));
+        System.out.println(UtilTool.makeOrderNumber(1, OrderNumberType.BUY));
+    }
 
 }

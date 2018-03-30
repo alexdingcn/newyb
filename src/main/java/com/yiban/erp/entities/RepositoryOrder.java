@@ -2,8 +2,11 @@ package com.yiban.erp.entities;
 
 import com.yiban.erp.constant.RepositoryOrderStatus;
 
+import java.math.BigDecimal;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class RepositoryOrder {
     private Long id;
@@ -20,7 +23,7 @@ public class RepositoryOrder {
 
     private Long supplierContactId;
 
-    private Integer buyerId;
+    private Long buyerId;
 
     private String status;
 
@@ -38,7 +41,7 @@ public class RepositoryOrder {
 
     private Integer checkTemp;
 
-    private String tempControlStatus;
+    private Long tempControlStatus;
 
     private Integer shipCompanyId;
 
@@ -75,6 +78,98 @@ public class RepositoryOrder {
     private String updateBy;
 
     private Date updateTime;
+
+    private String supplierName;
+    private String supplierContactName;
+    private String warehouseName;
+    private String saleNickName;
+    private String saleRealName;
+
+    private String tempControlMethodName;
+    private String tempControlStatusName;
+    private String shipMethodName;
+    private String shipToolName;
+    private String buyTypeName;
+    private String billTypeName;
+
+
+    public void setOptions(List<Options> optionsList) {
+        if (optionsList == null || optionsList.isEmpty()) {
+            return;
+        }
+        Map<Long, Options> optionsMap = new HashMap<>();
+        optionsList.stream().forEach(item -> optionsMap.put(item.getId(), item));
+        this.tempControlMethodName = optionsMap.get(this.tempControlMethod) != null ? optionsMap.get(this.tempControlMethod).getValue() : null;
+        this.tempControlStatusName = optionsMap.get(this.tempControlStatusName) != null ? optionsMap.get(this.tempControlStatusName).getValue() : null;
+        this.shipMethodName = optionsMap.get(this.shipMethodName) != null ? optionsMap.get(this.shipMethodName).getValue() : null;
+        this.shipToolName = optionsMap.get(this.shipToolName) != null ? optionsMap.get(this.shipToolName).getValue() : null;
+        this.buyTypeName = optionsMap.get(this.buyTypeName) != null ? optionsMap.get(this.buyTypeName).getValue() : null;
+        this.billTypeName = optionsMap.get(this.billTypeName) != null ? optionsMap.get(this.billTypeName).getValue() : null;
+    }
+
+    public String getTempControlMethodName() {
+        return tempControlMethodName;
+    }
+
+    public String getTempControlStatusName() {
+        return tempControlStatusName;
+    }
+
+    public String getShipMethodName() {
+        return shipMethodName;
+    }
+
+    public String getShipToolName() {
+        return shipToolName;
+    }
+
+    public String getBuyTypeName() {
+        return buyTypeName;
+    }
+
+    public String getBillTypeName() {
+        return billTypeName;
+    }
+
+    public String getSupplierName() {
+        return supplierName;
+    }
+
+    public void setSupplierName(String supplierName) {
+        this.supplierName = supplierName;
+    }
+
+    public String getSupplierContactName() {
+        return supplierContactName;
+    }
+
+    public void setSupplierContactName(String supplierContactName) {
+        this.supplierContactName = supplierContactName;
+    }
+
+    public String getWarehouseName() {
+        return warehouseName;
+    }
+
+    public void setWarehouseName(String warehouseName) {
+        this.warehouseName = warehouseName;
+    }
+
+    public String getSaleNickName() {
+        return saleNickName;
+    }
+
+    public void setSaleNickName(String saleNickName) {
+        this.saleNickName = saleNickName;
+    }
+
+    public String getSaleRealName() {
+        return saleRealName;
+    }
+
+    public void setSaleRealName(String saleRealName) {
+        this.saleRealName = saleRealName;
+    }
 
     private List<RepositoryOrderDetail> details;
 
@@ -134,11 +229,11 @@ public class RepositoryOrder {
         this.supplierContactId = supplierContactId;
     }
 
-    public Integer getBuyerId() {
+    public Long getBuyerId() {
         return buyerId;
     }
 
-    public void setBuyerId(Integer buyerId) {
+    public void setBuyerId(Long buyerId) {
         this.buyerId = buyerId;
     }
 
@@ -206,12 +301,12 @@ public class RepositoryOrder {
         this.checkTemp = checkTemp;
     }
 
-    public String getTempControlStatus() {
+    public Long getTempControlStatus() {
         return tempControlStatus;
     }
 
-    public void setTempControlStatus(String tempControlStatus) {
-        this.tempControlStatus = tempControlStatus == null ? null : tempControlStatus.trim();
+    public void setTempControlStatus(Long tempControlStatus) {
+        this.tempControlStatus = tempControlStatus;
     }
 
     public Integer getShipCompanyId() {

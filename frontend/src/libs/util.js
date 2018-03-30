@@ -60,7 +60,7 @@ util.ajax.interceptors.response.use(
                     });
             }
         }
-        return Promise.reject(error);  // 返回接口返回的错误信息
+        return Promise.reject(error); // 返回接口返回的错误信息
     }
 );
 
@@ -374,22 +374,27 @@ function showErrorMessage (vm, data) {
 
 util.errorProcessor = function (vm, error, callback) {
     let response = error.response;
-    let httpCode = response.status;
-    let data = response.data;
-    if (httpCode === 403) {
-        vm.$router.push('error-403', { params: data });
-    } else if (httpCode === 404) {
-        vm.$Notice.error({
-            title: '系统异常',
-            desc: '获取系统资源路径失败, 请联系技术人员'
-        });
-    } else {
-        if (callback) {
-            callback(data);
+    if (response) {
+        let httpCode = response.status;
+        let data = response.data;
+        if (httpCode === 403) {
+            vm.$router.push('error-403', { params: data });
+        } else if (httpCode === 404) {
+            vm.$Notice.error({
+                title: '系统异常',
+                desc: '获取系统资源路径失败, 请联系技术人员'
+            });
         } else {
-            showErrorMessage(vm, data);
+            if (callback) {
+                callback(data);
+            } else {
+                showErrorMessage(vm, data);
+            }
         }
+    } else {
+        showErrorMessage(vm, '服务器连接中断');
     }
+
 };
 
 export default util;

@@ -9,7 +9,7 @@
     <result column="ref_no" property="refNo" jdbcType="VARCHAR" />
     <result column="supplier_id" property="supplierId" jdbcType="BIGINT" />
     <result column="supplier_contact_id" property="supplierContactId" jdbcType="BIGINT" />
-    <result column="buyer_id" property="buyerId" jdbcType="INTEGER" />
+    <result column="buyer_id" property="buyerId" jdbcType="BIGINT" />
     <result column="status" property="status" jdbcType="VARCHAR" />
     <result column="key_word" property="keyWord" jdbcType="VARCHAR" />
     <result column="receive_date" property="receiveDate" jdbcType="TIMESTAMP" />
@@ -18,7 +18,7 @@
     <result column="temp_control_method" property="tempControlMethod" jdbcType="BIGINT" />
     <result column="receive_temp" property="receiveTemp" jdbcType="INTEGER" />
     <result column="check_temp" property="checkTemp" jdbcType="INTEGER" />
-    <result column="temp_control_status" property="tempControlStatus" jdbcType="VARCHAR" />
+    <result column="temp_control_status" property="tempControlStatus" jdbcType="BIGINT" />
     <result column="ship_company_id" property="shipCompanyId" jdbcType="INTEGER" />
     <result column="ship_method" property="shipMethod" jdbcType="BIGINT" />
     <result column="ship_tool" property="shipTool" jdbcType="BIGINT" />
@@ -71,10 +71,10 @@
       )
     values (#{id,jdbcType=BIGINT}, #{companyId,jdbcType=INTEGER}, #{buyOrderId,jdbcType=BIGINT},
       #{orderNumber,jdbcType=VARCHAR}, #{refNo,jdbcType=VARCHAR},
-      #{supplierId,jdbcType=BIGINT}, #{supplierContactId,jdbcType=BIGINT}, #{buyerId,jdbcType=INTEGER}, 
+      #{supplierId,jdbcType=BIGINT}, #{supplierContactId,jdbcType=BIGINT}, #{buyerId,jdbcType=BIGINT},
       #{status,jdbcType=VARCHAR}, #{keyWord,jdbcType=VARCHAR}, #{receiveDate,jdbcType=TIMESTAMP}, 
       #{payDate,jdbcType=TIMESTAMP}, #{goodBillNo,jdbcType=VARCHAR}, #{tempControlMethod,jdbcType=BIGINT}, 
-      #{receiveTemp,jdbcType=INTEGER}, #{checkTemp,jdbcType=INTEGER}, #{tempControlStatus,jdbcType=VARCHAR}, 
+      #{receiveTemp,jdbcType=INTEGER}, #{checkTemp,jdbcType=INTEGER}, #{tempControlStatus,jdbcType=BIGINT},
       #{shipCompanyId,jdbcType=INTEGER}, #{shipMethod,jdbcType=BIGINT}, #{shipTool,jdbcType=BIGINT}, 
       #{shipCarNo,jdbcType=VARCHAR}, #{shipDriverName,jdbcType=VARCHAR}, #{shipStartDate,jdbcType=TIMESTAMP},
       #{shipEndDate,jdbcType=TIMESTAMP}, #{shipEntrustNo,jdbcType=VARCHAR}, #{shipStartAddress,jdbcType=VARCHAR}, 
@@ -215,7 +215,7 @@
         #{supplierContactId,jdbcType=BIGINT},
       </if>
       <if test="buyerId != null" >
-        #{buyerId,jdbcType=INTEGER},
+        #{buyerId,jdbcType=BIGINT},
       </if>
       <if test="status != null" >
         #{status,jdbcType=VARCHAR},
@@ -242,7 +242,7 @@
         #{checkTemp,jdbcType=INTEGER},
       </if>
       <if test="tempControlStatus != null" >
-        #{tempControlStatus,jdbcType=VARCHAR},
+        #{tempControlStatus,jdbcType=BIGINT},
       </if>
       <if test="shipCompanyId != null" >
         #{shipCompanyId,jdbcType=INTEGER},
@@ -316,7 +316,7 @@
         supplier_contact_id = #{supplierContactId,jdbcType=BIGINT},
       </if>
       <if test="buyerId != null" >
-        buyer_id = #{buyerId,jdbcType=INTEGER},
+        buyer_id = #{buyerId,jdbcType=BIGINT},
       </if>
       <if test="status != null" >
         status = #{status,jdbcType=VARCHAR},
@@ -343,7 +343,7 @@
         check_temp = #{checkTemp,jdbcType=INTEGER},
       </if>
       <if test="tempControlStatus != null" >
-        temp_control_status = #{tempControlStatus,jdbcType=VARCHAR},
+        temp_control_status = #{tempControlStatus,jdbcType=BIGINT},
       </if>
       <if test="shipCompanyId != null" >
         ship_company_id = #{shipCompanyId,jdbcType=INTEGER},
@@ -409,7 +409,7 @@
       ref_no = #{refNo,jdbcType=VARCHAR},
       supplier_id = #{supplierId,jdbcType=BIGINT},
       supplier_contact_id = #{supplierContactId,jdbcType=BIGINT},
-      buyer_id = #{buyerId,jdbcType=INTEGER},
+      buyer_id = #{buyerId,jdbcType=BIGINT},
       status = #{status,jdbcType=VARCHAR},
       key_word = #{keyWord,jdbcType=VARCHAR},
       receive_date = #{receiveDate,jdbcType=TIMESTAMP},
@@ -418,7 +418,7 @@
       temp_control_method = #{tempControlMethod,jdbcType=BIGINT},
       receive_temp = #{receiveTemp,jdbcType=INTEGER},
       check_temp = #{checkTemp,jdbcType=INTEGER},
-      temp_control_status = #{tempControlStatus,jdbcType=VARCHAR},
+      temp_control_status = #{tempControlStatus,jdbcType=BIGINT},
       ship_company_id = #{shipCompanyId,jdbcType=INTEGER},
       ship_method = #{shipMethod,jdbcType=BIGINT},
       ship_tool = #{shipTool,jdbcType=BIGINT},
@@ -439,4 +439,55 @@
       update_time = #{updateTime,jdbcType=TIMESTAMP}
     where id = #{id,jdbcType=BIGINT}
   </update>
+
+  <sql id="listSql" >
+      o.id as id, o.company_id as companyId, o.buy_order_id as buyOrderId, o.order_number as orderNumber,
+      o.ref_no as refNo, o.supplier_id as supplierId, o.supplier_contact_id as supplierContactId, o.buyer_id as buyerId, o.status as status,
+      o.key_word as keyWord, o.receive_date as receiveDate, o.pay_date as payDate, o.good_bill_no as goodBillNo,
+      o.temp_control_method as tempControlMethod, o.receive_temp as receiveTemp,
+      o.check_temp as checkTemp, o.temp_control_status as tempControlStatus, o.ship_company_id as shipCompanyId, o.ship_method as shipMethod,
+      o.ship_tool as shipTool, o.ship_car_no as shipCarNo,
+      o.ship_driver_name as shipDriverName, o.ship_start_date as shipStartDate, o.ship_end_date as shipEndDate,
+      o.ship_entrust_no as shipEntrustNo, o.ship_start_address as shipStartAddress,
+      o.warehouse_id as warehouseId, o.buy_type as buyType, o.term as term, o.come_from as comeFrom, o.bill_type as billType,
+      o.create_by as createBy, o.create_time as createTime, o.update_by as updateBy, o.update_time as updateTime,
+      s.name as supplierName, sc.name as supplierContactName, w.name as warehouseName,
+      u.nickname as saleNickName, u.realname as saleRealName
+  </sql>
+
+  <select id="getList" parameterType="com.yiban.erp.dto.ReceiveListReq" resultType="com.yiban.erp.entities.RepositoryOrder">
+    select
+      <include refid="listSql"/>
+    from repository_order o, supplier s, supplier_contact sc, warehouse w, users u
+    where o.supplier_id = s.id and o.supplier_contact_id = sc.id
+      and o.warehouse_id = w.id and o.buyer_id = u.id
+      and o.buyer_id = u.id
+    and o.company_id = #{companyId}
+    and o.status != 'DELETE'
+    <if test="startReceiveDate != null">
+      and o.receive_date >= #{startReceiveDate}
+    </if>
+    <if test="endReceiveDate != null">
+      and o.receive_date &lt;= #{endReceiveDate}
+    </if>
+    <if test="statusList != null" >
+      and o.status in
+      <foreach collection="statusList" item="item" open="(" close=")" separator=", ">
+        #{item}
+      </foreach>
+    </if>
+  </select>
+
+  <select id="getByBuyOrder" parameterType="map" resultType="com.yiban.erp.entities.RepositoryOrder">
+    select
+      <include refid="listSql"/>
+    from repository_order o, supplier s, supplier_contact sc, warehouse w, users u
+    where o.supplier_id = s.id and o.supplier_contact_id = sc.id
+    and o.warehouse_id = w.id and o.buyer_id = u.id
+    and o.buyer_id = u.id
+    and o.company_id = #{companyId}
+    and o.status != 'DELETE'
+    and o.buy_order_id = #{buyOrderId}
+  </select>
+
 </mapper>

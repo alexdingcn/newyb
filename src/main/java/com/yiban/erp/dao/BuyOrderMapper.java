@@ -4,6 +4,7 @@ import com.yiban.erp.dto.CurrentBalanceResp;
 import com.yiban.erp.entities.BuyOrder;
 import com.yiban.erp.entities.BuyOrderQuery;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -23,5 +24,7 @@ public interface BuyOrderMapper {
 
     List<BuyOrder> queryOrders(BuyOrderQuery buyOrder);
 
-    CurrentBalanceResp getGoodsOrderCount(Long goodsId);
+    BuyOrder getOrderById(Long orderId);
+
+    List<CurrentBalanceResp> getGoodsOrderCount(@Param("goodsIdList") List<Long> goodsIdList);
 }

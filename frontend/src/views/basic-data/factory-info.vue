@@ -179,9 +179,6 @@ export default {
             ruleValidate: {
                 name: [
                     {required: true, message: '名称不能为空', trigger: 'blur'}
-                ],
-                address: [
-                    {required: true, message: '地址不能为空', trigger: 'blur'}
                 ]
             }
         };
@@ -189,7 +186,7 @@ export default {
     methods: {
         init () {
             var self = this;
-            if (this.$route.params && this.$route.params.factory_id) {
+            if (this.$route.params && this.$route.params.factory_id && this.$route.params.factory_id > 0) {
                 util.ajax.get('/factory/' + this.$route.params.factory_id)
                     .then(function (response) {
                         self.formItem = response.data;
@@ -227,7 +224,7 @@ export default {
                 });
         },
         onChangeName () {
-            if (this.formItem.name !== '') {
+            if (this.formItem.name && this.formItem.name.length > 0) {
                 util.setCurrentPageTitle(this, this.formItem.name, true);
                 var self = this;
                 util.ajax.post('/util/pinyinAbbr', { name: this.formItem.name })

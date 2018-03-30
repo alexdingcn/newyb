@@ -1,7 +1,11 @@
 package com.yiban.erp.dao;
 
+import com.yiban.erp.dto.ReceiveListReq;
 import com.yiban.erp.entities.RepositoryOrder;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 @Mapper
 public interface RepositoryOrderMapper {
@@ -16,4 +20,9 @@ public interface RepositoryOrderMapper {
     int updateByPrimaryKeySelective(RepositoryOrder record);
 
     int updateByPrimaryKey(RepositoryOrder record);
+
+    List<RepositoryOrder> getList(ReceiveListReq listReq);
+
+
+    RepositoryOrder getByBuyOrder(@Param("companyId") Integer companyId, @Param("buyOrderId") Long buyOrderId);
 }

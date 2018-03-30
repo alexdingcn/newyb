@@ -3,6 +3,7 @@ package com.yiban.erp.controller.buy;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.yiban.erp.constant.BuyOrderStatus;
+import com.yiban.erp.constant.OrderNumberType;
 import com.yiban.erp.dao.BuyOrderDetailMapper;
 import com.yiban.erp.dao.BuyOrderMapper;
 import com.yiban.erp.entities.BuyOrder;
@@ -10,6 +11,7 @@ import com.yiban.erp.entities.BuyOrderDetail;
 import com.yiban.erp.entities.BuyOrderQuery;
 import com.yiban.erp.entities.User;
 import com.yiban.erp.exception.ErrorCode;
+import com.yiban.erp.util.UtilTool;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.time.DateUtils;
 import org.slf4j.Logger;
@@ -91,7 +93,7 @@ public class BuyOrderController {
 
         int result = 0;
         if (buyOrder.getId() == null) {
-            buyOrder.setOrderNumber(new SimpleDateFormat("yyyyMMddHHmmss").format(new Date()) + RandomStringUtils.randomNumeric(5));
+            buyOrder.setOrderNumber(UtilTool.makeOrderNumber(user.getCompanyId(), OrderNumberType.BUY));
             buyOrder.setCompanyId(user.getCompanyId());
             buyOrder.setCreatedBy(user.getNickname());
             buyOrder.setStatus(BuyOrderStatus.INIT);
