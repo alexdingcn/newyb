@@ -4,7 +4,7 @@ import java.util.Date;
 
 public class RepertoryQuery {
     private Integer companyId;
-    private Long warehouseId;
+    private Integer warehouseId;
     private Long in_user_id;
     private String store_state;
     private String counter_state;
@@ -30,11 +30,11 @@ public class RepertoryQuery {
         this.companyId = companyId;
     }
 
-    public Long getWarehouseId() {
+    public Integer getWarehouseId() {
         return warehouseId;
     }
 
-    public void setWarehouseId(Long warehouseId) {
+    public void setWarehouseId(Integer warehouseId) {
         this.warehouseId = warehouseId;
     }
 

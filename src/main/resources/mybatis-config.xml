@@ -37,6 +37,6 @@
         <mapper resource="mapping/BizWxApplyMapper.xml"/>
         <mapper resource="mapping/RepositoryOrderMapper.xml"/>
         <mapper resource="mapping/RepositoryOrderDetailMapper.xml"/>
-
+        <mapper resource="mapping/RepertoryInMapper.xml"/>
     </mappers>
 </configuration>

@@ -153,7 +153,10 @@ export const appRouter = [
     title: '库存',
     component: Main,
     children: [
+        { path: 'in_store', title: '入库管理', name: 'in_store', component: () => import('@/views/warehouse/in_store.vue') },
         { path: 'store_now', title: '实时库存', name: 'store_now', component: () => import('@/views/warehouse/store_now.vue') },
+        { path: 'out_store', title: '出库管理', name: 'out_store', component: () => import('@/views/warehouse/out_store.vue') },
+        { path: 'check_store', title: '库存盘点', name: 'check_store', component: () => import('@/views/warehouse/check_store.vue') },
         { path: 'setting', title: '仓库点设置', name: 'wh_setting', component: () => import('@/views/warehouse/setting.vue') },
         { path: 'overview', title: '库存报表', name: 'wh_overview', component: () => import('@/views/warehouse/overview.vue') },
     ]

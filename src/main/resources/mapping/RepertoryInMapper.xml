@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.yiban.erp.dao.RepertoryInMapper" >
+  <resultMap id="BaseResultMap" type="com.yiban.erp.entities.RepertoryIn" >
+    <result column="id" property="id" jdbcType="BIGINT" />
+    <result column="company_id" property="companyId" jdbcType="INTEGER" />
+    <result column="warehouse_id" property="warehouseId" jdbcType="INTEGER" />
+    <result column="in_user_id" property="inUserId" jdbcType="INTEGER" />
+    <result column="in_date" property="inDate" jdbcType="TIMESTAMP" />
+    <result column="in_type" property="inType" jdbcType="INTEGER" />
+    <result column="buy_order_id" property="buyOrderId" jdbcType="BIGINT" />
+    <result column="supplier_id" property="supplierId" jdbcType="BIGINT" />
+    <result column="check_user_id" property="checkUserId" jdbcType="INTEGER" />
+    <result column="check_date" property="checkDate" jdbcType="TIMESTAMP" />
+    <result column="in_amount" property="inAmount" jdbcType="DECIMAL" />
+    <result column="in_money" property="inMoney" jdbcType="DECIMAL" />
+    <result column="state" property="state" jdbcType="INTEGER" />
+    <result column="in_note" property="inNote" jdbcType="VARCHAR" />
+  </resultMap>
+  <insert id="insert" parameterType="com.yiban.erp.entities.RepertoryIn"  useGeneratedKeys="true" keyProperty="id" >
+    insert into repertory_in (id, company_id, warehouse_id, 
+      in_user_id, in_date, in_type, 
+      buy_order_id, supplier_id,check_user_id, check_date,
+      in_amount, in_money, state, 
+      in_note)
+    values (#{id,jdbcType=BIGINT}, #{companyId,jdbcType=INTEGER}, #{warehouseId,jdbcType=INTEGER}, 
+      #{inUserId,jdbcType=INTEGER}, #{inDate,jdbcType=TIMESTAMP}, #{inType,jdbcType=INTEGER}, 
+      #{buyOrderId,jdbcType=BIGINT},#{supplierId,jdbcType=BIGINT}, #{checkUserId,jdbcType=INTEGER}, #{checkDate,jdbcType=TIMESTAMP},
+      #{inAmount,jdbcType=DECIMAL}, #{inMoney,jdbcType=DECIMAL}, #{state,jdbcType=INTEGER}, 
+      #{inNote,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.yiban.erp.entities.RepertoryIn"  useGeneratedKeys="true" keyProperty="id">
+    insert into repertory_in
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="companyId != null" >
+        company_id,
+      </if>
+      <if test="warehouseId != null" >
+        warehouse_id,
+      </if>
+      <if test="inUserId != null" >
+        in_user_id,
+      </if>
+      <if test="inDate != null" >
+        in_date,
+      </if>
+      <if test="inType != null" >
+        in_type,
+      </if>
+      <if test="buyOrderId != null" >
+        buy_order_id,
+      </if>
+      <if test="supplierId != null" >
+        supplier_id,
+      </if>
+      <if test="checkUserId != null" >
+        check_user_id,
+      </if>
+      <if test="checkDate != null" >
+        check_date,
+      </if>
+      <if test="inAmount != null" >
+        in_amount,
+      </if>
+      <if test="inMoney != null" >
+        in_money,
+      </if>
+      <if test="state != null" >
+        state,
+      </if>
+      <if test="inNote != null" >
+        in_note,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=BIGINT},
+      </if>
+      <if test="companyId != null" >
+        #{companyId,jdbcType=INTEGER},
+      </if>
+      <if test="warehouseId != null" >
+        #{warehouseId,jdbcType=INTEGER},
+      </if>
+      <if test="inUserId != null" >
+        #{inUserId,jdbcType=INTEGER},
+      </if>
+      <if test="inDate != null" >
+        #{inDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="inType != null" >
+        #{inType,jdbcType=INTEGER},
+      </if>
+      <if test="buyOrderId != null" >
+        #{buyOrderId,jdbcType=BIGINT},
+      </if>
+      <if test="supplierId != null" >
+        #{supplierId,jdbcType=BIGINT},
+      </if>
+      <if test="checkUserId != null" >
+        #{checkUserId,jdbcType=INTEGER},
+      </if>
+      <if test="checkDate != null" >
+        #{checkDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="inAmount != null" >
+        #{inAmount,jdbcType=DECIMAL},
+      </if>
+      <if test="inMoney != null" >
+        #{inMoney,jdbcType=DECIMAL},
+      </if>
+      <if test="state != null" >
+        #{state,jdbcType=INTEGER},
+      </if>
+      <if test="inNote != null" >
+        #{inNote,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+
+
+  <select id="queryInOrders" resultMap="BaseResultMap" parameterType="com.yiban.erp.querybean.InOrderQuery" >
+    select
+    inorder.*,su.name as supplier,w.name as warehouseName
+    from repertory_in inorder
+    LEFT JOIN supplier su ON su.id=inorder.supplier_id
+    LEFT JOIN warehouse w ON w.id=inorder.warehouse_id
+    where 1=1
+    <if test="companyId != null" >
+      and inorder.company_id = #{companyId, jdbcType=BIGINT}
+    </if>
+    <if test="warehouseId != null" >
+      and inorder.warehouse_id = #{warehouseId,jdbcType=BIGINT}
+    </if>
+    <if test="in_user_id != null" >
+      and inorder.in_user_id = #{in_user_id,jdbcType=BIGINT}
+    </if>
+    <if test="state != null" >
+      and inorder.state = #{state,jdbcType=INTEGER}
+    </if>
+
+    <if test="in_type != null" >
+      and inorder.in_type = #{in_type,jdbcType=INTEGER}
+    </if>
+    <if test="in_date_min != null" >
+      and inorder.in_date >= #{in_date_min,jdbcType=TIMESTAMP}
+    </if>
+    <if test="in_date_max != null" >
+      and #{in_date_max,jdbcType=TIMESTAMP} > inorder.in_date
+    </if>
+
+  </select>
+
+</mapper>
