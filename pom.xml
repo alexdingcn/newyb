@@ -6,7 +6,10 @@
 	<groupId>com.yiban</groupId>
 	<artifactId>erp</artifactId>
 	<version>0.1.0-SNAPSHOT</version>
-	<packaging>jar</packaging>
+    <modules>
+        <module>job</module>
+    </modules>
+    <packaging>pom</packaging>
 
 	<name>yiban_erp</name>
 	<description>ERP project for Yiban</description>
