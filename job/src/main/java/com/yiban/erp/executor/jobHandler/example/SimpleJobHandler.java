@@ -50,7 +50,7 @@ public class SimpleJobHandler extends IJobHandler {
         if (params != null) {
             XxlJobLogger.log("begin get user by nickname:{0}", params[0]);
             User user = userMapper.getUser(params[0]);
-            XxlJobLogger.log("get user by nicknmae:{0}, result:{}",
+            XxlJobLogger.log("get user by nicknmae:{0}, result:{1}",
                     params[0], JSON.toJSONString(user));
         }
 
