@@ -278,7 +278,6 @@ export default {
                         this.getMessageList();
                     }else {
                         let data = response.data;
-                        console.log(data);
                         this.mes.id = data.id;
                         this.mes.title = data.title;
                         this.mes.time = data.createTime ? moment(data.createTime).format('YYYY-MM-DD HH:mm:ss') : '';
