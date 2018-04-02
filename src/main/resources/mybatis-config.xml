@@ -38,5 +38,7 @@
         <mapper resource="mapping/RepositoryOrderMapper.xml"/>
         <mapper resource="mapping/RepositoryOrderDetailMapper.xml"/>
         <mapper resource="mapping/RepertoryInMapper.xml"/>
+        <mapper resource="mapping/MessageInfoMapper.xml"/>
+        <mapper resource="mapping/MessageOptionMapper.xml"/>
     </mappers>
 </configuration>

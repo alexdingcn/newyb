@@ -93,7 +93,10 @@ public enum ErrorCode {
     MOBILE_VERIFY_CODE_TOO_FREQUENT(4106, "验证码发送太频繁"),
 
     ACCESS_PERMISSION(9001, "无访问权限", ErrorDisplay.MODAL),
-    PARAMETER_MISSING(9002, "缺少必填字段");
+    PARAMETER_MISSING(9002, "缺少必填字段"),
+    MESSAGE_GET_FAIL(9003, "获取消息信息失败"),
+
+    ;
 
     private Integer code;
     private String message;
