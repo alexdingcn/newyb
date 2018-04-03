@@ -4,10 +4,9 @@
           <p slot="title">入库质量验收</p>
           <div slot="extra">
               <ButtonGroup>
-                <Button size="small" type="primary" icon="ios-search" >查询</Button>
-                <Button size="small" >抽样检查</Button>
-                <Button size="small" type="success" icon="ios-checkmark" >验收</Button>
-                <Button size="small" type="error" icon="close-round">取消验收</Button>
+                <Button size="small" type="primary" icon="ios-search" :loading="orderLoading" @click="refreshOrder">查询</Button>
+                <Button size="small" type="success" icon="ios-checkmark" @click="checkOneOrderBtn">验收一单</Button>
+                <Button type="warning" size="small" icon="close" @click="unCheckOneOrderBtn">取消验收一单</Button>
               </ButtonGroup>
           </div>
           
@@ -40,6 +39,9 @@
 
           <div class="detail-div">
               <ButtonGroup>
+                  <Button type="info" size="small" icon="android-bulb" @click="samplingSurveyBtnClick">抽样检查</Button>
+                  <Button type="success" size="small" icon="checkmark" @click="checkOneDetailBtn">验收一条</Button>
+                  <Button type="warning" size="small" icon="close" @click="unCheckOneDetailBtn">取消验收一条</Button>
                   <Button size="small" type="ghost">增加商品</Button>
                   <Button size="small">增加批次</Button>
                   <Button size="small" type="error">删除</Button>
@@ -48,33 +50,118 @@
               <Table border highlight-row height="300" :loading="detailLoading" 
                    :columns="detailColumns" :data="detailList" size="small" 
                    ref="detailTable" style="width: 100%;" 
+                   @on-row-click="handleSelectDetail" 
                    no-data-text="点击上方订单后查看明细">
                 <div slot="footer">
-                    <h3 class="padding-left-20" >
+                    <h3 class="detail-count-content" >
                         <b>到货数量:</b> {{ totalReceiveCount }} 
-                        <b class="margin-left-30">入库数量:</b> {{ totalInCount }}
-                        <b class="margin-left-30">合格数量:</b> {{ totalRightCount }}
-                        <b class="margin-left-30">不合格数量:</b> {{ totalErrorCount }}
-                        <b class="margin-left-30">采集数量:</b> {{ totalCheckCount }}
+                        <b class="detail-count-content-b">入库数量:</b> {{ totalInCount }}
+                        <b class="detail-count-content-b">合格数量:</b> {{ totalRightCount }}
+                        <b class="detail-count-content-b">不合格数量:</b> {{ totalErrorCount }}
+                        <b class="detail-count-content-b">采集数量:</b> {{ totalSurveyQuality }}
                     </h3>
                 </div>
             </Table>
           </div>
       </Card>
+      
+      <Modal v-model="surveyModal" title="商品抽样检查" :mask-closable="false" width="50">
+          <receive-survey :order="currentChooseOrder" :detail="currChooseDetail" 
+                @close="surveyClose" 
+                @survey-success="surveySuccess">
+            </receive-survey>
+          <div slot="footer"></div>
+      </Modal>
+
+      <Modal v-model="checkModal" title="验收结果" :mask-closable="false" width="50" @on-ok="checkSuccess" @on-cancel="checkCancel">
+          <Form ref="checkForm" :model="checkFormItem" :label-width="100">
+              <Row v-if="checkDetail">
+                  <Col span="12">
+                    <FormItem label="到货数量">
+                        <Input :number="true" v-model="checkFormItem.receiveQuality" :readonly="true"/>
+                    </FormItem>
+                  </Col>
+                  <Col span="12">
+                    <FormItem label="入库数量">
+                        <Input :number="true" v-model="checkFormItem.inCount" :readonly="true"/>
+                    </FormItem>
+                  </Col>
+              </Row>
+              <Row v-if="checkDetail">
+                  <Col span="12">
+                    <FormItem label="合格数量">
+                        <Input :number="true" v-model="checkFormItem.rightCount" @on-change="checkRightCountChange" />
+                    </FormItem>
+                  </Col>
+                  <Col span="12">
+                    <FormItem label="不合格数量">
+                        <Input :number="true" v-model="checkFormItem.errorCount" :readonly="true"/>
+                    </FormItem>
+                  </Col>
+              </Row>
+              <Row v-if="checkDetail">
+                  <Col span="12">
+                    <FormItem label="不合格品处置方案">
+                        <Input v-model="checkFormItem.errorPlan" />
+                    </FormItem>
+                  </Col>
+                  <Col span="12">
+                    <FormItem label="营销人员证书">
+                        <Input v-model="checkFormItem.saleCert" />
+                    </FormItem>
+                  </Col>
+              </Row>
+              <Row v-if="checkDetail">
+                  <Col span="24">
+                    <FormItem label="不合格品原因">
+                        <Input v-model="checkFormItem.errorReason" />
+                    </FormItem>
+                  </Col>
+              </Row>
+              <Row>
+                  <Col span="8">
+                    <FormItem label="温控方式验收">
+                        <temper-control-select v-model="checkFormItem.checkTempMethod"></temper-control-select>
+                    </FormItem>
+                  </Col>
+                  <Col span="8">
+                    <FormItem label="验收员">
+                        <Input v-model="checkFormItem.checkUser" />
+                    </FormItem>
+                  </Col>
+                  <Col span="8">
+                    <FormItem label="验收时间">
+                        <DatePicker format="yyyy-MM-dd HH:mm" type="datetime" v-model="checkFormItem.checkTime" />
+                    </FormItem>
+                  </Col>
+              </Row>
+              <Row>
+                  <Col span="24">
+                    <FormItem label="验收结果">
+                        <Input v-model="checkFormItem.checkResult" />
+                    </FormItem>
+                  </Col>
+              </Row>
+          </Form>
+      </Modal>
   </div>
 </template>
 
 <script>
 import util from "@/libs/util.js";
-import moment from 'moment';
+import moment,{ isMoment } from 'moment';
 import supplierSelect from "@/views/selector/supplier-select.vue";
 import warehouseSelect from "@/views/selector/warehouse-select.vue";
+import receiveSurvey from "./receive-survey.vue";
+import temperControlSelect from "@/views/selector/temper-control-select.vue";
 
 export default {
     name: 'buy-quality-check',
     components: {
         supplierSelect,
-        warehouseSelect
+        warehouseSelect,
+        receiveSurvey,
+        temperControlSelect
     },
     data() {
         return {
@@ -103,90 +190,99 @@ export default {
                 {
                     title: '收货时间',
                     key: 'receiveDate',
-                    width: 100,
                     render: (h, params) => {
                         let receiveDate = params.row.receiveDate;
-                        if(receiveDate) {
-                            return moment(receiveDate).format("YYYY-MM-DD");
-                        }else {
-                            return '';
-                        }
+                        return receiveDate ? moment(receiveDate).format("YYYY-MM-DD") : '';
                     }
                 },
                 {
                     title: '入库仓库',
                     key: 'warehouseName',
-                    width: 120
                 },
                 {
                     title: '供应商',
                     key: 'supplierName',
-                    width: 150
                 },
                 {
                     title: '供应商代表',
                     key: 'supplierContactName',
-                    width: 150
                 },
                 {
                     title: '采购员',
-                    key: 'buyerName',
-                    width: 100
+                    key: 'saleNickName',
+                    render: (h, params) => {
+                        let saleNickName = params.row.saleNickName;
+                        let saleRealName = params.row.saleRealName;
+                        if (saleNickName && saleRealName) {
+                            return h('span', saleNickName + ' - [' + saleRealName + ']');
+                        }else {
+                            return h('span', saleNickName);
+                        }
+                    }
                 },
                 {
                     title: '金额',
                     key: 'amount',
-                    width: 100
-                },
-                {
-                    title: '备注',
-                    key: 'comment',
-                    width: 150
+                    render: (h, params) => {
+                        let details = params.row.details;
+                        if (!details || details.length <= 0) {
+                            return h('span', 0);
+                        }
+                        let amount = 0;
+                        amount = details.reduce((total, item) => {
+                            return item.amount ? total + parseFloat(item.amount) : total + 0;
+                        }, 0);
+                        return h('span', amount);
+                    }
                 },
                 {
                     title: '收货员',
-                    key: 'receiveUserName',
-                    width: 100
-                },
-                {
-                    title: '验收员',
-                    key: 'checkUserName',
-                    width: 100
+                    key: 'createBy'
                 },
                 {
                     title: '到货温度',
                     key: 'receiveTemp',
-                    width: 100
                 },
                 {
                     title: '验收温度',
                     key: 'checkTemp',
-                    width: 100
+                    render: (h, params) => {
+                        var self = this;
+                        let oldCheckTemp = params.row.checkTemp;
+                        return h('Input', {
+                            props: {
+                                value : self.orderList[params.index][params.column.key]
+                            },
+                            on: {
+                                'on-blur' (event) {
+                                    let row = self.orderList[params.index];
+                                    row[params.column.key] = event.target.value;
+                                    if (event.target.value != oldCheckTemp && !isNaN(event.target.value)) {
+                                        self.chanageOrderCheckTemp(params.row.id, event.target.value);
+                                    }
+                                }
+                            }
+                        })
+                    }
                 },
                 {
                     title: '系统单号',
                     key: 'orderNumber',
-                    width: 120
                 },
                 {
                     title: '入库方式',
-                    key: 'buyType',
-                    width: 120
+                    key: 'buyTypeName',
                 },
                 {
                     title: '到货时间',
-                    key: 'receiveDate',
-                    width: 120,
+                    key: 'shipEndDate',
                     render: (h, params) => {
-                        let receiveDate = params.row.receiveDate;
-                        if(receiveDate) {
-                            return moment(receiveDate).format("YYYY-MM-DD");
-                        }else {
-                            return '';
-                        }
+                        let shipEndDate = params.row.shipEndDate;
+                        return shipEndDate ? moment(shipEndDate).format("YYYY-MM-DD") : '';
                     }
                 }
             ],
+            currentChooseOrder: {},
             detailLoading: false,
             detailList: [],
             detailColumns: [
@@ -197,68 +293,71 @@ export default {
                 },
                 {
                     title: "商品名称",
-                    type: 'goodName',
-                    width: 150
+                    key: 'goodsName',
+                    width: 160
                 },
                 {
                     title: "产地",
-                    type: 'origin',
-                    width: 150
+                    key: 'origin',
+                    width: 160
                 },
                 {
                     title: "剂型",
-                    type: 'jx',
-                    width: 100
+                    key: 'jx',
+                    width: 120
                 },
                 {
                     title: "规格",
-                    type: 'spece',
+                    key: 'spec',
                     width: 100
                 },
                 {
                     title: "生产企业",
-                    type: 'factoryName',
-                    width: 150
+                    key: 'factory',
+                    width: 120
                 },
                 {
                     title: "批准文号",
-                    type: 'permit',
-                    width: 150
+                    key: 'permit',
+                    width: 120
                 },
                 {
                     title: "存储条件",
-                    type: 'storageCondition',
-                    width: 150
+                    key: 'storageCondition',
+                    width: 100
                 },
                 {
                     title: "检验报告",
-                    type: 'checkRecord',
-                    width: 120
+                    key: 'checkRecord',
+                    width: 140
                 },
                 {
                     title: "特殊药品",
-                    type: 'specialManaged',
-                    width: 120
+                    key: 'specialManaged',
+                    width: 120,
+                    render (h, params) {
+                        let specialManaged = params.row.specialManaged;
+                        if (specialManaged) {
+                            return h('Tag', {props:{type:'dot', color:'red'}}, '是');
+                        }else{
+                            return h('Tag', {props:{type:'dot', color:'blue'}}, '否');
+                        }
+                    }
                 },
                 {
                     title: "单位",
-                    type: 'unitName',
-                    width: 120
-                },
-                {
-                    title: "电子监管码",
-                    type: 'eCheckCode',
+                    key: 'unitName',
                     width: 120
                 },
                 {
                     title: "批号",
-                    type: 'batchCode',
-                    width: 120
+                    key: 'batchCode',
+                    width: 140
                 },
                 {
                     title: "生产日期",
-                    type: 'productDate',
-                    width: 150,
+                    key: 'productDate',
+                    width: 140,
                     render: (h, params) => {
                         let productDate = params.row.productDate;
                         return productDate ? moment(productDate).format("YYYY-MM-DD") : '';
@@ -266,8 +365,8 @@ export default {
                 },
                 {
                     title: "有效期至",
-                    type: 'expDate',
-                    width: 150,
+                    key: 'expDate',
+                    width: 140,
                     render: (h, params) => {
                         let expDate = params.row.expDate;
                         return expDate ? moment(expDate).format("YYYY-MM-DD") : '';
@@ -275,74 +374,324 @@ export default {
                 },
                 {
                     title: "到货数量",
-                    type: 'receiveCount',
-                    width: 100
+                    width: 140,
+                    key: 'receiveQuality',
+                    render: (h, params) => {
+                        let self = this;
+                        return h('Input', {
+                            props: {
+                                value : self.detailList[params.index][params.column.key]
+                            },
+                            on: {
+                                'on-blur' (event) {
+                                    let row = self.detailList[params.index];
+                                    row[params.column.key] = event.target.value;
+                                    row['inCount'] = row[params.column.key];
+                                }
+                            }
+                        });
+                    }
                 },
                 {
                     title: "入库数量",
-                    type: 'inCount',
-                    width: 100
+                    key: 'inCount',
+                    width: 140
                 },
                 {
                     title: "合格数量",
-                    type: 'rightCount',
-                    width: 100
+                    key: 'rightCount',
+                    width: 140
                 },
                 {
                     title: "不合格数量",
-                    type: 'errorCount',
-                    width: 100
+                    key: 'errorCount',
+                    width: 140
                 },
                 {
                     title: "采集数量",
-                    type: 'checkCount',
-                    width: 100
+                    key: 'surveyQuality',
+                    width: 140,
+                    render: (h, params) => {
+                        let surveyQuality = params.row.surveyQuality;
+                        let surveyDate = params.row.surveyDate ? moment(params.row.surveyDate).format('YYYY-MM-DD HH:mm') : '';
+                        let surveyUser = params.row.surveyUser;
+                        if (!surveyQuality) {
+                            return h('span', '');
+                        }
+                        return h('Tooltip', {
+                            props: {
+                                placement:"top",
+                                content: '抽样员:' + surveyUser + ', 抽样时间:' + surveyDate
+                            }
+                        }, [
+                            h('span', surveyQuality),
+                        ]);
+                    }
                 },
                 {
                     title: "库区",
-                    type: 'warehouseLocation',
-                    width: 100
+                    key: 'warehouseLocation',
+                    width: 140
                 },
                 {
                     title: "验收状态",
-                    type: 'checkStatus',
-                    width: 100
+                    key: 'checkStatus',
+                    width: 140,
+                    render (h, params) {
+                        let checkStatus = params.row.checkStatus;
+                        if (checkStatus) {
+                            return h('Tag', {props:{type:'dot', color:'green'}}, '已验收');
+                        }else{
+                            return h('Tag', {props:{type:'dot', color:'red'}}, '未验收');
+                        }
+                    }
                 },
                 {
                     title: "温控方式验收",
-                    type: 'checkTempMethod',
-                    width: 100
+                    key: 'checkTempMethod',
+                    width: 140
                 },
                 {
                     title: "验收意见",
-                    type: 'checkResult',
-                    width: 150
+                    key: 'checkResult',
+                    width: 140
                 },
                 {
                     title: "验收员",
-                    type: 'checkUser',
-                    width: 150
+                    key: 'checkUser',
+                    width: 140
                 },
                 {
                     title: "验收时间",
-                    type: 'checkTime',
-                    width: 150,
+                    key: 'checkTime',
+                    width: 140,
                     render: (h, params) => {
                         let checkTime = params.row.checkTime;
                         return checkTime ? moment(checkTime).format('YYYY-MM-DD HH:mm') : '';
                     }
                 }
             ],
+            currChooseDetail: {},
             totalReceiveCount: 0,
             totalInCount: 0,
             totalRightCount: 0,
             totalErrorCount: 0,
-            totalCheckCount: 0
+            totalSurveyQuality: 0,
+            surveyModal: false,
+            checkDetail: false,
+            checkFormItem: {},
+            checkModal: false
+        }
+    },
+    watch: {
+        detailList(data) {
+            if(!data || data.length <= 0) {
+                this.totalReceiveCount = 0;
+                this.totalInCount = 0;
+                this.totalRightCount = 0;
+                this.totalErrorCount = 0;
+                this.totalSurveyQuality = 0;
+            }else {
+                this.totalReceiveCount = data.reduce((total, item) => {return item.receiveQuality ? total + item.receiveQuality : total + 0}, 0);
+                this.totalInCount = data.reduce((total, item) => {return item.inCount ? total + item.inCount : total + 0}, 0);
+                this.totalRightCount = data.reduce((total, item) => {return item.rightCount ? total + item.rightCount : total + 0}, 0);
+                this.totalErrorCount = data.reduce((total, item) => {return item.errorCount ? total + item.errorCount : total + 0}, 0);
+                this.totalSurveyQuality = data.reduce((total, item) => {return item.surveyQuality ? total + item.surveyQuality : total + 0}, 0);
+            }
         }
     },
     methods: {
+        refreshOrder() {
+            let statusList = [];
+            if (this.query.status === 'CHECKING') {
+                statusList = ['INIT'];
+            }else if (this.query.status == 'CHECKED') {
+                statusList = ['CHECKED'];
+            }else {
+                statusList = ['INIT', 'CHECKED'];
+            }
+            let reqData = {
+                statusList: statusList,
+                warehouseId: this.query.warehouseId,
+                supplierId: this.query.supplierId,
+                startReceiveDate: this.dateRange[0],
+                endReceiveDate: this.dateRange[1]
+            };
+            this.orderLoading = true;
+            util.ajax.post("/receive/list", reqData)
+                .then((response) => {
+                    this.orderLoading = false;
+                    this.orderList = response.data;
+                })
+                .catch((error) => {
+                    this.orderLoading = false;
+                    util.errorProcessor(this, error);
+                });
+            this.currentChooseOrder = {};
+            this.currChooseDetail = {};
+            this.detailList = [];
+        },
+        chanageOrderCheckTemp(orderId, newCheckTemp) {
+            if(!orderId || !newCheckTemp) {
+                return;
+            }
+            let reqData = {
+                orderId: orderId,
+                checkTemp: newCheckTemp
+            };
+            util.ajax.put('/receive/set/checkTemp', reqData)
+                .then((response) => {
+                    this.$Message.success('验收温度设定成功');
+                })
+                .catch((error) => {
+                    util.errorProcessor(this, error);
+                });
+        },
+        handleSelectOrder(rowData) { 
+            if (!rowData || !rowData.id) {
+                this.currentChooseOrder = {};
+                this.detailList = [];
+                return;
+            }
+            this.currentChooseOrder = rowData;
+            this.detailList = rowData.details;
+            this.currChooseDetail = {};
+        },
 
-        handleSelectOrder() {}
+        handleSelectDetail(rowData) {
+            if (!rowData || !rowData.id) {
+                this.currChooseDetail = {};
+            }else {
+                this.currChooseDetail = rowData;
+            }
+        },
+
+        samplingSurveyBtnClick() {
+            if (!this.currChooseDetail || !this.currChooseDetail.id) {
+                this.$Message.warning('请先选择需要抽样验收的商品');
+                return;
+            }
+            this.surveyModal = true;
+        },
+        surveyClose() {
+            this.surveyModal = false;
+        },
+        surveySuccess() {
+            this.surveyModal = false;
+            this.reloadOrderDetail();
+        },
+
+        reloadOrderDetail() {
+            this.detailLoading = true;
+            util.ajax.get('/receive/detail/' + this.currentChooseOrder.id)
+                .then((response) => {
+                    this.detailLoading = false;
+                    let data = response.data;
+                    if (data) {
+                        this.detailList = data;
+                        this.currChooseDetail = {};
+                    }
+                })
+                .catch((error) => {
+                    this.detailLoading = false;
+                    util.errorProcessor(this, error);
+                });
+        },
+
+        checkOneOrderBtn() {
+            if (!this.currentChooseOrder || !this.currentChooseOrder.id) {
+                this.$Message.warning('请先选择一条需要验收的订单信息');
+                return;
+            }
+            this.checkFormItem = {
+                orderId: this.currentChooseOrder.id,
+                checkTime: moment().format("YYYY-MM-DD HH:mm")
+            }
+            this.checkDetail = false;
+            this.checkModal = true;
+        },
+        checkOneDetailBtn() {
+            if (!this.currChooseDetail || !this.currChooseDetail.id) {
+                this.$Message.warning('请先选择一条需要验收的产品信息');
+                return;
+            }
+            let receiveQuality = this.currChooseDetail.receiveQuality ? this.currChooseDetail.receiveQuality : 0;
+            let rightCount = this.currChooseDetail.rightCount ? this.currChooseDetail.rightCount : receiveQuality;
+            if(rightCount > receiveQuality) {
+                this.$Message.error('合格数量不能大于收货数量');
+            }
+            let inCount = rightCount;
+            let errorCount = receiveQuality - rightCount;
+            this.checkFormItem = {
+                detailId: this.currChooseDetail.id,
+                receiveQuality: receiveQuality,
+                inCount: rightCount,
+                rightCount: rightCount,
+                errorCount: errorCount,
+                checkTime: moment().format("YYYY-MM-DD HH:mm")
+            }
+            this.checkDetail = true;
+            this.checkModal = true;
+        },
+        checkRightCountChange() {
+            let receiveQuality = this.checkFormItem.receiveQuality;
+            let rightCount = this.checkFormItem.rightCount ? this.checkFormItem.rightCount : receiveQuality;
+            let inCount = rightCount;
+            let errorCount = receiveQuality - rightCount;
+            this.checkFormItem.inCount = inCount;
+            this.checkFormItem.errorCount = errorCount;
+        },
+        checkCancel() {
+            this.checkFormItem = {
+                orderId: '',
+                detailId: ''
+            };
+            this.checkModal = false;
+        },
+        checkSuccess() {
+            if (this.checkFormItem.checkTime) {
+                this.checkFormItem.checkTime = moment(this.checkFormItem.checkTime, 'YYYY-MM-DD HH:mm');
+            }
+            this.detailLoading = true;
+            util.ajax.put('/receive/set/check', this.checkFormItem)
+                .then((response) => {
+                    this.detailLoading = false;
+                    this.$Message.success('验收成功');
+                    this.reloadOrderDetail();
+                })
+                .catch((error) => {
+                    this.detailLoading = false;
+                    util.errorProcessor(this, error);
+                })
+        },
+        unCheckOneOrderBtn() {
+            if (!this.currentChooseOrder || !this.currentChooseOrder.id) {
+                this.$Message.warning('请先选择需要取消验证的订单');
+                return;
+            }
+            util.ajax.put('/receive/set/check/order/' + this.currentChooseOrder.id)
+                .then((response) => {
+                    this.$Message.success('取消成功');
+                    this.reloadOrderDetail();
+                })
+                .catch((error) => {
+                    util.errorProcessor(this, error);
+                })
+        },
+        unCheckOneDetailBtn() {
+            if (!this.currChooseDetail || !this.currChooseDetail.id) {
+                this.$Message.warning('请先选择需要取消验证的订单');
+                return;
+            }
+            util.ajax.put('/receive/set/check/detail/' + this.currChooseDetail.id)
+                .then((response) => {
+                    this.$Message.success('取消成功');
+                    this.reloadOrderDetail();
+                })
+                .catch((error) => {
+                    util.errorProcessor(this, error);
+                })
+        }
     }
 }
 </script>
@@ -354,5 +703,10 @@ export default {
 .detail-div {
     margin-top: 10px;
 }
-
+.detail-count-content {
+    margin-left: 10px;
+}
+.detail-count-content-b {
+    margin-left: 40px;
+}
 </style>

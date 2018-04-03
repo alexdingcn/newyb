@@ -4,5 +4,6 @@ public enum RepositoryOrderStatus {
 
     TEMP_STORAGE,
     INIT,
+    CHECKED,
     DELETE;
 }

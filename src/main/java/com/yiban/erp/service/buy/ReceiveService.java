@@ -7,16 +7,19 @@ import com.yiban.erp.constant.RepositoryOrderStatus;
 import com.yiban.erp.dao.*;
 import com.yiban.erp.dto.CurrentBalanceResp;
 import com.yiban.erp.dto.ReceiveListReq;
+import com.yiban.erp.dto.ReceiveSetReq;
 import com.yiban.erp.entities.*;
 import com.yiban.erp.exception.BizException;
 import com.yiban.erp.exception.BizRuntimeException;
 import com.yiban.erp.exception.ErrorCode;
 import com.yiban.erp.util.UtilTool;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import sun.nio.cs.US_ASCII;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -214,6 +217,10 @@ public class ReceiveService {
         return orders;
     }
 
+    public List<RepositoryOrderDetail> getDetailList(Long orderId) {
+        return repositoryOrderDetailMapper.getByOrderIdList(Arrays.asList(orderId));
+    }
+
     public void removeById(User user, Long id) throws BizException{
         if (id == null) {
             throw new BizException(ErrorCode.RECEIVE_ORDER_GET_FAIL);
@@ -322,4 +329,138 @@ public class ReceiveService {
         return order;
     }
 
+    public void setOrderCheckTemp(ReceiveSetReq setReq, User user) throws BizException {
+        RepositoryOrder order = repositoryOrderMapper.selectByPrimaryKey(setReq.getOrderId());
+        if (order == null ) {
+            logger.warn("get order fail by id:{}", setReq.getOrderId());
+            throw new BizException(ErrorCode.RECEIVE_ORDER_GET_FAIL);
+        }
+        order.setUpdateTime(new Date());
+        order.setUpdateBy(user.getNickname());
+        order.setCheckTemp(setReq.getCheckTemp());
+        repositoryOrderMapper.updateByPrimaryKeySelective(order);
+    }
+
+    public void setDetailSurvey(User user, ReceiveSetReq setReq) throws BizException {
+        RepositoryOrderDetail detail = repositoryOrderDetailMapper.selectByPrimaryKey(setReq.getDetailId());
+        if (detail == null) {
+            logger.warn("get detail record fail by id:{}", setReq.getDetailId());
+            throw new BizException(ErrorCode.RECEIVE_ORDER_GET_FAIL);
+        }
+        if (setReq.getSurveyQuality() == null || setReq.getSurveyDate() == null || StringUtils.isBlank(setReq.getSurveyUser())) {
+            logger.warn("request params is error.");
+            throw new BizException(ErrorCode.PARAMETER_MISSING);
+        }
+        detail.setSurveyDate(setReq.getSurveyDate());
+        detail.setSurveyQuality(setReq.getSurveyQuality());
+        detail.setSurveyUser(setReq.getSurveyUser());
+        detail.setSurveyAddress(setReq.getSurveyAddress());
+        detail.setSurveyResult(setReq.getSurveyResult());
+        detail.setSurveyTarget(setReq.getSurveyTarget());
+        detail.setUpdateBy(user.getNickname());
+        detail.setUpdateTime(new Date());
+        repositoryOrderDetailMapper.updateByPrimaryKeySelective(detail);
+    }
+
+
+    public void setCheckResult(User user, ReceiveSetReq setReq) throws BizException {
+        if (setReq == null || (setReq.getOrderId() == null && setReq.getDetailId() == null)) {
+            logger.warn("request params order id or detail id is null.");
+            throw new BizException(ErrorCode.PARAMETER_MISSING);
+        }
+        if (setReq.getOrderId() != null) {
+            //整单验证通过
+            checkOneOrder(user, setReq);
+        }else if (setReq.getDetailId() != null) {
+            //单笔详情验证
+            checkOneDetail(user, setReq);
+        }else {
+            throw new BizException(ErrorCode.PARAMETER_MISSING);
+        }
+    }
+
+    private void checkOneOrder(User user, ReceiveSetReq setReq) throws BizException {
+        RepositoryOrder order = repositoryOrderMapper.selectByPrimaryKey(setReq.getOrderId());
+        if (order == null) {
+            logger.warn("get order info fail by id:{}", setReq.getOrderId());
+            throw new BizException(ErrorCode.RECEIVE_ORDER_GET_FAIL);
+        }
+        if (!order.getCompanyId().equals(user.getCompanyId())) {
+            logger.error("user get company is not match. orderId:{} user:{}", setReq.getOrderId(), user.getId());
+            throw new BizRuntimeException(ErrorCode.ACCESS_PERMISSION);
+        }
+        setReq.setUpdateBy(user.getNickname());
+        setReq.setUpdateTime(new Date());
+        repositoryOrderDetailMapper.setCheckByOrder(setReq);
+
+        //直接把订单的状态修改为意见验收通过的的状态
+        order.setStatus(RepositoryOrderStatus.CHECKED.name());
+        order.setUpdateBy(user.getNickname());
+        order.setUpdateTime(new Date());
+        repositoryOrderMapper.updateByPrimaryKeySelective(order);
+    }
+
+    private void checkOneDetail(User user, ReceiveSetReq setReq) throws BizException {
+        RepositoryOrderDetail detail = repositoryOrderDetailMapper.selectByPrimaryKey(setReq.getDetailId());
+        if (detail == null) {
+            logger.warn("get order detail fail by id:{}", setReq.getDetailId());
+            throw new BizException(ErrorCode.RECEIVE_ORDER_GET_FAIL);
+        }
+        //直接调用验收逻辑
+        setReq.setUpdateBy(user.getNickname());
+        setReq.setUpdateTime(new Date());
+        int count = repositoryOrderDetailMapper.setCheckByDetail(setReq);
+        if (count <= 0) {
+            throw new BizRuntimeException(ErrorCode.FAILED_UPDATE_FROM_DB);
+        }
+
+        //验证订单的是否意见全部验证通过，如果是，需要把订单修改为已经验收完毕的状态
+        List<RepositoryOrderDetail> details = repositoryOrderDetailMapper.getByOrderIdList(Arrays.asList(detail.getRepositoryOrderId()));
+        boolean checked = true;
+        for (RepositoryOrderDetail item : details) {
+            if (item.getCheckStatus() != null && !item.getCheckStatus()) {
+                checked = false;
+                break;
+            }
+        }
+        if (checked) {
+            logger.warn("user:{} check order detail:{} then order check over. orderId:{}", user.getId(), detail.getId(), detail.getRepositoryOrderId());
+            repositoryOrderMapper.setCheckStatus(detail.getRepositoryOrderId(), RepositoryOrderStatus.CHECKED.name(), user.getNickname(), new Date());
+        }
+    }
+
+    public void setUncheckOrder(User user, Long orderId) throws BizException {
+        RepositoryOrder order = repositoryOrderMapper.selectByPrimaryKey(orderId);
+        if (order == null) {
+            throw new BizException(ErrorCode.RECEIVE_ORDER_GET_FAIL);
+        }
+        ReceiveSetReq setReq = new ReceiveSetReq();
+        setReq.setOrderId(orderId);
+        setReq.setUpdateBy(user.getNickname());
+        setReq.setUpdateTime(new Date());
+        repositoryOrderDetailMapper.setUnCheckByOrder(setReq);
+
+        //把订单的状态修改为INIT状态
+        order.setStatus(RepositoryOrderStatus.INIT.name());
+        order.setUpdateTime(new Date());
+        order.setUpdateBy(user.getNickname());
+        repositoryOrderMapper.updateByPrimaryKeySelective(order);
+    }
+
+
+    public void setUncheckDetail(User user, Long detailId) throws BizException {
+        RepositoryOrderDetail detail = repositoryOrderDetailMapper.selectByPrimaryKey(detailId);
+        if (detail == null) {
+            throw new BizException(ErrorCode.RECEIVE_ORDER_GET_FAIL);
+        }
+        ReceiveSetReq setReq = new ReceiveSetReq();
+        setReq.setDetailId(detailId);
+        setReq.setUpdateBy(user.getNickname());
+        setReq.setUpdateTime(new Date());
+        int count = repositoryOrderDetailMapper.setUnCheckByDetail(setReq);
+        if (count <=0) {
+            throw new BizRuntimeException(ErrorCode.FAILED_UPDATE_FROM_DB);
+        }
+        repositoryOrderMapper.setCheckStatus(detail.getRepositoryOrderId(), RepositoryOrderStatus.INIT.name(), user.getNickname(), new Date());
+    }
 }

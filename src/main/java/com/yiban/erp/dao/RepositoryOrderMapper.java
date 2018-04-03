@@ -5,6 +5,7 @@ import com.yiban.erp.entities.RepositoryOrder;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.Date;
 import java.util.List;
 
 @Mapper
@@ -25,4 +26,9 @@ public interface RepositoryOrderMapper {
 
 
     RepositoryOrder getByBuyOrder(@Param("companyId") Integer companyId, @Param("buyOrderId") Long buyOrderId);
+
+    int setCheckStatus(@Param("id") Long repositoryOrderId,
+                       @Param("status") String name,
+                       @Param("updateBy") String nickname,
+                       @Param("updateTime") Date date);
 }

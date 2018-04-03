@@ -9,6 +9,9 @@ public class ReceiveListReq {
     private List<String> statusList;
     private Date startReceiveDate;
     private Date endReceiveDate;
+    private Integer warehouseId;
+    private Long supplierId;
+
 
     public Integer getCompanyId() {
         return companyId;
@@ -40,5 +43,21 @@ public class ReceiveListReq {
 
     public void setEndReceiveDate(Date endReceiveDate) {
         this.endReceiveDate = endReceiveDate;
+    }
+
+    public Integer getWarehouseId() {
+        return warehouseId;
+    }
+
+    public void setWarehouseId(Integer warehouseId) {
+        this.warehouseId = warehouseId;
+    }
+
+    public Long getSupplierId() {
+        return supplierId;
+    }
+
+    public void setSupplierId(Long supplierId) {
+        this.supplierId = supplierId;
     }
 }

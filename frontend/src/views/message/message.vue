@@ -118,7 +118,7 @@ export default {
         };
         return {
             dateRange: [
-                moment().subtract(1, 'm').format('YYYY-MM-DD'),
+                moment().subtract(1, 'M').format('YYYY-MM-DD'),
                 moment().add(1, 'd').format('YYYY-MM-DD')
             ],
             dataLoading: false,

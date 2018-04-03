@@ -16,8 +16,8 @@
     <result column="pay_date" property="payDate" jdbcType="TIMESTAMP" />
     <result column="good_bill_no" property="goodBillNo" jdbcType="VARCHAR" />
     <result column="temp_control_method" property="tempControlMethod" jdbcType="BIGINT" />
-    <result column="receive_temp" property="receiveTemp" jdbcType="INTEGER" />
-    <result column="check_temp" property="checkTemp" jdbcType="INTEGER" />
+    <result column="receive_temp" property="receiveTemp" jdbcType="DECIMAL" />
+    <result column="check_temp" property="checkTemp" jdbcType="DECIMAL" />
     <result column="temp_control_status" property="tempControlStatus" jdbcType="BIGINT" />
     <result column="ship_company_id" property="shipCompanyId" jdbcType="INTEGER" />
     <result column="ship_method" property="shipMethod" jdbcType="BIGINT" />
@@ -74,7 +74,7 @@
       #{supplierId,jdbcType=BIGINT}, #{supplierContactId,jdbcType=BIGINT}, #{buyerId,jdbcType=BIGINT},
       #{status,jdbcType=VARCHAR}, #{keyWord,jdbcType=VARCHAR}, #{receiveDate,jdbcType=TIMESTAMP}, 
       #{payDate,jdbcType=TIMESTAMP}, #{goodBillNo,jdbcType=VARCHAR}, #{tempControlMethod,jdbcType=BIGINT}, 
-      #{receiveTemp,jdbcType=INTEGER}, #{checkTemp,jdbcType=INTEGER}, #{tempControlStatus,jdbcType=BIGINT},
+      #{receiveTemp,jdbcType=DECIMAL}, #{checkTemp,jdbcType=DECIMAL}, #{tempControlStatus,jdbcType=BIGINT},
       #{shipCompanyId,jdbcType=INTEGER}, #{shipMethod,jdbcType=BIGINT}, #{shipTool,jdbcType=BIGINT}, 
       #{shipCarNo,jdbcType=VARCHAR}, #{shipDriverName,jdbcType=VARCHAR}, #{shipStartDate,jdbcType=TIMESTAMP},
       #{shipEndDate,jdbcType=TIMESTAMP}, #{shipEntrustNo,jdbcType=VARCHAR}, #{shipStartAddress,jdbcType=VARCHAR}, 
@@ -236,10 +236,10 @@
         #{tempControlMethod,jdbcType=BIGINT},
       </if>
       <if test="receiveTemp != null" >
-        #{receiveTemp,jdbcType=INTEGER},
+        #{receiveTemp,jdbcType=DECIMAL},
       </if>
       <if test="checkTemp != null" >
-        #{checkTemp,jdbcType=INTEGER},
+        #{checkTemp,jdbcType=DECIMAL},
       </if>
       <if test="tempControlStatus != null" >
         #{tempControlStatus,jdbcType=BIGINT},
@@ -337,10 +337,10 @@
         temp_control_method = #{tempControlMethod,jdbcType=BIGINT},
       </if>
       <if test="receiveTemp != null" >
-        receive_temp = #{receiveTemp,jdbcType=INTEGER},
+        receive_temp = #{receiveTemp,jdbcType=DECIMAL},
       </if>
       <if test="checkTemp != null" >
-        check_temp = #{checkTemp,jdbcType=INTEGER},
+        check_temp = #{checkTemp,jdbcType=DECIMAL},
       </if>
       <if test="tempControlStatus != null" >
         temp_control_status = #{tempControlStatus,jdbcType=BIGINT},
@@ -416,8 +416,8 @@
       pay_date = #{payDate,jdbcType=TIMESTAMP},
       good_bill_no = #{goodBillNo,jdbcType=VARCHAR},
       temp_control_method = #{tempControlMethod,jdbcType=BIGINT},
-      receive_temp = #{receiveTemp,jdbcType=INTEGER},
-      check_temp = #{checkTemp,jdbcType=INTEGER},
+      receive_temp = #{receiveTemp,jdbcType=DECIMAL},
+      check_temp = #{checkTemp,jdbcType=DECIMAL},
       temp_control_status = #{tempControlStatus,jdbcType=BIGINT},
       ship_company_id = #{shipCompanyId,jdbcType=INTEGER},
       ship_method = #{shipMethod,jdbcType=BIGINT},
@@ -464,6 +464,12 @@
       and o.buyer_id = u.id
     and o.company_id = #{companyId}
     and o.status != 'DELETE'
+    <if test="warehouseId != null">
+      and o.warehouse_id = #{warehouseId}
+    </if>
+    <if test="supplierId != null" >
+      and o.supplier_id = #{supplierId}
+    </if>
     <if test="startReceiveDate != null">
       and o.receive_date >= #{startReceiveDate}
     </if>
@@ -489,5 +495,13 @@
     and o.status != 'DELETE'
     and o.buy_order_id = #{buyOrderId}
   </select>
+
+  <update id="setCheckStatus" parameterType="map">
+    update repository_order
+      set status = #{status},
+          update_by = #{updateBy},
+          update_time = #{updateTime}
+    where id = #{id}
+  </update>
 
 </mapper>
