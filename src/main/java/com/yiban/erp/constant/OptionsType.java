@@ -9,6 +9,8 @@ public enum OptionsType {
     SELL_ORDER_REVIEW("销售订单审核方式"),
     BUY_TYPE("采购属性"),
     BILL_TYPE("发票种类"),
+    WAREHOUSE_IN_TYPE("入库类型"),
+    WAREHOUSE_OUT_TYPE("入库类型"),
     ;
 
     private String description;

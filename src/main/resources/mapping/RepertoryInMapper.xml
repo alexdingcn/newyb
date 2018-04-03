@@ -5,29 +5,35 @@
     <result column="id" property="id" jdbcType="BIGINT" />
     <result column="company_id" property="companyId" jdbcType="INTEGER" />
     <result column="warehouse_id" property="warehouseId" jdbcType="INTEGER" />
-    <result column="in_user_id" property="inUserId" jdbcType="INTEGER" />
+    <result column="in_user_id" property="inUserId" jdbcType="BIGINT" />
     <result column="in_date" property="inDate" jdbcType="TIMESTAMP" />
     <result column="in_type" property="inType" jdbcType="INTEGER" />
     <result column="buy_order_id" property="buyOrderId" jdbcType="BIGINT" />
     <result column="supplier_id" property="supplierId" jdbcType="BIGINT" />
-    <result column="check_user_id" property="checkUserId" jdbcType="INTEGER" />
+    <result column="check_user_id" property="checkUserId" jdbcType="BIGINT" />
     <result column="check_date" property="checkDate" jdbcType="TIMESTAMP" />
     <result column="in_amount" property="inAmount" jdbcType="DECIMAL" />
     <result column="in_money" property="inMoney" jdbcType="DECIMAL" />
     <result column="state" property="state" jdbcType="INTEGER" />
     <result column="in_note" property="inNote" jdbcType="VARCHAR" />
+    <result column="created_by" property="createdBy" jdbcType="VARCHAR" />
+    <result column="updated_by" property="updatedBy" jdbcType="VARCHAR" />
+    <result column="created_time" property="createdTime" jdbcType="TIMESTAMP" />
+    <result column="updated_time" property="updatedTime" jdbcType="TIMESTAMP" />
   </resultMap>
   <insert id="insert" parameterType="com.yiban.erp.entities.RepertoryIn"  useGeneratedKeys="true" keyProperty="id" >
     insert into repertory_in (id, company_id, warehouse_id, 
       in_user_id, in_date, in_type, 
       buy_order_id, supplier_id,check_user_id, check_date,
       in_amount, in_money, state, 
-      in_note)
+      in_note,created_by, updated_by,
+    created_time, updated_time)
     values (#{id,jdbcType=BIGINT}, #{companyId,jdbcType=INTEGER}, #{warehouseId,jdbcType=INTEGER}, 
-      #{inUserId,jdbcType=INTEGER}, #{inDate,jdbcType=TIMESTAMP}, #{inType,jdbcType=INTEGER}, 
-      #{buyOrderId,jdbcType=BIGINT},#{supplierId,jdbcType=BIGINT}, #{checkUserId,jdbcType=INTEGER}, #{checkDate,jdbcType=TIMESTAMP},
+      #{inUserId,jdbcType=BIGINT}, #{inDate,jdbcType=TIMESTAMP}, #{inType,jdbcType=INTEGER},
+      #{buyOrderId,jdbcType=BIGINT},#{supplierId,jdbcType=BIGINT}, #{checkUserId,jdbcType=BIGINT}, #{checkDate,jdbcType=TIMESTAMP},
       #{inAmount,jdbcType=DECIMAL}, #{inMoney,jdbcType=DECIMAL}, #{state,jdbcType=INTEGER}, 
-      #{inNote,jdbcType=VARCHAR})
+      #{inNote,jdbcType=VARCHAR}, #{createdBy,jdbcType=VARCHAR}, #{updatedBy,jdbcType=VARCHAR},
+      #{createdTime,jdbcType=TIMESTAMP}, #{updatedTime,jdbcType=TIMESTAMP})
   </insert>
   <insert id="insertSelective" parameterType="com.yiban.erp.entities.RepertoryIn"  useGeneratedKeys="true" keyProperty="id">
     insert into repertory_in
@@ -74,6 +80,18 @@
       <if test="inNote != null" >
         in_note,
       </if>
+      <if test="createdBy != null" >
+        created_by,
+      </if>
+      <if test="updatedBy != null" >
+        updated_by,
+      </if>
+      <if test="createdTime != null" >
+        created_time,
+      </if>
+      <if test="updatedTime != null" >
+        updated_time,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides="," >
       <if test="id != null" >
@@ -86,7 +104,7 @@
         #{warehouseId,jdbcType=INTEGER},
       </if>
       <if test="inUserId != null" >
-        #{inUserId,jdbcType=INTEGER},
+        #{inUserId,jdbcType=BIGINT},
       </if>
       <if test="inDate != null" >
         #{inDate,jdbcType=TIMESTAMP},
@@ -101,7 +119,7 @@
         #{supplierId,jdbcType=BIGINT},
       </if>
       <if test="checkUserId != null" >
-        #{checkUserId,jdbcType=INTEGER},
+        #{checkUserId,jdbcType=BIGINT},
       </if>
       <if test="checkDate != null" >
         #{checkDate,jdbcType=TIMESTAMP},
@@ -118,16 +136,31 @@
       <if test="inNote != null" >
         #{inNote,jdbcType=VARCHAR},
       </if>
+      <if test="createdBy != null" >
+        created_by = #{createdBy,jdbcType=VARCHAR},
+      </if>
+      <if test="updatedBy != null" >
+        updated_by = #{updatedBy,jdbcType=VARCHAR},
+      </if>
+      <if test="createdTime != null" >
+        created_time = #{createdTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updatedTime != null" >
+        updated_time = #{updatedTime,jdbcType=TIMESTAMP},
+      </if>
     </trim>
   </insert>
 
 
   <select id="queryInOrders" resultMap="BaseResultMap" parameterType="com.yiban.erp.querybean.InOrderQuery" >
     select
-    inorder.*,su.name as supplier,w.name as warehouseName
+    inorder.*,su.name as supplier,w.name as warehouseName,u.nickname as checkedBy,bo.order_number as orderNumber
+
     from repertory_in inorder
     LEFT JOIN supplier su ON su.id=inorder.supplier_id
     LEFT JOIN warehouse w ON w.id=inorder.warehouse_id
+    LEFT JOIN users u ON u.id=inorder.check_user_id
+    LEFT JOIN buy_order bo ON bo.id=inorder.buy_order_id
     where 1=1
     <if test="companyId != null" >
       and inorder.company_id = #{companyId, jdbcType=BIGINT}

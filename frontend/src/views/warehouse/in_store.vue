@@ -12,7 +12,7 @@
             <div slot="extra" style="width:1000px">
                 <Row type="flex" justify="end">
                     <Col span="2" >
-                        <Button  icon="plus-round" @click="" >新增</Button>
+                        <Button  icon="plus-round" @click="addReperstoryInOrder" >新增</Button>
                     </Col>
                     <Col span="2" >
                     <Button icon="checkmark-round" @click="showCheckModal">审核</Button>
@@ -186,6 +186,11 @@
                     return 'table-row-' + row.status.toLowerCase();
                 }
                 return '';
+            },
+            addReperstoryInOrder () {
+                this.$router.push({
+                    name: 'in_order_add'
+                });
             },
             queryOrderList () {
                 var self = this;

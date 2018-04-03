@@ -10,7 +10,7 @@ public class RepertoryIn {
 
     private Integer warehouseId;
 
-    private Integer inUserId;
+    private Long inUserId;
 
     private Date inDate;
 
@@ -20,7 +20,7 @@ public class RepertoryIn {
 
     private Long supplierId;
 
-    private Integer checkUserId;
+    private Long checkUserId;
 
     private Date checkDate;
 
@@ -32,12 +32,30 @@ public class RepertoryIn {
 
     private String inNote;
 
+    private String createdBy;
+
+    private String updatedBy;
+
+    private Date createdTime;
+
+    private Date updatedTime;
 
 
 //展示数据
 
     private String warehouseName;
     private String supplier;
+    private String checkedBy;
+
+    private String orderNumber;
+
+    public String getOrderNumber() {
+        return orderNumber;
+    }
+
+    public void setOrderNumber(String orderNumber) {
+        this.orderNumber = orderNumber;
+    }
 
     public Long getId() {
         return id;
@@ -61,14 +79,6 @@ public class RepertoryIn {
 
     public void setWarehouseId(Integer warehouseId) {
         this.warehouseId = warehouseId;
-    }
-
-    public Integer getInUserId() {
-        return inUserId;
-    }
-
-    public void setInUserId(Integer inUserId) {
-        this.inUserId = inUserId;
     }
 
     public Date getInDate() {
@@ -95,11 +105,19 @@ public class RepertoryIn {
         this.buyOrderId = buyOrderId;
     }
 
-    public Integer getCheckUserId() {
+    public Long getInUserId() {
+        return inUserId;
+    }
+
+    public void setInUserId(Long inUserId) {
+        this.inUserId = inUserId;
+    }
+
+    public Long getCheckUserId() {
         return checkUserId;
     }
 
-    public void setCheckUserId(Integer checkUserId) {
+    public void setCheckUserId(Long checkUserId) {
         this.checkUserId = checkUserId;
     }
 
@@ -159,4 +177,51 @@ public class RepertoryIn {
         this.supplier = supplier;
     }
 
+    public Long getSupplierId() {
+        return supplierId;
+    }
+
+    public void setSupplierId(Long supplierId) {
+        this.supplierId = supplierId;
+    }
+
+    public String getCreatedBy() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(String createdBy) {
+        this.createdBy = createdBy;
+    }
+
+    public String getUpdatedBy() {
+        return updatedBy;
+    }
+
+    public void setUpdatedBy(String updatedBy) {
+        this.updatedBy = updatedBy;
+    }
+
+    public Date getCreatedTime() {
+        return createdTime;
+    }
+
+    public void setCreatedTime(Date createdTime) {
+        this.createdTime = createdTime;
+    }
+
+    public Date getUpdatedTime() {
+        return updatedTime;
+    }
+
+    public void setUpdatedTime(Date updatedTime) {
+        this.updatedTime = updatedTime;
+    }
+
+    public String getCheckedBy() {
+        return checkedBy;
+    }
+
+    public void setCheckedBy(String checkedBy) {
+        this.checkedBy = checkedBy;
+    }
 }
