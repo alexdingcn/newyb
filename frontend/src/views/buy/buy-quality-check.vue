@@ -860,6 +860,13 @@ export default {
             util.ajax.put('/receive/order/fileNo', reqData)
                 .then((response) => {
                     this.currentChooseOrder.fileNo = data.fileNo;
+                    for(let i=0; i<this.orderList.length; i++) {
+                        let row = this.orderList[i];
+                        if(this.currentChooseOrder.id === row.id) {
+                            row.fileNo = data.fileNo;
+                            break;
+                        }
+                    }
                 })
                 .catch((error) => {
                     util.errorProcessor(this, error);

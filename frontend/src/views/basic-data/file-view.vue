@@ -46,7 +46,7 @@ export default {
         },
         change:{
             type: Number,
-            default: 0
+            default: -1
         }
     },
     data () {
@@ -59,6 +59,9 @@ export default {
             fileDetail: {},
             fileList: []
         };
+    },
+    mounted() {
+        this.initDate();
     },
     watch: {
         fileId () {
