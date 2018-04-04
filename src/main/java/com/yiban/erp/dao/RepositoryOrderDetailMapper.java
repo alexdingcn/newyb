@@ -27,6 +27,8 @@ public interface RepositoryOrderDetailMapper {
 
     List<RepositoryOrderDetail> getByOrderIdList(@Param("orderIdList") List<Long> orderIdList);
 
+    List<RepositoryOrderDetail> getByOrderId(Long orderId);
+
     int setCheckByOrder(ReceiveSetReq setReq); //一次验收一笔订单
 
     int setCheckByDetail(ReceiveSetReq setReq); //一次验收一笔订单详情

@@ -79,6 +79,8 @@ public class RepositoryOrder {
 
     private Date updateTime;
 
+    private String fileNo;
+
     private String supplierName;
     private String supplierContactName;
     private String warehouseName;
@@ -467,5 +469,13 @@ public class RepositoryOrder {
             return true;
         }
         return false;
+    }
+
+    public String getFileNo() {
+        return fileNo;
+    }
+
+    public void setFileNo(String fileNo) {
+        this.fileNo = fileNo;
     }
 }

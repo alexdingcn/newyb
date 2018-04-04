@@ -6,7 +6,8 @@
               <ButtonGroup>
                 <Button size="small" type="primary" icon="ios-search" :loading="orderLoading" @click="refreshOrder">查询</Button>
                 <Button size="small" type="success" icon="ios-checkmark" @click="checkOneOrderBtn">验收一单</Button>
-                <Button type="warning" size="small" icon="close" @click="unCheckOneOrderBtn">取消验收一单</Button>
+                <Button size="small" type="warning"  icon="close" @click="unCheckOneOrderBtn">取消验收一单</Button>
+                <Button size="small" type="info"  icon="images" @click="showCheckFile">检验档案</Button>
               </ButtonGroup>
           </div>
           
@@ -38,15 +39,15 @@
           </div>
 
           <div class="detail-div">
-              <ButtonGroup>
-                  <Button type="info" size="small" icon="android-bulb" @click="samplingSurveyBtnClick">抽样检查</Button>
-                  <Button type="success" size="small" icon="checkmark" @click="checkOneDetailBtn">验收一条</Button>
-                  <Button type="warning" size="small" icon="close" @click="unCheckOneDetailBtn">取消验收一条</Button>
-                  <Button size="small" type="ghost">增加商品</Button>
-                  <Button size="small">增加批次</Button>
-                  <Button size="small" type="error">删除</Button>
-                  <Button size="small" type="success">保存</Button>
-              </ButtonGroup>
+                <Row type="flex" justify="end">
+                    <ButtonGroup>
+                        <Button type="info" size="small" icon="android-bulb" @click="samplingSurveyBtnClick">抽样检查</Button>
+                        <Button type="success" size="small" icon="checkmark" @click="checkOneDetailBtn">验收一条</Button>
+                        <Button type="warning" size="small" icon="close" @click="unCheckOneDetailBtn">取消验收一条</Button>
+                        <Button type="success" size="small" icon="android-checkbox-outline" @click="saveOroderDetail">保存详情</Button>
+                        <Button type="error" size="small" icon="close" @click="removeDetail">删除一条</Button>
+                    </ButtonGroup>
+                </Row>
               <Table border highlight-row height="300" :loading="detailLoading" 
                    :columns="detailColumns" :data="detailList" size="small" 
                    ref="detailTable" style="width: 100%;" 
@@ -144,6 +145,11 @@
               </Row>
           </Form>
       </Modal>
+
+      <Modal v-model="checkFileModal" title="检验报告档案" :mask-closable="false" width="50">
+          <file-detail :fileNo="checkFileNo" @add-file-success="addFileSuccess" ></file-detail>
+          <div slot="footer"></div>
+      </Modal>
   </div>
 </template>
 
@@ -154,6 +160,8 @@ import supplierSelect from "@/views/selector/supplier-select.vue";
 import warehouseSelect from "@/views/selector/warehouse-select.vue";
 import receiveSurvey from "./receive-survey.vue";
 import temperControlSelect from "@/views/selector/temper-control-select.vue";
+import goodSelect from "@/views/selector/good-select.vue";
+import fileDetail from "@/views/basic-data/file-detail.vue";
 
 export default {
     name: 'buy-quality-check',
@@ -161,7 +169,9 @@ export default {
         supplierSelect,
         warehouseSelect,
         receiveSurvey,
-        temperControlSelect
+        temperControlSelect,
+        goodSelect,
+        fileDetail
     },
     data() {
         return {
@@ -327,11 +337,6 @@ export default {
                     width: 100
                 },
                 {
-                    title: "检验报告",
-                    key: 'checkRecord',
-                    width: 140
-                },
-                {
                     title: "特殊药品",
                     key: 'specialManaged',
                     width: 120,
@@ -352,15 +357,49 @@ export default {
                 {
                     title: "批号",
                     key: 'batchCode',
-                    width: 140
+                    width: 140,
+                    render: (h, params) => {
+                        if (params.row.checkStatus) {
+                            return h('span', params.row.batchCode);
+                        }else {
+                            let self = this;
+                            return h('Input', {
+                                props: {
+                                    value : self.detailList[params.index][params.column.key]
+                                },
+                                on: {
+                                    'on-blur' (event) {
+                                        let row = self.detailList[params.index];
+                                        row[params.column.key] = event.target.value;
+                                    }
+                                }
+                            });
+                        }
+                    }
                 },
                 {
                     title: "生产日期",
                     key: 'productDate',
                     width: 140,
                     render: (h, params) => {
-                        let productDate = params.row.productDate;
-                        return productDate ? moment(productDate).format("YYYY-MM-DD") : '';
+                        if (params.row.checkStatus) {
+                            return params.row.productDate ? moment(params.row.productDate).format('YYYY-MM-DD') : '';
+                        }else {
+                            let self = this;
+                            return h('DatePicker', {
+                                props: {
+                                    type: 'date',
+                                    placement: 'top',
+                                    value: params.row.productDate
+                                },
+                                on: {
+                                    'on-change': (date) =>{
+                                        let row = self.detailList[params.index];
+                                        row[params.column.key] = date; 
+                                    }
+                                }
+                            });
+                        }
                     }
                 },
                 {
@@ -368,28 +407,60 @@ export default {
                     key: 'expDate',
                     width: 140,
                     render: (h, params) => {
-                        let expDate = params.row.expDate;
-                        return expDate ? moment(expDate).format("YYYY-MM-DD") : '';
+                        if (params.row.checkStatus) {
+                            return params.row.expDate ? moment(params.row.expDate).format('YYYY-MM-DD') : '';
+                        }else {
+                            let self = this;
+                            return h('DatePicker', {
+                                props: {
+                                    type: 'date',
+                                    placement: 'top',
+                                    value: params.row.expDate
+                                },
+                                on: {
+                                    'on-change': (date) =>{
+                                        let row = self.detailList[params.index];
+                                        row[params.column.key] = date; 
+                                    }
+                                }
+                            });
+                        }
                     }
+                },
+                {
+                    title: '单价',
+                    width: 120,
+                    key: 'price'
+                },
+                {
+                    title: '金额',
+                    width: 120,
+                    key: 'amount'
                 },
                 {
                     title: "到货数量",
                     width: 140,
                     key: 'receiveQuality',
                     render: (h, params) => {
-                        let self = this;
-                        return h('Input', {
-                            props: {
-                                value : self.detailList[params.index][params.column.key]
-                            },
-                            on: {
-                                'on-blur' (event) {
-                                    let row = self.detailList[params.index];
-                                    row[params.column.key] = event.target.value;
-                                    row['inCount'] = row[params.column.key];
+                        if (params.row.checkStatus) {
+                            return h('span', params.row.receiveQuality);
+                        }else {
+                            let self = this;
+                            return h('Input', {
+                                props: {
+                                    value : self.detailList[params.index][params.column.key]
+                                },
+                                on: {
+                                    'on-blur' (event) {
+                                        let row = self.detailList[params.index];
+                                        row[params.column.key] = event.target.value;
+                                        row['inCount'] = row[params.column.key];
+                                        let price = params.row.price ? params.row.price : 0;
+                                        row['amount'] = event.target.value * price;
+                                    }
                                 }
-                            }
-                        });
+                            });
+                        }
                     }
                 },
                 {
@@ -431,7 +502,25 @@ export default {
                 {
                     title: "库区",
                     key: 'warehouseLocation',
-                    width: 140
+                    width: 140,
+                    render: (h, params) => {
+                        if (params.row.checkStatus) {
+                            return h('span', params.row.warehouseLocation);
+                        }else {
+                            let self = this;
+                            return h('Input', {
+                                props: {
+                                    value : self.detailList[params.index][params.column.key]
+                                },
+                                on: {
+                                    'on-blur' (event) {
+                                        let row = self.detailList[params.index];
+                                        row[params.column.key] = event.target.value;
+                                    }
+                                }
+                            });
+                        }
+                    }
                 },
                 {
                     title: "验收状态",
@@ -480,7 +569,9 @@ export default {
             surveyModal: false,
             checkDetail: false,
             checkFormItem: {},
-            checkModal: false
+            checkModal: false,
+            checkFileNo: '',
+            checkFileModal: false
         }
     },
     watch: {
@@ -556,6 +647,7 @@ export default {
             this.currentChooseOrder = rowData;
             this.detailList = rowData.details;
             this.currChooseDetail = {};
+            this.checkFileNo = '';
         },
 
         handleSelectDetail(rowData) {
@@ -691,6 +783,91 @@ export default {
                 .catch((error) => {
                     util.errorProcessor(this, error);
                 })
+        },
+
+        removeDetail() {
+            if (!this.currChooseDetail || !this.currChooseDetail.id) {
+                this.$Message.warning('请先选择需要删除的商品记录');
+                return;
+            }
+            if (this.currChooseDetail.checkStatus) {
+                this.$Message.warning('已经验证通过的数据不能删除.');
+                return;
+            }
+            let detailItem = this.currChooseDetail;
+            this.$Modal.confirm({
+                title: '删除确认',
+                content: '是否确认删除商品:' + detailItem.goodsName  + '，删除后不可恢复!',
+                onOk: () => {
+                    util.ajax.delete('/receive/detail/remove/' + detailItem.id)
+                        .then((response) => {
+                            this.$Message.success('删除成功');
+                            this.reloadOrderDetail();
+                        })
+                        .catch((error) => {util.errorProcessor(this, error);})
+                },
+                onCancel: () => {}
+            });
+        },
+
+        saveOroderDetail() {
+            if(!this.detailList || this.detailList.length <= 0) {
+                this.$Message.warning('订单没有商品数据需要保存');
+                return;
+            }
+            if(!this.currentChooseOrder || !this.currentChooseOrder.id) {
+                this.$Message.warning('获取选定的订单失败，请重新选择订单');
+                return;
+            }
+            let reqData = {
+                orderId: this.currentChooseOrder.id,
+                detailList: this.detailList
+            };
+            this.detailLoading = true;
+            util.ajax.post('/receive/set/save/detail', reqData)
+                .then((response) => {
+                    this.detailLoading = false;
+                    this.$Message.success('保存成功');
+                    this.reloadOrderDetail();
+                })
+                .catch((error) => {
+                    this.detailLoading = false; 
+                    util.errorProcessor(this, error);
+                })
+        },
+
+        showCheckFile() {
+            if(!this.currentChooseOrder || !this.currentChooseOrder.id) {
+                this.$Message.warning('请先选择对应订单信息');
+                return;
+            }
+            let fileNo = this.currentChooseOrder.fileNo;
+            this.checkFileNo = fileNo;
+            this.checkFileModal = true;
+        },
+        addFileSuccess(data) {
+            if (!data || !data.fileNo) {
+                this.$Notice.error({
+                    title: '系统错误',
+                    desc: '添加档案成功后获取档案信息失败, 请联系技术人员查询原因.'
+                });
+                return;
+            }
+            let reqData = {
+                orderId: this.currentChooseOrder.id,
+                fileNo: data.fileNo
+            };
+            util.ajax.put('/receive/order/fileNo', reqData)
+                .then((response) => {
+                    this.currentChooseOrder.fileNo = data.fileNo;
+                })
+                .catch((error) => {
+                    util.errorProcessor(this, error);
+                    this.$Notice.error({
+                        title: '系统错误',
+                        desc: '添加档案成功后绑定档案信息失败, 请联系技术人员查询原因.'
+                    });
+                })
         }
     }
 }
@@ -708,5 +885,9 @@ export default {
 }
 .detail-count-content-b {
     margin-left: 40px;
+}
+.add-goods-class {
+    margin-left: 10px;
+    width: 300px;
 }
 </style>

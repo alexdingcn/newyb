@@ -47,50 +47,7 @@
                 </Card>
             </Col>
             <Col span="14">
-                <Card>
-                    <p slot="title">
-                        <Icon type="document"></Icon> {{fileInforCardTitleName}}
-                    </p>
-                    <div slot="extra">
-                        <Button type="primary" :disabled="fileInfoFormEditDisable" :loading="fileInfoSubmitLoading" @click="submitFileInfoBtnClick">提交</Button>
-                    </div>
-
-                    <Row type="flex" justify="center">
-                        <Form ref="fileInfoForm" :model="fileInfoFormItem" :rules="fileInfoFormValidate" label-position="right" :label-width="100" style="width:70%;">
-                            <FormItem label="档案类型" prop="fileType">
-                                <Select v-model="fileInfoFormItem.fileType" :disabled="fileInfoFormEditDisable">
-                                    <Option v-for="item in fileTypeList" :value="item.typeName" :key="item.id">{{ item.typeName }}</Option>
-                                </Select>
-                            </FormItem>
-                            <FormItem label="档案编号">
-                                <Input type="text" v-model="fileInfoFormItem.fileNo" placeholder="由系统自动生成" readonly></Input>
-                            </FormItem>
-                            <FormItem label="档案名称" prop="fileName">
-                                <Input type="text" v-model="fileInfoFormItem.fileName" :readonly="fileInfoFormEditDisable"></Input>
-                            </FormItem>
-                            <FormItem label="备注">
-                                <Input type="text" v-model="fileInfoFormItem.comment" :readonly="fileInfoFormEditDisable"></Input>
-                            </FormItem>
-                            <FormItem label="操作员">
-                                <Input type="text" v-model="fileInfoFormItem.updateBy" readonly></Input>
-                            </FormItem>
-                            <FormItem label="操作时间">
-                                <DatePicker type="datetime" v-model="fileInfoFormItem.updateTime" format="yyyy-MM-dd HH:mm" readonly></DatePicker>
-                            </FormItem>
-                        </Form>
-                    </Row>
-                    <Row >
-                        <Button type="primary" :disabled="!fileInfoFormEditDisable" size="small" 
-                            @click="addFileUploadBtnClick">
-                            <Icon type="upload"></Icon>
-                            上传档案文件
-                        </Button>
-                    </Row>
-                    <Table ref="uploadTable" border highlight-row 
-                        :columns="uploadTabColumns" :data="uploadTabData" size="small">
-                    </Table>
-                </Card>
-                <file-view :fileInfo="fileInfoFormItem"></file-view>
+                <file-detail :fileNo="editFileNo" @add-file-success="loadFileInfoList"></file-detail>
             </Col>
           </Row>
       </Row>
@@ -117,46 +74,6 @@
             </Row>
           </div>
       </Modal>
-
-      <Modal v-model="fileUploadModalVisible" title="上传档案文件" :closable="false">
-          <Row type="flex" justify="center">
-              <Form ref="fileUploadForm" :model="fileUploadFormData" label-position="right" :label-width="100">
-                  <FormItem label="描述信息">
-                    <Input type="text" v-model="fileUploadFormData.comment" placeholder="请输入描述信息"></Input>
-                  </FormItem>
-              </Form>
-          </Row>
-          <Row type="flex" justify="center">
-            <Upload ref="uploadModal" multiple :before-upload="handleBeforeUpload" :show-upload-list="false"
-                    :max-size="uploadMaxSize" 
-                    :format="uploadFormat" 
-                    :action="uploadAction">
-                <Button type="ghost" icon="ios-cloud-upload-outline">选择需要上传的文件</Button>
-            </Upload>
-          </Row>
-          <Row type="flex" justify="center">
-              <p>已选择的文件</p>
-          </Row>
-          <Row type="flex" justify="center" v-for="(item, index) in chooseUploadFiles" :key="index">
-            <strong class="margin-right-5 margin-top-10">{{item.name}}</strong>
-            <a class="margin-top-10" href="#" :disabled="item.disabled" @click="removeChooseUploadFile(index)"><Icon size="20" :type="item.icon" :color="item.color"></Icon></a>
-          </Row>
-          
-          <div slot="footer">
-            <Row >
-                <Col span="6" offset="6">
-                    <Button type="primary" :loading="fileUploadSubmitLoading" @click="fileUploadSubmit" long>
-                        <span v-if="!fileUploadSubmitLoading">提交</span>
-                        <span v-else>正在提交...</span>
-                    </Button>
-                </Col>
-                <Col span=6 class="padding-left-10">
-                    <Button @click="closedfileUploadModal" long>取消</Button>
-                </Col>
-            </Row>
-          </div>
-      </Modal>
-
   </div>
 </template>
 
@@ -164,11 +81,13 @@
 import util from '@/libs/util.js';
 import dataConver from '@/libs/data-conver.js';
 import fileView from './file-view.vue';
+import fileDetail from "./file-detail.vue";
 
 export default {
     name: 'basic_data_file',
     components: {
-        fileView
+        fileView,
+        fileDetail
     },
     data () {
         return {
@@ -216,88 +135,15 @@ export default {
                     sortable: true
                 }
             ],
-            fileInforCardTitleName: '',
             delFileInfoBtnDisable: true,
             delFileInfoBtnLoading: false,
-            fileInfoTabCurrClickData: {},
-            fileInfoTabSelectedData: [],
-            fileInfoFormItem: {
-                id: '',
-                fileType: '',
-                fileNo: '',
-                fileName: '',
-                comment: '',
-                updateBy: '',
-                updateTime: ''
-            },
-            fileInfoFormValidate: {
-                fileType: [
-                    { required: true, message: '档案类型必输', trigger: 'blur' }
-                ],
-                fileName: [
-                    { required: true, message: '档案名称必输', trigger: 'blur' }
-                ]
-            },
-            fileInfoFormView: 'add',
-            fileInfoSubmitLoading: false,
-            uploadTabData: [],
-            uploadTabColumns: [
-                {
-                    title: '描述',
-                    key: 'comment',
-                    align: 'center'
-                },
-                {
-                    title: '位置标识',
-                    key: 'location',
-                    align: 'center'
-                },
-                {
-                    title: '操作',
-                    key: '',
-                    width: 100,
-                    align: 'center',
-                    render: (h, params) => {
-                        return h('Button', {
-                            props: {
-                                type: 'error',
-                                size: 'small',
-                                icon: 'close-circled'
-                            },
-                            on: {
-                                click: () => {
-                                    this.removeFileUpload(params.row.id, params.row.index);
-                                }
-                            }
-                        }, '删除');
-                    }
-                }
-            ],
-            fileUploadModalVisible: false,
-            fileUploadFormData: {
-                fileId: '',
-                comment: ''
-            },
-            fileUploadSubmitLoading: false,
-            uploadMaxSize: 10240,
-            uploadFormat: ['png', 'jpg', 'jpeg', 'git', 'tiff', 'pdf', 'doc', 'docx', 'xlsx', 'xls', 'csv', 'txt', 'zip', 'rar', 'tar'],
-            chooseUploadFiles: [],
-            uploadAction: `${util.baseUrl}/file/upload/add`
+            editFileNo: '',
+            fileInfoTabSelectedData: []
         };
     },
     mounted () {
-        this.getUploadFormat();
         this.loadFileTypeList();
-        this.fileInfoFormChangeToAddView();
-    },
-    computed: {
-        fileInfoFormEditDisable () {
-            if (this.fileInfoFormView === 'add') {
-                return false;
-            } else {
-                return true;
-            }
-        }
+        this.addFileInfoBtnClick();
     },
     watch: {
         fileInfoTabSelectedData () {
@@ -309,18 +155,6 @@ export default {
         }
     },
     methods: {
-
-        getUploadFormat () {
-            util.ajax.get('/file/upload/format')
-                .then((response) => {
-                    if (response.data) {
-                        this.uploadFormat = response.data;
-                    }
-                })
-                .catch((error) => {
-                    util.errorProcessor(this, error);
-                });
-        },
 
         loadFileTypeList () {
             util.ajax.get('/file/filetype/list')
@@ -385,6 +219,7 @@ export default {
                 .then((response) => {
                     this.fileTabData = response.data.data;
                     this.fileInfoTotalCount = response.data.count;
+                    this.fileInfoTabSelectedData = [];
                 })
                 .catch((error) => {
                     util.errorProcessor(this, error);
@@ -402,7 +237,7 @@ export default {
         },
 
         addFileInfoBtnClick () {
-            this.fileInfoFormChangeToAddView();
+            this.editFileNo = '';
         },
 
         delFileInfoBtnClick () {
@@ -424,151 +259,23 @@ export default {
                 this.delFileInfoBtnLoading = false;
                 this.fileInfoTabLoading = false;
                 this.delFileInfoBtnDisable = true;
-                this.fileInfoFormChangeToAddView();
+                this.editFileNo = '';
             } else {
                 this.$Message.info('请先选择需要删除的档案信息');
             }
         },
 
         fileInfoTabRowClick (data) {
-            this.fileInfoTabCurrClickData = data;
-            if (data && data.id && data.id > 0) {
-                this.fileInfoFormChangeToEditView(data.id);
+            if (data && data.id && data.id > 0 && data.fileNo) {
+                this.editFileNo = data.fileNo;
+            }else {
+                this.editFileNo = '';
             }
         },
 
         fileInfoTabSelecttionChange (data) {
             this.fileInfoTabSelectedData = data;
-        },
-
-        fileInfoFormChangeToEditView (fileId) {
-            if (!fileId) {
-                this.$Message.warning('获取档案标识失败');
-                return;
-            }
-            let reqData = {fileId: fileId};
-            util.ajax.get('/file/fileid', {params: reqData})
-                .then((response) => {
-                    let result = response.data;
-                    this.fileInforCardTitleName = result.fileName;
-                    this.fileInfoFormItem = result;
-                    this.uploadTabData = result.fileUploads;
-                    this.fileInfoFormView = 'edit';
-                })
-                .catch((error) => {
-                    util.errorProcessor(this, error);
-                });
-        },
-
-        fileInfoFormChangeToAddView () {
-            this.fileInforCardTitleName = '新增档案信息';
-            this.fileInfoFormItem = {},
-            this.uploadTabData = [],
-            this.fileInfoFormView = 'add';
-        },
-
-        submitFileInfoBtnClick () {
-            this.fileInfoSubmitLoading = true;
-            this.$refs.fileInfoForm.validate(valid => {
-                if (!valid) {
-                    this.$Message.info('请检查必输项');
-                    this.fileInfoSubmitLoading = false;
-                } else {
-                    let reqData = this.fileInfoFormItem;
-                    util.ajax.post('/file/add', reqData)
-                        .then((response) => {
-                            this.$Message.success('新建档案信息成功');
-                            this.loadFileInfoList();
-                            this.fileInfoFormChangeToEditView(response.data.id);
-                        })
-                        .catch((error) => {
-                            util.errorProcessor(this, error);
-                        });
-                    this.fileInfoSubmitLoading = false;
-                }
-            });
-        },
-
-        addFileUploadBtnClick () {
-            this.fileUploadModalVisible = true;
-            this.fileUploadFormData = {
-                fileId: this.fileInfoFormItem.id,
-                comment: ''
-            };
-        },
-
-        handleBeforeUpload (file) {
-            let item = {
-                name: file.name,
-                icon: 'close-circled',
-                color: 'red',
-                disabled: false,
-                file: file,
-                isUpload: false
-            };
-            this.chooseUploadFiles.push(item);
-            return false;
-        },
-
-        removeChooseUploadFile (data) {
-            this.chooseUploadFiles.splice(data, 1);
-            this.$refs.uploadModal.fileList.splice(data, 1);
-        },
-
-        fileUploadSubmit () {
-            if (!this.chooseUploadFiles || this.chooseUploadFiles.length <= 0) {
-                this.$Message.info('请先选择需要上传的文件');
-                return;
-            }
-            this.fileUploadSubmitLoading = true;
-            for (let i = 0; i < this.chooseUploadFiles.length; i++) {
-                let chooseItem = this.chooseUploadFiles[i];
-                if (chooseItem.isUpload) {
-                    continue;
-                }
-                chooseItem.disabled = true;
-                chooseItem.color = '';
-                let reqData = new FormData();
-                reqData.append('fileId', this.fileUploadFormData.fileId);
-                reqData.append('comment', this.fileUploadFormData.comment);
-                reqData.append('file', chooseItem.file);
-                util.ajax.post('/file/upload/add', reqData, {headers: {'Content-Type': 'multipart/form-data'}})
-                    .then((response) => {
-                        chooseItem.icon = 'checkmark';
-                        chooseItem.color = 'green';
-                        chooseItem.isUpload = true;
-                    })
-                    .catch((error) => {
-                        chooseItem.icon = 'close';
-                        util.errorProcessor(this, error);
-                    });
-            }
-            this.fileUploadSubmitLoading = false;
-        },
-
-        closedfileUploadModal () {
-            this.fileInfoFormChangeToEditView(this.fileUploadFormData.fileId); // 刷新
-            this.chooseUploadFiles = [];
-            this.$refs.uploadModal.clearFiles();
-            this.fileUploadModalVisible = false;
-            this.fileUploadFormData = {};
-        },
-
-        removeFileUpload (data, index) {
-            if (!data) {
-                this.$Message.warning('获取需要删除的附件标识失败');
-                return;
-            }
-            util.ajax.delete('/file/upload/remove/' + data)
-                .then((response) => {
-                    this.$Message.success('删除成功');
-                    this.fileInfoFormChangeToEditView(this.fileInfoFormItem.id); // 刷新
-                })
-                .catch((error) => {
-                    util.errorProcessor(this, error);
-                });
         }
-
     }
 
 };

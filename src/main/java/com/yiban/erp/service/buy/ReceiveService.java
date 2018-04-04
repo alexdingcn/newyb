@@ -1,5 +1,6 @@
 package com.yiban.erp.service.buy;
 
+import com.alibaba.fastjson.JSON;
 import com.yiban.erp.constant.BuyOrderStatus;
 import com.yiban.erp.constant.OptionsType;
 import com.yiban.erp.constant.OrderNumberType;
@@ -21,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import sun.nio.cs.US_ASCII;
 
+import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -43,6 +45,8 @@ public class ReceiveService {
     private BuyOrderDetailMapper buyOrderDetailMapper;
     @Autowired
     private GoodsMapper goodsMapper;
+    @Autowired
+    private FileInfoMapper fileInfoMapper;
 
     /**
      * 获取某商品当前库存和申购订单信息
@@ -218,7 +222,7 @@ public class ReceiveService {
     }
 
     public List<RepositoryOrderDetail> getDetailList(Long orderId) {
-        return repositoryOrderDetailMapper.getByOrderIdList(Arrays.asList(orderId));
+        return repositoryOrderDetailMapper.getByOrderId(orderId);
     }
 
     public void removeById(User user, Long id) throws BizException{
@@ -275,7 +279,7 @@ public class ReceiveService {
             List<Options> options = optionsMapper.findByTypes(user.getCompanyId(), queryOptions);
             order.setOptions(options);
             //获取所有订单对应的详情信息
-            List<RepositoryOrderDetail> details = repositoryOrderDetailMapper.getByOrderIdList(Arrays.asList(order.getId()));
+            List<RepositoryOrderDetail> details = repositoryOrderDetailMapper.getByOrderId(order.getId());
             if (details ==null || details.isEmpty()) {
                 return order;
             }
@@ -415,7 +419,7 @@ public class ReceiveService {
         }
 
         //验证订单的是否意见全部验证通过，如果是，需要把订单修改为已经验收完毕的状态
-        List<RepositoryOrderDetail> details = repositoryOrderDetailMapper.getByOrderIdList(Arrays.asList(detail.getRepositoryOrderId()));
+        List<RepositoryOrderDetail> details = repositoryOrderDetailMapper.getByOrderId(detail.getRepositoryOrderId());
         boolean checked = true;
         for (RepositoryOrderDetail item : details) {
             if (item.getCheckStatus() != null && !item.getCheckStatus()) {
@@ -462,5 +466,90 @@ public class ReceiveService {
             throw new BizRuntimeException(ErrorCode.FAILED_UPDATE_FROM_DB);
         }
         repositoryOrderMapper.setCheckStatus(detail.getRepositoryOrderId(), RepositoryOrderStatus.INIT.name(), user.getNickname(), new Date());
+    }
+
+    public void removeDetail(User user, Long detailId) throws BizException {
+        RepositoryOrderDetail detail = repositoryOrderDetailMapper.selectByPrimaryKey(detailId);
+        if (detail == null) {
+            logger.warn("get order detail fail by id:{}", detailId);
+            throw new BizException(ErrorCode.RECEIVE_ORDER_GET_FAIL);
+        }
+        if (detail.getCheckStatus() != null && detail.getCheckStatus()) {
+            logger.warn("order detail is checked cannot remove.");
+            throw new BizException(ErrorCode.RECEIVE_DETAIL_REMOVE_STATUS);
+        }
+        logger.info("user:{} remove receive detail info:{}", user.getId(), JSON.toJSONString(detail));
+        repositoryOrderDetailMapper.deleteByPrimaryKey(detailId);
+    }
+
+    public int setSaveDetail(User user, ReceiveSetReq setReq) throws BizException {
+        RepositoryOrder order = repositoryOrderMapper.selectByPrimaryKey(setReq.getOrderId());
+        if (order == null) {
+            logger.warn("get order by id fail. id:{}", setReq.getOrderId());
+            throw new BizException(ErrorCode.RECEIVE_ORDER_GET_FAIL);
+        }
+        List<RepositoryOrderDetail> updateList = setReq.getDetailList();
+        if (updateList == null || updateList.isEmpty()) {
+            logger.warn("detail update list is null.");
+            return 0;
+        }
+        Map<Long, RepositoryOrderDetail> updateMap = new HashMap<>();
+        updateList.stream().forEach(item -> updateMap.put(item.getId(), item));
+        for (RepositoryOrderDetail detail : updateList) {
+            if (!order.getId().equals(detail.getRepositoryOrderId())) {
+                logger.warn("order id is not equals detail repository id. detailId:{} orderId:{}", detail.getId(), order.getId());
+                throw new BizException(ErrorCode.RECEIVE_DETAIL_SAVE_PARAMS_ERROR);
+            }
+        }
+        List<RepositoryOrderDetail> details = repositoryOrderDetailMapper.getByOrderId(order.getId());
+        //只修改没有验证通过，如果验证都过了，不能修改
+        List<RepositoryOrderDetail> canUpdateList = new ArrayList<>();
+        details.stream().forEach(item -> {
+            if (item.getCheckStatus() == null || !item.getCheckStatus()) {
+                canUpdateList.add(item);
+            }
+        });
+        if (canUpdateList.isEmpty()) {
+            logger.info("order detail is all checked, can not update.");
+            return 0;
+        }
+        int count = 0;
+        for (RepositoryOrderDetail detail : canUpdateList) {
+            RepositoryOrderDetail mergeItem = updateMap.get(detail.getId());
+            if (mergeItem == null) {
+                continue;
+            }
+            detail.setBatchCode(mergeItem.getBatchCode());
+            detail.setProductDate(mergeItem.getProductDate());
+            detail.setExpDate(mergeItem.getExpDate());
+            detail.setReceiveQuality(mergeItem.getReceiveQuality());
+            detail.setInCount(mergeItem.getInCount());
+            detail.setRightCount(mergeItem.getRightCount());
+            detail.setErrorCount(mergeItem.getErrorCount());
+            BigDecimal price = detail.getPrice();
+            Integer receiveQuality = detail.getReceiveQuality() != null ? detail.getReceiveQuality() : 0;
+            detail.setAmount(price.multiply(BigDecimal.valueOf(receiveQuality)));
+            detail.setWarehouseLocation(mergeItem.getWarehouseLocation());
+            int result = repositoryOrderDetailMapper.updateByPrimaryKeySelective(detail);
+            count += result;
+        }
+        return count;
+    }
+
+    public void setOrderFileNo(User user, Long orderId, String fileNo) throws BizException{
+        RepositoryOrder order = repositoryOrderMapper.selectByPrimaryKey(orderId);
+        if (order == null) {
+            logger.warn("get order fail by order id:{}", orderId);
+            throw new BizException(ErrorCode.RECEIVE_ORDER_GET_FAIL);
+        }
+        FileInfo fileInfo = fileInfoMapper.getByFileNo(user.getCompanyId(), fileNo);
+        if (fileInfo == null) {
+            logger.warn("get file info fail by fileNo:{}, companyId:{}", fileNo, user.getCompanyId());
+            throw new BizException(ErrorCode.FILE_GET_INFO_FAIL);
+        }
+        order.setFileNo(fileInfo.getFileNo());
+        order.setUpdateBy(user.getNickname());
+        order.setUpdateTime(new Date());
+        repositoryOrderMapper.updateByPrimaryKeySelective(order);
     }
 }

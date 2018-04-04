@@ -1,6 +1,7 @@
 package com.yiban.erp.controller.buy;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.yiban.erp.dto.CurrentBalanceResp;
 import com.yiban.erp.dto.ReceiveListReq;
 import com.yiban.erp.dto.ReceiveSetReq;
@@ -108,6 +109,14 @@ public class BuyReceiveController {
         return ResponseEntity.ok().body(JSON.toJSONString(details));
     }
 
+    @RequestMapping(value = "/detail/remove/{detailId}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> detailRemove(@PathVariable Long detailId,
+                                               @AuthenticationPrincipal User user) throws Exception {
+        logger.info("user:{} remove order detail by id:{}", user.getId(), detailId);
+        receiveService.removeDetail(user, detailId);
+        return ResponseEntity.ok().build();
+    }
+
     @RequestMapping(value = "/set/check", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> setCheck(@RequestBody ReceiveSetReq setReq,
                                            @AuthenticationPrincipal User user) throws Exception {
@@ -129,6 +138,24 @@ public class BuyReceiveController {
                                                     @AuthenticationPrincipal User user) throws Exception {
         logger.info("user:{} set uncheck order detail:{}", user.getId(), detailId);
         receiveService.setUncheckDetail(user, detailId);
+        return ResponseEntity.ok().build();
+    }
+
+    @RequestMapping(value = "/set/save/detail", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> setSaveDetail(@RequestBody ReceiveSetReq setReq,
+                                                @AuthenticationPrincipal User user) throws Exception {
+        logger.warn("user:{} update order detail info.", user.getId());
+        int count = receiveService.setSaveDetail(user, setReq);
+        JSONObject response = new JSONObject();
+        response.put("count", count);
+        return ResponseEntity.ok().body(response.toJSONString());
+    }
+
+    @RequestMapping(value = "/order/fileNo", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> setOrderFileNo(@RequestBody ReceiveSetReq setReq,
+                                                 @AuthenticationPrincipal User user) throws Exception {
+        logger.info("user:{} set order:{} fileNo:{}", user.getId(), setReq.getOrderId(), setReq.getFileNo());
+        receiveService.setOrderFileNo(user, setReq.getOrderId(), setReq.getFileNo());
         return ResponseEntity.ok().build();
     }
 

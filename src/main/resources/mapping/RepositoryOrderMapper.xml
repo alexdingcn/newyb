@@ -37,6 +37,7 @@
     <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
     <result column="update_by" property="updateBy" jdbcType="VARCHAR" />
     <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+    <result column="file_no" property="fileNo" jdbcType="VARCHAR" />
   </resultMap>
   <sql id="Base_Column_List" >
     id, company_id, buy_order_id, order_number, ref_no, supplier_id, supplier_contact_id, buyer_id, status,
@@ -44,7 +45,7 @@
     check_temp, temp_control_status, ship_company_id, ship_method, ship_tool, ship_car_no, 
     ship_driver_name, ship_start_date, ship_end_date, ship_entrust_no, ship_start_address, 
     warehouse_id, buy_type, term, come_from, bill_type, create_by, create_time, update_by, 
-    update_time
+    update_time, file_no
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
     select 
@@ -67,7 +68,7 @@
       ship_end_date, ship_entrust_no, ship_start_address, 
       warehouse_id, buy_type, term, 
       come_from, bill_type, create_by, 
-      create_time, update_by, update_time
+      create_time, update_by, update_time, file_no
       )
     values (#{id,jdbcType=BIGINT}, #{companyId,jdbcType=INTEGER}, #{buyOrderId,jdbcType=BIGINT},
       #{orderNumber,jdbcType=VARCHAR}, #{refNo,jdbcType=VARCHAR},
@@ -80,7 +81,8 @@
       #{shipEndDate,jdbcType=TIMESTAMP}, #{shipEntrustNo,jdbcType=VARCHAR}, #{shipStartAddress,jdbcType=VARCHAR}, 
       #{warehouseId,jdbcType=INTEGER}, #{buyType,jdbcType=BIGINT}, #{term,jdbcType=INTEGER},
       #{comeFrom,jdbcType=VARCHAR}, #{billType,jdbcType=BIGINT}, #{createBy,jdbcType=VARCHAR},
-      #{createTime,jdbcType=TIMESTAMP}, #{updateBy,jdbcType=VARCHAR}, #{updateTime,jdbcType=TIMESTAMP}
+      #{createTime,jdbcType=TIMESTAMP}, #{updateBy,jdbcType=VARCHAR}, #{updateTime,jdbcType=TIMESTAMP},
+      #{fileNo,jdbcType=VARCHAR}
       )
   </insert>
   <insert id="insertSelective" parameterType="com.yiban.erp.entities.RepositoryOrder" keyProperty="id" useGeneratedKeys="true" >
@@ -191,6 +193,9 @@
       <if test="updateTime != null" >
         update_time,
       </if>
+      <if test="fileNo != null">
+        file_no,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides="," >
       <if test="id != null" >
@@ -298,6 +303,9 @@
       <if test="updateTime != null" >
         #{updateTime,jdbcType=TIMESTAMP},
       </if>
+      <if test="fileNo != null">
+        #{fileNo,jdbcType=VARCHAR},
+      </if>
     </trim>
   </insert>
   <update id="updateByPrimaryKeySelective" parameterType="com.yiban.erp.entities.RepositoryOrder" >
@@ -399,6 +407,9 @@
       <if test="updateTime != null" >
         update_time = #{updateTime,jdbcType=TIMESTAMP},
       </if>
+      <if test="fileNo != null">
+        file_no = #{fileNo,jdbcType=VARCHAR},
+      </if>
     </set>
     where id = #{id,jdbcType=BIGINT}
   </update>
@@ -436,7 +447,8 @@
       create_by = #{createBy,jdbcType=VARCHAR},
       create_time = #{createTime,jdbcType=TIMESTAMP},
       update_by = #{updateBy,jdbcType=VARCHAR},
-      update_time = #{updateTime,jdbcType=TIMESTAMP}
+      update_time = #{updateTime,jdbcType=TIMESTAMP},
+      file_no = #{fileNo,jdbcType=VARCHAR}
     where id = #{id,jdbcType=BIGINT}
   </update>
 
@@ -450,7 +462,7 @@
       o.ship_driver_name as shipDriverName, o.ship_start_date as shipStartDate, o.ship_end_date as shipEndDate,
       o.ship_entrust_no as shipEntrustNo, o.ship_start_address as shipStartAddress,
       o.warehouse_id as warehouseId, o.buy_type as buyType, o.term as term, o.come_from as comeFrom, o.bill_type as billType,
-      o.create_by as createBy, o.create_time as createTime, o.update_by as updateBy, o.update_time as updateTime,
+      o.create_by as createBy, o.create_time as createTime, o.update_by as updateBy, o.update_time as updateTime, o.file_no as fileNo,
       s.name as supplierName, sc.name as supplierContactName, w.name as warehouseName,
       u.nickname as saleNickName, u.realname as saleRealName
   </sql>

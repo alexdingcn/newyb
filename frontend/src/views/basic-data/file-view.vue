@@ -43,6 +43,10 @@ export default {
         fileInfo: {
             type: Object,
             default: null
+        },
+        change:{
+            type: Number,
+            default: 0
         }
     },
     data () {
@@ -66,11 +70,18 @@ export default {
         fileInfo () {
             this.initDate();
         },
+        change() { 
+            //主要是当fileId 或者fileNo 或者fileInfo没有变动时，进行变动
+            this.initDate();
+        },
         fileDetail () {
             if (this.fileDetail && this.fileDetail.id) {
                 this.fileList = this.fileDetail.fileUploads;
                 this.getcurrCarouselItem(0);
                 this.currCarousel = 0;
+            }else {
+                this.fileList = [];
+                this.currCarouselItem = {};
             }
         },
         currCarousel () {
@@ -78,8 +89,6 @@ export default {
         },
         currCarouselItem () {
             let item = this.currCarouselItem;
-            console.log('currCarouselItem change');
-            console.log(item);
             if (!item || !item.id) {
                 this.uploadBtnDisabled = true;
                 this.showTitle = '';
@@ -112,14 +121,8 @@ export default {
         },
 
         initDate () {
-            console.log(this.fileId);
-            console.log(this.fileNo);
-            console.log(this.fileInfo);
             if (!this.fileId && !this.fileNo && !this.fileInfo) {
-                this.$Notice.error({
-                    title: '系统错误',
-                    desc: '获取档案信息失败'
-                });
+                this.fileDetail = {};
                 return;
             }
             if (this.fileInfo) {
@@ -142,7 +145,6 @@ export default {
         },
 
         getFileInfoByFileNo (fileNo) {
-            console.log(fileNo);
             util.ajax.get('/file/fileno', {params: {fileNo: fileNo}})
                 .then((response) => {
                     this.fileDetail = response.data;

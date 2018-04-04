@@ -83,6 +83,9 @@ public enum ErrorCode {
     RECEIVE_ORDER_CAN_NOT_REMOVE(2406, "订单处于不可删除状态"),
     RECEIVE_BUY_ORDER_STATUS(2407, "采购订单不处于审核通过状态"),
     RECEIVE_CHECK_STATUS_ERROR(2408, "当前订单不处于可验收状态"),
+    RECEIVE_DETAIL_REMOVE_STATUS(2409, "订单详情已经验证通过，不能删除"),
+    RECEIVE_DETAIL_SAVE_PARAMS_ERROR(2410, "订单详情参数与订单信息不匹配", ErrorDisplay.NOTICE),
+
 
 
     // 41xx - 贷款

@@ -1,7 +1,10 @@
 package com.yiban.erp.dto;
 
+import com.yiban.erp.entities.RepositoryOrderDetail;
+
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
 public class ReceiveSetReq {
 
@@ -32,6 +35,12 @@ public class ReceiveSetReq {
     private String checkUser;
     private Date checkTime;
     private String checkResult;
+
+    //保存详情信息
+    List<RepositoryOrderDetail> detailList;
+
+    //档案编号
+    private String fileNo;
 
     public Long getOrderId() {
         return orderId;
@@ -199,5 +208,21 @@ public class ReceiveSetReq {
 
     public void setUpdateTime(Date updateTime) {
         this.updateTime = updateTime;
+    }
+
+    public List<RepositoryOrderDetail> getDetailList() {
+        return detailList;
+    }
+
+    public void setDetailList(List<RepositoryOrderDetail> detailList) {
+        this.detailList = detailList;
+    }
+
+    public String getFileNo() {
+        return fileNo;
+    }
+
+    public void setFileNo(String fileNo) {
+        this.fileNo = fileNo;
     }
 }

@@ -413,7 +413,7 @@
         survey_target = #{surveyTarget,jdbcType=VARCHAR},
       </if>
       <if test="checkStatus != null">
-        check_tatus = #{checkStatus,jdbcType=BIT},
+        check_status = #{checkStatus,jdbcType=BIT},
       </if>
       <if test="errorPlan != null">
         error_plan = #{errorPlan,jdbcType=VARCHAR},
@@ -468,7 +468,7 @@
       survey_address = #{surveyAddress,jdbcType=VARCHAR},
       survey_result = #{surveyResult,jdbcType=VARCHAR},
       survey_target = #{surveyTarget,jdbcType=VARCHAR},
-      check_tatus = #{checkStatus,jdbcType=BIT},
+      check_status = #{checkStatus,jdbcType=BIT},
       error_plan = #{errorPlan,jdbcType=VARCHAR},
       sale_cert = #{saleCert,jdbcType=VARCHAR},
       error_reason = #{errorReason,jdbcType=VARCHAR},
@@ -569,6 +569,24 @@
     <foreach collection="orderIdList" separator="," open="(" close=")" item="item">
       #{item}
     </foreach>
+  </select>
+
+  <select id="getByOrderId" parameterType="java.lang.Long" resultMap="DetailMap">
+    select
+      *
+    from repository_order_detail r left join (
+      select
+      g.id as g_id, g.name, g.company_id, g.category_id, g.full_name, g.origin, g.jx, g.spec, g.serial, g.code,
+      g.factory_id, g.unit, g.pack_unit, g.medium_pack, g.big_pack, g.pinyin, g.storage_condition, g.storage_description,
+      g.permit_id, g.jx_id, g.is_foreign, g.is_prescription, g.special_managed,
+      c.name as categoryName, f.name as factory, u1.name as unitName, u2.name as packUnitName
+      from goods g
+      left join good_category c on g.category_id = c.id
+      left join factory f on g.factory_id = f.id
+      left join unit u1 on g.unit = u1.id
+      left join unit u2 on g.unit = u2.id
+    ) t on r.goods_id = t.g_id
+    where r.repository_order_id = #{orderId}
   </select>
 
   <update id="setCheckByOrder" parameterType="com.yiban.erp.dto.ReceiveSetReq">
