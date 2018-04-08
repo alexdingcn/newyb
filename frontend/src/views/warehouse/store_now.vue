@@ -24,7 +24,7 @@
             </Col>
 
              <Col span="3">
-             <FormItem label="柜台" >
+             <FormItem label="库区" >
                  <Select v-model="storeNow.store_state" size="small"  prop="store_state">
                      <Option v-for="option in storeOptions" :value="option.id" :label="option.name" :key="option.id">
                          {{option.name}}

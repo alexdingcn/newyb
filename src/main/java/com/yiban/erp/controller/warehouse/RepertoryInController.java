@@ -4,7 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.yiban.erp.dao.RepertoryInMapper;
 import com.yiban.erp.entities.RepertoryIn;
 import com.yiban.erp.entities.User;
-import com.yiban.erp.querybean.InOrderQuery;
+import com.yiban.erp.dto.InOrderQuery;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

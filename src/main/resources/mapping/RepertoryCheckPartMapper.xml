@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.yiban.erp.dao.RepertoryCheckPartMapper" >
+  <resultMap id="BaseResultMap" type="com.yiban.erp.entities.RepertoryCheckPart" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="check_no" property="checkNo" jdbcType="VARCHAR" />
+    <result column="r_check_id" property="rCheckId" jdbcType="BIGINT" />
+    <result column="check_user_id" property="checkUserId" jdbcType="BIGINT" />
+    <result column="part_no" property="partNo" jdbcType="VARCHAR" />
+    <result column="process_user_id" property="processUserId" jdbcType="BIGINT" />
+    <result column="process_result" property="processResult" jdbcType="VARCHAR" />
+    <result column="process_time" property="processTime" jdbcType="TIMESTAMP" />
+    <result column="created_by" property="createdBy" jdbcType="VARCHAR" />
+    <result column="created_time" property="createdTime" jdbcType="TIMESTAMP" />
+    <result column="updated_by" property="updatedBy" jdbcType="VARCHAR" />
+    <result column="updated_time" property="updatedTime" jdbcType="TIMESTAMP" />
+    <result column="part_note" property="partNote" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, check_no, r_check_id, check_user_id, part_no,process_user_id, process_result,process_time,created_by, created_time, updated_by,
+    updated_time,part_note
+  </sql>
+
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select
+    <include refid="Base_Column_List" />
+    from repertory_check_part
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+
+  <select id="selectByCheckOrderId" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select part.*,u.nickname as processUserName
+    from repertory_check_part part
+    LEFT JOIN users u on (part.process_user_id =u.id)
+    where part.r_check_id = #{checkOrderId,jdbcType=BIGINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
+    delete from repertory_check_part
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="com.yiban.erp.entities.RepertoryCheckPart" >
+    insert into repertory_check_part (id, check_no, r_check_id, 
+      check_user_id, part_no,process_user_id,process_result,process_time, created_by,
+      created_time, updated_by, updated_time, 
+      part_note)
+    values (#{id,jdbcType=BIGINT}, #{checkNo,jdbcType=VARCHAR}, #{rCheckId,jdbcType=BIGINT}, 
+      #{checkUserId,jdbcType=BIGINT}, #{partNo,jdbcType=VARCHAR}, #{processUserId,jdbcType=BIGINT},
+
+      #{processResult,jdbcType=VARCHAR}, #{processTime,jdbcType=TIMESTAMP}, #{createdBy,jdbcType=VARCHAR},
+      #{createdTime,jdbcType=TIMESTAMP}, #{updatedBy,jdbcType=VARCHAR}, #{updatedTime,jdbcType=TIMESTAMP}, 
+      #{partNote,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.yiban.erp.entities.RepertoryCheckPart"  keyProperty="id" useGeneratedKeys="true" >
+    insert into repertory_check_part
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="checkNo != null" >
+        check_no,
+      </if>
+      <if test="rCheckId != null" >
+        r_check_id,
+      </if>
+      <if test="checkUserId != null" >
+        check_user_id,
+      </if>
+      <if test="partNo != null" >
+        part_no,
+      </if>
+
+      <if test="proceeUserId != null" >
+        process_user_id,
+      </if>
+
+      <if test="proceeResult != null" >
+        process_result,
+      </if>
+      <if test="processTime != null" >
+        process_time,
+      </if>
+      <if test="createdTime != null" >
+        created_time,
+      </if>
+      <if test="updatedBy != null" >
+        updated_by,
+      </if>
+      <if test="updatedTime != null" >
+        updated_time,
+      </if>
+      <if test="partNote != null" >
+        part_note,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=BIGINT},
+      </if>
+      <if test="checkNo != null" >
+        #{checkNo,jdbcType=VARCHAR},
+      </if>
+      <if test="rCheckId != null" >
+        #{rCheckId,jdbcType=BIGINT},
+      </if>
+      <if test="checkUserId != null" >
+        #{checkUserId,jdbcType=BIGINT},
+      </if>
+      <if test="partNo != null" >
+        #{partNo,jdbcType=VARCHAR},
+      </if>
+      <if test="processUserId != null" >
+        #{processUserId,jdbcType=BIGINT},
+      </if>
+      <if test="processResult != null" >
+        #{processResult,jdbcType=VARCHAR},
+      </if>
+      <if test="processTime != null" >
+        #{processTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createdBy != null" >
+        #{createdBy,jdbcType=VARCHAR},
+      </if>
+      <if test="createdTime != null" >
+        #{createdTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updatedBy != null" >
+        #{updatedBy,jdbcType=VARCHAR},
+      </if>
+      <if test="updatedTime != null" >
+        #{updatedTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="partNote != null" >
+        #{partNote,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.yiban.erp.entities.RepertoryCheckPart" >
+    update repertory_check_part
+    <set >
+      <if test="checkNo != null" >
+        check_no = #{checkNo,jdbcType=VARCHAR},
+      </if>
+      <if test="rCheckId != null" >
+        r_check_id = #{rCheckId,jdbcType=BIGINT},
+      </if>
+      <if test="checkUserId != null" >
+        check_user_id = #{checkUserId,jdbcType=BIGINT},
+      </if>
+      <if test="partNo != null" >
+        part_no = #{partNo,jdbcType=VARCHAR},
+      </if>
+      <if test="processUserId != null" >
+        process_user_id = #{processUserId,jdbcType=BIGINT},
+      </if>
+      <if test="processResult != null" >
+        process_result = #{processResult,jdbcType=VARCHAR},
+      </if>
+      <if test="processTime != null" >
+        process_time = #{processTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createdBy != null" >
+        created_by = #{createdBy,jdbcType=VARCHAR},
+      </if>
+      <if test="createdTime != null" >
+        created_time = #{createdTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updatedBy != null" >
+        updated_by = #{updatedBy,jdbcType=VARCHAR},
+      </if>
+      <if test="updatedTime != null" >
+        updated_time = #{updatedTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="partNote != null" >
+        part_note = #{partNote,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.yiban.erp.entities.RepertoryCheckPart" >
+    update repertory_check_part
+    set check_no = #{checkNo,jdbcType=VARCHAR},
+      r_check_id = #{rCheckId,jdbcType=BIGINT},
+      check_user_id = #{checkUserId,jdbcType=BIGINT},
+      part_no = #{partNo,jdbcType=VARCHAR},
+      process_user_id = #{processUserId,jdbcType=BIGINT},
+      process_result = #{processResult,jdbcType=VARCHAR},
+      process_time = #{processTime,jdbcType=TIMESTAMP},
+      created_by = #{createdBy,jdbcType=VARCHAR},
+      created_time = #{createdTime,jdbcType=TIMESTAMP},
+      updated_by = #{updatedBy,jdbcType=VARCHAR},
+      updated_time = #{updatedTime,jdbcType=TIMESTAMP}
+       part_note = #{partNote,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+</mapper>

@@ -1,4 +1,4 @@
-package com.yiban.erp.querybean;
+package com.yiban.erp.dto;
 
 import java.util.Date;
 

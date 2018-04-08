@@ -2,11 +2,10 @@ package com.yiban.erp.dao;
 
 import com.yiban.erp.dto.CurrentBalanceResp;
 import com.yiban.erp.entities.RepertoryInfo;
-import com.yiban.erp.querybean.RepertoryQuery;
+import com.yiban.erp.dto.RepertoryQuery;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
-import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -16,6 +15,8 @@ public interface RepertoryInfoMapper {
     int deleteByPrimaryKey(Integer id);
 
     int insert(RepertoryInfo record);
+
+    int insertBatch(@Param("list") List<RepertoryInfo> infoList);
 
     int insertSelective(RepertoryInfo record);
 
@@ -46,4 +47,6 @@ public interface RepertoryInfoMapper {
     List<CurrentBalanceResp> getBalance(@Param("warehouseId") Integer warehouseId, @Param("goodsIdList") List<Long> goodsIdList);
     //获取某一商品最近一次的采购价
     List<CurrentBalanceResp> getLastBuyPrice(@Param("warehouseId") Integer warehouseId, @Param("goodsIdList") List<Long> goodsIdList);
+
+
 }

@@ -1,7 +1,7 @@
 package com.yiban.erp.dao;
 
 import com.yiban.erp.entities.RepertoryIn;
-import com.yiban.erp.querybean.InOrderQuery;
+import com.yiban.erp.dto.InOrderQuery;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;

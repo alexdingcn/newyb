@@ -11,6 +11,8 @@ public enum OptionsType {
     BILL_TYPE("发票种类"),
     WAREHOUSE_IN_TYPE("入库类型"),
     WAREHOUSE_OUT_TYPE("入库类型"),
+    WAREHOUSE_CHECK_TYPE("盘点类型"),
+    WAREHOUSE_CHECK_STATE("盘点单状态"),
     ;
 
     private String description;

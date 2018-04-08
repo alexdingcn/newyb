@@ -25,7 +25,7 @@ public class RepertoryService {
     public List<RepertoryInfo> getSearchList(Map<String, Object> requestMap) {
         List<RepertoryInfo> list = repertoryInfoMapper.getDetailList(requestMap);
         return setGoodsToList(list);
-    }
+}
 
     private List<RepertoryInfo> setGoodsToList(List<RepertoryInfo> list) {
         if (list == null || list.isEmpty()) {

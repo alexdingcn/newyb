@@ -1,6 +1,5 @@
 package com.yiban.erp.controller.warehouse;
 
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.yiban.erp.constant.RepertoryCounterStatus;
 import com.yiban.erp.constant.RepertorySaleStatus;
@@ -8,7 +7,7 @@ import com.yiban.erp.constant.RepertoryStoreStatus;
 import com.yiban.erp.dao.RepertoryInfoMapper;
 import com.yiban.erp.entities.RepertoryInfo;
 import com.yiban.erp.entities.User;
-import com.yiban.erp.querybean.RepertoryQuery;
+import com.yiban.erp.dto.RepertoryQuery;
 import com.yiban.erp.service.warehouse.RepertoryService;
 import com.yiban.erp.util.DateUtil;
 import org.apache.commons.lang3.StringUtils;

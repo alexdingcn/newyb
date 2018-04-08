@@ -27,13 +27,24 @@
             <div slot="extra">
 
                 <ButtonGroup class="padding-left-20">
-                    <Button type="primary" icon="android-add-circle" @click="" >载入采购单</Button>&nbsp;&nbsp;
+                    <Button type="primary" icon="android-add-circle" @click="buyCheckOrderGetBtnClick" >载入采购单</Button>&nbsp;&nbsp;
                     <Button type="primary" icon="android-add-circle" @click="saveInOrder" :loading="saving">保存</Button>
                 </ButtonGroup>
             </div>
 
             <Form :label-width="85" :rules="ruleValidate" :model="inOrder" ref="InOrderForm">
                 <Row>
+                    <Col span="6">
+                    <FormItem label="仓库点" prop="warehouseId">
+                        <warehouse-select v-model="inOrder.warehouseId" size="small"></warehouse-select>
+                    </FormItem>
+                    </Col>
+                    <Col span="6">
+                    <FormItem label="入库类型" prop="inType">
+                        <warehouse-intype-select v-model="inOrder.inType" size="small"></warehouse-intype-select>
+                    </FormItem>
+                    </Col>
+
                     <Col span="6">
                     <FormItem label="供应商" prop="supplierId" >
                         <Select
@@ -50,9 +61,9 @@
                     </FormItem>
                     </Col>
                     <Col span="6">
-                    <FormItem label="入库人员" prop="in_user_id">
+                    <FormItem label="入库人员" prop="inUserId">
                         <Select
-                                v-model="inOrder.in_user_id"
+                                v-model="inOrder.inUserId"
                                 clearable
                                 size="small"
                                 placeholder="入库人员">
@@ -61,24 +72,6 @@
                                 {{option.realname||''}}
                             </Option>
                         </Select>
-                    </FormItem>
-                    </Col>
-                </Row>
-                <Row>
-                    <Col span="6">
-                    <FormItem label="入库类型" prop="in_type">
-                        <warehouse-intype-select v-model="inOrder.in_type" size="small"></warehouse-intype-select>
-                    </FormItem>
-                    </Col>
-                    <Col span="5">
-                    <FormItem label="采购单号" prop="shipToolId">
-
-                    </FormItem>
-                    </Col>
-
-                    <Col span="6">
-                    <FormItem label="仓库点" prop="warehouseId">
-                        <warehouse-select v-model="inOrder.warehouseId" size="small"></warehouse-select>
                     </FormItem>
                     </Col>
                 </Row>
@@ -102,21 +95,17 @@
                         </Select>
                     </FormItem>
                     </Col>
-                    <Col span="5">
-                    <FormItem label="到货日期" prop="eta">
-                        <DatePicker type="date" v-model="inOrder.eta" size="small"/>
+                    <Col span="6">
+                    <FormItem label="到货日期" prop="inDate">
+                        <DatePicker type="date" v-model="inOrder.inDate" size="small"/>
                     </FormItem>
                     </Col>
                     <Col span="12">
-                    <FormItem label="备注" prop="comment">
-                        <Input v-model="inOrder.comment" size="small"/>
+                    <FormItem label="备注" prop="inNote">
+                        <Input v-model="inOrder.inNote" size="small"/>
                     </FormItem>
                     </Col>
-                    <!--
-                    <Col span="6">
-                        <Button type="primary" icon="ios-list-outline" class="margin-left-5"></Button>
-                    </Col>
-                    -->
+
                 </Row>
 
                 <Table border highlight-row
@@ -140,6 +129,10 @@
                @on-cancel="closeTab">
             <p>是否继续添加下一笔订单?</p>
         </Modal>
+        <Modal v-model="buyCheckOrder" title="采购单提取" :mask-closable="false" width="70">
+            <buy-order-in-list @on-choosed="buyOrderChoose" :chooseModal="true" ></buy-order-in-list>
+            <div slot="footer"></div>
+        </Modal>
     </Row>
 
 </template>
@@ -148,16 +141,15 @@
     import axios from 'axios';
     import moment from 'moment';
     import util from '@/libs/util.js';
-    import shipToolSelect from "@/views/selector/ship-tool-select.vue";
     import warehouseIntypeSelect from "@/views/selector/warehouse-intype-select.vue";
     import warehouseSelect from "@/views/selector/warehouse-select.vue";
-
+    import buyOrderInList from "@/views/warehouse/buy-order-in-list.vue";
     export default {
         name: 'in_order',
         components: {
-            shipToolSelect,
             warehouseIntypeSelect,
-            warehouseSelect
+            warehouseSelect,
+            buyOrderInList
         },
         data () {
             return {
@@ -167,16 +159,9 @@
                 goodsLoading: false,
                 goodsOptions: [],
                 buyerOptions: [],
-                supplierContactLoading: false,
-                supplierContactOptions: [],
                 totalAmount: 0,
                 edittingRow: {},
                 closeConfirm: false,
-                fapiaoTypes: [
-                    { value: 'PP', label: '普通发票'},
-                    { value: 'ZZS', label: '增值税发票'}
-                ],
-                searchFactoryVal: '',
                 orderItems: [],
                 inOrder: {
                     supplierId: null,
@@ -399,7 +384,9 @@
                     orderItems: [
                         { required: true, type: 'array', array: {min: 1}, message: '请添加商品', trigger: 'blur' }
                     ]
-                }
+                },
+                buyCheckOrder: false
+
             };
         },
         mounted () {
@@ -463,6 +450,41 @@
                 } else {
                     this.goodsOptions = [];
                 }
+            },
+            buyCheckOrderGetBtnClick() {
+                this.buyCheckOrder = true;
+            },
+            buyOrderChoose(buyOrder) {
+                if(!buyOrder || !buyOrder.id) {
+                    this.$Message.warning('获取选取的订单信息失败');
+                    return;
+                }
+                util.ajax.get("/receive/buy/order/" + buyOrder.id)
+                    .then((response) => {
+                        let data  = response.data;
+                        if (data) {
+                            this.buyCheckOrder = false;
+                            this.editView = true;
+                            this.order = data;
+                            this.orderItems = data.details ? data.details : [];
+                            let itemIds = [];
+                            if(this.orderItems && this.orderItems.length > 0) {
+                                for (let i=0; i<this.orderItems.length; i++) {
+                                    let item = this.orderItems[i];
+                                    if(item && item.goodsId) {
+                                        itemIds.push(item.goodsId);
+                                    }
+                                }
+                            }
+                            this.order['orderItemIds'] = itemIds;
+                            this.receiveTemp = false;
+                            //设置每一条明细的历史价格和订单数信息
+                            this.setCurrentBalanceRecord(itemIds);
+                        }
+                    })
+                    .catch((error) => {
+                        util.errorProcessor(this, error);
+                    });
             },
             handleRowDbClick (row) {
                 this.$Modal.confirm({

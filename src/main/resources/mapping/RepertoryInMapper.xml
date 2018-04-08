@@ -152,7 +152,7 @@
   </insert>
 
 
-  <select id="queryInOrders" resultMap="BaseResultMap" parameterType="com.yiban.erp.querybean.InOrderQuery" >
+  <select id="queryInOrders" resultMap="BaseResultMap" parameterType="com.yiban.erp.dto.InOrderQuery" >
     select
     inorder.*,su.name as supplier,w.name as warehouseName,u.nickname as checkedBy,bo.order_number as orderNumber
 

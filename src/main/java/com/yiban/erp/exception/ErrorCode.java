@@ -28,6 +28,11 @@ public enum ErrorCode {
     BUY_ORDER_PARAMS_INVALID(1301, "采购订单参数错误"),
     BUY_ORDER_IS_CHECKED(1302, "采购订单已审核不可修改"),
 
+
+
+    // 15xx - 盘点
+    CHECK_ORDER_NO_GOODS(1500, "无符合盘点条件的商品"),
+
     // 20xx - 客户
     CUSTOMER_GET_FAIL(2000, "获取客户信息失败"),
     CUSTOMER_DEL_PARAMS_EMPTY(2001, "请选择需要删除的客户"),
