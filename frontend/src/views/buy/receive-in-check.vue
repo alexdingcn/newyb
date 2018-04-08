@@ -443,6 +443,7 @@ export default {
                         .then((response) => {
                             self.orderLoading = false;
                             self.$Message.success('审查成功');
+                            self.refreshOrder();
                         })
                         .catch((error) => {
                             self.orderLoading = false;
