@@ -16,12 +16,14 @@ import com.yiban.erp.exception.ErrorCode;
 import com.yiban.erp.util.UtilTool;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.omg.CORBA.ORB;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import sun.nio.cs.US_ASCII;
 
+import java.lang.reflect.InvocationTargetException;
 import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -551,5 +553,81 @@ public class ReceiveService {
         order.setUpdateBy(user.getNickname());
         order.setUpdateTime(new Date());
         repositoryOrderMapper.updateByPrimaryKeySelective(order);
+    }
+
+    public void setOrderInCheck(User user, Long orderId) throws BizException {
+        RepositoryOrder order = repositoryOrderMapper.selectByPrimaryKey(orderId);
+        if (order == null) {
+            logger.warn("get order fail by id:{}", orderId);
+            throw new BizException(ErrorCode.RECEIVE_ORDER_GET_FAIL);
+        }
+        if (!RepositoryOrderStatus.CHECKED.name().equalsIgnoreCase(order.getStatus())) {
+            logger.warn("order status is not in CHECKED status, can not in check success.");
+            throw new BizException(ErrorCode.RECEIVE_ORDER_STATUS_NOT_CHECKED);
+        }
+        //保险检查每一个订单详情是否存在为审核通过的状态
+        List<RepositoryOrderDetail> details = repositoryOrderDetailMapper.getByOrderId(orderId);
+        if (details == null || details.isEmpty()) {
+            logger.warn("order in repository check but detail list is empty. orderId:{}", orderId);
+            throw new BizException(ErrorCode.RECEIVE_ORDER_DETAIL_EMPTY);
+        }
+        boolean checkStatus = true;
+        for (RepositoryOrderDetail detail : details) {
+            if (detail.getCheckStatus() == null || !detail.getCheckStatus()) {
+                checkStatus = false;
+                break;
+            }
+        }
+        if (!checkStatus) {
+            logger.warn("order detail have check status is false. orderId:{}", orderId);
+            throw new BizException(ErrorCode.RECEIVE_ORDER_STATUS_NOT_CHECKED);
+        }
+        //TODO 验证是否在盘库状态，如果正在盘库，不能进行操作
+
+        //如果审核通过，修改状态
+        int count = repositoryOrderMapper.setCheckStatus(order.getId(),
+                RepositoryOrderStatus.IN_CHECKED.name(), user.getNickname(), new Date());
+        if (count <= 0) {
+            logger.error("update order status fail. order id:{}", order.getId());
+            throw new BizRuntimeException(ErrorCode.FAILED_UPDATE_FROM_DB);
+        }
+        //把数据插入到库存中
+        List<RepertoryInfo> infoList = createRepertoryInfos(user, order, details);
+        int inCount = repertoryInfoMapper.insertBatch(infoList);
+        logger.info("insert repertory info count:{}", inCount);
+    }
+
+    private List<RepertoryInfo> createRepertoryInfos(User user, RepositoryOrder order, List<RepositoryOrderDetail> detailList) {
+        List<RepertoryInfo> infos = new ArrayList<>();
+        for (RepositoryOrderDetail detail : detailList) {
+            RepertoryInfo item = new RepertoryInfo();
+            item.setCompanyId(order.getCompanyId());
+            item.setWarehouseId(order.getWarehouseId());
+            item.setInUserId(user.getId());
+            item.setGoodId(detail.getGoodsId());
+            item.setInQuantity(detail.getInCount());
+            item.setQuantity(detail.getInCount());
+            item.setBuyPrice(detail.getPrice());
+//            item.setSalePrice(detail.getPrice());    //仓库信息中按逻辑不存销售假信息
+            item.setCode(detail.getGoods() == null ? null : detail.getGoods().getCode());
+            item.setBatchCode(detail.getBatchCode());
+            item.setExp(false);
+            item.setSaleEnable(true);
+            item.setProductDate(detail.getProductDate());
+            item.setExpDate(detail.getExpDate());
+            item.setInDate(new Date());
+            item.setLocation(detail.getWarehouseLocation());
+            item.setSupplierId(order.getSupplierId());
+            item.setSupplierContactId(order.getSupplierContactId());
+            item.setBuyerId(order.getBuyerId());
+            item.setOrderId(order.getId());
+            item.setCreateBy(user.getNickname());
+            item.setCreateTime(new Date());
+            item.setUpdateBy(user.getNickname());
+            item.setUpdateTime(new Date());
+
+            infos.add(item);
+        }
+        return infos;
     }
 }

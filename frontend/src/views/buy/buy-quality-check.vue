@@ -14,7 +14,7 @@
         <Form ref="searchForm" :model="query" :label-width="100">
                 <Row type="flex" justify="start">
                 <FormItem label="收货日期">
-                    <DatePicker size="small" v-model="dateRange" type="daterange" placement="bottom-end" placeholder="收货日期" style="width:180px"></DatePicker>
+                    <DatePicker size="small" v-model="dateRange" type="daterange" placement="bottom-start" placeholder="收货日期" style="width:180px"></DatePicker>
                 </FormItem>
                 <FormItem label="仓库">
                    <warehouse-select v-model="query.warehouseId" size="small"></warehouse-select>

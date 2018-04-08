@@ -85,6 +85,8 @@ public enum ErrorCode {
     RECEIVE_CHECK_STATUS_ERROR(2408, "当前订单不处于可验收状态"),
     RECEIVE_DETAIL_REMOVE_STATUS(2409, "订单详情已经验证通过，不能删除"),
     RECEIVE_DETAIL_SAVE_PARAMS_ERROR(2410, "订单详情参数与订单信息不匹配", ErrorDisplay.NOTICE),
+    RECEIVE_ORDER_STATUS_NOT_CHECKED(2411, "订单未处于验收通过的状态，不能审核通过"),
+    RECEIVE_ORDER_DETAIL_EMPTY(2412, "获取订单商品信息失败"),
 
 
 

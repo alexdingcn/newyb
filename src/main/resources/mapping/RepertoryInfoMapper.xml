@@ -3,7 +3,9 @@
 <mapper namespace="com.yiban.erp.dao.RepertoryInfoMapper" >
   <resultMap id="BaseResultMap" type="com.yiban.erp.entities.RepertoryInfo" >
     <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="company_id" property="companyId" jdbcType="INTEGER" />
     <result column="warehouse_id" property="warehouseId" jdbcType="INTEGER" />
+    <result column="in_user_id" property="inUserId" jdbcType="BIGINT" />
     <result column="good_id" property="goodId" jdbcType="BIGINT" />
     <result column="in_quantity" property="inQuantity" jdbcType="INTEGER" />
     <result column="quantity" property="quantity" jdbcType="INTEGER" />
@@ -11,20 +13,25 @@
     <result column="sale_price" property="salePrice" jdbcType="DECIMAL" />
     <result column="code" property="code" jdbcType="VARCHAR" />
     <result column="batch_code" property="batchCode" jdbcType="VARCHAR" />
-    <result column="is_exp" property="isExp" jdbcType="TINYINT" />
-    <result column="sale_enable" property="saleEnable" jdbcType="TINYINT" />
+    <result column="is_exp" property="isExp" jdbcType="BIT" />
+    <result column="sale_enable" property="saleEnable" jdbcType="BIT" />
     <result column="product_date" property="productDate" jdbcType="DATE" />
     <result column="exp_date" property="expDate" jdbcType="DATE" />
+    <result column="in_date" property="inDate" jdbcType="TIMESTAMP" />
     <result column="location" property="location" jdbcType="VARCHAR" />
+    <result column="supplier_id" property="supplierId" jdbcType="BIGINT"/>
+    <result column="supplier_contact_id" property="supplierContactId" jdbcType="BIGINT"/>
+    <result column="buyer_id" property="buyerId" jdbcType="BIGINT"/>
+    <result column="order_id" property="orderId" jdbcType="BIGINT"/>
     <result column="create_by" property="createBy" jdbcType="VARCHAR" />
     <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
     <result column="update_by" property="updateBy" jdbcType="VARCHAR" />
     <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
   </resultMap>
   <sql id="Base_Column_List" >
-    id, warehouse_id, good_id, in_quantity, quantity, buy_price, sale_price, code, batch_code, 
-    is_exp, sale_enable, product_date, exp_date, location, create_by, create_time, update_by, 
-    update_time
+    id, company_id, warehouse_id, in_user_id, good_id, in_quantity, quantity, buy_price, sale_price, code, batch_code,
+    is_exp, sale_enable, product_date, exp_date, in_date, location, supplier_id, supplier_contact_id, buyer_id, order_id,
+    create_by, create_time, update_by, update_time
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
     select 
@@ -37,29 +44,60 @@
     where id = #{id,jdbcType=BIGINT}
   </delete>
   <insert id="insert" parameterType="com.yiban.erp.entities.RepertoryInfo" keyProperty="id" useGeneratedKeys="true">
-    insert into repertory_info (id, warehouse_id, good_id, 
+    insert into repertory_info (id, company_id, warehouse_id, in_user_id, good_id,
       in_quantity, quantity, buy_price, 
       sale_price, code, batch_code, 
       is_exp, sale_enable, product_date, 
-      exp_date, location, create_by, 
-      create_time, update_by, update_time
+      exp_date, in_date, location, supplier_id, supplier_contact_id, buyer_id, order_id,
+      create_by, create_time, update_by, update_time
       )
-    values (#{id,jdbcType=BIGINT}, #{warehouseId,jdbcType=INTEGER}, #{goodId,jdbcType=BIGINT},
+    values (#{id,jdbcType=BIGINT}, #{companyId,jdbcType=INTEGER}, #{warehouseId,jdbcType=INTEGER},
+      #{inUserId,jdbcType=BIGINT}, #{goodId,jdbcType=BIGINT},
       #{inQuantity,jdbcType=INTEGER}, #{quantity,jdbcType=INTEGER}, #{buyPrice,jdbcType=DECIMAL}, 
       #{salePrice,jdbcType=DECIMAL}, #{code,jdbcType=VARCHAR}, #{batchCode,jdbcType=VARCHAR}, 
-      #{isExp,jdbcType=TINYINT}, #{saleEnable,jdbcType=TINYINT}, #{productDate,jdbcType=DATE}, 
-      #{expDate,jdbcType=DATE}, #{location,jdbcType=VARCHAR}, #{createBy,jdbcType=VARCHAR}, 
+      #{isExp,jdbcType=BIT}, #{saleEnable,jdbcType=BIT}, #{productDate,jdbcType=DATE},
+      #{expDate,jdbcType=DATE}, #{inDate,jdbcType=TIMESTAMP}, #{location,jdbcType=VARCHAR},
+      #{supplierId,jdbcType=BIGINT}, #{supplierContactId,jdbcType=BIGINT}, #{buyerId,jdbcType=BIGINT}, #{orderId,jdbcType=BIGINT},
+      #{createBy,jdbcType=VARCHAR},
       #{createTime,jdbcType=TIMESTAMP}, #{updateBy,jdbcType=VARCHAR}, #{updateTime,jdbcType=TIMESTAMP}
       )
   </insert>
+  <insert id="insertBatch" parameterType="com.yiban.erp.entities.RepertoryInfo" keyProperty="id" useGeneratedKeys="true">
+    insert into repertory_info (company_id, warehouse_id, in_user_id, good_id,
+      in_quantity, quantity, buy_price,
+      sale_price, code, batch_code,
+      is_exp, sale_enable, product_date,
+      exp_date, in_date, location, supplier_id, supplier_contact_id, buyer_id, order_id,
+      create_by, create_time, update_by, update_time
+      )
+    values
+    <foreach collection="list" item="item" separator="), (" open="(" close=")">
+      #{item.companyId,jdbcType=INTEGER}, #{item.warehouseId,jdbcType=INTEGER},
+      #{item.inUserId,jdbcType=BIGINT}, #{item.goodId,jdbcType=BIGINT},
+      #{item.inQuantity,jdbcType=INTEGER}, #{item.quantity,jdbcType=INTEGER}, #{item.buyPrice,jdbcType=DECIMAL},
+      #{item.salePrice,jdbcType=DECIMAL}, #{item.code,jdbcType=VARCHAR}, #{item.batchCode,jdbcType=VARCHAR},
+      #{item.isExp,jdbcType=BIT}, #{item.saleEnable,jdbcType=BIT}, #{item.productDate,jdbcType=DATE},
+      #{item.expDate,jdbcType=DATE}, #{item.inDate,jdbcType=TIMESTAMP}, #{item.location,jdbcType=VARCHAR},
+      #{item.supplierId,jdbcType=BIGINT}, #{item.supplierContactId,jdbcType=BIGINT}, #{item.buyerId,jdbcType=BIGINT}, #{item.orderId,jdbcType=BIGINT},
+      #{item.createBy,jdbcType=VARCHAR},
+      #{item.createTime,jdbcType=TIMESTAMP}, #{item.updateBy,jdbcType=VARCHAR}, #{item.updateTime,jdbcType=TIMESTAMP}
+    </foreach>
+  </insert>
+
   <insert id="insertSelective" parameterType="com.yiban.erp.entities.RepertoryInfo" keyProperty="id" useGeneratedKeys="true">
     insert into repertory_info
     <trim prefix="(" suffix=")" suffixOverrides="," >
       <if test="id != null" >
         id,
       </if>
+      <if test="companyId != null">
+        company_id,
+      </if>
       <if test="warehouseId != null" >
         warehouse_id,
+      </if>
+      <if test="inUserId != null" >
+        in_user_id,
       </if>
       <if test="goodId != null" >
         good_id,
@@ -94,8 +132,23 @@
       <if test="expDate != null" >
         exp_date,
       </if>
+      <if test="inDate != null">
+        in_date,
+      </if>
       <if test="location != null" >
         location,
+      </if>
+      <if test="supplierId != null">
+        supplier_id,
+      </if>
+      <if test="supplierContactId != null">
+        supplier_contact_id,
+      </if>
+      <if test="buyerId != null">
+        buyer_id,
+      </if>
+      <if test="orderId != null">
+        order_id,
       </if>
       <if test="createBy != null" >
         create_by,
@@ -114,8 +167,14 @@
       <if test="id != null" >
         #{id,jdbcType=BIGINT},
       </if>
+      <if test="companyId != null" >
+        #{companyId,jdbcType=INTEGER},
+      </if>
       <if test="warehouseId != null" >
         #{warehouseId,jdbcType=INTEGER},
+      </if>
+      <if test="inUserId != null" >
+        #{inUserId,jdbcType=BIGINT},
       </if>
       <if test="goodId != null" >
         #{goodId,jdbcType=BIGINT},
@@ -139,10 +198,10 @@
         #{batchCode,jdbcType=VARCHAR},
       </if>
       <if test="isExp != null" >
-        #{isExp,jdbcType=TINYINT},
+        #{isExp,jdbcType=BIT},
       </if>
       <if test="saleEnable != null" >
-        #{saleEnable,jdbcType=TINYINT},
+        #{saleEnable,jdbcType=BIT},
       </if>
       <if test="productDate != null" >
         #{productDate,jdbcType=DATE},
@@ -150,8 +209,23 @@
       <if test="expDate != null" >
         #{expDate,jdbcType=DATE},
       </if>
+      <if test="inDate != null" >
+        #{inDate,jdbcType=TIMESTAMP},
+      </if>
       <if test="location != null" >
         #{location,jdbcType=VARCHAR},
+      </if>
+      <if test="supplierId != null">
+        #{supplierId,jdbcType=BIGINT},
+      </if>
+      <if test="supplierContactId != null">
+        #{supplierContactId,jdbcType=BIGINT},
+      </if>
+      <if test="buyerId != null">
+        #{buyerId,jdbcType=BIGINT},
+      </if>
+      <if test="orderId != null">
+        #{orderId,jdbcType=BIGINT},
       </if>
       <if test="createBy != null" >
         #{createBy,jdbcType=VARCHAR},
@@ -170,8 +244,14 @@
   <update id="updateByPrimaryKeySelective" parameterType="com.yiban.erp.entities.RepertoryInfo" >
     update repertory_info
     <set >
+      <if test="companyId != null" >
+        company_id = #{companyId,jdbcType=INTEGER},
+      </if>
       <if test="warehouseId != null" >
         warehouse_id = #{warehouseId,jdbcType=INTEGER},
+      </if>
+      <if test="inUserId != null" >
+        in_user_id = #{inUserId,jdbcType=BIGINT},
       </if>
       <if test="goodId != null" >
         good_id = #{goodId,jdbcType=BIGINT},
@@ -195,10 +275,10 @@
         batch_code = #{batchCode,jdbcType=VARCHAR},
       </if>
       <if test="isExp != null" >
-        is_exp = #{isExp,jdbcType=TINYINT},
+        is_exp = #{isExp,jdbcType=BIT},
       </if>
       <if test="saleEnable != null" >
-        sale_enable = #{saleEnable,jdbcType=TINYINT},
+        sale_enable = #{saleEnable,jdbcType=BIT},
       </if>
       <if test="productDate != null" >
         product_date = #{productDate,jdbcType=DATE},
@@ -206,8 +286,23 @@
       <if test="expDate != null" >
         exp_date = #{expDate,jdbcType=DATE},
       </if>
+      <if test="inDate != null" >
+        in_date = #{inDate,jdbcType=TIMESTAMP},
+      </if>
       <if test="location != null" >
         location = #{location,jdbcType=VARCHAR},
+      </if>
+      <if test="supplierId != null">
+        supplier_id = #{supplierId,jdbcType=BIGINT},
+      </if>
+      <if test="supplierContactId != null">
+        supplier_contact_id = #{supplierContactId,jdbcType=BIGINT},
+      </if>
+      <if test="buyerId != null">
+        buyer_id = #{buyerId,jdbcType=BIGINT},
+      </if>
+      <if test="orderId != null">
+        order_id = #{orderId,jdbcType=BIGINT},
       </if>
       <if test="createBy != null" >
         create_by = #{createBy,jdbcType=VARCHAR},
@@ -226,7 +321,10 @@
   </update>
   <update id="updateByPrimaryKey" parameterType="com.yiban.erp.entities.RepertoryInfo" >
     update repertory_info
-    set warehouse_id = #{warehouseId,jdbcType=INTEGER},
+    set
+      company_id = #{companyId,jdbcType=INTEGER},
+      warehouse_id = #{warehouseId,jdbcType=INTEGER},
+      in_user_id = #{inUserId,jdbcType=BIGINT},
       good_id = #{goodId,jdbcType=BIGINT},
       in_quantity = #{inQuantity,jdbcType=INTEGER},
       quantity = #{quantity,jdbcType=INTEGER},
@@ -234,11 +332,16 @@
       sale_price = #{salePrice,jdbcType=DECIMAL},
       code = #{code,jdbcType=VARCHAR},
       batch_code = #{batchCode,jdbcType=VARCHAR},
-      is_exp = #{isExp,jdbcType=TINYINT},
-      sale_enable = #{saleEnable,jdbcType=TINYINT},
+      is_exp = #{isExp,jdbcType=BIT},
+      sale_enable = #{saleEnable,jdbcType=BIT},
       product_date = #{productDate,jdbcType=DATE},
       exp_date = #{expDate,jdbcType=DATE},
+      in_date = #{inDate,jdbcType=TIMESTAMP},
       location = #{location,jdbcType=VARCHAR},
+      supplier_id = #{supplierId,jdbcType=BIGINT},
+      supplier_contact_id = #{supplierContactId,jdbcType=BIGINT},
+      buyer_id = #{buyerId,jdbcType=BIGINT},
+      order_id = #{orderId,jdbcType=BIGINT},
       create_by = #{createBy,jdbcType=VARCHAR},
       create_time = #{createTime,jdbcType=TIMESTAMP},
       update_by = #{updateBy,jdbcType=VARCHAR},
@@ -248,10 +351,11 @@
 
   <select id="getDetailList" parameterType="map" resultType="com.yiban.erp.entities.RepertoryInfo">
     select
-      r.id as id, r.warehouse_id as warehouseId, r.good_id as goodId, r.in_quantity as inQuantiry,
+      r.id as id, r.company_id as companyId, r.warehouse_id as warehouseId, r.in_user_id as inUserId, r.good_id as goodId, r.in_quantity as inQuantiry,
       r.quantity as quantity, r.buy_price as buyPrice, r.sale_price as salePrice, r.code as code,
       r.batch_code as batchCode, r.is_exp as isExp, r.sale_enable as saleEnable,
-      r.product_date as productDate, r.exp_date as expDate, r.location as location,
+      r.product_date as productDate, r.exp_date as expDate, r.in_Date as inDate,  r.location as location,
+      r.supplier_id as supplierId, r.supplierContactId as supplierContactId, r.buyer_id as buyerId, r.order_id as orderId,
       r.create_by as createBy, r.create_time as createTime, r.update_by as updateBy,
       r.update_time as updateTime,
       w.name as warehouseName

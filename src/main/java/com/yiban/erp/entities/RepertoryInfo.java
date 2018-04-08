@@ -5,11 +5,11 @@ import java.util.Date;
 
 public class RepertoryInfo {
     private Long id;
-    private Integer company_id;
+    private Integer companyId;
 
     private Integer warehouseId;
 
-    private Integer in_user_id;
+    private Long inUserId;
 
     private Long goodId;
 
@@ -25,9 +25,9 @@ public class RepertoryInfo {
 
     private String batchCode;
 
-    private Byte isExp;
+    private Boolean isExp;
 
-    private Byte saleEnable;
+    private Boolean saleEnable;
 
     private Date productDate;
 
@@ -37,15 +37,19 @@ public class RepertoryInfo {
 
     private String location;
 
-    private long supplier_id;
+    private Long supplierId;
 
-    private long factory_id;
+    private Long supplierContactId;
 
-    private String store_state;
+    private Long buyerId;
 
-    private String counter_state;
+    private Long orderId; //入库单号
 
-    private String sale_sate;
+    private String storeState;
+
+    private String counterState;
+
+    private String saleSate;
 
     private String createBy;
 
@@ -148,19 +152,19 @@ public class RepertoryInfo {
         this.batchCode = batchCode == null ? null : batchCode.trim();
     }
 
-    public Byte getIsExp() {
+    public Boolean getExp() {
         return isExp;
     }
 
-    public void setIsExp(Byte isExp) {
-        this.isExp = isExp;
+    public void setExp(Boolean exp) {
+        isExp = exp;
     }
 
-    public Byte getSaleEnable() {
+    public Boolean getSaleEnable() {
         return saleEnable;
     }
 
-    public void setSaleEnable(Byte saleEnable) {
+    public void setSaleEnable(Boolean saleEnable) {
         this.saleEnable = saleEnable;
     }
 
@@ -272,37 +276,52 @@ public class RepertoryInfo {
         return goods;
     }
 
-
-    public Integer getCompany_id() {
-        return company_id;
+    public Integer getCompanyId() {
+        return companyId;
     }
 
-    public void setCompany_id(Integer company_id) {
-        this.company_id = company_id;
+    public void setCompanyId(Integer companyId) {
+        this.companyId = companyId;
     }
 
-    public Integer getIn_user_id() {
-        return in_user_id;
+    public Long getInUserId() {
+        return inUserId;
     }
 
-    public void setIn_user_id(Integer in_user_id) {
-        this.in_user_id = in_user_id;
+    public void setInUserId(Long inUserId) {
+        this.inUserId = inUserId;
     }
 
-    public long getSupplier_id() {
-        return supplier_id;
+    public Long getSupplierId() {
+        return supplierId;
     }
 
-    public void setSupplier_id(long supplier_id) {
-        this.supplier_id = supplier_id;
+    public void setSupplierId(Long supplierId) {
+        this.supplierId = supplierId;
     }
 
-    public long getFactory_id() {
-        return factory_id;
+    public Long getSupplierContactId() {
+        return supplierContactId;
     }
 
-    public void setFactory_id(long factory_id) {
-        this.factory_id = factory_id;
+    public void setSupplierContactId(Long supplierContactId) {
+        this.supplierContactId = supplierContactId;
+    }
+
+    public Long getBuyerId() {
+        return buyerId;
+    }
+
+    public void setBuyerId(Long buyerId) {
+        this.buyerId = buyerId;
+    }
+
+    public Long getOrderId() {
+        return orderId;
+    }
+
+    public void setOrderId(Long orderId) {
+        this.orderId = orderId;
     }
 
     public String getIn_user_name() {
@@ -321,28 +340,28 @@ public class RepertoryInfo {
         this.inDate = inDate;
     }
 
-    public String getStore_state() {
-        return store_state;
+    public String getStoreState() {
+        return storeState;
     }
 
-    public void setStore_state(String store_state) {
-        this.store_state = store_state;
+    public void setStoreState(String storeState) {
+        this.storeState = storeState;
     }
 
-    public String getCounter_state() {
-        return counter_state;
+    public String getCounterState() {
+        return counterState;
     }
 
-    public void setCounter_state(String counter_state) {
-        this.counter_state = counter_state;
+    public void setCounterState(String counterState) {
+        this.counterState = counterState;
     }
 
-    public String getSale_sate() {
-        return sale_sate;
+    public String getSaleSate() {
+        return saleSate;
     }
 
-    public void setSale_sate(String sale_sate) {
-        this.sale_sate = sale_sate;
+    public void setSaleSate(String saleSate) {
+        this.saleSate = saleSate;
     }
 
     public String getSupplier() {

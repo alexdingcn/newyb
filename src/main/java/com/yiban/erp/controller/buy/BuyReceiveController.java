@@ -159,4 +159,12 @@ public class BuyReceiveController {
         return ResponseEntity.ok().build();
     }
 
+    @RequestMapping(value = "/set/incheck", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> setOrderInCheck(@RequestBody ReceiveSetReq setReq,
+                                                  @AuthenticationPrincipal User user) throws Exception {
+        logger.info("user:{} request order in repository check for orderId:{}", user.getId(), setReq.getOrderId());
+        receiveService.setOrderInCheck(user, setReq.getOrderId());
+        return ResponseEntity.ok().build();
+    }
+
 }

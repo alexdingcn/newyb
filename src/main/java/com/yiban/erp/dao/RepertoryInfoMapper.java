@@ -17,6 +17,8 @@ public interface RepertoryInfoMapper {
 
     int insert(RepertoryInfo record);
 
+    int insertBatch(@Param("list") List<RepertoryInfo> infoList);
+
     int insertSelective(RepertoryInfo record);
 
     RepertoryInfo selectByPrimaryKey(Integer id);
@@ -46,4 +48,6 @@ public interface RepertoryInfoMapper {
     List<CurrentBalanceResp> getBalance(@Param("warehouseId") Integer warehouseId, @Param("goodsIdList") List<Long> goodsIdList);
     //获取某一商品最近一次的采购价
     List<CurrentBalanceResp> getLastBuyPrice(@Param("warehouseId") Integer warehouseId, @Param("goodsIdList") List<Long> goodsIdList);
+
+
 }
