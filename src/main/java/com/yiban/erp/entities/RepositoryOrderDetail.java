@@ -10,11 +10,11 @@ public class RepositoryOrderDetail {
 
     private Long goodsId;
 
-    private Integer receiveQuality;
+    private BigDecimal receiveQuality;
 
-    private Integer bigQuality;
+    private BigDecimal bigQuality;
 
-    private Integer free;
+    private BigDecimal free;
 
     private BigDecimal price;
 
@@ -28,7 +28,7 @@ public class RepositoryOrderDetail {
 
     private String warehouseLocation;
 
-    private Integer rejectQuality;
+    private BigDecimal rejectQuality;
 
     private String rejectComment;
 
@@ -42,12 +42,12 @@ public class RepositoryOrderDetail {
 
     private Date updateTime;
 
-    private Integer inCount; //入库量，直接设置为收货量
-    private Integer rightCount; //合格数量
-    private Integer errorCount; //不合格的数量
+    private BigDecimal inCount; //入库量，直接设置为收货量
+    private BigDecimal rightCount; //合格数量
+    private BigDecimal errorCount; //不合格的数量
 
     private Date surveyDate;
-    private Integer surveyQuality; //抽样检查数量
+    private BigDecimal surveyQuality; //抽样检查数量
     private String surveyUser;
     private String surveyAddress;
     private String surveyResult;
@@ -152,29 +152,7 @@ public class RepositoryOrderDetail {
         this.goodsId = goodsId;
     }
 
-    public Integer getReceiveQuality() {
-        return receiveQuality;
-    }
 
-    public void setReceiveQuality(Integer receiveQuality) {
-        this.receiveQuality = receiveQuality;
-    }
-
-    public Integer getBigQuality() {
-        return bigQuality;
-    }
-
-    public void setBigQuality(Integer bigQuality) {
-        this.bigQuality = bigQuality;
-    }
-
-    public Integer getFree() {
-        return free;
-    }
-
-    public void setFree(Integer free) {
-        this.free = free;
-    }
 
     public BigDecimal getPrice() {
         return price;
@@ -224,13 +202,7 @@ public class RepositoryOrderDetail {
         this.warehouseLocation = warehouseLocation == null ? null : warehouseLocation.trim();
     }
 
-    public Integer getRejectQuality() {
-        return rejectQuality;
-    }
 
-    public void setRejectQuality(Integer rejectQuality) {
-        this.rejectQuality = rejectQuality;
-    }
 
     public String getRejectComment() {
         return rejectComment;
@@ -280,11 +252,11 @@ public class RepositoryOrderDetail {
         this.updateTime = updateTime;
     }
 
-    public Integer getInCount() {
+    public BigDecimal getInCount() {
         return inCount;
     }
 
-    public void setInCount(Integer inCount) {
+    public void setInCount(BigDecimal inCount) {
         if (inCount == null) {
             this.inCount = this.receiveQuality;
         }else {
@@ -292,21 +264,7 @@ public class RepositoryOrderDetail {
         }
     }
 
-    public Integer getRightCount() {
-        return rightCount;
-    }
 
-    public void setRightCount(Integer rightCount) {
-        this.rightCount = rightCount;
-    }
-
-    public Integer getErrorCount() {
-        return errorCount;
-    }
-
-    public void setErrorCount(Integer errorCount) {
-        this.errorCount = errorCount;
-    }
 
 
     public Date getSurveyDate() {
@@ -317,13 +275,7 @@ public class RepositoryOrderDetail {
         this.surveyDate = surveyDate;
     }
 
-    public Integer getSurveyQuality() {
-        return surveyQuality;
-    }
 
-    public void setSurveyQuality(Integer surveyQuality) {
-        this.surveyQuality = surveyQuality;
-    }
 
     public String getSurveyUser() {
         return surveyUser;
@@ -419,5 +371,61 @@ public class RepositoryOrderDetail {
 
     public void setCheckResult(String checkResult) {
         this.checkResult = checkResult;
+    }
+
+    public BigDecimal getReceiveQuality() {
+        return receiveQuality;
+    }
+
+    public void setReceiveQuality(BigDecimal receiveQuality) {
+        this.receiveQuality = receiveQuality;
+    }
+
+    public BigDecimal getBigQuality() {
+        return bigQuality;
+    }
+
+    public void setBigQuality(BigDecimal bigQuality) {
+        this.bigQuality = bigQuality;
+    }
+
+    public BigDecimal getFree() {
+        return free;
+    }
+
+    public void setFree(BigDecimal free) {
+        this.free = free;
+    }
+
+    public BigDecimal getRejectQuality() {
+        return rejectQuality;
+    }
+
+    public void setRejectQuality(BigDecimal rejectQuality) {
+        this.rejectQuality = rejectQuality;
+    }
+
+    public BigDecimal getRightCount() {
+        return rightCount;
+    }
+
+    public void setRightCount(BigDecimal rightCount) {
+        this.rightCount = rightCount;
+    }
+
+    public BigDecimal getErrorCount() {
+        return errorCount;
+    }
+
+    public void setErrorCount(BigDecimal errorCount) {
+        this.errorCount = errorCount;
+    }
+
+    public BigDecimal getSurveyQuality() {
+        return surveyQuality;
+    }
+
+    public void setSurveyQuality(BigDecimal surveyQuality) {
+        this.surveyQuality = surveyQuality;
     }
 }

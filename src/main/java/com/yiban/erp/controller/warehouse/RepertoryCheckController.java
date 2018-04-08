@@ -156,7 +156,7 @@ public class RepertoryCheckController {
                 RepertoryInfo tempGoods=checklist.get(i);
                 RepertoryCheckDetail rcheckDetail=new RepertoryCheckDetail();
                 rcheckDetail.setBatchCode(tempGoods.getBatchCode());
-                rcheckDetail.setAccAmount(new BigDecimal(tempGoods.getQuantity()));        //账面数量必定大于0
+                rcheckDetail.setAccAmount(tempGoods.getQuantity());        //账面数量必定大于0
                 rcheckDetail.setCheckAmount(new BigDecimal(0));
                 rcheckDetail.setCompanyId(tempGoods.getCompanyId());
                 rcheckDetail.setWarehouseId(tempGoods.getWarehouseId());

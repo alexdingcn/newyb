@@ -43,7 +43,7 @@ public class SellOrderDetail {
     private RepertoryInfo repertoryInfo;
     private Long goodId;  //在设置repertoryInfo时设置, 辅助前端展示
     private String goodName; //在设置repertoryInfo时设置, 辅助前端展示
-    private Integer repertoryQuantity; //在设置repertoryInfo时设置, 辅助前端展示
+    private BigDecimal repertoryQuantity; //在设置repertoryInfo时设置, 辅助前端展示
     private String factoryName; //在设置repertoryInfo时设置, 辅助前端展示
 
     private Date createOrderDate;
@@ -266,11 +266,11 @@ public class SellOrderDetail {
         this.goodName = goodName;
     }
 
-    public Integer getRepertoryQuantity() {
+    public BigDecimal getRepertoryQuantity() {
         return repertoryQuantity;
     }
 
-    public void setRepertoryQuantity(Integer repertoryQuantity) {
+    public void setRepertoryQuantity(BigDecimal repertoryQuantity) {
         this.repertoryQuantity = repertoryQuantity;
     }
 

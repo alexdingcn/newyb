@@ -6,12 +6,11 @@
     <result column="company_id" property="companyId" jdbcType="INTEGER" />
     <result column="warehouse_id" property="warehouseId" jdbcType="INTEGER" />
     <result column="in_user_id" property="inUserId" jdbcType="BIGINT" />
-    <result column="good_id" property="goodId" jdbcType="BIGINT" />
-    <result column="in_quantity" property="inQuantity" jdbcType="INTEGER" />
-    <result column="quantity" property="quantity" jdbcType="INTEGER" />
+    <result column="goods_id" property="goodsId" jdbcType="BIGINT" />
+    <result column="factory_id" property="factoryId" jdbcType="INTEGER" />
+    <result column="in_quantity" property="inQuantity" jdbcType="DECIMAL" />
+    <result column="quantity" property="quantity" jdbcType="DECIMAL" />
     <result column="buy_price" property="buyPrice" jdbcType="DECIMAL" />
-    <result column="sale_price" property="salePrice" jdbcType="DECIMAL" />
-    <result column="code" property="code" jdbcType="VARCHAR" />
     <result column="batch_code" property="batchCode" jdbcType="VARCHAR" />
     <result column="is_exp" property="isExp" jdbcType="BIT" />
     <result column="sale_enable" property="saleEnable" jdbcType="BIT" />
@@ -23,15 +22,16 @@
     <result column="supplier_contact_id" property="supplierContactId" jdbcType="BIGINT"/>
     <result column="buyer_id" property="buyerId" jdbcType="BIGINT"/>
     <result column="order_id" property="orderId" jdbcType="BIGINT"/>
+    <result column="sale_state" property="saleState" jdbcType="BIT" />
     <result column="create_by" property="createBy" jdbcType="VARCHAR" />
     <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
     <result column="update_by" property="updateBy" jdbcType="VARCHAR" />
     <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
   </resultMap>
   <sql id="Base_Column_List" >
-    id, company_id, warehouse_id, in_user_id, good_id, in_quantity, quantity, buy_price, sale_price, code, batch_code,
+    id, company_id, warehouse_id, in_user_id, goods_id, factory_id, in_quantity, quantity, buy_price, sale_price, code, batch_code,
     is_exp, sale_enable, product_date, exp_date, in_date, location, supplier_id, supplier_contact_id, buyer_id, order_id,
-    create_by, create_time, update_by, update_time
+    sale_state, create_by, create_time, update_by, update_time
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
     select 
@@ -44,42 +44,40 @@
     where id = #{id,jdbcType=BIGINT}
   </delete>
   <insert id="insert" parameterType="com.yiban.erp.entities.RepertoryInfo" keyProperty="id" useGeneratedKeys="true">
-    insert into repertory_info (id, company_id, warehouse_id, in_user_id, good_id,
-      in_quantity, quantity, buy_price, 
-      sale_price, code, batch_code, 
+    insert into repertory_info (id, company_id, warehouse_id, in_user_id, goods_id, factory_id,
+      in_quantity, quantity, buy_price, batch_code,
       is_exp, sale_enable, product_date, 
       exp_date, in_date, location, supplier_id, supplier_contact_id, buyer_id, order_id,
-      create_by, create_time, update_by, update_time
+      sale_state, create_by, create_time, update_by, update_time
       )
     values (#{id,jdbcType=BIGINT}, #{companyId,jdbcType=INTEGER}, #{warehouseId,jdbcType=INTEGER},
-      #{inUserId,jdbcType=BIGINT}, #{goodId,jdbcType=BIGINT},
-      #{inQuantity,jdbcType=INTEGER}, #{quantity,jdbcType=INTEGER}, #{buyPrice,jdbcType=DECIMAL}, 
-      #{salePrice,jdbcType=DECIMAL}, #{code,jdbcType=VARCHAR}, #{batchCode,jdbcType=VARCHAR}, 
+      #{inUserId,jdbcType=BIGINT}, #{goodsId,jdbcType=BIGINT}, #{factoryId,jdbcType=INTEGER},
+      #{inQuantity,jdbcType=DECIMAL}, #{quantity,jdbcType=DECIMAL}, #{buyPrice,jdbcType=DECIMAL},
+      #{batchCode,jdbcType=VARCHAR},
       #{isExp,jdbcType=BIT}, #{saleEnable,jdbcType=BIT}, #{productDate,jdbcType=DATE},
       #{expDate,jdbcType=DATE}, #{inDate,jdbcType=TIMESTAMP}, #{location,jdbcType=VARCHAR},
       #{supplierId,jdbcType=BIGINT}, #{supplierContactId,jdbcType=BIGINT}, #{buyerId,jdbcType=BIGINT}, #{orderId,jdbcType=BIGINT},
-      #{createBy,jdbcType=VARCHAR},
+      #{saleState,jdbcType=BIT}, #{createBy,jdbcType=VARCHAR},
       #{createTime,jdbcType=TIMESTAMP}, #{updateBy,jdbcType=VARCHAR}, #{updateTime,jdbcType=TIMESTAMP}
       )
   </insert>
   <insert id="insertBatch" parameterType="com.yiban.erp.entities.RepertoryInfo" keyProperty="id" useGeneratedKeys="true">
-    insert into repertory_info (company_id, warehouse_id, in_user_id, good_id,
-      in_quantity, quantity, buy_price,
-      sale_price, code, batch_code,
+    insert into repertory_info (company_id, warehouse_id, in_user_id, goods_id, factory_id,
+      in_quantity, quantity, buy_price, batch_code,
       is_exp, sale_enable, product_date,
       exp_date, in_date, location, supplier_id, supplier_contact_id, buyer_id, order_id,
-      create_by, create_time, update_by, update_time
+      sale_state, create_by, create_time, update_by, update_time
       )
     values
     <foreach collection="list" item="item" separator="), (" open="(" close=")">
       #{item.companyId,jdbcType=INTEGER}, #{item.warehouseId,jdbcType=INTEGER},
-      #{item.inUserId,jdbcType=BIGINT}, #{item.goodId,jdbcType=BIGINT},
-      #{item.inQuantity,jdbcType=INTEGER}, #{item.quantity,jdbcType=INTEGER}, #{item.buyPrice,jdbcType=DECIMAL},
-      #{item.salePrice,jdbcType=DECIMAL}, #{item.code,jdbcType=VARCHAR}, #{item.batchCode,jdbcType=VARCHAR},
+      #{item.inUserId,jdbcType=BIGINT}, #{item.goodsId,jdbcType=BIGINT}, #{item.factoryId,jdbcType=INTEGER},
+      #{item.inQuantity,jdbcType=DECIMAL}, #{item.quantity,jdbcType=DECIMAL}, #{item.buyPrice,jdbcType=DECIMAL},
+      #{item.batchCode,jdbcType=VARCHAR},
       #{item.isExp,jdbcType=BIT}, #{item.saleEnable,jdbcType=BIT}, #{item.productDate,jdbcType=DATE},
       #{item.expDate,jdbcType=DATE}, #{item.inDate,jdbcType=TIMESTAMP}, #{item.location,jdbcType=VARCHAR},
       #{item.supplierId,jdbcType=BIGINT}, #{item.supplierContactId,jdbcType=BIGINT}, #{item.buyerId,jdbcType=BIGINT}, #{item.orderId,jdbcType=BIGINT},
-      #{item.createBy,jdbcType=VARCHAR},
+      #{item.saleState,jdbcType=BIT}, #{item.createBy,jdbcType=VARCHAR},
       #{item.createTime,jdbcType=TIMESTAMP}, #{item.updateBy,jdbcType=VARCHAR}, #{item.updateTime,jdbcType=TIMESTAMP}
     </foreach>
   </insert>
@@ -99,8 +97,11 @@
       <if test="inUserId != null" >
         in_user_id,
       </if>
-      <if test="goodId != null" >
-        good_id,
+      <if test="goodsId != null" >
+        goods_id,
+      </if>
+      <if test="factoryId != null" >
+        factory_id,
       </if>
       <if test="inQuantity != null" >
         in_quantity,
@@ -110,12 +111,6 @@
       </if>
       <if test="buyPrice != null" >
         buy_price,
-      </if>
-      <if test="salePrice != null" >
-        sale_price,
-      </if>
-      <if test="code != null" >
-        code,
       </if>
       <if test="batchCode != null" >
         batch_code,
@@ -150,6 +145,9 @@
       <if test="orderId != null">
         order_id,
       </if>
+      <if test="saleState != null">
+        sale_state,
+      </if>
       <if test="createBy != null" >
         create_by,
       </if>
@@ -176,23 +174,20 @@
       <if test="inUserId != null" >
         #{inUserId,jdbcType=BIGINT},
       </if>
-      <if test="goodId != null" >
-        #{goodId,jdbcType=BIGINT},
+      <if test="goodsId != null" >
+        #{goodsId,jdbcType=BIGINT},
+      </if>
+      <if test="factoryId">
+        #{factoryId,jdbcType=INTEGER},
       </if>
       <if test="inQuantity != null" >
-        #{inQuantity,jdbcType=INTEGER},
+        #{inQuantity,jdbcType=DECIMAL},
       </if>
       <if test="quantity != null" >
-        #{quantity,jdbcType=INTEGER},
+        #{quantity,jdbcType=DECIMAL},
       </if>
       <if test="buyPrice != null" >
         #{buyPrice,jdbcType=DECIMAL},
-      </if>
-      <if test="salePrice != null" >
-        #{salePrice,jdbcType=DECIMAL},
-      </if>
-      <if test="code != null" >
-        #{code,jdbcType=VARCHAR},
       </if>
       <if test="batchCode != null" >
         #{batchCode,jdbcType=VARCHAR},
@@ -227,6 +222,9 @@
       <if test="orderId != null">
         #{orderId,jdbcType=BIGINT},
       </if>
+      <if test="saleState != null">
+        #{saleState,jdbcType=BIT},
+      </if>
       <if test="createBy != null" >
         #{createBy,jdbcType=VARCHAR},
       </if>
@@ -253,23 +251,20 @@
       <if test="inUserId != null" >
         in_user_id = #{inUserId,jdbcType=BIGINT},
       </if>
-      <if test="goodId != null" >
-        good_id = #{goodId,jdbcType=BIGINT},
+      <if test="goodsId != null" >
+        goods_id = #{goodsId,jdbcType=BIGINT},
+      </if>
+      <if test="factoryId">
+        factory_id = #{factoryId,jdbcType=INTEGER},
       </if>
       <if test="inQuantity != null" >
-        in_quantity = #{inQuantity,jdbcType=INTEGER},
+        in_quantity = #{inQuantity,jdbcType=DECIMAL},
       </if>
       <if test="quantity != null" >
-        quantity = #{quantity,jdbcType=INTEGER},
+        quantity = #{quantity,jdbcType=DECIMAL},
       </if>
       <if test="buyPrice != null" >
         buy_price = #{buyPrice,jdbcType=DECIMAL},
-      </if>
-      <if test="salePrice != null" >
-        sale_price = #{salePrice,jdbcType=DECIMAL},
-      </if>
-      <if test="code != null" >
-        code = #{code,jdbcType=VARCHAR},
       </if>
       <if test="batchCode != null" >
         batch_code = #{batchCode,jdbcType=VARCHAR},
@@ -304,6 +299,9 @@
       <if test="orderId != null">
         order_id = #{orderId,jdbcType=BIGINT},
       </if>
+      <if test="saleState != null">
+        sale_state = #{saleState,jdbcType=BIT},
+      </if>
       <if test="createBy != null" >
         create_by = #{createBy,jdbcType=VARCHAR},
       </if>
@@ -325,12 +323,11 @@
       company_id = #{companyId,jdbcType=INTEGER},
       warehouse_id = #{warehouseId,jdbcType=INTEGER},
       in_user_id = #{inUserId,jdbcType=BIGINT},
-      good_id = #{goodId,jdbcType=BIGINT},
-      in_quantity = #{inQuantity,jdbcType=INTEGER},
-      quantity = #{quantity,jdbcType=INTEGER},
+      goods_id = #{goodsId,jdbcType=BIGINT},
+      factory_id = #{factoryId,jdbcType=INTEGER},
+      in_quantity = #{inQuantity,jdbcType=DECIMAL},
+      quantity = #{quantity,jdbcType=DECIMAL},
       buy_price = #{buyPrice,jdbcType=DECIMAL},
-      sale_price = #{salePrice,jdbcType=DECIMAL},
-      code = #{code,jdbcType=VARCHAR},
       batch_code = #{batchCode,jdbcType=VARCHAR},
       is_exp = #{isExp,jdbcType=BIT},
       sale_enable = #{saleEnable,jdbcType=BIT},
@@ -342,6 +339,7 @@
       supplier_contact_id = #{supplierContactId,jdbcType=BIGINT},
       buyer_id = #{buyerId,jdbcType=BIGINT},
       order_id = #{orderId,jdbcType=BIGINT},
+      sale_state = #{saleState,jdbcType=BIT},
       create_by = #{createBy,jdbcType=VARCHAR},
       create_time = #{createTime,jdbcType=TIMESTAMP},
       update_by = #{updateBy,jdbcType=VARCHAR},
@@ -351,25 +349,27 @@
 
   <select id="getDetailList" parameterType="map" resultType="com.yiban.erp.entities.RepertoryInfo">
     select
-      r.id as id, r.company_id as companyId, r.warehouse_id as warehouseId, r.in_user_id as inUserId, r.good_id as goodId, r.in_quantity as inQuantiry,
-      r.quantity as quantity, r.buy_price as buyPrice, r.sale_price as salePrice, r.code as code,
+      r.id as id, r.company_id as companyId, r.warehouse_id as warehouseId, r.in_user_id as inUserId,
+      r.goods_id as goodsId, r.factory_id as factoryId, r.in_quantity as inQuantiry,
+      r.quantity as quantity, r.buy_price as buyPrice,
       r.batch_code as batchCode, r.is_exp as isExp, r.sale_enable as saleEnable,
       r.product_date as productDate, r.exp_date as expDate, r.in_Date as inDate,  r.location as location,
       r.supplier_id as supplierId, r.supplierContactId as supplierContactId, r.buyer_id as buyerId, r.order_id as orderId,
-      r.create_by as createBy, r.create_time as createTime, r.update_by as updateBy,
+      r.sale_state as saleState, r.create_by as createBy, r.create_time as createTime, r.update_by as updateBy,
       r.update_time as updateTime,
       w.name as warehouseName
-    from repertory_info r , warehouse w, goods g
-      left join factory f on g.factory_id = f.id
-    where r.warehouse_id = w.id and r.good_id = g.id
+    from repertory_info r
+    left join factory f on r.factory_id = f.id,
+    warehouse w, goods g
+    where r.warehouse_id = w.id and r.goods_id = g.id
       and w.company_id = #{companyId}
       and r.warehouse_id = #{warehouseId}
       and r.is_exp = 0
       <if test="saleEnable != null" >
         and r.sale_enable = #{saleEnable}
       </if>
-      <if test="goodId != null" >
-        r.good_id = #{goodId}
+      <if test="goodsId != null" >
+        r.goods_id = #{goodsId}
       </if>
       <if test="goodSearch != null">
         <bind name="pattern" value="'%' + goodSearch + '%'" />
@@ -378,7 +378,6 @@
       <if test="factoryId != null">
         and f.id = #{factoryId}
       </if>
-
       <if test="limitCheck != null">
         and r.quantity > #{limitCheck}
       </if>
@@ -391,17 +390,18 @@
   <select id="getDetailListCount" parameterType="map" resultType="java.lang.Integer">
     select
       count(1)
-    from repertory_info r , warehouse w, goods g
-    left join factory f on g.factory_id = f.id
-    where r.warehouse_id = w.id and r.good_id = g.id
+    from repertory_info r
+    left join factory f on f.factory_id = f.id,
+    warehouse w, goods g
+    where r.warehouse_id = w.id and r.goods_id = g.id
     and w.company_id = #{companyId}
     and r.warehouse_id = #{warehouseId}
     and r.is_exp = 0
     <if test="saleEnable != null" >
       and r.sale_enable = #{saleEnable}
     </if>
-    <if test="goodId != null" >
-      r.good_id = #{goodId}
+    <if test="goodsId != null" >
+      r.goods_id = #{goodsId}
     </if>
     <if test="goodSearch != null">
       <bind name="pattern" value="'%' + goodSearch + '%'" />
@@ -425,7 +425,7 @@
     select
       g.`name` as goodName
     from sell_order_detail d, repertory_info r, goods g
-    where d.repertory_id = r.id and r.good_id = g.id
+    where d.repertory_id = r.id and r.goods_id = g.id
     and (r.quantity - d.quantity &lt; 0)
     and d.sell_order_id = #{sellOrderId};
   </select>
@@ -439,24 +439,24 @@
   </update>
 
   <select id="getBalance" parameterType="map" resultType="com.yiban.erp.dto.CurrentBalanceResp">
-    select good_id as goodsId, count(quantity) as balance
+    select goods_id as goodsId, count(quantity) as balance
     from repertory_info
     where warehouse_id = #{warehouseId}
-    and good_id in
+    and goods_id in
     <foreach collection="goodsIdList" open="(" close=")" item="item" separator=",">
       #{item}
     </foreach>
-    group by good_id
+    group by goods_id
   </select>
 
   <select id="getLastBuyPrice" parameterType="map" resultType="com.yiban.erp.dto.CurrentBalanceResp" >
-    select t2.good_id as goodsId, t2.buy_price as lastPrice from (
+    select t2.goods_id as goodsId, t2.buy_price as lastPrice from (
       select max(id) as id from repertory_info
-        where good_id in
+        where goods_id in
           <foreach collection="goodsIdList" open="(" close=")" item="item" separator=",">
             #{item}
           </foreach>
-        group by good_id) t1, repertory_info t2
+        group by goods_id) t1, repertory_info t2
     where t1.id = t2.id;
   </select>
 
@@ -468,7 +468,7 @@
     LEFT JOIN warehouse w ON w.id=rp.warehouse_id
     LEFT JOIN factory f ON f.id=rp.factory_id
     LEFT JOIN users  inu ON inu.id=rp.in_user_id
-    LEFT JOIN goods  g ON  g.id=rp.good_id
+    LEFT JOIN goods  g ON  g.id=rp.goods_id
     LEFT JOIN unit unit ON g.unit=unit.id
     WHERE 1=1
 
@@ -515,7 +515,7 @@
     LEFT JOIN warehouse w ON w.id=rp.warehouse_id
     LEFT JOIN factory f ON f.id=rp.factory_id
     LEFT JOIN users  inu ON inu.id=rp.in_user_id
-    LEFT JOIN goods  g ON  g.id=rp.good_id
+    LEFT JOIN goods  g ON  g.id=rp.goods_id
     LEFT JOIN unit unit ON g.unit=unit.id
     WHERE 1=1
 

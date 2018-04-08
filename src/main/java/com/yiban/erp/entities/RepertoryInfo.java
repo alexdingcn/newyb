@@ -9,21 +9,21 @@ public class RepertoryInfo {
 
     private Integer warehouseId;
 
+    private String location;
+
     private Long inUserId;
+
+    private String batchCode;
 
     private Long goodId;
 
-    private Integer inQuantity;
+    private Integer factoryId;
 
-    private Integer quantity;
+    private BigDecimal inQuantity;
+
+    private BigDecimal quantity;
 
     private BigDecimal buyPrice;
-
-    private BigDecimal salePrice;
-
-    private String code;
-
-    private String batchCode;
 
     private Boolean isExp;
 
@@ -35,8 +35,6 @@ public class RepertoryInfo {
 
     private Date expDate;
 
-    private String location;
-
     private Long supplierId;
 
     private Long supplierContactId;
@@ -45,11 +43,7 @@ public class RepertoryInfo {
 
     private Long orderId; //入库单号
 
-    private String storeState;
-
-    private String counterState;
-
-    private String saleSate;
+    private Boolean saleSate;
 
     private String createBy;
 
@@ -60,7 +54,6 @@ public class RepertoryInfo {
     private Date updateTime;
 
     private Goods goods;
-
 
     //展示字段
     private String warehouseName;
@@ -102,46 +95,6 @@ public class RepertoryInfo {
 
     public void setGoodId(Long goodId) {
         this.goodId = goodId;
-    }
-
-    public Integer getInQuantity() {
-        return inQuantity;
-    }
-
-    public void setInQuantity(Integer inQuantity) {
-        this.inQuantity = inQuantity;
-    }
-
-    public Integer getQuantity() {
-        return quantity;
-    }
-
-    public void setQuantity(Integer quantity) {
-        this.quantity = quantity;
-    }
-
-    public BigDecimal getBuyPrice() {
-        return buyPrice;
-    }
-
-    public void setBuyPrice(BigDecimal buyPrice) {
-        this.buyPrice = buyPrice;
-    }
-
-    public BigDecimal getSalePrice() {
-        return salePrice;
-    }
-
-    public void setSalePrice(BigDecimal salePrice) {
-        this.salePrice = salePrice;
-    }
-
-    public String getCode() {
-        return code;
-    }
-
-    public void setCode(String code) {
-        this.code = code == null ? null : code.trim();
     }
 
     public String getBatchCode() {
@@ -340,27 +293,43 @@ public class RepertoryInfo {
         this.inDate = inDate;
     }
 
-    public String getStoreState() {
-        return storeState;
+    public Integer getFactoryId() {
+        return factoryId;
     }
 
-    public void setStoreState(String storeState) {
-        this.storeState = storeState;
+    public void setFactoryId(Integer factoryId) {
+        this.factoryId = factoryId;
     }
 
-    public String getCounterState() {
-        return counterState;
+    public BigDecimal getInQuantity() {
+        return inQuantity;
     }
 
-    public void setCounterState(String counterState) {
-        this.counterState = counterState;
+    public void setInQuantity(BigDecimal inQuantity) {
+        this.inQuantity = inQuantity;
     }
 
-    public String getSaleSate() {
+    public BigDecimal getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(BigDecimal quantity) {
+        this.quantity = quantity;
+    }
+
+    public BigDecimal getBuyPrice() {
+        return buyPrice;
+    }
+
+    public void setBuyPrice(BigDecimal buyPrice) {
+        this.buyPrice = buyPrice;
+    }
+
+    public Boolean getSaleSate() {
         return saleSate;
     }
 
-    public void setSaleSate(String saleSate) {
+    public void setSaleSate(Boolean saleSate) {
         this.saleSate = saleSate;
     }
 

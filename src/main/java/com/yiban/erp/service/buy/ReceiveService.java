@@ -324,8 +324,8 @@ public class ReceiveService {
             RepositoryOrderDetail detail = new RepositoryOrderDetail();
             detail.setGoodsId(item.getGoodsId());
             detail.setGoods(goodsMap.get(item.getGoodsId()));
-            detail.setReceiveQuality(item.getQuantity() == null ? 0 : item.getQuantity().intValue());
-            detail.setBigQuality(0);
+            detail.setReceiveQuality(item.getQuantity() == null ? BigDecimal.ZERO : item.getQuantity());
+            detail.setBigQuality(BigDecimal.ZERO);
             detail.setPrice(item.getBuyPrice());
             detail.setAmount(item.getAmount());
             details.add(detail);
@@ -529,8 +529,8 @@ public class ReceiveService {
             detail.setRightCount(mergeItem.getRightCount());
             detail.setErrorCount(mergeItem.getErrorCount());
             BigDecimal price = detail.getPrice();
-            Integer receiveQuality = detail.getReceiveQuality() != null ? detail.getReceiveQuality() : 0;
-            detail.setAmount(price.multiply(BigDecimal.valueOf(receiveQuality)));
+            BigDecimal receiveQuality = detail.getReceiveQuality() != null ? detail.getReceiveQuality() : BigDecimal.ZERO;
+            detail.setAmount(price.multiply(receiveQuality));
             detail.setWarehouseLocation(mergeItem.getWarehouseLocation());
             int result = repositoryOrderDetailMapper.updateByPrimaryKeySelective(detail);
             count += result;
@@ -608,8 +608,6 @@ public class ReceiveService {
             item.setInQuantity(detail.getInCount());
             item.setQuantity(detail.getInCount());
             item.setBuyPrice(detail.getPrice());
-//            item.setSalePrice(detail.getPrice());    //仓库信息中按逻辑不存销售假信息
-            item.setCode(detail.getGoods() == null ? null : detail.getGoods().getCode());
             item.setBatchCode(detail.getBatchCode());
             item.setExp(false);
             item.setSaleEnable(true);
