@@ -37,9 +37,9 @@ public class RepositoryOrder {
 
     private Long tempControlMethod;
 
-    private Integer receiveTemp;
+    private BigDecimal receiveTemp;
 
-    private Integer checkTemp;
+    private BigDecimal checkTemp;
 
     private Long tempControlStatus;
 
@@ -79,6 +79,8 @@ public class RepositoryOrder {
 
     private Date updateTime;
 
+    private String fileNo;
+
     private String supplierName;
     private String supplierContactName;
     private String warehouseName;
@@ -92,6 +94,8 @@ public class RepositoryOrder {
     private String buyTypeName;
     private String billTypeName;
 
+    private List<RepositoryOrderDetail> details;
+
 
     public void setOptions(List<Options> optionsList) {
         if (optionsList == null || optionsList.isEmpty()) {
@@ -100,11 +104,11 @@ public class RepositoryOrder {
         Map<Long, Options> optionsMap = new HashMap<>();
         optionsList.stream().forEach(item -> optionsMap.put(item.getId(), item));
         this.tempControlMethodName = optionsMap.get(this.tempControlMethod) != null ? optionsMap.get(this.tempControlMethod).getValue() : null;
-        this.tempControlStatusName = optionsMap.get(this.tempControlStatusName) != null ? optionsMap.get(this.tempControlStatusName).getValue() : null;
-        this.shipMethodName = optionsMap.get(this.shipMethodName) != null ? optionsMap.get(this.shipMethodName).getValue() : null;
+        this.tempControlStatusName = optionsMap.get(this.tempControlStatus) != null ? optionsMap.get(this.tempControlStatus).getValue() : null;
+        this.shipMethodName = optionsMap.get(this.shipMethod) != null ? optionsMap.get(this.shipMethod).getValue() : null;
         this.shipToolName = optionsMap.get(this.shipToolName) != null ? optionsMap.get(this.shipToolName).getValue() : null;
-        this.buyTypeName = optionsMap.get(this.buyTypeName) != null ? optionsMap.get(this.buyTypeName).getValue() : null;
-        this.billTypeName = optionsMap.get(this.billTypeName) != null ? optionsMap.get(this.billTypeName).getValue() : null;
+        this.buyTypeName = optionsMap.get(this.buyType) != null ? optionsMap.get(this.buyType).getValue() : null;
+        this.billTypeName = optionsMap.get(this.billType) != null ? optionsMap.get(this.billType).getValue() : null;
     }
 
     public String getTempControlMethodName() {
@@ -170,8 +174,6 @@ public class RepositoryOrder {
     public void setSaleRealName(String saleRealName) {
         this.saleRealName = saleRealName;
     }
-
-    private List<RepositoryOrderDetail> details;
 
     public Long getId() {
         return id;
@@ -285,19 +287,19 @@ public class RepositoryOrder {
         this.tempControlMethod = tempControlMethod;
     }
 
-    public Integer getReceiveTemp() {
+    public BigDecimal getReceiveTemp() {
         return receiveTemp;
     }
 
-    public void setReceiveTemp(Integer receiveTemp) {
+    public void setReceiveTemp(BigDecimal receiveTemp) {
         this.receiveTemp = receiveTemp;
     }
 
-    public Integer getCheckTemp() {
+    public BigDecimal getCheckTemp() {
         return checkTemp;
     }
 
-    public void setCheckTemp(Integer checkTemp) {
+    public void setCheckTemp(BigDecimal checkTemp) {
         this.checkTemp = checkTemp;
     }
 
@@ -467,5 +469,13 @@ public class RepositoryOrder {
             return true;
         }
         return false;
+    }
+
+    public String getFileNo() {
+        return fileNo;
+    }
+
+    public void setFileNo(String fileNo) {
+        this.fileNo = fileNo;
     }
 }

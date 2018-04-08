@@ -1,5 +1,6 @@
 package com.yiban.erp.service.buy;
 
+import com.alibaba.fastjson.JSON;
 import com.yiban.erp.constant.BuyOrderStatus;
 import com.yiban.erp.constant.OptionsType;
 import com.yiban.erp.constant.OrderNumberType;
@@ -7,17 +8,23 @@ import com.yiban.erp.constant.RepositoryOrderStatus;
 import com.yiban.erp.dao.*;
 import com.yiban.erp.dto.CurrentBalanceResp;
 import com.yiban.erp.dto.ReceiveListReq;
+import com.yiban.erp.dto.ReceiveSetReq;
 import com.yiban.erp.entities.*;
 import com.yiban.erp.exception.BizException;
 import com.yiban.erp.exception.BizRuntimeException;
 import com.yiban.erp.exception.ErrorCode;
 import com.yiban.erp.util.UtilTool;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.omg.CORBA.ORB;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import sun.nio.cs.US_ASCII;
 
+import java.lang.reflect.InvocationTargetException;
+import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -40,6 +47,8 @@ public class ReceiveService {
     private BuyOrderDetailMapper buyOrderDetailMapper;
     @Autowired
     private GoodsMapper goodsMapper;
+    @Autowired
+    private FileInfoMapper fileInfoMapper;
 
     /**
      * 获取某商品当前库存和申购订单信息
@@ -214,6 +223,10 @@ public class ReceiveService {
         return orders;
     }
 
+    public List<RepositoryOrderDetail> getDetailList(Long orderId) {
+        return repositoryOrderDetailMapper.getByOrderId(orderId);
+    }
+
     public void removeById(User user, Long id) throws BizException{
         if (id == null) {
             throw new BizException(ErrorCode.RECEIVE_ORDER_GET_FAIL);
@@ -268,7 +281,7 @@ public class ReceiveService {
             List<Options> options = optionsMapper.findByTypes(user.getCompanyId(), queryOptions);
             order.setOptions(options);
             //获取所有订单对应的详情信息
-            List<RepositoryOrderDetail> details = repositoryOrderDetailMapper.getByOrderIdList(Arrays.asList(order.getId()));
+            List<RepositoryOrderDetail> details = repositoryOrderDetailMapper.getByOrderId(order.getId());
             if (details ==null || details.isEmpty()) {
                 return order;
             }
@@ -322,4 +335,299 @@ public class ReceiveService {
         return order;
     }
 
+    public void setOrderCheckTemp(ReceiveSetReq setReq, User user) throws BizException {
+        RepositoryOrder order = repositoryOrderMapper.selectByPrimaryKey(setReq.getOrderId());
+        if (order == null ) {
+            logger.warn("get order fail by id:{}", setReq.getOrderId());
+            throw new BizException(ErrorCode.RECEIVE_ORDER_GET_FAIL);
+        }
+        order.setUpdateTime(new Date());
+        order.setUpdateBy(user.getNickname());
+        order.setCheckTemp(setReq.getCheckTemp());
+        repositoryOrderMapper.updateByPrimaryKeySelective(order);
+    }
+
+    public void setDetailSurvey(User user, ReceiveSetReq setReq) throws BizException {
+        RepositoryOrderDetail detail = repositoryOrderDetailMapper.selectByPrimaryKey(setReq.getDetailId());
+        if (detail == null) {
+            logger.warn("get detail record fail by id:{}", setReq.getDetailId());
+            throw new BizException(ErrorCode.RECEIVE_ORDER_GET_FAIL);
+        }
+        if (setReq.getSurveyQuality() == null || setReq.getSurveyDate() == null || StringUtils.isBlank(setReq.getSurveyUser())) {
+            logger.warn("request params is error.");
+            throw new BizException(ErrorCode.PARAMETER_MISSING);
+        }
+        detail.setSurveyDate(setReq.getSurveyDate());
+        detail.setSurveyQuality(setReq.getSurveyQuality());
+        detail.setSurveyUser(setReq.getSurveyUser());
+        detail.setSurveyAddress(setReq.getSurveyAddress());
+        detail.setSurveyResult(setReq.getSurveyResult());
+        detail.setSurveyTarget(setReq.getSurveyTarget());
+        detail.setUpdateBy(user.getNickname());
+        detail.setUpdateTime(new Date());
+        repositoryOrderDetailMapper.updateByPrimaryKeySelective(detail);
+    }
+
+
+    public void setCheckResult(User user, ReceiveSetReq setReq) throws BizException {
+        if (setReq == null || (setReq.getOrderId() == null && setReq.getDetailId() == null)) {
+            logger.warn("request params order id or detail id is null.");
+            throw new BizException(ErrorCode.PARAMETER_MISSING);
+        }
+        if (setReq.getOrderId() != null) {
+            //整单验证通过
+            checkOneOrder(user, setReq);
+        }else if (setReq.getDetailId() != null) {
+            //单笔详情验证
+            checkOneDetail(user, setReq);
+        }else {
+            throw new BizException(ErrorCode.PARAMETER_MISSING);
+        }
+    }
+
+    private void checkOneOrder(User user, ReceiveSetReq setReq) throws BizException {
+        RepositoryOrder order = repositoryOrderMapper.selectByPrimaryKey(setReq.getOrderId());
+        if (order == null) {
+            logger.warn("get order info fail by id:{}", setReq.getOrderId());
+            throw new BizException(ErrorCode.RECEIVE_ORDER_GET_FAIL);
+        }
+        if (!order.getCompanyId().equals(user.getCompanyId())) {
+            logger.error("user get company is not match. orderId:{} user:{}", setReq.getOrderId(), user.getId());
+            throw new BizRuntimeException(ErrorCode.ACCESS_PERMISSION);
+        }
+        setReq.setUpdateBy(user.getNickname());
+        setReq.setUpdateTime(new Date());
+        repositoryOrderDetailMapper.setCheckByOrder(setReq);
+
+        //直接把订单的状态修改为意见验收通过的的状态
+        order.setStatus(RepositoryOrderStatus.CHECKED.name());
+        order.setUpdateBy(user.getNickname());
+        order.setUpdateTime(new Date());
+        repositoryOrderMapper.updateByPrimaryKeySelective(order);
+    }
+
+    private void checkOneDetail(User user, ReceiveSetReq setReq) throws BizException {
+        RepositoryOrderDetail detail = repositoryOrderDetailMapper.selectByPrimaryKey(setReq.getDetailId());
+        if (detail == null) {
+            logger.warn("get order detail fail by id:{}", setReq.getDetailId());
+            throw new BizException(ErrorCode.RECEIVE_ORDER_GET_FAIL);
+        }
+        //直接调用验收逻辑
+        setReq.setUpdateBy(user.getNickname());
+        setReq.setUpdateTime(new Date());
+        int count = repositoryOrderDetailMapper.setCheckByDetail(setReq);
+        if (count <= 0) {
+            throw new BizRuntimeException(ErrorCode.FAILED_UPDATE_FROM_DB);
+        }
+
+        //验证订单的是否意见全部验证通过，如果是，需要把订单修改为已经验收完毕的状态
+        List<RepositoryOrderDetail> details = repositoryOrderDetailMapper.getByOrderId(detail.getRepositoryOrderId());
+        boolean checked = true;
+        for (RepositoryOrderDetail item : details) {
+            if (item.getCheckStatus() != null && !item.getCheckStatus()) {
+                checked = false;
+                break;
+            }
+        }
+        if (checked) {
+            logger.warn("user:{} check order detail:{} then order check over. orderId:{}", user.getId(), detail.getId(), detail.getRepositoryOrderId());
+            repositoryOrderMapper.setCheckStatus(detail.getRepositoryOrderId(), RepositoryOrderStatus.CHECKED.name(), user.getNickname(), new Date());
+        }
+    }
+
+    public void setUncheckOrder(User user, Long orderId) throws BizException {
+        RepositoryOrder order = repositoryOrderMapper.selectByPrimaryKey(orderId);
+        if (order == null) {
+            throw new BizException(ErrorCode.RECEIVE_ORDER_GET_FAIL);
+        }
+        ReceiveSetReq setReq = new ReceiveSetReq();
+        setReq.setOrderId(orderId);
+        setReq.setUpdateBy(user.getNickname());
+        setReq.setUpdateTime(new Date());
+        repositoryOrderDetailMapper.setUnCheckByOrder(setReq);
+
+        //把订单的状态修改为INIT状态
+        order.setStatus(RepositoryOrderStatus.INIT.name());
+        order.setUpdateTime(new Date());
+        order.setUpdateBy(user.getNickname());
+        repositoryOrderMapper.updateByPrimaryKeySelective(order);
+    }
+
+
+    public void setUncheckDetail(User user, Long detailId) throws BizException {
+        RepositoryOrderDetail detail = repositoryOrderDetailMapper.selectByPrimaryKey(detailId);
+        if (detail == null) {
+            throw new BizException(ErrorCode.RECEIVE_ORDER_GET_FAIL);
+        }
+        ReceiveSetReq setReq = new ReceiveSetReq();
+        setReq.setDetailId(detailId);
+        setReq.setUpdateBy(user.getNickname());
+        setReq.setUpdateTime(new Date());
+        int count = repositoryOrderDetailMapper.setUnCheckByDetail(setReq);
+        if (count <=0) {
+            throw new BizRuntimeException(ErrorCode.FAILED_UPDATE_FROM_DB);
+        }
+        repositoryOrderMapper.setCheckStatus(detail.getRepositoryOrderId(), RepositoryOrderStatus.INIT.name(), user.getNickname(), new Date());
+    }
+
+    public void removeDetail(User user, Long detailId) throws BizException {
+        RepositoryOrderDetail detail = repositoryOrderDetailMapper.selectByPrimaryKey(detailId);
+        if (detail == null) {
+            logger.warn("get order detail fail by id:{}", detailId);
+            throw new BizException(ErrorCode.RECEIVE_ORDER_GET_FAIL);
+        }
+        if (detail.getCheckStatus() != null && detail.getCheckStatus()) {
+            logger.warn("order detail is checked cannot remove.");
+            throw new BizException(ErrorCode.RECEIVE_DETAIL_REMOVE_STATUS);
+        }
+        logger.info("user:{} remove receive detail info:{}", user.getId(), JSON.toJSONString(detail));
+        repositoryOrderDetailMapper.deleteByPrimaryKey(detailId);
+    }
+
+    public int setSaveDetail(User user, ReceiveSetReq setReq) throws BizException {
+        RepositoryOrder order = repositoryOrderMapper.selectByPrimaryKey(setReq.getOrderId());
+        if (order == null) {
+            logger.warn("get order by id fail. id:{}", setReq.getOrderId());
+            throw new BizException(ErrorCode.RECEIVE_ORDER_GET_FAIL);
+        }
+        List<RepositoryOrderDetail> updateList = setReq.getDetailList();
+        if (updateList == null || updateList.isEmpty()) {
+            logger.warn("detail update list is null.");
+            return 0;
+        }
+        Map<Long, RepositoryOrderDetail> updateMap = new HashMap<>();
+        updateList.stream().forEach(item -> updateMap.put(item.getId(), item));
+        for (RepositoryOrderDetail detail : updateList) {
+            if (!order.getId().equals(detail.getRepositoryOrderId())) {
+                logger.warn("order id is not equals detail repository id. detailId:{} orderId:{}", detail.getId(), order.getId());
+                throw new BizException(ErrorCode.RECEIVE_DETAIL_SAVE_PARAMS_ERROR);
+            }
+        }
+        List<RepositoryOrderDetail> details = repositoryOrderDetailMapper.getByOrderId(order.getId());
+        //只修改没有验证通过，如果验证都过了，不能修改
+        List<RepositoryOrderDetail> canUpdateList = new ArrayList<>();
+        details.stream().forEach(item -> {
+            if (item.getCheckStatus() == null || !item.getCheckStatus()) {
+                canUpdateList.add(item);
+            }
+        });
+        if (canUpdateList.isEmpty()) {
+            logger.info("order detail is all checked, can not update.");
+            return 0;
+        }
+        int count = 0;
+        for (RepositoryOrderDetail detail : canUpdateList) {
+            RepositoryOrderDetail mergeItem = updateMap.get(detail.getId());
+            if (mergeItem == null) {
+                continue;
+            }
+            detail.setBatchCode(mergeItem.getBatchCode());
+            detail.setProductDate(mergeItem.getProductDate());
+            detail.setExpDate(mergeItem.getExpDate());
+            detail.setReceiveQuality(mergeItem.getReceiveQuality());
+            detail.setInCount(mergeItem.getInCount());
+            detail.setRightCount(mergeItem.getRightCount());
+            detail.setErrorCount(mergeItem.getErrorCount());
+            BigDecimal price = detail.getPrice();
+            Integer receiveQuality = detail.getReceiveQuality() != null ? detail.getReceiveQuality() : 0;
+            detail.setAmount(price.multiply(BigDecimal.valueOf(receiveQuality)));
+            detail.setWarehouseLocation(mergeItem.getWarehouseLocation());
+            int result = repositoryOrderDetailMapper.updateByPrimaryKeySelective(detail);
+            count += result;
+        }
+        return count;
+    }
+
+    public void setOrderFileNo(User user, Long orderId, String fileNo) throws BizException{
+        RepositoryOrder order = repositoryOrderMapper.selectByPrimaryKey(orderId);
+        if (order == null) {
+            logger.warn("get order fail by order id:{}", orderId);
+            throw new BizException(ErrorCode.RECEIVE_ORDER_GET_FAIL);
+        }
+        FileInfo fileInfo = fileInfoMapper.getByFileNo(user.getCompanyId(), fileNo);
+        if (fileInfo == null) {
+            logger.warn("get file info fail by fileNo:{}, companyId:{}", fileNo, user.getCompanyId());
+            throw new BizException(ErrorCode.FILE_GET_INFO_FAIL);
+        }
+        order.setFileNo(fileInfo.getFileNo());
+        order.setUpdateBy(user.getNickname());
+        order.setUpdateTime(new Date());
+        repositoryOrderMapper.updateByPrimaryKeySelective(order);
+    }
+
+    public void setOrderInCheck(User user, Long orderId) throws BizException {
+        RepositoryOrder order = repositoryOrderMapper.selectByPrimaryKey(orderId);
+        if (order == null) {
+            logger.warn("get order fail by id:{}", orderId);
+            throw new BizException(ErrorCode.RECEIVE_ORDER_GET_FAIL);
+        }
+        if (!RepositoryOrderStatus.CHECKED.name().equalsIgnoreCase(order.getStatus())) {
+            logger.warn("order status is not in CHECKED status, can not in check success.");
+            throw new BizException(ErrorCode.RECEIVE_ORDER_STATUS_NOT_CHECKED);
+        }
+        //保险检查每一个订单详情是否存在为审核通过的状态
+        List<RepositoryOrderDetail> details = repositoryOrderDetailMapper.getByOrderId(orderId);
+        if (details == null || details.isEmpty()) {
+            logger.warn("order in repository check but detail list is empty. orderId:{}", orderId);
+            throw new BizException(ErrorCode.RECEIVE_ORDER_DETAIL_EMPTY);
+        }
+        boolean checkStatus = true;
+        for (RepositoryOrderDetail detail : details) {
+            if (detail.getCheckStatus() == null || !detail.getCheckStatus()) {
+                checkStatus = false;
+                break;
+            }
+        }
+        if (!checkStatus) {
+            logger.warn("order detail have check status is false. orderId:{}", orderId);
+            throw new BizException(ErrorCode.RECEIVE_ORDER_STATUS_NOT_CHECKED);
+        }
+        //TODO 验证是否在盘库状态，如果正在盘库，不能进行操作
+
+        //如果审核通过，修改状态
+        int count = repositoryOrderMapper.setCheckStatus(order.getId(),
+                RepositoryOrderStatus.IN_CHECKED.name(), user.getNickname(), new Date());
+        if (count <= 0) {
+            logger.error("update order status fail. order id:{}", order.getId());
+            throw new BizRuntimeException(ErrorCode.FAILED_UPDATE_FROM_DB);
+        }
+        //把数据插入到库存中
+        List<RepertoryInfo> infoList = createRepertoryInfos(user, order, details);
+        int inCount = repertoryInfoMapper.insertBatch(infoList);
+        logger.info("insert repertory info count:{}", inCount);
+    }
+
+    private List<RepertoryInfo> createRepertoryInfos(User user, RepositoryOrder order, List<RepositoryOrderDetail> detailList) {
+        List<RepertoryInfo> infos = new ArrayList<>();
+        for (RepositoryOrderDetail detail : detailList) {
+            RepertoryInfo item = new RepertoryInfo();
+            item.setCompanyId(order.getCompanyId());
+            item.setWarehouseId(order.getWarehouseId());
+            item.setInUserId(user.getId());
+            item.setGoodId(detail.getGoodsId());
+            item.setInQuantity(detail.getInCount());
+            item.setQuantity(detail.getInCount());
+            item.setBuyPrice(detail.getPrice());
+//            item.setSalePrice(detail.getPrice());    //仓库信息中按逻辑不存销售假信息
+            item.setCode(detail.getGoods() == null ? null : detail.getGoods().getCode());
+            item.setBatchCode(detail.getBatchCode());
+            item.setExp(false);
+            item.setSaleEnable(true);
+            item.setProductDate(detail.getProductDate());
+            item.setExpDate(detail.getExpDate());
+            item.setInDate(new Date());
+            item.setLocation(detail.getWarehouseLocation());
+            item.setSupplierId(order.getSupplierId());
+            item.setSupplierContactId(order.getSupplierContactId());
+            item.setBuyerId(order.getBuyerId());
+            item.setOrderId(order.getId());
+            item.setCreateBy(user.getNickname());
+            item.setCreateTime(new Date());
+            item.setUpdateBy(user.getNickname());
+            item.setUpdateTime(new Date());
+
+            infos.add(item);
+        }
+        return infos;
+    }
 }

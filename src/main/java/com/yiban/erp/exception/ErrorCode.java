@@ -87,6 +87,12 @@ public enum ErrorCode {
     RECEIVE_ORDER_GET_FAIL(2405, "获取订单失败"),
     RECEIVE_ORDER_CAN_NOT_REMOVE(2406, "订单处于不可删除状态"),
     RECEIVE_BUY_ORDER_STATUS(2407, "采购订单不处于审核通过状态"),
+    RECEIVE_CHECK_STATUS_ERROR(2408, "当前订单不处于可验收状态"),
+    RECEIVE_DETAIL_REMOVE_STATUS(2409, "订单详情已经验证通过，不能删除"),
+    RECEIVE_DETAIL_SAVE_PARAMS_ERROR(2410, "订单详情参数与订单信息不匹配", ErrorDisplay.NOTICE),
+    RECEIVE_ORDER_STATUS_NOT_CHECKED(2411, "订单未处于验收通过的状态，不能审核通过"),
+    RECEIVE_ORDER_DETAIL_EMPTY(2412, "获取订单商品信息失败"),
+
 
 
     // 41xx - 贷款
@@ -98,7 +104,10 @@ public enum ErrorCode {
     MOBILE_VERIFY_CODE_TOO_FREQUENT(4106, "验证码发送太频繁"),
 
     ACCESS_PERMISSION(9001, "无访问权限", ErrorDisplay.MODAL),
-    PARAMETER_MISSING(9002, "缺少必填字段");
+    PARAMETER_MISSING(9002, "缺少必填字段"),
+    MESSAGE_GET_FAIL(9003, "获取消息信息失败"),
+
+    ;
 
     private Integer code;
     private String message;

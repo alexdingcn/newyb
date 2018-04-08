@@ -16,8 +16,8 @@
     <result column="pay_date" property="payDate" jdbcType="TIMESTAMP" />
     <result column="good_bill_no" property="goodBillNo" jdbcType="VARCHAR" />
     <result column="temp_control_method" property="tempControlMethod" jdbcType="BIGINT" />
-    <result column="receive_temp" property="receiveTemp" jdbcType="INTEGER" />
-    <result column="check_temp" property="checkTemp" jdbcType="INTEGER" />
+    <result column="receive_temp" property="receiveTemp" jdbcType="DECIMAL" />
+    <result column="check_temp" property="checkTemp" jdbcType="DECIMAL" />
     <result column="temp_control_status" property="tempControlStatus" jdbcType="BIGINT" />
     <result column="ship_company_id" property="shipCompanyId" jdbcType="INTEGER" />
     <result column="ship_method" property="shipMethod" jdbcType="BIGINT" />
@@ -37,6 +37,7 @@
     <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
     <result column="update_by" property="updateBy" jdbcType="VARCHAR" />
     <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+    <result column="file_no" property="fileNo" jdbcType="VARCHAR" />
   </resultMap>
   <sql id="Base_Column_List" >
     id, company_id, buy_order_id, order_number, ref_no, supplier_id, supplier_contact_id, buyer_id, status,
@@ -44,7 +45,7 @@
     check_temp, temp_control_status, ship_company_id, ship_method, ship_tool, ship_car_no, 
     ship_driver_name, ship_start_date, ship_end_date, ship_entrust_no, ship_start_address, 
     warehouse_id, buy_type, term, come_from, bill_type, create_by, create_time, update_by, 
-    update_time
+    update_time, file_no
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
     select 
@@ -67,20 +68,21 @@
       ship_end_date, ship_entrust_no, ship_start_address, 
       warehouse_id, buy_type, term, 
       come_from, bill_type, create_by, 
-      create_time, update_by, update_time
+      create_time, update_by, update_time, file_no
       )
     values (#{id,jdbcType=BIGINT}, #{companyId,jdbcType=INTEGER}, #{buyOrderId,jdbcType=BIGINT},
       #{orderNumber,jdbcType=VARCHAR}, #{refNo,jdbcType=VARCHAR},
       #{supplierId,jdbcType=BIGINT}, #{supplierContactId,jdbcType=BIGINT}, #{buyerId,jdbcType=BIGINT},
       #{status,jdbcType=VARCHAR}, #{keyWord,jdbcType=VARCHAR}, #{receiveDate,jdbcType=TIMESTAMP}, 
       #{payDate,jdbcType=TIMESTAMP}, #{goodBillNo,jdbcType=VARCHAR}, #{tempControlMethod,jdbcType=BIGINT}, 
-      #{receiveTemp,jdbcType=INTEGER}, #{checkTemp,jdbcType=INTEGER}, #{tempControlStatus,jdbcType=BIGINT},
+      #{receiveTemp,jdbcType=DECIMAL}, #{checkTemp,jdbcType=DECIMAL}, #{tempControlStatus,jdbcType=BIGINT},
       #{shipCompanyId,jdbcType=INTEGER}, #{shipMethod,jdbcType=BIGINT}, #{shipTool,jdbcType=BIGINT}, 
       #{shipCarNo,jdbcType=VARCHAR}, #{shipDriverName,jdbcType=VARCHAR}, #{shipStartDate,jdbcType=TIMESTAMP},
       #{shipEndDate,jdbcType=TIMESTAMP}, #{shipEntrustNo,jdbcType=VARCHAR}, #{shipStartAddress,jdbcType=VARCHAR}, 
       #{warehouseId,jdbcType=INTEGER}, #{buyType,jdbcType=BIGINT}, #{term,jdbcType=INTEGER},
       #{comeFrom,jdbcType=VARCHAR}, #{billType,jdbcType=BIGINT}, #{createBy,jdbcType=VARCHAR},
-      #{createTime,jdbcType=TIMESTAMP}, #{updateBy,jdbcType=VARCHAR}, #{updateTime,jdbcType=TIMESTAMP}
+      #{createTime,jdbcType=TIMESTAMP}, #{updateBy,jdbcType=VARCHAR}, #{updateTime,jdbcType=TIMESTAMP},
+      #{fileNo,jdbcType=VARCHAR}
       )
   </insert>
   <insert id="insertSelective" parameterType="com.yiban.erp.entities.RepositoryOrder" keyProperty="id" useGeneratedKeys="true" >
@@ -191,6 +193,9 @@
       <if test="updateTime != null" >
         update_time,
       </if>
+      <if test="fileNo != null">
+        file_no,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides="," >
       <if test="id != null" >
@@ -236,10 +241,10 @@
         #{tempControlMethod,jdbcType=BIGINT},
       </if>
       <if test="receiveTemp != null" >
-        #{receiveTemp,jdbcType=INTEGER},
+        #{receiveTemp,jdbcType=DECIMAL},
       </if>
       <if test="checkTemp != null" >
-        #{checkTemp,jdbcType=INTEGER},
+        #{checkTemp,jdbcType=DECIMAL},
       </if>
       <if test="tempControlStatus != null" >
         #{tempControlStatus,jdbcType=BIGINT},
@@ -298,6 +303,9 @@
       <if test="updateTime != null" >
         #{updateTime,jdbcType=TIMESTAMP},
       </if>
+      <if test="fileNo != null">
+        #{fileNo,jdbcType=VARCHAR},
+      </if>
     </trim>
   </insert>
   <update id="updateByPrimaryKeySelective" parameterType="com.yiban.erp.entities.RepositoryOrder" >
@@ -337,10 +345,10 @@
         temp_control_method = #{tempControlMethod,jdbcType=BIGINT},
       </if>
       <if test="receiveTemp != null" >
-        receive_temp = #{receiveTemp,jdbcType=INTEGER},
+        receive_temp = #{receiveTemp,jdbcType=DECIMAL},
       </if>
       <if test="checkTemp != null" >
-        check_temp = #{checkTemp,jdbcType=INTEGER},
+        check_temp = #{checkTemp,jdbcType=DECIMAL},
       </if>
       <if test="tempControlStatus != null" >
         temp_control_status = #{tempControlStatus,jdbcType=BIGINT},
@@ -399,6 +407,9 @@
       <if test="updateTime != null" >
         update_time = #{updateTime,jdbcType=TIMESTAMP},
       </if>
+      <if test="fileNo != null">
+        file_no = #{fileNo,jdbcType=VARCHAR},
+      </if>
     </set>
     where id = #{id,jdbcType=BIGINT}
   </update>
@@ -416,8 +427,8 @@
       pay_date = #{payDate,jdbcType=TIMESTAMP},
       good_bill_no = #{goodBillNo,jdbcType=VARCHAR},
       temp_control_method = #{tempControlMethod,jdbcType=BIGINT},
-      receive_temp = #{receiveTemp,jdbcType=INTEGER},
-      check_temp = #{checkTemp,jdbcType=INTEGER},
+      receive_temp = #{receiveTemp,jdbcType=DECIMAL},
+      check_temp = #{checkTemp,jdbcType=DECIMAL},
       temp_control_status = #{tempControlStatus,jdbcType=BIGINT},
       ship_company_id = #{shipCompanyId,jdbcType=INTEGER},
       ship_method = #{shipMethod,jdbcType=BIGINT},
@@ -436,7 +447,8 @@
       create_by = #{createBy,jdbcType=VARCHAR},
       create_time = #{createTime,jdbcType=TIMESTAMP},
       update_by = #{updateBy,jdbcType=VARCHAR},
-      update_time = #{updateTime,jdbcType=TIMESTAMP}
+      update_time = #{updateTime,jdbcType=TIMESTAMP},
+      file_no = #{fileNo,jdbcType=VARCHAR}
     where id = #{id,jdbcType=BIGINT}
   </update>
 
@@ -450,7 +462,7 @@
       o.ship_driver_name as shipDriverName, o.ship_start_date as shipStartDate, o.ship_end_date as shipEndDate,
       o.ship_entrust_no as shipEntrustNo, o.ship_start_address as shipStartAddress,
       o.warehouse_id as warehouseId, o.buy_type as buyType, o.term as term, o.come_from as comeFrom, o.bill_type as billType,
-      o.create_by as createBy, o.create_time as createTime, o.update_by as updateBy, o.update_time as updateTime,
+      o.create_by as createBy, o.create_time as createTime, o.update_by as updateBy, o.update_time as updateTime, o.file_no as fileNo,
       s.name as supplierName, sc.name as supplierContactName, w.name as warehouseName,
       u.nickname as saleNickName, u.realname as saleRealName
   </sql>
@@ -464,6 +476,12 @@
       and o.buyer_id = u.id
     and o.company_id = #{companyId}
     and o.status != 'DELETE'
+    <if test="warehouseId != null">
+      and o.warehouse_id = #{warehouseId}
+    </if>
+    <if test="supplierId != null" >
+      and o.supplier_id = #{supplierId}
+    </if>
     <if test="startReceiveDate != null">
       and o.receive_date >= #{startReceiveDate}
     </if>
@@ -489,5 +507,13 @@
     and o.status != 'DELETE'
     and o.buy_order_id = #{buyOrderId}
   </select>
+
+  <update id="setCheckStatus" parameterType="map">
+    update repository_order
+      set status = #{status},
+          update_by = #{updateBy},
+          update_time = #{updateTime}
+    where id = #{id}
+  </update>
 
 </mapper>

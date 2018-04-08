@@ -16,7 +16,7 @@
                         </Col>
                         <Col span="12" >
                             <FormItem label="制单日期">
-                                <DatePicker size="small" v-model="dateRange" type="daterange" placement="bottom-end" placeholder="制单日期" style="width:180px"></DatePicker>
+                                <DatePicker size="small" v-model="dateRange" type="daterange" placement="bottom-start" placeholder="制单日期" style="width:180px"></DatePicker>
                             </FormItem>
                         </Col>
                         <Col span="4"></Col>

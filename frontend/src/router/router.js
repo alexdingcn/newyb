@@ -2,84 +2,84 @@ import Main from '@/views/Main.vue';
 
 // 不作为Main组件的子页面展示的页面单独写，如下
 export const loginRouter = {
-    path: '/login',
-    name: 'login',
-    meta: {
-        title: '登录',
-        noAuth: true
-    },
-    component: () => import('@/views/login.vue')
+        path: '/login',
+        name: 'login',
+        meta: {
+            title: '登录',
+            noAuth: true
+        },
+        component: () => import('@/views/login.vue')
 };
 
 export const registerRouter = {
-    path: '/register',
-    name: 'register',
-    meta: {
-        title: '注册',
-        noAuth: true
-    },
-    component: () => import('@/views/register.vue')
+        path: '/register',
+        name: 'register',
+        meta: {
+            title: '注册',
+            noAuth: true
+        },
+        component: () => import('@/views/register.vue')
 };
 
 export const loanApplyRouter = {
-    path: '/loan/apply',
-    name: 'loan_apply',
-    meta: {
-        title: '融资申请-医伴金服',
-        noAuth: true
-    },
-    component: () => import('@/views/loan/apply.vue')
+        path: '/loan/apply',
+        name: 'loan_apply',
+        meta: {
+            title: '融资申请-医伴金服',
+            noAuth: true
+        },
+        component: () => import('@/views/loan/apply.vue')
 };
 export const loanBizlicenseRouter = {
-    path: '/loan/bizlicense',
-    name: 'loan_bizlicense',
-    meta: {
-        title: '融资申请-医伴金服',
-        noAuth: true
-    },
-    component: () => import('@/views/loan/bizlicense.vue')
+        path: '/loan/bizlicense',
+        name: 'loan_bizlicense',
+        meta: {
+            title: '融资申请-医伴金服',
+            noAuth: true
+        },
+        component: () => import('@/views/loan/bizlicense.vue')
 };
 
 export const page404 = {
-    path: '/*',
-    name: 'error-404',
-    meta: {
-        title: '404-页面不存在',
-        noAuth: true
-    },
-    component: () => import('@/views/error-page/404.vue')
+        path: '/*',
+        name: 'error-404',
+        meta: {
+            title: '404-页面不存在',
+            noAuth: true
+        },
+        component: () => import('@/views/error-page/404.vue')
 };
 
 export const page403 = {
-    path: '/403',
-    meta: {
-        title: '403-权限不足',
-        noAuth: true
-    },
-    name: 'error-403',
-    component: () => import('@//views/error-page/403.vue')
+        path: '/403',
+        meta: {
+            title: '403-权限不足',
+            noAuth: true
+        },
+        name: 'error-403',
+        component: () => import('@//views/error-page/403.vue')
 };
 
 export const page500 = {
-    path: '/500',
-    meta: {
-        title: '500-服务端错误',
-        noAuth: true
-    },
-    name: 'error-500',
-    component: () => import('@/views/error-page/500.vue')
+        path: '/500',
+        meta: {
+            title: '500-服务端错误',
+            noAuth: true
+        },
+        name: 'error-500',
+        component: () => import('@/views/error-page/500.vue')
 };
 
 export const preview = {
-    path: '/preview',
-    name: 'preview',
-    component: () => import('@/views/form/article-publish/preview.vue')
+        path: '/preview',
+        name: 'preview',
+        component: () => import('@/views/form/article-publish/preview.vue')
 };
 
 export const locking = {
-    path: '/locking',
-    name: 'locking',
-    component: () => import('@/views/main-components/lockscreen/components/locking-page.vue')
+        path: '/locking',
+        name: 'locking',
+        component: () => import('@/views/main-components/lockscreen/components/locking-page.vue')
 };
 
 // 作为Main组件的子页面展示但是不在左侧菜单显示的路由写在otherRouter里
@@ -125,6 +125,50 @@ export const appRouter = [
             { path: 'ship', title: '运输公司档案', name: 'basic_data_ship', component: () => import('@/views/basic-data/ship.vue') }
         ]
     },
+{
+    path: '/buy',
+    icon: 'bag',
+    name: 'buy',
+    title: '采购',
+    component: Main,
+    children: [
+        { path: 'order', title: '采购制单', name: 'buy_order', component: () => import('@/views/buy/buy-order.vue') },
+        { path: 'review', title: '采购单审核', name: 'buy_order_review', component: () => import('@/views/buy/buy-order-list.vue') },
+        { path: 'receive', title: '采购收货', name: 'buy_receive', component: () => import('@/views/buy/buy-receive.vue') },
+        { path: "quality-check", title: '入库质量验收', name: 'buy-quality-check', component: () => import('@/views/buy/buy-quality-check.vue')},
+        { path: "in-check", title: '入库审核', name: 'receive-in-check', component: () => import('@/views/buy/receive-in-check.vue')},
+    ]
+},
+{
+    path: '/sell',
+    icon: 'ios-calculator',
+    name: 'sell',
+    title: '销售',
+    component: Main,
+    children: [
+        { path: 'order', title: '销售制单', name: 'sell_order', component: () => import('@/views/sell/make.vue') },
+        { path: 'quality-review', title: '销售出库质量审核', name: 'sell-quality-review', component: () => import('@/views/sell/sell-quality-review.vue') },
+        { path: 'sale-review', title: '销售审核', name: 'sell-sale-review', component: () => import('@/views/sell/sell-sale-review.vue') },
+        { path: 'list', title: '销售订单列表', name: 'sell_list', component: () => import('@/views/sell/sell-order-list.vue') },
+    ]
+},
+{
+    path: '/warehouse',
+    icon: 'social-buffer',
+    name: 'warehouse',
+    title: '库存',
+    component: Main,
+    children: [
+        { path: 'in_store', title: '入库管理', name: 'in_store', component: () => import('@/views/warehouse/in_store.vue') },
+        { path: 'store_now', title: '实时库存', name: 'store_now', component: () => import('@/views/warehouse/store_now.vue') },
+        { path: 'out_store', title: '出库管理', name: 'out_store', component: () => import('@/views/warehouse/out_store.vue') },
+        { path: 'check_store', title: '库存盘点', name: 'check_store', component: () => import('@/views/warehouse/check_store.vue') },
+        { path: 'setting', title: '仓库点设置', name: 'wh_setting', component: () => import('@/views/warehouse/setting.vue') },
+        { path: 'overview', title: '库存报表', name: 'wh_overview', component: () => import('@/views/warehouse/overview.vue') },
+    ]
+},
+{
+    path: '/access',
     {
         path: '/buy',
         icon: 'bag',
@@ -167,36 +211,36 @@ export const appRouter = [
     {
         path: '/access',
         icon: 'key',
-        name: 'access',
-        title: '权限管理',
-        component: Main,
-        children: [
-            { path: 'index', title: '权限管理', name: 'access_index', component: () => import('@/views/access/access.vue') }
-        ]
-    },
-    {
-        path: '/access-test',
+    name: 'access',
+    title: '权限管理',
+    component: Main,
+    children: [
+        { path: 'index', title: '权限管理', name: 'access_index', component: () => import('@/views/access/access.vue') }
+    ]
+},
+{
+    path: '/access-test',
         icon: 'lock-combination',
-        title: '权限测试页',
-        name: 'accesstest',
-        access: 0,
-        component: Main,
-        children: [
-            { path: 'index', title: '权限测试页', name: 'accesstest_index', access: 0, component: () => import('@/views/access/access-test.vue') }
-        ]
-    },
-    {
-        path: '/international',
+    title: '权限测试页',
+    name: 'accesstest',
+    access: 0,
+    component: Main,
+    children: [
+        { path: 'index', title: '权限测试页', name: 'accesstest_index', access: 0, component: () => import('@/views/access/access-test.vue') }
+    ]
+},
+{
+    path: '/international',
         icon: 'earth',
-        title: {i18n: 'international'},
-        name: 'international',
+    title: {i18n: 'international'},
+    name: 'international',
         component: Main,
-        children: [
-            { path: 'index', title: {i18n: 'international'}, name: 'international_index', component: () => import('@/views/international/international.vue') }
-        ]
-    },
-    {
-        path: '/component',
+    children: [
+    { path: 'index', title: {i18n: 'international'}, name: 'international_index', component: () => import('@/views/international/international.vue') }
+]
+},
+{
+    path: '/component',
         icon: 'social-buffer',
         name: 'component',
         title: '组件',
@@ -285,8 +329,8 @@ export const appRouter = [
 
 //     ]
 // },
-    {
-        path: '/tables',
+{
+    path: '/tables',
         icon: 'ios-grid-view',
         name: 'tables',
         title: '表格',

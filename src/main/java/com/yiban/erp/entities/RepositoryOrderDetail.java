@@ -42,6 +42,26 @@ public class RepositoryOrderDetail {
 
     private Date updateTime;
 
+    private Integer inCount; //入库量，直接设置为收货量
+    private Integer rightCount; //合格数量
+    private Integer errorCount; //不合格的数量
+
+    private Date surveyDate;
+    private Integer surveyQuality; //抽样检查数量
+    private String surveyUser;
+    private String surveyAddress;
+    private String surveyResult;
+    private String surveyTarget;
+
+    private Boolean checkStatus;
+    private String errorPlan;
+    private String saleCert;
+    private String errorReason;
+    private Long checkTempMethod;
+    private String checkUser;
+    private Date checkTime;
+    private String checkResult;
+
     private Goods goods;
 
     private String goodsName;
@@ -52,7 +72,17 @@ public class RepositoryOrderDetail {
     private String unitName;
     private String packUnitName;
     private Integer bigPack;
+    private String permit;
+    private String storageCondition;
+    private Boolean specialManaged;
 
+    public Boolean getSpecialManaged() {
+        return this.goods == null ? null : this.goods.getSpecialManaged();
+    }
+
+    public String getStorageCondition() {
+        return this.goods == null ? null : this.goods.getStorageCondition();
+    }
 
     public String getGoodsName() {
         return this.goods == null ? null : this.goods.getName();
@@ -84,6 +114,10 @@ public class RepositoryOrderDetail {
 
     public Integer getBigPack() {
         return this.goods == null ? null : this.goods.getBigPack();
+    }
+
+    public String getPermit() {
+        return this.goodsName == null ? null : String.valueOf(this.goods.getPermitId());
     }
 
     public Goods getGoods() {
@@ -244,5 +278,146 @@ public class RepositoryOrderDetail {
 
     public void setUpdateTime(Date updateTime) {
         this.updateTime = updateTime;
+    }
+
+    public Integer getInCount() {
+        return inCount;
+    }
+
+    public void setInCount(Integer inCount) {
+        if (inCount == null) {
+            this.inCount = this.receiveQuality;
+        }else {
+            this.inCount = inCount;
+        }
+    }
+
+    public Integer getRightCount() {
+        return rightCount;
+    }
+
+    public void setRightCount(Integer rightCount) {
+        this.rightCount = rightCount;
+    }
+
+    public Integer getErrorCount() {
+        return errorCount;
+    }
+
+    public void setErrorCount(Integer errorCount) {
+        this.errorCount = errorCount;
+    }
+
+
+    public Date getSurveyDate() {
+        return surveyDate;
+    }
+
+    public void setSurveyDate(Date surveyDate) {
+        this.surveyDate = surveyDate;
+    }
+
+    public Integer getSurveyQuality() {
+        return surveyQuality;
+    }
+
+    public void setSurveyQuality(Integer surveyQuality) {
+        this.surveyQuality = surveyQuality;
+    }
+
+    public String getSurveyUser() {
+        return surveyUser;
+    }
+
+    public void setSurveyUser(String surveyUser) {
+        this.surveyUser = surveyUser;
+    }
+
+    public String getSurveyAddress() {
+        return surveyAddress;
+    }
+
+    public void setSurveyAddress(String surveyAddress) {
+        this.surveyAddress = surveyAddress;
+    }
+
+    public String getSurveyResult() {
+        return surveyResult;
+    }
+
+    public void setSurveyResult(String surveyResult) {
+        this.surveyResult = surveyResult;
+    }
+
+    public String getSurveyTarget() {
+        return surveyTarget;
+    }
+
+    public void setSurveyTarget(String surveyTarget) {
+        this.surveyTarget = surveyTarget;
+    }
+
+    public Boolean getCheckStatus() {
+        return checkStatus;
+    }
+
+    public void setCheckStatus(Boolean checkStatus) {
+        this.checkStatus = checkStatus;
+    }
+
+    public String getErrorPlan() {
+        return errorPlan;
+    }
+
+    public void setErrorPlan(String errorPlan) {
+        this.errorPlan = errorPlan;
+    }
+
+    public String getSaleCert() {
+        return saleCert;
+    }
+
+    public void setSaleCert(String saleCert) {
+        this.saleCert = saleCert;
+    }
+
+    public String getErrorReason() {
+        return errorReason;
+    }
+
+    public void setErrorReason(String errorReason) {
+        this.errorReason = errorReason;
+    }
+
+    public Long getCheckTempMethod() {
+        return checkTempMethod;
+    }
+
+    public void setCheckTempMethod(Long checkTempMethod) {
+        this.checkTempMethod = checkTempMethod;
+    }
+
+    public String getCheckUser() {
+        return checkUser;
+    }
+
+    public void setCheckUser(String checkUser) {
+        this.checkUser = checkUser;
+    }
+
+    public Date getCheckTime() {
+        return checkTime;
+    }
+
+    public void setCheckTime(Date checkTime) {
+        this.checkTime = checkTime;
+    }
+
+    public String getCheckResult() {
+        return checkResult;
+    }
+
+    public void setCheckResult(String checkResult) {
+        this.checkResult = checkResult;
     }
 }
