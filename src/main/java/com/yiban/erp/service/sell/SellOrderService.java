@@ -191,10 +191,10 @@ public class SellOrderService {
         Map<Long, List<SellOrderDetail>> result = new HashMap<>();
         for (SellOrderDetail detail : details) {
             RepertoryInfo repertoryInfo = detail.getRepertoryInfo();
-            if (repertoryInfo == null || repertoryInfo.getGoodId() == null) {
+            if (repertoryInfo == null || repertoryInfo.getGoodsId() == null) {
                 continue;
             }
-            Long goodId = repertoryInfo.getGoodId();
+            Long goodId = repertoryInfo.getGoodsId();
             if (!result.containsKey(goodId)) {
                 List<SellOrderDetail> itemList = new ArrayList<>();
                 result.put(goodId, itemList);

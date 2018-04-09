@@ -33,12 +33,12 @@ public class RepertoryService {
         }
         //获取对应的商品基础信息
         List<Long> goodIdList = new ArrayList<>();
-        list.stream().forEach(item -> goodIdList.add(item.getGoodId()));
+        list.stream().forEach(item -> goodIdList.add(item.getGoodsId()));
         List<Goods> goodsList = goodsMapper.selectByIdList(goodIdList);
         final Map<Long, Goods> goodMap = new HashMap<>();
         goodsList.stream().forEach(item -> goodMap.put(item.getId(), item));
         list.stream().forEach(item -> {
-            Goods goodItem = goodMap.get(item.getGoodId());
+            Goods goodItem = goodMap.get(item.getGoodsId());
             item.setGoods(goodItem);
         });
         return list;
