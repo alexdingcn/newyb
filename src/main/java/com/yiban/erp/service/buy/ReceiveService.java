@@ -1,10 +1,7 @@
 package com.yiban.erp.service.buy;
 
 import com.alibaba.fastjson.JSON;
-import com.yiban.erp.constant.BuyOrderStatus;
-import com.yiban.erp.constant.OptionsType;
-import com.yiban.erp.constant.OrderNumberType;
-import com.yiban.erp.constant.RepositoryOrderStatus;
+import com.yiban.erp.constant.*;
 import com.yiban.erp.dao.*;
 import com.yiban.erp.dto.CurrentBalanceResp;
 import com.yiban.erp.dto.ReceiveListReq;
@@ -143,9 +140,11 @@ public class ReceiveService {
         saveOrderDetail(user, order);
 
         //如果是保存操作，不是暂挂，验证是否存在采购单号，如果存在，修改到已经收货的状态
-        if (RepositoryOrderStatus.INIT.name().equalsIgnoreCase(order.getStatus()) && order.getBuyOrderId() != null) {
-            logger.info("set buy order status to shiped. buyOrderId:{}", order.getBuyOrderId());
-            BuyOrder buyOrder = buyOrderMapper.selectByPrimaryKey(order.getBuyOrderId());
+        if (RepositoryOrderStatus.INIT.name().equalsIgnoreCase(order.getStatus())
+                && RepositoryRefType.BUY_ORDER.name().equalsIgnoreCase(order.getRefType())
+                && order.getRefOrderId() != null) {
+            logger.info("set buy order status to shiped. buyOrderId:{}", order.getRefOrderId());
+            BuyOrder buyOrder = buyOrderMapper.selectByPrimaryKey(order.getRefOrderId());
             if (buyOrder != null) {
                 buyOrder.setStatus(BuyOrderStatus.SHIPPED.name());
                 buyOrder.setUpdatedBy(user.getNickname());
@@ -263,7 +262,7 @@ public class ReceiveService {
             throw new BizException(ErrorCode.RECEIVE_BUY_ORDER_STATUS);
         }
         //查询当前采购收货单中是否存在该笔订单数据，如果存在，直接返回，如果不存在，生成对应数据
-        RepositoryOrder order = repositoryOrderMapper.getByBuyOrder(user.getCompanyId(), buyOrderId);
+        RepositoryOrder order = repositoryOrderMapper.getByRefOrder(user.getCompanyId(), RepositoryRefType.BUY_ORDER.name(), buyOrderId);
         if (order == null) {
             logger.info("buy order is not exist in receive order. buy order id:{}", buyOrderId);
             return makeReceiveOrderByBuyOrder(user, buyOrder);
@@ -294,7 +293,8 @@ public class ReceiveService {
     private RepositoryOrder makeReceiveOrderByBuyOrder(User user, BuyOrder buyOrder) {
         RepositoryOrder order = new RepositoryOrder();
         order.setCompanyId(buyOrder.getCompanyId());
-        order.setBuyOrderId(buyOrder.getId());
+        order.setRefOrderId(buyOrder.getId());
+        order.setRefType(RepositoryRefType.BUY_ORDER.name());
         order.setSupplierId(buyOrder.getSupplierId());
         order.setSupplierName(buyOrder.getSupplier());
         order.setSupplierContactId(buyOrder.getSupplierContactId());
@@ -324,8 +324,8 @@ public class ReceiveService {
             RepositoryOrderDetail detail = new RepositoryOrderDetail();
             detail.setGoodsId(item.getGoodsId());
             detail.setGoods(goodsMap.get(item.getGoodsId()));
-            detail.setReceiveQuality(item.getQuantity() == null ? 0 : item.getQuantity().intValue());
-            detail.setBigQuality(0);
+            detail.setReceiveQuality(item.getQuantity() == null ? BigDecimal.ZERO : item.getQuantity());
+            detail.setBigQuality(BigDecimal.ZERO);
             detail.setPrice(item.getBuyPrice());
             detail.setAmount(item.getAmount());
             details.add(detail);
@@ -529,8 +529,8 @@ public class ReceiveService {
             detail.setRightCount(mergeItem.getRightCount());
             detail.setErrorCount(mergeItem.getErrorCount());
             BigDecimal price = detail.getPrice();
-            Integer receiveQuality = detail.getReceiveQuality() != null ? detail.getReceiveQuality() : 0;
-            detail.setAmount(price.multiply(BigDecimal.valueOf(receiveQuality)));
+            BigDecimal receiveQuality = detail.getReceiveQuality() != null ? detail.getReceiveQuality() : BigDecimal.ZERO;
+            detail.setAmount(price.multiply(receiveQuality));
             detail.setWarehouseLocation(mergeItem.getWarehouseLocation());
             int result = repositoryOrderDetailMapper.updateByPrimaryKeySelective(detail);
             count += result;
@@ -603,24 +603,33 @@ public class ReceiveService {
             RepertoryInfo item = new RepertoryInfo();
             item.setCompanyId(order.getCompanyId());
             item.setWarehouseId(order.getWarehouseId());
+            item.setLocation(detail.getWarehouseLocation());
             item.setInUserId(user.getId());
             item.setGoodsId(detail.getGoodsId());
+<<<<<<< HEAD
             item.setInQuantity(detail.getInCount());
             item.setQuantity(detail.getInCount());
             item.setBuyPrice(detail.getPrice());
 //            item.setSalePrice(detail.getPrice());    //仓库信息中按逻辑不存销售假信息
 //            item.setSalePrice(detail.getPrice());    //仓库信息中按逻辑不存销售假信息
             item.setBatchCode(detail.getBatchCode());
+=======
+            item.setBatchCode(detail.getBatchCode());
+            item.setFactoryId(detail.getGoods() == null ? null : detail.getGoods().getFactoryId());
+            item.setInQuantity(detail.getInCount());
+            item.setQuantity(detail.getInCount());
+            item.setBuyPrice(detail.getPrice());
+>>>>>>> 18736afebc9cfb38e9f90dd548b979b6ca9838f4
             item.setExp(false);
             item.setSaleEnable(true);
             item.setProductDate(detail.getProductDate());
             item.setExpDate(detail.getExpDate());
             item.setInDate(new Date());
-            item.setLocation(detail.getWarehouseLocation());
             item.setSupplierId(order.getSupplierId());
             item.setSupplierContactId(order.getSupplierContactId());
             item.setBuyerId(order.getBuyerId());
             item.setOrderId(order.getId());
+            item.setSaleSate(detail.getSaleState());
             item.setCreateBy(user.getNickname());
             item.setCreateTime(new Date());
             item.setUpdateBy(user.getNickname());

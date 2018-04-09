@@ -18,16 +18,16 @@ public class ReceiveSetReq {
 
     //设置详情的抽样数据
     private Date surveyDate;
-    private Integer surveyQuality;
+    private BigDecimal surveyQuality;
     private String surveyUser;
     private String surveyAddress;
     private String surveyResult;
     private String surveyTarget;
 
     //设置验收结果
-    private Integer inCount;
-    private Integer rightCount;
-    private Integer errorCount;
+    private BigDecimal inCount;
+    private BigDecimal rightCount;
+    private BigDecimal errorCount;
     private String errorPlan;
     private String saleCert;
     private String errorReason;
@@ -74,14 +74,6 @@ public class ReceiveSetReq {
         this.surveyDate = surveyDate;
     }
 
-    public Integer getSurveyQuality() {
-        return surveyQuality;
-    }
-
-    public void setSurveyQuality(Integer surveyQuality) {
-        this.surveyQuality = surveyQuality;
-    }
-
     public String getSurveyUser() {
         return surveyUser;
     }
@@ -114,27 +106,35 @@ public class ReceiveSetReq {
         this.surveyTarget = surveyTarget;
     }
 
-    public Integer getInCount() {
+    public BigDecimal getSurveyQuality() {
+        return surveyQuality;
+    }
+
+    public void setSurveyQuality(BigDecimal surveyQuality) {
+        this.surveyQuality = surveyQuality;
+    }
+
+    public BigDecimal getInCount() {
         return inCount;
     }
 
-    public void setInCount(Integer inCount) {
+    public void setInCount(BigDecimal inCount) {
         this.inCount = inCount;
     }
 
-    public Integer getRightCount() {
+    public BigDecimal getRightCount() {
         return rightCount;
     }
 
-    public void setRightCount(Integer rightCount) {
+    public void setRightCount(BigDecimal rightCount) {
         this.rightCount = rightCount;
     }
 
-    public Integer getErrorCount() {
+    public BigDecimal getErrorCount() {
         return errorCount;
     }
 
-    public void setErrorCount(Integer errorCount) {
+    public void setErrorCount(BigDecimal errorCount) {
         this.errorCount = errorCount;
     }
 

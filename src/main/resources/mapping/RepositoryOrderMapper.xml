@@ -4,7 +4,8 @@
   <resultMap id="BaseResultMap" type="com.yiban.erp.entities.RepositoryOrder" >
     <id column="id" property="id" jdbcType="BIGINT" />
     <result column="company_id" property="companyId" jdbcType="INTEGER" />
-    <result column="buy_order_id" property="buyOrderId" jdbcType="BIGINT" />
+    <result column="ref_order_id" property="refOrderId" jdbcType="BIGINT" />
+    <result column="ref_type" property="refType" jdbcType="VARCHAR" />
     <result column="order_number" property="orderNumber" jdbcType="VARCHAR" />
     <result column="ref_no" property="refNo" jdbcType="VARCHAR" />
     <result column="supplier_id" property="supplierId" jdbcType="BIGINT" />
@@ -14,7 +15,7 @@
     <result column="key_word" property="keyWord" jdbcType="VARCHAR" />
     <result column="receive_date" property="receiveDate" jdbcType="TIMESTAMP" />
     <result column="pay_date" property="payDate" jdbcType="TIMESTAMP" />
-    <result column="good_bill_no" property="goodBillNo" jdbcType="VARCHAR" />
+    <result column="goods_bill_no" property="goodsBillNo" jdbcType="VARCHAR" />
     <result column="temp_control_method" property="tempControlMethod" jdbcType="BIGINT" />
     <result column="receive_temp" property="receiveTemp" jdbcType="DECIMAL" />
     <result column="check_temp" property="checkTemp" jdbcType="DECIMAL" />
@@ -40,8 +41,8 @@
     <result column="file_no" property="fileNo" jdbcType="VARCHAR" />
   </resultMap>
   <sql id="Base_Column_List" >
-    id, company_id, buy_order_id, order_number, ref_no, supplier_id, supplier_contact_id, buyer_id, status,
-    key_word, receive_date, pay_date, good_bill_no, temp_control_method, receive_temp, 
+    id, company_id, ref_order_id, ref_type, order_number, ref_no, supplier_id, supplier_contact_id, buyer_id, status,
+    key_word, receive_date, pay_date, goods_bill_no, temp_control_method, receive_temp,
     check_temp, temp_control_status, ship_company_id, ship_method, ship_tool, ship_car_no, 
     ship_driver_name, ship_start_date, ship_end_date, ship_entrust_no, ship_start_address, 
     warehouse_id, buy_type, term, come_from, bill_type, create_by, create_time, update_by, 
@@ -58,10 +59,10 @@
     where id = #{id,jdbcType=BIGINT}
   </delete>
   <insert id="insert" parameterType="com.yiban.erp.entities.RepositoryOrder" keyProperty="id" useGeneratedKeys="true" >
-    insert into repository_order (id, company_id, buy_order_id, order_number, ref_no,
+    insert into repository_order (id, company_id, ref_order_id, ref_type, order_number, ref_no,
       supplier_id, supplier_contact_id, buyer_id, 
       status, key_word, receive_date, 
-      pay_date, good_bill_no, temp_control_method, 
+      pay_date, goods_bill_no, temp_control_method,
       receive_temp, check_temp, temp_control_status, 
       ship_company_id, ship_method, ship_tool, 
       ship_car_no, ship_driver_name, ship_start_date, 
@@ -70,11 +71,11 @@
       come_from, bill_type, create_by, 
       create_time, update_by, update_time, file_no
       )
-    values (#{id,jdbcType=BIGINT}, #{companyId,jdbcType=INTEGER}, #{buyOrderId,jdbcType=BIGINT},
-      #{orderNumber,jdbcType=VARCHAR}, #{refNo,jdbcType=VARCHAR},
+    values (#{id,jdbcType=BIGINT}, #{companyId,jdbcType=INTEGER}, #{refOrderId,jdbcType=BIGINT},
+      #{refType,jdbcType=VARCHAR}, #{orderNumber,jdbcType=VARCHAR}, #{refNo,jdbcType=VARCHAR},
       #{supplierId,jdbcType=BIGINT}, #{supplierContactId,jdbcType=BIGINT}, #{buyerId,jdbcType=BIGINT},
       #{status,jdbcType=VARCHAR}, #{keyWord,jdbcType=VARCHAR}, #{receiveDate,jdbcType=TIMESTAMP}, 
-      #{payDate,jdbcType=TIMESTAMP}, #{goodBillNo,jdbcType=VARCHAR}, #{tempControlMethod,jdbcType=BIGINT}, 
+      #{payDate,jdbcType=TIMESTAMP}, #{goodsBillNo,jdbcType=VARCHAR}, #{tempControlMethod,jdbcType=BIGINT},
       #{receiveTemp,jdbcType=DECIMAL}, #{checkTemp,jdbcType=DECIMAL}, #{tempControlStatus,jdbcType=BIGINT},
       #{shipCompanyId,jdbcType=INTEGER}, #{shipMethod,jdbcType=BIGINT}, #{shipTool,jdbcType=BIGINT}, 
       #{shipCarNo,jdbcType=VARCHAR}, #{shipDriverName,jdbcType=VARCHAR}, #{shipStartDate,jdbcType=TIMESTAMP},
@@ -94,8 +95,11 @@
       <if test="companyId != null" >
         company_id,
       </if>
-      <if test="buyOrderId != null" >
-        buy_order_id,
+      <if test="refOrderId != null" >
+        ref_order_id,
+      </if>
+      <if test="refType != null">
+        ref_type,
       </if>
       <if test="orderNumber != null">
         order_number,
@@ -124,8 +128,8 @@
       <if test="payDate != null" >
         pay_date,
       </if>
-      <if test="goodBillNo != null" >
-        good_bill_no,
+      <if test="goodsBillNo != null" >
+        goods_bill_no,
       </if>
       <if test="tempControlMethod != null" >
         temp_control_method,
@@ -204,8 +208,11 @@
       <if test="companyId != null" >
         #{companyId,jdbcType=INTEGER},
       </if>
-      <if test="buyOrderId != null" >
-        #{buyOrderId,jdbcType=BIGINT},
+      <if test="refOrderId != null" >
+        #{refOrderId,jdbcType=BIGINT},
+      </if>
+      <if test="refType != null">
+        #{refType,jdbcType=VARCHAR},
       </if>
       <if test="orderNumber != null">
         #{orderNumber,jdbcType=VARCHAR},
@@ -234,8 +241,8 @@
       <if test="payDate != null" >
         #{payDate,jdbcType=TIMESTAMP},
       </if>
-      <if test="goodBillNo != null" >
-        #{goodBillNo,jdbcType=VARCHAR},
+      <if test="goodsBillNo != null" >
+        #{goodsBillNo,jdbcType=VARCHAR},
       </if>
       <if test="tempControlMethod != null" >
         #{tempControlMethod,jdbcType=BIGINT},
@@ -311,8 +318,11 @@
   <update id="updateByPrimaryKeySelective" parameterType="com.yiban.erp.entities.RepositoryOrder" >
     update repository_order
     <set >
-      <if test="buyOrderId != null" >
-        buy_order_id = #{buyOrderId,jdbcType=BIGINT},
+      <if test="refOrderId != null" >
+        ref_order_id = #{refOrderId,jdbcType=BIGINT},
+      </if>
+      <if test="refType != null">
+        ref_type = #{refType, jdbcType=VARCHAR},
       </if>
       <if test="refNo != null">
         ref_no = #{refNo,jdbcType=VARCHAR},
@@ -338,8 +348,8 @@
       <if test="payDate != null" >
         pay_date = #{payDate,jdbcType=TIMESTAMP},
       </if>
-      <if test="goodBillNo != null" >
-        good_bill_no = #{goodBillNo,jdbcType=VARCHAR},
+      <if test="goodsBillNo != null" >
+        goods_bill_no = #{goodsBillNo,jdbcType=VARCHAR},
       </if>
       <if test="tempControlMethod != null" >
         temp_control_method = #{tempControlMethod,jdbcType=BIGINT},
@@ -416,7 +426,8 @@
   <update id="updateByPrimaryKey" parameterType="com.yiban.erp.entities.RepositoryOrder" >
     update repository_order
     set
-      buy_order_id = #{buyOrderId,jdbcType=BIGINT},
+      ref_order_id = #{refOrderId,jdbcType=BIGINT},
+      ref_type = #{refType, jdbcType=VARCHAR},
       ref_no = #{refNo,jdbcType=VARCHAR},
       supplier_id = #{supplierId,jdbcType=BIGINT},
       supplier_contact_id = #{supplierContactId,jdbcType=BIGINT},
@@ -425,7 +436,7 @@
       key_word = #{keyWord,jdbcType=VARCHAR},
       receive_date = #{receiveDate,jdbcType=TIMESTAMP},
       pay_date = #{payDate,jdbcType=TIMESTAMP},
-      good_bill_no = #{goodBillNo,jdbcType=VARCHAR},
+      goods_bill_no = #{goodsBillNo,jdbcType=VARCHAR},
       temp_control_method = #{tempControlMethod,jdbcType=BIGINT},
       receive_temp = #{receiveTemp,jdbcType=DECIMAL},
       check_temp = #{checkTemp,jdbcType=DECIMAL},
@@ -453,9 +464,9 @@
   </update>
 
   <sql id="listSql" >
-      o.id as id, o.company_id as companyId, o.buy_order_id as buyOrderId, o.order_number as orderNumber,
+      o.id as id, o.company_id as companyId, o.ref_order_id as refOrderId, o.ref_type as refType, o.order_number as orderNumber,
       o.ref_no as refNo, o.supplier_id as supplierId, o.supplier_contact_id as supplierContactId, o.buyer_id as buyerId, o.status as status,
-      o.key_word as keyWord, o.receive_date as receiveDate, o.pay_date as payDate, o.good_bill_no as goodBillNo,
+      o.key_word as keyWord, o.receive_date as receiveDate, o.pay_date as payDate, o.goods_bill_no as goodsBillNo,
       o.temp_control_method as tempControlMethod, o.receive_temp as receiveTemp,
       o.check_temp as checkTemp, o.temp_control_status as tempControlStatus, o.ship_company_id as shipCompanyId, o.ship_method as shipMethod,
       o.ship_tool as shipTool, o.ship_car_no as shipCarNo,
@@ -496,7 +507,7 @@
     </if>
   </select>
 
-  <select id="getByBuyOrder" parameterType="map" resultType="com.yiban.erp.entities.RepositoryOrder">
+  <select id="getByRefOrder" parameterType="map" resultType="com.yiban.erp.entities.RepositoryOrder">
     select
       <include refid="listSql"/>
     from repository_order o, supplier s, supplier_contact sc, warehouse w, users u
@@ -505,7 +516,8 @@
     and o.buyer_id = u.id
     and o.company_id = #{companyId}
     and o.status != 'DELETE'
-    and o.buy_order_id = #{buyOrderId}
+    and o.ref_type = #{refType}
+    and o.ref_order_id = #{refOrderId}
   </select>
 
   <update id="setCheckStatus" parameterType="map">

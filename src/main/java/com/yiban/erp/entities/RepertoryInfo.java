@@ -9,17 +9,29 @@ public class RepertoryInfo {
 
     private Integer warehouseId;
 
+    private String location;
+
     private Long inUserId;
+
+<<<<<<< HEAD
+    private Long goodsId;
+=======
+    private String batchCode;
+>>>>>>> 18736afebc9cfb38e9f90dd548b979b6ca9838f4
 
     private Long goodsId;
 
-    private Integer inQuantity;
+    private Long factoryId;
 
-    private Integer quantity;
+    private BigDecimal inQuantity;
+
+<<<<<<< HEAD
+    private String batchCode;
+=======
+    private BigDecimal quantity;
 
     private BigDecimal buyPrice;
-
-    private String batchCode;
+>>>>>>> 18736afebc9cfb38e9f90dd548b979b6ca9838f4
 
     private Boolean isExp;
 
@@ -31,8 +43,6 @@ public class RepertoryInfo {
 
     private Date expDate;
 
-    private String location;
-
     private Long supplierId;
 
     private Long supplierContactId;
@@ -41,11 +51,7 @@ public class RepertoryInfo {
 
     private Long orderId; //入库单号
 
-    private String storeState;
-
-    private String counterState;
-
-    private String saleSate;
+    private Boolean saleSate;
 
     private String createBy;
 
@@ -56,7 +62,6 @@ public class RepertoryInfo {
     private Date updateTime;
 
     private Goods goods;
-
 
     //展示字段
     private String warehouseName;
@@ -100,6 +105,7 @@ public class RepertoryInfo {
         this.warehouseId = warehouseId;
     }
 
+<<<<<<< HEAD
     public Long getInUserId() {
         return inUserId;
     }
@@ -108,6 +114,8 @@ public class RepertoryInfo {
         this.inUserId = inUserId;
     }
 
+=======
+>>>>>>> 18736afebc9cfb38e9f90dd548b979b6ca9838f4
     public Long getGoodsId() {
         return goodsId;
     }
@@ -116,6 +124,7 @@ public class RepertoryInfo {
         this.goodsId = goodsId;
     }
 
+<<<<<<< HEAD
     public Integer getInQuantity() {
         return inQuantity;
     }
@@ -140,6 +149,8 @@ public class RepertoryInfo {
         this.buyPrice = buyPrice;
     }
 
+=======
+>>>>>>> 18736afebc9cfb38e9f90dd548b979b6ca9838f4
     public String getBatchCode() {
         return batchCode;
     }
@@ -320,6 +331,7 @@ public class RepertoryInfo {
         this.factoryName = factoryName;
     }
 
+<<<<<<< HEAD
     public String getInUserName() {
         return inUserName;
     }
@@ -342,6 +354,46 @@ public class RepertoryInfo {
 
     public void setJx(String jx) {
         this.jx = jx;
+=======
+    public Long getFactoryId() {
+        return factoryId;
+    }
+
+    public void setFactoryId(Long factoryId) {
+        this.factoryId = factoryId;
+    }
+
+    public BigDecimal getInQuantity() {
+        return inQuantity;
+    }
+
+    public void setInQuantity(BigDecimal inQuantity) {
+        this.inQuantity = inQuantity;
+    }
+
+    public BigDecimal getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(BigDecimal quantity) {
+        this.quantity = quantity;
+    }
+
+    public BigDecimal getBuyPrice() {
+        return buyPrice;
+    }
+
+    public void setBuyPrice(BigDecimal buyPrice) {
+        this.buyPrice = buyPrice;
+    }
+
+    public Boolean getSaleSate() {
+        return saleSate;
+    }
+
+    public void setSaleSate(Boolean saleSate) {
+        this.saleSate = saleSate;
+>>>>>>> 18736afebc9cfb38e9f90dd548b979b6ca9838f4
     }
 
     public String getSpec() {
