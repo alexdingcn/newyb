@@ -68,6 +68,62 @@ update_by|String|修改人
 update_time|Datetime|最近一次修改时间
 
 
+### 库存盘点计划表：repertory_check_plan
+
+> 记录每次发起库存盘点启动信息
+
+字段名|类型|描述
+-|-|-
+id|Long|(自增类型ID pk)
+check_type|Integer|盘库类型 0-库存盘点  1-直接盘库  2-单品盘库
+check_code|String|盘点单号
+company_id|Integer|公司ID(fk)
+warehouse_id|Integer|仓库ID
+warehouse_location|String|库位
+check_date|Datetime|盘点时间
+make_user_id|Long|制单人
+check_user_id|Long|审核人
+state|Integer|状态 0:待处理 1:未审核 2审核 3生成盘盈入库单、盘亏出库单
+comment|String|备注
+check_response_user|String|盘库监督员
+manager|String|经理
+manager_note|String|经理意见
+finance|String|财务
+finance_note|String|财务意见
+create_by|String|创建人nickname
+create_time|Datetime|创建时间
+update_by|String|修改人
+update_time|Datetime|最近一次修改时间
+
+
+### 库存盘点计划表：repertory_check_plan_detail
+
+> 记录每次发起库存盘点启动信息
+
+字段名|类型|描述
+-|-|-
+id|Long|(自增类型ID pk)
+check_plan_id|Long|盘库计划单ID
+form_no|String|盘库表单号
+form_status|String|表单确认状态 UNCHECK-未确认 CHECKED-已确认
+repertory_info_id|Long|库存记录ID
+goods_id|Long|商品ID
+batch_code|String|批次号
+acc_limit|Decimal(14,3)|账面数量
+check_limit|Decimal(14,3)|盘点数量
+check_note|String|盘点结果
+check_status|Integer|盘亏盘盈状态 0-正常 1-盘盈 -1-盘亏
+price|Decimal(14,3)|单价
+amount|Decimal(14,3)|金额
+product_date|Date|生产日期
+exp_date|Date|有效期至
+warehouse_location|String|货位号
+create_by|String|创建人nickname
+create_time|Datetime|创建时间
+update_by|String|修改人
+update_time|Datetime|最近一次修改时间
+
+
 ### 库存限额表：repertory_limit
 
 > 按仓库和商品编号，定义每一个商品的预警阀值
@@ -86,16 +142,7 @@ update_by|String|修改人
 update_time|Datetime|最近一次修改时间
 
 
-### 库存结存表：repertory_balance
-
-> 统计库存数据信息
-
-字段名|类型|描述
--|-|-
-id|Long|(自增类型ID pk)
-
-
-### 入库订单表：repository_order
+### 入库订单表：repertory_in
 
 > 所有的入库单信息建立和质量审查过程中使用
 
@@ -141,14 +188,14 @@ update_time|Datetime|最近一次修改时间
 
 
 
-### 入库订单详情：repository_order_detail
+### 入库订单详情：repertory_in_detail
 
 > 入库单详情信息
 
 字段名|类型|描述
 -|-|-
 id|Long|(自增类型ID pk)
-repository_order_id|Long|入库单ID
+in_order_id|Long|入库单ID
 goods_id|Long|商品ID
 receive_quality|Decimal(14,3)|收货数量
 big_quality|Decimal(14,3)|大件数量
@@ -183,4 +230,27 @@ create_by|String|创建人nickname
 create_time|Datetime|创建时间
 update_by|String|修改人
 update_time|Datetime|最近一次修改时间
+
+
+### 出库订单表：repertory_out
+
+> 所有的出库单信息建立和质量审查过程中使用
+
+字段名|类型|描述
+-|-|-
+id|Long|(自增类型ID pk)
+company_id|Integer|公司ID
+ref_order_id|Long|上级来源订单ID(可以存在不同的出库库原始订单)
+order_number|String|出库库单编号
+ref_no|String|出库单自定义编号
+
+
+### 出库订单表：repertory_out_detail
+
+> 所有的出库单信息建立和质量审查过程中使用
+
+字段名|类型|描述
+-|-|-
+id|Long|(自增类型ID pk)
+out_order_id|Long|出库单ID
 
