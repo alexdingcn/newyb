@@ -163,7 +163,7 @@ public class RepertoryCheckController {
                 rcheckDetail.setCreatedBy(user.getNickname());
                 rcheckDetail.setCreatedTime(new Date());
                 rcheckDetail.setPrice(tempGoods.getBuyPrice());
-                rcheckDetail.setGoodId(tempGoods.getGoodId());
+                rcheckDetail.setGoodId(tempGoods.getGoodsId());
                 rcheckDetail.setCheckId(rcheck.getId());
                 rcheckDetail.setRepertoryInfoId(tempGoods.getId());
                 repertoryCheckDetailMapper.insert(rcheckDetail);

@@ -11,17 +11,13 @@ public class RepertoryInfo {
 
     private Long inUserId;
 
-    private Long goodId;
+    private Long goodsId;
 
     private Integer inQuantity;
 
     private Integer quantity;
 
     private BigDecimal buyPrice;
-
-    private BigDecimal salePrice;
-
-    private String code;
 
     private String batchCode;
 
@@ -67,18 +63,18 @@ public class RepertoryInfo {
     private String goodName;
     private String supplier;
     private String factoryName;
-    private String in_user_name;
+    private String inUserName;
     private String origin;
     private String jx;
     private String spec;
     private String unitName;
-    private String med_type;
-    private long permit_id;
-    private long base_med_id;
+    private String medType;
+    private long permitId;
+    private long baseMedId;
     private Byte enable;
-    private BigDecimal in_tax;
-    private BigDecimal out_tax;
-    private String storage_condition;
+    private BigDecimal inax;
+    private BigDecimal outTax;
+    private String storageCondition;
 
     public Long getId() {
         return id;
@@ -86,6 +82,14 @@ public class RepertoryInfo {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public Integer getCompanyId() {
+        return companyId;
+    }
+
+    public void setCompanyId(Integer companyId) {
+        this.companyId = companyId;
     }
 
     public Integer getWarehouseId() {
@@ -96,12 +100,20 @@ public class RepertoryInfo {
         this.warehouseId = warehouseId;
     }
 
-    public Long getGoodId() {
-        return goodId;
+    public Long getInUserId() {
+        return inUserId;
     }
 
-    public void setGoodId(Long goodId) {
-        this.goodId = goodId;
+    public void setInUserId(Long inUserId) {
+        this.inUserId = inUserId;
+    }
+
+    public Long getGoodsId() {
+        return goodsId;
+    }
+
+    public void setGoodsId(Long goodsId) {
+        this.goodsId = goodsId;
     }
 
     public Integer getInQuantity() {
@@ -128,28 +140,12 @@ public class RepertoryInfo {
         this.buyPrice = buyPrice;
     }
 
-    public BigDecimal getSalePrice() {
-        return salePrice;
-    }
-
-    public void setSalePrice(BigDecimal salePrice) {
-        this.salePrice = salePrice;
-    }
-
-    public String getCode() {
-        return code;
-    }
-
-    public void setCode(String code) {
-        this.code = code == null ? null : code.trim();
-    }
-
     public String getBatchCode() {
         return batchCode;
     }
 
     public void setBatchCode(String batchCode) {
-        this.batchCode = batchCode == null ? null : batchCode.trim();
+        this.batchCode = batchCode;
     }
 
     public Boolean getExp() {
@@ -176,6 +172,14 @@ public class RepertoryInfo {
         this.productDate = productDate;
     }
 
+    public Date getInDate() {
+        return inDate;
+    }
+
+    public void setInDate(Date inDate) {
+        this.inDate = inDate;
+    }
+
     public Date getExpDate() {
         return expDate;
     }
@@ -189,107 +193,7 @@ public class RepertoryInfo {
     }
 
     public void setLocation(String location) {
-        this.location = location == null ? null : location.trim();
-    }
-
-    public String getCreateBy() {
-        return createBy;
-    }
-
-    public void setCreateBy(String createBy) {
-        this.createBy = createBy;
-    }
-
-    public Date getCreateTime() {
-        return createTime;
-    }
-
-    public void setCreateTime(Date createTime) {
-        this.createTime = createTime;
-    }
-
-    public String getUpdateBy() {
-        return updateBy;
-    }
-
-    public void setUpdateBy(String updateBy) {
-        this.updateBy = updateBy == null ? null : updateBy.trim();
-    }
-
-    public Date getUpdateTime() {
-        return updateTime;
-    }
-
-    public void setUpdateTime(Date updateTime) {
-        this.updateTime = updateTime;
-    }
-
-    public String getWarehouseName() {
-        return warehouseName;
-    }
-
-    public void setWarehouseName(String warehouseName) {
-        this.warehouseName = warehouseName;
-    }
-
-    public String getGoodName() {
-        return goodName;
-    }
-
-    public void setGoodName(String goodName) {
-        this.goodName = goodName;
-    }
-
-    public String getFactoryName() {
-        return factoryName;
-    }
-
-    public void setFactoryName(String factoryName) {
-        this.factoryName = factoryName;
-    }
-
-    public String getJx() {
-        return jx;
-    }
-
-    public void setJx(String jx) {
-        this.jx = jx;
-    }
-
-    public String getSpec() {
-        return spec;
-    }
-
-    public void setSpec(String spec) {
-        this.spec = spec;
-    }
-
-    public String getUnitName() {
-        return unitName;
-    }
-
-    public void setUnitName(String unitName) {
-        this.unitName = unitName;
-    }
-
-    public Goods getGoods() {
-        return goods;
-    }
-
-    public Integer getCompanyId() {
-        return companyId;
-    }
-
-    public void setCompanyId(Integer companyId) {
-        this.companyId = companyId;
-    }
-
-    public Long getInUserId() {
-        return inUserId;
-    }
-
-    public void setInUserId(Long inUserId) {
-        this.inUserId = inUserId;
+        this.location = location;
     }
 
     public Long getSupplierId() {
@@ -324,22 +228,6 @@ public class RepertoryInfo {
         this.orderId = orderId;
     }
 
-    public String getIn_user_name() {
-        return in_user_name;
-    }
-
-    public void setIn_user_name(String in_user_name) {
-        this.in_user_name = in_user_name;
-    }
-
-    public Date getInDate() {
-        return inDate;
-    }
-
-    public void setInDate(Date inDate) {
-        this.inDate = inDate;
-    }
-
     public String getStoreState() {
         return storeState;
     }
@@ -364,12 +252,80 @@ public class RepertoryInfo {
         this.saleSate = saleSate;
     }
 
+    public String getCreateBy() {
+        return createBy;
+    }
+
+    public void setCreateBy(String createBy) {
+        this.createBy = createBy;
+    }
+
+    public Date getCreateTime() {
+        return createTime;
+    }
+
+    public void setCreateTime(Date createTime) {
+        this.createTime = createTime;
+    }
+
+    public String getUpdateBy() {
+        return updateBy;
+    }
+
+    public void setUpdateBy(String updateBy) {
+        this.updateBy = updateBy;
+    }
+
+    public Date getUpdateTime() {
+        return updateTime;
+    }
+
+    public void setUpdateTime(Date updateTime) {
+        this.updateTime = updateTime;
+    }
+
+    public Goods getGoods() {
+        return goods;
+    }
+
+    public String getWarehouseName() {
+        return warehouseName;
+    }
+
+    public void setWarehouseName(String warehouseName) {
+        this.warehouseName = warehouseName;
+    }
+
+    public String getGoodName() {
+        return goodName;
+    }
+
+    public void setGoodName(String goodName) {
+        this.goodName = goodName;
+    }
+
     public String getSupplier() {
         return supplier;
     }
 
     public void setSupplier(String supplier) {
         this.supplier = supplier;
+    }
+
+    public String getFactoryName() {
+        return factoryName;
+    }
+
+    public void setFactoryName(String factoryName) {
+        this.factoryName = factoryName;
+    }
+
+    public String getInUserName() {
+        return inUserName;
+    }
+
+    public void setInUserName(String inUserName) {
+        this.inUserName = inUserName;
     }
 
     public String getOrigin() {
@@ -380,28 +336,52 @@ public class RepertoryInfo {
         this.origin = origin;
     }
 
-    public String getMed_type() {
-        return med_type;
+    public String getJx() {
+        return jx;
     }
 
-    public void setMed_type(String med_type) {
-        this.med_type = med_type;
+    public void setJx(String jx) {
+        this.jx = jx;
     }
 
-    public long getPermit_id() {
-        return permit_id;
+    public String getSpec() {
+        return spec;
     }
 
-    public void setPermit_id(long permit_id) {
-        this.permit_id = permit_id;
+    public void setSpec(String spec) {
+        this.spec = spec;
     }
 
-    public long getBase_med_id() {
-        return base_med_id;
+    public String getUnitName() {
+        return unitName;
     }
 
-    public void setBase_med_id(long base_med_id) {
-        this.base_med_id = base_med_id;
+    public void setUnitName(String unitName) {
+        this.unitName = unitName;
+    }
+
+    public String getMedType() {
+        return medType;
+    }
+
+    public void setMedType(String medType) {
+        this.medType = medType;
+    }
+
+    public long getPermitId() {
+        return permitId;
+    }
+
+    public void setPermitId(long permitId) {
+        this.permitId = permitId;
+    }
+
+    public long getBaseMedId() {
+        return baseMedId;
+    }
+
+    public void setBaseMedId(long baseMedId) {
+        this.baseMedId = baseMedId;
     }
 
     public Byte getEnable() {
@@ -412,28 +392,28 @@ public class RepertoryInfo {
         this.enable = enable;
     }
 
-    public BigDecimal getIn_tax() {
-        return in_tax;
+    public BigDecimal getInax() {
+        return inax;
     }
 
-    public void setIn_tax(BigDecimal in_tax) {
-        this.in_tax = in_tax;
+    public void setInax(BigDecimal inax) {
+        this.inax = inax;
     }
 
-    public BigDecimal getOut_tax() {
-        return out_tax;
+    public BigDecimal getOutTax() {
+        return outTax;
     }
 
-    public void setOut_tax(BigDecimal out_tax) {
-        this.out_tax = out_tax;
+    public void setOutTax(BigDecimal outTax) {
+        this.outTax = outTax;
     }
 
-    public String getStorage_condition() {
-        return storage_condition;
+    public String getStorageCondition() {
+        return storageCondition;
     }
 
-    public void setStorage_condition(String storage_condition) {
-        this.storage_condition = storage_condition;
+    public void setStorageCondition(String storageCondition) {
+        this.storageCondition = storageCondition;
     }
 
     public void setGoods(Goods goods) {

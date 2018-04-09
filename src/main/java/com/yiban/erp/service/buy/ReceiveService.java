@@ -604,12 +604,12 @@ public class ReceiveService {
             item.setCompanyId(order.getCompanyId());
             item.setWarehouseId(order.getWarehouseId());
             item.setInUserId(user.getId());
-            item.setGoodId(detail.getGoodsId());
+            item.setGoodsId(detail.getGoodsId());
             item.setInQuantity(detail.getInCount());
             item.setQuantity(detail.getInCount());
             item.setBuyPrice(detail.getPrice());
 //            item.setSalePrice(detail.getPrice());    //仓库信息中按逻辑不存销售假信息
-            item.setCode(detail.getGoods() == null ? null : detail.getGoods().getCode());
+//            item.setSalePrice(detail.getPrice());    //仓库信息中按逻辑不存销售假信息
             item.setBatchCode(detail.getBatchCode());
             item.setExp(false);
             item.setSaleEnable(true);
