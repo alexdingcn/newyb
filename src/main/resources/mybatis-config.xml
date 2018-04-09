@@ -3,11 +3,9 @@
         PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-config.dtd">
 <configuration>
-
     <typeAliases>
         <package name="com.yiban.erp.entities"/>
     </typeAliases>
-
     <mappers>
         <mapper resource="mapping/UserMapper.xml"/>
         <mapper resource="mapping/UserRoleMapper.xml"/>
@@ -40,9 +38,7 @@
         <mapper resource="mapping/RepertoryInMapper.xml"/>
         <mapper resource="mapping/MessageInfoMapper.xml"/>
         <mapper resource="mapping/MessageOptionMapper.xml"/>
-        <mapper resource="mapping/RepertoryCheckMapper.xml"/>
-        <mapper resource="mapping/RepertoryCheckDetailMapper.xml"/>
-        <mapper resource="mapping/RepertoryCheckPartMapper.xml"/>
-        <mapper resource="mapping/RepertoryCheckPartDetailMapper.xml"/>
+        <mapper resource="mapping/RepertoryCheckPlanMapper.xml"/>
+        <mapper resource="mapping/RepertoryCheckDetailPlanMapper.xml"/>
     </mappers>
 </configuration>

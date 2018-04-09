@@ -3,28 +3,36 @@ package com.yiban.erp.entities;
 import java.math.BigDecimal;
 import java.util.Date;
 
-public class RepertoryCheckPartDetail {
+public class RepertoryCheckPlanDetail {
     private Long id;
 
-    private Long checkId;
+    private Long checkPlanId;
 
-    private Integer companyId;
+    private String formNo;
 
-    private Integer warehouseId;
-
-    private Long goodId;
+    private String formStatus;
 
     private Long repertoryInfoId;
 
+    private Long goodsId;
+
     private String batchCode;
 
-    private BigDecimal accAmount;
+    private BigDecimal accLimit;
 
-    private BigDecimal checkAmount;
+    private BigDecimal checkLimit;
 
     private String checkNote;
 
+    private Integer checkStatus;
+
     private BigDecimal price;
+
+    private BigDecimal amount;
+
+    private Date productDate;
+
+    private Date expDate;
 
     private String createdBy;
 
@@ -42,36 +50,28 @@ public class RepertoryCheckPartDetail {
         this.id = id;
     }
 
-    public Long getCheckId() {
-        return checkId;
+    public Long getCheckPlanId() {
+        return checkPlanId;
     }
 
-    public void setCheckId(Long checkId) {
-        this.checkId = checkId;
+    public void setCheckPlanId(Long checkPlanId) {
+        this.checkPlanId = checkPlanId;
     }
 
-    public Integer getCompanyId() {
-        return companyId;
+    public String getFormNo() {
+        return formNo;
     }
 
-    public void setCompanyId(Integer companyId) {
-        this.companyId = companyId;
+    public void setFormNo(String formNo) {
+        this.formNo = formNo == null ? null : formNo.trim();
     }
 
-    public Integer getWarehouseId() {
-        return warehouseId;
+    public String getFormStatus() {
+        return formStatus;
     }
 
-    public void setWarehouseId(Integer warehouseId) {
-        this.warehouseId = warehouseId;
-    }
-
-    public Long getGoodId() {
-        return goodId;
-    }
-
-    public void setGoodId(Long goodId) {
-        this.goodId = goodId;
+    public void setFormStatus(String formStatus) {
+        this.formStatus = formStatus == null ? null : formStatus.trim();
     }
 
     public Long getRepertoryInfoId() {
@@ -82,6 +82,14 @@ public class RepertoryCheckPartDetail {
         this.repertoryInfoId = repertoryInfoId;
     }
 
+    public Long getGoodsId() {
+        return goodsId;
+    }
+
+    public void setGoodsId(Long goodsId) {
+        this.goodsId = goodsId;
+    }
+
     public String getBatchCode() {
         return batchCode;
     }
@@ -90,20 +98,20 @@ public class RepertoryCheckPartDetail {
         this.batchCode = batchCode == null ? null : batchCode.trim();
     }
 
-    public BigDecimal getAccAmount() {
-        return accAmount;
+    public BigDecimal getAccLimit() {
+        return accLimit;
     }
 
-    public void setAccAmount(BigDecimal accAmount) {
-        this.accAmount = accAmount;
+    public void setAccLimit(BigDecimal accLimit) {
+        this.accLimit = accLimit;
     }
 
-    public BigDecimal getCheckAmount() {
-        return checkAmount;
+    public BigDecimal getCheckLimit() {
+        return checkLimit;
     }
 
-    public void setCheckAmount(BigDecimal checkAmount) {
-        this.checkAmount = checkAmount;
+    public void setCheckLimit(BigDecimal checkLimit) {
+        this.checkLimit = checkLimit;
     }
 
     public String getCheckNote() {
@@ -114,12 +122,36 @@ public class RepertoryCheckPartDetail {
         this.checkNote = checkNote == null ? null : checkNote.trim();
     }
 
+    public Integer getCheckStatus() {
+        return checkStatus;
+    }
+
+    public void setCheckStatus(Integer checkStatus) {
+        this.checkStatus = checkStatus;
+    }
+
     public BigDecimal getPrice() {
         return price;
     }
 
     public void setPrice(BigDecimal price) {
         this.price = price;
+    }
+
+    public BigDecimal getAmount() {
+        return amount;
+    }
+
+    public void setAmount(BigDecimal amount) {
+        this.amount = amount;
+    }
+
+    public Date getProductDate() {
+        return productDate;
+    }
+
+    public void setProductDate(Date productDate) {
+        this.productDate = productDate;
     }
 
     public String getCreatedBy() {
@@ -152,5 +184,13 @@ public class RepertoryCheckPartDetail {
 
     public void setUpdatedTime(Date updatedTime) {
         this.updatedTime = updatedTime;
+    }
+
+    public Date getExpDate() {
+        return expDate;
+    }
+
+    public void setExpDate(Date expDate) {
+        this.expDate = expDate;
     }
 }

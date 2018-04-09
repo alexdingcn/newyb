@@ -31,8 +31,8 @@ public enum ErrorCode {
 
 
     // 15xx - 盘点
-    CHECK_ORDER_NO_GOODS(1500, "无符合盘点条件的商品"),
-
+    CHECK_PLAN_NO_GOODS(1500, "无符合盘点条件的商品"),
+    CHECK_PLAN_TYPE_ERROR(1501, "暂未开放该类型盘点"),
     // 20xx - 客户
     CUSTOMER_GET_FAIL(2000, "获取客户信息失败"),
     CUSTOMER_DEL_PARAMS_EMPTY(2001, "请选择需要删除的客户"),

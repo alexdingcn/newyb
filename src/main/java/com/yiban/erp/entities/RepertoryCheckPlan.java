@@ -2,7 +2,7 @@ package com.yiban.erp.entities;
 
 import java.util.Date;
 
-public class RepertoryCheck {
+public class RepertoryCheckPlan {
     private Long id;
 
     private Integer checkType;
@@ -13,11 +13,9 @@ public class RepertoryCheck {
 
     private Integer warehouseId;
 
-    private String counterState;
+    private String warehouseLocation;
 
     private Date checkDate;
-
-    private Long userId;
 
     private Long makeUserId;
 
@@ -25,7 +23,7 @@ public class RepertoryCheck {
 
     private Integer state;
 
-    private String note;
+    private String comment;
 
     private String checkResponseUser;
 
@@ -37,17 +35,13 @@ public class RepertoryCheck {
 
     private String financeNote;
 
-    private String createdBy;
+    private String createBy;
 
-    private Date createdTime;
+    private Date createTime;
 
-    private String updatedBy;
+    private String updateBy;
 
-    private Date updatedTime;
-
-    //展示信息
-    private String warehouseName;
-    private String makeUser;
+    private Date updateTime;
 
     public Long getId() {
         return id;
@@ -89,12 +83,12 @@ public class RepertoryCheck {
         this.warehouseId = warehouseId;
     }
 
-    public String getCounterState() {
-        return counterState;
+    public String getWarehouseLocation() {
+        return warehouseLocation;
     }
 
-    public void setCounterState(String counterState) {
-        this.counterState = counterState == null ? null : counterState.trim();
+    public void setWarehouseLocation(String warehouseLocation) {
+        this.warehouseLocation = warehouseLocation == null ? null : warehouseLocation.trim();
     }
 
     public Date getCheckDate() {
@@ -103,14 +97,6 @@ public class RepertoryCheck {
 
     public void setCheckDate(Date checkDate) {
         this.checkDate = checkDate;
-    }
-
-    public Long getUserId() {
-        return userId;
-    }
-
-    public void setUserId(Long userId) {
-        this.userId = userId;
     }
 
     public Long getMakeUserId() {
@@ -137,12 +123,12 @@ public class RepertoryCheck {
         this.state = state;
     }
 
-    public String getNote() {
-        return note;
+    public String getComment() {
+        return comment;
     }
 
-    public void setNote(String note) {
-        this.note = note == null ? null : note.trim();
+    public void setComment(String comment) {
+        this.comment = comment == null ? null : comment.trim();
     }
 
     public String getCheckResponseUser() {
@@ -185,51 +171,35 @@ public class RepertoryCheck {
         this.financeNote = financeNote == null ? null : financeNote.trim();
     }
 
-    public String getCreatedBy() {
-        return createdBy;
+    public String getCreateBy() {
+        return createBy;
     }
 
-    public void setCreatedBy(String createdBy) {
-        this.createdBy = createdBy == null ? null : createdBy.trim();
+    public void setCreateBy(String createBy) {
+        this.createBy = createBy == null ? null : createBy.trim();
     }
 
-    public Date getCreatedTime(Date date) {
-        return createdTime;
+    public Date getCreateTime() {
+        return createTime;
     }
 
-    public void setCreatedTime(Date createdTime) {
-        this.createdTime = createdTime;
+    public void setCreateTime(Date createTime) {
+        this.createTime = createTime;
     }
 
-    public String getUpdatedBy() {
-        return updatedBy;
+    public String getUpdateBy() {
+        return updateBy;
     }
 
-    public void setUpdatedBy(String updatedBy) {
-        this.updatedBy = updatedBy == null ? null : updatedBy.trim();
+    public void setUpdateBy(String updateBy) {
+        this.updateBy = updateBy == null ? null : updateBy.trim();
     }
 
-    public Date getUpdatedTime() {
-        return updatedTime;
+    public Date getUpdateTime() {
+        return updateTime;
     }
 
-    public void setUpdatedTime(Date updatedTime) {
-        this.updatedTime = updatedTime;
-    }
-
-    public String getWarehouseName() {
-        return warehouseName;
-    }
-
-    public void setWarehouseName(String warehouseName) {
-        this.warehouseName = warehouseName;
-    }
-
-    public String getMakeUser() {
-        return makeUser;
-    }
-
-    public void setMakeUser(String makeUser) {
-        this.makeUser = makeUser;
+    public void setUpdateTime(Date updateTime) {
+        this.updateTime = updateTime;
     }
 }

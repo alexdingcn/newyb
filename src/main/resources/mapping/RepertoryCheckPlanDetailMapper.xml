@@ -1,0 +1,994 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yiban.erp.dao.RepertoryCheckPlanDetailMapper">
+  <resultMap id="BaseResultMap" type="com.yiban.erp.entities.RepertoryCheckPlanDetail">
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="check_plan_id" jdbcType="BIGINT" property="checkPlanId" />
+    <result column="form_no" jdbcType="VARCHAR" property="formNo" />
+    <result column="form_status" jdbcType="VARCHAR" property="formStatus" />
+    <result column="repertory_info_id" jdbcType="BIGINT" property="repertoryInfoId" />
+    <result column="goods_id" jdbcType="BIGINT" property="goodsId" />
+    <result column="batch_code" jdbcType="VARCHAR" property="batchCode" />
+    <result column="acc_limit" jdbcType="DECIMAL" property="accLimit" />
+    <result column="check_limit" jdbcType="DECIMAL" property="checkLimit" />
+    <result column="check_note" jdbcType="VARCHAR" property="checkNote" />
+    <result column="check_status" jdbcType="INTEGER" property="checkStatus" />
+    <result column="price" jdbcType="DECIMAL" property="price" />
+    <result column="amount" jdbcType="DECIMAL" property="amount" />
+    <result column="product_date" jdbcType="TIMESTAMP" property="productDate" />
+    <result column="created_by" jdbcType="VARCHAR" property="createdBy" />
+    <result column="created_time" jdbcType="TIMESTAMP" property="createdTime" />
+    <result column="updated_by" jdbcType="VARCHAR" property="updatedBy" />
+    <result column="updated_time" jdbcType="TIMESTAMP" property="updatedTime" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, check_plan_id, form_no, form_status, repertory_info_id, goods_id, batch_code, 
+    acc_limit, check_limit, check_note, check_status, price, amount, product_date, created_by, 
+    created_time, updated_by, updated_time
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from repertory_check_plan_detail
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from repertory_check_plan_detail
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="com.yiban.erp.entities.RepertoryCheckPlanDetail" useGeneratedKeys="true" keyProperty="id" >
+    insert into repertory_check_plan_detail (id, check_plan_id, form_no, 
+      form_status, repertory_info_id, goods_id, 
+      batch_code, acc_limit, check_limit, 
+      check_note, check_status, price, 
+      amount, product_date, created_by, 
+      created_time, updated_by, updated_time
+      )
+    values (#{id,jdbcType=BIGINT}, #{checkPlanId,jdbcType=BIGINT}, #{formNo,jdbcType=VARCHAR}, 
+      #{formStatus,jdbcType=VARCHAR}, #{repertoryInfoId,jdbcType=BIGINT}, #{goodsId,jdbcType=BIGINT}, 
+      #{batchCode,jdbcType=VARCHAR}, #{accLimit,jdbcType=DECIMAL}, #{checkLimit,jdbcType=DECIMAL}, 
+      #{checkNote,jdbcType=VARCHAR}, #{checkStatus,jdbcType=INTEGER}, #{price,jdbcType=DECIMAL}, 
+      #{amount,jdbcType=DECIMAL}, #{productDate,jdbcType=TIMESTAMP}, #{createdBy,jdbcType=VARCHAR}, 
+      #{createdTime,jdbcType=TIMESTAMP}, #{updatedBy,jdbcType=VARCHAR}, #{updatedTime,jdbcType=TIMESTAMP}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.yiban.erp.entities.RepertoryCheckPlanDetail" useGeneratedKeys="true" keyProperty="id" >
+    insert into repertory_check_plan_detail
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="checkPlanId != null">
+        check_plan_id,
+      </if>
+      <if test="formNo != null">
+        form_no,
+      </if>
+      <if test="formStatus != null">
+        form_status,
+      </if>
+      <if test="repertoryInfoId != null">
+        repertory_info_id,
+      </if>
+      <if test="goodsId != null">
+        goods_id,
+      </if>
+      <if test="batchCode != null">
+        batch_code,
+      </if>
+      <if test="accLimit != null">
+        acc_limit,
+      </if>
+      <if test="checkLimit != null">
+        check_limit,
+      </if>
+      <if test="checkNote != null">
+        check_note,
+      </if>
+      <if test="checkStatus != null">
+        check_status,
+      </if>
+      <if test="price != null">
+        price,
+      </if>
+      <if test="amount != null">
+        amount,
+      </if>
+      <if test="productDate != null">
+        product_date,
+      </if>
+      <if test="createdBy != null">
+        created_by,
+      </if>
+      <if test="createdTime != null">
+        created_time,
+      </if>
+      <if test="updatedBy != null">
+        updated_by,
+      </if>
+      <if test="updatedTime != null">
+        updated_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=BIGINT},
+      </if>
+      <if test="checkPlanId != null">
+        #{checkPlanId,jdbcType=BIGINT},
+      </if>
+      <if test="formNo != null">
+        #{formNo,jdbcType=VARCHAR},
+      </if>
+      <if test="formStatus != null">
+        #{formStatus,jdbcType=VARCHAR},
+      </if>
+      <if test="repertoryInfoId != null">
+        #{repertoryInfoId,jdbcType=BIGINT},
+      </if>
+      <if test="goodsId != null">
+        #{goodsId,jdbcType=BIGINT},
+      </if>
+      <if test="batchCode != null">
+        #{batchCode,jdbcType=VARCHAR},
+      </if>
+      <if test="accLimit != null">
+        #{accLimit,jdbcType=DECIMAL},
+      </if>
+      <if test="checkLimit != null">
+        #{checkLimit,jdbcType=DECIMAL},
+      </if>
+      <if test="checkNote != null">
+        #{checkNote,jdbcType=VARCHAR},
+      </if>
+      <if test="checkStatus != null">
+        #{checkStatus,jdbcType=INTEGER},
+      </if>
+      <if test="price != null">
+        #{price,jdbcType=DECIMAL},
+      </if>
+      <if test="amount != null">
+        #{amount,jdbcType=DECIMAL},
+      </if>
+      <if test="productDate != null">
+        #{productDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createdBy != null">
+        #{createdBy,jdbcType=VARCHAR},
+      </if>
+      <if test="createdTime != null">
+        #{createdTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updatedBy != null">
+        #{updatedBy,jdbcType=VARCHAR},
+      </if>
+      <if test="updatedTime != null">
+        #{updatedTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.yiban.erp.entities.RepertoryCheckPlanDetail">
+    update repertory_check_plan_detail
+    <set>
+      <if test="checkPlanId != null">
+        check_plan_id = #{checkPlanId,jdbcType=BIGINT},
+      </if>
+      <if test="formNo != null">
+        form_no = #{formNo,jdbcType=VARCHAR},
+      </if>
+      <if test="formStatus != null">
+        form_status = #{formStatus,jdbcType=VARCHAR},
+      </if>
+      <if test="repertoryInfoId != null">
+        repertory_info_id = #{repertoryInfoId,jdbcType=BIGINT},
+      </if>
+      <if test="goodsId != null">
+        goods_id = #{goodsId,jdbcType=BIGINT},
+      </if>
+      <if test="batchCode != null">
+        batch_code = #{batchCode,jdbcType=VARCHAR},
+      </if>
+      <if test="accLimit != null">
+        acc_limit = #{accLimit,jdbcType=DECIMAL},
+      </if>
+      <if test="checkLimit != null">
+        check_limit = #{checkLimit,jdbcType=DECIMAL},
+      </if>
+      <if test="checkNote != null">
+        check_note = #{checkNote,jdbcType=VARCHAR},
+      </if>
+      <if test="checkStatus != null">
+        check_status = #{checkStatus,jdbcType=INTEGER},
+      </if>
+      <if test="price != null">
+        price = #{price,jdbcType=DECIMAL},
+      </if>
+      <if test="amount != null">
+        amount = #{amount,jdbcType=DECIMAL},
+      </if>
+      <if test="productDate != null">
+        product_date = #{productDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createdBy != null">
+        created_by = #{createdBy,jdbcType=VARCHAR},
+      </if>
+      <if test="createdTime != null">
+        created_time = #{createdTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updatedBy != null">
+        updated_by = #{updatedBy,jdbcType=VARCHAR},
+      </if>
+      <if test="updatedTime != null">
+        updated_time = #{updatedTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.yiban.erp.entities.RepertoryCheckPlanDetail">
+    update repertory_check_plan_detail
+    set check_plan_id = #{checkPlanId,jdbcType=BIGINT},
+      form_no = #{formNo,jdbcType=VARCHAR},
+      form_status = #{formStatus,jdbcType=VARCHAR},
+      repertory_info_id = #{repertoryInfoId,jdbcType=BIGINT},
+      goods_id = #{goodsId,jdbcType=BIGINT},
+      batch_code = #{batchCode,jdbcType=VARCHAR},
+      acc_limit = #{accLimit,jdbcType=DECIMAL},
+      check_limit = #{checkLimit,jdbcType=DECIMAL},
+      check_note = #{checkNote,jdbcType=VARCHAR},
+      check_status = #{checkStatus,jdbcType=INTEGER},
+      price = #{price,jdbcType=DECIMAL},
+      amount = #{amount,jdbcType=DECIMAL},
+      product_date = #{productDate,jdbcType=TIMESTAMP},
+      created_by = #{createdBy,jdbcType=VARCHAR},
+      created_time = #{createdTime,jdbcType=TIMESTAMP},
+      updated_by = #{updatedBy,jdbcType=VARCHAR},
+      updated_time = #{updatedTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <resultMap id="BaseResultMap" type="com.yiban.erp.entities.RepertoryCheckPlanDetail">
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="check_plan_id" jdbcType="BIGINT" property="checkPlanId" />
+    <result column="form_no" jdbcType="VARCHAR" property="formNo" />
+    <result column="form_status" jdbcType="VARCHAR" property="formStatus" />
+    <result column="repertory_info_id" jdbcType="BIGINT" property="repertoryInfoId" />
+    <result column="goods_id" jdbcType="BIGINT" property="goodsId" />
+    <result column="batch_code" jdbcType="VARCHAR" property="batchCode" />
+    <result column="acc_limit" jdbcType="DECIMAL" property="accLimit" />
+    <result column="check_limit" jdbcType="DECIMAL" property="checkLimit" />
+    <result column="check_note" jdbcType="VARCHAR" property="checkNote" />
+    <result column="check_status" jdbcType="INTEGER" property="checkStatus" />
+    <result column="price" jdbcType="DECIMAL" property="price" />
+    <result column="amount" jdbcType="DECIMAL" property="amount" />
+    <result column="product_date" jdbcType="TIMESTAMP" property="productDate" />
+    <result column="created_by" jdbcType="VARCHAR" property="createdBy" />
+    <result column="created_time" jdbcType="TIMESTAMP" property="createdTime" />
+    <result column="updated_by" jdbcType="VARCHAR" property="updatedBy" />
+    <result column="updated_time" jdbcType="TIMESTAMP" property="updatedTime" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, check_plan_id, form_no, form_status, repertory_info_id, goods_id, batch_code, 
+    acc_limit, check_limit, check_note, check_status, price, amount, product_date, created_by, 
+    created_time, updated_by, updated_time
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from repertory_check_plan_detail
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from repertory_check_plan_detail
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="com.yiban.erp.entities.RepertoryCheckPlanDetail" useGeneratedKeys="true" keyProperty="id" >
+    insert into repertory_check_plan_detail (id, check_plan_id, form_no, 
+      form_status, repertory_info_id, goods_id, 
+      batch_code, acc_limit, check_limit, 
+      check_note, check_status, price, 
+      amount, product_date, created_by, 
+      created_time, updated_by, updated_time
+      )
+    values (#{id,jdbcType=BIGINT}, #{checkPlanId,jdbcType=BIGINT}, #{formNo,jdbcType=VARCHAR}, 
+      #{formStatus,jdbcType=VARCHAR}, #{repertoryInfoId,jdbcType=BIGINT}, #{goodsId,jdbcType=BIGINT}, 
+      #{batchCode,jdbcType=VARCHAR}, #{accLimit,jdbcType=DECIMAL}, #{checkLimit,jdbcType=DECIMAL}, 
+      #{checkNote,jdbcType=VARCHAR}, #{checkStatus,jdbcType=INTEGER}, #{price,jdbcType=DECIMAL}, 
+      #{amount,jdbcType=DECIMAL}, #{productDate,jdbcType=TIMESTAMP}, #{createdBy,jdbcType=VARCHAR}, 
+      #{createdTime,jdbcType=TIMESTAMP}, #{updatedBy,jdbcType=VARCHAR}, #{updatedTime,jdbcType=TIMESTAMP}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.yiban.erp.entities.RepertoryCheckPlanDetail" useGeneratedKeys="true" keyProperty="id" >
+    insert into repertory_check_plan_detail
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="checkPlanId != null">
+        check_plan_id,
+      </if>
+      <if test="formNo != null">
+        form_no,
+      </if>
+      <if test="formStatus != null">
+        form_status,
+      </if>
+      <if test="repertoryInfoId != null">
+        repertory_info_id,
+      </if>
+      <if test="goodsId != null">
+        goods_id,
+      </if>
+      <if test="batchCode != null">
+        batch_code,
+      </if>
+      <if test="accLimit != null">
+        acc_limit,
+      </if>
+      <if test="checkLimit != null">
+        check_limit,
+      </if>
+      <if test="checkNote != null">
+        check_note,
+      </if>
+      <if test="checkStatus != null">
+        check_status,
+      </if>
+      <if test="price != null">
+        price,
+      </if>
+      <if test="amount != null">
+        amount,
+      </if>
+      <if test="productDate != null">
+        product_date,
+      </if>
+      <if test="createdBy != null">
+        created_by,
+      </if>
+      <if test="createdTime != null">
+        created_time,
+      </if>
+      <if test="updatedBy != null">
+        updated_by,
+      </if>
+      <if test="updatedTime != null">
+        updated_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=BIGINT},
+      </if>
+      <if test="checkPlanId != null">
+        #{checkPlanId,jdbcType=BIGINT},
+      </if>
+      <if test="formNo != null">
+        #{formNo,jdbcType=VARCHAR},
+      </if>
+      <if test="formStatus != null">
+        #{formStatus,jdbcType=VARCHAR},
+      </if>
+      <if test="repertoryInfoId != null">
+        #{repertoryInfoId,jdbcType=BIGINT},
+      </if>
+      <if test="goodsId != null">
+        #{goodsId,jdbcType=BIGINT},
+      </if>
+      <if test="batchCode != null">
+        #{batchCode,jdbcType=VARCHAR},
+      </if>
+      <if test="accLimit != null">
+        #{accLimit,jdbcType=DECIMAL},
+      </if>
+      <if test="checkLimit != null">
+        #{checkLimit,jdbcType=DECIMAL},
+      </if>
+      <if test="checkNote != null">
+        #{checkNote,jdbcType=VARCHAR},
+      </if>
+      <if test="checkStatus != null">
+        #{checkStatus,jdbcType=INTEGER},
+      </if>
+      <if test="price != null">
+        #{price,jdbcType=DECIMAL},
+      </if>
+      <if test="amount != null">
+        #{amount,jdbcType=DECIMAL},
+      </if>
+      <if test="productDate != null">
+        #{productDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createdBy != null">
+        #{createdBy,jdbcType=VARCHAR},
+      </if>
+      <if test="createdTime != null">
+        #{createdTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updatedBy != null">
+        #{updatedBy,jdbcType=VARCHAR},
+      </if>
+      <if test="updatedTime != null">
+        #{updatedTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.yiban.erp.entities.RepertoryCheckPlanDetail">
+    update repertory_check_plan_detail
+    <set>
+      <if test="checkPlanId != null">
+        check_plan_id = #{checkPlanId,jdbcType=BIGINT},
+      </if>
+      <if test="formNo != null">
+        form_no = #{formNo,jdbcType=VARCHAR},
+      </if>
+      <if test="formStatus != null">
+        form_status = #{formStatus,jdbcType=VARCHAR},
+      </if>
+      <if test="repertoryInfoId != null">
+        repertory_info_id = #{repertoryInfoId,jdbcType=BIGINT},
+      </if>
+      <if test="goodsId != null">
+        goods_id = #{goodsId,jdbcType=BIGINT},
+      </if>
+      <if test="batchCode != null">
+        batch_code = #{batchCode,jdbcType=VARCHAR},
+      </if>
+      <if test="accLimit != null">
+        acc_limit = #{accLimit,jdbcType=DECIMAL},
+      </if>
+      <if test="checkLimit != null">
+        check_limit = #{checkLimit,jdbcType=DECIMAL},
+      </if>
+      <if test="checkNote != null">
+        check_note = #{checkNote,jdbcType=VARCHAR},
+      </if>
+      <if test="checkStatus != null">
+        check_status = #{checkStatus,jdbcType=INTEGER},
+      </if>
+      <if test="price != null">
+        price = #{price,jdbcType=DECIMAL},
+      </if>
+      <if test="amount != null">
+        amount = #{amount,jdbcType=DECIMAL},
+      </if>
+      <if test="productDate != null">
+        product_date = #{productDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createdBy != null">
+        created_by = #{createdBy,jdbcType=VARCHAR},
+      </if>
+      <if test="createdTime != null">
+        created_time = #{createdTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updatedBy != null">
+        updated_by = #{updatedBy,jdbcType=VARCHAR},
+      </if>
+      <if test="updatedTime != null">
+        updated_time = #{updatedTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.yiban.erp.entities.RepertoryCheckPlanDetail">
+    update repertory_check_plan_detail
+    set check_plan_id = #{checkPlanId,jdbcType=BIGINT},
+      form_no = #{formNo,jdbcType=VARCHAR},
+      form_status = #{formStatus,jdbcType=VARCHAR},
+      repertory_info_id = #{repertoryInfoId,jdbcType=BIGINT},
+      goods_id = #{goodsId,jdbcType=BIGINT},
+      batch_code = #{batchCode,jdbcType=VARCHAR},
+      acc_limit = #{accLimit,jdbcType=DECIMAL},
+      check_limit = #{checkLimit,jdbcType=DECIMAL},
+      check_note = #{checkNote,jdbcType=VARCHAR},
+      check_status = #{checkStatus,jdbcType=INTEGER},
+      price = #{price,jdbcType=DECIMAL},
+      amount = #{amount,jdbcType=DECIMAL},
+      product_date = #{productDate,jdbcType=TIMESTAMP},
+      created_by = #{createdBy,jdbcType=VARCHAR},
+      created_time = #{createdTime,jdbcType=TIMESTAMP},
+      updated_by = #{updatedBy,jdbcType=VARCHAR},
+      updated_time = #{updatedTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <resultMap id="BaseResultMap" type="com.yiban.erp.entities.RepertoryCheckPlanDetail">
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="check_plan_id" jdbcType="BIGINT" property="checkPlanId" />
+    <result column="form_no" jdbcType="VARCHAR" property="formNo" />
+    <result column="form_status" jdbcType="VARCHAR" property="formStatus" />
+    <result column="repertory_info_id" jdbcType="BIGINT" property="repertoryInfoId" />
+    <result column="goods_id" jdbcType="BIGINT" property="goodsId" />
+    <result column="batch_code" jdbcType="VARCHAR" property="batchCode" />
+    <result column="acc_limit" jdbcType="DECIMAL" property="accLimit" />
+    <result column="check_limit" jdbcType="DECIMAL" property="checkLimit" />
+    <result column="check_note" jdbcType="VARCHAR" property="checkNote" />
+    <result column="check_status" jdbcType="INTEGER" property="checkStatus" />
+    <result column="price" jdbcType="DECIMAL" property="price" />
+    <result column="amount" jdbcType="DECIMAL" property="amount" />
+    <result column="product_date" jdbcType="TIMESTAMP" property="productDate" />
+    <result column="created_by" jdbcType="VARCHAR" property="createdBy" />
+    <result column="created_time" jdbcType="TIMESTAMP" property="createdTime" />
+    <result column="updated_by" jdbcType="VARCHAR" property="updatedBy" />
+    <result column="updated_time" jdbcType="TIMESTAMP" property="updatedTime" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, check_plan_id, form_no, form_status, repertory_info_id, goods_id, batch_code, 
+    acc_limit, check_limit, check_note, check_status, price, amount, product_date, created_by, 
+    created_time, updated_by, updated_time
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from repertory_check_plan_detail
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from repertory_check_plan_detail
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="com.yiban.erp.entities.RepertoryCheckPlanDetail" useGeneratedKeys="true" keyProperty="id" >
+    insert into repertory_check_plan_detail (id, check_plan_id, form_no, 
+      form_status, repertory_info_id, goods_id, 
+      batch_code, acc_limit, check_limit, 
+      check_note, check_status, price, 
+      amount, product_date, created_by, 
+      created_time, updated_by, updated_time
+      )
+    values (#{id,jdbcType=BIGINT}, #{checkPlanId,jdbcType=BIGINT}, #{formNo,jdbcType=VARCHAR}, 
+      #{formStatus,jdbcType=VARCHAR}, #{repertoryInfoId,jdbcType=BIGINT}, #{goodsId,jdbcType=BIGINT}, 
+      #{batchCode,jdbcType=VARCHAR}, #{accLimit,jdbcType=DECIMAL}, #{checkLimit,jdbcType=DECIMAL}, 
+      #{checkNote,jdbcType=VARCHAR}, #{checkStatus,jdbcType=INTEGER}, #{price,jdbcType=DECIMAL}, 
+      #{amount,jdbcType=DECIMAL}, #{productDate,jdbcType=TIMESTAMP}, #{createdBy,jdbcType=VARCHAR}, 
+      #{createdTime,jdbcType=TIMESTAMP}, #{updatedBy,jdbcType=VARCHAR}, #{updatedTime,jdbcType=TIMESTAMP}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.yiban.erp.entities.RepertoryCheckPlanDetail" useGeneratedKeys="true" keyProperty="id" >
+    insert into repertory_check_plan_detail
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="checkPlanId != null">
+        check_plan_id,
+      </if>
+      <if test="formNo != null">
+        form_no,
+      </if>
+      <if test="formStatus != null">
+        form_status,
+      </if>
+      <if test="repertoryInfoId != null">
+        repertory_info_id,
+      </if>
+      <if test="goodsId != null">
+        goods_id,
+      </if>
+      <if test="batchCode != null">
+        batch_code,
+      </if>
+      <if test="accLimit != null">
+        acc_limit,
+      </if>
+      <if test="checkLimit != null">
+        check_limit,
+      </if>
+      <if test="checkNote != null">
+        check_note,
+      </if>
+      <if test="checkStatus != null">
+        check_status,
+      </if>
+      <if test="price != null">
+        price,
+      </if>
+      <if test="amount != null">
+        amount,
+      </if>
+      <if test="productDate != null">
+        product_date,
+      </if>
+      <if test="createdBy != null">
+        created_by,
+      </if>
+      <if test="createdTime != null">
+        created_time,
+      </if>
+      <if test="updatedBy != null">
+        updated_by,
+      </if>
+      <if test="updatedTime != null">
+        updated_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=BIGINT},
+      </if>
+      <if test="checkPlanId != null">
+        #{checkPlanId,jdbcType=BIGINT},
+      </if>
+      <if test="formNo != null">
+        #{formNo,jdbcType=VARCHAR},
+      </if>
+      <if test="formStatus != null">
+        #{formStatus,jdbcType=VARCHAR},
+      </if>
+      <if test="repertoryInfoId != null">
+        #{repertoryInfoId,jdbcType=BIGINT},
+      </if>
+      <if test="goodsId != null">
+        #{goodsId,jdbcType=BIGINT},
+      </if>
+      <if test="batchCode != null">
+        #{batchCode,jdbcType=VARCHAR},
+      </if>
+      <if test="accLimit != null">
+        #{accLimit,jdbcType=DECIMAL},
+      </if>
+      <if test="checkLimit != null">
+        #{checkLimit,jdbcType=DECIMAL},
+      </if>
+      <if test="checkNote != null">
+        #{checkNote,jdbcType=VARCHAR},
+      </if>
+      <if test="checkStatus != null">
+        #{checkStatus,jdbcType=INTEGER},
+      </if>
+      <if test="price != null">
+        #{price,jdbcType=DECIMAL},
+      </if>
+      <if test="amount != null">
+        #{amount,jdbcType=DECIMAL},
+      </if>
+      <if test="productDate != null">
+        #{productDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createdBy != null">
+        #{createdBy,jdbcType=VARCHAR},
+      </if>
+      <if test="createdTime != null">
+        #{createdTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updatedBy != null">
+        #{updatedBy,jdbcType=VARCHAR},
+      </if>
+      <if test="updatedTime != null">
+        #{updatedTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.yiban.erp.entities.RepertoryCheckPlanDetail">
+    update repertory_check_plan_detail
+    <set>
+      <if test="checkPlanId != null">
+        check_plan_id = #{checkPlanId,jdbcType=BIGINT},
+      </if>
+      <if test="formNo != null">
+        form_no = #{formNo,jdbcType=VARCHAR},
+      </if>
+      <if test="formStatus != null">
+        form_status = #{formStatus,jdbcType=VARCHAR},
+      </if>
+      <if test="repertoryInfoId != null">
+        repertory_info_id = #{repertoryInfoId,jdbcType=BIGINT},
+      </if>
+      <if test="goodsId != null">
+        goods_id = #{goodsId,jdbcType=BIGINT},
+      </if>
+      <if test="batchCode != null">
+        batch_code = #{batchCode,jdbcType=VARCHAR},
+      </if>
+      <if test="accLimit != null">
+        acc_limit = #{accLimit,jdbcType=DECIMAL},
+      </if>
+      <if test="checkLimit != null">
+        check_limit = #{checkLimit,jdbcType=DECIMAL},
+      </if>
+      <if test="checkNote != null">
+        check_note = #{checkNote,jdbcType=VARCHAR},
+      </if>
+      <if test="checkStatus != null">
+        check_status = #{checkStatus,jdbcType=INTEGER},
+      </if>
+      <if test="price != null">
+        price = #{price,jdbcType=DECIMAL},
+      </if>
+      <if test="amount != null">
+        amount = #{amount,jdbcType=DECIMAL},
+      </if>
+      <if test="productDate != null">
+        product_date = #{productDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createdBy != null">
+        created_by = #{createdBy,jdbcType=VARCHAR},
+      </if>
+      <if test="createdTime != null">
+        created_time = #{createdTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updatedBy != null">
+        updated_by = #{updatedBy,jdbcType=VARCHAR},
+      </if>
+      <if test="updatedTime != null">
+        updated_time = #{updatedTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.yiban.erp.entities.RepertoryCheckPlanDetail">
+    update repertory_check_plan_detail
+    set check_plan_id = #{checkPlanId,jdbcType=BIGINT},
+      form_no = #{formNo,jdbcType=VARCHAR},
+      form_status = #{formStatus,jdbcType=VARCHAR},
+      repertory_info_id = #{repertoryInfoId,jdbcType=BIGINT},
+      goods_id = #{goodsId,jdbcType=BIGINT},
+      batch_code = #{batchCode,jdbcType=VARCHAR},
+      acc_limit = #{accLimit,jdbcType=DECIMAL},
+      check_limit = #{checkLimit,jdbcType=DECIMAL},
+      check_note = #{checkNote,jdbcType=VARCHAR},
+      check_status = #{checkStatus,jdbcType=INTEGER},
+      price = #{price,jdbcType=DECIMAL},
+      amount = #{amount,jdbcType=DECIMAL},
+      product_date = #{productDate,jdbcType=TIMESTAMP},
+      created_by = #{createdBy,jdbcType=VARCHAR},
+      created_time = #{createdTime,jdbcType=TIMESTAMP},
+      updated_by = #{updatedBy,jdbcType=VARCHAR},
+      updated_time = #{updatedTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <resultMap id="BaseResultMap" type="com.yiban.erp.entities.RepertoryCheckPlanDetail">
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="check_plan_id" jdbcType="BIGINT" property="checkPlanId" />
+    <result column="form_no" jdbcType="VARCHAR" property="formNo" />
+    <result column="form_status" jdbcType="VARCHAR" property="formStatus" />
+    <result column="repertory_info_id" jdbcType="BIGINT" property="repertoryInfoId" />
+    <result column="goods_id" jdbcType="BIGINT" property="goodsId" />
+    <result column="batch_code" jdbcType="VARCHAR" property="batchCode" />
+    <result column="acc_limit" jdbcType="DECIMAL" property="accLimit" />
+    <result column="check_limit" jdbcType="DECIMAL" property="checkLimit" />
+    <result column="check_note" jdbcType="VARCHAR" property="checkNote" />
+    <result column="check_status" jdbcType="INTEGER" property="checkStatus" />
+    <result column="price" jdbcType="DECIMAL" property="price" />
+    <result column="amount" jdbcType="DECIMAL" property="amount" />
+    <result column="product_date" jdbcType="TIMESTAMP" property="productDate" />
+    <result column="created_by" jdbcType="VARCHAR" property="createdBy" />
+    <result column="created_time" jdbcType="TIMESTAMP" property="createdTime" />
+    <result column="updated_by" jdbcType="VARCHAR" property="updatedBy" />
+    <result column="updated_time" jdbcType="TIMESTAMP" property="updatedTime" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, check_plan_id, form_no, form_status, repertory_info_id, goods_id, batch_code, 
+    acc_limit, check_limit, check_note, check_status, price, amount, product_date, created_by, 
+    created_time, updated_by, updated_time
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from repertory_check_plan_detail
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from repertory_check_plan_detail
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="com.yiban.erp.entities.RepertoryCheckPlanDetail" useGeneratedKeys="true" keyProperty="id" >
+    insert into repertory_check_plan_detail (id, check_plan_id, form_no, 
+      form_status, repertory_info_id, goods_id, 
+      batch_code, acc_limit, check_limit, 
+      check_note, check_status, price, 
+      amount, product_date, created_by, 
+      created_time, updated_by, updated_time
+      )
+    values (#{id,jdbcType=BIGINT}, #{checkPlanId,jdbcType=BIGINT}, #{formNo,jdbcType=VARCHAR}, 
+      #{formStatus,jdbcType=VARCHAR}, #{repertoryInfoId,jdbcType=BIGINT}, #{goodsId,jdbcType=BIGINT}, 
+      #{batchCode,jdbcType=VARCHAR}, #{accLimit,jdbcType=DECIMAL}, #{checkLimit,jdbcType=DECIMAL}, 
+      #{checkNote,jdbcType=VARCHAR}, #{checkStatus,jdbcType=INTEGER}, #{price,jdbcType=DECIMAL}, 
+      #{amount,jdbcType=DECIMAL}, #{productDate,jdbcType=TIMESTAMP}, #{createdBy,jdbcType=VARCHAR}, 
+      #{createdTime,jdbcType=TIMESTAMP}, #{updatedBy,jdbcType=VARCHAR}, #{updatedTime,jdbcType=TIMESTAMP}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.yiban.erp.entities.RepertoryCheckPlanDetail" useGeneratedKeys="true" keyProperty="id" >
+    insert into repertory_check_plan_detail
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="checkPlanId != null">
+        check_plan_id,
+      </if>
+      <if test="formNo != null">
+        form_no,
+      </if>
+      <if test="formStatus != null">
+        form_status,
+      </if>
+      <if test="repertoryInfoId != null">
+        repertory_info_id,
+      </if>
+      <if test="goodsId != null">
+        goods_id,
+      </if>
+      <if test="batchCode != null">
+        batch_code,
+      </if>
+      <if test="accLimit != null">
+        acc_limit,
+      </if>
+      <if test="checkLimit != null">
+        check_limit,
+      </if>
+      <if test="checkNote != null">
+        check_note,
+      </if>
+      <if test="checkStatus != null">
+        check_status,
+      </if>
+      <if test="price != null">
+        price,
+      </if>
+      <if test="amount != null">
+        amount,
+      </if>
+      <if test="productDate != null">
+        product_date,
+      </if>
+      <if test="createdBy != null">
+        created_by,
+      </if>
+      <if test="createdTime != null">
+        created_time,
+      </if>
+      <if test="updatedBy != null">
+        updated_by,
+      </if>
+      <if test="updatedTime != null">
+        updated_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=BIGINT},
+      </if>
+      <if test="checkPlanId != null">
+        #{checkPlanId,jdbcType=BIGINT},
+      </if>
+      <if test="formNo != null">
+        #{formNo,jdbcType=VARCHAR},
+      </if>
+      <if test="formStatus != null">
+        #{formStatus,jdbcType=VARCHAR},
+      </if>
+      <if test="repertoryInfoId != null">
+        #{repertoryInfoId,jdbcType=BIGINT},
+      </if>
+      <if test="goodsId != null">
+        #{goodsId,jdbcType=BIGINT},
+      </if>
+      <if test="batchCode != null">
+        #{batchCode,jdbcType=VARCHAR},
+      </if>
+      <if test="accLimit != null">
+        #{accLimit,jdbcType=DECIMAL},
+      </if>
+      <if test="checkLimit != null">
+        #{checkLimit,jdbcType=DECIMAL},
+      </if>
+      <if test="checkNote != null">
+        #{checkNote,jdbcType=VARCHAR},
+      </if>
+      <if test="checkStatus != null">
+        #{checkStatus,jdbcType=INTEGER},
+      </if>
+      <if test="price != null">
+        #{price,jdbcType=DECIMAL},
+      </if>
+      <if test="amount != null">
+        #{amount,jdbcType=DECIMAL},
+      </if>
+      <if test="productDate != null">
+        #{productDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createdBy != null">
+        #{createdBy,jdbcType=VARCHAR},
+      </if>
+      <if test="createdTime != null">
+        #{createdTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updatedBy != null">
+        #{updatedBy,jdbcType=VARCHAR},
+      </if>
+      <if test="updatedTime != null">
+        #{updatedTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.yiban.erp.entities.RepertoryCheckPlanDetail">
+    update repertory_check_plan_detail
+    <set>
+      <if test="checkPlanId != null">
+        check_plan_id = #{checkPlanId,jdbcType=BIGINT},
+      </if>
+      <if test="formNo != null">
+        form_no = #{formNo,jdbcType=VARCHAR},
+      </if>
+      <if test="formStatus != null">
+        form_status = #{formStatus,jdbcType=VARCHAR},
+      </if>
+      <if test="repertoryInfoId != null">
+        repertory_info_id = #{repertoryInfoId,jdbcType=BIGINT},
+      </if>
+      <if test="goodsId != null">
+        goods_id = #{goodsId,jdbcType=BIGINT},
+      </if>
+      <if test="batchCode != null">
+        batch_code = #{batchCode,jdbcType=VARCHAR},
+      </if>
+      <if test="accLimit != null">
+        acc_limit = #{accLimit,jdbcType=DECIMAL},
+      </if>
+      <if test="checkLimit != null">
+        check_limit = #{checkLimit,jdbcType=DECIMAL},
+      </if>
+      <if test="checkNote != null">
+        check_note = #{checkNote,jdbcType=VARCHAR},
+      </if>
+      <if test="checkStatus != null">
+        check_status = #{checkStatus,jdbcType=INTEGER},
+      </if>
+      <if test="price != null">
+        price = #{price,jdbcType=DECIMAL},
+      </if>
+      <if test="amount != null">
+        amount = #{amount,jdbcType=DECIMAL},
+      </if>
+      <if test="productDate != null">
+        product_date = #{productDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createdBy != null">
+        created_by = #{createdBy,jdbcType=VARCHAR},
+      </if>
+      <if test="createdTime != null">
+        created_time = #{createdTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updatedBy != null">
+        updated_by = #{updatedBy,jdbcType=VARCHAR},
+      </if>
+      <if test="updatedTime != null">
+        updated_time = #{updatedTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.yiban.erp.entities.RepertoryCheckPlanDetail">
+    update repertory_check_plan_detail
+    set check_plan_id = #{checkPlanId,jdbcType=BIGINT},
+      form_no = #{formNo,jdbcType=VARCHAR},
+      form_status = #{formStatus,jdbcType=VARCHAR},
+      repertory_info_id = #{repertoryInfoId,jdbcType=BIGINT},
+      goods_id = #{goodsId,jdbcType=BIGINT},
+      batch_code = #{batchCode,jdbcType=VARCHAR},
+      acc_limit = #{accLimit,jdbcType=DECIMAL},
+      check_limit = #{checkLimit,jdbcType=DECIMAL},
+      check_note = #{checkNote,jdbcType=VARCHAR},
+      check_status = #{checkStatus,jdbcType=INTEGER},
+      price = #{price,jdbcType=DECIMAL},
+      amount = #{amount,jdbcType=DECIMAL},
+      product_date = #{productDate,jdbcType=TIMESTAMP},
+      created_by = #{createdBy,jdbcType=VARCHAR},
+      created_time = #{createdTime,jdbcType=TIMESTAMP},
+      updated_by = #{updatedBy,jdbcType=VARCHAR},
+      updated_time = #{updatedTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+
+
+  <select id="getCheckPlanDetailList" parameterType="map" resultMap="BaseResultMap">
+    SELECT  a.*,r.code as code,g.origin as origin,g.spec as spec,g.unit as unit,g.name as goodsName,g.factory_id,f.name as factoryName
+    FROM `repertory_check_plan_detail`  a
+    LEFT JOIN `goods`  g ON g.`id`=a.good_id
+    LEFT JOIN `repertory_info` r ON r.`id`=a.repertory_info_id
+    LEFT JOIN `factory` f ON f.`id`=g.factory_id
+    WHERE 1=1
+    <if test="checkPlanId != null" >
+      and a.check_plan_id = #{checkPlanId}
+    </if>
+    order by a.id desc
+  </select>
+</mapper>

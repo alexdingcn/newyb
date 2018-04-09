@@ -13,25 +13,18 @@ public class RepertoryInfo {
 
     private Long inUserId;
 
-<<<<<<< HEAD
     private Long goodsId;
-=======
-    private String batchCode;
->>>>>>> 18736afebc9cfb38e9f90dd548b979b6ca9838f4
 
-    private Long goodsId;
+    private String batchCode;
 
     private Long factoryId;
 
     private BigDecimal inQuantity;
 
-<<<<<<< HEAD
-    private String batchCode;
-=======
     private BigDecimal quantity;
 
     private BigDecimal buyPrice;
->>>>>>> 18736afebc9cfb38e9f90dd548b979b6ca9838f4
+
 
     private Boolean isExp;
 
@@ -105,7 +98,14 @@ public class RepertoryInfo {
         this.warehouseId = warehouseId;
     }
 
-<<<<<<< HEAD
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
+    }
+
     public Long getInUserId() {
         return inUserId;
     }
@@ -114,8 +114,6 @@ public class RepertoryInfo {
         this.inUserId = inUserId;
     }
 
-=======
->>>>>>> 18736afebc9cfb38e9f90dd548b979b6ca9838f4
     public Long getGoodsId() {
         return goodsId;
     }
@@ -124,20 +122,35 @@ public class RepertoryInfo {
         this.goodsId = goodsId;
     }
 
-<<<<<<< HEAD
-    public Integer getInQuantity() {
+    public String getBatchCode() {
+        return batchCode;
+    }
+
+    public void setBatchCode(String batchCode) {
+        this.batchCode = batchCode;
+    }
+
+    public Long getFactoryId() {
+        return factoryId;
+    }
+
+    public void setFactoryId(Long factoryId) {
+        this.factoryId = factoryId;
+    }
+
+    public BigDecimal getInQuantity() {
         return inQuantity;
     }
 
-    public void setInQuantity(Integer inQuantity) {
+    public void setInQuantity(BigDecimal inQuantity) {
         this.inQuantity = inQuantity;
     }
 
-    public Integer getQuantity() {
+    public BigDecimal getQuantity() {
         return quantity;
     }
 
-    public void setQuantity(Integer quantity) {
+    public void setQuantity(BigDecimal quantity) {
         this.quantity = quantity;
     }
 
@@ -147,16 +160,6 @@ public class RepertoryInfo {
 
     public void setBuyPrice(BigDecimal buyPrice) {
         this.buyPrice = buyPrice;
-    }
-
-=======
->>>>>>> 18736afebc9cfb38e9f90dd548b979b6ca9838f4
-    public String getBatchCode() {
-        return batchCode;
-    }
-
-    public void setBatchCode(String batchCode) {
-        this.batchCode = batchCode;
     }
 
     public Boolean getExp() {
@@ -199,14 +202,6 @@ public class RepertoryInfo {
         this.expDate = expDate;
     }
 
-    public String getLocation() {
-        return location;
-    }
-
-    public void setLocation(String location) {
-        this.location = location;
-    }
-
     public Long getSupplierId() {
         return supplierId;
     }
@@ -239,27 +234,11 @@ public class RepertoryInfo {
         this.orderId = orderId;
     }
 
-    public String getStoreState() {
-        return storeState;
-    }
-
-    public void setStoreState(String storeState) {
-        this.storeState = storeState;
-    }
-
-    public String getCounterState() {
-        return counterState;
-    }
-
-    public void setCounterState(String counterState) {
-        this.counterState = counterState;
-    }
-
-    public String getSaleSate() {
+    public Boolean getSaleSate() {
         return saleSate;
     }
 
-    public void setSaleSate(String saleSate) {
+    public void setSaleSate(Boolean saleSate) {
         this.saleSate = saleSate;
     }
 
@@ -331,7 +310,6 @@ public class RepertoryInfo {
         this.factoryName = factoryName;
     }
 
-<<<<<<< HEAD
     public String getInUserName() {
         return inUserName;
     }
@@ -354,46 +332,6 @@ public class RepertoryInfo {
 
     public void setJx(String jx) {
         this.jx = jx;
-=======
-    public Long getFactoryId() {
-        return factoryId;
-    }
-
-    public void setFactoryId(Long factoryId) {
-        this.factoryId = factoryId;
-    }
-
-    public BigDecimal getInQuantity() {
-        return inQuantity;
-    }
-
-    public void setInQuantity(BigDecimal inQuantity) {
-        this.inQuantity = inQuantity;
-    }
-
-    public BigDecimal getQuantity() {
-        return quantity;
-    }
-
-    public void setQuantity(BigDecimal quantity) {
-        this.quantity = quantity;
-    }
-
-    public BigDecimal getBuyPrice() {
-        return buyPrice;
-    }
-
-    public void setBuyPrice(BigDecimal buyPrice) {
-        this.buyPrice = buyPrice;
-    }
-
-    public Boolean getSaleSate() {
-        return saleSate;
-    }
-
-    public void setSaleSate(Boolean saleSate) {
-        this.saleSate = saleSate;
->>>>>>> 18736afebc9cfb38e9f90dd548b979b6ca9838f4
     }
 
     public String getSpec() {
