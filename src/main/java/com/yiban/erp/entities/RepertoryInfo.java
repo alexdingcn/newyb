@@ -15,9 +15,9 @@ public class RepertoryInfo {
 
     private String batchCode;
 
-    private Long goodId;
+    private Long goodsId;
 
-    private Integer factoryId;
+    private Long factoryId;
 
     private BigDecimal inQuantity;
 
@@ -89,12 +89,12 @@ public class RepertoryInfo {
         this.warehouseId = warehouseId;
     }
 
-    public Long getGoodId() {
-        return goodId;
+    public Long getGoodsId() {
+        return goodsId;
     }
 
-    public void setGoodId(Long goodId) {
-        this.goodId = goodId;
+    public void setGoodsId(Long goodsId) {
+        this.goodsId = goodsId;
     }
 
     public String getBatchCode() {
@@ -293,11 +293,11 @@ public class RepertoryInfo {
         this.inDate = inDate;
     }
 
-    public Integer getFactoryId() {
+    public Long getFactoryId() {
         return factoryId;
     }
 
-    public void setFactoryId(Integer factoryId) {
+    public void setFactoryId(Long factoryId) {
         this.factoryId = factoryId;
     }
 

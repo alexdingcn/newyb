@@ -507,7 +507,7 @@
     </if>
   </select>
 
-  <select id="getByBuyOrder" parameterType="map" resultType="com.yiban.erp.entities.RepositoryOrder">
+  <select id="getByRefOrder" parameterType="map" resultType="com.yiban.erp.entities.RepositoryOrder">
     select
       <include refid="listSql"/>
     from repository_order o, supplier s, supplier_contact sc, warehouse w, users u
@@ -516,6 +516,7 @@
     and o.buyer_id = u.id
     and o.company_id = #{companyId}
     and o.status != 'DELETE'
+    and o.ref_type = #{refType}
     and o.ref_order_id = #{refOrderId}
   </select>
 

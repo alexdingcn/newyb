@@ -7,7 +7,7 @@
     <result column="warehouse_id" property="warehouseId" jdbcType="INTEGER" />
     <result column="in_user_id" property="inUserId" jdbcType="BIGINT" />
     <result column="goods_id" property="goodsId" jdbcType="BIGINT" />
-    <result column="factory_id" property="factoryId" jdbcType="INTEGER" />
+    <result column="factory_id" property="factoryId" jdbcType="BIGINT" />
     <result column="in_quantity" property="inQuantity" jdbcType="DECIMAL" />
     <result column="quantity" property="quantity" jdbcType="DECIMAL" />
     <result column="buy_price" property="buyPrice" jdbcType="DECIMAL" />
@@ -51,7 +51,7 @@
       sale_state, create_by, create_time, update_by, update_time
       )
     values (#{id,jdbcType=BIGINT}, #{companyId,jdbcType=INTEGER}, #{warehouseId,jdbcType=INTEGER},
-      #{inUserId,jdbcType=BIGINT}, #{goodsId,jdbcType=BIGINT}, #{factoryId,jdbcType=INTEGER},
+      #{inUserId,jdbcType=BIGINT}, #{goodsId,jdbcType=BIGINT}, #{factoryId,jdbcType=BIGINT},
       #{inQuantity,jdbcType=DECIMAL}, #{quantity,jdbcType=DECIMAL}, #{buyPrice,jdbcType=DECIMAL},
       #{batchCode,jdbcType=VARCHAR},
       #{isExp,jdbcType=BIT}, #{saleEnable,jdbcType=BIT}, #{productDate,jdbcType=DATE},
@@ -71,7 +71,7 @@
     values
     <foreach collection="list" item="item" separator="), (" open="(" close=")">
       #{item.companyId,jdbcType=INTEGER}, #{item.warehouseId,jdbcType=INTEGER},
-      #{item.inUserId,jdbcType=BIGINT}, #{item.goodsId,jdbcType=BIGINT}, #{item.factoryId,jdbcType=INTEGER},
+      #{item.inUserId,jdbcType=BIGINT}, #{item.goodsId,jdbcType=BIGINT}, #{item.factoryId,jdbcType=BIGINT},
       #{item.inQuantity,jdbcType=DECIMAL}, #{item.quantity,jdbcType=DECIMAL}, #{item.buyPrice,jdbcType=DECIMAL},
       #{item.batchCode,jdbcType=VARCHAR},
       #{item.isExp,jdbcType=BIT}, #{item.saleEnable,jdbcType=BIT}, #{item.productDate,jdbcType=DATE},
@@ -178,7 +178,7 @@
         #{goodsId,jdbcType=BIGINT},
       </if>
       <if test="factoryId">
-        #{factoryId,jdbcType=INTEGER},
+        #{factoryId,jdbcType=BIGINT},
       </if>
       <if test="inQuantity != null" >
         #{inQuantity,jdbcType=DECIMAL},
@@ -255,7 +255,7 @@
         goods_id = #{goodsId,jdbcType=BIGINT},
       </if>
       <if test="factoryId">
-        factory_id = #{factoryId,jdbcType=INTEGER},
+        factory_id = #{factoryId,jdbcType=BIGINT},
       </if>
       <if test="inQuantity != null" >
         in_quantity = #{inQuantity,jdbcType=DECIMAL},
@@ -324,7 +324,7 @@
       warehouse_id = #{warehouseId,jdbcType=INTEGER},
       in_user_id = #{inUserId,jdbcType=BIGINT},
       goods_id = #{goodsId,jdbcType=BIGINT},
-      factory_id = #{factoryId,jdbcType=INTEGER},
+      factory_id = #{factoryId,jdbcType=BIGINT},
       in_quantity = #{inQuantity,jdbcType=DECIMAL},
       quantity = #{quantity,jdbcType=DECIMAL},
       buy_price = #{buyPrice,jdbcType=DECIMAL},

@@ -1,10 +1,7 @@
 package com.yiban.erp.service.buy;
 
 import com.alibaba.fastjson.JSON;
-import com.yiban.erp.constant.BuyOrderStatus;
-import com.yiban.erp.constant.OptionsType;
-import com.yiban.erp.constant.OrderNumberType;
-import com.yiban.erp.constant.RepositoryOrderStatus;
+import com.yiban.erp.constant.*;
 import com.yiban.erp.dao.*;
 import com.yiban.erp.dto.CurrentBalanceResp;
 import com.yiban.erp.dto.ReceiveListReq;
@@ -142,8 +139,10 @@ public class ReceiveService {
         logger.info("begin save repository order details.");
         saveOrderDetail(user, order);
 
-        //如果是保存操作，不是暂挂，验证是否存在采购单号，如果存在，修改到已经收货的状态 TODO add refType
-        if (RepositoryOrderStatus.INIT.name().equalsIgnoreCase(order.getStatus()) && order.getRefOrderId() != null) {
+        //如果是保存操作，不是暂挂，验证是否存在采购单号，如果存在，修改到已经收货的状态
+        if (RepositoryOrderStatus.INIT.name().equalsIgnoreCase(order.getStatus())
+                && RepositoryRefType.BUY_ORDER.name().equalsIgnoreCase(order.getRefType())
+                && order.getRefOrderId() != null) {
             logger.info("set buy order status to shiped. buyOrderId:{}", order.getRefOrderId());
             BuyOrder buyOrder = buyOrderMapper.selectByPrimaryKey(order.getRefOrderId());
             if (buyOrder != null) {
@@ -249,7 +248,6 @@ public class ReceiveService {
 
     public RepositoryOrder getByBuyOrder(User user, Long buyOrderId) throws BizException {
         logger.debug("user:{} get receive order by buy order id:{}", user.getId(), buyOrderId);
-        //TODO ADD refType
         BuyOrder buyOrder = buyOrderMapper.getOrderById(buyOrderId);
         if (buyOrder == null) {
             logger.warn("get buy order fail. id:{}", buyOrderId);
@@ -264,7 +262,7 @@ public class ReceiveService {
             throw new BizException(ErrorCode.RECEIVE_BUY_ORDER_STATUS);
         }
         //查询当前采购收货单中是否存在该笔订单数据，如果存在，直接返回，如果不存在，生成对应数据
-        RepositoryOrder order = repositoryOrderMapper.getByBuyOrder(user.getCompanyId(), buyOrderId);
+        RepositoryOrder order = repositoryOrderMapper.getByRefOrder(user.getCompanyId(), RepositoryRefType.BUY_ORDER.name(), buyOrderId);
         if (order == null) {
             logger.info("buy order is not exist in receive order. buy order id:{}", buyOrderId);
             return makeReceiveOrderByBuyOrder(user, buyOrder);
@@ -296,6 +294,7 @@ public class ReceiveService {
         RepositoryOrder order = new RepositoryOrder();
         order.setCompanyId(buyOrder.getCompanyId());
         order.setRefOrderId(buyOrder.getId());
+        order.setRefType(RepositoryRefType.BUY_ORDER.name());
         order.setSupplierId(buyOrder.getSupplierId());
         order.setSupplierName(buyOrder.getSupplier());
         order.setSupplierContactId(buyOrder.getSupplierContactId());
@@ -604,22 +603,24 @@ public class ReceiveService {
             RepertoryInfo item = new RepertoryInfo();
             item.setCompanyId(order.getCompanyId());
             item.setWarehouseId(order.getWarehouseId());
+            item.setLocation(detail.getWarehouseLocation());
             item.setInUserId(user.getId());
-            item.setGoodId(detail.getGoodsId());
+            item.setGoodsId(detail.getGoodsId());
+            item.setBatchCode(detail.getBatchCode());
+            item.setFactoryId(detail.getGoods() == null ? null : detail.getGoods().getFactoryId());
             item.setInQuantity(detail.getInCount());
             item.setQuantity(detail.getInCount());
             item.setBuyPrice(detail.getPrice());
-            item.setBatchCode(detail.getBatchCode());
             item.setExp(false);
             item.setSaleEnable(true);
             item.setProductDate(detail.getProductDate());
             item.setExpDate(detail.getExpDate());
             item.setInDate(new Date());
-            item.setLocation(detail.getWarehouseLocation());
             item.setSupplierId(order.getSupplierId());
             item.setSupplierContactId(order.getSupplierContactId());
             item.setBuyerId(order.getBuyerId());
             item.setOrderId(order.getId());
+            item.setSaleSate(detail.getSaleState());
             item.setCreateBy(user.getNickname());
             item.setCreateTime(new Date());
             item.setUpdateBy(user.getNickname());
