@@ -133,9 +133,9 @@ export const appRouter = [
     children: [
         { path: 'order', title: '采购制单', name: 'buy_order', component: () => import('@/views/buy/buy-order.vue') },
         { path: 'review', title: '采购单审核', name: 'buy_order_review', component: () => import('@/views/buy/buy-order-list.vue') },
-        { path: 'receive', title: '采购收货', name: 'buy_receive', component: () => import('@/views/buy/buy-receive.vue') },
-        { path: "quality-check", title: '入库质量验收', name: 'buy-quality-check', component: () => import('@/views/buy/buy-quality-check.vue')},
-        { path: "in-check", title: '入库审核', name: 'receive-in-check', component: () => import('@/views/buy/receive-in-check.vue')},
+        { path: 'receive', title: '采购收货', name: 'buy_receive', component: () => import('@/views/repertory/in-make.vue') },
+        { path: "buy-quality-check", title: '入库质量验收', name: 'buy-quality-check', component: () => import('@/views/repertory/in-quality-check.vue')},
+        { path: "in-check", title: '入库审核', name: 'receive-in-check', component: () => import('@/views/repertory/in-check.vue')},
     ]
 },
 {
@@ -162,6 +162,9 @@ export const appRouter = [
         { path: 'store_check_index', title: '库存盘点', name: 'store_check_index', component: () => import('@/views/warehouse/store_check_index.vue') },
         { path: 'setting', title: '仓库点设置', name: 'wh_setting', component: () => import('@/views/warehouse/setting.vue') },
         { path: 'overview', title: '库存报表', name: 'wh_overview', component: () => import('@/views/warehouse/overview.vue') },
+        { path: 'in-make', title: '录制入库单', name: 'in-make', component: () => import('@/views/repertory/in-make.vue') },
+        { path: "in-quality-check", title: '入库质量验收', name: 'in-quality-check', component: () => import('@/views/repertory/in-quality-check.vue')},
+        { path: "in-check", title: '入库审核', name: 'in-check', component: () => import('@/views/repertory/in-check.vue')},
     ]
 }, {
         path: '/access',

@@ -22,6 +22,7 @@
       <result column="supplier_contact_id" property="supplierContactId" jdbcType="BIGINT" />
       <result column="buyer_id" property="buyerId" jdbcType="BIGINT" />
       <result column="order_id" property="orderId" jdbcType="BIGINT" />
+      <result column="order_detail_id" property="orderDetailId" jdbcType="BIGINT" />
       <result column="sale_sate" property="saleSate" jdbcType="BIT" />
       <result column="create_by" property="createBy" jdbcType="VARCHAR" />
       <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
@@ -31,7 +32,7 @@
   <sql id="Base_Column_List" >
     id, company_id, warehouse_id, location, in_user_id, batch_code, goods_id, factory_id,
     in_quantity, quantity, buy_price, is_exp, sale_enable, product_date, exp_date, in_date,
-    supplier_id, supplier_contact_id, buyer_id, order_id, sale_sate, create_by, create_time,
+    supplier_id, supplier_contact_id, buyer_id, order_id, order_detail_id, sale_sate, create_by, create_time,
     update_by, update_time
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
@@ -51,7 +52,7 @@
       quantity, buy_price, is_exp,
       sale_enable, product_date, exp_date,
       in_date, supplier_id, supplier_contact_id,
-      buyer_id, order_id, sale_sate,
+      buyer_id, order_id, order_detail_id, sale_sate,
       create_by, create_time, update_by,
       update_time)
     values (#{companyId,jdbcType=INTEGER}, #{warehouseId,jdbcType=INTEGER},
@@ -60,18 +61,18 @@
       #{quantity,jdbcType=DECIMAL}, #{buyPrice,jdbcType=DECIMAL}, #{isExp,jdbcType=BIT},
       #{saleEnable,jdbcType=BIT}, #{productDate,jdbcType=DATE}, #{expDate,jdbcType=DATE},
       #{inDate,jdbcType=TIMESTAMP}, #{supplierId,jdbcType=BIGINT}, #{supplierContactId,jdbcType=BIGINT},
-      #{buyerId,jdbcType=BIGINT}, #{orderId,jdbcType=BIGINT}, #{saleSate,jdbcType=BIT},
+      #{buyerId,jdbcType=BIGINT}, #{orderId,jdbcType=BIGINT}, #{orderDetailId,jdbcType=BIGINT}, #{saleSate,jdbcType=BIT},
       #{createBy,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, #{updateBy,jdbcType=VARCHAR},
       #{updateTime,jdbcType=TIMESTAMP})
   </insert>
   <insert id="insertBatch" parameterType="com.yiban.erp.entities.RepertoryInfo" keyProperty="id" useGeneratedKeys="true">
-      insert into repertory_info (id, company_id, warehouse_id,
+      insert into repertory_info (company_id, warehouse_id,
       location, in_user_id, batch_code,
       goods_id, factory_id, in_quantity,
       quantity, buy_price, is_exp,
       sale_enable, product_date, exp_date,
       in_date, supplier_id, supplier_contact_id,
-      buyer_id, order_id, sale_sate,
+      buyer_id, order_id, order_detail_id, sale_sate,
       create_by, create_time, update_by,
       update_time)
     values
@@ -82,7 +83,7 @@
         #{item.quantity,jdbcType=DECIMAL}, #{item.buyPrice,jdbcType=DECIMAL}, #{item.isExp,jdbcType=BIT},
         #{item.saleEnable,jdbcType=BIT}, #{item.productDate,jdbcType=DATE}, #{item.expDate,jdbcType=DATE},
         #{item.inDate,jdbcType=TIMESTAMP}, #{item.supplierId,jdbcType=BIGINT}, #{item.supplierContactId,jdbcType=BIGINT},
-        #{item.buyerId,jdbcType=BIGINT}, #{item.orderId,jdbcType=BIGINT}, #{item.saleSate,jdbcType=BIT},
+        #{item.buyerId,jdbcType=BIGINT}, #{item.orderId,jdbcType=BIGINT}, #{item.orderDetailId,jdbcType=BIGINT}, #{item.saleSate,jdbcType=BIT},
         #{item.createBy,jdbcType=VARCHAR}, #{item.createTime,jdbcType=TIMESTAMP}, #{item.updateBy,jdbcType=VARCHAR},
         #{item.updateTime,jdbcType=TIMESTAMP}
     </foreach>
@@ -150,6 +151,9 @@
           </if>
           <if test="orderId != null" >
               order_id,
+          </if>
+          <if test="orderDetailId != null" >
+              order_detail_id,
           </if>
           <if test="saleSate != null" >
               sale_sate,
@@ -228,6 +232,9 @@
           <if test="orderId != null" >
               #{orderId,jdbcType=BIGINT},
           </if>
+          <if test="orderDetailId != null" >
+              #{orderDetailId,jdbcType=BIGINT},
+          </if>
           <if test="saleSate != null" >
               #{saleSate,jdbcType=BIT},
           </if>
@@ -305,6 +312,9 @@
           <if test="orderId != null" >
               order_id = #{orderId,jdbcType=BIGINT},
           </if>
+          <if test="orderDetailId != null" >
+              order_detail_id = #{orderDetailId,jdbcType=BIGINT},
+          </if>
           <if test="saleSate != null" >
               sale_sate = #{saleSate,jdbcType=BIT},
           </if>
@@ -344,6 +354,7 @@
       supplier_contact_id = #{supplierContactId,jdbcType=BIGINT},
       buyer_id = #{buyerId,jdbcType=BIGINT},
       order_id = #{orderId,jdbcType=BIGINT},
+      order_detail_id = #{orderDetailId,jdbcType=BIGINT},
       sale_sate = #{saleSate,jdbcType=BIT},
       create_by = #{createBy,jdbcType=VARCHAR},
       create_time = #{createTime,jdbcType=TIMESTAMP},
@@ -359,7 +370,7 @@
       r.in_quantity as inQuantity, r.quantity as quantity, r.buy_price as buyPrice, r.is_exp as isExp,
       r.sale_enable as sale_enable, r.product_date as productDate, r.exp_date as expDate, r.in_date as inDate,
       r.supplier_id as supplierId, r.supplier_contact_id as supplierContactId, r.buyer_id buyerId,
-      r.order_id as orderId, r.sale_sate as saleState, r.create_by as createBy, r.create_time as createTime,
+      r.order_id as orderId, r.order_detail_id as orderDetailId, r.sale_sate as saleState, r.create_by as createBy, r.create_time as createTime,
       r.update_by as updateBy, r.update_time as updateTime,
       w.name as warehouseName
     from repertory_info r

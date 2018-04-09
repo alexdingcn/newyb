@@ -135,9 +135,8 @@ public class RepertoryInService {
         logger.info("begin save repository order details.");
         saveOrderDetail(user, order);
 
-        //如果是保存操作，不是暂挂，验证是否存在采购单号，如果存在，修改到已经收货的状态
-        if (RepertoryInStatus.INIT.name().equalsIgnoreCase(order.getStatus())
-                && RepertoryRefType.BUY_ORDER.name().equalsIgnoreCase(order.getRefType())
+        //如果是保存操作，验证是否存在采购单号，如果存在，修改到已经收货的状态
+        if (RepertoryRefType.BUY_ORDER.name().equalsIgnoreCase(order.getRefType())
                 && order.getRefOrderId() != null) {
             logger.info("set buy order status to shiped. buyOrderId:{}", order.getRefOrderId());
             BuyOrder buyOrder = buyOrderMapper.selectByPrimaryKey(order.getRefOrderId());
@@ -615,6 +614,7 @@ public class RepertoryInService {
             item.setSupplierContactId(order.getSupplierContactId());
             item.setBuyerId(order.getBuyerId());
             item.setOrderId(order.getId());
+            item.setOrderDetailId(detail.getId());
             item.setSaleSate(detail.getSaleState());
             item.setCreateBy(user.getNickname());
             item.setCreateTime(new Date());

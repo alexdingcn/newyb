@@ -67,10 +67,10 @@
       </Card>
       
       <Modal v-model="surveyModal" title="商品抽样检查" :mask-closable="false" width="50">
-          <receive-survey :order="currentChooseOrder" :detail="currChooseDetail" 
+          <in-survey-check :order="currentChooseOrder" :detail="currChooseDetail" 
                 @close="surveyClose" 
                 @survey-success="surveySuccess">
-            </receive-survey>
+            </in-survey-check>
           <div slot="footer"></div>
       </Modal>
 
@@ -158,17 +158,17 @@ import util from "@/libs/util.js";
 import moment,{ isMoment } from 'moment';
 import supplierSelect from "@/views/selector/supplier-select.vue";
 import warehouseSelect from "@/views/selector/warehouse-select.vue";
-import receiveSurvey from "./receive-survey.vue";
+import inSurveyCheck from "./in-survey-check.vue";
 import temperControlSelect from "@/views/selector/temper-control-select.vue";
 import goodSelect from "@/views/selector/good-select.vue";
 import fileDetail from "@/views/basic-data/file-detail.vue";
 
 export default {
-    name: 'buy-quality-check',
+    name: 'in-quality-check',
     components: {
         supplierSelect,
         warehouseSelect,
-        receiveSurvey,
+        inSurveyCheck,
         temperControlSelect,
         goodSelect,
         fileDetail
@@ -261,6 +261,7 @@ export default {
                         let oldCheckTemp = params.row.checkTemp;
                         return h('Input', {
                             props: {
+                                number: true,
                                 value : self.orderList[params.index][params.column.key]
                             },
                             on: {
@@ -272,7 +273,7 @@ export default {
                                     }
                                 }
                             }
-                        })
+                        });
                     }
                 },
                 {
@@ -448,6 +449,7 @@ export default {
                             let self = this;
                             return h('Input', {
                                 props: {
+                                    number: true,
                                     value : self.detailList[params.index][params.column.key]
                                 },
                                 on: {
@@ -609,7 +611,7 @@ export default {
                 endReceiveDate: this.dateRange[1]
             };
             this.orderLoading = true;
-            util.ajax.post("/receive/list", reqData)
+            util.ajax.post("/repertory/in/list", reqData)
                 .then((response) => {
                     this.orderLoading = false;
                     this.orderList = response.data;
@@ -630,7 +632,7 @@ export default {
                 orderId: orderId,
                 checkTemp: newCheckTemp
             };
-            util.ajax.put('/receive/set/checkTemp', reqData)
+            util.ajax.put('/repertory/in/set/checkTemp', reqData)
                 .then((response) => {
                     this.$Message.success('验收温度设定成功');
                 })
@@ -675,7 +677,7 @@ export default {
 
         reloadOrderDetail() {
             this.detailLoading = true;
-            util.ajax.get('/receive/detail/' + this.currentChooseOrder.id)
+            util.ajax.get('/repertory/in/detail/' + this.currentChooseOrder.id)
                 .then((response) => {
                     this.detailLoading = false;
                     let data = response.data;
@@ -711,6 +713,7 @@ export default {
             let rightCount = this.currChooseDetail.rightCount ? this.currChooseDetail.rightCount : receiveQuality;
             if(rightCount > receiveQuality) {
                 this.$Message.error('合格数量不能大于收货数量');
+                return;
             }
             let inCount = rightCount;
             let errorCount = receiveQuality - rightCount;
@@ -745,7 +748,7 @@ export default {
                 this.checkFormItem.checkTime = moment(this.checkFormItem.checkTime, 'YYYY-MM-DD HH:mm');
             }
             this.detailLoading = true;
-            util.ajax.put('/receive/set/check', this.checkFormItem)
+            util.ajax.put('/repertory/in/set/check', this.checkFormItem)
                 .then((response) => {
                     this.detailLoading = false;
                     this.$Message.success('验收成功');
@@ -761,7 +764,7 @@ export default {
                 this.$Message.warning('请先选择需要取消验证的订单');
                 return;
             }
-            util.ajax.put('/receive/set/check/order/' + this.currentChooseOrder.id)
+            util.ajax.put('/repertory/in/set/check/order/' + this.currentChooseOrder.id)
                 .then((response) => {
                     this.$Message.success('取消成功');
                     this.reloadOrderDetail();
@@ -775,7 +778,7 @@ export default {
                 this.$Message.warning('请先选择需要取消验证的订单');
                 return;
             }
-            util.ajax.put('/receive/set/check/detail/' + this.currChooseDetail.id)
+            util.ajax.put('/repertory/in/set/check/detail/' + this.currChooseDetail.id)
                 .then((response) => {
                     this.$Message.success('取消成功');
                     this.reloadOrderDetail();
@@ -799,7 +802,7 @@ export default {
                 title: '删除确认',
                 content: '是否确认删除商品:' + detailItem.goodsName  + '，删除后不可恢复!',
                 onOk: () => {
-                    util.ajax.delete('/receive/detail/remove/' + detailItem.id)
+                    util.ajax.delete('/repertory/in/detail/remove/' + detailItem.id)
                         .then((response) => {
                             this.$Message.success('删除成功');
                             this.reloadOrderDetail();
@@ -824,7 +827,7 @@ export default {
                 detailList: this.detailList
             };
             this.detailLoading = true;
-            util.ajax.post('/receive/set/save/detail', reqData)
+            util.ajax.post('/repertory/in/set/save/detail', reqData)
                 .then((response) => {
                     this.detailLoading = false;
                     this.$Message.success('保存成功');
@@ -857,7 +860,7 @@ export default {
                 orderId: this.currentChooseOrder.id,
                 fileNo: data.fileNo
             };
-            util.ajax.put('/receive/order/fileNo', reqData)
+            util.ajax.put('/repertory/in/order/fileNo', reqData)
                 .then((response) => {
                     this.currentChooseOrder.fileNo = data.fileNo;
                     for(let i=0; i<this.orderList.length; i++) {

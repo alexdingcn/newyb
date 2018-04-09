@@ -4,7 +4,7 @@
         <Row type="flex" justify="start">
             <Col span="6">
                 <span style="width:100px; margin-right:10px;">收货日期</span>
-                <DatePicker v-model="dateRange" type="daterange" placement="bottom-end" placeholder="收货日期" style="width:200px"></DatePicker>
+                <DatePicker v-model="dateRange" type="daterange" placement="bottom-start" placeholder="收货日期" style="width:200px"></DatePicker>
             </Col>
             <Col span="18">
                 <Row type="flex" justify="end">
@@ -17,16 +17,16 @@
             </Col>
         </Row>
         <Table ref="orderTable" border highlight-row disabled-hover height="250" 
-        size="small" :columns="orderColumns" :data="orderData" :loading="orderLoading" 
-        @on-row-click="handleSelectOrder"
-        @on-row-dblclick="handleDbClick" 
-        no-data-text="使用右上方输入搜索条件">
+            size="small" :columns="orderColumns" :data="orderData" :loading="orderLoading" 
+            @on-row-click="handleSelectOrder"
+            @on-row-dblclick="handleDbClick" 
+            no-data-text="使用右上方输入搜索条件">
         </Table>
 
         <div style="margin-top:10px;">
             <Table ref="detailTable" border highlight-row disabled-hover height="280" 
-            size="small" :columns="detailColumns" :data="detailData" 
-            no-data-text="点击上方订单数据显示">
+                size="small" :columns="detailColumns" :data="detailData" 
+                no-data-text="点击上方订单数据显示">
             </Table> 
         </div>
   </div>
@@ -37,7 +37,7 @@ import util from '@/libs/util.js';
 import moment from 'moment';
 
 export default {
-    name: 'buy-receive-temp',
+    name: 'in-temp',
     components: {},
     props: {
         open: {
@@ -168,7 +168,7 @@ export default {
                 endReceiveDate: endDate
             };
             this.orderLoading = true;
-            util.ajax.post('/receive/list', reqData)
+            util.ajax.post('/repertory/in/list', reqData)
                 .then((response) => {
                     this.orderLoading = false;
                     this.orderData = response.data;
@@ -201,10 +201,11 @@ export default {
                 title: '操作确认提醒',
                 content: '是否确认删除订单信息，删除后不可恢复',
                 onOk: () => {
-                    util.ajax.delete("/receive/remove/" + self.chooseItem.id)
+                    util.ajax.delete("/repertory/in/remove/" + self.chooseItem.id)
                         .then((response) => {
                             self.$Message.success('删除成功');
                             self.orderData.splice(this.chooseIndex, 1);
+                            self.detailData = [];
                         })
                         .catch((error) => {
                             util.errorProcessor(self, error);

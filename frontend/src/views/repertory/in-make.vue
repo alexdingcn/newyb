@@ -1,5 +1,5 @@
 <style lang="less">
-    @import '@/styles/common.less';
+    @import '../../styles/common.less';
 </style>
 
 <template>
@@ -16,7 +16,7 @@
                     <Button type="info" icon="filing" @click="getTempOrderBtnClick" > 暂挂提取 </Button>
                     <Button type="ghost" icon="ios-printer" :loading="saving">打印</Button>
 				</ButtonGroup>
-			</div>
+			</div>      
 
 			<Form :label-width="85" :rules="ruleValidate" :model="order" ref="orderForm">
 				<Row>
@@ -74,7 +74,7 @@
 					</Col>
                     <Col span="6">
                         <FormItem label="到货温度(℃)" >
-                            <Input v-model="order.receiveTemp" size="small"/>
+                            <Input :number="true" v-model="order.receiveTemp" size="small"/>
                         </FormItem>
 					</Col>
                     <Col span="6">
@@ -192,7 +192,7 @@
 		</Modal>
 
         <Modal v-model="receiveTemp" title="采购入库单暂挂提取" :mask-closable="false" width="70">
-            <buy-receive-temp :open="receiveTemp" @on-choosed="receiveTempChoose"></buy-receive-temp>
+            <in-temp :open="receiveTemp" @on-choosed="receiveTempChoose"></in-temp>
             <div slot="footer"></div>
         </Modal>
 
@@ -220,11 +220,11 @@
     import buyTypeSelect from "@/views/selector/buy-type-select.vue";
     import billTypeSelect from "@/views/selector/bill-type-select.vue";
     import goodSelect from "@/views/selector/good-select.vue";
-    import buyReceiveTemp from "./buy-receive-temp.vue";
-    import buyOrderList from "./buy-order-list.vue";
+    import inTemp from "./in-temp.vue";
+    import buyOrderList from "@/views/buy/buy-order-list.vue";
 
     export default {
-        name: 'buy_order',
+        name: 'in-make',
         components: {
             supplierSelect,
             supplierContactSelect,
@@ -238,7 +238,7 @@
             buyTypeSelect,
             billTypeSelect,
             goodSelect,
-            buyReceiveTemp,
+            inTemp,
             buyOrderList
         },
         data () {
@@ -344,6 +344,7 @@
                         	var self = this;
                             return h('Input', {
                                 props: {
+                                    number: true,
 								  	value: self.orderItems[params.index][params.column.key]
                                 },
                                 on: {
@@ -364,6 +365,7 @@
                         	var self = this;
                             return h('Input', {
                                 props: {
+                                    number: true,
 								  	value: self.orderItems[params.index][params.column.key]
                                 },
                                 on: {
@@ -391,6 +393,7 @@
                         	var self = this;
                             return h('Input', {
                                 props: {
+                                    number: true,
 								  	value: self.orderItems[params.index][params.column.key]
                                 },
                                 on: {
@@ -520,6 +523,7 @@
                         	var self = this;
                             return h('Input', {
                                 props: {
+                                    number: true,
 								  	value: self.orderItems[params.index][params.column.key]
                                 },
                                 on: {
@@ -560,6 +564,7 @@
                         	var self = this;
                             return h('Input', {
                                 props: {
+                                    number: true,
 								  	value: self.orderItems[params.index][params.column.key]
                                 },
                                 on: {
@@ -657,7 +662,7 @@
                         warehouseId: this.order.warehouseId,
                         goodsIdList: JSON.stringify([goodsId])
                     };
-                    util.ajax.get("/receive/current/balance", {params: reqDate})
+                    util.ajax.get("/repertory/in/current/balance", {params: reqDate})
                         .then((response) => {
                             let data = response.data;
                             let record ='';
@@ -711,7 +716,7 @@
                 var self = this;
                 this.saving = true;
                 this.order['status'] = status;
-                util.ajax.post('/receive/save', this.order)
+                util.ajax.post('/repertory/in/save', this.order)
                     .then(function (response) {
                         self.saving = false;
                         self.$Message.info('采购入库订单保存成功');
@@ -805,7 +810,7 @@
                     goodsIdList: JSON.stringify(goodsIdList)
                 };
                 let self = this;
-                util.ajax.get("/receive/current/balance", {params: reqDate})
+                util.ajax.get("/repertory/in/current/balance", {params: reqDate})
                     .then((response) => {
                         let data = response.data;
                         self.orderItems.forEach((element, index) => {
@@ -816,7 +821,6 @@
                                 element['balance'] = record.balance ? record.balance : '';
                                 element['ongoingCount'] = record.ongoingCount ? record.ongoingCount : '';
                             }
-                            console.log(element);
                             self.$set(this.orderItems, index, element)
                         });
                     })
@@ -834,7 +838,7 @@
                     this.$Message.warning('获取选取的订单信息失败');
                     return;
                 }
-                util.ajax.get("/receive/buy/order/" + buyOrder.id) 
+                util.ajax.get("/repertory/in/buy/order/" + buyOrder.id) 
                     .then((response) => {
                         let data  = response.data;
                         if (data) {
@@ -874,8 +878,6 @@
     padding-left: 5px;
     padding-right: 5px;
 }
-th .ivu-table-cell {
-	width-space: nowrap;
-}
+
 
 </style>

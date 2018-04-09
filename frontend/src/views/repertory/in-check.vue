@@ -68,7 +68,7 @@ import supplierSelect from "@/views/selector/supplier-select.vue";
 import fileDetail from "@/views/basic-data/file-detail.vue";
 
 export default {
-    name: 'receiveInCheck',
+    name: 'in-check',
     components: {
         warehouseSelect,
         supplierSelect,
@@ -385,7 +385,7 @@ export default {
                 endReceiveDate: this.dateRange[1]
             };
             this.orderLoading = true;
-            util.ajax.post("/receive/list", reqData)
+            util.ajax.post("/repertory/in/list", reqData)
                 .then((response) => {
                     this.orderLoading = false;
                     this.orderList = response.data;
@@ -439,7 +439,7 @@ export default {
                 title: '审核信息确认',
                 content: '是否已确认订单详情数据正确，提交审核通过后不能修改',
                 onOk: () => {
-                    util.ajax.put('/receive/set/incheck', reqData)
+                    util.ajax.put('/repertory/in/set/incheck', reqData)
                         .then((response) => {
                             self.orderLoading = false;
                             self.$Message.success('审查成功');
@@ -477,7 +477,7 @@ export default {
                 orderId: this.currentChooseOrder.id,
                 fileNo: data.fileNo
             };
-            util.ajax.put('/receive/order/fileNo', reqData)
+            util.ajax.put('/repertory/in/order/fileNo', reqData)
                 .then((response) => {
                     this.currentChooseOrder.fileNo = data.fileNo;
                     for(let i=0; i<this.orderList.length; i++) {

@@ -151,7 +151,7 @@ import util from "@/libs/util.js";
 import moment from 'moment';
 
 export default {
-    name: 'receive-survey',
+    name: 'in-survey-check',
     props: {
         order: {
             type:Object,
@@ -252,7 +252,7 @@ export default {
                         surveyResult: this.formItem.surveyResult,
                         surveyTarget: this.formItem.surveyTarget
                     };
-                    util.ajax.post("/receive/set/survey", reqData)
+                    util.ajax.post("/repertory/in/set/survey", reqData)
                         .then((response) => {
                             this.$Message.success('添加抽样检查结论成功');
                             this.$emit('survey-success');

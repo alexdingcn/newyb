@@ -45,6 +45,8 @@ public class RepertoryInfo {
 
     private Long orderId;
 
+    private Long orderDetailId;
+
     private Boolean saleSate;
 
     private String createBy;
@@ -368,5 +370,13 @@ public class RepertoryInfo {
 
     public void setStorageCondition(String storageCondition) {
         this.storageCondition = storageCondition;
+    }
+
+    public Long getOrderDetailId() {
+        return orderDetailId;
+    }
+
+    public void setOrderDetailId(Long orderDetailId) {
+        this.orderDetailId = orderDetailId;
     }
 }

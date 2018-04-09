@@ -58,6 +58,7 @@ product_date|Date|生产日期
 exp_date|Date|有效期至
 in_date|Date|入库时间
 order_id|Long|入库单ID
+order_detail_id|Long|入库单明细ID
 supplier_id|Long|供应商ID
 supplier_contact_id|Long|供应商代表
 buyer_id|Long|采购员ID
