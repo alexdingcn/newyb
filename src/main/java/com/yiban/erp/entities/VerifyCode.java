@@ -1,4 +1,4 @@
-package com.yiban.erp.dao;
+package com.yiban.erp.entities;
 
 import java.io.Serializable;
 import java.util.Date;

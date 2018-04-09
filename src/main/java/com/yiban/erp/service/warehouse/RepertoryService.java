@@ -4,6 +4,7 @@ import com.yiban.erp.dao.GoodsMapper;
 import com.yiban.erp.dao.RepertoryInfoMapper;
 import com.yiban.erp.entities.Goods;
 import com.yiban.erp.entities.RepertoryInfo;
+import com.yiban.erp.entities.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,7 +26,7 @@ public class RepertoryService {
     public List<RepertoryInfo> getSearchList(Map<String, Object> requestMap) {
         List<RepertoryInfo> list = repertoryInfoMapper.getDetailList(requestMap);
         return setGoodsToList(list);
-}
+    }
 
     private List<RepertoryInfo> setGoodsToList(List<RepertoryInfo> list) {
         if (list == null || list.isEmpty()) {
@@ -60,6 +61,5 @@ public class RepertoryService {
         infos.stream().forEach(item -> map.put(item.getId(), item));
         return map;
     }
-
 
 }

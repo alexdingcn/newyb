@@ -9,6 +9,8 @@ public class Warehouse {
 
     private String name;
 
+    private String status;
+
     private String description;
 
     private String createdBy;
@@ -41,6 +43,14 @@ public class Warehouse {
 
     public void setName(String name) {
         this.name = name == null ? null : name.trim();
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 
     public String getDescription() {

@@ -1,13 +1,12 @@
 <style lang="less">
-    @import '../../styles/common.less';
-	@import './buy-order.less';
+    @import '@/styles/common.less';
 </style>
 
 <template>
 	<Row>
 		<Card>
 			<p slot="title" >
-				<Icon type="document"></Icon> 采购收货单
+				<Icon type="document"></Icon> 创建入库单
 			</p>
 			<div slot="extra">
 				<ButtonGroup class="padding-left-20" size="small">
@@ -867,5 +866,16 @@
 </script>
 
 <style>
+.ivu-form-item {
+    margin-bottom: 0px;
+}
+
+.ivu-table-cell {
+    padding-left: 5px;
+    padding-right: 5px;
+}
+th .ivu-table-cell {
+	width-space: nowrap;
+}
 
 </style>

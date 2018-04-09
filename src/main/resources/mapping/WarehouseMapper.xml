@@ -5,6 +5,7 @@
     <id column="id" property="id" jdbcType="INTEGER" />
     <result column="company_id" property="companyId" jdbcType="INTEGER" />
     <result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="status" property="status" jdbcType="VARCHAR" />
     <result column="description" property="description" jdbcType="VARCHAR" />
     <result column="created_by" property="createdBy" jdbcType="VARCHAR" />
     <result column="updated_by" property="updatedBy" jdbcType="VARCHAR" />
@@ -12,7 +13,7 @@
     <result column="updated_time" property="updatedTime" jdbcType="TIMESTAMP" />
   </resultMap>
   <sql id="Base_Column_List" >
-    id, company_id, name, description, created_by, updated_by, created_time, updated_time
+    id, company_id, name, status, description, created_by, updated_by, created_time, updated_time
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
     select 
@@ -35,10 +36,10 @@
     where id = #{id,jdbcType=INTEGER}
   </delete>
   <insert id="insert" parameterType="com.yiban.erp.entities.Warehouse" useGeneratedKeys="true" keyProperty="id">
-    insert into warehouse (company_id, name,
+    insert into warehouse (company_id, name, status,
       description, created_by, updated_by, 
       created_time, updated_time)
-    values (#{companyId,jdbcType=INTEGER}, #{name,jdbcType=VARCHAR},
+    values (#{companyId,jdbcType=INTEGER}, #{name,jdbcType=VARCHAR}, #{status,jdbcType=VARCHAR},
       #{description,jdbcType=VARCHAR}, #{createdBy,jdbcType=VARCHAR}, #{updatedBy,jdbcType=VARCHAR}, 
       #{createdTime,jdbcType=TIMESTAMP}, #{updatedTime,jdbcType=TIMESTAMP})
   </insert>
@@ -51,6 +52,9 @@
       </if>
       <if test="name != null" >
         name,
+      </if>
+      <if test="status != null">
+        status,
       </if>
       <if test="description != null" >
         description,
@@ -75,6 +79,9 @@
       </if>
       <if test="name != null" >
         #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=VARCHAR},
       </if>
       <if test="description != null" >
         #{description,jdbcType=VARCHAR},
@@ -102,6 +109,9 @@
       <if test="name != null" >
         name = #{name,jdbcType=VARCHAR},
       </if>
+      <if test="status != null" >
+        status = #{status,jdbcType=VARCHAR},
+      </if>
       <if test="description != null" >
         description = #{description,jdbcType=VARCHAR},
       </if>
@@ -124,6 +134,7 @@
     update warehouse
     set company_id = #{companyId,jdbcType=INTEGER},
       name = #{name,jdbcType=VARCHAR},
+      status = #{status,jdbcType=VARCHAR},
       description = #{description,jdbcType=VARCHAR},
       created_by = #{createdBy,jdbcType=VARCHAR},
       updated_by = #{updatedBy,jdbcType=VARCHAR},

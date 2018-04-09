@@ -2,40 +2,91 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.yiban.erp.dao.RepertoryInMapper" >
   <resultMap id="BaseResultMap" type="com.yiban.erp.entities.RepertoryIn" >
-    <result column="id" property="id" jdbcType="BIGINT" />
+    <id column="id" property="id" jdbcType="BIGINT" />
     <result column="company_id" property="companyId" jdbcType="INTEGER" />
-    <result column="warehouse_id" property="warehouseId" jdbcType="INTEGER" />
-    <result column="in_user_id" property="inUserId" jdbcType="BIGINT" />
-    <result column="in_date" property="inDate" jdbcType="TIMESTAMP" />
-    <result column="in_type" property="inType" jdbcType="INTEGER" />
-    <result column="buy_order_id" property="buyOrderId" jdbcType="BIGINT" />
+    <result column="ref_order_id" property="refOrderId" jdbcType="BIGINT" />
+    <result column="ref_type" property="refType" jdbcType="VARCHAR" />
+    <result column="order_number" property="orderNumber" jdbcType="VARCHAR" />
+    <result column="ref_no" property="refNo" jdbcType="VARCHAR" />
     <result column="supplier_id" property="supplierId" jdbcType="BIGINT" />
-    <result column="check_user_id" property="checkUserId" jdbcType="BIGINT" />
-    <result column="check_date" property="checkDate" jdbcType="TIMESTAMP" />
-    <result column="in_amount" property="inAmount" jdbcType="DECIMAL" />
-    <result column="in_money" property="inMoney" jdbcType="DECIMAL" />
-    <result column="state" property="state" jdbcType="INTEGER" />
-    <result column="in_note" property="inNote" jdbcType="VARCHAR" />
-    <result column="created_by" property="createdBy" jdbcType="VARCHAR" />
-    <result column="updated_by" property="updatedBy" jdbcType="VARCHAR" />
-    <result column="created_time" property="createdTime" jdbcType="TIMESTAMP" />
-    <result column="updated_time" property="updatedTime" jdbcType="TIMESTAMP" />
+    <result column="supplier_contact_id" property="supplierContactId" jdbcType="BIGINT" />
+    <result column="buyer_id" property="buyerId" jdbcType="BIGINT" />
+    <result column="status" property="status" jdbcType="VARCHAR" />
+    <result column="key_word" property="keyWord" jdbcType="VARCHAR" />
+    <result column="receive_date" property="receiveDate" jdbcType="TIMESTAMP" />
+    <result column="pay_date" property="payDate" jdbcType="TIMESTAMP" />
+    <result column="goods_bill_no" property="goodsBillNo" jdbcType="VARCHAR" />
+    <result column="temp_control_method" property="tempControlMethod" jdbcType="BIGINT" />
+    <result column="receive_temp" property="receiveTemp" jdbcType="DECIMAL" />
+    <result column="check_temp" property="checkTemp" jdbcType="DECIMAL" />
+    <result column="temp_control_status" property="tempControlStatus" jdbcType="BIGINT" />
+    <result column="ship_company_id" property="shipCompanyId" jdbcType="INTEGER" />
+    <result column="ship_method" property="shipMethod" jdbcType="BIGINT" />
+    <result column="ship_tool" property="shipTool" jdbcType="BIGINT" />
+    <result column="ship_car_no" property="shipCarNo" jdbcType="VARCHAR" />
+    <result column="ship_driver_name" property="shipDriverName" jdbcType="VARCHAR" />
+    <result column="ship_start_date" property="shipStartDate" jdbcType="TIMESTAMP" />
+    <result column="ship_end_date" property="shipEndDate" jdbcType="TIMESTAMP" />
+    <result column="ship_entrust_no" property="shipEntrustNo" jdbcType="VARCHAR" />
+    <result column="ship_start_address" property="shipStartAddress" jdbcType="VARCHAR" />
+    <result column="warehouse_id" property="warehouseId" jdbcType="INTEGER" />
+    <result column="buy_type" property="buyType" jdbcType="BIGINT" />
+    <result column="term" property="term" jdbcType="INTEGER" />
+    <result column="come_from" property="comeFrom" jdbcType="VARCHAR" />
+    <result column="bill_type" property="billType" jdbcType="BIGINT" />
+    <result column="file_no" property="fileNo" jdbcType="VARCHAR" />
+    <result column="create_by" property="createBy" jdbcType="VARCHAR" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_by" property="updateBy" jdbcType="VARCHAR" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
   </resultMap>
-  <insert id="insert" parameterType="com.yiban.erp.entities.RepertoryIn"  useGeneratedKeys="true" keyProperty="id" >
-    insert into repertory_in (id, company_id, warehouse_id, 
-      in_user_id, in_date, in_type, 
-      buy_order_id, supplier_id,check_user_id, check_date,
-      in_amount, in_money, state, 
-      in_note,created_by, updated_by,
-    created_time, updated_time)
-    values (#{id,jdbcType=BIGINT}, #{companyId,jdbcType=INTEGER}, #{warehouseId,jdbcType=INTEGER}, 
-      #{inUserId,jdbcType=BIGINT}, #{inDate,jdbcType=TIMESTAMP}, #{inType,jdbcType=INTEGER},
-      #{buyOrderId,jdbcType=BIGINT},#{supplierId,jdbcType=BIGINT}, #{checkUserId,jdbcType=BIGINT}, #{checkDate,jdbcType=TIMESTAMP},
-      #{inAmount,jdbcType=DECIMAL}, #{inMoney,jdbcType=DECIMAL}, #{state,jdbcType=INTEGER}, 
-      #{inNote,jdbcType=VARCHAR}, #{createdBy,jdbcType=VARCHAR}, #{updatedBy,jdbcType=VARCHAR},
-      #{createdTime,jdbcType=TIMESTAMP}, #{updatedTime,jdbcType=TIMESTAMP})
+  <sql id="Base_Column_List" >
+    id, company_id, ref_order_id, ref_type, order_number, ref_no, supplier_id, supplier_contact_id, 
+    buyer_id, status, key_word, receive_date, pay_date, goods_bill_no, temp_control_method, 
+    receive_temp, check_temp, temp_control_status, ship_company_id, ship_method, ship_tool, 
+    ship_car_no, ship_driver_name, ship_start_date, ship_end_date, ship_entrust_no, ship_start_address, 
+    warehouse_id, buy_type, term, come_from, bill_type, file_no, create_by, create_time, 
+    update_by, update_time
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select 
+    <include refid="Base_Column_List" />
+    from repertory_in
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
+    delete from repertory_in
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="com.yiban.erp.entities.RepertoryIn" >
+    insert into repertory_in (id, company_id, ref_order_id, 
+      ref_type, order_number, ref_no, 
+      supplier_id, supplier_contact_id, buyer_id, 
+      status, key_word, receive_date, 
+      pay_date, goods_bill_no, temp_control_method, 
+      receive_temp, check_temp, temp_control_status, 
+      ship_company_id, ship_method, ship_tool, 
+      ship_car_no, ship_driver_name, ship_start_date, 
+      ship_end_date, ship_entrust_no, ship_start_address, 
+      warehouse_id, buy_type, term, 
+      come_from, bill_type, file_no, 
+      create_by, create_time, update_by, 
+      update_time)
+    values (#{id,jdbcType=BIGINT}, #{companyId,jdbcType=INTEGER}, #{refOrderId,jdbcType=BIGINT}, 
+      #{refType,jdbcType=VARCHAR}, #{orderNumber,jdbcType=VARCHAR}, #{refNo,jdbcType=VARCHAR}, 
+      #{supplierId,jdbcType=BIGINT}, #{supplierContactId,jdbcType=BIGINT}, #{buyerId,jdbcType=BIGINT}, 
+      #{status,jdbcType=VARCHAR}, #{keyWord,jdbcType=VARCHAR}, #{receiveDate,jdbcType=TIMESTAMP}, 
+      #{payDate,jdbcType=TIMESTAMP}, #{goodsBillNo,jdbcType=VARCHAR}, #{tempControlMethod,jdbcType=BIGINT}, 
+      #{receiveTemp,jdbcType=DECIMAL}, #{checkTemp,jdbcType=DECIMAL}, #{tempControlStatus,jdbcType=BIGINT}, 
+      #{shipCompanyId,jdbcType=INTEGER}, #{shipMethod,jdbcType=BIGINT}, #{shipTool,jdbcType=BIGINT}, 
+      #{shipCarNo,jdbcType=VARCHAR}, #{shipDriverName,jdbcType=VARCHAR}, #{shipStartDate,jdbcType=TIMESTAMP}, 
+      #{shipEndDate,jdbcType=TIMESTAMP}, #{shipEntrustNo,jdbcType=VARCHAR}, #{shipStartAddress,jdbcType=VARCHAR}, 
+      #{warehouseId,jdbcType=INTEGER}, #{buyType,jdbcType=BIGINT}, #{term,jdbcType=INTEGER}, 
+      #{comeFrom,jdbcType=VARCHAR}, #{billType,jdbcType=BIGINT}, #{fileNo,jdbcType=VARCHAR}, 
+      #{createBy,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, #{updateBy,jdbcType=VARCHAR}, 
+      #{updateTime,jdbcType=TIMESTAMP})
   </insert>
-  <insert id="insertSelective" parameterType="com.yiban.erp.entities.RepertoryIn"  useGeneratedKeys="true" keyProperty="id">
+  <insert id="insertSelective" parameterType="com.yiban.erp.entities.RepertoryIn" >
     insert into repertory_in
     <trim prefix="(" suffix=")" suffixOverrides="," >
       <if test="id != null" >
@@ -44,53 +95,110 @@
       <if test="companyId != null" >
         company_id,
       </if>
-      <if test="warehouseId != null" >
-        warehouse_id,
+      <if test="refOrderId != null" >
+        ref_order_id,
       </if>
-      <if test="inUserId != null" >
-        in_user_id,
+      <if test="refType != null" >
+        ref_type,
       </if>
-      <if test="inDate != null" >
-        in_date,
+      <if test="orderNumber != null" >
+        order_number,
       </if>
-      <if test="inType != null" >
-        in_type,
-      </if>
-      <if test="buyOrderId != null" >
-        buy_order_id,
+      <if test="refNo != null" >
+        ref_no,
       </if>
       <if test="supplierId != null" >
         supplier_id,
       </if>
-      <if test="checkUserId != null" >
-        check_user_id,
+      <if test="supplierContactId != null" >
+        supplier_contact_id,
       </if>
-      <if test="checkDate != null" >
-        check_date,
+      <if test="buyerId != null" >
+        buyer_id,
       </if>
-      <if test="inAmount != null" >
-        in_amount,
+      <if test="status != null" >
+        status,
       </if>
-      <if test="inMoney != null" >
-        in_money,
+      <if test="keyWord != null" >
+        key_word,
       </if>
-      <if test="state != null" >
-        state,
+      <if test="receiveDate != null" >
+        receive_date,
       </if>
-      <if test="inNote != null" >
-        in_note,
+      <if test="payDate != null" >
+        pay_date,
       </if>
-      <if test="createdBy != null" >
-        created_by,
+      <if test="goodsBillNo != null" >
+        goods_bill_no,
       </if>
-      <if test="updatedBy != null" >
-        updated_by,
+      <if test="tempControlMethod != null" >
+        temp_control_method,
       </if>
-      <if test="createdTime != null" >
-        created_time,
+      <if test="receiveTemp != null" >
+        receive_temp,
       </if>
-      <if test="updatedTime != null" >
-        updated_time,
+      <if test="checkTemp != null" >
+        check_temp,
+      </if>
+      <if test="tempControlStatus != null" >
+        temp_control_status,
+      </if>
+      <if test="shipCompanyId != null" >
+        ship_company_id,
+      </if>
+      <if test="shipMethod != null" >
+        ship_method,
+      </if>
+      <if test="shipTool != null" >
+        ship_tool,
+      </if>
+      <if test="shipCarNo != null" >
+        ship_car_no,
+      </if>
+      <if test="shipDriverName != null" >
+        ship_driver_name,
+      </if>
+      <if test="shipStartDate != null" >
+        ship_start_date,
+      </if>
+      <if test="shipEndDate != null" >
+        ship_end_date,
+      </if>
+      <if test="shipEntrustNo != null" >
+        ship_entrust_no,
+      </if>
+      <if test="shipStartAddress != null" >
+        ship_start_address,
+      </if>
+      <if test="warehouseId != null" >
+        warehouse_id,
+      </if>
+      <if test="buyType != null" >
+        buy_type,
+      </if>
+      <if test="term != null" >
+        term,
+      </if>
+      <if test="comeFrom != null" >
+        come_from,
+      </if>
+      <if test="billType != null" >
+        bill_type,
+      </if>
+      <if test="fileNo != null" >
+        file_no,
+      </if>
+      <if test="createBy != null" >
+        create_by,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+      <if test="updateBy != null" >
+        update_by,
+      </if>
+      <if test="updateTime != null" >
+        update_time,
       </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides="," >
@@ -100,91 +208,332 @@
       <if test="companyId != null" >
         #{companyId,jdbcType=INTEGER},
       </if>
-      <if test="warehouseId != null" >
-        #{warehouseId,jdbcType=INTEGER},
+      <if test="refOrderId != null" >
+        #{refOrderId,jdbcType=BIGINT},
       </if>
-      <if test="inUserId != null" >
-        #{inUserId,jdbcType=BIGINT},
+      <if test="refType != null" >
+        #{refType,jdbcType=VARCHAR},
       </if>
-      <if test="inDate != null" >
-        #{inDate,jdbcType=TIMESTAMP},
+      <if test="orderNumber != null" >
+        #{orderNumber,jdbcType=VARCHAR},
       </if>
-      <if test="inType != null" >
-        #{inType,jdbcType=INTEGER},
-      </if>
-      <if test="buyOrderId != null" >
-        #{buyOrderId,jdbcType=BIGINT},
+      <if test="refNo != null" >
+        #{refNo,jdbcType=VARCHAR},
       </if>
       <if test="supplierId != null" >
         #{supplierId,jdbcType=BIGINT},
       </if>
-      <if test="checkUserId != null" >
-        #{checkUserId,jdbcType=BIGINT},
+      <if test="supplierContactId != null" >
+        #{supplierContactId,jdbcType=BIGINT},
       </if>
-      <if test="checkDate != null" >
-        #{checkDate,jdbcType=TIMESTAMP},
+      <if test="buyerId != null" >
+        #{buyerId,jdbcType=BIGINT},
       </if>
-      <if test="inAmount != null" >
-        #{inAmount,jdbcType=DECIMAL},
+      <if test="status != null" >
+        #{status,jdbcType=VARCHAR},
       </if>
-      <if test="inMoney != null" >
-        #{inMoney,jdbcType=DECIMAL},
+      <if test="keyWord != null" >
+        #{keyWord,jdbcType=VARCHAR},
       </if>
-      <if test="state != null" >
-        #{state,jdbcType=INTEGER},
+      <if test="receiveDate != null" >
+        #{receiveDate,jdbcType=TIMESTAMP},
       </if>
-      <if test="inNote != null" >
-        #{inNote,jdbcType=VARCHAR},
+      <if test="payDate != null" >
+        #{payDate,jdbcType=TIMESTAMP},
       </if>
-      <if test="createdBy != null" >
-        created_by = #{createdBy,jdbcType=VARCHAR},
+      <if test="goodsBillNo != null" >
+        #{goodsBillNo,jdbcType=VARCHAR},
       </if>
-      <if test="updatedBy != null" >
-        updated_by = #{updatedBy,jdbcType=VARCHAR},
+      <if test="tempControlMethod != null" >
+        #{tempControlMethod,jdbcType=BIGINT},
       </if>
-      <if test="createdTime != null" >
-        created_time = #{createdTime,jdbcType=TIMESTAMP},
+      <if test="receiveTemp != null" >
+        #{receiveTemp,jdbcType=DECIMAL},
       </if>
-      <if test="updatedTime != null" >
-        updated_time = #{updatedTime,jdbcType=TIMESTAMP},
+      <if test="checkTemp != null" >
+        #{checkTemp,jdbcType=DECIMAL},
+      </if>
+      <if test="tempControlStatus != null" >
+        #{tempControlStatus,jdbcType=BIGINT},
+      </if>
+      <if test="shipCompanyId != null" >
+        #{shipCompanyId,jdbcType=INTEGER},
+      </if>
+      <if test="shipMethod != null" >
+        #{shipMethod,jdbcType=BIGINT},
+      </if>
+      <if test="shipTool != null" >
+        #{shipTool,jdbcType=BIGINT},
+      </if>
+      <if test="shipCarNo != null" >
+        #{shipCarNo,jdbcType=VARCHAR},
+      </if>
+      <if test="shipDriverName != null" >
+        #{shipDriverName,jdbcType=VARCHAR},
+      </if>
+      <if test="shipStartDate != null" >
+        #{shipStartDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="shipEndDate != null" >
+        #{shipEndDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="shipEntrustNo != null" >
+        #{shipEntrustNo,jdbcType=VARCHAR},
+      </if>
+      <if test="shipStartAddress != null" >
+        #{shipStartAddress,jdbcType=VARCHAR},
+      </if>
+      <if test="warehouseId != null" >
+        #{warehouseId,jdbcType=INTEGER},
+      </if>
+      <if test="buyType != null" >
+        #{buyType,jdbcType=BIGINT},
+      </if>
+      <if test="term != null" >
+        #{term,jdbcType=INTEGER},
+      </if>
+      <if test="comeFrom != null" >
+        #{comeFrom,jdbcType=VARCHAR},
+      </if>
+      <if test="billType != null" >
+        #{billType,jdbcType=BIGINT},
+      </if>
+      <if test="fileNo != null" >
+        #{fileNo,jdbcType=VARCHAR},
+      </if>
+      <if test="createBy != null" >
+        #{createBy,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateBy != null" >
+        #{updateBy,jdbcType=VARCHAR},
+      </if>
+      <if test="updateTime != null" >
+        #{updateTime,jdbcType=TIMESTAMP},
       </if>
     </trim>
   </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.yiban.erp.entities.RepertoryIn" >
+    update repertory_in
+    <set >
+      <if test="companyId != null" >
+        company_id = #{companyId,jdbcType=INTEGER},
+      </if>
+      <if test="refOrderId != null" >
+        ref_order_id = #{refOrderId,jdbcType=BIGINT},
+      </if>
+      <if test="refType != null" >
+        ref_type = #{refType,jdbcType=VARCHAR},
+      </if>
+      <if test="orderNumber != null" >
+        order_number = #{orderNumber,jdbcType=VARCHAR},
+      </if>
+      <if test="refNo != null" >
+        ref_no = #{refNo,jdbcType=VARCHAR},
+      </if>
+      <if test="supplierId != null" >
+        supplier_id = #{supplierId,jdbcType=BIGINT},
+      </if>
+      <if test="supplierContactId != null" >
+        supplier_contact_id = #{supplierContactId,jdbcType=BIGINT},
+      </if>
+      <if test="buyerId != null" >
+        buyer_id = #{buyerId,jdbcType=BIGINT},
+      </if>
+      <if test="status != null" >
+        status = #{status,jdbcType=VARCHAR},
+      </if>
+      <if test="keyWord != null" >
+        key_word = #{keyWord,jdbcType=VARCHAR},
+      </if>
+      <if test="receiveDate != null" >
+        receive_date = #{receiveDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="payDate != null" >
+        pay_date = #{payDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="goodsBillNo != null" >
+        goods_bill_no = #{goodsBillNo,jdbcType=VARCHAR},
+      </if>
+      <if test="tempControlMethod != null" >
+        temp_control_method = #{tempControlMethod,jdbcType=BIGINT},
+      </if>
+      <if test="receiveTemp != null" >
+        receive_temp = #{receiveTemp,jdbcType=DECIMAL},
+      </if>
+      <if test="checkTemp != null" >
+        check_temp = #{checkTemp,jdbcType=DECIMAL},
+      </if>
+      <if test="tempControlStatus != null" >
+        temp_control_status = #{tempControlStatus,jdbcType=BIGINT},
+      </if>
+      <if test="shipCompanyId != null" >
+        ship_company_id = #{shipCompanyId,jdbcType=INTEGER},
+      </if>
+      <if test="shipMethod != null" >
+        ship_method = #{shipMethod,jdbcType=BIGINT},
+      </if>
+      <if test="shipTool != null" >
+        ship_tool = #{shipTool,jdbcType=BIGINT},
+      </if>
+      <if test="shipCarNo != null" >
+        ship_car_no = #{shipCarNo,jdbcType=VARCHAR},
+      </if>
+      <if test="shipDriverName != null" >
+        ship_driver_name = #{shipDriverName,jdbcType=VARCHAR},
+      </if>
+      <if test="shipStartDate != null" >
+        ship_start_date = #{shipStartDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="shipEndDate != null" >
+        ship_end_date = #{shipEndDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="shipEntrustNo != null" >
+        ship_entrust_no = #{shipEntrustNo,jdbcType=VARCHAR},
+      </if>
+      <if test="shipStartAddress != null" >
+        ship_start_address = #{shipStartAddress,jdbcType=VARCHAR},
+      </if>
+      <if test="warehouseId != null" >
+        warehouse_id = #{warehouseId,jdbcType=INTEGER},
+      </if>
+      <if test="buyType != null" >
+        buy_type = #{buyType,jdbcType=BIGINT},
+      </if>
+      <if test="term != null" >
+        term = #{term,jdbcType=INTEGER},
+      </if>
+      <if test="comeFrom != null" >
+        come_from = #{comeFrom,jdbcType=VARCHAR},
+      </if>
+      <if test="billType != null" >
+        bill_type = #{billType,jdbcType=BIGINT},
+      </if>
+      <if test="fileNo != null" >
+        file_no = #{fileNo,jdbcType=VARCHAR},
+      </if>
+      <if test="createBy != null" >
+        create_by = #{createBy,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateBy != null" >
+        update_by = #{updateBy,jdbcType=VARCHAR},
+      </if>
+      <if test="updateTime != null" >
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.yiban.erp.entities.RepertoryIn" >
+    update repertory_in
+    set company_id = #{companyId,jdbcType=INTEGER},
+      ref_order_id = #{refOrderId,jdbcType=BIGINT},
+      ref_type = #{refType,jdbcType=VARCHAR},
+      order_number = #{orderNumber,jdbcType=VARCHAR},
+      ref_no = #{refNo,jdbcType=VARCHAR},
+      supplier_id = #{supplierId,jdbcType=BIGINT},
+      supplier_contact_id = #{supplierContactId,jdbcType=BIGINT},
+      buyer_id = #{buyerId,jdbcType=BIGINT},
+      status = #{status,jdbcType=VARCHAR},
+      key_word = #{keyWord,jdbcType=VARCHAR},
+      receive_date = #{receiveDate,jdbcType=TIMESTAMP},
+      pay_date = #{payDate,jdbcType=TIMESTAMP},
+      goods_bill_no = #{goodsBillNo,jdbcType=VARCHAR},
+      temp_control_method = #{tempControlMethod,jdbcType=BIGINT},
+      receive_temp = #{receiveTemp,jdbcType=DECIMAL},
+      check_temp = #{checkTemp,jdbcType=DECIMAL},
+      temp_control_status = #{tempControlStatus,jdbcType=BIGINT},
+      ship_company_id = #{shipCompanyId,jdbcType=INTEGER},
+      ship_method = #{shipMethod,jdbcType=BIGINT},
+      ship_tool = #{shipTool,jdbcType=BIGINT},
+      ship_car_no = #{shipCarNo,jdbcType=VARCHAR},
+      ship_driver_name = #{shipDriverName,jdbcType=VARCHAR},
+      ship_start_date = #{shipStartDate,jdbcType=TIMESTAMP},
+      ship_end_date = #{shipEndDate,jdbcType=TIMESTAMP},
+      ship_entrust_no = #{shipEntrustNo,jdbcType=VARCHAR},
+      ship_start_address = #{shipStartAddress,jdbcType=VARCHAR},
+      warehouse_id = #{warehouseId,jdbcType=INTEGER},
+      buy_type = #{buyType,jdbcType=BIGINT},
+      term = #{term,jdbcType=INTEGER},
+      come_from = #{comeFrom,jdbcType=VARCHAR},
+      bill_type = #{billType,jdbcType=BIGINT},
+      file_no = #{fileNo,jdbcType=VARCHAR},
+      create_by = #{createBy,jdbcType=VARCHAR},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_by = #{updateBy,jdbcType=VARCHAR},
+      update_time = #{updateTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
 
+  <sql id="listSql" >
+      o.id as id, o.company_id as companyId, o.ref_order_id as refOrderId, o.ref_type as refType,
+      o.order_number as orderNumber, o.ref_no as refNo, o.supplier_id as supplierId, o.supplier_contact_id as supplierContactId,
+      o.buyer_id as buyerId, o.status as status, o.key_word as keyWord, o.receive_date as receiveDate,
+      o.pay_date as payDate, o.goods_bill_no as goodsBillNo, o.temp_control_method as tempControlMethod,
+      o.receive_temp as receive_temp, o.check_temp as checkTemp, o.temp_control_status as tempControlStatus,
+      o.ship_company_id as shipCompanyId, o.ship_method as shipMethod, ship_tool as shipTool,
+      o.ship_car_no as shipCardNo, o.ship_driver_name as shipDriverName, o.ship_start_date as shipStartDate,
+      o.ship_end_date as shipEndDate, o.ship_entrust_no as shipEntrustNo, o.ship_start_address as shipStartAddress,
+      o.warehouse_id as warehouseId, o.buy_type as buyType, o.term as term, o.come_from as comeFrom, o.bill_type as billType,
+      o.file_no as fileNo, o.create_by as createBy, o.create_time as createTime,
+      o.update_by as updateBy, o.update_time as updateTime,
+      s.name as supplierName, sc.name as supplierContactName, w.name as warehouseName,
+      u.nickname as saleNickName, u.realname as saleRealName
+  </sql>
 
-  <select id="queryInOrders" resultMap="BaseResultMap" parameterType="com.yiban.erp.dto.InOrderQuery" >
+  <select id="getList" parameterType="com.yiban.erp.dto.ReceiveListReq" resultType="com.yiban.erp.entities.RepertoryIn">
     select
-    inorder.*,su.name as supplier,w.name as warehouseName,u.nickname as checkedBy,bo.order_number as orderNumber
-
-    from repertory_in inorder
-    LEFT JOIN supplier su ON su.id=inorder.supplier_id
-    LEFT JOIN warehouse w ON w.id=inorder.warehouse_id
-    LEFT JOIN users u ON u.id=inorder.check_user_id
-    LEFT JOIN buy_order bo ON bo.id=inorder.buy_order_id
-    where 1=1
-    <if test="companyId != null" >
-      and inorder.company_id = #{companyId, jdbcType=BIGINT}
+    <include refid="listSql"/>
+    from repertory_in o, supplier s, supplier_contact sc, warehouse w, users u
+    where o.supplier_id = s.id and o.supplier_contact_id = sc.id
+    and o.warehouse_id = w.id and o.buyer_id = u.id
+    and o.buyer_id = u.id
+    and o.company_id = #{companyId}
+    and o.status != 'DELETE'
+    <if test="warehouseId != null">
+      and o.warehouse_id = #{warehouseId}
     </if>
-    <if test="warehouseId != null" >
-      and inorder.warehouse_id = #{warehouseId,jdbcType=BIGINT}
+    <if test="supplierId != null" >
+      and o.supplier_id = #{supplierId}
     </if>
-    <if test="in_user_id != null" >
-      and inorder.in_user_id = #{in_user_id,jdbcType=BIGINT}
+    <if test="startReceiveDate != null">
+      and o.receive_date >= #{startReceiveDate}
     </if>
-    <if test="state != null" >
-      and inorder.state = #{state,jdbcType=INTEGER}
+    <if test="endReceiveDate != null">
+      and o.receive_date &lt;= #{endReceiveDate}
     </if>
-
-    <if test="in_type != null" >
-      and inorder.in_type = #{in_type,jdbcType=INTEGER}
+    <if test="statusList != null" >
+      and o.status in
+      <foreach collection="statusList" item="item" open="(" close=")" separator=", ">
+        #{item}
+      </foreach>
     </if>
-    <if test="in_date_min != null" >
-      and inorder.in_date >= #{in_date_min,jdbcType=TIMESTAMP}
-    </if>
-    <if test="in_date_max != null" >
-      and #{in_date_max,jdbcType=TIMESTAMP} > inorder.in_date
-    </if>
-
   </select>
+
+  <select id="getByRefOrder" parameterType="map" resultType="com.yiban.erp.entities.RepertoryIn">
+    select
+    <include refid="listSql"/>
+    from repertory_in o, supplier s, supplier_contact sc, warehouse w, users u
+    where o.supplier_id = s.id and o.supplier_contact_id = sc.id
+    and o.warehouse_id = w.id and o.buyer_id = u.id
+    and o.buyer_id = u.id
+    and o.company_id = #{companyId}
+    and o.status != 'DELETE'
+    and o.ref_type = #{refType}
+    and o.ref_order_id = #{refOrderId}
+  </select>
+
+  <update id="setCheckStatus" parameterType="map">
+    update repertory_in
+      set status = #{status},
+          update_by = #{updateBy},
+          update_time = #{updateTime}
+    where id = #{id}
+  </update>
 
 </mapper>

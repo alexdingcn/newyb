@@ -4,7 +4,9 @@ import java.math.BigDecimal;
 import java.util.Date;
 
 public class RepertoryInfo {
+
     private Long id;
+
     private Integer companyId;
 
     private Integer warehouseId;
@@ -25,16 +27,15 @@ public class RepertoryInfo {
 
     private BigDecimal buyPrice;
 
-
     private Boolean isExp;
 
     private Boolean saleEnable;
 
     private Date productDate;
 
-    private Date inDate;
-
     private Date expDate;
+
+    private Date inDate;
 
     private Long supplierId;
 
@@ -42,7 +43,7 @@ public class RepertoryInfo {
 
     private Long buyerId;
 
-    private Long orderId; //入库单号
+    private Long orderId;
 
     private Boolean saleSate;
 
@@ -59,20 +60,30 @@ public class RepertoryInfo {
     //展示字段
     private String warehouseName;
     private String goodName;
-    private String supplier;
     private String factoryName;
-    private String inUserName;
     private String origin;
     private String jx;
     private String spec;
     private String unitName;
-    private String medType;
     private long permitId;
     private long baseMedId;
-    private Byte enable;
-    private BigDecimal inax;
-    private BigDecimal outTax;
     private String storageCondition;
+
+    public void setGoods(Goods goods) {
+        this.goods = goods;
+        if (goods != null) {
+            this.goodName = goods.getName();
+            this.factoryName = goods.getFactory();
+            this.origin = goods.getOrigin();
+            this.jx = goods.getJx();
+            this.spec = goods.getSpec();
+            this.unitName = goods.getUnitName();
+            this.permitId = goods.getPermitId();
+            this.baseMedId = goods.getBaseMedId();
+            this.storageCondition = goods.getStorageCondition();
+        }
+    }
+
 
     public Long getId() {
         return id;
@@ -114,21 +125,6 @@ public class RepertoryInfo {
         this.inUserId = inUserId;
     }
 
-    public Long getGoodsId() {
-        return goodsId;
-    }
-
-    public void setGoodsId(Long goodsId) {
-        this.goodsId = goodsId;
-    }
-
-    public String getBatchCode() {
-        return batchCode;
-    }
-
-    public void setBatchCode(String batchCode) {
-        this.batchCode = batchCode;
-    }
 
     public Long getFactoryId() {
         return factoryId;
@@ -186,20 +182,36 @@ public class RepertoryInfo {
         this.productDate = productDate;
     }
 
-    public Date getInDate() {
-        return inDate;
-    }
-
-    public void setInDate(Date inDate) {
-        this.inDate = inDate;
-    }
-
     public Date getExpDate() {
         return expDate;
     }
 
     public void setExpDate(Date expDate) {
         this.expDate = expDate;
+    }
+
+    public Long getGoodsId() {
+        return goodsId;
+    }
+
+    public void setGoodsId(Long goodsId) {
+        this.goodsId = goodsId;
+    }
+
+    public String getBatchCode() {
+        return batchCode;
+    }
+
+    public void setBatchCode(String batchCode) {
+        this.batchCode = batchCode;
+    }
+
+    public Date getInDate() {
+        return inDate;
+    }
+
+    public void setInDate(Date inDate) {
+        this.inDate = inDate;
     }
 
     public Long getSupplierId() {
@@ -294,28 +306,12 @@ public class RepertoryInfo {
         this.goodName = goodName;
     }
 
-    public String getSupplier() {
-        return supplier;
-    }
-
-    public void setSupplier(String supplier) {
-        this.supplier = supplier;
-    }
-
     public String getFactoryName() {
         return factoryName;
     }
 
     public void setFactoryName(String factoryName) {
         this.factoryName = factoryName;
-    }
-
-    public String getInUserName() {
-        return inUserName;
-    }
-
-    public void setInUserName(String inUserName) {
-        this.inUserName = inUserName;
     }
 
     public String getOrigin() {
@@ -350,14 +346,6 @@ public class RepertoryInfo {
         this.unitName = unitName;
     }
 
-    public String getMedType() {
-        return medType;
-    }
-
-    public void setMedType(String medType) {
-        this.medType = medType;
-    }
-
     public long getPermitId() {
         return permitId;
     }
@@ -374,46 +362,11 @@ public class RepertoryInfo {
         this.baseMedId = baseMedId;
     }
 
-    public Byte getEnable() {
-        return enable;
-    }
-
-    public void setEnable(Byte enable) {
-        this.enable = enable;
-    }
-
-    public BigDecimal getInax() {
-        return inax;
-    }
-
-    public void setInax(BigDecimal inax) {
-        this.inax = inax;
-    }
-
-    public BigDecimal getOutTax() {
-        return outTax;
-    }
-
-    public void setOutTax(BigDecimal outTax) {
-        this.outTax = outTax;
-    }
-
     public String getStorageCondition() {
         return storageCondition;
     }
 
     public void setStorageCondition(String storageCondition) {
         this.storageCondition = storageCondition;
-    }
-
-    public void setGoods(Goods goods) {
-        this.goods = goods;
-        if (goods != null) {
-            this.goodName = goods.getName();
-            this.factoryName = goods.getFactory();
-            this.jx = goods.getJx();
-            this.spec = goods.getSpec();
-            this.unitName = goods.getUnitName();
-        }
     }
 }

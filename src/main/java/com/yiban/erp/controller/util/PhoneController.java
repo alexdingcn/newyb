@@ -8,7 +8,7 @@ import com.aliyuncs.dysmsapi.model.v20170525.SendSmsRequest;
 import com.aliyuncs.dysmsapi.model.v20170525.SendSmsResponse;
 import com.aliyuncs.profile.DefaultProfile;
 import com.aliyuncs.profile.IClientProfile;
-import com.yiban.erp.dao.VerifyCode;
+import com.yiban.erp.entities.VerifyCode;
 import com.yiban.erp.dto.VerifyCodeReq;
 import com.yiban.erp.exception.BizException;
 import com.yiban.erp.exception.ErrorCode;

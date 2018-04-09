@@ -1,6 +1,6 @@
 package com.yiban.erp.constant;
 
-public enum RepositoryOrderStatus {
+public enum RepertoryInStatus {
 
     TEMP_STORAGE,
     INIT,

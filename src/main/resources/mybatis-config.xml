@@ -25,6 +25,7 @@
         <mapper resource="mapping/FileUploadMapper.xml"/>
         <mapper resource="mapping/OptionsMapper.xml"/>
         <mapper resource="mapping/WarehouseMapper.xml"/>
+        <mapper resource="mapping/WarehouseLocationMapper.xml"/>
         <mapper resource="mapping/BuyOrderMapper.xml"/>
         <mapper resource="mapping/BuyOrderDetailMapper.xml"/>
         <mapper resource="mapping/SellOrderMapper.xml"/>
@@ -33,12 +34,10 @@
         <mapper resource="mapping/ShipCompanyMapper.xml"/>
         <mapper resource="mapping/RepertoryInfoMapper.xml"/>
         <mapper resource="mapping/BizWxApplyMapper.xml"/>
-        <mapper resource="mapping/RepositoryOrderMapper.xml"/>
-        <mapper resource="mapping/RepositoryOrderDetailMapper.xml"/>
         <mapper resource="mapping/RepertoryInMapper.xml"/>
+        <mapper resource="mapping/RepertoryInDetailMapper.xml"/>
         <mapper resource="mapping/MessageInfoMapper.xml"/>
         <mapper resource="mapping/MessageOptionMapper.xml"/>
         <mapper resource="mapping/RepertoryCheckPlanMapper.xml"/>
-        <mapper resource="mapping/RepertoryCheckDetailPlanMapper.xml"/>
     </mappers>
 </configuration>
