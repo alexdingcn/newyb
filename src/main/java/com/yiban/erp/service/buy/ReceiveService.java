@@ -142,10 +142,10 @@ public class ReceiveService {
         logger.info("begin save repository order details.");
         saveOrderDetail(user, order);
 
-        //如果是保存操作，不是暂挂，验证是否存在采购单号，如果存在，修改到已经收货的状态
-        if (RepositoryOrderStatus.INIT.name().equalsIgnoreCase(order.getStatus()) && order.getBuyOrderId() != null) {
-            logger.info("set buy order status to shiped. buyOrderId:{}", order.getBuyOrderId());
-            BuyOrder buyOrder = buyOrderMapper.selectByPrimaryKey(order.getBuyOrderId());
+        //如果是保存操作，不是暂挂，验证是否存在采购单号，如果存在，修改到已经收货的状态 TODO add refType
+        if (RepositoryOrderStatus.INIT.name().equalsIgnoreCase(order.getStatus()) && order.getRefOrderId() != null) {
+            logger.info("set buy order status to shiped. buyOrderId:{}", order.getRefOrderId());
+            BuyOrder buyOrder = buyOrderMapper.selectByPrimaryKey(order.getRefOrderId());
             if (buyOrder != null) {
                 buyOrder.setStatus(BuyOrderStatus.SHIPPED.name());
                 buyOrder.setUpdatedBy(user.getNickname());
@@ -249,6 +249,7 @@ public class ReceiveService {
 
     public RepositoryOrder getByBuyOrder(User user, Long buyOrderId) throws BizException {
         logger.debug("user:{} get receive order by buy order id:{}", user.getId(), buyOrderId);
+        //TODO ADD refType
         BuyOrder buyOrder = buyOrderMapper.getOrderById(buyOrderId);
         if (buyOrder == null) {
             logger.warn("get buy order fail. id:{}", buyOrderId);
@@ -294,7 +295,7 @@ public class ReceiveService {
     private RepositoryOrder makeReceiveOrderByBuyOrder(User user, BuyOrder buyOrder) {
         RepositoryOrder order = new RepositoryOrder();
         order.setCompanyId(buyOrder.getCompanyId());
-        order.setBuyOrderId(buyOrder.getId());
+        order.setRefOrderId(buyOrder.getId());
         order.setSupplierId(buyOrder.getSupplierId());
         order.setSupplierName(buyOrder.getSupplier());
         order.setSupplierContactId(buyOrder.getSupplierContactId());

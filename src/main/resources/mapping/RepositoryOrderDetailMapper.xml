@@ -5,26 +5,26 @@
     <id column="id" property="id" jdbcType="BIGINT" />
     <result column="repository_order_id" property="repositoryOrderId" jdbcType="BIGINT" />
     <result column="goods_id" property="goodsId" jdbcType="BIGINT" />
-    <result column="receive_quality" property="receiveQuality" jdbcType="INTEGER" />
-    <result column="big_quality" property="bigQuality" jdbcType="INTEGER" />
-    <result column="free" property="free" jdbcType="INTEGER" />
+    <result column="receive_quality" property="receiveQuality" jdbcType="DECIMAL" />
+    <result column="big_quality" property="bigQuality" jdbcType="DECIMAL" />
+    <result column="free" property="free" jdbcType="DECIMAL" />
     <result column="price" property="price" jdbcType="DECIMAL" />
     <result column="exp_date" property="expDate" jdbcType="TIMESTAMP" />
     <result column="product_date" property="productDate" jdbcType="TIMESTAMP" />
     <result column="batch_code" property="batchCode" jdbcType="VARCHAR" />
     <result column="amount" property="amount" jdbcType="DECIMAL" />
     <result column="warehouse_location" property="warehouseLocation" jdbcType="VARCHAR" />
-    <result column="reject_quality" property="rejectQuality" jdbcType="INTEGER" />
+    <result column="reject_quality" property="rejectQuality" jdbcType="DECIMAL" />
     <result column="reject_comment" property="rejectComment" jdbcType="VARCHAR" />
     <result column="tax_rate" property="taxRate" jdbcType="DECIMAL" />
     <result column="create_by" property="createBy" jdbcType="VARCHAR" />
     <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
     <result column="update_by" property="updateBy" jdbcType="VARCHAR" />
     <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
-    <result column="in_count" property="inCount" jdbcType="INTEGER" />
-    <result column="right_count" property="rightCount" jdbcType="INTEGER" />
-    <result column="error_count" property="errorCount" jdbcType="INTEGER" />
-    <result column="survey_quality" property="surveyQuality" jdbcType="INTEGER" />
+    <result column="in_count" property="inCount" jdbcType="DECIMAL" />
+    <result column="right_count" property="rightCount" jdbcType="DECIMAL" />
+    <result column="error_count" property="errorCount" jdbcType="DECIMAL" />
+    <result column="survey_quality" property="surveyQuality" jdbcType="DECIMAL" />
     <result column="survey_date" property="surveyDate" jdbcType="TIMESTAMP" />
     <result column="survey_user" property="surveyUser" jdbcType="VARCHAR" />
     <result column="survey_address" property="surveyAddress" jdbcType="VARCHAR" />
@@ -38,13 +38,15 @@
     <result column="check_user" property="checkUser" jdbcType="VARCHAR" />
     <result column="check_time" property="checkTime" jdbcType="TIMESTAMP" />
     <result column="check_result" property="checkResult" jdbcType="VARCHAR" />
+    <result column="sale_state" property="saleState" jdbcType="BIT"/>
   </resultMap>
   <sql id="Base_Column_List" >
     id, repository_order_id, goods_id, receive_quality, big_quality, free, price, exp_date, 
     product_date, batch_code, amount, warehouse_location, reject_quality, reject_comment, tax_rate,
     create_by, create_time, update_by, update_time, in_count, right_count, error_count,
     survey_quality, survey_date, survey_user, survey_address, survey_result, survey_target,
-    check_status, error_plan, sale_cert, error_reason, check_temp_method, check_user, check_time, check_result
+    check_status, error_plan, sale_cert, error_reason, check_temp_method, check_user, check_time, check_result,
+    sale_state
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
     select 
@@ -69,19 +71,20 @@
       reject_quality, reject_comment, tax_rate, create_by,
       create_time, update_by, update_time, in_count, right_count, error_count,
       survey_quality, survey_date, survey_user, survey_address, survey_result, survey_target,
-      check_status, error_plan, sale_cert, error_reason, check_temp_method, check_user, check_time, check_result
+      check_status, error_plan, sale_cert, error_reason, check_temp_method, check_user, check_time, check_result, sale_state
       )
     values (#{repositoryOrderId,jdbcType=BIGINT}, #{goodsId,jdbcType=BIGINT},
-      #{receiveQuality,jdbcType=INTEGER}, #{bigQuality,jdbcType=INTEGER}, #{free,jdbcType=INTEGER}, 
+      #{receiveQuality,jdbcType=DECIMAL}, #{bigQuality,jdbcType=DECIMAL}, #{free,jdbcType=DECIMAL},
       #{price,jdbcType=DECIMAL}, #{expDate,jdbcType=TIMESTAMP}, #{productDate,jdbcType=TIMESTAMP}, 
       #{batchCode,jdbcType=VARCHAR}, #{amount,jdbcType=DECIMAL}, #{warehouseLocation,jdbcType=VARCHAR}, 
-      #{rejectQuality,jdbcType=INTEGER}, #{rejectComment,jdbcType=VARCHAR}, #{taxRate,jdbcType=DECIMAL}, #{createBy,jdbcType=VARCHAR},
+      #{rejectQuality,jdbcType=DECIMAL}, #{rejectComment,jdbcType=VARCHAR}, #{taxRate,jdbcType=DECIMAL}, #{createBy,jdbcType=VARCHAR},
       #{createTime,jdbcType=TIMESTAMP}, #{updateBy,jdbcType=VARCHAR}, #{updateTime,jdbcType=TIMESTAMP},
-      #{inCount,jdbcType=INTEGER},  #{rightCount,jdbcType=INTEGER},  #{errorCount,jdbcType=INTEGER},
-      #{surveyQuality,jdbcType=INTEGER},  #{surveyDate,jdbcType=TIMESTAMP},  #{surveyUser,jdbcType=VARCHAR}
+      #{inCount,jdbcType=DECIMAL},  #{rightCount,jdbcType=DECIMAL},  #{errorCount,jdbcType=DECIMAL},
+      #{surveyQuality,jdbcType=DECIMAL},  #{surveyDate,jdbcType=TIMESTAMP},  #{surveyUser,jdbcType=VARCHAR}
       #{surveyAddress,jdbcType=VARCHAR},  #{surveyResult,jdbcType=VARCHAR},  #{surveyTarget,jdbcType=VARCHAR}
       #{checkStatus,jdbcType=BIT}, #{errorPlan,jdbcType=VARCHAR}, #{saleCert,jdbcType=VARCHAR}, #{errorReason,jdbcType=VARCHAR},
-      #{checkTempMethod,jdbcType=BIGINT}, #{checkUser,jdbcType=VARCHAR}, #{checkTime,jdbcType=TIMESTAMP}, #{checkResult,jdbcType=VARCHAR}
+      #{checkTempMethod,jdbcType=BIGINT}, #{checkUser,jdbcType=VARCHAR}, #{checkTime,jdbcType=TIMESTAMP}, #{checkResult,jdbcType=VARCHAR},
+      #{saleState, jdbcType=BIT}
       )
   </insert>
 
@@ -93,21 +96,22 @@
     reject_quality, reject_comment, tax_rate, create_by,
     create_time, update_by, update_time, in_count, right_count, error_count,
     survey_quality, survey_date, survey_user, survey_address, survey_result, survey_target,
-    check_status, error_plan, sale_cert, error_reason, check_temp_method, check_user, check_time, check_result
+    check_status, error_plan, sale_cert, error_reason, check_temp_method, check_user, check_time, check_result, sale_state
     )
     values
     <foreach collection="details" item="item" open="(" close=")" separator="), (">
       #{item.repositoryOrderId,jdbcType=BIGINT}, #{item.goodsId,jdbcType=BIGINT},
-      #{item.receiveQuality,jdbcType=INTEGER}, #{item.bigQuality,jdbcType=INTEGER}, #{item.free,jdbcType=INTEGER},
+      #{item.receiveQuality,jdbcType=DECIMAL}, #{item.bigQuality,jdbcType=DECIMAL}, #{item.free,jdbcType=DECIMAL},
       #{item.price,jdbcType=DECIMAL}, #{item.expDate,jdbcType=TIMESTAMP}, #{item.productDate,jdbcType=TIMESTAMP},
       #{item.batchCode,jdbcType=VARCHAR}, #{item.amount,jdbcType=DECIMAL}, #{item.warehouseLocation,jdbcType=VARCHAR},
-      #{item.rejectQuality,jdbcType=INTEGER}, #{item.rejectComment,jdbcType=VARCHAR}, #{item.taxRate,jdbcType=DECIMAL}, #{item.createBy,jdbcType=VARCHAR},
+      #{item.rejectQuality,jdbcType=DECIMAL}, #{item.rejectComment,jdbcType=VARCHAR}, #{item.taxRate,jdbcType=DECIMAL}, #{item.createBy,jdbcType=VARCHAR},
       #{item.createTime,jdbcType=TIMESTAMP}, #{item.updateBy,jdbcType=VARCHAR}, #{item.updateTime,jdbcType=TIMESTAMP},
-      #{inCount,jdbcType=INTEGER},  #{rightCount,jdbcType=INTEGER},  #{errorCount,jdbcType=INTEGER},
-      #{surveyQuality,jdbcType=INTEGER},  #{surveyDate,jdbcType=TIMESTAMP},  #{surveyUser,jdbcType=VARCHAR}
+      #{inCount,jdbcType=DECIMAL},  #{rightCount,jdbcType=DECIMAL},  #{errorCount,jdbcType=DECIMAL},
+      #{surveyQuality,jdbcType=DECIMAL},  #{surveyDate,jdbcType=TIMESTAMP},  #{surveyUser,jdbcType=VARCHAR}
       #{surveyAddress,jdbcType=VARCHAR},  #{surveyResult,jdbcType=VARCHAR},  #{surveyTarget,jdbcType=VARCHAR},
       #{checkStatus,jdbcType=BIT}, #{errorPlan,jdbcType=VARCHAR}, #{saleCert,jdbcType=VARCHAR}, #{errorReason,jdbcType=VARCHAR},
-      #{checkTempMethod,jdbcType=BIGINT}, #{checkUser,jdbcType=VARCHAR}, #{checkTime,jdbcType=TIMESTAMP}, #{checkResult,jdbcType=VARCHAR}
+      #{checkTempMethod,jdbcType=BIGINT}, #{checkUser,jdbcType=VARCHAR}, #{checkTime,jdbcType=TIMESTAMP}, #{checkResult,jdbcType=VARCHAR},
+      #{saleState, jdbcType=BIT}
     </foreach>
   </insert>
 
@@ -219,6 +223,9 @@
       <if test="checkResult != null">
         check_result,
       </if>
+      <if test="saleState != null">
+        sale_state,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides="," >
       <if test="repositoryOrderId != null" >
@@ -228,13 +235,13 @@
         #{goodsId,jdbcType=BIGINT},
       </if>
       <if test="receiveQuality != null" >
-        #{receiveQuality,jdbcType=INTEGER},
+        #{receiveQuality,jdbcType=DECIMAL},
       </if>
       <if test="bigQuality != null" >
-        #{bigQuality,jdbcType=INTEGER},
+        #{bigQuality,jdbcType=DECIMAL},
       </if>
       <if test="free != null" >
-        #{free,jdbcType=INTEGER},
+        #{free,jdbcType=DECIMAL},
       </if>
       <if test="price != null" >
         #{price,jdbcType=DECIMAL},
@@ -255,7 +262,7 @@
         #{warehouseLocation,jdbcType=VARCHAR},
       </if>
       <if test="rejectQuality != null" >
-        #{rejectQuality,jdbcType=INTEGER},
+        #{rejectQuality,jdbcType=DECIMAL},
       </if>
       <if test="rejectComment != null" >
         #{rejectComment,jdbcType=VARCHAR},
@@ -276,16 +283,16 @@
         #{updateTime,jdbcType=TIMESTAMP},
       </if>
       <if test="inCount != null" >
-        #{inCount,jdbcType=INTEGER},
+        #{inCount,jdbcType=DECIMAL},
       </if>
       <if test="rightCount != null" >
-        #{rightCount,jdbcType=INTEGER},
+        #{rightCount,jdbcType=DECIMAL},
       </if>
       <if test="errorCount != null" >
-        #{errorCount,jdbcType=INTEGER},
+        #{errorCount,jdbcType=DECIMAL},
       </if>
       <if test="surveyQuality != null" >
-        #{surveyQuality,jdbcType=INTEGER},
+        #{surveyQuality,jdbcType=DECIMAL},
       </if>
       <if test="surveyDate != null" >
         #{surveyDate,jdbcType=TIMESTAMP},
@@ -326,6 +333,9 @@
       <if test="checkResult != null">
         #{checkResult,jdbcType=VARCHAR},
       </if>
+      <if test="saleState != null">
+        #{saleState,jdbcType=BIT},
+      </if>
     </trim>
   </insert>
   <update id="updateByPrimaryKeySelective" parameterType="com.yiban.erp.entities.RepositoryOrderDetail" >
@@ -338,13 +348,13 @@
         goods_id = #{goodsId,jdbcType=BIGINT},
       </if>
       <if test="receiveQuality != null" >
-        receive_quality = #{receiveQuality,jdbcType=INTEGER},
+        receive_quality = #{receiveQuality,jdbcType=DECIMAL},
       </if>
       <if test="bigQuality != null" >
-        big_quality = #{bigQuality,jdbcType=INTEGER},
+        big_quality = #{bigQuality,jdbcType=DECIMAL},
       </if>
       <if test="free != null" >
-        free = #{free,jdbcType=INTEGER},
+        free = #{free,jdbcType=DECIMAL},
       </if>
       <if test="price != null" >
         price = #{price,jdbcType=DECIMAL},
@@ -365,7 +375,7 @@
         warehouse_location = #{warehouseLocation,jdbcType=VARCHAR},
       </if>
       <if test="rejectQuality != null" >
-        reject_quality = #{rejectQuality,jdbcType=INTEGER},
+        reject_quality = #{rejectQuality,jdbcType=DECIMAL},
       </if>
       <if test="rejectComment != null" >
         reject_comment = #{rejectComment,jdbcType=VARCHAR},
@@ -386,16 +396,16 @@
         update_time = #{updateTime,jdbcType=TIMESTAMP},
       </if>
       <if test="inCount != null" >
-        in_count = #{inCount,jdbcType=INTEGER},
+        in_count = #{inCount,jdbcType=DECIMAL},
       </if>
       <if test="rightCount != null" >
-        right_count = #{rightCount,jdbcType=INTEGER},
+        right_count = #{rightCount,jdbcType=DECIMAL},
       </if>
       <if test="errorCount != null" >
-        error_count = #{errorCount,jdbcType=INTEGER},
+        error_count = #{errorCount,jdbcType=DECIMAL},
       </if>
       <if test="surveyQuality != null" >
-        survey_quality = #{surveyQuality,jdbcType=INTEGER},
+        survey_quality = #{surveyQuality,jdbcType=DECIMAL},
       </if>
       <if test="surveyDate != null" >
         survey_date = #{surveyDate,jdbcType=TIMESTAMP},
@@ -436,6 +446,9 @@
       <if test="checkResult != null">
         check_result = #{checkResult,jdbcType=VARCHAR},
       </if>
+      <if test="saleState != null">
+        sale_state = #{saleState,jdbcType=BIT},
+      </if>
     </set>
     where id = #{id,jdbcType=BIGINT}
   </update>
@@ -443,26 +456,26 @@
     update repository_order_detail
     set repository_order_id = #{repositoryOrderId,jdbcType=BIGINT},
       goods_id = #{goodsId,jdbcType=BIGINT},
-      receive_quality = #{receiveQuality,jdbcType=INTEGER},
-      big_quality = #{bigQuality,jdbcType=INTEGER},
-      free = #{free,jdbcType=INTEGER},
+      receive_quality = #{receiveQuality,jdbcType=DECIMAL},
+      big_quality = #{bigQuality,jdbcType=DECIMAL},
+      free = #{free,jdbcType=DECIMAL},
       price = #{price,jdbcType=DECIMAL},
       exp_date = #{expDate,jdbcType=TIMESTAMP},
       product_date = #{productDate,jdbcType=TIMESTAMP},
       batch_code = #{batchCode,jdbcType=VARCHAR},
       amount = #{amount,jdbcType=DECIMAL},
       warehouse_location = #{warehouseLocation,jdbcType=VARCHAR},
-      reject_quality = #{rejectQuality,jdbcType=INTEGER},
+      reject_quality = #{rejectQuality,jdbcType=DECIMAL},
       reject_comment = #{rejectComment,jdbcType=VARCHAR},
       tax_rate = #{taxRate,jdbcType=DECIMAL},
       create_by = #{createBy,jdbcType=VARCHAR},
       create_time = #{createTime,jdbcType=TIMESTAMP},
       update_by = #{updateBy,jdbcType=VARCHAR},
       update_time = #{updateTime,jdbcType=TIMESTAMP},
-      in_count = #{inCount,jdbcType=INTEGER},
-      right_count = #{rightCount,jdbcType=INTEGER},
-      error_count = #{errorCount,jdbcType=INTEGER},
-      survey_quality = #{surveyQuality,jdbcType=INTEGER},
+      in_count = #{inCount,jdbcType=DECIMAL},
+      right_count = #{rightCount,jdbcType=DECIMAL},
+      error_count = #{errorCount,jdbcType=DECIMAL},
+      survey_quality = #{surveyQuality,jdbcType=DECIMAL},
       survey_date = #{surveyDate,jdbcType=TIMESTAMP},
       survey_user = #{surveyUser,jdbcType=VARCHAR},
       survey_address = #{surveyAddress,jdbcType=VARCHAR},
@@ -475,7 +488,8 @@
       check_temp_method = #{checkTempMethod,jdbcType=BIGINT},
       check_user = #{checkUser,jdbcType=VARCHAR},
       check_time = #{checkTime,jdbcType=TIMESTAMP},
-      check_result = #{checkResult,jdbcType=VARCHAR}
+      check_result = #{checkResult,jdbcType=VARCHAR},
+      sale_state = #{saleState,jdbcType=BIT}
     where id = #{id,jdbcType=BIGINT}
   </update>
 
@@ -484,26 +498,26 @@
     <id column="id" property="id" jdbcType="BIGINT" />
     <result column="repository_order_id" property="repositoryOrderId" jdbcType="BIGINT" />
     <result column="goods_id" property="goodsId" jdbcType="BIGINT" />
-    <result column="receive_quality" property="receiveQuality" jdbcType="INTEGER" />
-    <result column="big_quality" property="bigQuality" jdbcType="INTEGER" />
-    <result column="free" property="free" jdbcType="INTEGER" />
+    <result column="receive_quality" property="receiveQuality" jdbcType="DECIMAL" />
+    <result column="big_quality" property="bigQuality" jdbcType="DECIMAL" />
+    <result column="free" property="free" jdbcType="DECIMAL" />
     <result column="price" property="price" jdbcType="DECIMAL" />
     <result column="exp_date" property="expDate" jdbcType="TIMESTAMP" />
     <result column="product_date" property="productDate" jdbcType="TIMESTAMP" />
     <result column="batch_code" property="batchCode" jdbcType="VARCHAR" />
     <result column="amount" property="amount" jdbcType="DECIMAL" />
     <result column="warehouse_location" property="warehouseLocation" jdbcType="VARCHAR" />
-    <result column="reject_quality" property="rejectQuality" jdbcType="INTEGER" />
+    <result column="reject_quality" property="rejectQuality" jdbcType="DECIMAL" />
     <result column="reject_comment" property="rejectComment" jdbcType="VARCHAR" />
     <result column="tax_rate" property="taxRate" jdbcType="DECIMAL"/>
     <result column="create_by" property="createBy" jdbcType="VARCHAR" />
     <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
     <result column="update_by" property="updateBy" jdbcType="VARCHAR" />
     <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
-    <result column="in_count" property="inCount" jdbcType="INTEGER" />
-    <result column="right_count" property="rightCount" jdbcType="INTEGER" />
-    <result column="error_count" property="errorCount" jdbcType="INTEGER" />
-    <result column="survey_quality" property="surveyQuality" jdbcType="INTEGER" />
+    <result column="in_count" property="inCount" jdbcType="DECIMAL" />
+    <result column="right_count" property="rightCount" jdbcType="DECIMAL" />
+    <result column="error_count" property="errorCount" jdbcType="DECIMAL" />
+    <result column="survey_quality" property="surveyQuality" jdbcType="DECIMAL" />
     <result column="survey_date" property="surveyDate" jdbcType="TIMESTAMP" />
     <result column="survey_user" property="surveyUser" jdbcType="VARCHAR" />
     <result column="survey_address" property="surveyAddress" jdbcType="VARCHAR" />
@@ -517,6 +531,7 @@
     <result column="check_user" property="checkUser" jdbcType="VARCHAR" />
     <result column="check_time" property="checkTime" jdbcType="TIMESTAMP" />
     <result column="check_result" property="checkResult" jdbcType="VARCHAR" />
+    <result column="sale_state" property="saleState" jdbcType="BIT" />
     <association property="goods" column="goods_id" javaType="com.yiban.erp.entities.Goods" resultMap="GoodsResultMap"/>
   </resultMap>
 

@@ -62,6 +62,8 @@ public class RepositoryOrderDetail {
     private Date checkTime;
     private String checkResult;
 
+    private Boolean saleState;
+
     private Goods goods;
 
     private String goodsName;
@@ -427,5 +429,13 @@ public class RepositoryOrderDetail {
 
     public void setSurveyQuality(BigDecimal surveyQuality) {
         this.surveyQuality = surveyQuality;
+    }
+
+    public Boolean getSaleState() {
+        return saleState;
+    }
+
+    public void setSaleState(Boolean saleState) {
+        this.saleState = saleState;
     }
 }

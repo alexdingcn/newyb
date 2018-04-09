@@ -13,7 +13,9 @@ public class RepositoryOrder {
 
     private Integer companyId;
 
-    private Long buyOrderId;
+    private Long refOrderId;
+
+    private String refType;
 
     private String orderNumber;
 
@@ -33,7 +35,7 @@ public class RepositoryOrder {
 
     private Date payDate;
 
-    private String goodBillNo;
+    private String goodsBillNo;
 
     private Long tempControlMethod;
 
@@ -191,12 +193,28 @@ public class RepositoryOrder {
         this.companyId = companyId;
     }
 
-    public Long getBuyOrderId() {
-        return buyOrderId;
+    public Long getRefOrderId() {
+        return refOrderId;
     }
 
-    public void setBuyOrderId(Long buyOrderId) {
-        this.buyOrderId = buyOrderId;
+    public void setRefOrderId(Long refOrderId) {
+        this.refOrderId = refOrderId;
+    }
+
+    public String getRefType() {
+        return refType;
+    }
+
+    public void setRefType(String refType) {
+        this.refType = refType;
+    }
+
+    public String getGoodsBillNo() {
+        return goodsBillNo;
+    }
+
+    public void setGoodsBillNo(String goodsBillNo) {
+        this.goodsBillNo = goodsBillNo;
     }
 
     public String getOrderNumber() {
@@ -271,13 +289,6 @@ public class RepositoryOrder {
         this.payDate = payDate;
     }
 
-    public String getGoodBillNo() {
-        return goodBillNo;
-    }
-
-    public void setGoodBillNo(String goodBillNo) {
-        this.goodBillNo = goodBillNo == null ? null : goodBillNo.trim();
-    }
 
     public Long getTempControlMethod() {
         return tempControlMethod;

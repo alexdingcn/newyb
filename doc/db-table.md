@@ -61,7 +61,7 @@ order_id|Long|入库单ID
 supplier_id|Long|供应商ID
 supplier_contact_id|Long|供应商代表
 buyer_id|Long|采购员ID
-store_state|Boolean|是否为代销
+sale_state|Boolean|是否为代销
 create_by|String|创建人nickname
 create_time|Datetime|创建时间
 update_by|String|修改人

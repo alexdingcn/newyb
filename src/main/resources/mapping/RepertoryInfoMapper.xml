@@ -439,7 +439,7 @@
   </update>
 
   <select id="getBalance" parameterType="map" resultType="com.yiban.erp.dto.CurrentBalanceResp">
-    select goods_id as goodsId, count(quantity) as balance
+    select goods_id as goodsId, sum(quantity) as balance
     from repertory_info
     where warehouse_id = #{warehouseId}
     and goods_id in
