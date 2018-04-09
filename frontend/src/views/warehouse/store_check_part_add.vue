@@ -51,7 +51,10 @@
                                 :loading="goodsLoading">
                             <Option v-for="option in goodsOptions" :value="option.id" :label="option.name" :key="option.id">
                                 <span class="option-goods-name">{{ option.name }}</span>
+                                <span class="option-goods-name">{{ option.batchCode }}</span>
+                                <span class="option-goods-spec">{{ option.quantity }}</span>
                                 <span class="option-goods-spec">{{ option.spec }} | {{option.factory}}</span>
+
                             </Option>
                         </Select>
                     </FormItem>
@@ -81,12 +84,9 @@
                        no-data-text="在商品输入框选择后添加"
                     >
                 </Table>
-
             </Form>
         </Card>
-
     </Row>
-
 </template>
 
 
@@ -235,7 +235,7 @@
                 var self = this;
                 if (query !== '') {
                     this.goodsLoading = true;
-                    util.ajax.get('/goods/list',
+                    util.ajax.get('/repertory/list',
                         { params:
                                 {search: query,warehouseId:this.storeCheck.warehouseId, page: 1, size: 10}
                         })

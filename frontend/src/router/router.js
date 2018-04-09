@@ -96,7 +96,6 @@ export const otherRouter = {
         { path: 'ownspace', title: '个人中心', name: 'ownspace_index', component: () => import('@/views/own-space/own-space.vue') },
         { path: 'order/:order_id', title: '订单详情', name: 'order-info', component: () => import('@/views/advanced-router/component/order-info.vue') }, // 用于展示动态路由
         { path: 'shopping', title: '购物详情', name: 'shopping', component: () => import('@/views/advanced-router/component/shopping-info.vue') }, // 用于展示带参路由
-        { path: 'message', title: '消息中心', name: 'message_index', component: () => import('@/views/message/message.vue') },
         { path: 'store_check_add', title: '盘点制单', name: 'store_check_add', component: () => import('@/views/warehouse/store_check_add.vue') },
         { path: 'store_check_info', title: '盘点信息', name: 'store_check_info', component: () => import('@/views/warehouse/store_check_info.vue') },
         { path: 'store_check_part_index', title: '盘点信息', name: 'store_check_part_index', component: () => import('@/views/warehouse/store_check_part_index.vue') },
@@ -159,56 +158,12 @@ export const appRouter = [
     title: '库存',
     component: Main,
     children: [
-        { path: 'in_store', title: '入库管理', name: 'in_store', component: () => import('@/views/warehouse/in_store.vue') },
         { path: 'store_now', title: '实时库存', name: 'store_now', component: () => import('@/views/warehouse/store_now.vue') },
-        { path: 'out_store', title: '出库管理', name: 'out_store', component: () => import('@/views/warehouse/out_store.vue') },
-        { path: 'check_store', title: '库存盘点', name: 'check_store', component: () => import('@/views/warehouse/check_store.vue') },
+        { path: 'store_check_index', title: '库存盘点', name: 'store_check_index', component: () => import('@/views/warehouse/store_check_index.vue') },
         { path: 'setting', title: '仓库点设置', name: 'wh_setting', component: () => import('@/views/warehouse/setting.vue') },
         { path: 'overview', title: '库存报表', name: 'wh_overview', component: () => import('@/views/warehouse/overview.vue') },
     ]
-},
-{
-    path: '/access',
-    {
-        path: '/buy',
-        icon: 'bag',
-        name: 'buy',
-        title: '采购',
-        component: Main,
-        children: [
-            { path: 'order', title: '采购制单', name: 'buy_order', component: () => import('@/views/buy/buy-order.vue') },
-            { path: 'review', title: '采购单审核', name: 'buy_order_review', component: () => import('@/views/buy/buy-order-list.vue') },
-            { path: 'receive', title: '采购收货', name: 'buy_receive', component: () => import('@/views/buy/buy-receive.vue') },
-            { path: "quality-check", title: '入库质量验收', name: 'buy-quality-check', component: () => import('@/views/buy/buy-quality-check.vue')},
-        ]
-    },
-    {
-        path: '/sell',
-        icon: 'ios-calculator',
-        name: 'sell',
-        title: '销售',
-        component: Main,
-        children: [
-            { path: 'order', title: '销售制单', name: 'sell_order', component: () => import('@/views/sell/make.vue') },
-            { path: 'quality-review', title: '销售出库质量审核', name: 'sell-quality-review', component: () => import('@/views/sell/sell-quality-review.vue') },
-            { path: 'sale-review', title: '销售审核', name: 'sell-sale-review', component: () => import('@/views/sell/sell-sale-review.vue') },
-            { path: 'list', title: '销售订单列表', name: 'sell_list', component: () => import('@/views/sell/sell-order-list.vue') },
-        ]
-    },
-    {
-        path: '/warehouse',
-        icon: 'social-buffer',
-        name: 'warehouse',
-        title: '库存',
-        component: Main,
-        children: [
-            { path: 'store_now', title: '实时库存', name: 'store_now', component: () => import('@/views/warehouse/store_now.vue') },
-            { path: 'store_check_index', title: '库存盘点', name: 'store_check_index', component: () => import('@/views/warehouse/store_check_index.vue') },
-            { path: 'setting', title: '仓库点设置', name: 'wh_setting', component: () => import('@/views/warehouse/setting.vue') },
-            { path: 'overview', title: '库存报表', name: 'wh_overview', component: () => import('@/views/warehouse/overview.vue') },
-        ]
-    },
-    {
+}, {
         path: '/access',
         icon: 'key',
     name: 'access',
