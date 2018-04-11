@@ -150,6 +150,8 @@
           <file-detail :fileNo="checkFileNo" @add-file-success="addFileSuccess" ></file-detail>
           <div slot="footer"></div>
       </Modal>
+
+      <warehouse-location-modal :openModal="locationModal" :warehouseId="currentChooseOrder.warehouseId" @on-ok="chooseLocation" @on-close="locationModalClose"></warehouse-location-modal>
   </div>
 </template>
 
@@ -162,6 +164,7 @@ import inSurveyCheck from "./in-survey-check.vue";
 import temperControlSelect from "@/views/selector/temper-control-select.vue";
 import goodSelect from "@/views/selector/good-select.vue";
 import fileDetail from "@/views/basic-data/file-detail.vue";
+import warehouseLocationModal from "@/views/selector/warehouse-location-modal.vue";
 
 export default {
     name: 'in-quality-check',
@@ -171,9 +174,30 @@ export default {
         inSurveyCheck,
         temperControlSelect,
         goodSelect,
-        fileDetail
+        fileDetail,
+        warehouseLocationModal
     },
     data() {
+
+        const addWarehouseLocation = (h, location, rowData, index) => {
+            let label = location ? location : '';
+            return h('div', [
+                h('span', label),
+                h('Button', {
+                    props: {
+                        type: 'text',
+                        size: 'small',
+                        icon: 'edit'
+                    },
+                    on: {
+                        'click': () => {
+                            this.openChooseLocation(rowData, index);
+                        }
+                    }
+                })
+            ]);
+        };
+
         return {
             statusOptions: [
                 {key: 'ALL', name: '所有'},
@@ -190,6 +214,9 @@ export default {
                 moment().format('YYYY-MM-DD')
             ],
             orderLoading: false,
+            currEditLocationRow: {},
+            currDditLocationIndex: '',
+            locationModal: false,
             orderList: [],
             orderListColumns: [
                 {
@@ -504,24 +531,9 @@ export default {
                 {
                     title: "库区",
                     key: 'warehouseLocation',
-                    width: 140,
+                    width: 200,
                     render: (h, params) => {
-                        if (params.row.checkStatus) {
-                            return h('span', params.row.warehouseLocation);
-                        }else {
-                            let self = this;
-                            return h('Input', {
-                                props: {
-                                    value : self.detailList[params.index][params.column.key]
-                                },
-                                on: {
-                                    'on-blur' (event) {
-                                        let row = self.detailList[params.index];
-                                        row[params.column.key] = event.target.value;
-                                    }
-                                }
-                            });
-                        }
+                        return addWarehouseLocation(h, params.row.warehouseLocation, params.row, params.index);
                     }
                 },
                 {
@@ -878,7 +890,29 @@ export default {
                         desc: '添加档案成功后绑定档案信息失败, 请联系技术人员查询原因.'
                     });
                 })
-        }
+        },
+
+        openChooseLocation(rowData, index) {
+                if (!rowData || index === undefined || index < 0) {
+                    this.$Message.error('获取编辑位置失败');
+                    return;
+                }
+                this.currEditLocationRow = rowData;
+                this.currDditLocationIndex = index;
+                this.locationModal = true;
+            },
+
+            chooseLocation(data) {
+                this.locationModal = false;
+                this.currEditLocationRow.warehouseLocation = data.location;
+                this.$set(this.detailList, this.currDditLocationIndex, this.currEditLocationRow);
+            },
+
+            locationModalClose() {
+                this.locationModal = false;
+                this.currDditLocationIndex = '';
+                this.currEditLocationRow = {};
+            }
     }
 }
 </script>

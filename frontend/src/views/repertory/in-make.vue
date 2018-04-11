@@ -201,7 +201,7 @@
             <div slot="footer"></div>
         </Modal>
 
-        <warehouse-location-select :openModal="locationModal" :warehouseId="order.warehouseId" @on-ok="chooseLocation" @on-close="locationModalClose"></warehouse-location-select>
+        <warehouse-location-modal :openModal="locationModal" :warehouseId="order.warehouseId" @on-ok="chooseLocation" @on-close="locationModalClose"></warehouse-location-modal>
 
 	</Row>
 
@@ -224,7 +224,7 @@
     import goodSelect from "@/views/selector/good-select.vue";
     import inTemp from "./in-temp.vue";
     import buyOrderList from "@/views/buy/buy-order-list.vue";
-    import warehouseLocationSelect from "@/views/selector/warehouse-location-select.vue";
+    import warehouseLocationModal from "@/views/selector/warehouse-location-modal.vue";
 
     export default {
         name: 'in-make',
@@ -243,7 +243,7 @@
             goodSelect,
             inTemp,
             buyOrderList,
-            warehouseLocationSelect
+            warehouseLocationModal
         },
         data () {
             const addWarehouseLocation = (h, location, rowData, index) => {
@@ -252,7 +252,7 @@
                     h('span', label),
                     h('Button', {
                         props: {
-                            type: 'primary',
+                            type: 'text',
                             size: 'small',
                             icon: 'edit'
                         },
@@ -507,9 +507,8 @@
                         title: '货位号',
                         key: 'warehouseLocation',
                         align: 'center',
-                        width: 130,
+                        width: 200,
                         render: (h, params) => {
-                            
                             return addWarehouseLocation(h, params.row.warehouseLocation, params.row, params.index);
                         }
                     },

@@ -105,6 +105,7 @@ update_time|Datetime|最近一次修改时间
 -|-|-
 id|Long|(自增类型ID pk)
 check_plan_id|Long|盘库计划单ID
+make_user_id|Long|盘查人
 form_no|String|盘库表单号
 form_status|String|表单确认状态 UNCHECK-未确认 CHECKED-已确认
 repertory_info_id|Long|库存记录ID

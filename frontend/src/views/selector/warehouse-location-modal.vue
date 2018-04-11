@@ -20,7 +20,7 @@
 import util from "@/libs/util.js";
 
 export default {
-    name: "warehouse-location-select",
+    name: "warehouse-location-modal",
     props: {
         warehouseId: {
             type: Number|String,
