@@ -96,7 +96,7 @@ import util from "@/libs/util.js";
 import moment from "moment";
 
 export default {
-    name: 'message_index',
+    name: 'message',
     filters: {
         timeFilter(time) {
             return time ? moment(time).format('YYYY-MM-DD HH:mm:ss') : '';
