@@ -93,6 +93,8 @@ public enum ErrorCode {
     RECEIVE_ORDER_STATUS_NOT_CHECKED(2411, "订单未处于验收通过的状态，不能审核通过"),
     RECEIVE_ORDER_DETAIL_EMPTY(2412, "获取订单商品信息失败"),
 
+    WAREHOUSE_LOCATION_EXIST(2501, "仓库位置已经存在, 不能添加同名库位"),
+
 
 
     // 41xx - 贷款

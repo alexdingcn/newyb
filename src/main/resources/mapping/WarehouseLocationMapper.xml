@@ -12,6 +12,19 @@
     <result column="update_by" property="updateBy" jdbcType="VARCHAR" />
     <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
   </resultMap>
+  
+  <sql id="Base_Column">
+    id, warehouse_id, location, status, comment, create_by, create_time, update_by, update_time
+  </sql>
+  
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select
+      <include refid="Base_Column" />
+    from warehouse_location
+    where id = #{id,jdbcType=INTEGER}
+    and status != 'DELETE'
+  </select>
+  
   <insert id="insert" parameterType="com.yiban.erp.entities.WarehouseLocation" keyProperty="id" useGeneratedKeys="true" >
     insert into warehouse_location (warehouse_id, location,
       status, comment, create_by, 
@@ -78,35 +91,62 @@
     </trim>
   </insert>
 
-  <update id="updateSelective" >
+  <update id="updateSelective" parameterType="com.yiban.erp.entities.WarehouseLocation" >
     update warehouse_location
     <set >
       <if test="warehouseId != null" >
-        #{warehouseId,jdbcType=INTEGER},
+        warehouse_id = #{warehouseId,jdbcType=INTEGER},
       </if>
       <if test="location != null" >
-        #{location,jdbcType=VARCHAR},
+        location = #{location,jdbcType=VARCHAR},
       </if>
       <if test="status != null" >
-        #{status,jdbcType=VARCHAR},
+        status = #{status,jdbcType=VARCHAR},
       </if>
       <if test="comment != null" >
-        #{comment,jdbcType=VARCHAR},
+        comment = #{comment,jdbcType=VARCHAR},
       </if>
       <if test="createBy != null" >
-        #{createBy,jdbcType=VARCHAR},
+        create_by = #{createBy,jdbcType=VARCHAR},
       </if>
       <if test="createTime != null" >
-        #{createTime,jdbcType=TIMESTAMP},
+        create_time = #{createTime,jdbcType=TIMESTAMP},
       </if>
       <if test="updateBy != null" >
-        #{updateBy,jdbcType=VARCHAR},
+        update_by = #{updateBy,jdbcType=VARCHAR},
       </if>
       <if test="updateTime != null" >
-        #{updateTime,jdbcType=TIMESTAMP},
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
       </if>
     </set>
     where id = #{id, jdbcType=INTEGER}
   </update>
+  
+  <select id="getList" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select
+      <include refid="Base_Column" />
+    from warehouse_location
+    where warehouse_id = #{warehouseId}
+    and status != 'DELETE'
+  </select>
+
+  <select id="getListByIds" parameterType="map" resultMap="BaseResultMap">
+    select
+      <include refid="Base_Column"/>
+    from warehouse_location
+    where id in
+    <foreach collection="ids" open="(" close=")" separator=", " item="item">
+      #{item}
+    </foreach>
+  </select>
+
+  <select id="getByLocation" parameterType="map" resultMap="BaseResultMap">
+    select
+      <include refid="Base_Column" />
+      from warehouse_location
+      where warehouse_id = #{warehouseId}
+      and location = #{location}
+      and status != 'DELETE'
+  </select>
 
 </mapper>

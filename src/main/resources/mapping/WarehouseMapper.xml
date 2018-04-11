@@ -20,6 +20,7 @@
     <include refid="Base_Column_List" />
     from warehouse
     where id = #{id,jdbcType=INTEGER}
+    and status != 'DELETE'
   </select>
   <select id="getWarehouses" resultMap="BaseResultMap">
     select
@@ -29,6 +30,7 @@
     <if test="companyId != null" >
       and company_id = #{companyId, jdbcType=INTEGER}
     </if>
+    and status != 'DELETE'
   </select>
 
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
@@ -142,4 +144,13 @@
       updated_time = #{updatedTime,jdbcType=TIMESTAMP}
     where id = #{id,jdbcType=INTEGER}
   </update>
+
+  <update id="updateStatus" parameterType="map" >
+    update warehouse
+      set status = #{toStatus},
+        updated_by = #{updatedBy},
+        updated_time = #{updatedTime}
+    where id = #{id}
+  </update>
+
 </mapper>

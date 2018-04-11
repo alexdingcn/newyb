@@ -201,6 +201,8 @@
             <div slot="footer"></div>
         </Modal>
 
+        <warehouse-location-select :openModal="locationModal" :warehouseId="order.warehouseId" @on-ok="chooseLocation" @on-close="locationModalClose"></warehouse-location-select>
+
 	</Row>
 
 </template>
@@ -222,6 +224,7 @@
     import goodSelect from "@/views/selector/good-select.vue";
     import inTemp from "./in-temp.vue";
     import buyOrderList from "@/views/buy/buy-order-list.vue";
+    import warehouseLocationSelect from "@/views/selector/warehouse-location-select.vue";
 
     export default {
         name: 'in-make',
@@ -239,9 +242,30 @@
             billTypeSelect,
             goodSelect,
             inTemp,
-            buyOrderList
+            buyOrderList,
+            warehouseLocationSelect
         },
         data () {
+            const addWarehouseLocation = (h, location, rowData, index) => {
+                let label = location ? location : '';
+                return h('div', [
+                    h('span', label),
+                    h('Button', {
+                        props: {
+                            type: 'primary',
+                            size: 'small',
+                            icon: 'edit'
+                        },
+                        on: {
+                            'click': () => {
+                                
+                                this.openChooseLocation(rowData, index);
+                            }
+                        }
+                    })
+                ]);
+            };
+
             return {
                 saving: false,
             	totalAmount: 0,
@@ -252,6 +276,9 @@
                     supplierId: null,
                 	orderItemIds: []
                 },
+                currEditLocationRow: {},
+                currDditLocationIndex: '',
+                locationModal: false,
                 orderColumns: [
                     {
                         type: 'index',
@@ -482,18 +509,8 @@
                         align: 'center',
                         width: 130,
                         render: (h, params) => {
-                        	var self = this;
-                            return h('Input', {
-                                props: {
-								  	value: self.orderItems[params.index][params.column.key]
-                                },
-                                on: {
- 									'on-blur' (event) {
- 										let row = self.orderItems[params.index];
-                                        row[params.column.key] = event.target.value;
- 									}
-                                }
-                            });
+                            
+                            return addWarehouseLocation(h, params.row.warehouseLocation, params.row, params.index);
                         }
                     },
                     {
@@ -864,6 +881,28 @@
                     .catch((error) => {
                         util.errorProcessor(this, error);
                     });
+            },
+
+            openChooseLocation(rowData, index) {
+                if (!rowData || index === undefined || index < 0) {
+                    this.$Message.error('获取编辑位置失败');
+                    return;
+                }
+                this.currEditLocationRow = rowData;
+                this.currDditLocationIndex = index;
+                this.locationModal = true;
+            },
+
+            chooseLocation(data) {
+                this.locationModal = false;
+                this.currEditLocationRow.warehouseLocation = data.location;
+                this.$set(this.orderItems, this.currDditLocationIndex, this.currEditLocationRow);
+            },
+
+            locationModalClose() {
+                this.locationModal = false;
+                this.currDditLocationIndex = '';
+                this.currEditLocationRow = {};
             }
         }
     };
