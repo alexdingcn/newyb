@@ -28,7 +28,7 @@ export default {
     methods: {
         initList() {
             util.ajax
-                .get("/userrole/list", { params: { roleQuery: "ROLE_SALER" } })
+                .get("/userrole/list", { params: { roleQuery: "ROLE_SALE" } })
                 .then(response => {
                     this.optionList = response.data;
                 })

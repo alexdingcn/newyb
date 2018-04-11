@@ -69,7 +69,7 @@
             },
             getSalerList () {
                 var self = this;
-                util.ajax.get('/userrole/list', {params: {roleQuery: 'ROLE_SALER'} })
+                util.ajax.get('/userrole/list', {params: {roleQuery: 'ROLE_SALE'} })
                     .then(function (response) {
                         if (response.status === 200 && response.data) {
                             var list = response.data;
@@ -97,7 +97,7 @@
                         if (existed) {
                             newSalers[userId] = existed;
                         } else {
-                            newSalers[userId] = {userId: userId, name: 'ROLE_SALER'};
+                            newSalers[userId] = {userId: userId, name: 'ROLE_SALE'};
                         }
                     }
                     this.salers = newSalers;
@@ -116,7 +116,7 @@
                     params.push(this.salers[key]);
                 }
                 let reqData = {
-                    roleTypes: ['ROLE_SALER'],
+                    roleTypes: ['ROLE_SALE'],
                     roles: params
                 };
                 util.ajax.post('/userrole/save', reqData)
