@@ -256,3 +256,84 @@ ref_no|String|出库单自定义编号
 id|Long|(自增类型ID pk)
 out_order_id|Long|出库单ID
 
+
+
+
+### 公司表：users
+
+> 公司信息定义
+
+字段名|类型|描述
+-|-|-
+id|Integer|(自增类型ID pk)
+name|String|公司名称
+enabled|Boolean|是否可用
+created_time|Datetime|创建时间
+updated_time|Datetime|修改时间
+created_by|String|创建人
+updated_by|String|修改人
+
+
+### 用户表：users
+
+> 用户表
+
+字段名|类型|描述
+-|-|-
+id|Long|(自增类型ID pk)
+company_id|Integer|公司ID
+nickname|String|用户名
+mobile|String|手机号
+realname|String|真实姓名
+email|String|电子邮箱
+phone|String|固定电话
+idcard|String|身份证号
+forget_token|String|忘记密码的token
+address|String|地址
+birthday|Date|生日
+sex|Boolean|性别
+status|Integer|状态：1:启用 0:未激活 -1:禁用
+comment|String|备注
+created_by|String|创建人
+updated_by|String|修改人
+created_time|Datetime|创建时间
+update_time|Datetime|修改时间
+
+
+### 用户认证表：user_auths
+
+> 用户认证信息登记表
+
+字段名|类型|描述
+-|-|-
+id|Long|(自增类型ID pk)
+user_id|Long|用户ID
+identifier|String|身份唯一标识
+identifier_type|String|身份标识类型：username/email/mobile/qq/weibo/weixin
+credential|String|密码或者token
+verified|Boolean|是否验证
+created_by|String|创建人
+updated_by|String|修改人
+craeted_time|Datetime|创建时间
+updated_time|Datetime|修改时间
+
+
+### 用户角色表：user_roles
+
+> 登记用户的角色信息
+
+字段名|类型|描述
+-|-|-
+id|Long|(自增类型ID pk)
+user_id|Long|用户ID
+name|String|角色名称
+can_write|Boolean|是否可写
+can_update|Boolean|是否修改
+can_audit|Boolean|是否可以审核
+can_delete|Boolean|是否可以审核
+created_by|String|创建人
+updated_by|String|修改人
+craeted_time|Datetime|创建时间
+updated_time|Datetime|修改时间
+
+

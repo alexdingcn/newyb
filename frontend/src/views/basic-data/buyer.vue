@@ -64,7 +64,7 @@
                         }
                     })
                     .catch(function (error) {
-                        console.log(error);
+                        util.errorProcessor(self, error);
                     });
             },
             getBuyerList () {
@@ -84,7 +84,7 @@
                         }
                     })
                     .catch(function (error) {
-                        console.log(error);
+                        util.errorProcessor(self, error);
                     });
             },
             handleMove (newTargetKeys) {
@@ -127,7 +127,7 @@
                         }
                     })
                     .catch(function (error) {
-                        console.log(error);
+                        util.errorProcessor(self, error);
                     });
             }
         },

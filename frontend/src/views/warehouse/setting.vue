@@ -26,7 +26,7 @@
                     </Row>
                 </Card>
             </Col>
-            <Col span="11" offset="1">
+            <Col span="11" style="margin-left:10px;">
                 <Card>
                     <p slot="title">
                         <Icon type="ios-albums"></Icon> 库位 {{warehouseNameTitle ||  ''}}
