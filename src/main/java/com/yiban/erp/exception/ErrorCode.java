@@ -18,6 +18,13 @@ public enum ErrorCode {
     USER_REGISTER_FAIL(1104, "用户创建失败"),
     USER_GET_FAIL(1105, "获取当前客户信息失败", ErrorDisplay.NOTICE),
     USER_ROLE_SAVE_PARAMS(1106, "保存用户角色信息参数错误", ErrorDisplay.NOTICE),
+    USER_REGISTER_PARAMS(1107, "注册必输参数存在空值"),
+    USER_REGISTER_IDCARD_ERROR(1108, "身份证号验证失败, 请确认是否输入正确"),
+    USER_REGISTER_COMPANY_ENABLED(1109, "公司营业执照已注册，请联系运营方进行激活"),
+    USER_REGISTER_COMPANY_EXIST(1110, "公司营业执照已注册，请联系公司管理员确认"),
+    USER_REGISTER_NICKNAME_EXIST(1111, "用户名已经存在"),
+    USER_REGISTER_EXCEPTION(1112, "管理员用户注册异常, 请联系运营方"),
+    USER_NICKNAME_EXIST(1113, "用户名已经存在"),
 
     // 12xx - 商品
     GOODS_CATEGORY_ID_MISSING(1201, "缺失商品分类ID"),
@@ -104,6 +111,7 @@ public enum ErrorCode {
     GET_BIZOCR_RESULT_FAIL(4102, "无法获得营业执照OCR结果"),
     MOBILE_MISSING(4105, "手机号缺失"),
     MOBILE_VERIFY_CODE_TOO_FREQUENT(4106, "验证码发送太频繁"),
+    VERIFY_CODE_VALIDATE_FAIL(4107, "短信验证码错误"),
 
     ACCESS_PERMISSION(9001, "无访问权限", ErrorDisplay.MODAL),
     PARAMETER_MISSING(9002, "缺少必填字段"),

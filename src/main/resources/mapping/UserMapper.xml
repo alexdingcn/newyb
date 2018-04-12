@@ -13,8 +13,8 @@
     <result column="forget_token" property="forgetToken" jdbcType="VARCHAR" />
     <result column="address" property="address" jdbcType="VARCHAR" />
     <result column="birthday" property="birthday" jdbcType="DATE" />
-    <result column="sex" property="sex" jdbcType="BIT" />
-    <result column="status" property="status" jdbcType="TINYINT" />
+    <result column="sex" property="sex" jdbcType="INTEGER" />
+    <result column="status" property="status" jdbcType="INTEGER" />
     <result column="comment" property="comment" jdbcType="VARCHAR" />
     <result column="created_by" property="createdBy" jdbcType="VARCHAR" />
     <result column="updated_by" property="updatedBy" jdbcType="VARCHAR" />
@@ -37,6 +37,13 @@
     <include refid="Base_Column_List" />
     from users
     where status > 0
+  </select>
+
+  <select id="findUserByNickName" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select
+      <include refid="Base_Column_List" />
+    from users
+    where nickname = #{nickname}
   </select>
 
   <select id="findUserByNameOrMobile" resultMap="BaseResultMap" parameterType="java.lang.String" >
@@ -64,7 +71,7 @@
     values (#{companyId,jdbcType=INTEGER}, #{nickname,jdbcType=VARCHAR},
       #{mobile,jdbcType=VARCHAR}, #{realname,jdbcType=VARCHAR}, #{email,jdbcType=VARCHAR}, 
       #{phone,jdbcType=VARCHAR}, #{idcard,jdbcType=VARCHAR}, #{forgetToken,jdbcType=VARCHAR}, 
-      #{address,jdbcType=VARCHAR}, #{birthday,jdbcType=DATE}, #{sex,jdbcType=BIT}, #{status,jdbcType=TINYINT}, 
+      #{address,jdbcType=VARCHAR}, #{birthday,jdbcType=DATE}, #{sex,jdbcType=INTEGER}, #{status,jdbcType=INTEGER},
       #{comment,jdbcType=VARCHAR}, #{createdBy,jdbcType=VARCHAR}, #{updatedBy,jdbcType=VARCHAR}, 
       #{createdTime,jdbcType=TIMESTAMP}, #{updatedTime,jdbcType=TIMESTAMP})
   </insert>
@@ -155,10 +162,10 @@
         #{birthday,jdbcType=DATE},
       </if>
       <if test="sex != null" >
-        #{sex,jdbcType=BIT},
+        #{sex,jdbcType=INTEGER},
       </if>
       <if test="status != null" >
-        #{status,jdbcType=TINYINT},
+        #{status,jdbcType=INTEGER},
       </if>
       <if test="comment != null" >
         #{comment,jdbcType=VARCHAR},
@@ -211,10 +218,10 @@
         birthday = #{birthday,jdbcType=DATE},
       </if>
       <if test="sex != null" >
-        sex = #{sex,jdbcType=BIT},
+        sex = #{sex,jdbcType=INTEGER},
       </if>
       <if test="status != null" >
-        status = #{status,jdbcType=TINYINT},
+        status = #{status,jdbcType=INTEGER},
       </if>
       <if test="comment != null" >
         comment = #{comment,jdbcType=VARCHAR},
@@ -246,8 +253,8 @@
       forget_token = #{forgetToken,jdbcType=VARCHAR},
       address = #{address,jdbcType=VARCHAR},
       birthday = #{birthday,jdbcType=DATE},
-      sex = #{sex,jdbcType=BIT},
-      status = #{status,jdbcType=TINYINT},
+      sex = #{sex,jdbcType=INTEGER},
+      status = #{status,jdbcType=INTEGER},
       comment = #{comment,jdbcType=VARCHAR},
       created_by = #{createdBy,jdbcType=VARCHAR},
       updated_by = #{updatedBy,jdbcType=VARCHAR},

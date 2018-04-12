@@ -267,6 +267,7 @@ out_order_id|Long|出库单ID
 -|-|-
 id|Integer|(自增类型ID pk)
 name|String|公司名称
+license|String|营业执照
 enabled|Boolean|是否可用
 created_time|Datetime|创建时间
 updated_time|Datetime|修改时间
@@ -291,7 +292,7 @@ idcard|String|身份证号
 forget_token|String|忘记密码的token
 address|String|地址
 birthday|Date|生日
-sex|Boolean|性别
+sex|Integer|性别 0:女 1:男 -1:异常
 status|Integer|状态：1:启用 0:未激活 -1:禁用
 comment|String|备注
 created_by|String|创建人

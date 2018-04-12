@@ -28,9 +28,9 @@ public class User {
 
     private Date birthday;
 
-    private Boolean sex;
+    private Integer sex;
 
-    private Byte status;
+    private Integer status;
 
     private String comment;
 
@@ -136,19 +136,19 @@ public class User {
         this.birthday = birthday;
     }
 
-    public Boolean getSex() {
+    public Integer getSex() {
         return sex;
     }
 
-    public void setSex(Boolean sex) {
+    public void setSex(Integer sex) {
         this.sex = sex;
     }
 
-    public Byte getStatus() {
+    public Integer getStatus() {
         return status;
     }
 
-    public void setStatus(Byte status) {
+    public void setStatus(Integer status) {
         this.status = status;
     }
 

@@ -7,6 +7,7 @@
         <package name="com.yiban.erp.entities"/>
     </typeAliases>
     <mappers>
+        <mapper resource="mapping/CompanyMapper.xml"/>
         <mapper resource="mapping/UserMapper.xml"/>
         <mapper resource="mapping/UserRoleMapper.xml"/>
         <mapper resource="mapping/UserAuthMapper.xml"/>
@@ -31,7 +32,6 @@
         <mapper resource="mapping/SellOrderMapper.xml"/>
         <mapper resource="mapping/SellOrderDetailMapper.xml"/>
         <mapper resource="mapping/SellOrderShipMapper.xml"/>
-        <mapper resource="mapping/ShipCompanyMapper.xml"/>
         <mapper resource="mapping/RepertoryInfoMapper.xml"/>
         <mapper resource="mapping/BizWxApplyMapper.xml"/>
         <mapper resource="mapping/RepertoryInMapper.xml"/>

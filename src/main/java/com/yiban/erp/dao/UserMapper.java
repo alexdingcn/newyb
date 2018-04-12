@@ -22,5 +22,7 @@ public interface UserMapper {
 
     User findUserByNameOrMobile(@Param("identifier") String identifier);
 
+    User findUserByNickName(String nickname);
+
     List<User> selectAll();
 }

@@ -152,7 +152,7 @@
                         }
                     })
                     .catch(function (error) {
-                        console.log(error);
+                        util.errorProcessor(self, error);
                     });
             },
             handleSubmit () {
