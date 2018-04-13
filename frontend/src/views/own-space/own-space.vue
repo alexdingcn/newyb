@@ -203,12 +203,14 @@ export default {
                     };
                     util.ajax.post('/user/update/password', reqData)
                         .then((response) => {
+                            this.savePassLoading = false;
                             this.$Message.success('修改成功, 需要重新登录');
                             this.$router.push({
                                 name: 'login'
                             });
                         })
                         .catch((error) => {
+                            this.savePassLoading = false;
                             util.errorProcessor(this, error);
                         });
                 } else {
