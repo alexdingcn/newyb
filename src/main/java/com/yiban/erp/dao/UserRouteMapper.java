@@ -12,16 +12,12 @@ public interface UserRouteMapper {
 
     int insert(UserRoute record);
 
-    int insertSelective(UserRoute record);
-
     UserRoute selectByPrimaryKey(Long id);
 
-    int updateByPrimaryKeySelective(UserRoute record);
-
-    int updateByPrimaryKey(UserRoute record);
 
     List<UserRoute> getByUserId(Long userId);
 
-    int deleteByIdList(@Param("userId") Long userId,
-                       @Param("ids") List<Long> ids);
+    int insertBatch(@Param("list") List<UserRoute> newUserRoute);
+
+    int deleteByUserId(Long id);
 }

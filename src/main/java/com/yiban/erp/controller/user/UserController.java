@@ -1,11 +1,13 @@
 package com.yiban.erp.controller.user;
 
 import com.alibaba.fastjson.JSON;
+import com.yiban.erp.constant.Constant;
 import com.yiban.erp.constant.IdentifierType;
 import com.yiban.erp.constant.UserStatus;
 import com.yiban.erp.dao.UserAuthMapper;
 import com.yiban.erp.dao.UserMapper;
 import com.yiban.erp.dao.UserRouteMapper;
+import com.yiban.erp.dto.SaveUserAccessReq;
 import com.yiban.erp.entities.User;
 import com.yiban.erp.entities.UserAuth;
 import com.yiban.erp.entities.UserRole;
@@ -13,6 +15,7 @@ import com.yiban.erp.entities.UserRoute;
 import com.yiban.erp.exception.BizException;
 import com.yiban.erp.exception.BizRuntimeException;
 import com.yiban.erp.exception.ErrorCode;
+import com.yiban.erp.service.auth.TokenService;
 import com.yiban.erp.service.util.PhoneService;
 import com.yiban.erp.util.IDCardUtil;
 import org.apache.commons.lang3.StringUtils;
@@ -26,6 +29,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -107,7 +111,7 @@ public class UserController {
         if (user == null) {
             return ResponseEntity.ok().build();
         }else {
-            throw new BizException(ErrorCode.USER_NICKNAME_EXIST);
+            throw new BizException(ErrorCode.USER_REGISTER_NICKNAME_EXIST);
         }
     }
 
@@ -144,7 +148,7 @@ public class UserController {
         if (existUser != null) {
             throw new BizException(ErrorCode.USER_MOBILE_EXIST);
         }
-        User oldUser = userMapper.selectByPrimaryKey(userId);
+        User oldUser = userMapper.getDetailById(userId);
         if (oldUser == null) {
             throw new BizException(ErrorCode.USER_GET_FAIL);
         }
@@ -187,7 +191,7 @@ public class UserController {
             logger.warn("update password but request params is null.");
             throw new BizException(ErrorCode.PARAMETER_MISSING);
         }
-        User user = userMapper.selectByPrimaryKey(userId);
+        User user = userMapper.getDetailById(userId);
         if (user == null) {
             logger.warn("get user result is null. userId:{}", userId);
             throw new BizException(ErrorCode.USER_GET_FAIL);
@@ -214,6 +218,88 @@ public class UserController {
     public ResponseEntity<String> getUserRoutes(@RequestParam("userId") Long userId) {
         List<UserRoute> routes = userRouteMapper.getByUserId(userId);
         return ResponseEntity.ok().body(JSON.toJSONString(routes));
+    }
+
+    @Transactional
+    @RequestMapping(value = "/save/access", method = RequestMethod.PUT, name = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> saveUserAccess(@RequestBody SaveUserAccessReq accessReq,
+                                                 @AuthenticationPrincipal User doUser) throws Exception {
+        logger.info("doUser:{} save user access info. accessReq:{}", doUser.getId(), JSON.toJSONString(accessReq));
+        User updateUser = userMapper.getDetailById(accessReq.getUserId());
+        if (updateUser == null || updateUser.getId() == null) {
+            logger.warn("get update user info fail by userId:{}", accessReq.getUserId());
+            throw new BizException(ErrorCode.USER_GET_FAIL);
+        }
+        if (!updateUser.getCompanyId().equals(doUser.getCompanyId())) {
+            logger.error("do user:{} and update user:{} company is not equals.", doUser.getId(), updateUser.getId());
+            throw new BizRuntimeException(ErrorCode.ACCESS_PERMISSION);
+        }
+        //先检查状态是否有变化，如果有，先修改状态的变化
+        if (accessReq.getStatus() != null && !accessReq.getStatus().equals(updateUser.getStatus())) {
+            logger.info("updateUser:{} status have change. old status:{} new status:{} do by user:{}",
+                    updateUser.getId(), updateUser.getStatus(), accessReq.getStatus(), doUser.getId());
+            //如果是离职状态的修改，需要把用户名和手机号进行数据格式化.
+            if (accessReq.getStatus() < 0) {
+                String pre = updateUser.getCompanyId() + "D";
+                updateUser.setNickname(pre + updateUser.getNickname());
+                updateUser.setMobile(pre + updateUser.getMobile());
+                updateUser.setStatus(UserStatus.DELETE.getCode());
+                updateUser.setUpdatedTime(new Date());
+                updateUser.setUpdatedBy(doUser.getNickname());
+                int count = userMapper.updateUserStatusToDelete(updateUser);
+                if (count > 0) {
+                    // 删除user_auths表中同一个用户的所有记录
+                    userAuthMapper.deleteByUserId(updateUser.getId());
+                    //做到这步，离职数据修改成功，直接返回，不需要在修改菜单项数据
+                    return ResponseEntity.ok().build();
+                }else {
+                    throw new BizRuntimeException(ErrorCode.FAILED_UPDATE_FROM_DB);
+                }
+            }else {
+                updateUser.setStatus(accessReq.getStatus() > 0 ? UserStatus.NORMAL.getCode() : UserStatus.UN_ACTIVATE.getCode());
+                updateUser.setUpdatedBy(doUser.getNickname());
+                updateUser.setUpdatedTime(new Date());
+                int count = userMapper.updateByPrimaryKeySelective(updateUser);
+                if (count <= 0 ) {
+                    throw new BizRuntimeException(ErrorCode.FAILED_UPDATE_FROM_DB);
+                }
+            }
+        }
+        List<String> routes = accessReq.getRouteNames();
+        if (routes == null) {
+            return ResponseEntity.ok().build(); //如果权限列表是空值，直接算成功了返回，不修改权限数据.
+        }
+        List<UserRoute> oldRoute = userRouteMapper.getByUserId(updateUser.getId());
+        List<String> oldRouteNames = new ArrayList<>(); //主要用户清除用户登录态的token使用
+        oldRoute.stream().forEach(item -> oldRouteNames.add(item.getRouteName()));
+        //修改用户的所有权限，直接删除原来的，然后添加所有新的数据，注意，超级管理员不能删除授权页面的数据
+        userRouteMapper.deleteByUserId(updateUser.getId());
+        List<UserRoute> newUserRoute = new ArrayList<>();
+        if (updateUser.getSuperUser() != null && updateUser.getSuperUser()) {
+            //超级用户，如果权限列表中没有授权页面的权限，需要加上，相当于超级用户至少存在一个授权页面。
+            if (!routes.contains(Constant.ACCESS_PAGE)) {
+                UserRoute route = new UserRoute();
+                route.setUserId(updateUser.getId());
+                route.setRouteName(Constant.ACCESS_PAGE);
+                route.setCreateBy(doUser.getNickname());
+                route.setCreateTime(new Date());
+                newUserRoute.add(route);
+            }
+        }
+        for (String routeName : routes) {
+            UserRoute route = new UserRoute();
+            route.setUserId(updateUser.getId());
+            route.setRouteName(routeName);
+            route.setCreateBy(doUser.getNickname());
+            route.setCreateTime(new Date());
+            newUserRoute.add(route);
+        }
+        if (!newUserRoute.isEmpty()) {
+            userRouteMapper.insertBatch(newUserRoute);
+            //剔除修改页面权限的用户登录态，让用户重新登录
+            TokenService.setUserJWTTokenExpired(updateUser, oldRouteNames);
+        }
+        return ResponseEntity.ok().build(); //返回成功
     }
 
 }

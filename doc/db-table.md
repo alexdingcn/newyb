@@ -294,6 +294,7 @@ address|String|地址
 birthday|Date|生日
 sex|Integer|性别 0:女 1:男 -1:异常
 status|Integer|状态：1:启用 0:未激活 -1:禁用
+super_user|Boolean|是否为超级管理员用户
 comment|String|备注
 created_by|String|创建人
 updated_by|String|修改人

@@ -31,7 +31,7 @@
                                 <Icon type="person"></Icon> {{showUserTitle || ''}}
                             </p>
                             <div slot="extra">
-                                <Button type="success" icon="checkmark">确认保存</Button>
+                                <Button type="success" icon="checkmark" :loading="saveLoading" @click="saveDataStep1">确认保存</Button>
                             </div>
                             <div>
                                 <h3>用户状态</h3>
@@ -113,22 +113,18 @@ export default {
             routeTreeData: [],
             lastTime: 0,
             treeLoading: false,
-            spinShow: false
+            spinShow: false,
+            saveLoading: false,
+            showUserTitle: ''
         };
     },
     mounted() {
         this.init();
     },
-    computed: {
-        showUserTitle() {
-            let nickName = this.currUser ? this.currUser.nickname : '';
-            let realname = this.currUser ? this.currUser.realname : '';
-            return nickName + (realname ? '[' + realname + ']' : '');
-        }
-    },
     watch: {
-        currUser(data) {
+        currUser: function(data) {
             this.userStatus = data.status;
+            this.showTitleChange()
             this.selectedTreeLeaf(data);
         }
     },
@@ -136,6 +132,15 @@ export default {
         init() {
             this.createMenuTree();
             this.refreshUserList();
+        },
+
+        showTitleChange() {
+            if(!this.currUser) {
+                return '';
+            }
+            let nickName = this.currUser ? this.currUser.nickname : '';
+            let realname = this.currUser ? this.currUser.realname : '';
+            return nickName + (realname ? '[' + realname + ']' : '');
         },
 
         createMenuTree() {
@@ -251,15 +256,13 @@ export default {
                 this.clearTreeCheck();
                 return;
             }
-            
-            let menuList = this.routeTreeData.children;
+            let menuList = this.routeTreeData[0].children;
             userRoutes.forEach((item) => {
-                console.log(item);
                 menuList.forEach((menu) => {
                     let menuClhidList = menu.children;
                     if (menuClhidList && menuClhidList.length > 0) {
                         let leaf = menuClhidList.find((child) => {
-                            return item.name === child.value;
+                            return item.routeName === child.value;
                         });
                         if (leaf) {
                             leaf.checked = true;
@@ -276,7 +279,104 @@ export default {
                     item.checked = false;
                 });
             }
+        },
+
+        saveDataStep1() {
+            if (!this.currUser || !this.currUser.id) {
+                this.$Message.warning('请先选择需要修改的用户');
+                return;
+            }
+            this.spinShow = true;
+            this.saveLoading = true;
+            let self = this;
+            if (self.userStatus === -1) {
+                self.$Modal.confirm({
+                    title: '离职状态确认',
+                    content: '是否确认用户' + self.currUser.nickname +'已经离职，离职状态提交后不可恢复! ',
+                    onOk: () => {
+                        self.saveDataStep3(); //直接到第三步提交
+                    },
+                    onCancel: () => {
+                        this.spinShow = false;
+                        this.saveLoading = false;
+                    }
+                });
+            }else {
+                self.saveDataStep2();
+            }
+        },
+
+        saveDataStep2() {
+            if (!this.currUser || !this.currUser.id) {
+                this.$Message.warning('请先选择需要修改的用户');
+                this.spinShow = false;
+                this.saveLoading = false;
+                return;
+            }
+            let self = this;
+            self.$Modal.confirm({
+                title: '保存提醒',
+                content: '权限数据是否已经修改正确',
+                onOk: () => {
+                    self.saveDataStep3();
+                },
+                onCancel: () => {
+                    this.spinShow = false;
+                    this.saveLoading = false;
+                }
+            });
+        },
+
+        saveDataStep3() {
+            if (!this.currUser || !this.currUser.id) {
+                this.$Message.warning('请先选择需要修改的用户');
+                this.spinShow = false;
+                this.saveLoading = false;
+                return;
+            }
+            //所有修改权限的数据
+            let accessRoutes = [];
+            let checkedTreeData = this.$refs.routeTree.getCheckedNodes();
+            if(checkedTreeData && checkedTreeData.length > 0) {
+                checkedTreeData.forEach(item => {
+                    if (item.value) {
+                        accessRoutes.push(item.value);
+                    }
+                });
+            }
+            let reqData = {
+                userId: this.currUser.id,
+                status: this.userStatus,
+                routeNames: accessRoutes
+            };
+            let self = this;
+            util.ajax.put('/user/save/access', reqData)
+                .then((response) => {
+                    self.spinShow = false;
+                    this.saveLoading = false;
+                    self.$Message.success('保存成功');
+                    //重新设置下当前选择用户的状态
+                    self.currUser.status = self.userStatus;
+                    self.allUserList.forEach((item, index) => {
+                        if (item.id === self.currUser.id) {
+                            console.log(index);
+                            self.$set(self.allUserList, index, self.currUser);
+                        }
+                    });
+                    self.userList.forEach((item, index) => {
+                        if(item.id === self.currUser.id) {
+                            console.log(index);
+                            self.$set(self.userList, index, self.currUser);
+                        }
+                    });
+                })
+                .catch((error) => {
+                    self.spinShow = false;
+                    this.saveLoading = false;
+                    util.errorProcessor(self, error);
+                });
         }
+        
 
         // changeAccess (res) {
         //     this.$store.commit('updateMenulist', this.$store.state.user.accessRoutes);

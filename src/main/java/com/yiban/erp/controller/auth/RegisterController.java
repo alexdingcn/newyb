@@ -1,14 +1,17 @@
 package com.yiban.erp.controller.auth;
 
 
+import com.yiban.erp.constant.Constant;
 import com.yiban.erp.constant.IdentifierType;
 import com.yiban.erp.constant.UserStatus;
 import com.yiban.erp.dao.CompanyMapper;
 import com.yiban.erp.dao.UserAuthMapper;
 import com.yiban.erp.dao.UserMapper;
+import com.yiban.erp.dao.UserRouteMapper;
 import com.yiban.erp.entities.Company;
 import com.yiban.erp.entities.User;
 import com.yiban.erp.entities.UserAuth;
+import com.yiban.erp.entities.UserRoute;
 import com.yiban.erp.exception.BizException;
 import com.yiban.erp.exception.BizRuntimeException;
 import com.yiban.erp.exception.ErrorCode;
@@ -38,6 +41,8 @@ public class RegisterController {
     private UserMapper userMapper;
     @Autowired
     private UserAuthMapper userAuthMapper;
+    @Autowired
+    private UserRouteMapper userRouteMapper;
     @Autowired
     private CompanyMapper companyMapper;
     @Autowired
@@ -112,11 +117,12 @@ public class RegisterController {
         user.setNickname(username);
         user.setRealname(realName);
         user.setMobile(mobile);
-        user.setCreatedBy("admin");
+        user.setCreatedBy(username);
         user.setIdcard(idCard);
         user.setBirthday(IDCardUtil.getBirthday(idCard));
         user.setSex(IDCardUtil.getSex(idCard));
         user.setStatus(UserStatus.NORMAL.getCode());
+        user.setSuperUser(true); //超级管理员
         user.setCreatedTime(new Date());
         if (userMapper.insert(user) > 0) {
             String encryptedPass = new BCryptPasswordEncoder().encode(password);
@@ -141,7 +147,15 @@ public class RegisterController {
             userAuth.setCreatedTime(new Date());
             int mobileResult = userAuthMapper.insert(userAuth);
 
-            if (usernameResult > 0 && mobileResult > 0) {
+            //为超级管理员加入第一个权限功能页面
+            UserRoute userRoute = new UserRoute();
+            userRoute.setUserId(user.getId());
+            userRoute.setRouteName(Constant.ACCESS_PAGE);
+            userRoute.setCreateBy(user.getNickname());
+            userRoute.setCreateTime(new Date());
+            int routeCount = userRouteMapper.insert(userRoute);
+
+            if (usernameResult > 0 && mobileResult > 0 && routeCount > 0) {
                 return ResponseEntity.ok().build();
             }
         }

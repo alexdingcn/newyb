@@ -34,6 +34,8 @@ public class User {
 
     private Integer status;
 
+    private Boolean superUser; //是否为超级管理员，只有通过公司注册的才是true,其他全是false
+
     private String comment;
 
     private String createdBy;
@@ -160,6 +162,14 @@ public class User {
 
     public void setStatus(Integer status) {
         this.status = status;
+    }
+
+    public Boolean getSuperUser() {
+        return superUser;
+    }
+
+    public void setSuperUser(Boolean superUser) {
+        this.superUser = superUser;
     }
 
     public String getComment() {

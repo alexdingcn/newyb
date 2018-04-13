@@ -35,6 +35,11 @@
     delete from user_auths
     where id = #{id,jdbcType=BIGINT}
   </delete>
+
+  <delete id="deleteByUserId" parameterType="java.lang.Long">
+    delete from user_auths where user_id = #{userId}
+  </delete>
+
   <insert id="insert" parameterType="com.yiban.erp.entities.UserAuth" useGeneratedKeys="true" keyProperty="id">
     insert into user_auths (user_id, identifier,
       identifier_type, credential, verified, 

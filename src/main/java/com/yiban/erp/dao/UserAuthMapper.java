@@ -33,4 +33,6 @@ public interface UserAuthMapper {
                        @Param("credential") String credential,
                        @Param("updatedBy") String updatedBy,
                        @Param("updatedTime")Date updatedTime);
+
+    int deleteByUserId(Long userId);
 }

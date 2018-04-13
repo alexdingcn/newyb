@@ -31,4 +31,6 @@ public interface UserMapper {
     User getDetailById(Long userId);
 
     int updateMobile(User oldUser);
+
+    int updateUserStatusToDelete(User updateUser);
 }

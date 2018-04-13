@@ -68,6 +68,25 @@ public class TokenService {
         }
     }
 
+    public static void setUserJWTTokenExpired(User user, List<String> auths) {
+        StringBuilder sb = new StringBuilder();
+        for (String auth : auths) {
+            sb.append(auth);
+        }
+        String JWT = Jwts.builder()
+            // 保存权限（角色）
+            .claim("authorities", sb.toString())
+            // 用户名写入标题
+//                .setSubject(authentication.getName())
+            .claim("user", JSON.toJSONString(user.getCompactUser()))
+//                .setSubject(authentication.getName())
+            // 有效期设置为当前,就是让他过期
+            .setExpiration(new Date())
+            // 签名设置
+            .signWith(SignatureAlgorithm.HS512, SECRET)
+            .compact();
+    }
+
     // JWT验证方法
     static Authentication getAuthentication(HttpServletRequest request) {
         // 从Header中拿到token
