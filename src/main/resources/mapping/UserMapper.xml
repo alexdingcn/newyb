@@ -32,11 +32,11 @@
     where id = #{id,jdbcType=BIGINT}
   </select>
 
-  <select id="selectAll" resultMap="BaseResultMap" >
+  <select id="selectAll" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
     select
     <include refid="Base_Column_List" />
     from users
-    where status > 0
+    where status > 0 and company_id  = #{companyId}
   </select>
 
   <select id="findUserByNickName" parameterType="java.lang.String" resultMap="BaseResultMap">

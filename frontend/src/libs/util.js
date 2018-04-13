@@ -82,14 +82,6 @@ util.oneOf = function (ele, targetArr) {
     }
 };
 
-// util.showThisRoute = function (itAccess, currentAccess) {
-//     if (typeof itAccess === 'object' && Array.isArray(itAccess)) {
-//         return util.oneOf(currentAccess, itAccess);
-//     } else {
-//         return itAccess === currentAccess;
-//     }
-// };
-
 util.showThisRoute = function (routeName, currAccessRoutes) {
     if (currAccessRoutes && Array.isArray(currAccessRoutes)) {
         return util.oneOf(routeName, currAccessRoutes);

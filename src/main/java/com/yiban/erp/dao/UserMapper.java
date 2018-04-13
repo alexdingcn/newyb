@@ -26,7 +26,7 @@ public interface UserMapper {
 
     User findUserByMobile(String mobile);
 
-    List<User> selectAll();
+    List<User> selectAll(Integer companyId);
 
     User getDetailById(Long userId);
 

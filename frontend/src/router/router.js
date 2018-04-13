@@ -125,81 +125,71 @@ export const appRouter = [
             { path: 'ship', title: '运输公司档案', name: 'basic_data_ship', component: () => import('@/views/basic-data/ship.vue') }
         ]
     },
-{
-    path: '/buy',
-    icon: 'bag',
-    name: 'buy',
-    title: '采购',
-    component: Main,
-    children: [
-        { path: 'order', title: '采购制单', name: 'buy_order', component: () => import('@/views/buy/buy-order.vue') },
-        { path: 'review', title: '采购单审核', name: 'buy_order_review', component: () => import('@/views/buy/buy-order-list.vue') },
-        { path: 'receive', title: '采购收货', name: 'buy_receive', component: () => import('@/views/repertory/in-make.vue') },
-        { path: "buy-quality-check", title: '入库质量验收', name: 'buy-quality-check', component: () => import('@/views/repertory/in-quality-check.vue')},
-        { path: "in-check", title: '入库审核', name: 'receive-in-check', component: () => import('@/views/repertory/in-check.vue')},
-    ]
-},
-{
-    path: '/sell',
-    icon: 'ios-calculator',
-    name: 'sell',
-    title: '销售',
-    component: Main,
-    children: [
-        { path: 'order', title: '销售制单', name: 'sell_order', component: () => import('@/views/sell/make.vue') },
-        { path: 'quality-review', title: '销售出库质量审核', name: 'sell-quality-review', component: () => import('@/views/sell/sell-quality-review.vue') },
-        { path: 'sale-review', title: '销售审核', name: 'sell-sale-review', component: () => import('@/views/sell/sell-sale-review.vue') },
-        { path: 'list', title: '销售订单列表', name: 'sell_list', component: () => import('@/views/sell/sell-order-list.vue') },
-    ]
-},
-{
-    path: '/warehouse',
-    icon: 'social-buffer',
-    name: 'warehouse',
-    title: '库存',
-    component: Main,
-    children: [
-        { path: 'store_now', title: '实时库存', name: 'store_now', component: () => import('@/views/warehouse/store_now.vue') },
-        { path: 'store_check_index', title: '库存盘点', name: 'store_check_index', component: () => import('@/views/warehouse/store_check_index.vue') },
-        { path: 'setting', title: '仓库点设置', name: 'wh_setting', component: () => import('@/views/warehouse/setting.vue') },
-        { path: 'overview', title: '库存报表', name: 'wh_overview', component: () => import('@/views/warehouse/overview.vue') },
-        { path: 'in-make', title: '录制入库单', name: 'in-make', component: () => import('@/views/repertory/in-make.vue') },
-        { path: "in-quality-check", title: '入库质量验收', name: 'in-quality-check', component: () => import('@/views/repertory/in-quality-check.vue')},
-        { path: "in-check", title: '入库审核', name: 'in-check', component: () => import('@/views/repertory/in-check.vue')},
-    ]
-}, {
+    {
+        path: '/buy',
+        icon: 'bag',
+        name: 'buy',
+        title: '采购',
+        component: Main,
+        children: [
+            { path: 'order', title: '采购制单', name: 'buy_order', component: () => import('@/views/buy/buy-order.vue') },
+            { path: 'review', title: '采购单审核', name: 'buy_order_review', component: () => import('@/views/buy/buy-order-list.vue') },
+            { path: 'receive', title: '采购收货', name: 'buy_receive', component: () => import('@/views/repertory/in-make.vue') },
+            { path: "buy-quality-check", title: '入库质量验收', name: 'buy-quality-check', component: () => import('@/views/repertory/in-quality-check.vue')},
+            { path: "in-check", title: '入库审核', name: 'receive-in-check', component: () => import('@/views/repertory/in-check.vue')},
+        ]
+    },
+    {
+        path: '/sell',
+        icon: 'ios-calculator',
+        name: 'sell',
+        title: '销售',
+        component: Main,
+        children: [
+            { path: 'order', title: '销售制单', name: 'sell_order', component: () => import('@/views/sell/make.vue') },
+            { path: 'quality-review', title: '销售出库质量审核', name: 'sell-quality-review', component: () => import('@/views/sell/sell-quality-review.vue') },
+            { path: 'sale-review', title: '销售审核', name: 'sell-sale-review', component: () => import('@/views/sell/sell-sale-review.vue') },
+            { path: 'list', title: '销售订单列表', name: 'sell_list', component: () => import('@/views/sell/sell-order-list.vue') },
+        ]
+    },
+    {
+        path: '/warehouse',
+        icon: 'social-buffer',
+        name: 'warehouse',
+        title: '库存',
+        component: Main,
+        children: [
+            { path: 'store_now', title: '实时库存', name: 'store_now', component: () => import('@/views/warehouse/store_now.vue') },
+            { path: 'store_check_index', title: '库存盘点', name: 'store_check_index', component: () => import('@/views/warehouse/store_check_index.vue') },
+            { path: 'setting', title: '仓库点设置', name: 'wh_setting', component: () => import('@/views/warehouse/setting.vue') },
+            { path: 'overview', title: '库存报表', name: 'wh_overview', component: () => import('@/views/warehouse/overview.vue') },
+            { path: 'in-make', title: '录制入库单', name: 'in-make', component: () => import('@/views/repertory/in-make.vue') },
+            { path: "in-quality-check", title: '入库质量验收', name: 'in-quality-check', component: () => import('@/views/repertory/in-quality-check.vue')},
+            { path: "in-check", title: '入库审核', name: 'in-check', component: () => import('@/views/repertory/in-check.vue')},
+        ]
+    }, 
+    {
         path: '/access',
         icon: 'key',
-    name: 'access',
-    title: '权限管理',
-    component: Main,
-    children: [
-        { path: 'index', title: '权限管理', name: 'access_index', component: () => import('@/views/access/access.vue') }
-    ]
-},
-{
-    path: '/access-test',
-        icon: 'lock-combination',
-    title: '权限测试页',
-    name: 'accesstest',
-    access: 0,
-    component: Main,
-    children: [
-        { path: 'index', title: '权限测试页', name: 'accesstest_index', access: 0, component: () => import('@/views/access/access-test.vue') }
-    ]
-},
-{
-    path: '/international',
-        icon: 'earth',
-    title: {i18n: 'international'},
-    name: 'international',
+        name: 'access',
+        title: '权限管理',
         component: Main,
-    children: [
-    { path: 'index', title: {i18n: 'international'}, name: 'international_index', component: () => import('@/views/international/international.vue') }
-]
-},
-{
-    path: '/component',
+        children: [
+            { path: 'index', title: '权限管理', name: 'access_index', component: () => import('@/views/access/access.vue') }
+        ]
+    },
+    {
+        path: '/international',
+        icon: 'earth',
+        title: {i18n: 'international'},
+        name: 'international',
+        component: Main,
+        children: [
+            { path: 'index', title: {i18n: 'international'}, name: 'international_index', component: () => import('@/views/international/international.vue') }
+        ]
+    },
+    {
+        path: '/component',
         icon: 'social-buffer',
         name: 'component',
         title: '组件',
@@ -276,20 +266,8 @@ export const appRouter = [
 
         ]
     },
-// {
-//     path: '/charts',
-//     icon: 'ios-analytics',
-//     name: 'charts',
-//     title: '图表',
-//     component: Main,
-//     children: [
-//         { path: 'pie', title: '饼状图', name: 'pie', icon: 'ios-pie', component: resolve => { require('@/views/access/access.vue') },
-//         { path: 'histogram', title: '柱状图', name: 'histogram', icon: 'stats-bars', component: resolve => { require('@/views/access/access.vue') }
-
-//     ]
-// },
-{
-    path: '/tables',
+    {
+        path: '/tables',
         icon: 'ios-grid-view',
         name: 'tables',
         title: '表格',

@@ -5,8 +5,11 @@ import com.yiban.erp.constant.IdentifierType;
 import com.yiban.erp.constant.UserStatus;
 import com.yiban.erp.dao.UserAuthMapper;
 import com.yiban.erp.dao.UserMapper;
+import com.yiban.erp.dao.UserRouteMapper;
 import com.yiban.erp.entities.User;
 import com.yiban.erp.entities.UserAuth;
+import com.yiban.erp.entities.UserRole;
+import com.yiban.erp.entities.UserRoute;
 import com.yiban.erp.exception.BizException;
 import com.yiban.erp.exception.BizRuntimeException;
 import com.yiban.erp.exception.ErrorCode;
@@ -39,6 +42,8 @@ public class UserController {
     private PhoneService phoneService;
     @Autowired
     private UserAuthMapper userAuthMapper;
+    @Autowired
+    private UserRouteMapper userRouteMapper;
 
     /**
      * 获取可用用户的列表
@@ -46,8 +51,8 @@ public class UserController {
      * @return
      */
     @RequestMapping(value = "/list", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> list() {
-        List<User> userList = userMapper.selectAll();
+    public ResponseEntity<String> list(@AuthenticationPrincipal User user) {
+        List<User> userList = userMapper.selectAll(user.getCompanyId());
         return ResponseEntity.ok().body(JSON.toJSONString(userList));
     }
 
@@ -203,6 +208,12 @@ public class UserController {
             return ResponseEntity.ok().build();
         }
         throw new BizRuntimeException(ErrorCode.FAILED_UPDATE_FROM_DB);
+    }
+
+    @RequestMapping(value = "/route/list", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> getUserRoutes(@RequestParam("userId") Long userId) {
+        List<UserRoute> routes = userRouteMapper.getByUserId(userId);
+        return ResponseEntity.ok().body(JSON.toJSONString(routes));
     }
 
 }
