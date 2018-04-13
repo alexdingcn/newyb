@@ -47,4 +47,10 @@ public class UtilToolTest {
         System.out.println("sex:" + IDCardUtil.getSex(newIdCard));
     }
 
+    @Test
+    public void testMakeIDCard() {
+        String newIDCard = IDCardUtil.generateID();
+        System.out.println(newIDCard);
+    }
+
 }

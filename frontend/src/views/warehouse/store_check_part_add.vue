@@ -219,7 +219,6 @@
                             console.log(error);
                         });
                 }else{
-                    alert("checkOrderId异常"+checkOrderId);
                 }
             },backPartIndex(){
                 this.$router.push({

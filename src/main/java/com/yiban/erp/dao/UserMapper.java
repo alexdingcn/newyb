@@ -24,5 +24,11 @@ public interface UserMapper {
 
     User findUserByNickName(String nickname);
 
+    User findUserByMobile(String mobile);
+
     List<User> selectAll();
+
+    User getDetailById(Long userId);
+
+    int updateMobile(User oldUser);
 }

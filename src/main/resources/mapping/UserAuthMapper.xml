@@ -24,12 +24,12 @@
     where id = #{id,jdbcType=BIGINT}
   </select>
 
-  <select id="findByIdentifier" resultMap="BaseResultMap" parameterType="java.lang.String" >
+  <select id="findByIdentifier" resultMap="BaseResultMap" parameterType="map" >
     select
     <include refid="Base_Column_List" />
     from user_auths
     where identifier = #{identifier, jdbcType=VARCHAR}
-    and identifier_type = 'USERNAME'
+    and identifier_type = #{type}
   </select>
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
     delete from user_auths
@@ -154,4 +154,24 @@
       updated_time = #{updatedTime,jdbcType=TIMESTAMP}
     where id = #{id,jdbcType=BIGINT}
   </update>
+
+  <update id="updateAuthIdentifier" parameterType="map">
+    update user_auths
+    set identifier = #{value},
+        updated_by = #{updatedBy},
+        updated_time = #{updatedTime}
+    where user_id = #{userId}
+      and identifier_type = #{type}
+  </update>
+
+  <update id="updatePassword" parameterType="map">
+    update user_auths
+      set
+        credential = #{credential},
+        updated_by = #{updatedBy},
+        updated_time = #{updatedTime}
+    where user_id = #{userId}
+      and (identifier_type = 'USERNAME' or identifier_type = 'MOBILE')
+  </update>
+
 </mapper>

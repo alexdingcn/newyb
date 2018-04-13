@@ -263,7 +263,6 @@
 
 
                 if(this.storeCheck.checkType == 2){
-                    alert(" this.disableGoos =false;");
                     this.disableGoos =false;
                 }else{
                     this.disableGoos =true;

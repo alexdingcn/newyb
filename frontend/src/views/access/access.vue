@@ -48,8 +48,8 @@ export default {
     name: 'access_index',
     data () {
         return {
-            accessCode: parseInt(Cookies.get('access')),
-            switchValue: parseInt(Cookies.get('access')) === 1
+            accessCode: 0,
+            switchValue: 0
         };
     },
     computed: {
@@ -59,14 +59,7 @@ export default {
     },
     methods: {
         changeAccess (res) {
-            if (res) {
-                this.accessCode = 1;
-                Cookies.set('access', 1);
-            } else {
-                this.accessCode = 0;
-                Cookies.set('access', 0);
-            }
-            this.$store.commit('updateMenulist');
+            this.$store.commit('updateMenulist', this.$store.state.user.accessRoutes);
         }
     }
 };

@@ -12,39 +12,46 @@
             <div>
                 <Form 
                     ref="userForm"
-                    :model="userForm" 
+                    :model="userDetail" 
                     :label-width="100" 
                     label-position="right"
-                    :rules="inforValidate"
                 >
-                    <FormItem label="用户姓名：" prop="name">
-                        <div style="display:inline-block;width:300px;">
-                            <Input v-model="userForm.name" ></Input>
-                        </div>
-                    </FormItem>
-                    <FormItem label="用户手机：" prop="cellphone" >
-                        <div style="display:inline-block;width:204px;">
-                            <Input v-model="userForm.cellphone" @on-keydown="hasChangePhone"></Input>
-                        </div>
-                        <div style="display:inline-block;position:relative;">
-                            <Button @click="getIdentifyCode" :disabled="canGetIdentifyCode">{{ gettingIdentifyCodeBtnContent }}</Button>
-                            <div class="own-space-input-identifycode-con" v-if="inputCodeVisible">
-                                <div style="background-color:white;z-index:110;margin:10px;">
-                                    <Input v-model="securityCode" placeholder="请填写短信验证码" ></Input>
-                                    <div style="margin-top:10px;text-align:right">
-                                        <Button type="ghost" @click="cancelInputCodeBox">取消</Button>
-                                        <Button type="primary" @click="submitCode" :loading="checkIdentifyCodeLoading">确定</Button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                    <FormItem label="用户名：" prop="nickname">
+                        <strong> {{ userDetail.nickname }} </strong>
                     </FormItem>
                     <FormItem label="公司：">
-                        <span>{{ userForm.company }}</span>
+                        <strong>{{ userDetail.companyName }}</strong>
                     </FormItem>
-                    <FormItem label="部门：">
-                        <span>{{ userForm.department }}</span>
+                    <FormItem label="用户手机：" prop="mobile">
+                        <strong>{{ userDetail.mobile }} </strong>
+                        <Button type="text" icon="edit" @click="editMobileBtnClick"></Button>
                     </FormItem>
+                    <FormItem label="真实姓名：" >
+                        <div style="display:inline-block;width:250px;">
+                            <Input v-model="userDetail.realname" ></Input>
+                        </div>
+                    </FormItem>
+                    <FormItem label="电子邮箱：" >
+                        <div style="display:inline-block;width:250px;">
+                            <Input v-model="userDetail.email" ></Input>
+                        </div>
+                    </FormItem>
+                    <FormItem label="固定电话：" >
+                        <div style="display:inline-block;width:250px;">
+                            <Input v-model="userDetail.phone" ></Input>
+                        </div>
+                    </FormItem>
+                    <FormItem label="身份证号：" >
+                        <div style="display:inline-block;width:250px;">
+                            <Input v-model="userDetail.idcard" ></Input>
+                        </div>
+                    </FormItem>
+                    <FormItem label="联系地址：" >
+                        <div style="display:inline-block;width:400px;">
+                            <Input v-model="userDetail.address" ></Input>
+                        </div>
+                    </FormItem>
+                    
                     <FormItem label="登录密码：">
                         <Button type="text" size="small" @click="showEditPassword">修改密码</Button>
                     </FormItem>
@@ -59,13 +66,13 @@
             <h3 slot="header" style="color:#2D8CF0">修改密码</h3>
             <Form ref="editPasswordForm" :model="editPasswordForm" :label-width="100" label-position="right" :rules="passwordValidate">
                 <FormItem label="原密码" prop="oldPass" :error="oldPassError">
-                    <Input v-model="editPasswordForm.oldPass" placeholder="请输入现在使用的密码" ></Input>
+                    <Input type="password" v-model="editPasswordForm.oldPass" placeholder="请输入现在使用的密码" ></Input>
                 </FormItem>
                 <FormItem label="新密码" prop="newPass">
-                    <Input v-model="editPasswordForm.newPass" placeholder="请输入新密码，至少6位字符" ></Input>
+                    <Input type="password" v-model="editPasswordForm.newPass" placeholder="请输入新密码，至少6位字符" ></Input>
                 </FormItem>
                 <FormItem label="确认新密码" prop="rePass">
-                    <Input v-model="editPasswordForm.rePass" placeholder="请再次输入新密码" ></Input>
+                    <Input type="password" v-model="editPasswordForm.rePass" placeholder="请再次输入新密码" ></Input>
                 </FormItem>
             </Form>
             <div slot="footer">
@@ -73,21 +80,35 @@
                 <Button type="primary" :loading="savePassLoading" @click="saveEditPass">保存</Button>
             </div>
         </Modal>
+
+        <Modal v-model="editMobileModal" :closable='false' :mask-closable=false :width="400">
+            <h3 slot="header" style="color:#2D8CF0">修改手机号</h3>
+            <Form ref="editMobileForm" :model="editMobileForm" :label-width="100" label-position="right" :rules="mobileValidate">
+                <FormItem label="新手机号" prop="mobile">
+                    <Input v-model="editMobileForm.mobile" placeholder="请输入新手机号码" @on-blur="validMobileExist" >
+                        <Button slot="append" @click="handleVerifyCode" :disabled="sendVerifyCodeDisabled">{{verifyText}}</Button>
+                    </Input>
+                </FormItem>
+                <FormItem label="验证码" prop="verifyCode">
+                    <Input v-model="editMobileForm.verifyCode" placeholder="请输入短信验证码" ></Input>
+                </FormItem>
+            </Form>
+            <Alert type="error" v-show="valdMessage" show-icon>{{ valdMessage }}</Alert>
+            <div slot="footer">
+                <Button type="text" @click="cancelEditMobile">取消</Button>
+                <Button type="primary" :loading="saveMobileLoading" @click="saveEditMobile" >保存</Button>
+            </div>
+        </Modal>
+
     </div>
 </template>
 
 <script>
+import util from "@/libs/util.js";
+
 export default {
     name: 'ownspace_index',
     data () {
-        const validePhone = (rule, value, callback) => {
-            var re = /^1[0-9]{10}$/;
-            if (!re.test(value)) {
-                callback(new Error('请输入正确格式的手机号'));
-            } else {
-                callback();
-            }
-        };
         const valideRePassword = (rule, value, callback) => {
             if (value !== this.editPasswordForm.newPass) {
                 callback(new Error('两次输入密码不一致'));
@@ -95,34 +116,24 @@ export default {
                 callback();
             }
         };
+        const valideMobile = (rule, value, callback) => {
+            if (!value) {
+                callback(new Error('新手机号必输'));
+            }else {
+                var re = /^1[0-9]{10}$/;
+                if (!re.test(value)) {
+                    callback(new Error('请输入正确格式的手机号'));
+                } else {
+                    callback();
+                }
+            }
+        }
         return {
-            userForm: {
-                name: '',
-                cellphone: '',
-                company: '',
-                department: ''
-            },
-            uid: '', // 登录用户的userId
-            securityCode: '', // 验证码
-            phoneHasChanged: false, // 是否编辑了手机
+            userDetail: {},
             save_loading: false,
-            identifyError: '', // 验证码错误
             editPasswordModal: false, // 修改密码模态框显示
             savePassLoading: false,
             oldPassError: '',
-            identifyCodeRight: false, // 验证码是否正确
-            hasGetIdentifyCode: false, // 是否点了获取验证码
-            canGetIdentifyCode: false, // 是否可点获取验证码
-            checkIdentifyCodeLoading: false,
-            inforValidate: {
-                name: [
-                    { required: true, message: '请输入姓名', trigger: 'blur' }
-                ],
-                cellphone: [
-                    { required: true, message: '请输入手机号码' },
-                    { validator: validePhone }
-                ]
-            },
             editPasswordForm: {
                 oldPass: '',
                 newPass: '',
@@ -142,36 +153,70 @@ export default {
                     { validator: valideRePassword, trigger: 'blur' }
                 ]
             },
-            inputCodeVisible: false, // 显示填写验证码box
-            initPhone: '',
-            gettingIdentifyCodeBtnContent: '获取验证码' // “获取验证码”按钮的文字
+            editMobileModal: false,
+            saveMobileLoading: false,
+            countDown: 0,
+            editMobileForm: {
+                mobile: '',
+                verifyCode: ''
+            },
+            valdMessage: '',
+            mobileValidate: {
+               mobile: [
+                   { required: true, message: '请输入新手机号', trigger: 'blur' },
+                   { validator: valideMobile, trigger: 'blur' }
+               ],
+               verifyCode: [
+                   { required: true, message: '验证码必输', trigger: 'blur' }
+               ]
+            }
         };
     },
-    methods: {
-        getIdentifyCode () {
-            this.hasGetIdentifyCode = true;
-            this.$refs['userForm'].validate((valid) => {
-                if (valid) {
-                    this.canGetIdentifyCode = true;
-                    let timeLast = 60;
-                    let timer = setInterval(() => {
-                        if (timeLast >= 0) {
-                            this.gettingIdentifyCodeBtnContent = timeLast + '秒后重试';
-                            timeLast -= 1;
-                        } else {
-                            clearInterval(timer);
-                            this.gettingIdentifyCodeBtnContent = '获取验证码';
-                            this.canGetIdentifyCode = false;
-                        }
-                    }, 1000);
-                    this.inputCodeVisible = true;
-                    // you can write ajax request here
-                }
-            });
+    computed: {
+        verifyText: function () {
+            return this.countDown > 0 ? this.countDown + 's后重新获取' : '获取验证码';
         },
+        sendVerifyCodeDisabled() {
+              let result = true;
+              var re = /^1[0-9]{10}$/;
+              if (this.editMobileForm.mobile && re.test(this.editMobileForm.mobile) && this.countDown <= 0 && !this.valdMessage) {
+                  result = false;
+              }
+              return result;
+        }
+    },
+    methods: {
         showEditPassword () {
             this.editPasswordModal = true;
         },
+        cancelEditPass () {
+            this.editPasswordModal = false;
+        },
+        saveEditPass () {
+            this.$refs['editPasswordForm'].validate((valid) => {
+                if (valid) {
+                    this.savePassLoading = true;
+                    let reqData = {
+                        userId: this.userDetail.id,
+                        oldPass: this.editPasswordForm.oldPass,
+                        newPass: this.editPasswordForm.newPass
+                    };
+                    util.ajax.post('/user/update/password', reqData)
+                        .then((response) => {
+                            this.$Message.success('修改成功, 需要重新登录');
+                            this.$router.push({
+                                name: 'login'
+                            });
+                        })
+                        .catch((error) => {
+                            util.errorProcessor(this, error);
+                        });
+                } else {
+                    this.$Message.warning('数据格式错误');
+                }
+            });
+        },
+
         cancelEditUserInfor () {
             this.$store.commit('removeTag', 'ownspace_index');
             localStorage.pageOpenedList = JSON.stringify(this.$store.state.app.pageOpenedList);
@@ -185,71 +230,120 @@ export default {
                 name: lastPageName
             });
         },
+        
         saveEdit () {
-            this.$refs['userForm'].validate((valid) => {
-                if (valid) {
-                    if (this.phoneHasChanged && this.userForm.cellphone !== this.initPhone) { // 手机号码修改过了而且修改之后的手机号和原来的不一样
-                        if (this.hasGetIdentifyCode) { // 判断是否点了获取验证码
-                            if (this.identifyCodeRight) { // 判断验证码是否正确
-                                this.saveInfoAjax();
-                            } else {
-                                this.$Message.error('验证码错误，请重新输入');
-                            }
-                        } else {
-                            this.$Message.warning('请先点击获取验证码');
-                        }
-                    } else {
-                        this.saveInfoAjax();
-                    }
-                }
-            });
+            if (!this.userDetail || !this.userDetail.id) {
+                this.$Message.warning('获取用户详情失败, 请刷新页面重试');
+                return;
+            }
+            this.save_loading = true;
+            util.ajax.put('user/save', this.userDetail)
+                .then((response) => {
+                    this.save_loading = false;
+                    this.$Message.success('保存成功');
+                    this.userDetail = response.data;
+                })
+                .catch((error) => {
+                    util.errorProcessor(this, error);
+                });
         },
-        cancelEditPass () {
-            this.editPasswordModal = false;
-        },
-        saveEditPass () {
-            this.$refs['editPasswordForm'].validate((valid) => {
-                if (valid) {
-                    this.savePassLoading = true;
-                    // you can write ajax request here
-                }
-            });
-        },
-        init () {
-            this.userForm.name = 'Lison';
-            this.userForm.cellphone = '17712345678';
-            this.initPhone = '17712345678';
-            this.userForm.company = 'TalkingData';
-            this.userForm.department = '可视化部门';
-        },
-        cancelInputCodeBox () {
-            this.inputCodeVisible = false;
-            this.userForm.cellphone = this.initPhone;
-        },
-        submitCode () {
-            let vm = this;
-            vm.checkIdentifyCodeLoading = true;
-            if (this.securityCode.length === 0) {
-                this.$Message.error('请填写短信验证码');
-            } else {
-                setTimeout(() => {
-                    this.$Message.success('验证码正确');
-                    this.inputCodeVisible = false;
-                    this.checkIdentifyCodeLoading = false;
-                }, 1000);
+
+        countDownTimer: function () {
+            if (this.countDown > 0) {
+                this.countDown--;
+                setTimeout(this.countDownTimer, 1000);
             }
         },
-        hasChangePhone () {
-            this.phoneHasChanged = true;
-            this.hasGetIdentifyCode = false;
-            this.identifyCodeRight = false;
+
+        validMobileExist() {
+            this.valdMessage = undefined;
+            let mobile = this.editMobileForm.mobile;
+            if(!mobile) {
+                return;
+            }
+            let re = /^1[0-9]{10}$/;
+            if (!re.test(mobile)) {
+                return;
+            }
+            util.ajax.get('/user/valid/mobile', {params: {mobile: mobile}})
+                .then((response) => {
+                    this.valdMessage = undefined;
+                })
+                .catch((error) => {
+                    this.valdMessage = error.response.data.message;
+                })
         },
-        saveInfoAjax () {
-            this.save_loading = true;
-            setTimeout(() => {
-                this.$Message.success('保存成功');
-                this.save_loading = false;
-            }, 1000);
+
+        handleVerifyCode () {
+            var self = this;
+            this.countDown = 60;
+            this.countDownTimer();
+            util.ajax.post('/phone/verifycode', {
+                    mobile: self.editMobileForm.mobile,
+                })
+                .then(function (response) {
+                    if (response.status === 200) {
+                        self.countDown = 60;
+                    }
+                })
+                .catch(function (error) {
+                    util.errorProcessor(self, error);
+                });
+        },
+
+        editMobileBtnClick() {
+            this.editMobileModal = true;
+        },
+
+        cancelEditMobile() {
+            this.editMobileForm = {};
+            this.editMobileModal = false;
+        },
+
+        saveEditMobile() {
+            this.$refs.editMobileForm.validate(valid => {
+                if (!valid) {
+                    this.$Message.warning('必输项信息缺失');
+                    return;
+                } else {
+                    let reqData = {
+                        userId: this.userDetail.id,
+                        mobile: this.editMobileForm.mobile,
+                        verifyCode: this.editMobileForm.verifyCode
+                    }
+                    this.saveMobileLoading = true;
+                    util.ajax.put('/user/update/mobile', reqData)
+                        .then((response) => {
+                            this.saveMobileLoading = false;
+                            this.userDetail.mobile = this.editMobileForm.mobile;
+                            this.cancelEditMobile();
+                            this.$Message.success('修改成功');
+                        })
+                        .catch((error) => {
+                            this.saveMobileLoading = false;
+                            util.errorProcessor(this, error);
+                        });
+                }
+            })
+        },
+        
+        init () {
+            let storeUser = this.$store.state.user.userDetail;
+            if (!storeUser || !storeUser.id) {
+                //获取不到用户信息，直接跳转到登录
+                this.$router.push({
+                    name: 'login'
+                });
+                return;
+            }
+            //获取用户详情信息
+            util.ajax.get('/user/detail', {params: {userId: storeUser.id}})
+                .then((response) => {
+                    this.userDetail = response.data;
+                })
+                .catch((error) => {
+                    util.errorProcessor(this, error);
+                });
         }
     },
     mounted () {
@@ -257,3 +351,7 @@ export default {
     }
 };
 </script>
+
+<style>
+
+</style>

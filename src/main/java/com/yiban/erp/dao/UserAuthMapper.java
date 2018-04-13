@@ -1,9 +1,10 @@
 package com.yiban.erp.dao;
 
-import com.yiban.erp.entities.User;
 import com.yiban.erp.entities.UserAuth;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
+
+import java.util.Date;
 
 @Mapper
 public interface UserAuthMapper {
@@ -19,5 +20,17 @@ public interface UserAuthMapper {
 
     int updateByPrimaryKey(UserAuth record);
 
-    UserAuth findByIdentifier(@Param("identifier") String findByIdentifier);
+    UserAuth findByIdentifier(@Param("identifier") String findByIdentifier,
+                              @Param("type") String type);
+
+    int updateAuthIdentifier(@Param("userId") Long id,
+                             @Param("type") String type,
+                             @Param("value") String value,
+                             @Param("updatedBy") String updatedBy,
+                             @Param("updatedTime")Date updatedTime);
+
+    int updatePassword(@Param("userId") Long userId,
+                       @Param("credential") String credential,
+                       @Param("updatedBy") String updatedBy,
+                       @Param("updatedTime")Date updatedTime);
 }

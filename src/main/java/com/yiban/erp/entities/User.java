@@ -10,6 +10,8 @@ public class User {
 
     private Integer companyId;
 
+    private String companyName;
+
     private String nickname;
 
     private String mobile;
@@ -62,6 +64,14 @@ public class User {
 
     public void setCompanyId(Integer companyId) {
         this.companyId = companyId;
+    }
+
+    public String getCompanyName() {
+        return companyName;
+    }
+
+    public void setCompanyName(String companyName) {
+        this.companyName = companyName;
     }
 
     public String getNickname() {
@@ -218,15 +228,17 @@ public class User {
 
     @JSONField(serialize = false)
     public User getCompactUser() {
-        // return cloned user without credential
         User user = new User();
         user.setMobile(this.getMobile());
         user.setCompanyId(this.getCompanyId());
+        user.setCompanyName(this.getCompanyName());
         user.setNickname(this.getNickname());
         user.setRealname(this.getRealname());
         user.setCreatedTime(this.getCreatedTime());
         user.setUpdatedTime(this.getUpdatedTime());
         user.setEmail(this.getEmail());
+        user.setPhone(this.getPhone());
+        user.setAddress(this.getAddress());
         user.setId(this.getId());
         user.setIdcard(this.getIdcard());
         user.setStatus(this.getStatus());

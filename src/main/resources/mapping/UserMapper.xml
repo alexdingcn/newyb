@@ -41,9 +41,29 @@
 
   <select id="findUserByNickName" parameterType="java.lang.String" resultMap="BaseResultMap">
     select
-      <include refid="Base_Column_List" />
-    from users
-    where nickname = #{nickname}
+      u.id, u.company_id, u.nickname, mobile, u.realname, u.email, u.phone, u.idcard, u.forget_token, u.address,
+      u.birthday, u.sex, u.status, u.comment, u.created_by, u.updated_by, u.created_time, u.updated_time,
+      c.name as companyName
+    from users u, company c
+    where u.company_id = c.id and u.nickname = #{nickname}
+  </select>
+
+  <select id="findUserByMobile" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select
+      u.id, u.company_id, u.nickname, mobile, u.realname, u.email, u.phone, u.idcard, u.forget_token, u.address,
+      u.birthday, u.sex, u.status, u.comment, u.created_by, u.updated_by, u.created_time, u.updated_time,
+      c.name as companyName
+    from users u, company c
+    where u.company_id = c.id and u.mobile = #{mobile}
+  </select>
+
+  <select id="getDetailById" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select
+      u.id, u.company_id, u.nickname, mobile, u.realname, u.email, u.phone, u.idcard, u.forget_token, u.address,
+      u.birthday, u.sex, u.status, u.comment, u.created_by, u.updated_by, u.created_time, u.updated_time,
+      c.name as companyName
+    from users u, company c
+    where u.company_id = c.id and u.id = #{userId}
   </select>
 
   <select id="findUserByNameOrMobile" resultMap="BaseResultMap" parameterType="java.lang.String" >
@@ -187,15 +207,6 @@
   <update id="updateByPrimaryKeySelective" parameterType="com.yiban.erp.entities.User" >
     update users
     <set >
-      <if test="companyId != null" >
-        company_id = #{companyId,jdbcType=INTEGER},
-      </if>
-      <if test="nickname != null" >
-        nickname = #{nickname,jdbcType=VARCHAR},
-      </if>
-      <if test="mobile != null" >
-        mobile = #{mobile,jdbcType=VARCHAR},
-      </if>
       <if test="realname != null" >
         realname = #{realname,jdbcType=VARCHAR},
       </if>
@@ -243,9 +254,7 @@
   </update>
   <update id="updateByPrimaryKey" parameterType="com.yiban.erp.entities.User" >
     update users
-    set company_id = #{companyId,jdbcType=INTEGER},
-      nickname = #{nickname,jdbcType=VARCHAR},
-      mobile = #{mobile,jdbcType=VARCHAR},
+    set
       realname = #{realname,jdbcType=VARCHAR},
       email = #{email,jdbcType=VARCHAR},
       phone = #{phone,jdbcType=VARCHAR},
@@ -262,4 +271,14 @@
       updated_time = #{updatedTime,jdbcType=TIMESTAMP}
     where id = #{id,jdbcType=BIGINT}
   </update>
+
+  <update id="updateMobile" parameterType="com.yiban.erp.entities.User">
+    update users
+      set
+        mobile = #{mobile},
+        updated_by = #{updatedBy,jdbcType=VARCHAR},
+        updated_time = #{updatedTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+
 </mapper>

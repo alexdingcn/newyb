@@ -9,6 +9,8 @@ import com.yiban.erp.dao.UserMapper;
 import com.yiban.erp.entities.Company;
 import com.yiban.erp.entities.User;
 import com.yiban.erp.entities.UserAuth;
+import com.yiban.erp.exception.BizException;
+import com.yiban.erp.exception.BizRuntimeException;
 import com.yiban.erp.exception.ErrorCode;
 import com.yiban.erp.service.util.PhoneService;
 import com.yiban.erp.util.IDCardUtil;
@@ -43,7 +45,7 @@ public class RegisterController {
 
     @Transactional
     @RequestMapping(value = "/register", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> register(@RequestBody Map requestMap) {
+    public ResponseEntity<String> register(@RequestBody Map requestMap) throws Exception {
         String username = (String) requestMap.getOrDefault("userName", "");
         String password = (String) requestMap.getOrDefault("password", "");
         String mobile = (String) requestMap.getOrDefault("mobile", "");
@@ -55,15 +57,15 @@ public class RegisterController {
 
         if (StringUtils.isBlank(companyName) || StringUtils.isBlank(businessLicense) || StringUtils.isBlank(realName) || StringUtils.isBlank(idCard)) {
             logger.warn("required params is null.");
-            return ResponseEntity.badRequest().body(ErrorCode.USER_REGISTER_PARAMS.toString());
+            throw new BizException(ErrorCode.USER_REGISTER_PARAMS);
         }
         if (StringUtils.isBlank(username) || StringUtils.isBlank(password) || StringUtils.isBlank(mobile)) {
             logger.warn("required params is null.");
-            return ResponseEntity.badRequest().body(ErrorCode.USER_REGISTER_PARAMS.toString());
+            throw new BizException(ErrorCode.USER_REGISTER_PARAMS);
         }
         if (!phoneService.validVerifyCode(mobile, verifyCode)) {
             //短信验证码错误
-            return ResponseEntity.badRequest().body(ErrorCode.VERIFY_CODE_VALIDATE_FAIL.toString());
+            throw new BizException(ErrorCode.VERIFY_CODE_VALIDATE_FAIL);
         }
 
         username = username.trim();
@@ -71,7 +73,7 @@ public class RegisterController {
         //验证身份证号是否正确
         if (!IDCardUtil.isValid(idCard)) {
             logger.warn("register IDCard is error.");
-            return ResponseEntity.badRequest().body(ErrorCode.USER_REGISTER_IDCARD_ERROR.toString());
+            throw new BizException(ErrorCode.USER_REGISTER_IDCARD_ERROR);
         }
 
         //验证公司的营业执照是否存在
@@ -79,17 +81,17 @@ public class RegisterController {
         if (oldCompany != null) {
             if (oldCompany.getEnabled() == null || !oldCompany.getEnabled()) {
                 logger.warn("company license is register but enabled is false. companyId:{}", oldCompany.getId());
-                return ResponseEntity.badRequest().body(ErrorCode.USER_REGISTER_COMPANY_ENABLED.toString());
+                throw new BizException(ErrorCode.USER_REGISTER_COMPANY_ENABLED);
             }else {
                 logger.warn("company is exist. companyId:{}", oldCompany.getId());
-                return ResponseEntity.badRequest().body(ErrorCode.USER_REGISTER_COMPANY_EXIST.toString());
+                throw new BizException(ErrorCode.USER_REGISTER_COMPANY_EXIST);
             }
         }
         //验证用户名是否意见存在，如果存在了，提示错误
         User oldUser = userMapper.findUserByNickName(username);
         if (oldUser != null) {
             logger.warn("username is exist. username:{}", username);
-            return ResponseEntity.badRequest().body(ErrorCode.USER_REGISTER_NICKNAME_EXIST.toString());
+            throw new BizException(ErrorCode.USER_REGISTER_NICKNAME_EXIST);
         }
 
         //如果验证通过，先创建公司信息
@@ -102,7 +104,7 @@ public class RegisterController {
         int result = companyMapper.insert(company);
         if (result <= 0 || company.getId() == null || company.getId() <= 0) {
             logger.warn("company created fail.");
-            return ResponseEntity.badRequest().body(ErrorCode.FAILED_INSERT_FROM_DB.toString());
+            throw new BizRuntimeException(ErrorCode.FAILED_INSERT_FROM_DB);
         }
 
         User user = new User();
@@ -144,7 +146,7 @@ public class RegisterController {
             }
         }
         logger.error("Failed to create user");
-        return ResponseEntity.badRequest().body(ErrorCode.USER_REGISTER_EXCEPTION.toString());
+        throw new BizRuntimeException(ErrorCode.USER_REGISTER_EXCEPTION);
     }
 
 }

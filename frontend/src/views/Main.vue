@@ -33,7 +33,7 @@
                     <full-screen v-model="isFullScreen" @on-change="fullscreenChange"></full-screen>
                     <lock-screen></lock-screen>
                     <message-tip v-model="mesCount"></message-tip>
-                    <!--<theme-switch></theme-switch>-->
+                    <theme-switch></theme-switch>
                     
                     <div class="user-dropdown-menu-con">
                         <Row type="flex" justify="end" align="middle" class="user-dropdown-innercon">
@@ -72,7 +72,7 @@
     import fullScreen from './main-components/fullscreen.vue';
     import lockScreen from './main-components/lockscreen/lockscreen.vue';
     import messageTip from './main-components/message-tip.vue';
-//    import themeSwitch from './main-components/theme-switch/theme-switch.vue';
+   import themeSwitch from './main-components/theme-switch/theme-switch.vue';
     import Cookies from 'js-cookie';
     import util from '@/libs/util.js';
     
@@ -83,13 +83,12 @@
             breadcrumbNav,
             fullScreen,
             lockScreen,
-            messageTip
-        //            themeSwitch
+            messageTip,
+            themeSwitch
         },
         data () {
             return {
                 shrink: false,
-                userName: '',
                 isFullScreen: false,
                 openedSubmenuArr: this.$store.state.app.openedSubmenuArr
             };
@@ -118,16 +117,23 @@
             },
             mesCount () {
                 return this.$store.state.app.messageCount;
+            },
+            userName () {
+                let userDetail = this.$store.state.user.userDetail;
+                if (userDetail) {
+                    return userDetail.nickname;
+                }else {
+                    return '';
+                }
             }
         },
         methods: {
             init () {
                 let pathArr = util.setCurrentPath(this, this.$route.name);
-                this.$store.commit('updateMenulist');
+                this.$store.commit('updateMenulist', this.$store.state.user.accessRoutes);
                 if (pathArr.length >= 2) {
                     this.$store.commit('addOpenSubmenu', pathArr[1].name);
                 }
-                this.userName = Cookies.get('user');
                 let messageCount = 3;
                 this.messageCount = messageCount.toString();
                 this.checkTag(this.$route.name);
@@ -154,7 +160,7 @@
                             }
                         })
                         .catch(function (error) {
-                            console.log(error);
+                            util.errorProcessor(self, error);
                         });
                     this.$router.push({
                         name: 'login'
