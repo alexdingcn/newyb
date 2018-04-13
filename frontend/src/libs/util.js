@@ -82,11 +82,19 @@ util.oneOf = function (ele, targetArr) {
     }
 };
 
-util.showThisRoute = function (itAccess, currentAccess) {
-    if (typeof itAccess === 'object' && Array.isArray(itAccess)) {
-        return util.oneOf(currentAccess, itAccess);
+// util.showThisRoute = function (itAccess, currentAccess) {
+//     if (typeof itAccess === 'object' && Array.isArray(itAccess)) {
+//         return util.oneOf(currentAccess, itAccess);
+//     } else {
+//         return itAccess === currentAccess;
+//     }
+// };
+
+util.showThisRoute = function (routeName, currAccessRoutes) {
+    if (currAccessRoutes && Array.isArray(currAccessRoutes)) {
+        return util.oneOf(routeName, currAccessRoutes);
     } else {
-        return itAccess === currentAccess;
+        return false;
     }
 };
 
@@ -377,7 +385,9 @@ util.errorProcessor = function (vm, error, callback) {
     if (response) {
         let httpCode = response.status;
         let data = response.data;
-        if (httpCode === 403) {
+        if (httpCode === 401) {
+            vm.$Message.warning('登录太失效, 请重新登录');
+        } else if (httpCode === 403) {
             vm.$router.push('error-403', { params: data });
         } else if (httpCode === 404) {
             vm.$Notice.error({

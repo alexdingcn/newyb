@@ -338,3 +338,19 @@ craeted_time|Datetime|创建时间
 updated_time|Datetime|修改时间
 
 
+### 用户菜单路由权限表：user_route
+
+> 用于控制用户可见的菜单相，定义的route_name需要与路由定义的name相同,逻辑上路由定义的name是唯一的
+
+字段名|类型|描述
+-|-|-
+id|Long|(自增类型ID pk)
+user_id|Long|用户ID
+route_name|String|路由名称
+create_by|String|创建人
+create_time|Datetime|创建时间
+update_by|String|修改人
+update_time|Datetime|修改时间
+
+
+

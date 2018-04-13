@@ -37,54 +37,81 @@ const app = {
         setTagsList (state, list) {
             state.tagsList.push(...list);
         },
+        // updateMenulist (state) {
+        //     let accessCode = parseInt(Cookies.get('access'));
+        //     let menuList = [];
+        //     appRouter.forEach((item, index) => {
+        //         if (item.access !== undefined) {
+        //             if (Util.showThisRoute(item.access, accessCode)) {
+        //                 if (item.children.length === 1) {
+        //                     menuList.push(item);
+        //                 } else {
+        //                     let len = menuList.push(item);
+        //                     let childrenArr = [];
+        //                     childrenArr = item.children.filter(child => {
+        //                         if (child.access !== undefined) {
+        //                             if (child.access === accessCode) {
+        //                                 return child;
+        //                             }
+        //                         } else {
+        //                             return child;
+        //                         }
+        //                     });
+        //                     menuList[len - 1].children = childrenArr;
+        //                 }
+        //             }
+        //         } else {
+        //             if (item.children.length === 1) {
+        //                 menuList.push(item);
+        //             } else {
+        //                 let len = menuList.push(item);
+        //                 let childrenArr = [];
+        //                 childrenArr = item.children.filter(child => {
+        //                     if (child.access !== undefined) {
+        //                         if (Util.showThisRoute(child.access, accessCode)) {
+        //                             return child;
+        //                         }
+        //                     } else {
+        //                         return child;
+        //                     }
+        //                 });
+        //                 if (childrenArr === undefined || childrenArr.length === 0) {
+        //                     menuList.splice(len - 1, 1);
+        //                 } else {
+        //                     let handledItem = JSON.parse(JSON.stringify(menuList[len - 1]));
+        //                     handledItem.children = childrenArr;
+        //                     menuList.splice(len - 1, 1, handledItem);
+        //                 }
+        //             }
+        //         }
+        //     });
+        //     state.menuList = menuList;
+        // },
         updateMenulist (state) {
-            let accessCode = parseInt(Cookies.get('access'));
+            let accessRoutes = [];
+            if (Cookies.get('access')) {
+                accessRoutes = JSON.parse(Cookies.get('access'));
+            }
             let menuList = [];
             appRouter.forEach((item, index) => {
-                if (item.access !== undefined) {
-                    if (Util.showThisRoute(item.access, accessCode)) {
-                        if (item.children.length === 1) {
-                            menuList.push(item);
-                        } else {
-                            let len = menuList.push(item);
-                            let childrenArr = [];
-                            childrenArr = item.children.filter(child => {
-                                if (child.access !== undefined) {
-                                    if (child.access === accessCode) {
-                                        return child;
-                                    }
-                                } else {
-                                    return child;
-                                }
-                            });
-                            menuList[len - 1].children = childrenArr;
+                if (item.children && item.children.length > 0) {
+                    let len = menuList.push(item);
+                    let childrenArr = [];
+                    childrenArr = item.children.filter(child => {
+                        if (Util.showThisRoute(child.name, accessRoutes)) {
+                            return child;
                         }
-                    }
-                } else {
-                    if (item.children.length === 1) {
-                        menuList.push(item);
+                    });
+                    if (childrenArr === undefined || childrenArr.length === 0) {
+                        menuList.splice(len - 1, 1);
                     } else {
-                        let len = menuList.push(item);
-                        let childrenArr = [];
-                        childrenArr = item.children.filter(child => {
-                            if (child.access !== undefined) {
-                                if (Util.showThisRoute(child.access, accessCode)) {
-                                    return child;
-                                }
-                            } else {
-                                return child;
-                            }
-                        });
-                        if (childrenArr === undefined || childrenArr.length === 0) {
-                            menuList.splice(len - 1, 1);
-                        } else {
-                            let handledItem = JSON.parse(JSON.stringify(menuList[len - 1]));
-                            handledItem.children = childrenArr;
-                            menuList.splice(len - 1, 1, handledItem);
-                        }
+                        let handledItem = JSON.parse(JSON.stringify(menuList[len - 1]));
+                        handledItem.children = childrenArr;
+                        menuList.splice(len - 1, 1, handledItem);
                     }
                 }
             });
+            alert(JSON.stringify(menuList[1]));
             state.menuList = menuList;
         },
         changeMenuTheme (state, theme) {

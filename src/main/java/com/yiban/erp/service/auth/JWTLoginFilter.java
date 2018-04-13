@@ -1,12 +1,10 @@
 package com.yiban.erp.service.auth;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yiban.erp.exception.ErrorCode;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
@@ -51,7 +49,7 @@ public class JWTLoginFilter extends AbstractAuthenticationProcessingFilter {
 
         response.setContentType("application/json");
         response.setStatus(HttpServletResponse.SC_OK);
-        response.getOutputStream().println(ErrorCode.LOGIN_PASSWORD_INVALID.toString());
+        response.getWriter().println(ErrorCode.LOGIN_PASSWORD_INVALID.toString());
     }
 
 

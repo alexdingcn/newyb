@@ -1,8 +1,6 @@
 package com.yiban.erp.config;
 
-import com.yiban.erp.dao.UserAuthMapper;
-import com.yiban.erp.dao.UserMapper;
-import com.yiban.erp.dao.UserRoleMapper;
+import com.yiban.erp.dao.*;
 import com.yiban.erp.service.auth.CustomAuthenticationProvider;
 import com.yiban.erp.service.auth.JWTAuthenticationFilter;
 import com.yiban.erp.service.auth.JWTLoginFilter;
@@ -35,9 +33,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
     private UserMapper userMapper;
-
     @Autowired
-    private UserRoleMapper userRoleMapper;
+    private UserRouteMapper userRouteMapper;
+    @Autowired
+    private CompanyMapper companyMapper;
 
 
     @Override
@@ -84,7 +83,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
     public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
-        auth.authenticationProvider(new CustomAuthenticationProvider(userMapper, userRoleMapper));
+        auth.authenticationProvider(new CustomAuthenticationProvider(userMapper, userRouteMapper, companyMapper));
     }
 
 }

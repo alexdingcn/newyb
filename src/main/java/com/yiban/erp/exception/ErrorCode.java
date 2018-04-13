@@ -25,6 +25,8 @@ public enum ErrorCode {
     USER_REGISTER_NICKNAME_EXIST(1111, "用户名已经存在"),
     USER_REGISTER_EXCEPTION(1112, "管理员用户注册异常, 请联系运营方"),
     USER_NICKNAME_EXIST(1113, "用户名已经存在"),
+    USER_LOGIN_UN_ACTIVATE(1114, "账号为未激活"),
+    COMPANY_UN_ENABLED(1115, "公司处于未激活状态，请联系运营方"),
 
     // 12xx - 商品
     GOODS_CATEGORY_ID_MISSING(1201, "缺失商品分类ID"),

@@ -1,8 +1,10 @@
 package com.yiban.erp.service.auth;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.yiban.erp.entities.User;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.slf4j.Logger;
@@ -15,6 +17,7 @@ import org.springframework.security.core.authority.AuthorityUtils;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -30,9 +33,13 @@ public class TokenService {
 
         List<GrantedAuthority> auths = (List<GrantedAuthority>) authentication.getAuthorities();
         StringBuilder sb = new StringBuilder();
+        List<String> authPageList = new ArrayList<>();
+        JSONObject result = new JSONObject();
         for (GrantedAuthority auth : auths) {
             sb.append(auth.getAuthority());
+            authPageList.add(auth.getAuthority()); //定义为用户可以看见的路由名称
         }
+        User user = (User) authentication.getPrincipal();
 
         // 生成JWT
         String JWT = Jwts.builder()
@@ -48,11 +55,14 @@ public class TokenService {
                 .signWith(SignatureAlgorithm.HS512, SECRET)
                 .compact();
 
-        // 将 JWT 写入 body
+        // 将 结果 写入 body
         try {
+            result.put("jwt", JWT);
+            result.put("authPages", authPageList);
+            result.put("userDetail", user);
             response.setContentType("application/json");
             response.setStatus(HttpServletResponse.SC_OK);
-            response.getOutputStream().println(JWT);
+            response.getWriter().println(result.toJSONString());
         } catch (IOException e) {
             logger.error(e.getMessage());
         }
@@ -64,28 +74,35 @@ public class TokenService {
         String token = request.getHeader(HEADER_STRING);
 
         if (token != null) {
-            // 解析 Token
-            Claims claims = Jwts.parser()
-                    // 验签
-                    .setSigningKey(SECRET)
-                    // 去掉 Bearer
-                    .parseClaimsJws(token.replace(TOKEN_PREFIX, ""))
-                    .getBody();
+            try {
 
-            // 拿用户
-            User user = null;
-            if (claims.containsKey("user")) {
-                String userStr = (String) claims.get("user");
-                user = JSON.parseObject(userStr, User.class);
+
+                // 解析 Token
+                Claims claims = Jwts.parser()
+                        // 验签
+                        .setSigningKey(SECRET)
+                        // 去掉 Bearer
+                        .parseClaimsJws(token.replace(TOKEN_PREFIX, ""))
+                        .getBody();
+
+                // 拿用户
+                User user = null;
+                if (claims.containsKey("user")) {
+                    String userStr = (String) claims.get("user");
+                    user = JSON.parseObject(userStr, User.class);
+                }
+
+                // 得到 权限（角色）
+                List<GrantedAuthority> authorities = AuthorityUtils.commaSeparatedStringToAuthorityList((String) claims.get("authorities"));
+
+                // 返回验证令牌
+                return user != null ?
+                        new UsernamePasswordAuthenticationToken(user, null, authorities) :
+                        null;
+
+            }catch (JwtException e) {
+                logger.warn("get an JWTException.{}", e.getMessage());
             }
-
-            // 得到 权限（角色）
-            List<GrantedAuthority> authorities = AuthorityUtils.commaSeparatedStringToAuthorityList((String) claims.get("authorities"));
-
-            // 返回验证令牌
-            return user != null ?
-                    new UsernamePasswordAuthenticationToken(user, null, authorities) :
-                    null;
         }
         return null;
     }
