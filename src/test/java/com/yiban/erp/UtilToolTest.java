@@ -53,4 +53,11 @@ public class UtilToolTest {
         System.out.println(newIDCard);
     }
 
+
+    @Test
+    public void testString() {
+        String token = "XXXX.12.123.xxxxxxxxxxxxxxx";
+        String cacheKey = token.substring(0, token.lastIndexOf("."));
+        System.out.println(cacheKey);
+    }
 }

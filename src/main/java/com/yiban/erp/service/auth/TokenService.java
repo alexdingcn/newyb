@@ -9,6 +9,7 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -60,7 +61,7 @@ public class TokenService {
             result.put("jwt", JWT);
             result.put("authPages", authPageList);
             result.put("userDetail", user);
-            response.setContentType("application/json");
+            response.setContentType(MediaType.APPLICATION_JSON_UTF8_VALUE);
             response.setStatus(HttpServletResponse.SC_OK);
             response.getWriter().println(result.toJSONString());
         } catch (IOException e) {
@@ -68,30 +69,11 @@ public class TokenService {
         }
     }
 
-    public static void setUserJWTTokenExpired(User user, List<String> auths) {
-        StringBuilder sb = new StringBuilder();
-        for (String auth : auths) {
-            sb.append(auth);
-        }
-        String JWT = Jwts.builder()
-            // 保存权限（角色）
-            .claim("authorities", sb.toString())
-            // 用户名写入标题
-//                .setSubject(authentication.getName())
-            .claim("user", JSON.toJSONString(user.getCompactUser()))
-//                .setSubject(authentication.getName())
-            // 有效期设置为当前,就是让他过期
-            .setExpiration(new Date())
-            // 签名设置
-            .signWith(SignatureAlgorithm.HS512, SECRET)
-            .compact();
-    }
-
     // JWT验证方法
     static Authentication getAuthentication(HttpServletRequest request) {
         // 从Header中拿到token
         String token = request.getHeader(HEADER_STRING);
-
+        logger.info("token={}", token);
         if (token != null) {
             try {
 

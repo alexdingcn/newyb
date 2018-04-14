@@ -1,9 +1,7 @@
 package com.yiban.erp.config;
 
 import com.yiban.erp.dao.*;
-import com.yiban.erp.service.auth.CustomAuthenticationProvider;
-import com.yiban.erp.service.auth.JWTAuthenticationFilter;
-import com.yiban.erp.service.auth.JWTLoginFilter;
+import com.yiban.erp.service.auth.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,6 +35,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     private UserRouteMapper userRouteMapper;
     @Autowired
     private CompanyMapper companyMapper;
+    @Autowired
+    private TokenManager tokenManager;
 
 
     @Override
@@ -58,10 +58,14 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .anyRequest().authenticated()
                 // 添加一个过滤器 所有访问 /login 的请求交给 JWTLoginFilter 来处理 这个类处理所有的JWT相关内容
                 .and()
-                .addFilterBefore(new JWTLoginFilter("/login", authenticationManager()),
+//                .addFilterBefore(new JWTLoginFilter("/login", authenticationManager()),
+//                        UsernamePasswordAuthenticationFilter.class)
+//                .addFilterBefore(new JWTAuthenticationFilter(), BasicAuthenticationFilter.class);
+                .addFilterBefore(new LoginFilter("/login", authenticationManager(), tokenManager),
                         UsernamePasswordAuthenticationFilter.class)
-                .addFilterBefore(new JWTAuthenticationFilter(), BasicAuthenticationFilter.class);
+                .addFilterBefore(new AuthenticationFilter(tokenManager), BasicAuthenticationFilter.class);
     }
+
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {

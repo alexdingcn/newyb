@@ -119,7 +119,7 @@ public enum ErrorCode {
     ACCESS_PERMISSION(9001, "无访问权限", ErrorDisplay.MODAL),
     PARAMETER_MISSING(9002, "缺少必填字段"),
     MESSAGE_GET_FAIL(9003, "获取消息信息失败"),
-
+    LOGIN_STATUS_MISS(9004, "登录态失效", ErrorDisplay.NOTICE),
     ;
 
     private Integer code;

@@ -15,6 +15,7 @@ import com.yiban.erp.entities.UserRoute;
 import com.yiban.erp.exception.BizException;
 import com.yiban.erp.exception.BizRuntimeException;
 import com.yiban.erp.exception.ErrorCode;
+import com.yiban.erp.service.auth.TokenManager;
 import com.yiban.erp.service.auth.TokenService;
 import com.yiban.erp.service.util.PhoneService;
 import com.yiban.erp.util.IDCardUtil;
@@ -48,6 +49,8 @@ public class UserController {
     private UserAuthMapper userAuthMapper;
     @Autowired
     private UserRouteMapper userRouteMapper;
+    @Autowired
+    private TokenManager tokenManager;
 
     /**
      * 获取可用用户的列表
@@ -240,7 +243,7 @@ public class UserController {
                     updateUser.getId(), updateUser.getStatus(), accessReq.getStatus(), doUser.getId());
             //如果是离职状态的修改，需要把用户名和手机号进行数据格式化.
             if (accessReq.getStatus() < 0) {
-                String pre = updateUser.getCompanyId() + "D";
+                String pre = updateUser.getCompanyId() + "DEL-";
                 updateUser.setNickname(pre + updateUser.getNickname());
                 updateUser.setMobile(pre + updateUser.getMobile());
                 updateUser.setStatus(UserStatus.DELETE.getCode());
@@ -251,6 +254,7 @@ public class UserController {
                     // 删除user_auths表中同一个用户的所有记录
                     userAuthMapper.deleteByUserId(updateUser.getId());
                     //做到这步，离职数据修改成功，直接返回，不需要在修改菜单项数据
+                    tokenManager.removeToken(updateUser);
                     return ResponseEntity.ok().build();
                 }else {
                     throw new BizRuntimeException(ErrorCode.FAILED_UPDATE_FROM_DB);
@@ -297,7 +301,7 @@ public class UserController {
         if (!newUserRoute.isEmpty()) {
             userRouteMapper.insertBatch(newUserRoute);
             //剔除修改页面权限的用户登录态，让用户重新登录
-            TokenService.setUserJWTTokenExpired(updateUser, oldRouteNames);
+            tokenManager.removeToken(updateUser);
         }
         return ResponseEntity.ok().build(); //返回成功
     }

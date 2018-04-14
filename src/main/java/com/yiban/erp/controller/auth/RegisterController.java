@@ -68,10 +68,6 @@ public class RegisterController {
             logger.warn("required params is null.");
             throw new BizException(ErrorCode.USER_REGISTER_PARAMS);
         }
-        if (!phoneService.validVerifyCode(mobile, verifyCode)) {
-            //短信验证码错误
-            throw new BizException(ErrorCode.VERIFY_CODE_VALIDATE_FAIL);
-        }
 
         username = username.trim();
         idCard = idCard.toUpperCase(); //字母转大写
@@ -79,6 +75,11 @@ public class RegisterController {
         if (!IDCardUtil.isValid(idCard)) {
             logger.warn("register IDCard is error.");
             throw new BizException(ErrorCode.USER_REGISTER_IDCARD_ERROR);
+        }
+
+        if (!phoneService.validVerifyCode(mobile, verifyCode)) {
+            //短信验证码错误
+            throw new BizException(ErrorCode.VERIFY_CODE_VALIDATE_FAIL);
         }
 
         //验证公司的营业执照是否存在
