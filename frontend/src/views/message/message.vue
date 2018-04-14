@@ -37,7 +37,7 @@
             <transition name="back-message-list">
                 <div v-if="!showMesTitleList" class="message-view-content-con">
                     <Row style="margin-top: 10px;">
-                        <Col span="4">
+                        <Col span="2">
                             <Row type="flex" justify="start">
                                 <span><Button type="text" @click="backMesTitleList"><Icon type="chevron-left"></Icon>&nbsp;&nbsp;返回</Button></span>
                             </Row>
@@ -47,7 +47,7 @@
                                 <h3>{{ mes.title }}</h3>
                             </Row>
                         </Col>
-                        <Col span="4">
+                        <Col span="6">
                             <Row type="flex" justify="end">
                                 <ButtonGroup size="small">
                                     <Button type="primary" icon="plus-round" @click="addOptionsBtnClick(mes.id)">添加评论信息</Button>

@@ -111,7 +111,7 @@ public class MessageService {
         if (userRoles != null && !userRoles.isEmpty()) {
             userRoles.stream().forEach(item -> roleTypeList.add(item.getName()));
         }
-        List<MessageInfo> messageInfos = messageInfoMapper.query(roleTypeList, beginTime, lastTime);
+        List<MessageInfo> messageInfos = messageInfoMapper.query(user.getCompanyId(), roleTypeList, beginTime, lastTime);
         MessageResp resp = new MessageResp();
         if (messageInfos == null || messageInfos.isEmpty()) {
             resp.setUnProcessCount(0);

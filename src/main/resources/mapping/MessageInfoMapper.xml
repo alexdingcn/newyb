@@ -181,6 +181,7 @@
     left join message_option o on i.id = o.message_id
     left join users u on u.id = o.user_id
     where i.status = 'NORMAL'
+    and i.company_id = #{companyId}
     and i.create_time >= #{startTime}
     and i.create_time &lt;= #{endTime}
     and i.role_type in

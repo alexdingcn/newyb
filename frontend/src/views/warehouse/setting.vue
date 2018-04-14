@@ -115,7 +115,7 @@
                         title: '状态',
                         key: 'status',
                         align: 'center',
-                        width: 180,
+                        width: 130,
                         render: (h, params) => {
                             let status = params.row.status;
                             switch (status) {
@@ -138,6 +138,7 @@
                         title: '创建时间',
                         key: 'createdTime',
                         align: 'center',
+                        width: 150,
                         render: (h, params) => {
                             return moment(params.row.createdTime).format('YYYY-MM-DD hh:mm:ss');
                         }
@@ -178,6 +179,7 @@
                         title: '创建时间',
                         key: 'createTime',
                         align: 'center',
+                        width: 150,
                         render: (h, params) => {
                             return params.row.createTime ? moment(params.row.createTime).format('YYYY-MM-DD hh:mm:ss') : '';
                         }

@@ -533,7 +533,11 @@ export default {
                     key: 'warehouseLocation',
                     width: 200,
                     render: (h, params) => {
-                        return addWarehouseLocation(h, params.row.warehouseLocation, params.row, params.index);
+                        if (params.row.checkStatus) {
+                            return h('span', params.row.warehouseLocation);
+                        }else {
+                            return addWarehouseLocation(h, params.row.warehouseLocation, params.row, params.index);
+                        }
                     }
                 },
                 {

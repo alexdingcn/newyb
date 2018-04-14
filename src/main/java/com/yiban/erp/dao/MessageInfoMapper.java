@@ -19,7 +19,8 @@ public interface MessageInfoMapper {
 
     int updateByPrimaryKeySelective(MessageInfo record);
 
-    List<MessageInfo> query(@Param("roleTypeList") List<String> roleTypeList,
+    List<MessageInfo> query(@Param("companyId") Integer companyId,
+                            @Param("roleTypeList") List<String> roleTypeList,
                             @Param("startTime") Date startTime,
                             @Param("endTime") Date endTime);
 }
