@@ -84,7 +84,7 @@ public class UserController {
         }
     }
 
-    @Transactional   
+    @Transactional
     protected User createUser(User baseUser, User doUser) throws Exception {
         if (StringUtils.isBlank(baseUser.getNickname()) || StringUtils.isBlank(baseUser.getMobile())) {
             throw new BizException(ErrorCode.USER_REGISTER_PARAMS);
