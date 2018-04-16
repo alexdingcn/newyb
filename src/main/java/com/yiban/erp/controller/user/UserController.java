@@ -10,13 +10,11 @@ import com.yiban.erp.dao.UserRouteMapper;
 import com.yiban.erp.dto.SaveUserAccessReq;
 import com.yiban.erp.entities.User;
 import com.yiban.erp.entities.UserAuth;
-import com.yiban.erp.entities.UserRole;
 import com.yiban.erp.entities.UserRoute;
 import com.yiban.erp.exception.BizException;
 import com.yiban.erp.exception.BizRuntimeException;
 import com.yiban.erp.exception.ErrorCode;
 import com.yiban.erp.service.auth.TokenManager;
-import com.yiban.erp.service.auth.TokenService;
 import com.yiban.erp.service.util.PhoneService;
 import com.yiban.erp.util.IDCardUtil;
 import org.apache.commons.lang3.StringUtils;
@@ -75,11 +73,79 @@ public class UserController {
     @RequestMapping(value = "/save", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> save(@RequestBody User updateUser,
                                        @AuthenticationPrincipal User doUser) throws Exception {
-        logger.info("user:{} update user info.", doUser.getId());
-        if (updateUser.getId() == null) {
-            throw new BizException(ErrorCode.PARAMETER_MISSING);
+        logger.info("user:{} do save update user info", doUser.getId());
+        if (updateUser.getId() != null) {
+            User newUser = updateUser(updateUser, doUser);
+            return ResponseEntity.ok().body(JSON.toJSONString(newUser));
+        }else {
+            logger.info("user:{} do create a new user info.", doUser.getId());
+            User newUser = createUser(updateUser, doUser);
+            return ResponseEntity.ok().body(JSON.toJSONString(newUser));
         }
-        String idCard = updateUser.getIdcard();
+    }
+
+    @Transactional   
+    protected User createUser(User baseUser, User doUser) throws Exception {
+        if (StringUtils.isBlank(baseUser.getNickname()) || StringUtils.isBlank(baseUser.getMobile())) {
+            throw new BizException(ErrorCode.USER_REGISTER_PARAMS);
+        }
+        //必输字段是否存在
+        if (StringUtils.isBlank(baseUser.getCredential())) {
+            logger.warn("password miss.");
+            throw new BizException(ErrorCode.LOGIN_PASSWORD_MISSING);
+        }
+        setUserIDCard(baseUser); //验证和设置身份证号
+        //验证用户名和手机号是否意见存在，如果存在，不能新建
+        User validUser1 = userMapper.findUserByNickName(baseUser.getNickname());
+        if (validUser1 != null) {
+            throw new BizException(ErrorCode.USER_REGISTER_NICKNAME_EXIST);
+        }
+        User validUser2 = userMapper.findUserByMobile(baseUser.getMobile());
+        if (validUser2 != null) {
+            throw new BizException(ErrorCode.USER_MOBILE_EXIST);
+        }
+
+        //验证都通过后，创建用户信息
+        baseUser.setCompanyId(doUser.getCompanyId());
+        baseUser.setStatus(UserStatus.UN_ACTIVATE.getCode());
+        baseUser.setSuperUser(false);
+        baseUser.setCreatedTime(new Date());
+        baseUser.setCreatedBy(doUser.getNickname());
+
+        int count = userMapper.insert(baseUser);
+        if (count > 0 && baseUser.getId() > 0) {
+            //创建登录密码信息
+            String encryptedPass = new BCryptPasswordEncoder().encode(baseUser.getCredential());
+
+            UserAuth userAuth = new UserAuth();
+            userAuth.setUserId(baseUser.getId());
+            userAuth.setIdentifierType(IdentifierType.USERNAME.name());
+            userAuth.setIdentifier(baseUser.getNickname());
+            userAuth.setCredential(encryptedPass);
+            userAuth.setVerified(true);
+            userAuth.setCreatedBy(doUser.getNickname());
+            userAuth.setCreatedTime(new Date());
+            int usernameResult = userAuthMapper.insert(userAuth);
+
+            userAuth = new UserAuth();
+            userAuth.setUserId(baseUser.getId());
+            userAuth.setIdentifierType(IdentifierType.MOBILE.name());
+            userAuth.setIdentifier(baseUser.getMobile());
+            userAuth.setCredential(encryptedPass);
+            userAuth.setVerified(true);
+            userAuth.setCreatedBy(doUser.getNickname());
+            userAuth.setCreatedTime(new Date());
+            int mobileResult = userAuthMapper.insert(userAuth);
+
+            if (usernameResult > 0 && mobileResult > 0) {
+                return baseUser;
+            }
+        }
+        throw new BizRuntimeException(ErrorCode.FAILED_INSERT_FROM_DB);
+    }
+
+    private void setUserIDCard(User setUser) throws BizException {
+        String idCard = setUser.getIdcard();
         if (StringUtils.isNotBlank(idCard)) {
             idCard = idCard.toUpperCase(); //转换大写
             if (!IDCardUtil.isValid(idCard)) {
@@ -87,23 +153,32 @@ public class UserController {
                 throw new BizException(ErrorCode.USER_REGISTER_IDCARD_ERROR);
             }
             else {
-                updateUser.setIdcard(idCard);
-                updateUser.setBirthday(IDCardUtil.getBirthday(idCard));
-                updateUser.setSex(IDCardUtil.getSex(idCard));
+                setUser.setIdcard(idCard);
+                setUser.setBirthday(IDCardUtil.getBirthday(idCard));
+                setUser.setSex(IDCardUtil.getSex(idCard));
             }
         }
+    }
+
+    @Transactional
+    protected User updateUser(User updateUser, User doUser) throws Exception {
+        logger.info("user:{} update user info.", doUser.getId());
+        if (updateUser.getId() == null) {
+            throw new BizException(ErrorCode.PARAMETER_MISSING);
+        }
+        setUserIDCard(updateUser);
         updateUser.setUpdatedTime(new Date());
         updateUser.setUpdatedBy(doUser.getNickname());
 
         int count = userMapper.updateByPrimaryKeySelective(updateUser);
         if (count > 0) {
             User newUser = userMapper.getDetailById(updateUser.getId());
-            return ResponseEntity.ok().body(JSON.toJSONString(newUser));
+            return newUser;
         }else {
             throw new BizRuntimeException(ErrorCode.FAILED_UPDATE_FROM_DB);
         }
-
     }
+
 
     @RequestMapping(value = "/valid/nickname", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> validNickName(@RequestParam("nickname") String nickName) throws Exception {

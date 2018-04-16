@@ -26,7 +26,7 @@ public enum ErrorCode {
     USER_REGISTER_EXCEPTION(1112, "管理员用户注册异常, 请联系运营方"),
     USER_LOGIN_UN_ACTIVATE(1114, "账号为未激活"),
     COMPANY_UN_ENABLED(1115, "公司处于未激活状态，请联系运营方"),
-    USER_MOBILE_EXIST(1116, "手机号已经存在"),
+    USER_MOBILE_EXIST(1116, "手机号已经存在, 不可再次注册"),
     USER_MOBILE_MISSING(1117, "手机号缺失"),
 
     // 12xx - 商品

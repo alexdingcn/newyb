@@ -12,17 +12,7 @@
             <div>
                 <Row>
                     <Col span="12">
-                        <Card>
-                            <p slot="title">
-                                <Icon type="person-stalker"></Icon> 用户列表
-                            </p>
-                            <div slot="extra">
-                                <Input style="width: 300px;" @on-keyup="searchValueChange" v-model="searchValue" icon="search" placeholder="用户名/手机号/真实姓名" />
-                            </div>
-                            <Table ref="userTab" size="small" highlight-row height="600" 
-                                :columns="userColumns" :data="userList" @on-row-click="chooseUser">
-                            </Table>
-                        </Card>
+                        <user-list ref="userList" @choose-user="chooseUser"></user-list>
                     </Col>
                     <Col span="10" style="margin-left: 50px;">
                         <Card>
@@ -67,51 +57,18 @@
 <script>
 import {appRouter} from '@/router/router';
 import util from "@/libs/util.js";
+import userList from './user-list.vue';
 
 export default {
     name: 'access_index',
+    components: {
+        userList
+    },
     data () {
         return {
-            userList: [],
-            allUserList: [],
-            userColumns: [
-                {
-                    title: '用户名',
-                    key: 'nickname',
-                    align: 'center'
-                },
-                {
-                    title: '手机号',
-                    key: 'mobile',
-                    align: 'center'
-                },
-                {
-                    title: '姓名',
-                    key: 'realname',
-                    align: 'center'
-                },
-                {
-                    title: '当前状态',
-                    key: 'status',
-                    align: 'center',
-                    render: (h, params) => {
-                        const row = params.row;
-                        const color = row.status === 1 ? 'green' : (row.status ===0 ? 'red' : '#bbbec4');
-                        const text = row.status === 1 ? '已激活' : (row.status === 0 ? '未激活' : '离职');
-                        return h('Tag', {
-                            props: {
-                                type: 'dot',
-                                color: color
-                            }
-                        }, text);
-                    }
-                }
-            ],
             currUser: {},
-            searchValue: '',
             userStatus: '',
             routeTreeData: [],
-            lastTime: 0,
             treeLoading: false,
             spinShow: false,
             saveLoading: false,
@@ -131,7 +88,6 @@ export default {
     methods: {
         init() {
             this.createMenuTree();
-            this.refreshUserList();
         },
 
         showTitleChange() {
@@ -178,55 +134,7 @@ export default {
             this.routeTreeData = treeData;
         },
 
-        refreshUserList() {
-            util.ajax.get('/user/list')
-                .then((response) => {
-                    this.allUserList = response.data;
-                    this.userList = this.allUserList;
-                    this.currUser = {},
-                    this.userStatus = '';
-                    this.searchValue = '';
-                })
-                .catch((error) => {
-                    util.errorProcessor(this, error);
-                });
-        },
-
-        searchValueChange(event) {
-            let self = this;
-            self.lastTime = event.timeStamp;
-            setTimeout(function() {
-                if(self.lastTime - event.timeStamp === 0) {
-                    self.searchUserList();
-                }
-            }, 500);
-        },
-
-        searchUserList() {
-            let searchList = [];
-             let value = this.searchValue;
-             if (!value) {
-                 this.userList = this.allUserList;
-             }
-             searchList = this.allUserList.filter((item) => {
-                 let nickname = item.nickname;
-                 let mobile = item.mobile;
-                 let realname = item.realname;
-                 if (nickname && typeof nickname === 'string' && nickname.indexOf(value) >= 0) {
-                     return item;
-                 }
-                 if (mobile && typeof mobile === 'string' && mobile.indexOf(value) >= 0) {
-                     return item;
-                 }
-                 if (realname && typeof realname === 'string' && realname.indexOf(value) >= 0) {
-                     return item;
-                 }
-             });
-             this.userList = searchList;
-             this.currUser = {};
-        },
-
-        chooseUser(data, index) {
+        chooseUser(data) {
             this.currUser = data;
         },
 
@@ -357,18 +265,7 @@ export default {
                     self.$Message.success('保存成功');
                     //重新设置下当前选择用户的状态
                     self.currUser.status = self.userStatus;
-                    self.allUserList.forEach((item, index) => {
-                        if (item.id === self.currUser.id) {
-                            console.log(index);
-                            self.$set(self.allUserList, index, self.currUser);
-                        }
-                    });
-                    self.userList.forEach((item, index) => {
-                        if(item.id === self.currUser.id) {
-                            console.log(index);
-                            self.$set(self.userList, index, self.currUser);
-                        }
-                    });
+                    self.$refs.userList.resetRowUserTab(self.currUser);
                 })
                 .catch((error) => {
                     self.spinShow = false;
@@ -377,10 +274,6 @@ export default {
                 });
         }
         
-
-        // changeAccess (res) {
-        //     this.$store.commit('updateMenulist', this.$store.state.user.accessRoutes);
-        // }
     }
 };
 </script>
