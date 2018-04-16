@@ -65,6 +65,11 @@ export default {
             lastTime: 0
         }
     },
+    watch: {
+        currUser: function(data) {
+            this.$emit('choose-user', data);
+        }
+    },
     mounted() {
         this.init();
     },
@@ -126,7 +131,7 @@ export default {
 
         chooseUser(data, index) {
             this.currUser = data;
-            this.$emit('choose-user', data);
+            
         },
 
         clearCurrentUser() {

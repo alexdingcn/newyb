@@ -81,22 +81,17 @@ export default {
     watch: {
         currUser: function(data) {
             this.userStatus = data.status;
-            this.showTitleChange()
+            if (data) {
+                let nickName = this.currUser ? this.currUser.nickname : '';
+                let realname = this.currUser ? this.currUser.realname : '';
+                this.showUserTitle = nickName + (realname ? '[' + realname + ']' : '');
+            }
             this.selectedTreeLeaf(data);
         }
     },
     methods: {
         init() {
             this.createMenuTree();
-        },
-
-        showTitleChange() {
-            if(!this.currUser) {
-                return '';
-            }
-            let nickName = this.currUser ? this.currUser.nickname : '';
-            let realname = this.currUser ? this.currUser.realname : '';
-            return nickName + (realname ? '[' + realname + ']' : '');
         },
 
         createMenuTree() {
@@ -160,8 +155,8 @@ export default {
         },
 
         checkedTreeByUserRoutes(userRoutes) {
+            this.clearTreeCheck(); //先把树的所有选择项清空在重新勾选
             if(!userRoutes || userRoutes.length <= 0) {
-                this.clearTreeCheck();
                 return;
             }
             let menuList = this.routeTreeData[0].children;
