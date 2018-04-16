@@ -43,6 +43,10 @@ public enum ErrorCode {
     // 15xx - 盘点
     CHECK_PLAN_NO_GOODS(1500, "无符合盘点条件的商品"),
     CHECK_PLAN_TYPE_ERROR(1501, "暂未开放该类型盘点"),
+    CHECK_PLAN_DETAIL_UPDATE_ERROR(1502, "执行盘点操作-更新失败"),
+    CHECK_PLAN_DETAIL_MORE_ERROR(1503, "盘盈记录添加失败-盘盈数据异常"),
+    CHECK_PLAN_PASS_ERROR(1504, "盘点单审核失败-盘点单中没有明细记录"),
+    CHECK_PLAN_PASS_STATE_ERROR(1505, "盘点单审核失败-盘点单包含异常未处理或已经审核的明细"),
     // 20xx - 客户
     CUSTOMER_GET_FAIL(2000, "获取客户信息失败"),
     CUSTOMER_DEL_PARAMS_EMPTY(2001, "请选择需要删除的客户"),

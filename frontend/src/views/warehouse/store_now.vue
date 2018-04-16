@@ -96,8 +96,8 @@
 
             <Row>
                 <Col span="6">
-                <FormItem label="商品速查" prop="good_id">
-                    <good-select v-model="storeNow.good_id" size="small"></good-select>
+                <FormItem label="商品速查" prop="goodsId">
+                    <good-select v-model="storeNow.goodsId" size="small"></good-select>
                 </FormItem>
                 </Col>
             </Row>
@@ -167,8 +167,8 @@
                         title: '商品名称',
                         key: 'goodName',
                         align: 'center',
-                        width: 150,
-                        sortable: true
+                        width: 150
+
                     },
                     {
                         title: '产地',

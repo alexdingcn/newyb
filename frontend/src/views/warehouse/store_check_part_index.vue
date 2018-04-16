@@ -119,7 +119,7 @@
                 checkTypeOptions:[{ id: 0, name:'库存盘点'},{ id: 1, name:'直接盘库'},{ id: 2, name:'单品盘点'}],
                 counterOptions:[{ id: 'ALL', name:'全部'}],
                 storeCheck: {
-                    checkOrderId: null
+                    checkPlanId: null
                 },
                 repertoryColumns: [
                     {
@@ -186,12 +186,12 @@
         },
 
         methods: {
-            init () {
+            initPartIndex () {
                 var self = this;
-                let checkOrderId=this.$route.params.checkOrderId.toString();
+                let checkPlanId=this.$route.params.checkPlanId.toString();
                 let warehouseName=this.$route.params.warehouseName.toString();
-                if(checkOrderId>0){
-                    util.ajax.post('/repertory/check/orderPartList?checkOrderId='+checkOrderId )
+                if(checkPlanId>0){
+                    util.ajax.post('/repertory/check/orderPartList?checkPlanId='+checkPlanId )
                         .then(function (response) {
                             self.repertoryCheckPartItems = [];
                             if (response.status === 200 && response.data) {
@@ -222,22 +222,24 @@
                             console.log(error);
                         });
                 }else{
+                    alert("checkPlanId异常"+checkPlanId);
                 }
 
 
             },addCheckPart(){
                 this.$router.push({
                     name: 'store_check_part_add',
-                    params:{checkOrderId: this.storeCheck.id,warehouseName:this.storeCheck.warehouseName}
+                    params:{checkPlanId: this.storeCheck.id,warehouseName:this.storeCheck.warehouseName}
                 });
             }
-        },
-        mounted () {
-            this.init();
+        }, mounted () {
+        this.initPartIndex();
+        }, activated () {
+           // this.clearData();
         },
         watch: {
-            '$route' () {
-                this.init();
+            '$route'() {
+                this.initPartIndex();
             }
         }
     };

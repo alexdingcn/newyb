@@ -13,7 +13,9 @@ public enum OptionsType {
     WAREHOUSE_OUT_TYPE("入库类型"),
     WAREHOUSE_CHECK_TYPE("盘点类型"),
     WAREHOUSE_CHECK_STATE("盘点单状态"),
-    ;
+    CHECK_PLAN_NORMAL("正常"),
+    CHECK_PLAN_LOSE("盘亏"),
+    CHECK_PLAN_MORE("盘盈"); ;
 
     private String description;
 

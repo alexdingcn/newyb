@@ -11,10 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
-import java.math.BigDecimal;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -32,7 +30,6 @@ public class RepertoryCheckController {
     private RepertoryCheckPlanMapper repertoryCheckPlanMapper;
     @Autowired
     private RepertoryCheckPlanDetailMapper repertoryCheckPlanDetailMapper;
-
 
 
     //根据条件获取入库单list
@@ -58,10 +55,10 @@ public class RepertoryCheckController {
     //根据条件获取入库单list
     @RequestMapping(value = "/orderPartList", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> list(@AuthenticationPrincipal User user,
-        @RequestParam(name = "checkOrderId", required = true) long checkOrderId
+        @RequestParam(name = "checkPlanId", required = true) long checkPlanId
     ){
-        RepertoryCheckPlan checkinfo= repertoryCheckPlanMapper.selectByPrimaryKey(checkOrderId);
-        //List<RepertoryCheckPart>  partlist = repertoryCheckPartMapper.selectByCheckOrderId(checkOrderId);
+        RepertoryCheckPlan checkinfo= repertoryCheckPlanMapper.selectByPrimaryKey(checkPlanId);
+        //List<RepertoryCheckPart>  partlist = repertoryCheckPartMapper.selectBycheckPlanId(checkPlanId);
         JSONObject result = new JSONObject();
         result.put("data", checkinfo);
         //result.put("checkPartList", partlist);
@@ -71,29 +68,60 @@ public class RepertoryCheckController {
     //根据条件获取入库单list
     @RequestMapping(value = "/orderinfo", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> orderinfo(@AuthenticationPrincipal User user,
-        @RequestParam(name = "checkOrderId", required = true) Long checkOrderId
+        @RequestParam(name = "checkPlanId", required = true) Long checkPlanId
     ) {
-        RepertoryCheckPlan checkinfo= repertoryCheckPlanMapper.selectByPrimaryKey(checkOrderId);
+        RepertoryCheckPlan checkinfo= repertoryCheckPlanMapper.selectByPrimaryKey(checkPlanId);
         JSONObject result = new JSONObject();
         result.put("data", checkinfo);
         return ResponseEntity.ok().body(result.toJSONString());
     }
 
-    //根据条件获取入库单list
+    //查询盘点单全部信息
     @RequestMapping(value = "/orderinfoList", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> orderinfoList(@AuthenticationPrincipal User user,
-                                            @RequestParam(name = "checkOrderId", required = true) Long checkOrderId
-    ) {
-
-        RepertoryCheckPlan checkinfo= repertoryCheckPlanMapper.selectByPrimaryKey(checkOrderId);
-        Map<String, Object> requestMap = new HashMap<>();
-        requestMap.put("checkOrderId", checkOrderId);
-        List<RepertoryCheckPlanDetail>  cdlist=repertoryCheckPlanDetailMapper.getCheckPlanDetailList(requestMap);
+                @RequestParam(name = "checkPlanId", required = true) Long checkPlanId
+    ) throws Exception {
         JSONObject result = new JSONObject();
-        result.put("data", checkinfo);
-        result.put("checkDetailList", cdlist);
+        result =repertoryCheckPlanService.getCheckPlanAndDetailJSON(checkPlanId);
         return ResponseEntity.ok().body(result.toJSONString());
     }
+
+    //盘点单审核通过
+    @RequestMapping(value = "/checkPlanPass", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> checkPlanPass(@AuthenticationPrincipal User user,
+                                                @RequestBody RepertoryCheckPlan rp)throws Exception {
+        JSONObject result = new JSONObject();
+        result =repertoryCheckPlanService.getCheckPlanPassJSON(user,rp);
+        return ResponseEntity.ok().body(result.toJSONString());
+    }
+
+
+    //根据盘点计划和拼命查询选择数据
+    @RequestMapping(value = "/orderinfoList4Search", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> orderinfoList4Search(@AuthenticationPrincipal User user,
+        @RequestParam(name = "checkPlanId", required = true) Long checkPlanId,
+        @RequestParam(name = "goodSearch", required = false) String goodSearch
+    ) throws Exception {
+        JSONObject result = new JSONObject();
+        Map<String, Object> requestMap = new HashMap<>();
+        requestMap.put("checkPlanId", checkPlanId);
+        requestMap.put("goodSearch", goodSearch);
+        result = repertoryCheckPlanService.getCheckPlanDetail4SearchJSON(requestMap);
+        return ResponseEntity.ok().body(result.toJSONString());
+    }
+
+    //查询某人执行的盘点单进度
+    @RequestMapping(value = "/orderinfoListByUser", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> orderinfoListByUser(@AuthenticationPrincipal User user,
+        @RequestParam(name = "checkPlanId", required = true) Long checkPlanId
+    ) throws Exception {
+        JSONObject result = new JSONObject();
+        result =repertoryCheckPlanService.getCheckPlanAndDetailJSONByUser(user,checkPlanId);
+        return ResponseEntity.ok().body(result.toJSONString());
+    }
+
+
+
 
     @RequestMapping(value = "/add", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> add(@AuthenticationPrincipal User user,
@@ -102,5 +130,33 @@ public class RepertoryCheckController {
         repertoryCheckPlanService.saveCheckPlan(user,repertoryCheckPlan);
         return ResponseEntity.ok().build();
     }
+
+    @RequestMapping(value = "/doCheckDetail", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> doCheckDetail(@AuthenticationPrincipal User user,
+        @RequestBody RepertoryCheckPlanDetail repertoryCheckPlanDetail)throws Exception  {
+        JSONObject result = new JSONObject();
+        result=repertoryCheckPlanService.doCheckDetail(user,repertoryCheckPlanDetail);
+        return ResponseEntity.ok().body(result.toJSONString());
+    }
+
+    //盘盈数据-可能包含本次盘点范围外的产品
+    @RequestMapping(value = "/doCheckDetailMore", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> doCheckDetailMore(@AuthenticationPrincipal User user,
+                                                @RequestBody RepertoryCheckPlanDetail repertoryCheckPlanDetail)throws Exception  {
+        JSONObject result = new JSONObject();
+        result=repertoryCheckPlanService.doCheckDetailMore(user,repertoryCheckPlanDetail);
+        return ResponseEntity.ok().body(result.toJSONString());
+    }
+    //增加盘盈记录
+    @RequestMapping(value = "/addPlanDetaile", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> addPlanDetaile(@AuthenticationPrincipal User user,
+                                      @RequestBody RepertoryCheckPlanDetail repertoryCheckPlanDetail)throws Exception  {
+        logger.info("ADD new repertoryCheckPlan order, userId={}", user.getId());
+
+        repertoryCheckPlanService.saveCheckPlanDetail(user,repertoryCheckPlanDetail);
+        return ResponseEntity.ok().build();
+    }
+
+
 
 }

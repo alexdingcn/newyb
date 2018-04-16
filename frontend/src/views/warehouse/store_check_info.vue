@@ -12,12 +12,12 @@
 
             <div slot="extra">
 
-                <!--<ButtonGroup >-->
-                    <!--<Button type="primary" icon="android-add-circle" @click="" >盘点表录入</Button>-->
-                <!--</ButtonGroup>-->
-                <!--<ButtonGroup >-->
-                    <!--<Button type="primary" icon="android-add-circle" @click="" >盘点表审核</Button>-->
-                <!--</ButtonGroup>-->
+                <ButtonGroup >
+                    <Button type="primary" icon="android-add-circle" @click="checkPlanPass" >审核通过</Button>
+                </ButtonGroup>
+                <ButtonGroup >
+                    <Button type="primary" icon="android-add-circle" @click="checkPlanException" >盘点异常修改</Button>
+                </ButtonGroup>
             </div>
             <Form :label-width="85" :model="storeCheck" ref="storeCheckForm">
                 <Row>
@@ -118,8 +118,9 @@
                 repertoryCheckDetailItems: [],
                 checkTypeOptions:[{ id: 0, name:'库存盘点'},{ id: 1, name:'直接盘库'},{ id: 2, name:'单品盘点'}],
                 counterOptions:[{ id: 'ALL', name:'全部'}],
+                checkPlanId: null,
                 storeCheck: {
-                    checkOrderId: null
+
                 },
             repertoryColumns: [
                     {
@@ -127,54 +128,77 @@
                         title: 'id',
                         align: 'center',
                         width: 30
-                    },
-                    {
-                        title: '货号',
-                        align: 'center',
-                        key: 'code',
-                        width: 160
-                    },
+                    },{
+                    title: '状态',
+                    key: 'checkStatus',
+                    align: 'center',
+                    width: 80,
+                    render: (h, params) =>{
+                        let state = params.row.checkStatus;
+                        if (state==undefined) {
+                            return h('Tag', {props:{ color:'yellow'}}, '待处理');
+                        }else if(0==state){
+                            return h('Tag', {props:{ color:'blue'}}, '正常');
+                        }else if(1==state){
+                            return h('Tag', {props:{ color:'red'}}, '盘盈');
+                        }else if(-1==state){
+                            return h('Tag', {props:{ color:'red'}}, '盘亏');
+                        }
+                    }
+                },
+                    // {
+                    //     title: '货号',
+                    //     align: 'center',
+                    //     key: 'code',
+                    //     width: 160
+                    // },
                     {
                         title: '品名',
                         align: 'center',
                         key: 'goodsName',
-                        width: 80
+                        width: 160
                     },
-
+                {
+                    title: '剂型',
+                    key: 'jx',
+                    align: 'center',
+                    width: 80
+                },
+                {
+                    title: '规格',
+                    key: 'spec',
+                    align: 'center',
+                    width: 80
+                },
                     {
                         title: '产地',
                         key: 'origin',
                         align: 'center',
                         width: 80
                     },
-                    {
-                        title: '规格',
-                        key: 'spec',
-                        align: 'center',
-                        width: 80
-                    },
+
 
                     {
                         title: '生产企业',
                         key: 'factoryName',
                         align: 'center',
-                        width: 80
+                        width: 160
                     },
                     {
                         title: '单位',
-                        key: 'unit',
+                        key: 'unitName',
                         align: 'center',
                         width: 80
                     },
                     {
                         title: '库存数量',
-                        key: 'accAmount',
+                        key: 'accLimit',
                         align: 'center',
                         width: 80
                     },
                     {
                         title: '盘点数量',
-                        key: 'checkAmount',
+                        key: 'checkLimit',
                         align: 'center',
                         width: 80
                     },
@@ -188,9 +212,9 @@
                         title: '生产日期',
                         key: 'productDate',
                         align: 'center',
-                        width: 0,
+                        width: 120,
                         render: (h, params) => {
-                            return moment(params.row.eta).format('YYYY-MM-DD');
+                            return moment(params.row.productDate).format('YYYY-MM-DD');
                         }
                     },
                     {
@@ -199,7 +223,7 @@
                         align: 'center',
                         width: 80,
                         render: (h, params) => {
-                            return moment(params.row.eta).format('YYYY-MM-DD');
+                            return moment(params.row.expDate).format('YYYY-MM-DD');
                         }
                     },
                     {
@@ -223,10 +247,12 @@
         methods: {
             init () {
                 var self = this;
-                let checkOrderId=this.$route.params.checkOrderId.toString();
-                 let warehouseName=this.$route.params.warehouseName.toString();
-                if(checkOrderId>0){
-                    util.ajax.post('/repertory/check/orderinfoList?checkOrderId='+checkOrderId )
+                console.log("接受 的数据checkPlanId=="+this.$route.params.checkPlanId.toString())
+                let checkPlanId=this.$route.params.checkPlanId.toString();
+                let warehouseName=this.$route.params.warehouseName.toString();
+                this.checkPlanId=checkPlanId;
+                if(checkPlanId>0){
+                    util.ajax.post('/repertory/check/orderinfoList?checkPlanId='+checkPlanId )
                         .then(function (response) {
                             self.repertoryCheckDetailItems = [];
                             if (response.status === 200 && response.data) {
@@ -258,10 +284,34 @@
                             console.log(error);
                     });
                 }else{
-                    alert("checkOrderId异常"+checkOrderId);
+                    alert("checkPlanId异常"+checkPlanId);
                 }
 
+            },checkPlanPass(){
 
+                if( this.checkPlanId>0){
+                    alert("this.checkPlanId 开始审核"+this.checkPlanId);
+                    util.ajax.post('/repertory/check/getCheckPlanPassJSON',this.storeCheck)
+                        .then(function (response) {
+                            self.repertoryCheckDetailItems = [];
+                            if (response.status === 200 && response.data) {
+                                self.$Message.info('盘点单审核成功');
+                                alert("返回库存盘点主页store_check_index");
+                            }
+                        })
+                        .catch(function (error) {
+                            console.log(error);
+                        });
+                }else{
+                    alert("checkPlanId异常"+checkPlanId);
+                }
+            },checkPlanException(){
+                if( this.checkPlanId>0){
+                    self.$Message.info('盘点单审核成不通过');
+                   // alert("this.checkPlanId 审核不通过"+this.checkPlanId);
+                }else{
+                    alert("checkPlanId异常"+checkPlanId);
+                }
             }
         },
         mounted () {

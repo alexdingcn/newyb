@@ -7,7 +7,7 @@ public class RepertoryCheckPlanDetail {
     private Long id;
 
     private Long checkPlanId;
-
+    private Long makeUserId;
     private String formNo;
 
     private String formStatus;
@@ -34,13 +34,25 @@ public class RepertoryCheckPlanDetail {
 
     private Date expDate;
 
-    private String createdBy;
+    private String createBy;
 
-    private Date createdTime;
+    private Date createTime;
 
-    private String updatedBy;
+    private String updateBy;
 
-    private Date updatedTime;
+    private Date updateTime;
+    //前端显示字段
+
+    private RepertoryInfo repertoryInfo;
+    private String code;
+    private String origin;
+    private String location;
+    private String spec;
+    private String jx;
+    private String unitName;
+    private String goodsName;
+    private Long factoryId;
+    private String factoryName;
 
     public Long getId() {
         return id;
@@ -154,38 +166,6 @@ public class RepertoryCheckPlanDetail {
         this.productDate = productDate;
     }
 
-    public String getCreatedBy() {
-        return createdBy;
-    }
-
-    public void setCreatedBy(String createdBy) {
-        this.createdBy = createdBy == null ? null : createdBy.trim();
-    }
-
-    public Date getCreatedTime() {
-        return createdTime;
-    }
-
-    public void setCreatedTime(Date createdTime) {
-        this.createdTime = createdTime;
-    }
-
-    public String getUpdatedBy() {
-        return updatedBy;
-    }
-
-    public void setUpdatedBy(String updatedBy) {
-        this.updatedBy = updatedBy == null ? null : updatedBy.trim();
-    }
-
-    public Date getUpdatedTime() {
-        return updatedTime;
-    }
-
-    public void setUpdatedTime(Date updatedTime) {
-        this.updatedTime = updatedTime;
-    }
-
     public Date getExpDate() {
         return expDate;
     }
@@ -193,4 +173,134 @@ public class RepertoryCheckPlanDetail {
     public void setExpDate(Date expDate) {
         this.expDate = expDate;
     }
+
+    public String getCreateBy() {
+        return createBy;
+    }
+
+    public void setCreateBy(String createBy) {
+        this.createBy = createBy == null ? null : createBy.trim();
+    }
+
+    public Date getCreateTime() {
+        return createTime;
+    }
+
+    public void setCreateTime(Date createTime) {
+        this.createTime = createTime;
+    }
+
+    public String getUpdateBy() {
+        return updateBy;
+    }
+
+    public void setUpdateBy(String updateBy) {
+        this.updateBy = updateBy == null ? null : updateBy.trim();
+    }
+
+    public Date getUpdateTime() {
+        return updateTime;
+    }
+
+    public void setUpdateTime(Date updateTime) {
+        this.updateTime = updateTime;
+    }
+
+    public String getCode() {
+        return code;
+    }
+
+    public void setCode(String code) {
+        this.code = code;
+    }
+
+    public String getOrigin() {
+        return origin;
+    }
+
+    public void setOrigin(String origin) {
+        this.origin = origin;
+    }
+
+    public String getSpec() {
+        return spec;
+    }
+
+    public void setSpec(String spec) {
+        this.spec = spec;
+    }
+
+    public String getGoodsName() {
+        return goodsName;
+    }
+
+    public void setGoodsName(String goodsName) {
+        this.goodsName = goodsName;
+    }
+
+    public Long getFactoryId() {
+        return factoryId;
+    }
+
+    public void setFactoryId(Long factoryId) {
+        this.factoryId = factoryId;
+    }
+
+    public String getFactoryName() {
+        return factoryName;
+    }
+
+    public void setFactoryName(String factoryName) {
+        this.factoryName = factoryName;
+    }
+
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
+    }
+
+    public String getJx() {
+        return jx;
+    }
+
+    public void setJx(String jx) {
+        this.jx = jx;
+    }
+
+    public String getUnitName() {
+        return unitName;
+    }
+
+    public void setUnitName(String unitName) {
+        this.unitName = unitName;
+    }
+
+    public RepertoryInfo getRepertoryInfo() {
+        return repertoryInfo;
+    }
+
+    public Long getMakeUserId() {
+        return makeUserId;
+    }
+
+    public void setMakeUserId(Long makeUserId) {
+        this.makeUserId = makeUserId;
+    }
+
+    public void setRepertoryInfo(RepertoryInfo repertoryInfo) {
+        this.repertoryInfo = repertoryInfo;
+        if (repertoryInfo != null && repertoryInfo.getGoods() != null) {
+            Goods goods = repertoryInfo.getGoods();
+            this.goodsName = goods.getName();
+            this.jx=goods.getJx();
+            this.spec=goods.getSpec();
+            this.origin=goods.getOrigin();
+            this.factoryName = goods.getFactory();
+            this.unitName=goods.getUnitName();
+        }
+    }
+
 }

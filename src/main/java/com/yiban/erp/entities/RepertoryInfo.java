@@ -67,8 +67,8 @@ public class RepertoryInfo {
     private String jx;
     private String spec;
     private String unitName;
-    private long permitId;
-    private long baseMedId;
+    private Long permitId;
+    private Integer baseMedId;
     private String storageCondition;
 
     public void setGoods(Goods goods) {
@@ -85,7 +85,6 @@ public class RepertoryInfo {
             this.storageCondition = goods.getStorageCondition();
         }
     }
-
 
     public Long getId() {
         return id;
@@ -127,6 +126,21 @@ public class RepertoryInfo {
         this.inUserId = inUserId;
     }
 
+    public Long getGoodsId() {
+        return goodsId;
+    }
+
+    public void setGoodsId(Long goodsId) {
+        this.goodsId = goodsId;
+    }
+
+    public String getBatchCode() {
+        return batchCode;
+    }
+
+    public void setBatchCode(String batchCode) {
+        this.batchCode = batchCode;
+    }
 
     public Long getFactoryId() {
         return factoryId;
@@ -192,22 +206,6 @@ public class RepertoryInfo {
         this.expDate = expDate;
     }
 
-    public Long getGoodsId() {
-        return goodsId;
-    }
-
-    public void setGoodsId(Long goodsId) {
-        this.goodsId = goodsId;
-    }
-
-    public String getBatchCode() {
-        return batchCode;
-    }
-
-    public void setBatchCode(String batchCode) {
-        this.batchCode = batchCode;
-    }
-
     public Date getInDate() {
         return inDate;
     }
@@ -246,6 +244,14 @@ public class RepertoryInfo {
 
     public void setOrderId(Long orderId) {
         this.orderId = orderId;
+    }
+
+    public Long getOrderDetailId() {
+        return orderDetailId;
+    }
+
+    public void setOrderDetailId(Long orderDetailId) {
+        this.orderDetailId = orderDetailId;
     }
 
     public Boolean getSaleSate() {
@@ -348,19 +354,19 @@ public class RepertoryInfo {
         this.unitName = unitName;
     }
 
-    public long getPermitId() {
+    public Long getPermitId() {
         return permitId;
     }
 
-    public void setPermitId(long permitId) {
+    public void setPermitId(Long permitId) {
         this.permitId = permitId;
     }
 
-    public long getBaseMedId() {
+    public Integer getBaseMedId() {
         return baseMedId;
     }
 
-    public void setBaseMedId(long baseMedId) {
+    public void setBaseMedId(Integer baseMedId) {
         this.baseMedId = baseMedId;
     }
 
@@ -370,13 +376,5 @@ public class RepertoryInfo {
 
     public void setStorageCondition(String storageCondition) {
         this.storageCondition = storageCondition;
-    }
-
-    public Long getOrderDetailId() {
-        return orderDetailId;
-    }
-
-    public void setOrderDetailId(Long orderDetailId) {
-        this.orderDetailId = orderDetailId;
     }
 }

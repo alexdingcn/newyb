@@ -51,15 +51,7 @@
                         <DatePicker type="date" v-model="storeCheck.checkDate" size="small"/>
                     </FormItem>
                     </Col>
-                    <Col span="4">
-                    <FormItem label="库区" >
-                        <Select v-model="storeCheck.counterState" size="small"  prop="counter_state">
-                            <Option v-for="option in counterOptions" :value="option.id" :label="option.name" :key="option.id">
-                                {{option.name}}
-                            </Option>
-                        </Select>
-                    </FormItem>
-                    </Col>
+
                 </Row>
                 <Row>
                     <Col span="5">
@@ -134,7 +126,6 @@
                 closeConfirm: false,
                 orderItems: [],
                 storeCheck: {
-                    counterState:'ALL',
                     checkType:0,
                     checkDate:moment().format('YYYY-MM-DD'),
                     orderItemIds:[]

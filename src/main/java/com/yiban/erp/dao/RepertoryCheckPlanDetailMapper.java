@@ -20,5 +20,6 @@ public interface RepertoryCheckPlanDetailMapper {
 
     int updateByPrimaryKey(RepertoryCheckPlanDetail record);
 
-    List<RepertoryCheckPlanDetail> getCheckPlanDetailList( Map<String, Object> requestMap);
+    List<RepertoryCheckPlanDetail> getCheckPlanDetailList(Map<String, Object> paramMap);
+
 }

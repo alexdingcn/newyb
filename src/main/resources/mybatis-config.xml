@@ -41,5 +41,6 @@
         <mapper resource="mapping/MessageInfoMapper.xml"/>
         <mapper resource="mapping/MessageOptionMapper.xml"/>
         <mapper resource="mapping/RepertoryCheckPlanMapper.xml"/>
+        <mapper resource="mapping/RepertoryCheckPlanDetailMapper.xml"/>
     </mappers>
 </configuration>

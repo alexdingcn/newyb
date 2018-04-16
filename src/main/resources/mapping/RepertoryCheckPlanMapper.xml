@@ -271,7 +271,8 @@
   <select id="getCheckPlanList" parameterType="map" resultMap="BaseResultMap">
     SELECT  a.*,w.`name` AS warehouseName
     FROM `repertory_check_plan`  a
-    LEFT JOIN `warehouse`  w ON w.`id`=a.`warehouse_id`
+    LEFT JOIN `warehouse`  w
+    ON w.`id`=a.`warehouse_id`
     WHERE  1=1
     <if test="warehouseId != null" >
       and a.warehouseId = #{warehouseId}
