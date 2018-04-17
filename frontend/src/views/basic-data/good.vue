@@ -6,7 +6,7 @@
 <template>
     <div class="layout">
         <Layout :style="{minHeight: '100vh'}">
-            <Sider collapsible defaultCollapsed :collapsed-width="150" :style="{background: '#fff'}" v-show="sidebarVisible">
+            <Sider collapsible defaultCollapsed :collapsed-width="200" :style="{background: '#fff'}" v-show="sidebarVisible">
                 <Card :bordered="false" dis-hover>
                     <p slot="title">
                         <Icon type="android-options"></Icon> 商品分类
@@ -15,7 +15,7 @@
                     <div class="good-category-con">
                         <ButtonGroup slot="extra">
                             <Button type="primary" icon="android-add-circle" size="small" @click="addCategory">添加</Button>
-                            <Button type="success" icon="edit" size="small" @click="addCategory" :disabled="disableDelCategory"></Button>
+                            <Button type="success" icon="edit" size="small" @click="editCategory" :disabled="disableDelCategory"></Button>
                             <Button type="error" icon="android-remove-circle" size="small" @click="delCategory" :disabled="disableDelCategory"></Button>
                         </ButtonGroup>
 
@@ -32,7 +32,8 @@
                     <div slot="extra">
                         <Input v-model="searchGoodsVal" icon="search" placeholder="商品名称/拼音简称" style="width: 300px"></Input>
                         <ButtonGroup>
-                            <Button type="primary" icon="android-add-circle" @click="addGoods">添加</Button>
+                            <Button type="success" icon="android-add-circle" @click="addGoods">添加</Button>
+                            <Button type="primary" icon="edit" @click="editGoods">修改</Button>
                             <Button type="error" icon="android-remove-circle" @click="delGoods">删除</Button>
                             <Button type="ghost" icon="ios-download-outline" @click="exportData">导出当前页数据</Button>
                         </ButtonGroup>
@@ -50,16 +51,25 @@
                 </Card>
             </Layout>
         </Layout>
+
+        <Modal v-model="checkModalShow" title="商品基础信息维护" :mask-closable="false" width="80">
+            <goods-info ></goods-info>
+            <div slot="footer"></div>
+        </Modal>
+
     </div>
 </template>
 
 <script>
-import axios from 'axios';
 import util from '@/libs/util.js';
+import goodsInfo from './goods-info.vue';
 import _ from 'lodash';
 
 export default {
     name: 'goods',
+    components: {
+        goodsInfo
+    },
     data () {
         return {
             sidebarVisible: true,
@@ -67,7 +77,7 @@ export default {
             searchGoodsVal: '',
             totalGoodsCount: 0,
             currentPage: 1,
-            goodCat: [ {title: '全部', id: 0, selected: true} ],
+            goodCat: [],
             selectedCategory: {},
             disableDelCategory: true,
             goodsTableLoading: false,
@@ -85,9 +95,14 @@ export default {
                     fixed: 'left'
                 },
                 {
+                    title: '货号',
+                    key: 'id',
+                    width: 80,
+                    fixed: 'left'
+                },
+                {
                     title: '商品名称',
                     key: 'name',
-                    align: 'center',
                     width: 220,
                     sortable: true,
                     fixed: 'left',
@@ -112,76 +127,74 @@ export default {
                 {
                     title: '类别',
                     key: 'categoryName',
-                    width: 100,
-                    align: 'center'
+                    width: 100
                 },
                 {
                     title: '产地',
-                    key: 'origin',
-                    width: 100,
-                    align: 'center'
+                    key: 'origin'
                 },
                 {
                     title: '计量单位',
-                    key: 'unitName',
-                    width: 80,
-                    align: 'center'
+                    key: 'unitName'
                 },
                 {
                     title: '剂型',
-                    key: 'jx',
-                    width: 80,
-                    align: 'center'
+                    key: 'jx'
                 },
                 {
                     title: '规格',
                     key: 'spec',
-                    width: 200,
-                    align: 'center',
                     sortable: true
                 },
                 {
                     title: '生产企业',
                     key: 'factory',
-                    width: 200,
-                    align: 'center'
                 },
                 {
-                    title: '库存',
-                    key: 'factory',
+                    title: '是否代销',
+                    key: 'isProxy',
                     width: 100,
-                    align: 'center'
+                    render: (h, params) => {
+                        return h('span', params.row.isProxy ? '是' : '否');
+                    }
                 },
                 {
-                    title: '在单数',
-                    key: 'factory',
+                    title: '重点养护',
+                    key: 'needCare',
                     width: 100,
-                    align: 'center'
+                    render: (h, params) => {
+                        return h('span', params.row.needCare ? '是':'否');
+                    }
+                },
+                {
+                    title: '提成基数',
+                    key: 'needCare',
+                    width: 100,
+                    render: (h, params) => {
+                        return h('span', params.row.needCare ? '是':'否');
+                    }
                 }
+                
             ],
-            goodsData: []
+            goodsData: [],
+            checkModalShow: false
         };
-    },
-    activated () {
-        this.loadTree();
     },
     mounted () {
         this.loadTree();
         this.loadGoodsData();
-    },
-    computed: {
-
     },
     methods: {
         loadTree () {
             var self = this;
             util.ajax.get('/good/category/tree')
                 .then(function (response) {
-                    self.goodCat = self.goodCat.slice(0, 1);
-                    self.goodCat = self.goodCat.concat(response.data);
+                    self.goodCat = response.data;
+                    self.selectedCategory = {};
+                    self.disableDelCategory = true;
                 })
                 .catch(function (error) {
-                    console.log(error);
+                    util.errorProcessor(self, error);
                 });
         },
         loadGoodsData () {
@@ -205,7 +218,7 @@ export default {
                 })
                 .catch(function (error) {
                     self.goodsTableLoading = false;
-                    console.log(error);
+                    util.errorProcessor(self, error);
                 });
         },
         onTreeNodeSelected (items) {
@@ -217,21 +230,69 @@ export default {
                 this.disableDelCategory = true;
             }
         },
+        
+        doEditCategory(newCategory) {
+            if (!this.selectedCategory.id || !newCategory) {
+                this.$$Message.warning('获取数据失败');
+                return;
+            }
+            let reqData = {
+                id: this.selectedCategory.id,
+                name: newCategory
+            };
+            let self = this;
+            util.ajax.put('/good/category/edit', reqData)
+                .then((response) => {
+                    self.loadTree();
+                })
+                .catch((error) => {
+                    util.errorProcessor(self, error);
+                })
+        },
+
+        editCategory() {
+            if(!this.selectedCategory || !this.selectedCategory.id) {
+                this.$Message.warning('请先选择需要修改的产品组类别');
+                return;
+            }
+            var inputVal = '';
+            let self = this;
+            this.$Modal.confirm({
+                onOk: () => {
+                    self.doEditCategory(inputVal);
+                },
+                render: (h) => {
+                    return h('Input', {
+                        props: {
+                            autofocus: true,
+                            maxlength: 20,
+                            value: self.selectedCategory.title
+                        },
+                        on: {
+                            input: (val) => {
+                                inputVal = val;
+                            }
+                        }
+                    });
+                }
+            });
+        },
+
         doAddCategory (newCategory) {
             var self = this;
             if (!newCategory) {
                 this.$Message.warning('商品分类名称不能为空');
                 return;
             }
-
             util.ajax.post('/good/category/add', { name: newCategory })
                 .then(function (response) {
                     self.loadTree();
                 })
                 .catch(function (error) {
-                    console.log(error);
+                    util.errorProcessor(self, error);
                 });
         },
+
         addCategory () {
             var inputVal = '';
             this.$Modal.confirm({
@@ -261,7 +322,7 @@ export default {
                     self.loadTree();
                 })
                 .catch(function (error) {
-                    self.$Message.warning(error.response.data.message);
+                    util.errorProcessor(self, error);
                 });
         },
         exportData () {
@@ -270,11 +331,10 @@ export default {
             });
         },
         addGoods () {
-            let argu = { goods_category: this.selectedCategory.id };
-            this.$router.push({
-                name: 'goods-info',
-                params: argu
-            });
+            this.checkModalShow = true;
+        },
+        editGoods () {
+            this.checkModalShow = true;
         },
         delGoods () {
             var row = this.$refs.goodsTable.getSelection();
@@ -285,7 +345,7 @@ export default {
                         self.loadTree();
                     })
                     .catch(function (error) {
-                        console.log(error);
+                        self.errorProcessor(self, error);
                     });
             } else {
                 this.$Message.warning('请选择一个商品后操作');
@@ -294,9 +354,6 @@ export default {
         changePage (pageNumber) {
             this.currentPage = pageNumber;
             this.loadGoodsData();
-        },
-        handleSearchGoods (value) {
-            console.log(value);
         }
     },
     watch: {

@@ -3,6 +3,7 @@ package com.yiban.erp.controller.util;
 import com.alibaba.fastjson.JSON;
 import com.yiban.erp.constant.OptionsType;
 import com.yiban.erp.dao.OptionsMapper;
+import com.yiban.erp.dto.OptionValue;
 import com.yiban.erp.entities.Options;
 import com.yiban.erp.entities.User;
 import com.yiban.erp.exception.BizException;
@@ -35,13 +36,13 @@ public class OptionsController {
      * @return
      */
     @RequestMapping(value = "/list", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> getPinyinAbbr(@AuthenticationPrincipal User user,
+    public ResponseEntity<JSON> getPinyinAbbr(@AuthenticationPrincipal User user,
                                                 @RequestBody List<String> options) throws Exception {
         List<String> queryOptions = null;
         if (options != null) {
             queryOptions = new ArrayList<>();
             for (String option : options) {
-                if (OptionsType.valueOf(option.toUpperCase()) != null) {
+                if (OptionsType.getByName(option.toUpperCase()) != null) {
                     queryOptions.add(option.toUpperCase());
                 }
             }
@@ -55,7 +56,19 @@ public class OptionsController {
             }
             result.get(option.getType()).add(option);
         }
-        return ResponseEntity.ok().body(JSON.toJSONString(result));
+        return ResponseEntity.ok().body((JSON) JSON.toJSON(result));
+    }
+
+    @RequestMapping(value = "/type", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> getAllTypes() {
+        List<OptionValue> options = new ArrayList<>();
+        for (OptionsType type : OptionsType.values()) {
+            OptionValue value = new OptionValue();
+            value.setValue(type.name());
+            value.setDesc(type.getDescription());
+            options.add(value);
+        }
+        return ResponseEntity.ok().body(JSON.toJSONString(options));
     }
 
 

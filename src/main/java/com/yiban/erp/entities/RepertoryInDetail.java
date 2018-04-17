@@ -88,7 +88,7 @@ public class RepertoryInDetail {
     private String factory;
     private String unitName;
     private String packUnitName;
-    private Integer bigPack;
+    private BigDecimal bigPack;
     private String permit;
     private String storageCondition;
     private Boolean specialManaged;
@@ -98,7 +98,7 @@ public class RepertoryInDetail {
     }
 
     public String getStorageCondition() {
-        return this.goods == null ? null : this.goods.getStorageCondition();
+        return this.goods == null ? null : this.goods.getStorageConditionName();
     }
 
     public String getGoodsName() {
@@ -110,7 +110,7 @@ public class RepertoryInDetail {
     }
 
     public String getJx() {
-        return this.goods == null ? null : this.goods.getJx();
+        return this.goods == null ? null : this.goods.getJxName();
     }
 
     public String getSpec() {
@@ -129,12 +129,12 @@ public class RepertoryInDetail {
         return this.goods == null ? null : this.goods.getPackUnitName();
     }
 
-    public Integer getBigPack() {
+    public BigDecimal getBigPack() {
         return this.goods == null ? null : this.goods.getBigPack();
     }
 
     public String getPermit() {
-        return this.goodsName == null ? null : String.valueOf(this.goods.getPermitId());
+        return this.goods == null ? null : this.goods.getPermitNo();
     }
 
     public Goods getGoods() {

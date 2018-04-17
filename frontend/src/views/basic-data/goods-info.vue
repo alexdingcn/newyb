@@ -15,7 +15,7 @@
                     <Button type="primary" @click="submitGoods">提交</Button>
                 </ButtonGroup>
 
-                <Form :model="formItem" :rules="ruleValidate" :label-width="80">
+                <Form :model="formItem" :rules="ruleValidate" :label-width="90">
                     <Row>
                         <Col span="6">
                             <FormItem label="通用名称" prop="name">
@@ -25,18 +25,18 @@
                         <Col span="6">
                             <FormItem label="商品类别" prop="categoryId">
                                 <Select v-model="formItem.categoryId" filterable>
-                                    <Option v-for="item in categoryList" :value="item.id" :key="item.id">{{ item.title }}</Option>
+                                    <Option v-for="item in categoryList" :value="item.id" :key="item.id">{{ item.name }}</Option>
                                 </Select>
                             </FormItem>
                         </Col>
                         <Col span="6">
-                            <FormItem label="商品编号" prop="serial">
-                                <Input v-model="formItem.serial" placeholder="例如 GO000198320138"/>
+                            <FormItem label="货号" prop="code">
+                                <Input v-model="formItem.id" disabled placeholder="系统自动生成"/>
                             </FormItem>
                         </Col>
                         <Col span="6">
-                            <FormItem label="货号" prop="code">
-                                <Input v-model="formItem.code" placeholder="例如 73928192"/>
+                            <FormItem label="条码" prop="serial">
+                                <Input v-model="formItem.serial" placeholder="例如 GO000198320138"/>
                             </FormItem>
                         </Col>
                     </Row>
@@ -46,7 +46,7 @@
                                 <Input v-model="formItem.spec" placeholder="例如 15g*10袋*120"/>
                             </FormItem>
                         </Col>
-                        <Col span="12">
+                        <Col span="10">
                             <Row>
                                 <Col span="18">
                                     <FormItem label="生产企业" prop="factory">
@@ -62,7 +62,7 @@
                                 </Col>
                             </Row>
                         </Col>
-                        <Col span="6">
+                        <Col span="8">
                             <FormItem label="产地" prop="origin">
                                 <Input v-model="formItem.origin" placeholder="例如 陕西"/>
                             </FormItem>
@@ -71,28 +71,12 @@
                     <Row>
                         <Col span="6">
                             <FormItem label="计量单位" prop="unit">
-                                <Select v-model="formItem.unit" placeholder="例如 盒" @on-change="onChangeUnit">
-                                    <Option v-for="item in unitList" :value="item.id" :label="item.name" :key="item.id">
-                                        {{ item.name }}
-                                    </Option>
-                                    <Option value="newUnit" key="newUnit" label="">
-                                        <span>新增单位</span>
-                                        <span style="float:right;color:#ccc"><i class="ivu-icon ivu-icon-share"></i></span>
-                                    </Option>
-                                </Select>
+                                <optionSelect v-model="formItem.unit" optionType='GOODS_UNIT' ></optionSelect>
                             </FormItem>
                         </Col>
                         <Col span="6">
                             <FormItem label="整件单位" prop="packUnit">
-                                <Select v-model="formItem.packUnit" placeholder="例如 箱" @on-change="onChangeBigUnit">
-                                    <Option v-for="item in unitList" :value="item.id" :label="item.name" :key="item.id">
-                                        {{ item.name }}
-                                    </Option>
-                                    <Option value="newUnit" key="newUnit">
-                                        <span>新增单位</span>
-                                        <span style="float:right;color:#ccc"><i class="ivu-icon ivu-icon-share"></i></span>
-                                    </Option>
-                                </Select>
+                                <optionSelect v-model="formItem.packUnit" optionType='GOODS_UNIT' ></optionSelect>
                             </FormItem>
                         </Col>
                         <Col span="6">
@@ -113,10 +97,18 @@
                             </FormItem>
                         </Col>
                         <Col span="6">
-                            <FormItem label="可销售">
+                            <FormItem label="是否可用">
                                 <i-switch v-model="formItem.enable" size="large">
                                     <span slot="open">可用</span>
                                     <span slot="close">禁用</span>
+                                </i-switch>
+                            </FormItem>
+                        </Col>
+                        <Col span="6">
+                            <FormItem label="代销">
+                                <i-switch v-model="formItem.isProxy" size="large">
+                                    <span slot="open">是</span>
+                                    <span slot="close">否</span>
                                 </i-switch>
                             </FormItem>
                         </Col>
@@ -147,7 +139,7 @@
                                 </Col>
                             </Row>
                             <Row>
-                                <Col span="8">
+                                <Col span="6">
                                     <FormItem label="商品名称" prop="fullName">
                                         <Input v-model="formItem.fullName" placeholder=""/>
                                     </FormItem>
@@ -157,14 +149,32 @@
                                         <Input v-model="formItem.pinyin"/>
                                     </FormItem>
                                 </Col>
-                                <Col span="10">
-                                    <FormItem label="批准文号" prop="permit">
-                                        <Input v-model="formItem.permit">
-                                        <Select value="gyz" slot="prepend" style="width: 100px">
-                                            <Option value="gyz">国药准字Z</Option>
-                                            <Option value="gyh">国药准字H</Option>
-                                        </Select>
-                                        </Input>
+                                <Col span="6">
+                                    <FormItem label="批准文号" prop="permitNo">
+                                        <Input v-model="formItem.permitNo"></Input>
+                                    </FormItem>
+                                </Col>
+                            </Row>
+                            <Row>
+                                <Col span="6">
+                                    <FormItem label="注册商标" prop="brandNo">
+                                        <Input v-model="formItem.brandNo"/>
+                                    </FormItem>
+                                </Col>
+                                <Col span="6">
+                                    <FormItem label="档案号" prop="archiveNo">
+                                        <Input v-model="formItem.archiveNo"/>
+                                    </FormItem>
+                                </Col>
+                                <Col span="6">
+                                    <FormItem label="储藏条件" prop="storageCondition">
+                                        <optionSelect v-model="formItem.storageCondition" optionType='STORAGE_METHOD' ></optionSelect>
+                                    </FormItem>
+                                </Col>
+
+                                <Col span="6">
+                                    <FormItem label="联系方式" prop="contact">
+                                        <Input v-model="formItem.contact"/>
                                     </FormItem>
                                 </Col>
                             </Row>
@@ -190,34 +200,9 @@
                                     </FormItem>
                                 </Col>
                             </Row>
-                            <Row>
-                                <Col span="6">
-                                    <FormItem label="储藏条件" prop="storageCondition">
-                                        <Input v-model="formItem.storageCondition"/>
-                                    </FormItem>
-                                </Col>
-
-                                <Col span="12">
-                                    <FormItem label="联系方式" prop="contact">
-                                        <Input v-model="formItem.contact"/>
-                                    </FormItem>
-                                </Col>
-                            </Row>
                         </TabPane>
                         <TabPane label="扩展信息" name="expanded" icon="paperclip">
-                            <Row>
-                                <Col span="6">
-                                    <FormItem label="注册商标" prop="brand">
-                                        <Input v-model="formItem.brand"/>
-                                    </FormItem>
-                                </Col>
-
-                                <Col span="6">
-                                    <FormItem label="档案号" prop="archiveNumber">
-                                        <Input v-model="formItem.archiveNumber"/>
-                                    </FormItem>
-                                </Col>
-                            </Row>
+                            
                             <Row>
                                 <Col span="20">
                                     <FormItem label="主治功能" prop="cureRange">
@@ -234,84 +219,202 @@
                             </Row>
 
                             <Row>
-                                <Col span="4">
-                                <FormItem label="处方药" prop="isPrescription">
-                                    <i-switch v-model="formItem.isPrescription">
-                                        <span slot="open">是</span>
-                                        <span slot="close">否</span>
-                                    </i-switch>
-                                </FormItem>
+                                <Col span="5">
+                                    <FormItem label="处方/非处方" prop="prescriptionId">
+                                        <option-select v-model="formItem.prescriptionId" optionType="PERSCRIPTION" ></option-select>
+                                    </FormItem>
                                 </Col>
-
-                                <Col span="4">
-                                <FormItem label="进口药" prop="isForeign">
-                                    <i-switch v-model="formItem.isForeign">
-                                        <span slot="open">是</span>
-                                        <span slot="close">否</span>
-                                    </i-switch>
-                                </FormItem>
+                                <Col span="5">
+                                    <FormItem label="进口药" prop="isForeign">
+                                        <Select v-model="formItem.isForeign">
+                                            <Option :value="1">进口</Option>
+                                            <Option :value="0">国产</Option>
+                                        </Select>
+                                    </FormItem>
                                 </Col>
-
-                                <Col span="4">
-                                <FormItem label="中西药" prop="isTcm">
-                                    <i-switch v-model="formItem.isTcm" size="large">
-                                        <span slot="open">中药</span>
-                                        <span slot="close">西药</span>
-                                    </i-switch>
-                                </FormItem>
+                                <Col span="5">
+                                    <FormItem label="中/西药属性" prop="medTypeId">
+                                        <option-select v-model="formItem.medTypeId" optionType="GOODS_MED_TYPE" ></option-select>
+                                    </FormItem>
                                 </Col>
-                            </Row>
-
-                            <Row>
-                                <Col span="6">
-                                <FormItem label="特殊管理属性" prop="specialManageId">
-                                    <option-select optionType="BUY_TYPE"></option-select>
-                                </FormItem>
-                                </Col>
-
-                                <Col span="6">
-                                <FormItem label="剂型属性" prop="specialManageId">
-                                    <Select v-model="formItem.factoryId" placeholder="例如 某制药有限公司" filterable>
-                                        <Option v-for="item in factoryList" :value="item.id" :label="item.name" :key="item.id">
-                                            {{ item.name }}
-                                        </Option>
-                                    </Select>
-                                </FormItem>
-                                </Col>
-                                <Col span="2">
-                                <Button type="ghost" icon="ios-settings-strong" @click="clickNewFactory"></Button>
+                                <Col span="5">
+                                    <FormItem label="社保目录" prop="isShebao">
+                                        <Select v-model="formItem.isShebao">
+                                            <Option :value="1">社保目录药</Option>
+                                            <Option :value="0">非社保目录药</Option>
+                                        </Select>
+                                    </FormItem>
                                 </Col>
                             </Row>
                             <Row>
-                                <Button/>
+                                <Col span="5">
+                                    <FormItem label="特殊管理属性" prop="specificMedId">
+                                        <option-select v-model="formItem.specificMedId" optionType="SPECIAL_MED" ></option-select>
+                                    </FormItem>
+                                </Col>
+                                <Col span="5">
+                                    <FormItem label="剂型属性" prop="jxId">
+                                        <option-select v-model="formItem.jxId" optionType="GOODS_JX" ></option-select>
+                                    </FormItem>
+                                </Col>
+                                <Col span="5">
+                                    <FormItem label="药基属性" prop="baseMedId">
+                                        <option-select v-model="formItem.baseMedId" optionType="GOODS_BASE_MED" ></option-select>
+                                    </FormItem>
+                                </Col>
+                                <Col span="5">
+                                    <FormItem label="功能分类属性" prop="funcCatId">
+                                        <option-select v-model="formItem.funcCatId" optionType="GOODS_FUNC_CAT" ></option-select>
+                                    </FormItem>
+                                </Col>
+                            </Row>
+                            <Row>
+                                <Col span="5">
+                                    <FormItem label="给药途径属性" prop="medicationId">
+                                        <option-select v-model="formItem.medicationId " optionType="GOODS_MEDICATION" ></option-select>
+                                    </FormItem>
+                                </Col>
+                                <Col span="5">
+                                    <FormItem label="养护标志属性" prop="careTimeId">
+                                        <option-select v-model="formItem.careTimeId" optionType="GOODS_CARE_TIME" ></option-select>
+                                    </FormItem>
+                                </Col>
+                                <Col span="5">
+                                    <FormItem label="GMP认证属性" prop="gmpTypeId">
+                                        <option-select v-model="formItem.gmpTypeId" optionType="GOODS_GMP_TYPE" ></option-select>
+                                    </FormItem>
+                                </Col>
+                                <Col span="5">
+                                    <FormItem label="ABC属性" prop="abcTypeId">
+                                        <option-select v-model="formItem.abcTypeId" optionType="GOODS_ABC_TYPE" ></option-select>
+                                    </FormItem>
+                                </Col>
+                            </Row>
+                            <Row>
+                                <Col span="5">
+                                    <FormItem label="经营范围属性" prop="scopeId">
+                                        <option-select v-model="formItem.scopeId" optionType="GOODS_SCOPE" ></option-select>
+                                    </FormItem>
+                                </Col>
+                                
+                                <Col span="5">
+                                    <FormItem label="新特药属性" prop="newTypeId">
+                                        <option-select v-model="formItem.newTypeId" optionType="GOODS_NEW_TYPE" ></option-select>
+                                    </FormItem>
+                                </Col>
                             </Row>
 
                         </TabPane>
-                        <TabPane label="证书信息" name="cert" icon="bookmark">证书信息</TabPane>
-                        <TabPane label="价格信息" name="price" icon="pricetags">价格信息</TabPane>
+                        <TabPane label="证书信息" name="cert" icon="bookmark">
+                            <Row>
+                                <Col span="1">
+                                    <strong>注册证书:</strong>
+                                </Col>
+                                <Col span="5">
+                                    <FormItem label="注册证书编号" prop="certNo">
+                                        <Input v-model="formItem.certNo"/>
+                                    </FormItem>
+                                </Col>
+                                <Col span="5">
+                                    <FormItem label="证书有效期至" prop="certExpDate">
+                                        <DatePicker type="date" v-model="formItem.certExpDate"></DatePicker>
+                                    </FormItem>
+                                </Col>
+                                <Col span="5">
+                                    <FormItem label="证书档案编号" prop="certFileNo">
+                                        <Input v-model="formItem.certFileNo"/>
+                                    </FormItem>
+                                </Col>
+                            </Row>
+                            <hr style="width:75%; margin-bottom: 15px;" size="2"/>
+                            <Row>
+                                <Col span="1">
+                                    <strong >注册商标: </strong>
+                                </Col>
+                                <Col span="5">
+                                    <FormItem label="商标编号" prop="brandNo">
+                                        <Input v-model="formItem.brandNo"/>
+                                    </FormItem>
+                                </Col>
+                                <Col span="5">
+                                    <FormItem label="证书有效期至" prop="certExpDate">
+                                        <DatePicker type="date" v-model="formItem.brandExpDate"></DatePicker>
+                                    </FormItem>
+                                </Col>
+                                <Col span="5">
+                                    <FormItem label="证书档案编号" prop="certFileNo">
+                                        <Input  v-model="formItem.brandFileNo"/>
+                                    </FormItem>
+                                </Col>
+                            </Row>
+                            <hr style="width:75%; margin-bottom: 15px;" size="2"/>
+                            <Row>
+                                <Col span="1">
+                                    <strong >批注文号: </strong>
+                                </Col>
+                                <Col span="5">
+                                    <FormItem label="批注文号" prop="permitNo">
+                                        <Input v-model="formItem.permitNo"/>
+                                    </FormItem>
+                                </Col>
+                                <Col span="5">
+                                    <FormItem label="证书有效期至" prop="certExpDate">
+                                        <DatePicker type="date" v-model="formItem.permitExpDate"></DatePicker>
+                                    </FormItem>
+                                </Col>
+                                <Col span="5">
+                                    <FormItem label="证书档案编号" prop="certFileNo">
+                                        <Input v-model="formItem.permitFileNo"/>
+                                    </FormItem>
+                                </Col>
+                            </Row>
+                        </TabPane>
+                        <TabPane label="价格信息" name="price" icon="pricetags">
+                            <Row>
+                                <Col span="5">
+                                    <FormItem label="零售价" prop="retailPrice">
+                                        <Input number v-model="formItem.retailPrice"/>
+                                    </FormItem>
+                                </Col>
+                                <Col span="5">
+                                    <FormItem label="批发价" prop="batchPrice">
+                                        <Input number v-model="formItem.batchPrice" />
+                                    </FormItem>
+                                </Col>
+                                <Col span="5">
+                                    <FormItem label="会员价" prop="memberPrice">
+                                        <Input number v-model="formItem.memberPrice"/>
+                                    </FormItem>
+                                </Col>
+                                <Col span="5">
+                                    <FormItem label="挂网价" prop="onlinePrice">
+                                        <Input number v-model="formItem.onlinePrice"/>
+                                    </FormItem>
+                                </Col>
+                            </Row>
+                            <Row>
+                                <Col span="5">
+                                    <FormItem label="拆零价" prop="splitPrice">
+                                        <Input number v-model="formItem.splitPrice"/>
+                                    </FormItem>
+                                </Col>
+                                <Col span="5">
+                                    <FormItem label="最低价" prop="lowPrice">
+                                        <Input number v-model="formItem.lowPrice" />
+                                    </FormItem>
+                                </Col>
+                                <Col span="5">
+                                    <FormItem label="最高限价" prop="hightPrice">
+                                        <Input number v-model="formItem.hightPrice"/>
+                                    </FormItem>
+                                </Col>
+                            </Row>
+                        </TabPane>
                     </Tabs>
                 </Form>
             </Card>
         </Row>
 
-        <Modal v-model="unitModalShow" width="360">
-            <p slot="header">
-                <Icon type="ios-plus-outline"></Icon>
-                <span>新增单位</span>
-            </p>
-
-            <div style="text-align:center">
-                <Row>
-                    <Input v-model="newUnitName" placeholder="单位名称" style="width: 200px"/>
-                    <Button type="primary" @click="handleAddUnit">增加</Button>
-                </Row>
-                <Row class="margin-top-10 searchable-table-con1">
-                    <Table :columns="unitColumns" :data="unitList"></Table>
-                </Row>
-            </div>
-            <div slot="footer">
-            </div>
-        </Modal>
     </div>
 </template>
 
@@ -324,48 +427,18 @@ export default {
     components: {
         optionSelect,
     },
+    props: {
+        goodsId: Number|String
+    },
     data () {
         return {
-            newUnitName: '',
-            unitModalShow: false,
             formItem: {
                 inTax: 16,
                 outTax: 16
             },
             categoryList: [],
             factoryList: [],
-            unitList: [],
             factoryMap: {},
-            unitColumns: [
-                {
-                    key: 'name',
-                    title: '单位'
-                },
-                {
-                    key: 'action',
-                    title: '操作',
-                    render: (h, params) => {
-                        return h('Button', {
-                            props: {
-                                type: 'error',
-                                size: 'small'
-                            },
-                            on: {
-                                click: () => {
-                                    var self = this;
-                                    util.ajax.post('/unit/remove/' + params.row.id)
-                                        .then(function (response) {
-                                            self.loadUnitList();
-                                        })
-                                        .catch(function (error) {
-                                            console.log(error);
-                                        });
-                                }
-                            }
-                        }, '删除');
-                    }
-                }
-            ],
             ruleValidate: {
                 name: [
                     {required: true, message: '通用名称不能为空', trigger: 'blur'}
@@ -380,26 +453,14 @@ export default {
         };
     },
     methods: {
-        loadUnitList () {
-            var self = this;
-            util.ajax.get('/unit/list')
-                .then(function (response) {
-                    self.unitList = response.data;
-                })
-                .catch(function (error) {
-                    console.log(error);
-                });
-        },
         init () {
             var self = this;
-            this.loadUnitList();
-
-            util.ajax.get('/good/category/tree')
+            util.ajax.get('/good/category/list')
                 .then(function (response) {
                     self.categoryList = response.data;
                 })
                 .catch(function (error) {
-                    console.log(error);
+                    util.errorProcessor(self, error);
                 });
             util.ajax.get('/factory/list')
                 .then(function (response) {
@@ -417,17 +478,15 @@ export default {
                     self.factoryList = factoryArr;
                 })
                 .catch(function (error) {
-                    console.log(error);
+                    util.errorProcessor(self, error);
                 });
-
-            if (this.$route.params && this.$route.params.goods_id) {
-                util.ajax.get('/goods/' + this.$route.params.goods_id)
+            if (this.goodsId) {
+                util.ajax.get('/goods/' + this.goodsId)
                     .then(function (response) {
                         self.formItem = response.data;
-                        util.setCurrentPageTitle(self, response.data.name, true);
                     })
                     .catch(function (error) {
-                        console.log(error);
+                        util.errorProcessor(self, error);
                     });
             } else {
                 this.formItem = {};
@@ -440,7 +499,7 @@ export default {
                     self.$Message.info('保存商品成功');
                 })
                 .catch(function (error) {
-                    console.log(error);
+                    util.errorProcessor(self, error);
                 });
         },
         clickNewFactory () {
@@ -462,35 +521,11 @@ export default {
                         self.formItem.pinyin = response.data;
                     })
                     .catch(function (error) {
-                        console.log(error);
+                        util.errorProcessor(self, error);
                     });
             }
-        },
-        onChangeUnit (item) {
-            if (item && item === 'newUnit') {
-                this.newUnitName = '';
-                this.unitModalShow = true;
-                this.formItem.unit = -1;
-            }
-        },
-        onChangeBigUnit (item) {
-            if (item && item === 'newUnit') {
-                this.newUnitName = '';
-                this.unitModalShow = true;
-                this.formItem.packUnit = -1;
-            }
-        },
-        handleAddUnit () {
-            var self = this;
-            util.ajax.post('/unit/add', { name: this.newUnitName })
-                .then(function (response) {
-                    self.unitModalShow = false;
-                    self.loadUnitList();
-                })
-                .catch(function (error) {
-                    console.log(error);
-                });
         }
+        
     },
     mounted () {
         this.init();
@@ -500,3 +535,12 @@ export default {
     }
 };
 </script>
+
+<style>
+
+.ivu-form-item {
+    margin-bottom: 20px;
+}
+
+</style>
+
