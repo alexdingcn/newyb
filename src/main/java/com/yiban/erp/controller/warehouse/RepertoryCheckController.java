@@ -1,6 +1,7 @@
 package com.yiban.erp.controller.warehouse;
 
 import com.alibaba.fastjson.JSONObject;
+import com.yiban.erp.constant.CheckPlanConstant;
 import com.yiban.erp.dao.RepertoryCheckPlanDetailMapper;
 import com.yiban.erp.dao.RepertoryCheckPlanMapper;
 import com.yiban.erp.entities.*;
@@ -33,15 +34,39 @@ public class RepertoryCheckController {
 
 
     //根据条件获取入库单list
-    @RequestMapping(value = "/list", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/list", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> list(@AuthenticationPrincipal User user,
         @RequestParam(name = "checkType", required = false) Integer checkType,
-        @RequestParam(name = "counterState", required = false) Integer counterState,
         @RequestParam(name = "warehouseId",required = false) Integer warehouseId,
         @RequestParam(name = "startDate", required = false) Date startDate,
         @RequestParam(name = "endDate", required = false) Date endDate
     ){
         Map<String, Object> requestMap = new HashMap<>();
+        requestMap.put("companyId", user.getCompanyId());
+        requestMap.put("checkType", checkType);
+        requestMap.put("warehouseId", warehouseId);
+        requestMap.put("startDate", startDate);
+        requestMap.put("endDate", endDate);
+        List<RepertoryCheckPlan> list = repertoryCheckPlanMapper.getCheckPlanList(requestMap);
+        JSONObject result = new JSONObject();
+        result.put("data", list);
+        return ResponseEntity.ok().body(result.toJSONString());
+    }
+
+
+
+    //查询待执行的盘点计划
+    @RequestMapping(value = "/doList", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> doList(@AuthenticationPrincipal User user,
+                                       @RequestParam(name = "checkType", required = false) Integer checkType,
+                                       @RequestParam(name = "warehouseId",required = false) Integer warehouseId,
+                                       @RequestParam(name = "startDate", required = false) Date startDate,
+                                       @RequestParam(name = "endDate", required = false) Date endDate
+    ){
+        Map<String, Object> requestMap = new HashMap<>();
+        requestMap.put("companyId", user.getCompanyId());
+        //待处理计划状态=0
+        requestMap.put("state", CheckPlanConstant.PLAN_UNCHECK);
         requestMap.put("checkType", checkType);
         requestMap.put("warehouseId", warehouseId);
         requestMap.put("startDate", startDate);
@@ -54,7 +79,7 @@ public class RepertoryCheckController {
 
     //根据条件获取入库单list
     @RequestMapping(value = "/orderPartList", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> list(@AuthenticationPrincipal User user,
+    public ResponseEntity<String> orderPartList(@AuthenticationPrincipal User user,
         @RequestParam(name = "checkPlanId", required = true) long checkPlanId
     ){
         RepertoryCheckPlan checkinfo= repertoryCheckPlanMapper.selectByPrimaryKey(checkPlanId);

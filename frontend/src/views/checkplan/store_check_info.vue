@@ -1,6 +1,21 @@
 <style lang="less">
     @import '../../styles/common.less';
-    @import './store_now.less';
+    .option-goods-spec {
+        float: right;
+        color: #999;
+    }
+    .ivu-form-item {
+        margin-bottom: 0px;
+    }
+
+    .ivu-table-cell {
+        padding-left: 5px;
+        padding-right: 5px;
+    }
+    th .ivu-table-cell {
+        width-space: nowrap;
+    }
+
 </style>
 
 <template>

@@ -97,10 +97,7 @@ export const otherRouter = {
         { path: 'ownspace', title: '个人中心', name: 'ownspace_index', component: () => import('@/views/own-space/own-space.vue') },
         { path: 'order/:order_id', title: '订单详情', name: 'order-info', component: () => import('@/views/advanced-router/component/order-info.vue') }, // 用于展示动态路由
         { path: 'shopping', title: '购物详情', name: 'shopping', component: () => import('@/views/advanced-router/component/shopping-info.vue') }, // 用于展示带参路由
-        { path: 'store_check_add', title: '盘点制单', name: 'store_check_add', component: () => import('@/views/warehouse/store_check_add.vue') },
-        { path: 'store_check_info', title: '盘点信息', name: 'store_check_info', component: () => import('@/views/warehouse/store_check_info.vue') },
-        { path: 'store_check_part_index', title: '盘点信息', name: 'store_check_part_index', component: () => import('@/views/warehouse/store_check_part_index.vue') },
-        { path: 'store_check_part_add', title: '盘点信息', name: 'store_check_part_add', component: () => import('@/views/warehouse/store_check_part_add.vue') },
+
 
     ]
 };
@@ -150,6 +147,7 @@ export const appRouter = [
             { path: 'quality-review', title: '销售出库质量审核', name: 'sell-quality-review', component: () => import('@/views/sell/sell-quality-review.vue') },
             { path: 'sale-review', title: '销售审核', name: 'sell-sale-review', component: () => import('@/views/sell/sell-sale-review.vue') },
             { path: 'list', title: '销售订单列表', name: 'sell_list', component: () => import('@/views/sell/sell-order-list.vue') },
+
         ]
     },
     {
@@ -160,15 +158,33 @@ export const appRouter = [
         component: Main,
         children: [
             { path: 'store_now', title: '实时库存', name: 'store_now', component: () => import('@/views/warehouse/store_now.vue') },
-            { path: 'store_check_index', title: '库存盘点', name: 'store_check_index', component: () => import('@/views/warehouse/store_check_index.vue') },
             { path: 'setting', title: '仓库点设置', name: 'wh_setting', component: () => import('@/views/warehouse/setting.vue') },
             { path: 'overview', title: '库存报表', name: 'wh_overview', component: () => import('@/views/warehouse/overview.vue') },
             { path: 'in-make', title: '录制入库单', name: 'in-make', component: () => import('@/views/repertory/in-make.vue') },
             { path: "in-quality-check", title: '入库质量验收', name: 'in-quality-check', component: () => import('@/views/repertory/in-quality-check.vue')},
             { path: "in-check", title: '入库审核', name: 'in-check', component: () => import('@/views/repertory/in-check.vue')},
         ]
-    }, 
-    {
+    },
+{
+    path: '/checkplan',
+        icon: 'social-buffer',
+    name: 'checkplan',
+    title: '库存盘点',
+    component: Main,
+    children: [
+        { path: 'store_check_index', title: '盘点单记录', name: 'store_check_index', component: () => import('@/views/checkplan/store_check_index.vue') },
+            { path: 'store_check_index_detail', title: '盘点单明細-不显示', name: 'store_check_index_detail', component: () => import('@/views/checkplan/store_check_index_detail.vue') },
+        { path: 'store_check_add', title: '盘点制单', name: 'store_check_add', component: () => import('@/views/checkplan/store_check_add.vue') },
+        { path: 'store_check_do_list', title: '执行盘点', name: 'store_check_do_list', component: () => import('@/views/checkplan/store_check_do_list.vue') },
+            { path: 'store_check_do_detail', title: '盘点执行进度', name: 'store_check_do_detail', component: () => import('@/views/checkplan/store_check_do_detail.vue') },
+      //  { path: 'store_check_part_index', title: '盘点表执行进度-不显示', name: 'store_check_part_index', component: () => import('@/views/checkplan/store_check_part_index.vue') },
+            { path: 'store_check_part_add',  title: '录入盘点信息-不显示', name: 'store_check_part_add', component: () => import('@/views/checkplan/store_check_part_add.vue') },
+        { path: "store_check_pass_list", title: '盘点审核', name: 'store_check_pass_list', component: () => import('@/views/checkplan/store_check_pass_list.vue')},
+        { path: "store_check_pass_detail", title: '盘点审核明细-不显示', name: 'store_check_pass_detail', component: () => import('@/views/checkplan/store_check_pass_detail.vue')},
+        //  { path: "store_check_info", title: '盘点审核明细-不显示', name: 'store_check_info', component: () => import('@/views/checkplan/store_check_info.vue')},
+        ]
+},
+{
         path: '/access',
         icon: 'key',
         name: 'access',

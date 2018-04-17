@@ -26,9 +26,9 @@
                 <Icon type="document"></Icon>盘点制单
             </p>
             <div slot="extra">
-                <ButtonGroup >
-                    <Button type="primary" icon="android-add-circle" @click="checkMoreModalShow = true" >盘盈登记</Button>
-                </ButtonGroup>
+                <!--<ButtonGroup >-->
+                    <!--<Button type="primary" icon="android-add-circle" @click="checkMoreModalShow = true" >盘盈登记</Button>-->
+                <!--</ButtonGroup>-->
                 <ButtonGroup >
                     <Button type="primary" icon="android-add-circle" @click="saveCheckPart" >保存盘点表</Button>
                 </ButtonGroup>
@@ -90,7 +90,7 @@
             <Icon type="ios-plus-outline"></Icon>
             <span>盘盈登记</span>
         </p>
-        <div style="text-align:center">
+        <div >
             <Row>盘点单ID：<Input span="8" v-model="checkMore.checkPlanId" disabled/></Row>
             <Row>库存ID：<Input span="8" v-model="checkMore.repertoryInfoId" disabled/></Row>
             <Row>名称：<Input span="8" v-model="checkMore.goodsName" /></Row>
@@ -235,7 +235,7 @@
                             width: 100,
                             render: (h, params) => {
                                 var self = this;
-                                if(self.orderItems[params.index][formStatus]!=undefined){
+                                if(self.orderItems[params.index]["formStatus"]=="CHECKED"){
                                     return self.orderItems[params.index][params.column.key];
                                 }else{
                                     return h('Input', {
@@ -295,8 +295,9 @@
                                                     util.ajax.post('/repertory/check/doCheckDetail', self.checkMore)
                                                         .then(function (response) {
                                                             if (response.status === 200 && response.data) {
-                                                                self.$Message.info('盘点明细保存成功');
                                                                 row.checkStatus= response.data.planDetail.checkStatus;
+                                                                self.$Message.info('盘点明细保存成功');
+                                                               //
                                                             }
                                                             self.saving = false;
                                                         })
@@ -387,7 +388,7 @@
                 }
             },backPartIndex(){
                 this.$router.push({
-                    name: 'store_check_part_index',
+                    name: 'store_check_do_list',
                     params:{checkPlanId: this.checkPlanId,warehouseName:this.storeCheck.warehouseName}
                 });
 

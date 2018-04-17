@@ -19,6 +19,8 @@
 </style>
 
 <template>
+    <div>
+
     <Row>
         <Card>
             <p slot="title" >
@@ -100,6 +102,7 @@
 
     </Row>
 
+    </div>
 </template>
 
 
@@ -109,7 +112,7 @@
     import util from '@/libs/util.js';
     import warehouseSelect from "@/views/selector/warehouse-select.vue";
     export default {
-        name: 'check_order',
+        name: 'store_check_add',
         components: {
             warehouseSelect
         },
@@ -123,7 +126,7 @@
                 counterOptions:[{ id: 'ALL', name:'全部'}],
                 goodsLoading: false,
                 edittingRow: {},
-                closeConfirm: false,
+
                 orderItems: [],
                 storeCheck: {
                     checkType:0,
@@ -292,8 +295,8 @@
                 this.saving = true;
                 util.ajax.post('/repertory/check/add', this.storeCheck)
                     .then(function (response) {
-                        if (response.status === 200 && response.data) {
-                            self.$Message.info('采购入库订单保存成功');
+                        if (response.status === 200 ) {
+                            self.$Message.info('盘点单添加成功');
                             self.$router.push({
                                 name: 'store_check_index'
                             });
@@ -301,10 +304,8 @@
                         self.saving = false;
                     })
                     .catch(function (error) {
-                        console.log(error);
                         self.saving = false;
-                        self.$Message.error('保存采购订单错误'+error);
-                        //							self.$Message.error('保存采购订单错误 ' + error.data.message);
+                        self.$Message.error('盘点单添加失败 '+error);
                     });
             },
             addCheckOrder () {
