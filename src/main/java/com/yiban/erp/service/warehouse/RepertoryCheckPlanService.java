@@ -164,7 +164,7 @@ public class RepertoryCheckPlanService {
             //统计盘点物品总值
             subMoney=subMoney.add( pcpd.getAccLimit().multiply(pcpd.getPrice()));
             //统计未盘点物品总数
-            if(CheckPlanConstant.PLAN_DETAIL_FORMSTATUS_UNCHECK.equals(pcpd.getFormStatus())){
+            if(null==pcpd.getCheckStatus()){
                 unCheckAmount=unCheckAmount.add(pcpd.getAccLimit());
             }
             //统计盘盈数据
@@ -189,66 +189,66 @@ public class RepertoryCheckPlanService {
         return result;
     }
 
-    //审核通过盘点单
-    @Transactional
-    public JSONObject getCheckPlanPassJSON(User user,RepertoryCheckPlan rp)throws BizException{
-        JSONObject result = new JSONObject();
-        RepertoryCheckPlan checkinfo= repertoryCheckPlanMapper.selectByPrimaryKey(rp.getId());
-        Map<String, Object> requestMap = new HashMap<>();
-        requestMap.put("checkPlanId", rp.getId());
-        requestMap.put("makeUserId",null);
-        List<RepertoryCheckPlanDetail>  cdlist=repertoryCheckPlanDetailMapper.getCheckPlanDetailList(requestMap);
-        //盘点单没有有效的记录
-        if(cdlist==null || cdlist.size()<=0){
-            throw new BizException(ErrorCode.CHECK_PLAN_TYPE_ERROR);
-        }
-
-        for(int i=0;i<cdlist.size();i++){
-            RepertoryCheckPlanDetail tempRP= cdlist.get(i);
-            if(!"UNCHECK".equals(tempRP.getFormStatus())){
-                throw new BizException(ErrorCode.CHECK_PLAN_PASS_ERROR);
-            }
-            tempRP.setFormStatus("CHECKED");
-        }
-        //  1.更新checkPlan
-        checkinfo.setState(2);
-        checkinfo.setCheckUserId(user.getId());
-        checkinfo.setCheckResponseUser(user.getNickname());
-        checkinfo.setComment(rp.getComment());
-        checkinfo.setManager(rp.getManager());
-        checkinfo.setManagerNote(rp.getManagerNote());
-        checkinfo.setFinance(rp.getFinance());
-        checkinfo.setFinanceNote(rp.getFinanceNote());
-        checkinfo.setUpdateBy(user.getNickname());
-        checkinfo.setUpdateTime(new Date());
-        repertoryCheckPlanMapper.updateByPrimaryKey(checkinfo);
-        //2.循环更新盘点明细
-
-
-        for(int i=0;i<cdlist.size();i++){
-            RepertoryCheckPlanDetail tempRP= cdlist.get(i);
-            tempRP.setFormStatus("CHECK");
-            //正常盘点-更新明细盘点状态
-            if(1==tempRP.getCheckStatus()){
-
-            //盘亏
-            }else if(-1==tempRP.getCheckStatus()){
-                //进行盘亏出库操作
-            }else if(1==tempRP.getCheckStatus()){
-                //进行盘盈入库的操作
-            }else{
-                throw new BizException(ErrorCode.CHECK_PLAN_PASS_STATE_ERROR);
-            }
-            tempRP.setUpdateBy(user.getNickname());
-            tempRP.setUpdateTime(new Date());
-            repertoryCheckPlanDetailMapper.updateByPrimaryKey(tempRP);
-        }
-
-
-
-
-        return result;
-    }
+//    //审核通过盘点单
+//    @Transactional
+//    public JSONObject getCheckPlanPassJSON(User user,RepertoryCheckPlan rp)throws BizException{
+//        JSONObject result = new JSONObject();
+//        RepertoryCheckPlan checkinfo= repertoryCheckPlanMapper.selectByPrimaryKey(rp.getId());
+//        Map<String, Object> requestMap = new HashMap<>();
+//        requestMap.put("checkPlanId", rp.getId());
+//        requestMap.put("makeUserId",null);
+//        List<RepertoryCheckPlanDetail>  cdlist=repertoryCheckPlanDetailMapper.getCheckPlanDetailList(requestMap);
+//        //盘点单没有有效的记录
+//        if(cdlist==null || cdlist.size()<=0){
+//            throw new BizException(ErrorCode.CHECK_PLAN_TYPE_ERROR);
+//        }
+//
+//        for(int i=0;i<cdlist.size();i++){
+//            RepertoryCheckPlanDetail tempRP= cdlist.get(i);
+//            if(!"UNCHECK".equals(tempRP.getFormStatus())){
+//                throw new BizException(ErrorCode.CHECK_PLAN_PASS_ERROR);
+//            }
+//            tempRP.setFormStatus("CHECKED");
+//        }
+//        //  1.更新checkPlan
+//        checkinfo.setState(2);
+//        checkinfo.setCheckUserId(user.getId());
+//        checkinfo.setCheckResponseUser(user.getNickname());
+//        checkinfo.setComment(rp.getComment());
+//        checkinfo.setManager(rp.getManager());
+//        checkinfo.setManagerNote(rp.getManagerNote());
+//        checkinfo.setFinance(rp.getFinance());
+//        checkinfo.setFinanceNote(rp.getFinanceNote());
+//        checkinfo.setUpdateBy(user.getNickname());
+//        checkinfo.setUpdateTime(new Date());
+//        repertoryCheckPlanMapper.updateByPrimaryKey(checkinfo);
+//        //2.循环更新盘点明细
+//
+//
+//        for(int i=0;i<cdlist.size();i++){
+//            RepertoryCheckPlanDetail tempRP= cdlist.get(i);
+//            tempRP.setFormStatus("CHECK");
+//            //正常盘点-更新明细盘点状态
+//            if(1==tempRP.getCheckStatus()){
+//
+//            //盘亏
+//            }else if(-1==tempRP.getCheckStatus()){
+//                //进行盘亏出库操作
+//            }else if(1==tempRP.getCheckStatus()){
+//                //进行盘盈入库的操作
+//            }else{
+//                throw new BizException(ErrorCode.CHECK_PLAN_PASS_STATE_ERROR);
+//            }
+//            tempRP.setUpdateBy(user.getNickname());
+//            tempRP.setUpdateTime(new Date());
+//            repertoryCheckPlanDetailMapper.updateByPrimaryKey(tempRP);
+//        }
+//
+//
+//
+//
+//        return result;
+//    }
 
     public JSONObject getCheckPlanDetail4SearchJSON(Map<String, Object> requestMap)throws BizException{
         JSONObject result = new JSONObject();
@@ -405,6 +405,98 @@ public class RepertoryCheckPlanService {
             resultjson.put("planDetailMore",rpMore);
         }
         return resultjson;
+    }
+    @Transactional
+    public void setCheckPlanPass(User user,Long planId,String comment, String manager,String managerNote,String finance,String financeNote) throws BizException {
+        if (planId==null ) {
+            throw new BizException(ErrorCode.CHECK_PLAN_PASS_VALIDATE_ERROR);
+        }
+        RepertoryCheckPlan cp= repertoryCheckPlanMapper.selectByPrimaryKey(planId);
+
+        if(CheckPlanConstant.PLAN_CHECK.equals(cp.getState())){
+            throw new BizException(ErrorCode.CHECK_PLAN_PASS_REPET_ERROR);
+        }
+        //更新cp信息
+        cp.setState(CheckPlanConstant.PLAN_CHECK);
+        cp.setUpdateBy(user.getNickname());
+        cp.setUpdateTime(new Date());
+        cp.setComment(comment);
+        cp.setManager(manager);
+        cp.setManagerNote(managerNote);
+        cp.setFinance(finance);
+        cp.setFinanceNote(financeNote);
+        //批量更新库存
+        repertoryCheckPlanMapper.updateByPrimaryKeySelective(cp);
+
+        //批量处理工单明细
+        Map<String, Object> requestMap = new HashMap<>();
+        requestMap.put("checkPlanId", planId);
+        List<RepertoryCheckPlanDetail>  cpdList=repertoryCheckPlanDetailMapper.getCheckPlanDetailList(requestMap);
+        //List<RepertoryCheckPlanDetail> updatePlanDetailList=new ArrayList<RepertoryCheckPlanDetail>();
+        List<RepertoryInfo> moreInlList=new ArrayList<RepertoryInfo>();
+        List<RepertoryInfo> loseOutList=new ArrayList<RepertoryInfo>();
+//        RepertoryIn inOrder=new RepertoryIn();
+//        List<RepertoryInDetail> moreInlList=new ArrayList<RepertoryInDetail>();
+//        //RepertoryOut outOrder=new RepertoryOut();
+//        List<RepertoryCheckPlanDetail> loseOutList=new ArrayList<RepertoryCheckPlanDetail>();
+
+        for(int i=0;i<cpdList.size();i++){
+            RepertoryCheckPlanDetail cpdTemp=cpdList.get(i);
+            //正常记录,只更新明细
+            cpdTemp.setFormStatus(CheckPlanConstant.PLAN_DETAIL_FORMSTATUS_CHECKED);
+            cpdTemp.setUpdateBy(user.getNickname());
+            cpdTemp.setUpdateTime(new Date());
+            //updatePlanDetailList.add(cpdTemp);
+             //盘盈记录
+            if(CheckPlanConstant.PLAN_DETAIL_CHECK_STATUS_MORE.equals(cpdTemp.getCheckStatus())){
+                //增加入库单，入库明细===
+
+                //直接增加库存
+                RepertoryInfo repertoryInfo=new RepertoryInfo();
+                repertoryInfo.setCompanyId(cp.getCompanyId());
+                repertoryInfo.setWarehouseId(cp.getWarehouseId());
+                repertoryInfo.setInUserId(user.getId());
+                repertoryInfo.setBatchCode(cpdTemp.getBatchCode());
+                repertoryInfo.setGoodsId(cpdTemp.getGoodsId());
+                repertoryInfo.setInQuantity(cpdTemp.getCheckLimit());
+                repertoryInfo.setQuantity(cpdTemp.getCheckLimit());
+                repertoryInfo.setBuyPrice(cpdTemp.getPrice());
+                repertoryInfo.setExpDate(cpdTemp.getExpDate());
+                repertoryInfo.setProductDate(cpdTemp.getProductDate());
+                repertoryInfo.setExp(Boolean.TRUE);
+                repertoryInfo.setSaleEnable(Boolean.TRUE);
+                repertoryInfo.setInDate(new Date());
+                repertoryInfo.setCreateBy(user.getNickname());
+                repertoryInfo.setCreateTime(new Date());
+                repertoryInfoMapper.insert(repertoryInfo);
+            //盘亏记录
+            }else if(CheckPlanConstant.PLAN_DETAIL_CHECK_STATUS_LOSE.equals(cpdTemp.getCheckStatus())){
+            //调用盘亏出库方法
+                RepertoryInfo repertoryInfo=repertoryInfoMapper.selectByPrimaryKey(cpdTemp.getRepertoryInfoId());
+                BigDecimal loseAmount=cpdTemp.getAccLimit().subtract(cpdTemp.getCheckLimit());
+                BigDecimal realAmount=repertoryInfo.getQuantity().subtract(loseAmount);
+
+                repertoryInfo.setQuantity(realAmount);
+                repertoryInfo.setUpdateBy(user.getNickname());
+                repertoryInfo.setUpdateTime(user.getUpdatedTime());
+                if(realAmount.doubleValue()>0){
+                //暂不处理
+                }
+                if(realAmount.doubleValue()==0){
+                //暂不处理
+                }
+                if(realAmount.doubleValue()<0){
+                    throw new BizException(ErrorCode.CHECK_PLAN_PASS_OUT_ERROR);
+                }
+                repertoryInfoMapper.updateByPrimaryKey(repertoryInfo);
+            }else{
+                throw new BizException(ErrorCode.CHECK_PLAN_PASS_STATE_ERROR);
+            }
+            //直接更新
+            repertoryCheckPlanDetailMapper.updateByPrimaryKeySelective(cpdTemp);
+
+
+        }
     }
 
 }

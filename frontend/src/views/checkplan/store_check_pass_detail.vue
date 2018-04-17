@@ -129,14 +129,13 @@
             <div >
                 <Row>本次盘点物品数量共计：   {{ checkPass.subAmount }}件</Row>
                 <Row>本次盘点物品金额共计： {{ checkPass.subMoney }}元</Row>
-                <Row>尚未盘点物品：{{ checkPass.unCheckAmount }}件</Row>
+                <Row><h2>尚未盘点物品：{{ checkPass.unCheckAmount }}件</h2></Row>
                 <Row>盘盈数量：{{ checkPass.checkMoreAmount }}件</Row>
                 <Row>盘盈金额：{{ checkPass.checkMoreMoney }}元</Row>
                 <Row>盘亏数量：{{ checkPass.loseAmount }}件</Row>
                 <Row>盘亏金额：{{ checkPass.loseMoney }}元</Row>
                 <Row>审核结果<Input span="8" v-model="checkPass.state" /></Row>
-                <Row>备注<Input span="8" v-model="checkPass.note" /></Row>
-
+                <Row>备注<Input span="8" v-model="checkPass.comment" /></Row>
                 <Row>总经理：<Input span="8" v-model="checkPass.manager" /></Row>
                 <Row>总经理意见：<Input v-model="checkPass.managerNote" /></Row>
                 <Row>财务：<Input v-model="checkPass.finance" /></Row>
@@ -353,7 +352,27 @@
 
 
             },handlePlanPass(){
-                alert("handle Pass");
+
+                alert(  JSON.stringify(this.checkPass));
+                util.ajax.post('/repertory/check/checkPlanPass' ,{
+                    state:this.checkPass.state,
+                    comment:this.checkPass.comment,
+                    manager:this.checkPass.manager,
+                    managerNote:this.checkPass.managerNote,
+                    finance:this.checkPass.finance,
+                    financeNote:this.checkPass.financeNote
+                })
+                    .then(function (response) {
+                        self.repertoryCheckDetailItems = [];
+                        if (response.status === 200 && response.data) {
+                            self.repertoryCheckDetailItems = response.data.checkDetailList;
+                            self.storeCheck=response.data.data;
+
+                        }
+                    })
+                    .catch(function (error) {
+                        console.log(error);
+                    });
             }
 
         },

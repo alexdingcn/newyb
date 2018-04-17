@@ -111,14 +111,14 @@ public class RepertoryCheckController {
         return ResponseEntity.ok().body(result.toJSONString());
     }
 
-    //盘点单审核通过
-    @RequestMapping(value = "/checkPlanPass", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> checkPlanPass(@AuthenticationPrincipal User user,
-                                                @RequestBody RepertoryCheckPlan rp)throws Exception {
-        JSONObject result = new JSONObject();
-        result =repertoryCheckPlanService.getCheckPlanPassJSON(user,rp);
-        return ResponseEntity.ok().body(result.toJSONString());
-    }
+//    //盘点单审核通过
+//    @RequestMapping(value = "/checkPlanPass", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+//    public ResponseEntity<String> checkPlanPass(@AuthenticationPrincipal User user,
+//                                                @RequestBody RepertoryCheckPlan rp)throws Exception {
+//        JSONObject result = new JSONObject();
+//        result =repertoryCheckPlanService.getCheckPlanPassJSON(user,rp);
+//        return ResponseEntity.ok().body(result.toJSONString());
+//    }
 
 
     //根据盘点计划和拼命查询选择数据
@@ -184,12 +184,24 @@ public class RepertoryCheckController {
     //查询盘点单全部信息
     @RequestMapping(value = "/getInfo4Pass", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> getInfo4Pass(@AuthenticationPrincipal User user,
-                                                @RequestParam(name = "checkPlanId", required = true) Long checkPlanId
+        @RequestParam(name = "checkPlanId", required = true) Long checkPlanId
     ) throws Exception {
         JSONObject result = new JSONObject();
         result =repertoryCheckPlanService.getInfo4PassJSON(checkPlanId);
         return ResponseEntity.ok().body(result.toJSONString());
     }
-
+    @RequestMapping(value = "/checkPlanPass", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> checkPlanPass(@RequestBody Map requestMap,
+                                         @AuthenticationPrincipal User user) throws Exception{
+        Long planId = (Long) requestMap.get("planId");
+        //Integer state = (Integer) requestMap.get("state");
+        String comment = (String) requestMap.get("comment");
+        String manager = (String) requestMap.get("manager");
+        String managerNote = (String) requestMap.get("managerNote");
+        String finance = (String) requestMap.get("finance");
+        String financeNote = (String) requestMap.get("financeNote");
+        repertoryCheckPlanService.setCheckPlanPass(user,planId,comment,manager,managerNote,finance,financeNote);
+        return ResponseEntity.ok().build();
+    }
 
 }
