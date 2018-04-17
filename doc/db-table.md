@@ -354,4 +354,23 @@ update_by|String|修改人
 update_time|Datetime|修改时间
 
 
+### 商品类别表：goods_category
+
+> 记录商品的分类信息表
+
+字段名|类型|描述
+-|-|-
+id|Integer|(自增类型ID pk)
+name|String|类别名称
+parent|Integer|上级类别(目前不启用)
+sequence|Integer|排序编号
+comment|String|备注
+created_time|DateTime|创建时间
+updated_time|Datetime|修改时间
+created_by|String|创建人
+updated_by|String|修改人
+company_id|Integer|公司ID
+
+
+
 

@@ -10,23 +10,21 @@ import java.util.List;
 public interface GoodsMapper {
     int deleteByPrimaryKey(Long id);
 
-    int insert(Goods record);
-
     int insertSelective(Goods record);
 
     Goods selectByPrimaryKey(Long id);
 
     int updateByPrimaryKeySelective(Goods record);
 
-    int updateByPrimaryKey(Goods record);
-
-    List<Goods> selectAll(@Param("categoryId") Integer catId,
+    List<Goods> selectAll(@Param("companyId") Integer companyId,
+                          @Param("categoryId") Integer catId,
                           @Param("factoryId") Integer factoryId,
                           @Param("search") String search,
                           @Param("offset") Integer offset,
                           @Param("limit") Integer limit);
 
-    Long selectCount(@Param("categoryId") Integer catId,
+    Long selectCount(@Param("companyId") Integer companyId,
+                     @Param("categoryId") Integer catId,
                      @Param("factoryId") Integer factoryId,
                      @Param("search") String search);
 

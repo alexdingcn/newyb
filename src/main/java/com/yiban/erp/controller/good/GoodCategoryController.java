@@ -7,7 +7,10 @@ import com.yiban.erp.dao.GoodCategoryMapper;
 import com.yiban.erp.dao.GoodsMapper;
 import com.yiban.erp.entities.GoodCategory;
 import com.yiban.erp.entities.User;
+import com.yiban.erp.exception.BizException;
+import com.yiban.erp.exception.BizRuntimeException;
 import com.yiban.erp.exception.ErrorCode;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Date;
 import java.util.List;
 
 
@@ -62,36 +66,60 @@ public class GoodCategoryController {
     }
 
     @RequestMapping(value = "/add", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> add(@RequestBody String payload) {
+    public ResponseEntity<String> add(@RequestBody String payload,
+                                      @AuthenticationPrincipal User user) throws Exception {
         JSONObject requestBody = JSON.parseObject(payload);
-        logger.info("ADD new good category:{}", requestBody.getString("name"));
+        String name = requestBody.getString("name");
+        logger.info("user:{} ADD new good category:{}", user.getId(), name);
+        if (StringUtils.isBlank(name)) {
+            throw new BizException(ErrorCode.GOODS_CATEGORY_NAME_MISS);
+        }
         GoodCategory goodCategory = new GoodCategory();
+        goodCategory.setCompanyId(user.getCompanyId());
         goodCategory.setName(requestBody.getString("name"));
-        goodCategory.setCreatedBy("admin");
+        goodCategory.setCreatedBy(user.getNickname());
+        goodCategory.setCreatedTime(new Date());
         int result = goodCategoryMapper.insertSelective(goodCategory);
         if (result > 0) {
             return ResponseEntity.ok().build();
         }
-        return ResponseEntity.badRequest().body("Failed to insert");
+        throw new BizRuntimeException(ErrorCode.FAILED_INSERT_FROM_DB);
+    }
+
+    @RequestMapping(value = "/edit", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> edit(@RequestBody GoodCategory goodCategory,
+                                       @AuthenticationPrincipal User user) throws Exception {
+        logger.info("user:{} update goods category:{} name:{}", user.getId(), goodCategory.getId(), goodCategory.getName());
+        if (StringUtils.isBlank(goodCategory.getName())) {
+            throw new BizException(ErrorCode.GOODS_CATEGORY_NAME_MISS);
+        }
+        goodCategory.setUpdatedBy(user.getNickname());
+        goodCategory.setUpdatedTime(new Date());
+        int count = goodCategoryMapper.updateByPrimaryKeySelective(goodCategory);
+        if (count > 0) {
+            return ResponseEntity.ok().build();
+        }
+        throw new BizRuntimeException(ErrorCode.FAILED_UPDATE_FROM_DB);
     }
 
     @RequestMapping(value = "/remove", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> remove(@RequestBody String payload) {
+    public ResponseEntity<String> remove(@RequestBody String payload,
+                                         @AuthenticationPrincipal User user) throws Exception {
         JSONObject requestBody = JSON.parseObject(payload);
         Integer id = requestBody.getInteger("id");
-        logger.info("DELETE good category:{}", id);
+        logger.info("user:{} DELETE good category:{}", user.getId(), id);
         if (id <= 0) {
-            return ResponseEntity.badRequest().body(ErrorCode.GOODS_CATEGORY_ID_MISSING.toString());
+            throw new BizException(ErrorCode.GOODS_CATEGORY_ID_MISSING);
         }
-        Long goodsCount = goodsMapper.selectCount(id, null, null);
+        Long goodsCount = goodsMapper.selectCount(user.getCompanyId(), id, null, null);
         if (goodsCount > 0) {
-            return ResponseEntity.badRequest().body(ErrorCode.GOODS_REMAINED_IN_CATEGORY.toString());
+            throw new BizException(ErrorCode.GOODS_REMAINED_IN_CATEGORY);
         }
 
         int result = goodCategoryMapper.deleteByPrimaryKey(id);
         if (result > 0) {
             return ResponseEntity.ok().build();
         }
-        return ResponseEntity.badRequest().body(ErrorCode.FAILED_DELETE_FROM_DB.toString());
+        throw new BizRuntimeException(ErrorCode.FAILED_DELETE_FROM_DB);
     }
 }

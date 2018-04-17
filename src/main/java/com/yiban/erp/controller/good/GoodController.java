@@ -40,8 +40,8 @@ public class GoodController {
         Integer pageSize = size == null ? 10 : size;
         Integer offset = (page == null || page <= 0 ? 0 : page - 1) * pageSize;
 
-        Long count = goodsMapper.selectCount(catId, factoryId, search);
-        List<Goods> goodsList = goodsMapper.selectAll(catId, factoryId, search, offset, pageSize);
+        Long count = goodsMapper.selectCount(user.getCompanyId(), catId, factoryId, search);
+        List<Goods> goodsList = goodsMapper.selectAll(user.getCompanyId(), catId, factoryId, search, offset, pageSize);
         JSONObject result = new JSONObject();
         result.put("total", count);
         result.put("data", JSON.toJSON(goodsList));
@@ -70,7 +70,7 @@ public class GoodController {
         if (goods.getId() == null) {
             result = goodsMapper.insertSelective(goods);
         } else {
-            result = goodsMapper.updateByPrimaryKey(goods);
+            result = goodsMapper.updateByPrimaryKeySelective(goods);
         }
         if (result > 0) {
             return ResponseEntity.ok().build();

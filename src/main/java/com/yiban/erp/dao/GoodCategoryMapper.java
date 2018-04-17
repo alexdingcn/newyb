@@ -10,8 +10,6 @@ import java.util.List;
 public interface GoodCategoryMapper {
     int deleteByPrimaryKey(Integer id);
 
-    int deleteByName(@Param(value = "name") String name);
-
     int insert(GoodCategory record);
 
     int insertSelective(GoodCategory record);

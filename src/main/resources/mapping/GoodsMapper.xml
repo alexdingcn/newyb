@@ -3,69 +3,80 @@
 <mapper namespace="com.yiban.erp.dao.GoodsMapper" >
   <resultMap id="BaseResultMap" type="com.yiban.erp.entities.Goods" >
     <id column="id" property="id" jdbcType="BIGINT" />
-    <result column="name" property="name" jdbcType="VARCHAR" />
     <result column="company_id" property="companyId" jdbcType="INTEGER" />
     <result column="category_id" property="categoryId" jdbcType="INTEGER" />
+    <result column="name" property="name" jdbcType="VARCHAR" />
     <result column="full_name" property="fullName" jdbcType="VARCHAR" />
     <result column="origin" property="origin" jdbcType="VARCHAR" />
-    <result column="jx" property="jx" jdbcType="VARCHAR" />
     <result column="spec" property="spec" jdbcType="VARCHAR" />
     <result column="serial" property="serial" jdbcType="VARCHAR" />
-    <result column="code" property="code" jdbcType="VARCHAR" />
     <result column="enable" property="enable" jdbcType="BIT" />
+    <result column="is_proxy" property="isProxy" jdbcType="BIT" />
     <result column="factory_id" property="factoryId" jdbcType="BIGINT" />
-    <result column="unit" property="unit" jdbcType="INTEGER" />
-    <result column="pack_unit" property="packUnit" jdbcType="INTEGER" />
-    <result column="medium_pack" property="mediumPack" jdbcType="INTEGER" />
-    <result column="big_pack" property="bigPack" jdbcType="INTEGER" />
+    <result column="unit" property="unit" jdbcType="BIGINT" />
+    <result column="pack_unit" property="packUnit" jdbcType="BIGINT" />
+    <result column="medium_pack" property="mediumPack" jdbcType="DECIMAL" />
+    <result column="big_pack" property="bigPack" jdbcType="DECIMAL" />
     <result column="pinyin" property="pinyin" jdbcType="VARCHAR" />
-    <result column="storage_condition" property="storageCondition" jdbcType="VARCHAR" />
-    <result column="storage_description" property="storageDescription" jdbcType="VARCHAR" />
+    <result column="storage_condition" property="storageCondition" jdbcType="BIGINT" />
     <result column="comment" property="comment" jdbcType="VARCHAR" />
-    <result column="cert_id" property="certId" jdbcType="BIGINT" />
-    <result column="brand_id" property="brandId" jdbcType="INTEGER" />
-    <result column="permit_id" property="permitId" jdbcType="BIGINT" />
-    <result column="jx_id" property="jxId" jdbcType="INTEGER" />
-    <result column="is_foreign" property="isForeign" jdbcType="BIT" />
-    <result column="med_type" property="medType" jdbcType="INTEGER" />
-    <result column="is_prescription" property="isPrescription" jdbcType="BIT" />
+    <result column="cert_no" property="certNo" jdbcType="VARCHAR" />
+    <result column="cert_exp_date" property="certExpDate" jdbcType="DATE" />
+    <result column="cert_file_no" property="certFileNo" jdbcType="VARCHAR" />
+    <result column="brand_no" property="brandNo" jdbcType="VARCHAR" />
+    <result column="brand_exp_date" property="brandExpDate" jdbcType="DATE" />
+    <result column="brand_file_no" property="brandFileNo" jdbcType="VARCHAR" />
+    <result column="permit_no" property="permitNo" jdbcType="VARCHAR" />
+    <result column="permit_exp_date" property="permitExpDate" jdbcType="DATE" />
+    <result column="permit_file_no" property="permitFileNo" jdbcType="VARCHAR" />
+    <result column="archive_no" property="archiveNo" jdbcType="VARCHAR" />
     <result column="in_check" property="inCheck" jdbcType="BIT" />
     <result column="first_check" property="firstCheck" jdbcType="BIT" />
     <result column="special_managed" property="specialManaged" jdbcType="BIT" />
     <result column="need_care" property="needCare" jdbcType="BIT" />
-    <result column="warning_days" property="warningDays" jdbcType="INTEGER" />
-    <result column="created_time" property="createdTime" jdbcType="TIMESTAMP" />
-    <result column="updated_time" property="updatedTime" jdbcType="TIMESTAMP" />
-    <result column="created_by" property="createdBy" jdbcType="VARCHAR" />
-    <result column="updated_by" property="updatedBy" jdbcType="VARCHAR" />
-    <result column="is_shebao" property="isShebao" jdbcType="BIT" />
     <result column="in_tax" property="inTax" jdbcType="DECIMAL" />
     <result column="out_tax" property="outTax" jdbcType="DECIMAL" />
-    <result column="valid_months" property="validMonths" jdbcType="TINYINT" />
+    <result column="valid_months" property="validMonths" jdbcType="INTEGER" />
+    <result column="warning_days" property="warningDays" jdbcType="INTEGER" />
     <result column="contact" property="contact" jdbcType="VARCHAR" />
-    <result column="archive_number" property="archiveNumber" jdbcType="VARCHAR" />
     <result column="cure_range" property="cureRange" jdbcType="VARCHAR" />
     <result column="sale_policy" property="salePolicy" jdbcType="VARCHAR" />
-    <result column="special_manage_id" property="specialManageId" jdbcType="INTEGER" />
-    <result column="medication_id" property="medicationId" jdbcType="INTEGER" />
-    <result column="function_category_id" property="functionCategoryId" jdbcType="INTEGER" />
-    <result column="specific_med_id" property="specificMedId" jdbcType="INTEGER" />
-    <result column="care_time_id" property="careTimeId" jdbcType="INTEGER" />
-    <result column="gmp_type_id" property="gmpTypeId" jdbcType="INTEGER" />
-    <result column="scope_id" property="scopeId" jdbcType="INTEGER" />
-    <result column="base_med_id" property="baseMedId" jdbcType="INTEGER" />
-    <result column="price_conf_id" property="priceConfId" jdbcType="BIGINT" />
-    <result column="pos_id" property="posId" jdbcType="BIGINT" />
+    <result column="is_foreign" property="isForeign" jdbcType="BIT" />
+    <result column="prescription_id" property="prescriptionId" jdbcType="BIGINT" />
+    <result column="med_type_id" property="medTypeId" jdbcType="BIGINT" />
+    <result column="is_shebao" property="isShebao" jdbcType="BIT" />
+    <result column="specific_med_id" property="specificMedId" jdbcType="BIGINT" />
+    <result column="jx_id" property="jxId" jdbcType="BIGINT" />
+    <result column="base_med_id" property="baseMedId" jdbcType="BIGINT" />
+    <result column="func_cat_id" property="funcCatId" jdbcType="BIGINT" />
+    <result column="medication_id" property="medicationId" jdbcType="BIGINT" />
+    <result column="care_time_id" property="careTimeId" jdbcType="BIGINT" />
+    <result column="gmp_type_id" property="gmpTypeId" jdbcType="BIGINT" />
+    <result column="abc_type_id" property="abcTypeId" jdbcType="BIGINT" />
+    <result column="scope_id" property="scopeId" jdbcType="BIGINT" />
+    <result column="new_type_id" property="newTypeId" jdbcType="BIGINT" />
+    <result column="retail_price" property="retailPrice" jdbcType="DECIMAL" />
+    <result column="batch_price" property="batchPrice" jdbcType="DECIMAL" />
+    <result column="member_price" property="memberPrice" jdbcType="DECIMAL" />
+    <result column="online_price" property="onlinePrice" jdbcType="DECIMAL" />
+    <result column="split_price" property="splitPrice" jdbcType="DECIMAL" />
+    <result column="low_price" property="lowPrice" jdbcType="DECIMAL" />
+    <result column="hight_price" property="hightPrice" jdbcType="DECIMAL" />
+    <result column="created_by" property="createdBy" jdbcType="VARCHAR" />
+    <result column="updated_by" property="updatedBy" jdbcType="VARCHAR" />
+    <result column="created_time" property="createdTime" jdbcType="TIMESTAMP" />
+    <result column="updated_time" property="updatedTime" jdbcType="TIMESTAMP" />
   </resultMap>
   <sql id="Base_Column_List" >
-    id, name, company_id, category_id, full_name, origin, jx, spec, serial, code, enable, 
-    factory_id, unit, pack_unit, medium_pack, big_pack, pinyin, storage_condition, storage_description, 
-    comment, cert_id, brand_id, permit_id, jx_id, is_foreign, med_type, is_prescription, 
-    in_check, first_check, special_managed, need_care, warning_days, created_time, updated_time, 
-    created_by, updated_by, is_shebao, in_tax, out_tax, valid_months, contact, archive_number, 
-    cure_range, sale_policy, special_manage_id, medication_id, function_category_id, 
-    specific_med_id, care_time_id, gmp_type_id, scope_id, base_med_id, price_conf_id, 
-    pos_id
+    id, company_id, category_id, name, full_name, origin, spec, serial, enable, is_proxy,
+    factory_id, unit, pack_unit, medium_pack, big_pack, pinyin, storage_condition, comment,
+    cert_no, cert_exp_date, cert_file_no, brand_no, brand_exp_date, brand_file_no, permit_no,
+    permit_exp_date, permit_file_no, archive_no, in_check, first_check, special_managed,
+    need_care, in_tax, out_tax, valid_months, warning_days, contact, cure_range, sale_policy,
+    is_foreign, prescription_id, med_type_id, is_shebao, specific_med_id, jx_id, base_med_id,
+    func_cat_id, medication_id, care_time_id, gmp_type_id, abc_type_id, scope_id, new_type_id,
+    retail_price, batch_price, member_price, online_price, split_price, low_price, hight_price,
+    created_by, updated_by, created_time, updated_time
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
     select 
@@ -73,68 +84,64 @@
     from goods
     where id = #{id,jdbcType=BIGINT}
   </select>
-    <select id="selectCount" resultType="java.lang.Long">
-        select
+  <select id="selectCount" resultType="java.lang.Long">
+      select
         count(1)
-        from goods
-        where 1=1
-        <if test="categoryId != null and categoryId > 0">
-            and category_id = #{categoryId}
-        </if>
-        <if test="factoryId != null and factoryId > 0">
-            and factory_id = #{factoryId}
-        </if>
-        <if test="search != null and search != ''">
-            <bind name="pattern" value="'%' + search + '%'" />
-            and ( name like #{pattern}  or lower(pinyin) like lower(#{pattern}) )
-        </if>
-    </select>
-    <select id="selectAll" resultType="com.yiban.erp.entities.Goods">
-        select
-        g.*, c.name as categoryName, f.name as factory, u1.name as unitName, u2.name as packUnitName
-        from goods g
-        left join good_category c on g.category_id = c.id
-        left join factory f on g.factory_id = f.id
-        left join unit u1 on g.unit = u1.id
-        left join unit u2 on g.unit = u2.id
-        where 1 = 1
-        <if test="categoryId != null and categoryId > 0">
-            and category_id = #{categoryId}
-        </if>
-        <if test="factoryId != null and factoryId > 0">
-            and factory_id = #{factoryId}
-        </if>
-        <if test="search != null and search != ''">
-            <bind name="pattern" value="'%' + search + '%'" />
-            and ( g.name like #{pattern} or lower(g.pinyin) like lower(#{pattern}) )
-        </if>
-        <if test="offset != null and limit != null">
-            limit #{offset}, #{limit}
-        </if>
-    </select>
+      from goods
+      where 1=1
+      and company_id = #{companyId}
+      <if test="categoryId != null and categoryId > 0">
+          and category_id = #{categoryId}
+      </if>
+      <if test="factoryId != null and factoryId > 0">
+          and factory_id = #{factoryId}
+      </if>
+      <if test="search != null and search != ''">
+          <bind name="pattern" value="'%' + search + '%'" />
+          and ( name like #{pattern}  or lower(pinyin) like lower(#{pattern}) )
+      </if>
+  </select>
+  <select id="selectAll" resultType="com.yiban.erp.entities.Goods">
+      select
+        g.*, c.name as categoryName, f.name as factory
+      from goods g
+      left join good_category c on g.category_id = c.id
+      left join factory f on g.factory_id = f.id
+      where 1 = 1
+      and g.company_id = #{companyId}
+      <if test="categoryId != null and categoryId > 0">
+          and category_id = #{categoryId}
+      </if>
+      <if test="factoryId != null and factoryId > 0">
+          and factory_id = #{factoryId}
+      </if>
+      <if test="search != null and search != ''">
+          <bind name="pattern" value="'%' + search + '%'" />
+          and ( g.name like #{pattern} or lower(g.pinyin) like lower(#{pattern}) )
+      </if>
+      <if test="offset != null and limit != null">
+          limit #{offset}, #{limit}
+      </if>
+  </select>
 
-    <select id="selectByIdList" parameterType="map" resultType="com.yiban.erp.entities.Goods">
-        select
-        g.*, c.name as categoryName, f.name as factory, u1.name as unitName, u2.name as packUnitName
-        from goods g
-        left join good_category c on g.category_id = c.id
-        left join factory f on g.factory_id = f.id
-        left join unit u1 on g.unit = u1.id
-        left join unit u2 on g.unit = u2.id
-        where 1 = 1 and g.id in
-        <foreach collection="idList" item="id" open="(" close=")" separator=", ">
-            #{id}
-        </foreach>
-    </select>
+  <select id="selectByIdList" parameterType="map" resultType="com.yiban.erp.entities.Goods">
+      select
+        g.*, c.name as categoryName, f.name as factory
+      from goods g
+      left join good_category c on g.category_id = c.id
+      left join factory f on g.factory_id = f.id
+      where 1 = 1 and g.id in
+      <foreach collection="idList" item="id" open="(" close=")" separator=", ">
+          #{id}
+      </foreach>
+  </select>
 
   <select id="selectById" parameterType="java.lang.Long" resultType="com.yiban.erp.entities.Goods">
     select
-    g.*, c.name as categoryName, f.name as factory, u1.name as unitName, u2.name as packUnitName
+      g.*, c.name as categoryName, f.name as factory
     from goods g
     left join good_category c on g.category_id = c.id
     left join factory f on g.factory_id = f.id
-    left join unit u1 on g.unit = u1.id
-    left join unit u2 on g.unit = u2.id
     where 1 = 1 and g.id = #{id}
   </select>
 
@@ -143,56 +150,17 @@
     where id = #{id,jdbcType=BIGINT}
   </delete>
 
-  <insert id="insert" parameterType="com.yiban.erp.entities.Goods" useGeneratedKeys="true" keyProperty="id">
-    insert into goods (name, company_id,
-      category_id, full_name, origin, 
-      jx, spec, serial, code, 
-      enable, factory_id, unit, 
-      pack_unit, medium_pack, big_pack, 
-      pinyin, storage_condition, storage_description, 
-      comment, cert_id, brand_id, 
-      permit_id, jx_id, is_foreign, 
-      med_type, is_prescription, in_check, 
-      first_check, special_managed, need_care, 
-      warning_days, created_time, updated_time, 
-      created_by, updated_by, is_shebao, 
-      in_tax, out_tax, valid_months, 
-      contact, archive_number, cure_range, 
-      sale_policy, special_manage_id, medication_id, 
-      function_category_id, specific_med_id, care_time_id, 
-      gmp_type_id, scope_id, base_med_id, 
-      price_conf_id, pos_id)
-    values (#{name,jdbcType=VARCHAR}, #{companyId,jdbcType=INTEGER},
-      #{categoryId,jdbcType=INTEGER}, #{fullName,jdbcType=VARCHAR}, #{origin,jdbcType=VARCHAR}, 
-      #{jx,jdbcType=VARCHAR}, #{spec,jdbcType=VARCHAR}, #{serial,jdbcType=VARCHAR}, #{code,jdbcType=VARCHAR}, 
-      #{enable,jdbcType=BIT}, #{factoryId,jdbcType=BIGINT}, #{unit,jdbcType=INTEGER}, 
-      #{packUnit,jdbcType=INTEGER}, #{mediumPack,jdbcType=INTEGER}, #{bigPack,jdbcType=INTEGER}, 
-      #{pinyin,jdbcType=VARCHAR}, #{storageCondition,jdbcType=VARCHAR}, #{storageDescription,jdbcType=VARCHAR}, 
-      #{comment,jdbcType=VARCHAR}, #{certId,jdbcType=BIGINT}, #{brandId,jdbcType=INTEGER}, 
-      #{permitId,jdbcType=BIGINT}, #{jxId,jdbcType=INTEGER}, #{isForeign,jdbcType=BIT}, 
-      #{medType,jdbcType=INTEGER}, #{isPrescription,jdbcType=BIT}, #{inCheck,jdbcType=BIT},
-      #{firstCheck,jdbcType=BIT}, #{specialManaged,jdbcType=BIT}, #{needCare,jdbcType=BIT}, 
-      #{warningDays,jdbcType=INTEGER}, #{createdTime,jdbcType=TIMESTAMP}, #{updatedTime,jdbcType=TIMESTAMP}, 
-      #{createdBy,jdbcType=VARCHAR}, #{updatedBy,jdbcType=VARCHAR}, #{isShebao,jdbcType=BIT}, 
-      #{inTax,jdbcType=DECIMAL}, #{outTax,jdbcType=DECIMAL}, #{validMonths,jdbcType=TINYINT}, 
-      #{contact,jdbcType=VARCHAR}, #{archiveNumber,jdbcType=VARCHAR}, #{cureRange,jdbcType=VARCHAR}, 
-      #{salePolicy,jdbcType=VARCHAR}, #{specialManageId,jdbcType=INTEGER}, #{medicationId,jdbcType=INTEGER}, 
-      #{functionCategoryId,jdbcType=INTEGER}, #{specificMedId,jdbcType=INTEGER}, #{careTimeId,jdbcType=INTEGER}, 
-      #{gmpTypeId,jdbcType=INTEGER}, #{scopeId,jdbcType=INTEGER}, #{baseMedId,jdbcType=INTEGER}, 
-      #{priceConfId,jdbcType=BIGINT}, #{posId,jdbcType=BIGINT})
-  </insert>
-  <insert id="insertSelective" parameterType="com.yiban.erp.entities.Goods" useGeneratedKeys="true" keyProperty="id">
-    insert into goods
+  <insert id="insertSelective" parameterType="com.yiban.erp.entities.Goods" keyProperty="id" useGeneratedKeys="true" >
+    insert into goods_info
     <trim prefix="(" suffix=")" suffixOverrides="," >
-
-      <if test="name != null" >
-        name,
-      </if>
       <if test="companyId != null" >
         company_id,
       </if>
       <if test="categoryId != null" >
         category_id,
+      </if>
+      <if test="name != null" >
+        name,
       </if>
       <if test="fullName != null" >
         full_name,
@@ -200,20 +168,17 @@
       <if test="origin != null" >
         origin,
       </if>
-      <if test="jx != null" >
-        jx,
-      </if>
       <if test="spec != null" >
         spec,
       </if>
       <if test="serial != null" >
         serial,
       </if>
-      <if test="code != null" >
-        code,
-      </if>
       <if test="enable != null" >
         enable,
+      </if>
+      <if test="isProxy != null" >
+        is_proxy,
       </if>
       <if test="factoryId != null" >
         factory_id,
@@ -236,32 +201,38 @@
       <if test="storageCondition != null" >
         storage_condition,
       </if>
-      <if test="storageDescription != null" >
-        storage_description,
-      </if>
       <if test="comment != null" >
         comment,
       </if>
-      <if test="certId != null" >
-        cert_id,
+      <if test="certNo != null" >
+        cert_no,
       </if>
-      <if test="brandId != null" >
-        brand_id,
+      <if test="certExpDate != null" >
+        cert_exp_date,
       </if>
-      <if test="permitId != null" >
-        permit_id,
+      <if test="certFileNo != null" >
+        cert_file_no,
       </if>
-      <if test="jxId != null" >
-        jx_id,
+      <if test="brandNo != null" >
+        brand_no,
       </if>
-      <if test="isForeign != null" >
-        is_foreign,
+      <if test="brandExpDate != null" >
+        brand_exp_date,
       </if>
-      <if test="medType != null" >
-        med_type,
+      <if test="brandFileNo != null" >
+        brand_file_no,
       </if>
-      <if test="isPrescription != null" >
-        is_prescription,
+      <if test="permitNo != null" >
+        permit_no,
+      </if>
+      <if test="permitExpDate != null" >
+        permit_exp_date,
+      </if>
+      <if test="permitFileNo != null" >
+        permit_file_no,
+      </if>
+      <if test="archiveNo != null" >
+        archive_no,
       </if>
       <if test="inCheck != null" >
         in_check,
@@ -275,24 +246,6 @@
       <if test="needCare != null" >
         need_care,
       </if>
-      <if test="warningDays != null" >
-        warning_days,
-      </if>
-      <if test="createdTime != null" >
-        created_time,
-      </if>
-      <if test="updatedTime != null" >
-        updated_time,
-      </if>
-      <if test="createdBy != null" >
-        created_by,
-      </if>
-      <if test="updatedBy != null" >
-        updated_by,
-      </if>
-      <if test="isShebao != null" >
-        is_shebao,
-      </if>
       <if test="inTax != null" >
         in_tax,
       </if>
@@ -302,11 +255,11 @@
       <if test="validMonths != null" >
         valid_months,
       </if>
+      <if test="warningDays != null" >
+        warning_days,
+      </if>
       <if test="contact != null" >
         contact,
-      </if>
-      <if test="archiveNumber != null" >
-        archive_number,
       </if>
       <if test="cureRange != null" >
         cure_range,
@@ -314,17 +267,32 @@
       <if test="salePolicy != null" >
         sale_policy,
       </if>
-      <if test="specialManageId != null" >
-        special_manage_id,
+      <if test="isForeign != null" >
+        is_foreign,
       </if>
-      <if test="medicationId != null" >
-        medication_id,
+      <if test="prescriptionId != null" >
+        prescription_id,
       </if>
-      <if test="functionCategoryId != null" >
-        function_category_id,
+      <if test="medTypeId != null" >
+        med_type_id,
+      </if>
+      <if test="isShebao != null" >
+        is_shebao,
       </if>
       <if test="specificMedId != null" >
         specific_med_id,
+      </if>
+      <if test="jxId != null" >
+        jx_id,
+      </if>
+      <if test="baseMedId != null" >
+        base_med_id,
+      </if>
+      <if test="funcCatId != null" >
+        func_cat_id,
+      </if>
+      <if test="medicationId != null" >
+        medication_id,
       </if>
       <if test="careTimeId != null" >
         care_time_id,
@@ -332,29 +300,58 @@
       <if test="gmpTypeId != null" >
         gmp_type_id,
       </if>
+      <if test="abcTypeId != null" >
+        abc_type_id,
+      </if>
       <if test="scopeId != null" >
         scope_id,
       </if>
-      <if test="baseMedId != null" >
-        base_med_id,
+      <if test="newTypeId != null" >
+        new_type_id,
       </if>
-      <if test="priceConfId != null" >
-        price_conf_id,
+      <if test="retailPrice != null" >
+        retail_price,
       </if>
-      <if test="posId != null" >
-        pos_id,
+      <if test="batchPrice != null" >
+        batch_price,
+      </if>
+      <if test="memberPrice != null" >
+        member_price,
+      </if>
+      <if test="onlinePrice != null" >
+        online_price,
+      </if>
+      <if test="splitPrice != null" >
+        split_price,
+      </if>
+      <if test="lowPrice != null" >
+        low_price,
+      </if>
+      <if test="hightPrice != null" >
+        hight_price,
+      </if>
+      <if test="createdBy != null" >
+        created_by,
+      </if>
+      <if test="updatedBy != null" >
+        updated_by,
+      </if>
+      <if test="createdTime != null" >
+        created_time,
+      </if>
+      <if test="updatedTime != null" >
+        updated_time,
       </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides="," >
-
-      <if test="name != null" >
-        #{name,jdbcType=VARCHAR},
-      </if>
       <if test="companyId != null" >
         #{companyId,jdbcType=INTEGER},
       </if>
       <if test="categoryId != null" >
         #{categoryId,jdbcType=INTEGER},
+      </if>
+      <if test="name != null" >
+        #{name,jdbcType=VARCHAR},
       </if>
       <if test="fullName != null" >
         #{fullName,jdbcType=VARCHAR},
@@ -362,68 +359,71 @@
       <if test="origin != null" >
         #{origin,jdbcType=VARCHAR},
       </if>
-      <if test="jx != null" >
-        #{jx,jdbcType=VARCHAR},
-      </if>
       <if test="spec != null" >
         #{spec,jdbcType=VARCHAR},
       </if>
       <if test="serial != null" >
         #{serial,jdbcType=VARCHAR},
       </if>
-      <if test="code != null" >
-        #{code,jdbcType=VARCHAR},
-      </if>
       <if test="enable != null" >
         #{enable,jdbcType=BIT},
+      </if>
+      <if test="isProxy != null" >
+        #{isProxy,jdbcType=BIT},
       </if>
       <if test="factoryId != null" >
         #{factoryId,jdbcType=BIGINT},
       </if>
       <if test="unit != null" >
-        #{unit,jdbcType=INTEGER},
+        #{unit,jdbcType=BIGINT},
       </if>
       <if test="packUnit != null" >
-        #{packUnit,jdbcType=INTEGER},
+        #{packUnit,jdbcType=BIGINT},
       </if>
       <if test="mediumPack != null" >
-        #{mediumPack,jdbcType=INTEGER},
+        #{mediumPack,jdbcType=DECIMAL},
       </if>
       <if test="bigPack != null" >
-        #{bigPack,jdbcType=INTEGER},
+        #{bigPack,jdbcType=DECIMAL},
       </if>
       <if test="pinyin != null" >
         #{pinyin,jdbcType=VARCHAR},
       </if>
       <if test="storageCondition != null" >
-        #{storageCondition,jdbcType=VARCHAR},
-      </if>
-      <if test="storageDescription != null" >
-        #{storageDescription,jdbcType=VARCHAR},
+        #{storageCondition,jdbcType=BIGINT},
       </if>
       <if test="comment != null" >
         #{comment,jdbcType=VARCHAR},
       </if>
-      <if test="certId != null" >
-        #{certId,jdbcType=BIGINT},
+      <if test="certNo != null" >
+        #{certNo,jdbcType=VARCHAR},
       </if>
-      <if test="brandId != null" >
-        #{brandId,jdbcType=INTEGER},
+      <if test="certExpDate != null" >
+        #{certExpDate,jdbcType=DATE},
       </if>
-      <if test="permitId != null" >
-        #{permitId,jdbcType=BIGINT},
+      <if test="certFileNo != null" >
+        #{certFileNo,jdbcType=VARCHAR},
       </if>
-      <if test="jxId != null" >
-        #{jxId,jdbcType=INTEGER},
+      <if test="brandNo != null" >
+        #{brandNo,jdbcType=VARCHAR},
       </if>
-      <if test="isForeign != null" >
-        #{isForeign,jdbcType=BIT},
+      <if test="brandExpDate != null" >
+        #{brandExpDate,jdbcType=DATE},
       </if>
-      <if test="medType != null" >
-        #{medType,jdbcType=INTEGER},
+      <if test="brandFileNo != null" >
+        #{brandFileNo,jdbcType=VARCHAR},
       </if>
-      <if test="isPrescription != null" >
-        #{isPrescription,jdbcType=BIT},
+      <if test="permitNo != null" >
+        #{permitNo,jdbcType=VARCHAR},
+      </if>
+      <if test="permitExpDate != null" >
+        #{permitExpDate,jdbcType=DATE},
+      </if>
+      <if test="permitFileNo != null" >
+        #{permitFileNo,jdbcType=VARCHAR},
+      </if>
+      <if test="archiveNo != null" >
+        #{archiveNo,jdbcType=VARCHAR},
       </if>
       <if test="inCheck != null" >
         #{inCheck,jdbcType=BIT},
@@ -437,24 +437,6 @@
       <if test="needCare != null" >
         #{needCare,jdbcType=BIT},
       </if>
-      <if test="warningDays != null" >
-        #{warningDays,jdbcType=INTEGER},
-      </if>
-      <if test="createdTime != null" >
-        #{createdTime,jdbcType=TIMESTAMP},
-      </if>
-      <if test="updatedTime != null" >
-        #{updatedTime,jdbcType=TIMESTAMP},
-      </if>
-      <if test="createdBy != null" >
-        #{createdBy,jdbcType=VARCHAR},
-      </if>
-      <if test="updatedBy != null" >
-        #{updatedBy,jdbcType=VARCHAR},
-      </if>
-      <if test="isShebao != null" >
-        #{isShebao,jdbcType=BIT},
-      </if>
       <if test="inTax != null" >
         #{inTax,jdbcType=DECIMAL},
       </if>
@@ -462,13 +444,13 @@
         #{outTax,jdbcType=DECIMAL},
       </if>
       <if test="validMonths != null" >
-        #{validMonths,jdbcType=TINYINT},
+        #{validMonths,jdbcType=INTEGER},
+      </if>
+      <if test="warningDays != null" >
+        #{warningDays,jdbcType=INTEGER},
       </if>
       <if test="contact != null" >
         #{contact,jdbcType=VARCHAR},
-      </if>
-      <if test="archiveNumber != null" >
-        #{archiveNumber,jdbcType=VARCHAR},
       </if>
       <if test="cureRange != null" >
         #{cureRange,jdbcType=VARCHAR},
@@ -476,49 +458,95 @@
       <if test="salePolicy != null" >
         #{salePolicy,jdbcType=VARCHAR},
       </if>
-      <if test="specialManageId != null" >
-        #{specialManageId,jdbcType=INTEGER},
+      <if test="isForeign != null" >
+        #{isForeign,jdbcType=BIT},
       </if>
-      <if test="medicationId != null" >
-        #{medicationId,jdbcType=INTEGER},
+      <if test="prescriptionId != null" >
+        #{prescriptionId,jdbcType=BIGINT},
       </if>
-      <if test="functionCategoryId != null" >
-        #{functionCategoryId,jdbcType=INTEGER},
+      <if test="medTypeId != null" >
+        #{medTypeId,jdbcType=BIGINT},
+      </if>
+      <if test="isShebao != null" >
+        #{isShebao,jdbcType=BIT},
       </if>
       <if test="specificMedId != null" >
-        #{specificMedId,jdbcType=INTEGER},
+        #{specificMedId,jdbcType=BIGINT},
       </if>
-      <if test="careTimeId != null" >
-        #{careTimeId,jdbcType=INTEGER},
-      </if>
-      <if test="gmpTypeId != null" >
-        #{gmpTypeId,jdbcType=INTEGER},
-      </if>
-      <if test="scopeId != null" >
-        #{scopeId,jdbcType=INTEGER},
+      <if test="jxId != null" >
+        #{jxId,jdbcType=BIGINT},
       </if>
       <if test="baseMedId != null" >
-        #{baseMedId,jdbcType=INTEGER},
+        #{baseMedId,jdbcType=BIGINT},
       </if>
-      <if test="priceConfId != null" >
-        #{priceConfId,jdbcType=BIGINT},
+      <if test="funcCatId != null" >
+        #{funcCatId,jdbcType=BIGINT},
       </if>
-      <if test="posId != null" >
-        #{posId,jdbcType=BIGINT},
+      <if test="medicationId != null" >
+        #{medicationId,jdbcType=BIGINT},
+      </if>
+      <if test="careTimeId != null" >
+        #{careTimeId,jdbcType=BIGINT},
+      </if>
+      <if test="gmpTypeId != null" >
+        #{gmpTypeId,jdbcType=BIGINT},
+      </if>
+      <if test="abcTypeId != null" >
+        #{abcTypeId,jdbcType=BIGINT},
+      </if>
+      <if test="scopeId != null" >
+        #{scopeId,jdbcType=BIGINT},
+      </if>
+      <if test="newTypeId != null" >
+        #{newTypeId,jdbcType=BIGINT},
+      </if>
+      <if test="retailPrice != null" >
+        #{retailPrice,jdbcType=DECIMAL},
+      </if>
+      <if test="batchPrice != null" >
+        #{batchPrice,jdbcType=DECIMAL},
+      </if>
+      <if test="memberPrice != null" >
+        #{memberPrice,jdbcType=DECIMAL},
+      </if>
+      <if test="onlinePrice != null" >
+        #{onlinePrice,jdbcType=DECIMAL},
+      </if>
+      <if test="splitPrice != null" >
+        #{splitPrice,jdbcType=DECIMAL},
+      </if>
+      <if test="lowPrice != null" >
+        #{lowPrice,jdbcType=DECIMAL},
+      </if>
+      <if test="hightPrice != null" >
+        #{hightPrice,jdbcType=DECIMAL},
+      </if>
+      <if test="createdBy != null" >
+        #{createdBy,jdbcType=VARCHAR},
+      </if>
+      <if test="updatedBy != null" >
+        #{updatedBy,jdbcType=VARCHAR},
+      </if>
+      <if test="createdTime != null" >
+        #{createdTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updatedTime != null" >
+        #{updatedTime,jdbcType=TIMESTAMP},
       </if>
     </trim>
   </insert>
+
   <update id="updateByPrimaryKeySelective" parameterType="com.yiban.erp.entities.Goods" >
-    update goods
+    update goods_info
     <set >
-      <if test="name != null" >
-        name = #{name,jdbcType=VARCHAR},
-      </if>
       <if test="companyId != null" >
         company_id = #{companyId,jdbcType=INTEGER},
       </if>
       <if test="categoryId != null" >
         category_id = #{categoryId,jdbcType=INTEGER},
+      </if>
+      <if test="name != null" >
+        name = #{name,jdbcType=VARCHAR},
       </if>
       <if test="fullName != null" >
         full_name = #{fullName,jdbcType=VARCHAR},
@@ -526,68 +554,71 @@
       <if test="origin != null" >
         origin = #{origin,jdbcType=VARCHAR},
       </if>
-      <if test="jx != null" >
-        jx = #{jx,jdbcType=VARCHAR},
-      </if>
       <if test="spec != null" >
         spec = #{spec,jdbcType=VARCHAR},
       </if>
       <if test="serial != null" >
         serial = #{serial,jdbcType=VARCHAR},
       </if>
-      <if test="code != null" >
-        code = #{code,jdbcType=VARCHAR},
-      </if>
       <if test="enable != null" >
         enable = #{enable,jdbcType=BIT},
+      </if>
+      <if test="isProxy != null" >
+        is_proxy = #{isProxy,jdbcType=BIT},
       </if>
       <if test="factoryId != null" >
         factory_id = #{factoryId,jdbcType=BIGINT},
       </if>
       <if test="unit != null" >
-        unit = #{unit,jdbcType=INTEGER},
+        unit = #{unit,jdbcType=BIGINT},
       </if>
       <if test="packUnit != null" >
-        pack_unit = #{packUnit,jdbcType=INTEGER},
+        pack_unit = #{packUnit,jdbcType=BIGINT},
       </if>
       <if test="mediumPack != null" >
-        medium_pack = #{mediumPack,jdbcType=INTEGER},
+        medium_pack = #{mediumPack,jdbcType=DECIMAL},
       </if>
       <if test="bigPack != null" >
-        big_pack = #{bigPack,jdbcType=INTEGER},
+        big_pack = #{bigPack,jdbcType=DECIMAL},
       </if>
       <if test="pinyin != null" >
         pinyin = #{pinyin,jdbcType=VARCHAR},
       </if>
       <if test="storageCondition != null" >
-        storage_condition = #{storageCondition,jdbcType=VARCHAR},
-      </if>
-      <if test="storageDescription != null" >
-        storage_description = #{storageDescription,jdbcType=VARCHAR},
+        storage_condition = #{storageCondition,jdbcType=BIGINT},
       </if>
       <if test="comment != null" >
         comment = #{comment,jdbcType=VARCHAR},
       </if>
-      <if test="certId != null" >
-        cert_id = #{certId,jdbcType=BIGINT},
+      <if test="certNo != null" >
+        cert_no = #{certNo,jdbcType=VARCHAR},
       </if>
-      <if test="brandId != null" >
-        brand_id = #{brandId,jdbcType=INTEGER},
+      <if test="certExpDate != null" >
+        cert_exp_date = #{certExpDate,jdbcType=DATE},
       </if>
-      <if test="permitId != null" >
-        permit_id = #{permitId,jdbcType=BIGINT},
+      <if test="certFileNo != null" >
+        cert_file_no = #{certFileNo,jdbcType=VARCHAR},
       </if>
-      <if test="jxId != null" >
-        jx_id = #{jxId,jdbcType=INTEGER},
+      <if test="brandNo != null" >
+        brand_no = #{brandNo,jdbcType=VARCHAR},
       </if>
-      <if test="isForeign != null" >
-        is_foreign = #{isForeign,jdbcType=BIT},
+      <if test="brandExpDate != null" >
+        brand_exp_date = #{brandExpDate,jdbcType=DATE},
       </if>
-      <if test="medType != null" >
-        med_type = #{medType,jdbcType=INTEGER},
+      <if test="brandFileNo != null" >
+        brand_file_no = #{brandFileNo,jdbcType=VARCHAR},
       </if>
-      <if test="isPrescription != null" >
-        is_prescription = #{isPrescription,jdbcType=BIT},
+      <if test="permitNo != null" >
+        permit_no = #{permitNo,jdbcType=VARCHAR},
+      </if>
+      <if test="permitExpDate != null" >
+        permit_exp_date = #{permitExpDate,jdbcType=DATE},
+      </if>
+      <if test="permitFileNo != null" >
+        permit_file_no = #{permitFileNo,jdbcType=VARCHAR},
+      </if>
+      <if test="archiveNo != null" >
+        archive_no = #{archiveNo,jdbcType=VARCHAR},
       </if>
       <if test="inCheck != null" >
         in_check = #{inCheck,jdbcType=BIT},
@@ -601,24 +632,6 @@
       <if test="needCare != null" >
         need_care = #{needCare,jdbcType=BIT},
       </if>
-      <if test="warningDays != null" >
-        warning_days = #{warningDays,jdbcType=INTEGER},
-      </if>
-      <if test="createdTime != null" >
-        created_time = #{createdTime,jdbcType=TIMESTAMP},
-      </if>
-      <if test="updatedTime != null" >
-        updated_time = #{updatedTime,jdbcType=TIMESTAMP},
-      </if>
-      <if test="createdBy != null" >
-        created_by = #{createdBy,jdbcType=VARCHAR},
-      </if>
-      <if test="updatedBy != null" >
-        updated_by = #{updatedBy,jdbcType=VARCHAR},
-      </if>
-      <if test="isShebao != null" >
-        is_shebao = #{isShebao,jdbcType=BIT},
-      </if>
       <if test="inTax != null" >
         in_tax = #{inTax,jdbcType=DECIMAL},
       </if>
@@ -626,13 +639,13 @@
         out_tax = #{outTax,jdbcType=DECIMAL},
       </if>
       <if test="validMonths != null" >
-        valid_months = #{validMonths,jdbcType=TINYINT},
+        valid_months = #{validMonths,jdbcType=INTEGER},
+      </if>
+      <if test="warningDays != null" >
+        warning_days = #{warningDays,jdbcType=INTEGER},
       </if>
       <if test="contact != null" >
         contact = #{contact,jdbcType=VARCHAR},
-      </if>
-      <if test="archiveNumber != null" >
-        archive_number = #{archiveNumber,jdbcType=VARCHAR},
       </if>
       <if test="cureRange != null" >
         cure_range = #{cureRange,jdbcType=VARCHAR},
@@ -640,94 +653,84 @@
       <if test="salePolicy != null" >
         sale_policy = #{salePolicy,jdbcType=VARCHAR},
       </if>
-      <if test="specialManageId != null" >
-        special_manage_id = #{specialManageId,jdbcType=INTEGER},
+      <if test="isForeign != null" >
+        is_foreign = #{isForeign,jdbcType=BIT},
       </if>
-      <if test="medicationId != null" >
-        medication_id = #{medicationId,jdbcType=INTEGER},
+      <if test="prescriptionId != null" >
+        prescription_id = #{prescriptionId,jdbcType=BIGINT},
       </if>
-      <if test="functionCategoryId != null" >
-        function_category_id = #{functionCategoryId,jdbcType=INTEGER},
+      <if test="medTypeId != null" >
+        med_type_id = #{medTypeId,jdbcType=BIGINT},
+      </if>
+      <if test="isShebao != null" >
+        is_shebao = #{isShebao,jdbcType=BIT},
       </if>
       <if test="specificMedId != null" >
-        specific_med_id = #{specificMedId,jdbcType=INTEGER},
+        specific_med_id = #{specificMedId,jdbcType=BIGINT},
       </if>
-      <if test="careTimeId != null" >
-        care_time_id = #{careTimeId,jdbcType=INTEGER},
-      </if>
-      <if test="gmpTypeId != null" >
-        gmp_type_id = #{gmpTypeId,jdbcType=INTEGER},
-      </if>
-      <if test="scopeId != null" >
-        scope_id = #{scopeId,jdbcType=INTEGER},
+      <if test="jxId != null" >
+        jx_id = #{jxId,jdbcType=BIGINT},
       </if>
       <if test="baseMedId != null" >
-        base_med_id = #{baseMedId,jdbcType=INTEGER},
+        base_med_id = #{baseMedId,jdbcType=BIGINT},
       </if>
-      <if test="priceConfId != null" >
-        price_conf_id = #{priceConfId,jdbcType=BIGINT},
+      <if test="funcCatId != null" >
+        func_cat_id = #{funcCatId,jdbcType=BIGINT},
       </if>
-      <if test="posId != null" >
-        pos_id = #{posId,jdbcType=BIGINT},
+      <if test="medicationId != null" >
+        medication_id = #{medicationId,jdbcType=BIGINT},
+      </if>
+      <if test="careTimeId != null" >
+        care_time_id = #{careTimeId,jdbcType=BIGINT},
+      </if>
+      <if test="gmpTypeId != null" >
+        gmp_type_id = #{gmpTypeId,jdbcType=BIGINT},
+      </if>
+      <if test="abcTypeId != null" >
+        abc_type_id = #{abcTypeId,jdbcType=BIGINT},
+      </if>
+      <if test="scopeId != null" >
+        scope_id = #{scopeId,jdbcType=BIGINT},
+      </if>
+      <if test="newTypeId != null" >
+        new_type_id = #{newTypeId,jdbcType=BIGINT},
+      </if>
+      <if test="retailPrice != null" >
+        retail_price = #{retailPrice,jdbcType=DECIMAL},
+      </if>
+      <if test="batchPrice != null" >
+        batch_price = #{batchPrice,jdbcType=DECIMAL},
+      </if>
+      <if test="memberPrice != null" >
+        member_price = #{memberPrice,jdbcType=DECIMAL},
+      </if>
+      <if test="onlinePrice != null" >
+        online_price = #{onlinePrice,jdbcType=DECIMAL},
+      </if>
+      <if test="splitPrice != null" >
+        split_price = #{splitPrice,jdbcType=DECIMAL},
+      </if>
+      <if test="lowPrice != null" >
+        low_price = #{lowPrice,jdbcType=DECIMAL},
+      </if>
+      <if test="hightPrice != null" >
+        hight_price = #{hightPrice,jdbcType=DECIMAL},
+      </if>
+      <if test="createdBy != null" >
+        created_by = #{createdBy,jdbcType=VARCHAR},
+      </if>
+      <if test="updatedBy != null" >
+        updated_by = #{updatedBy,jdbcType=VARCHAR},
+      </if>
+      <if test="createdTime != null" >
+        created_time = #{createdTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updatedTime != null" >
+        updated_time = #{updatedTime,jdbcType=TIMESTAMP},
       </if>
     </set>
     where id = #{id,jdbcType=BIGINT}
   </update>
-  <update id="updateByPrimaryKey" parameterType="com.yiban.erp.entities.Goods" >
-    update goods
-    set name = #{name,jdbcType=VARCHAR},
-      company_id = #{companyId,jdbcType=INTEGER},
-      category_id = #{categoryId,jdbcType=INTEGER},
-      full_name = #{fullName,jdbcType=VARCHAR},
-      origin = #{origin,jdbcType=VARCHAR},
-      jx = #{jx,jdbcType=VARCHAR},
-      spec = #{spec,jdbcType=VARCHAR},
-      serial = #{serial,jdbcType=VARCHAR},
-      code = #{code,jdbcType=VARCHAR},
-      enable = #{enable,jdbcType=BIT},
-      factory_id = #{factoryId,jdbcType=BIGINT},
-      unit = #{unit,jdbcType=INTEGER},
-      pack_unit = #{packUnit,jdbcType=INTEGER},
-      medium_pack = #{mediumPack,jdbcType=INTEGER},
-      big_pack = #{bigPack,jdbcType=INTEGER},
-      pinyin = #{pinyin,jdbcType=VARCHAR},
-      storage_condition = #{storageCondition,jdbcType=VARCHAR},
-      storage_description = #{storageDescription,jdbcType=VARCHAR},
-      comment = #{comment,jdbcType=VARCHAR},
-      cert_id = #{certId,jdbcType=BIGINT},
-      brand_id = #{brandId,jdbcType=INTEGER},
-      permit_id = #{permitId,jdbcType=BIGINT},
-      jx_id = #{jxId,jdbcType=INTEGER},
-      is_foreign = #{isForeign,jdbcType=BIT},
-      med_type = #{medType,jdbcType=INTEGER},
-      is_prescription = #{isPrescription,jdbcType=BIT},
-      in_check = #{inCheck,jdbcType=BIT},
-      first_check = #{firstCheck,jdbcType=BIT},
-      special_managed = #{specialManaged,jdbcType=BIT},
-      need_care = #{needCare,jdbcType=BIT},
-      warning_days = #{warningDays,jdbcType=INTEGER},
-      created_time = #{createdTime,jdbcType=TIMESTAMP},
-      updated_time = #{updatedTime,jdbcType=TIMESTAMP},
-      created_by = #{createdBy,jdbcType=VARCHAR},
-      updated_by = #{updatedBy,jdbcType=VARCHAR},
-      is_shebao = #{isShebao,jdbcType=BIT},
-      in_tax = #{inTax,jdbcType=DECIMAL},
-      out_tax = #{outTax,jdbcType=DECIMAL},
-      valid_months = #{validMonths,jdbcType=TINYINT},
-      contact = #{contact,jdbcType=VARCHAR},
-      archive_number = #{archiveNumber,jdbcType=VARCHAR},
-      cure_range = #{cureRange,jdbcType=VARCHAR},
-      sale_policy = #{salePolicy,jdbcType=VARCHAR},
-      special_manage_id = #{specialManageId,jdbcType=INTEGER},
-      medication_id = #{medicationId,jdbcType=INTEGER},
-      function_category_id = #{functionCategoryId,jdbcType=INTEGER},
-      specific_med_id = #{specificMedId,jdbcType=INTEGER},
-      care_time_id = #{careTimeId,jdbcType=INTEGER},
-      gmp_type_id = #{gmpTypeId,jdbcType=INTEGER},
-      scope_id = #{scopeId,jdbcType=INTEGER},
-      base_med_id = #{baseMedId,jdbcType=INTEGER},
-      price_conf_id = #{priceConfId,jdbcType=BIGINT},
-      pos_id = #{posId,jdbcType=BIGINT}
-    where id = #{id,jdbcType=BIGINT}
-  </update>
+
+
 </mapper>
