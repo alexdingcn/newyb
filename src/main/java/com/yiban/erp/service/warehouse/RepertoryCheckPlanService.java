@@ -1,6 +1,7 @@
 package com.yiban.erp.service.warehouse;
 
 import com.alibaba.fastjson.JSONObject;
+import com.yiban.erp.constant.CheckPlanConstant;
 import com.yiban.erp.constant.OrderNumberType;
 import com.yiban.erp.dao.GoodsMapper;
 import com.yiban.erp.dao.RepertoryCheckPlanDetailMapper;
@@ -136,6 +137,55 @@ public class RepertoryCheckPlanService {
         cdlist=setRepertoryToList(cdlist);
         result.put("data", checkinfo);
         result.put("checkDetailList", cdlist);
+        return result;
+    }
+
+
+    //根据盘点计划ID查询并统计盘点汇总信息
+    public JSONObject getInfo4PassJSON(Long checkPlanId)throws BizException{
+        JSONObject result = new JSONObject();
+        RepertoryCheckPlan checkinfo= repertoryCheckPlanMapper.selectByPrimaryKey(checkPlanId);
+        Map<String, Object> requestMap = new HashMap<>();
+        requestMap.put("checkPlanId", checkPlanId);
+        List<RepertoryCheckPlanDetail>  cdlist=repertoryCheckPlanDetailMapper.getCheckPlanDetailList(requestMap);
+        BigDecimal subAmount=new BigDecimal(0);
+        BigDecimal subMoney=new BigDecimal(0);
+        BigDecimal unCheckAmount=new BigDecimal(0);
+        BigDecimal checkMoreAmount=new BigDecimal(0);
+        BigDecimal checkMoreMoney=new BigDecimal(0);
+        BigDecimal loseAmount=new BigDecimal(0);
+        BigDecimal loseMoney=new BigDecimal(0);
+
+
+        for(int i=0;i<cdlist.size();i++){
+            RepertoryCheckPlanDetail pcpd=cdlist.get(i);
+           //统计盘点物品总数
+            subAmount=subAmount.add( pcpd.getAccLimit());
+            //统计盘点物品总值
+            subMoney=subMoney.add( pcpd.getAccLimit().multiply(pcpd.getPrice()));
+            //统计未盘点物品总数
+            if(CheckPlanConstant.PLAN_DETAIL_FORMSTATUS_UNCHECK.equals(pcpd.getFormStatus())){
+                unCheckAmount=unCheckAmount.add(pcpd.getAccLimit());
+            }
+            //统计盘盈数据
+            if(CheckPlanConstant.PLAN_DETAIL_CHECK_STATUS_MORE.equals(pcpd.getCheckStatus())){
+                checkMoreAmount=checkMoreAmount.add(pcpd.getCheckLimit());
+                checkMoreMoney=checkMoreMoney.add(pcpd.getCheckLimit().multiply(pcpd.getPrice()));
+            }
+            //统计盘亏数据
+            if(CheckPlanConstant.PLAN_DETAIL_CHECK_STATUS_LOSE.equals(pcpd.getCheckStatus())){
+                BigDecimal lose=pcpd.getAccLimit().subtract(pcpd.getCheckLimit());
+                loseAmount=loseAmount.add(lose);
+                loseMoney=loseMoney.add( lose.multiply(pcpd.getPrice()));
+            }
+        }
+        result.put("subAmount", subAmount);
+        result.put("subMoney", subMoney);
+        result.put("unCheckAmount", unCheckAmount);
+        result.put("checkMoreAmount", checkMoreAmount);
+        result.put("checkMoreMoney", checkMoreMoney);
+        result.put("loseAmount", loseAmount);
+        result.put("loseMoney", loseMoney);
         return result;
     }
 

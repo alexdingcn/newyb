@@ -181,7 +181,15 @@ public class RepertoryCheckController {
         repertoryCheckPlanService.saveCheckPlanDetail(user,repertoryCheckPlanDetail);
         return ResponseEntity.ok().build();
     }
-
+    //查询盘点单全部信息
+    @RequestMapping(value = "/getInfo4Pass", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> getInfo4Pass(@AuthenticationPrincipal User user,
+                                                @RequestParam(name = "checkPlanId", required = true) Long checkPlanId
+    ) throws Exception {
+        JSONObject result = new JSONObject();
+        result =repertoryCheckPlanService.getInfo4PassJSON(checkPlanId);
+        return ResponseEntity.ok().body(result.toJSONString());
+    }
 
 
 }
