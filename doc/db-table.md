@@ -482,3 +482,62 @@ file_no|String|生产商档案编号
 
 
 
+
+### 供应商信息表：supplier
+
+> 记录供应商信息
+
+字段名|类型|描述
+-|-|-
+id|Long|(自增类型ID pk)
+name|String|供应商名称
+pinyin|String|拼音
+enabled|Boolean|是否可用
+term|Integer|账期
+city|String|归属地区,包含地区码
+address|String|详细地址
+postcode|String|邮编
+fax|String|传真
+phone|String|联系电话
+email|String|电子邮件
+contact|String|联系人
+contact_phone|String|联系人电话
+employee|String|负责人
+legal_persion|String|法人代表
+discount|Decimal(5,2)|折扣率
+bank_account|String|银行账户
+bank_name|String|银行名称
+bank_number|String|银行账号
+tax_number|String|税号
+billing_method_id|Long|结算方式
+supplier_type_id|Long|类型
+have_stamp|Boolean|是否有印章
+have_bill_template|Boolean|是否有票据模板
+check_first|Boolean|是否首营检查
+is_factory|Boolean|是否生产企业
+is_direct_supplier|Boolean|是否直调供应商
+is_cold_business|Boolean|是否冷链经营
+can_special|Boolean|是否可以经营特殊商品
+warehouse_address|String|仓库地址
+business_scope|String|经营范围
+comment|String|备注
+license|String|营业执照
+license_exp|Date|营业执照有效期
+organization_no|String|组织机构代码证
+organization_exp|Date|组织机构代码证有效期
+gsp_gmp_no|String|GSP/GMP证件号
+gsp_gmp_exp|Date|GSP/GMP证有效期
+quality_protocol_no|String|质量保证协议
+quality_protocol_exp|Date|质量保证协议有效期
+sale_protocol_no|String|购销协议
+sale_protocol_exp|Date|购销协议有效期
+legal_protocol_no|String|法人委托书
+legal_protocol_exp|Date|法人委托书有效期
+other_protocol_no|String|其他协议
+other_protocol_exp|Date|其他协议有效期
+file_no|String|档案编号
+created_time|Datetime|创建时间
+created_by|String|创建人
+updated_by|String|修改人
+updated_time|String|修改时间
+
