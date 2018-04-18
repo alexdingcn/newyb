@@ -372,5 +372,77 @@ updated_by|String|修改人
 company_id|Integer|公司ID
 
 
+### 商品信息表：goods
+
+> 记录商品的信息表
+
+字段名|类型|描述
+-|-|-
+id|Long|(自增类型ID pk)
+company_id|Integer|公司ID
+category_id|Integer|商品类别ID
+name|String|商品通俗名称
+full_name|String|商用名称
+origin|String|产地
+spec|String|规格
+serial|String|条形码
+enable|Boolean|是否可用
+is_proxy|Boolean|是否代销
+factory_id|Long|厂商ID
+unit|Long|计量单位
+pack_unit|Long|大件计量单位
+medium_pack|Decimal(14,3)|中件装量
+big_pack|Decimal(14,3)|大件装量
+pinyin|String|拼音
+storage_condition|Long|存储条件
+comment|String|备注
+cert_no|String|注册证编号
+cert_exp_date|Date|注册证有效期至
+cert_file_no|String|注册证档案编号
+brand_no|String|注册商标证件号
+brand_exp_date|Date|注册商标证件有效期
+brand_file_no|String|注册商标档案编号
+permit_no|String|批准文号编号
+permit_exp_date|Date|批准文号有效期
+permit_file_no|String|批准文号档案编号
+archive_no|String|档案编号
+in_check|Boolean|入库检查
+first_check|Boolean|首营检查
+special_managed|Boolean|是否特殊管控
+need_care|Boolean|是否需要护理
+in_tax|Decimal(4,2)|进项税
+out_tax|Decimal(4,2)|销项税
+valid_months|Integer|有效期限(月份)
+warning_days|Integer|预警天数
+cantact|String|联系方式
+cure_range|String|主治功能
+sale_policy|String|销售策略
+is_foreign|String|是否进口药
+prescription_id|Long|处方/非处方属性
+med_type_id|Long|中西药属性
+is_shebao|Boolean|社保目录
+specific_med_id|Long|特殊管理属性
+jx_id|Long|剂型属性
+base_med_id|Long|药基属性
+func_cat_id|Long|功能分类属性
+medication_id|Long|给药途径属性
+care_time_id|Long|护养标志属性
+gmp_type_id|Long|GMP属性
+abc_type_id|Long|ABC属性
+scope_id|Long|经营范围属性
+new_type_id|Long|新特药属性
+retail_price|Decimal(10,3)|零售价
+batch_price|Decimal(10,3)|批发价
+member_price|Decimal(10,3)|会员价
+online_price|Decimal(10,3)|挂网价
+split_price|Decimal(10,3)|拆零价
+low_price|Decimal(10,3)|最低价
+hight_price|Decimal(10,3)|最高价
+created_by|String|创建人
+update_by|String|修改人
+created_time|Datetime|创建时间
+updated_time|Datetime|修改时间
+
+
 
 

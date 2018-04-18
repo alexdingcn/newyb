@@ -6,6 +6,8 @@ import com.alibaba.fastjson.JSONObject;
 import com.yiban.erp.dao.FactoryMapper;
 import com.yiban.erp.entities.Factory;
 import com.yiban.erp.entities.User;
+import com.yiban.erp.exception.BizRuntimeException;
+import com.yiban.erp.exception.ErrorCode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -33,8 +36,8 @@ public class FactoryController {
      * @return
      */
     @RequestMapping(value = "/list", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> list() {
-        List<Factory> factoryList = factoryMapper.selectAll();
+    public ResponseEntity<String> list(@AuthenticationPrincipal User user) {
+        List<Factory> factoryList = factoryMapper.selectAll(user.getCompanyId());
         return ResponseEntity.ok().body(JSON.toJSONString(factoryList));
     }
 
@@ -46,7 +49,7 @@ public class FactoryController {
             List<Factory> factoryList = factoryMapper.searchByNameOrContact(user.getCompanyId(), searchStr);
             return ResponseEntity.ok().body(JSON.toJSONString(factoryList));
         } else {
-            return list();
+            return ResponseEntity.ok().body(JSON.toJSONString(Collections.emptyList()));
         }
     }
 
@@ -57,7 +60,9 @@ public class FactoryController {
     }
 
     @RequestMapping(value = "/remove", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> remove(@RequestBody String payload) {
+    public ResponseEntity<String> remove(@RequestBody String payload,
+                                         @AuthenticationPrincipal User user) {
+        logger.info("user:{} request remove factory: {}", user.getId(), payload);
         JSONObject requestParams = JSON.parseObject(payload);
         JSONArray factoryIds = requestParams.getJSONArray("ids");
         if (factoryIds != null) {
@@ -72,19 +77,23 @@ public class FactoryController {
     }
 
     @RequestMapping(value = "/add", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> add(@RequestBody Factory factory) {
-        logger.info("ADD new factory:{}", factory);
-        factory.setCreatedBy("admin");
-        factory.setCreatedTime(new Date());
+    public ResponseEntity<String> add(@RequestBody Factory factory,
+                                      @AuthenticationPrincipal User user) {
+        logger.info("ADD new factory:{} by user:{}", JSON.toJSONString(factory), user.getId());
         int result = 0;
         if (factory.getId() == null) {
+            factory.setCompanyId(user.getCompanyId());
+            factory.setCreatedBy(user.getNickname());
+            factory.setCreatedTime(new Date());
             result = factoryMapper.insertSelective(factory);
         } else {
-            result = factoryMapper.updateByPrimaryKey(factory);
+            factory.setUpdatedBy(user.getNickname());
+            factory.setUpdatedTime(new Date());
+            result = factoryMapper.updateByPrimaryKeySelective(factory);
         }
         if (result > 0) {
             return ResponseEntity.ok().body(factory.getId().toString());
         }
-        return ResponseEntity.badRequest().body("Failed to insert/update");
+        throw new BizRuntimeException(ErrorCode.FAILED_UPDATE_FROM_DB);
     }
 }
