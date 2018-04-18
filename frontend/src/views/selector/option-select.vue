@@ -66,7 +66,10 @@ export default {
         canEditTable
     },
     props: {
-        value: Number|String,
+        value: {
+            tpye: Number|String,
+            default: ''
+        },
         disabled: {
             type: Boolean,
             default: false
@@ -80,6 +83,11 @@ export default {
                 return oneOf(data, ['small', 'large', 'default']);
             }
         },
+    },
+    watch: {
+        value(data) {
+            this.optionId = data;
+        }
     },
     data () {
         return {

@@ -12,7 +12,7 @@
                 </p>
 
                 <ButtonGroup slot="extra">
-                    <Button type="primary" @click="submitGoods">提交</Button>
+                    <Button type="primary" :loading="savebtnLoading" @click="submitGoods">提交</Button>
                 </ButtonGroup>
 
                 <Form :model="formItem" :rules="ruleValidate" :label-width="90">
@@ -71,12 +71,12 @@
                     <Row>
                         <Col span="6">
                             <FormItem label="计量单位" prop="unit">
-                                <optionSelect v-model="formItem.unit" optionType='GOODS_UNIT' ></optionSelect>
+                                <option-select v-model="formItem.unit" optionType='GOODS_UNIT' ></option-select>
                             </FormItem>
                         </Col>
                         <Col span="6">
                             <FormItem label="整件单位" prop="packUnit">
-                                <optionSelect v-model="formItem.packUnit" optionType='GOODS_UNIT' ></optionSelect>
+                                <option-select v-model="formItem.packUnit" optionType='GOODS_UNIT' ></option-select>
                             </FormItem>
                         </Col>
                         <Col span="6">
@@ -86,7 +86,7 @@
                         </Col>
                         <Col span="6">
                             <FormItem label="大件装量" prop="bigPack">
-                                <InputNumber :min="0" v-model="formItem.bigPack" placeholder="例如 100"/>
+                                <InputNumber :min="0"  v-model="formItem.bigPack" placeholder="例如 100"/>
                             </FormItem>
                         </Col>
                     </Row>
@@ -106,7 +106,7 @@
                         </Col>
                         <Col span="6">
                             <FormItem label="代销">
-                                <i-switch v-model="formItem.isProxy" size="large">
+                                <i-switch v-model="formItem.proxy" size="large">
                                     <span slot="open">是</span>
                                     <span slot="close">否</span>
                                 </i-switch>
@@ -238,8 +238,8 @@
                                     </FormItem>
                                 </Col>
                                 <Col span="5">
-                                    <FormItem label="社保目录" prop="isShebao">
-                                        <Select v-model="formItem.isShebao">
+                                    <FormItem label="社保目录" prop="shebao">
+                                        <Select v-model="formItem.shebao">
                                             <Option :value="1">社保目录药</Option>
                                             <Option :value="0">非社保目录药</Option>
                                         </Select>
@@ -322,7 +322,9 @@
                                 </Col>
                                 <Col span="5">
                                     <FormItem label="证书档案编号" prop="certFileNo">
-                                        <Input v-model="formItem.certFileNo"/>
+                                        <Input v-model="formItem.certFileNo">
+                                            <Button slot="append" type="text" icon="edit" @click="certFileInfo(formItem.certFileNo)"></Button>
+                                        </Input>
                                     </FormItem>
                                 </Col>
                             </Row>
@@ -342,8 +344,10 @@
                                     </FormItem>
                                 </Col>
                                 <Col span="5">
-                                    <FormItem label="证书档案编号" prop="certFileNo">
-                                        <Input  v-model="formItem.brandFileNo"/>
+                                    <FormItem label="证书档案编号" prop="brandFileNo">
+                                        <Input  v-model="formItem.brandFileNo">
+                                            <Button slot="append" type="text" icon="edit" @click="brandFileInfo(formItem.brandFileNo)"></Button>
+                                        </Input>
                                     </FormItem>
                                 </Col>
                             </Row>
@@ -363,8 +367,10 @@
                                     </FormItem>
                                 </Col>
                                 <Col span="5">
-                                    <FormItem label="证书档案编号" prop="certFileNo">
-                                        <Input v-model="formItem.permitFileNo"/>
+                                    <FormItem label="证书档案编号" prop="permitFileNo">
+                                        <Input v-model="formItem.permitFileNo" >
+                                            <Button slot="append" type="text" icon="edit" @click="permitFileInfo(formItem.permitFileNo)"></Button>
+                                        </Input>
                                     </FormItem>
                                 </Col>
                             </Row>
@@ -415,23 +421,34 @@
             </Card>
         </Row>
 
+        <Modal v-model="fileUploadModal" :title="uploadModalTitle" :mask-closable="false" width="50" class="file-upload-modal">
+            <file-detail :fileNo="uploadFileNo" @add-file-success="addFileSuccess" ></file-detail>
+            <div slot="footer"></div>
+        </Modal>
+
     </div>
 </template>
 
 <script>
 import util from '@/libs/util.js';
 import optionSelect from "../selector/option-select.vue";
+import fileDetail from "@/views/basic-data/file-detail.vue";
 
 export default {
     name: 'goods-info',
     components: {
         optionSelect,
+        fileDetail
     },
     props: {
-        goodsId: Number|String
+        goodsId: {
+            type:Number|String,
+            default: ''
+        }
     },
     data () {
         return {
+            savebtnLoading: false,
             formItem: {
                 inTax: 16,
                 outTax: 16
@@ -449,8 +466,18 @@ export default {
                 factoryId: [
                     {required: true, message: '生产企业不能为空', trigger: 'blur'}
                 ]
-            }
+            },
+            fileUploadType: '',
+            fileUploadModal: false,
+            uploadModalTitle: '档案信息',
+            uploadFileNo: ''
+
         };
+    },
+    watch: {
+        goodsId: function() {
+            this.loadGoods();
+        }
     },
     methods: {
         init () {
@@ -480,8 +507,12 @@ export default {
                 .catch(function (error) {
                     util.errorProcessor(self, error);
                 });
-            if (this.goodsId) {
-                util.ajax.get('/goods/' + this.goodsId)
+        },
+
+        loadGoods() {
+            let self = this;
+            if (self.goodsId) {
+                util.ajax.get('/goods/' + self.goodsId)
                     .then(function (response) {
                         self.formItem = response.data;
                     })
@@ -489,16 +520,21 @@ export default {
                         util.errorProcessor(self, error);
                     });
             } else {
-                this.formItem = {};
+                self.formItem = {};
             }
         },
+
         submitGoods () {
             var self = this;
-            util.ajax.post('/goods/add', this.formItem)
+            self.savebtnLoading = true;
+            util.ajax.post('/goods/save', this.formItem)
                 .then(function (response) {
-                    self.$Message.info('保存商品成功');
+                    self.savebtnLoading = false;
+                    self.$Message.success('保存商品成功');
+                    self.$emit('save-ok');
                 })
                 .catch(function (error) {
+                    self.savebtnLoading = false;
                     util.errorProcessor(self, error);
                 });
         },
@@ -524,6 +560,45 @@ export default {
                         util.errorProcessor(self, error);
                     });
             }
+        },
+
+        addFileSuccess(data) {
+            if (this.fileUploadType === 'brand') {
+                this.formItem.brandFileNo = data.fileNo;
+            }
+            else if (this.fileUploadType === "cert") {
+                this.formItem.certFileNo = data.fileNo;
+            }
+            else if (this.fileUploadType == "permit") {
+                this.formItem.permitFileNo = data.fileNo;
+            }
+            else {
+                this.$Message.error('系统关联错误.')
+            }
+        },
+
+        certFileInfo(fileNo) {
+            this.uploadFileNo = ''; //先清理一次
+            this.fileUploadType = "cert";
+            this.uploadModalTitle = '注册证书档案',
+            this.uploadFileNo = fileNo;
+            this.fileUploadModal = true;
+        },
+
+        brandFileInfo(fileNo) {
+            this.uploadFileNo = ''; //先清理一次
+            this.fileUploadType = "brand";
+            this.uploadModalTitle = '注册商标档案',
+            this.uploadFileNo = fileNo;
+            this.fileUploadModal = true;
+        },
+
+        permitFileInfo(fileNo) {
+            this.uploadFileNo = ''; //先清理一次
+            this.fileUploadType = "permit";
+            this.uploadModalTitle = '批准文号档案',
+            this.uploadFileNo = fileNo;
+            this.fileUploadModal = true;
         }
         
     },
@@ -540,6 +615,11 @@ export default {
 
 .ivu-form-item {
     margin-bottom: 20px;
+}
+
+.file-upload-modal {
+    position: fixed;
+    z-index: 3000;
 }
 
 </style>

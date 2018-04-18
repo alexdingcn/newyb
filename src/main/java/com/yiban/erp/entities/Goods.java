@@ -1,7 +1,10 @@
 package com.yiban.erp.entities;
 
+import com.yiban.erp.constant.OptionsType;
+
 import java.math.BigDecimal;
-import java.util.Date;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class Goods {
 
@@ -152,6 +155,48 @@ public class Goods {
     private String scopeName;
     private String newTypeName;
 
+
+    public void setOptionName(List<Options> options) {
+        if (options == null || options.isEmpty()) {
+            return;
+        }
+        Map<Long, Options> optionMap = new HashMap<>();
+        options.stream().forEach(item -> {
+            optionMap.put(item.getId(), item);
+        });
+        this.setStorageConditionName(optionMap.get(this.getStorageCondition()) != null ? optionMap.get(this.getStorageCondition()).getValue() : null);
+        this.setUnitName(optionMap.get(this.getUnit()) != null ? optionMap.get(this.getUnit()).getValue() : null);
+        this.setPackUnitName(optionMap.get(this.getPackUnit()) != null ? optionMap.get(this.getPackUnit()).getValue() : null);
+        this.setSpecificMedName(optionMap.get(this.getSpecificMedId()) != null ? optionMap.get(this.getSpecificMedId()).getValue() : null);
+        this.setJxName(optionMap.get(this.getJxId()) != null ? optionMap.get(this.getJxId()).getValue() : null);
+        this.setBaseMedName(optionMap.get(this.getBaseMedId()) != null ? optionMap.get(this.getBaseMedId()).getValue() : null);
+        this.setFuncCatName(optionMap.get(this.getFuncCatId()) != null ? optionMap.get(this.getFuncCatId()).getValue() : null);
+        this.setMedicationName(optionMap.get(this.getMedicationId()) != null ? optionMap.get(this.getMedicationId()).getValue() : null);
+        this.setCareTimeName(optionMap.get(this.getCareTimeId()) != null ? optionMap.get(this.getCareTimeId()).getValue() : null);
+        this.setGmpTypeName(optionMap.get(this.getGmpTypeId()) != null ? optionMap.get(this.getCareTimeId()).getValue() : null);
+        this.setAbcTypeName(optionMap.get(this.getAbcTypeId()) != null ? optionMap.get(this.getAbcTypeId()).getValue() : null);
+        this.setScopeName(optionMap.get(this.getScopeId()) != null ? optionMap.get(this.getScopeId()).getValue() : null);
+        this.setNewTypeName(optionMap.get(this.getNewTypeId()) != null ? optionMap.get(this.getNewTypeId()).getValue() : null);
+    }
+
+    public Set<Long> getOptionIdList() {
+        Set<Long> optionIdSet = new HashSet<>();
+        optionIdSet.add(this.getStorageCondition() != null ? this.getStorageCondition() : 0);
+        optionIdSet.add(this.getUnit() != null ? this.getUnit() : 0);
+        optionIdSet.add(this.getPackUnit() != null ? this.getPackUnit() : 0);
+        optionIdSet.add(this.getSpecificMedId() != null ? this.getSpecificMedId() : 0);
+        optionIdSet.add(this.getJxId() != null ? this.getJxId() : 0);
+        optionIdSet.add(this.getBaseMedId() != null ? this.getBaseMedId() : 0);
+        optionIdSet.add(this.getFuncCatId() != null ? this.getFuncCatId() : 0);
+        optionIdSet.add(this.getMedicationId() != null ? this.getMedicationId() : 0);
+        optionIdSet.add(this.getCareTimeId() != null ? this.getCareTimeId() : 0);
+        optionIdSet.add(this.getGmpTypeId() != null ? this.getGmpTypeId() : 0);
+        optionIdSet.add(this.getAbcTypeId() != null ? this.getAbcTypeId() : 0);
+        optionIdSet.add(this.getScopeId() != null ? this.getScopeId() : 0);
+        optionIdSet.add(this.getNewTypeId() != null ? this.getNewTypeId() : 0);
+
+        return optionIdSet;
+    }
 
     public Long getId() {
         return id;

@@ -84,7 +84,7 @@
     from goods
     where id = #{id,jdbcType=BIGINT}
   </select>
-  <select id="selectCount" resultType="java.lang.Long">
+  <select id="selectCount" resultType="java.lang.Long" parameterType="map">
       select
         count(1)
       from goods
@@ -101,7 +101,7 @@
           and ( name like #{pattern}  or lower(pinyin) like lower(#{pattern}) )
       </if>
   </select>
-  <select id="selectAll" resultType="com.yiban.erp.entities.Goods">
+  <select id="selectAll" resultMap="BaseResultMap" parameterType="map">
       select
         g.*, c.name as categoryName, f.name as factory
       from goods g
@@ -124,7 +124,7 @@
       </if>
   </select>
 
-  <select id="selectByIdList" parameterType="map" resultType="com.yiban.erp.entities.Goods">
+  <select id="selectByIdList" parameterType="map" resultMap="BaseResultMap">
       select
         g.*, c.name as categoryName, f.name as factory
       from goods g
@@ -136,7 +136,7 @@
       </foreach>
   </select>
 
-  <select id="selectById" parameterType="java.lang.Long" resultType="com.yiban.erp.entities.Goods">
+  <select id="selectById" parameterType="java.lang.Long" resultMap="BaseResultMap">
     select
       g.*, c.name as categoryName, f.name as factory
     from goods g
@@ -151,7 +151,7 @@
   </delete>
 
   <insert id="insertSelective" parameterType="com.yiban.erp.entities.Goods" keyProperty="id" useGeneratedKeys="true" >
-    insert into goods_info
+    insert into goods
     <trim prefix="(" suffix=")" suffixOverrides="," >
       <if test="companyId != null" >
         company_id,
@@ -537,7 +537,7 @@
   </insert>
 
   <update id="updateByPrimaryKeySelective" parameterType="com.yiban.erp.entities.Goods" >
-    update goods_info
+    update goods
     <set >
       <if test="companyId != null" >
         company_id = #{companyId,jdbcType=INTEGER},

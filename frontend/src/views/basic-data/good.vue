@@ -40,7 +40,11 @@
                     </div>
 
                     <Row type="flex" align="middle" class="advanced-router margin-top-8">
-                        <Table border stripe highlight-row :loading="goodsTableLoading" :columns="orderColumns" :data="goodsData" ref="goodsTable" style="width: 100%;" size="small"></Table>
+                        <Table border stripe highlight-row :loading="goodsTableLoading" 
+                            :columns="orderColumns" :data="goodsData" ref="goodsTable" 
+                            @on-row-click="goodsTabRowClick"
+                            @on-row-dblclick="goodsTabRowDblClick" 
+                            style="width: 100%;" size="small"></Table>
                     </Row>
                     <Row class="margin-top-8">
                         <div style="float: right;">
@@ -53,7 +57,7 @@
         </Layout>
 
         <Modal v-model="checkModalShow" title="商品基础信息维护" :mask-closable="false" width="80">
-            <goods-info ></goods-info>
+            <goods-info :goodsId="currentGoodsId" @save-ok="saveGoodsOk" ></goods-info>
             <div slot="footer"></div>
         </Modal>
 
@@ -105,24 +109,7 @@ export default {
                     key: 'name',
                     width: 220,
                     sortable: true,
-                    fixed: 'left',
-                    render: (h, params) => {
-                        return h('Button', {
-                            props: {
-                                type: 'text',
-                                size: 'small'
-                            },
-                            on: {
-                                click: () => {
-                                    let argu = { goods_id: params.row.id };
-                                    this.$router.push({
-                                        name: 'goods-info',
-                                        params: argu
-                                    });
-                                }
-                            }
-                        }, params.row.name);
-                    }
+                    fixed: 'left'
                 },
                 {
                     title: '类别',
@@ -131,31 +118,44 @@ export default {
                 },
                 {
                     title: '产地',
+                    width: 150,
                     key: 'origin'
                 },
                 {
                     title: '计量单位',
+                    width: 90,
                     key: 'unitName'
                 },
                 {
                     title: '剂型',
-                    key: 'jx'
+                    width: 120,
+                    key: 'jxName'
                 },
                 {
                     title: '规格',
                     key: 'spec',
-                    sortable: true
+                    sortable: true,
+                    width: 120
                 },
                 {
                     title: '生产企业',
                     key: 'factory',
+                    width: 160,
+                },
+                {
+                    title: '是否可用',
+                    key: 'enable',
+                    width: 100,
+                    render: (h, params) => {
+                        return h('span', params.row.enable ? '是' : '否');
+                    }
                 },
                 {
                     title: '是否代销',
-                    key: 'isProxy',
+                    key: 'proxy',
                     width: 100,
                     render: (h, params) => {
-                        return h('span', params.row.isProxy ? '是' : '否');
+                        return h('span', params.row.proxy ? '是' : '否');
                     }
                 },
                 {
@@ -167,17 +167,64 @@ export default {
                     }
                 },
                 {
-                    title: '提成基数',
-                    key: 'needCare',
+                    title: '条形码',
+                    width: 120,
+                    key: 'serial'
+                },
+                {
+                    title: '进项税%',
                     width: 100,
-                    render: (h, params) => {
-                        return h('span', params.row.needCare ? '是':'否');
-                    }
+                    key: 'inTax'
+                },
+                {
+                    title: '销项税%',
+                    width: 100,
+                    key: 'outTax'
+                },
+                {
+                    title: '预警天数',
+                    width: 100,
+                    key: 'warningDays'
+                },
+                {
+                    title: '效期(月)',
+                    width: 100,
+                    key: 'validMonths'
+                },
+                {
+                    title: '批准文号',
+                    width: 120,
+                    key: 'permitNo'
+                },
+                {
+                    title: '注册商标',
+                    width: 120,
+                    key: 'brandNo'
+                },
+                {
+                    title: '注册证',
+                    width: 120,
+                    key: 'certNo'
+                },
+                {
+                    title: '最低价',
+                    width: 100,
+                    key: 'lowPrice'
+                },
+                {
+                    title: '最高价',
+                    width: 100,
+                    key: 'hightPrice'
+                },
+                {
+                    title: '批发价',
+                    width: 100,
+                    key: 'batchPrice'
                 }
-                
             ],
             goodsData: [],
-            checkModalShow: false
+            checkModalShow: false,
+            currentGoodsId: ''
         };
     },
     mounted () {
@@ -215,6 +262,8 @@ export default {
                     self.goodsTableLoading = false;
                     self.goodsData = response.data.data;
                     self.totalGoodsCount = response.data.total;
+                    self.currentGoodsId = '';
+                    self.$refs.goodsTable.clearCurrentRow();
                 })
                 .catch(function (error) {
                     self.goodsTableLoading = false;
@@ -331,10 +380,19 @@ export default {
             });
         },
         addGoods () {
+            this.currentGoodsId = '';
             this.checkModalShow = true;
         },
         editGoods () {
+            if (!this.currentGoodsId) {
+                this.$Message.warning('请先选择对应的商品信息');
+                return;
+            }
             this.checkModalShow = true;
+        },
+        saveGoodsOk() {
+            this.loadGoodsData();
+            this.checkModalShow = false;
         },
         delGoods () {
             var row = this.$refs.goodsTable.getSelection();
@@ -354,6 +412,13 @@ export default {
         changePage (pageNumber) {
             this.currentPage = pageNumber;
             this.loadGoodsData();
+        },
+        goodsTabRowClick(data) {
+            this.currentGoodsId = data.id;
+        },
+        goodsTabRowDblClick(data) {
+            this.currentGoodsId = data.id;
+            this.editGoods();
         }
     },
     watch: {

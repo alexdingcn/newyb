@@ -40,6 +40,16 @@
     order by type, value
   </select>
 
+  <select id="getByIds" resultMap="BaseResultMap" parameterType="map">
+    select
+      <include refid="Base_Column_List"/>
+    from options
+    where id in
+    <foreach collection="ids" item="item" open="(" close=")" separator=",">
+      #{item}
+    </foreach>
+  </select>
+
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
     delete from options
     where id = #{id,jdbcType=BIGINT}
