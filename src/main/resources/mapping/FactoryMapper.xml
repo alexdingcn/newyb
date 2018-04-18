@@ -42,14 +42,14 @@
     from factory
     where id = #{id,jdbcType=BIGINT}
   </select>
-  <select id="selectAll" parameterType="java.lang.Long" resultMap="BaseResultMap" >
+  <select id="selectAll" parameterType="java.lang.Integer" resultMap="BaseResultMap" >
     select
     <include refid="Base_Column_List" />
     from factory
     where company_id = #{companyId}
     order by id desc
   </select>
-  <select id="searchByNameOrContact" resultMap="BaseResultMap" >
+  <select id="searchByNameOrContact" parameterType="map" resultMap="BaseResultMap" >
     <bind name="pattern" value="'%' + searchStr + '%'" />
     select
     <include refid="Base_Column_List" />
