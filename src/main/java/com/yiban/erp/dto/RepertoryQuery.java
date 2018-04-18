@@ -6,21 +6,18 @@ public class RepertoryQuery {
     private Integer companyId;
     private Integer warehouseId;
     private Long in_user_id;
-    private String store_state;
-    private String counter_state;
-    private String sale_state;
-    private Integer is_zero_store;
+    private String storeState;
+    private String saleState;
+    private Integer isZeroStore;
     private Long supplierId;
     private Long factoryId;
-    private Long good_id;
+    private Long goodsId;
     private Long buyerId;
     private Integer keedays;
-    private Date max_in_date;
-    private Date min_exp_date;
+    private Date maxInDate;
+    private Date minExpDate;
 
-    private Integer page;
-    private Integer size;
-    private Integer offset;
+    private String  goodSearch;
 
     public Integer getCompanyId() {
         return companyId;
@@ -38,28 +35,36 @@ public class RepertoryQuery {
         this.warehouseId = warehouseId;
     }
 
-    public String getStore_state() {
-        return store_state;
+    public Long getIn_user_id() {
+        return in_user_id;
     }
 
-    public void setStore_state(String store_state) {
-        this.store_state = store_state;
+    public void setIn_user_id(Long in_user_id) {
+        this.in_user_id = in_user_id;
     }
 
-    public String getCounter_state() {
-        return counter_state;
+    public String getStoreState() {
+        return storeState;
     }
 
-    public void setCounter_state(String counter_state) {
-        this.counter_state = counter_state;
+    public void setStoreState(String storeState) {
+        this.storeState = storeState;
     }
 
-    public String getSale_state() {
-        return sale_state;
+    public String getSaleState() {
+        return saleState;
     }
 
-    public void setSale_state(String sale_state) {
-        this.sale_state = sale_state;
+    public void setSaleState(String saleState) {
+        this.saleState = saleState;
+    }
+
+    public Integer getIsZeroStore() {
+        return isZeroStore;
+    }
+
+    public void setIsZeroStore(Integer isZeroStore) {
+        this.isZeroStore = isZeroStore;
     }
 
     public Long getSupplierId() {
@@ -78,20 +83,20 @@ public class RepertoryQuery {
         this.factoryId = factoryId;
     }
 
+    public Long getGoodsId() {
+        return goodsId;
+    }
+
+    public void setGoodsId(Long goodsId) {
+        this.goodsId = goodsId;
+    }
+
     public Long getBuyerId() {
         return buyerId;
     }
 
     public void setBuyerId(Long buyerId) {
         this.buyerId = buyerId;
-    }
-
-    public Long getGood_id() {
-        return good_id;
-    }
-
-    public void setGood_id(Long good_id) {
-        this.good_id = good_id;
     }
 
     public Integer getKeedays() {
@@ -102,37 +107,14 @@ public class RepertoryQuery {
         this.keedays = keedays;
     }
 
-    public Long getIn_user_id() {
-        return in_user_id;
+    public Date getMaxInDate() {
+        return maxInDate;
     }
 
-    public void setIn_user_id(Long in_user_id) {
-        this.in_user_id = in_user_id;
+    public void setMaxInDate(Date maxInDate) {
+        this.maxInDate = maxInDate;
     }
 
-    public Integer getIs_zero_store() {
-        return is_zero_store;
-    }
-
-    public void setIs_zero_store(Integer is_zero_store) {
-        this.is_zero_store = is_zero_store;
-    }
-
-    public Date getMax_in_date() {
-        return max_in_date;
-    }
-
-    public void setMax_in_date(Date max_in_date) {
-        this.max_in_date = max_in_date;
-    }
-
-    public Date getMin_exp_date() {
-        return min_exp_date;
-    }
-
-    public void setMin_exp_date(Date min_exp_date) {
-        this.min_exp_date = min_exp_date;
-    }
 
     public Integer getPage() {
         return page;
@@ -157,4 +139,26 @@ public class RepertoryQuery {
     public void setOffset(Integer offset) {
         this.offset = offset;
     }
+
+    public Date getMinExpDate() {
+        return minExpDate;
+    }
+
+    public void setMinExpDate(Date minExpDate) {
+        this.minExpDate = minExpDate;
+    }
+
+    public String getGoodSearch() {
+        return goodSearch;
+    }
+
+    public void setGoodSearch(String goodSearch) {
+        this.goodSearch = goodSearch;
+    }
+
+    private Integer page;
+    private Integer size;
+    private Integer offset;
+
+
 }

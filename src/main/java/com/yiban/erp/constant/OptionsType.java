@@ -29,8 +29,13 @@ public enum OptionsType {
     GOODS_GMP_TYPE("GMP认证属性"),
     GOODS_ABC_TYPE("ABC属性"),
     GOODS_SCOPE("经营范围属性"),
-    GOODS_NEW_TYPE("新特药属性")
-    ;
+    GOODS_NEW_TYPE("新特药属性"),
+
+
+    CHECK_PLAN_NORMAL("正常"),
+    CHECK_PLAN_LOSE("盘亏"),
+    CHECK_PLAN_MORE("盘盈");
+
 
     private String description;
 

@@ -86,7 +86,6 @@ public class RepertoryInfo {
         }
     }
 
-
     public Long getId() {
         return id;
     }
@@ -127,6 +126,21 @@ public class RepertoryInfo {
         this.inUserId = inUserId;
     }
 
+    public Long getGoodsId() {
+        return goodsId;
+    }
+
+    public void setGoodsId(Long goodsId) {
+        this.goodsId = goodsId;
+    }
+
+    public String getBatchCode() {
+        return batchCode;
+    }
+
+    public void setBatchCode(String batchCode) {
+        this.batchCode = batchCode;
+    }
 
     public Long getFactoryId() {
         return factoryId;
@@ -192,22 +206,6 @@ public class RepertoryInfo {
         this.expDate = expDate;
     }
 
-    public Long getGoodsId() {
-        return goodsId;
-    }
-
-    public void setGoodsId(Long goodsId) {
-        this.goodsId = goodsId;
-    }
-
-    public String getBatchCode() {
-        return batchCode;
-    }
-
-    public void setBatchCode(String batchCode) {
-        this.batchCode = batchCode;
-    }
-
     public Date getInDate() {
         return inDate;
     }
@@ -246,6 +244,14 @@ public class RepertoryInfo {
 
     public void setOrderId(Long orderId) {
         this.orderId = orderId;
+    }
+
+    public Long getOrderDetailId() {
+        return orderDetailId;
+    }
+
+    public void setOrderDetailId(Long orderDetailId) {
+        this.orderDetailId = orderDetailId;
     }
 
     public Boolean getSaleSate() {
@@ -370,13 +376,5 @@ public class RepertoryInfo {
 
     public void setStorageConditionName(String storageConditionName) {
         this.storageConditionName = storageConditionName;
-    }
-
-    public Long getOrderDetailId() {
-        return orderDetailId;
-    }
-
-    public void setOrderDetailId(Long orderDetailId) {
-        this.orderDetailId = orderDetailId;
     }
 }

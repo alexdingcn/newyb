@@ -12,7 +12,7 @@ import java.util.Map;
 
 @Mapper
 public interface RepertoryInfoMapper {
-    int deleteByPrimaryKey(Integer id);
+    int deleteByPrimaryKey(Long id);
 
     int insert(RepertoryInfo record);
 
@@ -20,7 +20,7 @@ public interface RepertoryInfoMapper {
 
     int insertSelective(RepertoryInfo record);
 
-    RepertoryInfo selectByPrimaryKey(Integer id);
+    RepertoryInfo selectByPrimaryKey(Long id);
 
     int updateByPrimaryKeySelective(RepertoryInfo record);
 
@@ -48,5 +48,6 @@ public interface RepertoryInfoMapper {
     //获取某一商品最近一次的采购价
     List<CurrentBalanceResp> getLastBuyPrice(@Param("warehouseId") Integer warehouseId, @Param("goodsIdList") List<Long> goodsIdList);
 
+    List<RepertoryInfo> selectByIdList(@Param("idList") List<Long> idList);
 
 }

@@ -43,6 +43,9 @@ public class RepertoryCheckPlan {
 
     private Date updateTime;
 
+    //展示字段
+    private String warehouseName;
+
     public Long getId() {
         return id;
     }
@@ -201,5 +204,13 @@ public class RepertoryCheckPlan {
 
     public void setUpdateTime(Date updateTime) {
         this.updateTime = updateTime;
+    }
+
+    public String getWarehouseName() {
+        return warehouseName;
+    }
+
+    public void setWarehouseName(String warehouseName) {
+        this.warehouseName = warehouseName;
     }
 }

@@ -1,6 +1,20 @@
 <style lang="less">
     @import '../../styles/common.less';
-    @import './store_now.less';
+    .option-goods-spec {
+        float: right;
+        color: #999;
+    }
+    .ivu-form-item {
+        margin-bottom: 0px;
+    }
+
+    .ivu-table-cell {
+        padding-left: 5px;
+        padding-right: 5px;
+    }
+    th .ivu-table-cell {
+        width-space: nowrap;
+    }
 </style>
 
 <template>
@@ -109,7 +123,7 @@
     import moment from 'moment';
     import util from '@/libs/util.js';
     export default {
-        name: 'store_check_info',
+        name: 'store_check_part_index',
         components: {
         },
         data () {
@@ -119,7 +133,7 @@
                 checkTypeOptions:[{ id: 0, name:'库存盘点'},{ id: 1, name:'直接盘库'},{ id: 2, name:'单品盘点'}],
                 counterOptions:[{ id: 'ALL', name:'全部'}],
                 storeCheck: {
-                    checkOrderId: null
+                    checkPlanId: null
                 },
                 repertoryColumns: [
                     {
@@ -186,12 +200,12 @@
         },
 
         methods: {
-            init () {
+            initPartIndex () {
                 var self = this;
-                let checkOrderId=this.$route.params.checkOrderId.toString();
+                let checkPlanId=this.$route.params.checkPlanId.toString();
                 let warehouseName=this.$route.params.warehouseName.toString();
-                if(checkOrderId>0){
-                    util.ajax.post('/repertory/check/orderPartList?checkOrderId='+checkOrderId )
+                if(checkPlanId>0){
+                    util.ajax.post('/repertory/check/orderPartList?checkPlanId='+checkPlanId )
                         .then(function (response) {
                             self.repertoryCheckPartItems = [];
                             if (response.status === 200 && response.data) {
@@ -222,22 +236,24 @@
                             console.log(error);
                         });
                 }else{
+                    alert("checkPlanId异常"+checkPlanId);
                 }
 
 
             },addCheckPart(){
                 this.$router.push({
                     name: 'store_check_part_add',
-                    params:{checkOrderId: this.storeCheck.id,warehouseName:this.storeCheck.warehouseName}
+                    params:{checkPlanId: this.storeCheck.id,warehouseName:this.storeCheck.warehouseName}
                 });
             }
-        },
-        mounted () {
-            this.init();
+        }, mounted () {
+        this.initPartIndex();
+        }, activated () {
+           // this.clearData();
         },
         watch: {
-            '$route' () {
-                this.init();
+            '$route'() {
+                this.initPartIndex();
             }
         }
     };

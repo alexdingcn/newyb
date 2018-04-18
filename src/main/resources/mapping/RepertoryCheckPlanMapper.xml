@@ -271,19 +271,26 @@
   <select id="getCheckPlanList" parameterType="map" resultMap="BaseResultMap">
     SELECT  a.*,w.`name` AS warehouseName
     FROM `repertory_check_plan`  a
-    LEFT JOIN `warehouse`  w ON w.`id`=a.`warehouse_id`
+    LEFT JOIN `warehouse`  w
+    ON w.`id`=a.`warehouse_id`
     WHERE  1=1
+    <if test="state != null" >
+      and a.state= #{state}
+    </if>
+    <if test="companyId != null" >
+      and a.company_id= #{companyId}
+    </if>
     <if test="warehouseId != null" >
-      and a.warehouseId = #{warehouseId}
+      and a.warehouse_id = #{warehouseId}
     </if>
     <if test="checkType != null" >
-      and a.checkType = #{checkType}
+      and a.check_type = #{checkType}
     </if>
     <if test="startDate != null">
-      and a.checkDate >= #{startDate}
+      and a.check_date >= #{startDate}
     </if>
     <if test="endDate != null">
-      and  #{endDate} >= a.checkDate
+      and  #{endDate} >= a.check_date
     </if>
     order by a.id desc
   </select>

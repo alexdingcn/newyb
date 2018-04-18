@@ -1,6 +1,5 @@
 <style lang="less">
     @import '../../styles/common.less';
-    @import './store_now.less';
 </style>
 
 <template>
@@ -15,20 +14,15 @@
                     <Button type="primary" icon="android-add-circle" @click="addCheckOrder" >盘点启动</Button>
                 </ButtonGroup>
                 <ButtonGroup >
-                    <Button type="primary" icon="android-add-circle" @click="checkOrderInfo" >盘点单详情</Button>
-                </ButtonGroup>
-                <ButtonGroup >
                     <Button type="primary" icon="android-add-circle" @click="doCheckOrder" >执行盘点</Button>
                 </ButtonGroup>
                 <!--<ButtonGroup >-->
                     <!--<Button type="primary" icon="android-add-circle" @click="" >盘点表审核</Button>-->
                 <!--</ButtonGroup>-->
                 <ButtonGroup >
-                    <Button type="primary" icon="android-add-circle" @click="" >盘点审核</Button>
+                    <Button type="primary" icon="android-add-circle" @click="checkOrderInfo" >盘点审核</Button>
                 </ButtonGroup>
-                <ButtonGroup >
-                    <Button type="primary" icon="android-add-circle" @click="" >盘盈制单/审核</Button>
-                </ButtonGroup>
+
             </div>
             <Form :label-width="85" :model="storeCheck" ref="storeCheckForm">
                 <Row>
@@ -163,18 +157,18 @@
                         align: 'center',
                         width: 80,
                         render: (h, params) => {
-                                return moment(params.row.eta).format('YYYY-MM-DD');
-                            }
+                            return moment(params.row.checkDate).format('YYYY-MM-DD');
+                        }
                     },
                     {
                         title: '制单人',
-                        key: 'createdBy',
+                        key: 'createBy',
                         align: 'center',
                         width: 80
                     },
                     {
                         title: '备注',
-                        key: 'note',
+                        key: 'comment',
                         align: 'center',
                         width: 150
                     },
@@ -237,9 +231,10 @@
                 } else if (rows.length > 1) {
                     this.$Message.warning('请一次选择一条盘点单');
                 } else if (rows.length == 1) {
+                    console.log("选择盘点单=="+rows[0].id);
                     this.$router.push({
                         name: 'store_check_info',
-                        params:{checkOrderId: rows[0].id,warehouseName:rows[0].warehouseName}
+                        params:{checkPlanId:rows[0].id,warehouseName:rows[0].warehouseName}
                     });
                 }
             },doCheckOrder(){
@@ -252,7 +247,7 @@
                 } else if (rows.length == 1) {
                     this.$router.push({
                         name: 'store_check_part_index',
-                        params:{checkOrderId: rows[0].id,warehouseName:rows[0].warehouseName}
+                        params:{checkPlanId: rows[0].id,warehouseName:rows[0].warehouseName}
                     });
                 }
             },
