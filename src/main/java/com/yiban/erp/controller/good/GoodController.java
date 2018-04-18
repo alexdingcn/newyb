@@ -9,6 +9,7 @@ import com.yiban.erp.entities.Options;
 import com.yiban.erp.entities.User;
 import com.yiban.erp.exception.BizRuntimeException;
 import com.yiban.erp.exception.ErrorCode;
+import com.yiban.erp.service.GoodsService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +29,7 @@ public class GoodController {
     @Autowired
     private GoodsMapper goodsMapper;
     @Autowired
-    private OptionsMapper optionsMapper;
+    private GoodsService goodsService;
 
     @RequestMapping(value = "/list", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> list(@AuthenticationPrincipal User user,
@@ -45,17 +46,7 @@ public class GoodController {
         List<Goods> goodsList = new ArrayList<>();
         if (count > 0) {
             goodsList = goodsMapper.selectAll(user.getCompanyId(), catId, factoryId, search, offset, pageSize);
-            if (goodsList != null && !goodsList.isEmpty()) {
-                //设置对应的Option的Name值
-                Set<Long> optionIdSet = new HashSet<>();
-                goodsList.stream().forEach(item -> {
-                    optionIdSet.addAll(item.getOptionIdList());
-                });
-                Long[] ids = new Long[optionIdSet.size()];
-                optionIdSet.toArray(ids);
-                List<Options> options = optionsMapper.getByIds(ids);
-                goodsList.stream().forEach(item -> item.setOptionName(options));
-            }
+            goodsService.setGoodsOptionName(goodsList);
         }
         JSONObject result = new JSONObject();
         result.put("total", count);
@@ -66,6 +57,7 @@ public class GoodController {
     @RequestMapping(value = "/{goodsId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> get(@PathVariable Long goodsId) {
         Goods goods = goodsMapper.selectByPrimaryKey(goodsId);
+        goodsService.setGoodsOptionName(goods);
         return ResponseEntity.ok().body(JSON.toJSONString(goods));
     }
 
@@ -75,7 +67,7 @@ public class GoodController {
         if (result > 0) {
             return ResponseEntity.ok().build();
         }
-        return ResponseEntity.badRequest().body("Failed to delete");
+        throw new BizRuntimeException(ErrorCode.FAILED_DELETE_FROM_DB);
     }
 
     @RequestMapping(value = "/save", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
