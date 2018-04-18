@@ -445,4 +445,40 @@ updated_time|Datetime|修改时间
 
 
 
+### 生产企业信息表：factory
+
+> 记录生产企业信息的表
+
+字段名|类型|描述
+-|-|-
+id|Long|(自增类型ID pk)
+companyId|String|公司ID
+name|String|生产企业名称
+origin|String|产地
+permit|String|生产许可证
+permit_exp|Date|生产许可证有效期
+license|String|营业执照
+license_exp|Date|营业执照有效期
+pinyin|String|拼音简称
+address|String|详细地址
+city|String|所在省市区(带城市编码)
+postcode|String|邮编
+phone|String|联系电话
+fax|String|传真
+email|String|电子邮件
+contact|String|联系人
+contact_phone|String|联系人电话
+employee|String|负责人
+is_gmp|Boolean|GMP认证
+bank_name|String|开户行
+bank_account|String|银行账号
+tax_number|String|税号
+comment|String|备注
+created_time|Datetime|创建时间
+created_by|String|创建人
+updated_by|String|修改人
+updated_time|String|修改时间
+file_no|String|生产商档案编号
+
+
 

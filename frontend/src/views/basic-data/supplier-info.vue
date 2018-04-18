@@ -238,7 +238,7 @@ import util from '@/libs/util.js';
 Vue.use(iviewArea);
 
 export default {
-    name: 'goods-info',
+    name: 'supplier-info',
     data () {
         return {
         	addContactModal: false,

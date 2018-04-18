@@ -261,24 +261,7 @@
                         key: 'goodsName',
                         align: 'center',
                         width: 150,
-                        sortable: true,
-                        render: (h, params) => {
-                            return h('Button', {
-                                props: {
-                                    type: 'text',
-                                    size: 'small'
-                                },
-                                on: {
-                                    click: () => {
-                                        let argu = { goods_id: params.row.goodsId };
-                                        this.$router.push({
-                                            name: 'goods-info',
-                                            params: argu
-                                        });
-                                    }
-                                }
-                            }, params.row.goodsName);
-                        }
+                        sortable: true
                     },
                     {
                         title: '产地',

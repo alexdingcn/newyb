@@ -398,13 +398,20 @@ export default {
             var row = this.$refs.goodsTable.getSelection();
             if (row && row.length > 0) {
                 var self = this;
-                util.ajax.post('/goods/remove/' + row[0].id)
-                    .then(function (response) {
-                        self.loadTree();
-                    })
-                    .catch(function (error) {
-                        self.errorProcessor(self, error);
-                    });
+                this.$Modal.confirm({
+                    title: '商品删除确认',
+                    content: '是否确认删除选择商品?',
+                    onOk: () => {
+                        util.ajax.post('/goods/remove/' + row[0].id)
+                            .then(function (response) {
+                                self.loadTree();
+                            })
+                            .catch(function (error) {
+                                self.errorProcessor(self, error);
+                            });
+                    },
+                    onCancel: () => {}
+                });
             } else {
                 this.$Message.warning('请选择一个商品后操作');
             }

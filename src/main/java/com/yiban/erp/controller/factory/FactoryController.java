@@ -49,7 +49,7 @@ public class FactoryController {
             List<Factory> factoryList = factoryMapper.searchByNameOrContact(user.getCompanyId(), searchStr);
             return ResponseEntity.ok().body(JSON.toJSONString(factoryList));
         } else {
-            return ResponseEntity.ok().body(JSON.toJSONString(Collections.emptyList()));
+            return list(user);
         }
     }
 
@@ -76,7 +76,7 @@ public class FactoryController {
         return ResponseEntity.ok().build();
     }
 
-    @RequestMapping(value = "/add", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/save", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> add(@RequestBody Factory factory,
                                       @AuthenticationPrincipal User user) {
         logger.info("ADD new factory:{} by user:{}", JSON.toJSONString(factory), user.getId());
@@ -92,7 +92,7 @@ public class FactoryController {
             result = factoryMapper.updateByPrimaryKeySelective(factory);
         }
         if (result > 0) {
-            return ResponseEntity.ok().body(factory.getId().toString());
+            return ResponseEntity.ok().body(JSON.toJSONString(factory));
         }
         throw new BizRuntimeException(ErrorCode.FAILED_UPDATE_FROM_DB);
     }

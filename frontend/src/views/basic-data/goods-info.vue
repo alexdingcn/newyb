@@ -541,7 +541,7 @@ export default {
         clickNewFactory () {
             let argu = { factory_id: 0, closeOnAdd: true };
             this.$router.push({
-                name: 'factory-info',
+                name: 'factory',
                 params: argu
             });
         },

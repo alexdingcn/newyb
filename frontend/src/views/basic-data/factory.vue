@@ -6,107 +6,70 @@
 <template>
     <div class="access">
         <Row>
-            <Card>
-                <p slot="title">
-                    <Icon type="ios-flask-outline"></Icon> 生产企业
-                </p>
-                <div slot="extra">
-                    <Input v-model="searchFactoryVal" placeholder="企业名称/联系人/拼音简称" clearable style="width: 300px"
-                           @on-enter="validateSearch"></Input>
-                    <Button type="primary" shape="circle" icon="ios-search" @click="searchFactory"></Button>
-                    <ButtonGroup class="padding-left-20">
-                        <Button type="primary" icon="android-add-circle" @click="addFactory">添加</Button>
-                        <Button type="error" icon="android-remove-circle"  @click="delFactory">删除</Button>
-                    </ButtonGroup>
-                </div>
+            <Col span="10">
+                <Card>
+                    <p slot="title">
+                        <Icon type="ios-flask-outline"></Icon> 生产企业
+                    </p>
+                    <div slot="extra">
+                        <Input v-model="searchFactoryVal" placeholder="企业名称/联系人/拼音简称" clearable style="width: 300px"
+                            @on-enter="validateSearch"></Input>
+                        <Button type="primary" shape="circle" icon="ios-search" @click="searchFactory"></Button>
+                        <ButtonGroup class="padding-left-20">
+                            <Button type="primary" icon="android-add-circle" @click="addFactory">添加</Button>
+                            <Button type="error" icon="android-remove-circle"  @click="delFactory">删除</Button>
+                        </ButtonGroup>
+                    </div>
 
-                <Row type="flex" justify="center" align="middle" class="advanced-router margin-top-8">
-                    <Table border highlight-row :columns="orderColumns" :data="factoryData" ref="factoryTable" style="width: 100%;" size="small"></Table>
-                </Row>
-            </Card>
+                    <Row type="flex" justify="center" align="middle" class="advanced-router margin-top-8">
+                        <Table border highlight-row :columns="orderColumns" :loading="tabLoading" 
+                            @on-row-click="tabRowClick" 
+                            :data="factoryData" ref="factoryTable" style="width: 100%;" size="small"></Table>
+                    </Row>
+                </Card>
+            </Col>
+            <Col span="12" style="margin-left: 20px;">
+                <factoty-info ref="factoryInfo" :factoryId="currFactoryId" @save-ok="factorySaveOk" ></factoty-info>
+            </Col>
         </Row>
     </div>
 </template>
 
 <script>
-    import axios from 'axios';
     import util from '@/libs/util.js';
+    import factotyInfo from './factory-info.vue';
 
     export default {
         name: 'factory',
+        components: {
+            factotyInfo
+        },
         data () {
             return {
                 searchFactoryVal: '',
+                tabLoading: false,
+                currFactoryId: '',
                 factoryData: [],
                 orderColumns: [
                     {
                         type: 'selection',
-                        width: 60,
-                        align: 'center'
-                    },
-                    {
-                        type: 'index',
-                        title: '',
-                        width: 40
-                    //                    fixed: 'left'
+                        width: 60
                     },
                     {
                         title: '名称',
                         key: 'name',
-                        align: 'center',
-                        width: 200,
-                        sortable: true,
-                        //                    fixed: 'left',
-                        render: (h, params) => {
-                            return h('Button', {
-                                props: {
-                                    type: 'text',
-                                    size: 'small'
-                                },
-                                on: {
-                                    click: () => {
-                                        let argu = { factory_id: params.row.id };
-                                        this.$router.push({
-                                            name: 'factory-info',
-                                            params: argu
-                                        });
-                                    }
-                                }
-                            }, params.row.name);
-                        }
+                        sortable: true
                     },
                     {
                         title: '产地',
                         key: 'origin',
-                        width: 100,
-                        align: 'center',
                         sortable: true
                     },
                     {
                         title: '拼音简称',
                         key: 'pinyin',
-                        width: 120,
                         align: 'center',
                         sortable: true
-                    },
-                    {
-                        title: '负责人',
-                        key: 'employee',
-                        width: 80,
-                        align: 'center'
-                    },
-                    {
-                        title: '联系人',
-                        key: 'contact',
-                        width: 200,
-                        align: 'center',
-                        sortable: true
-                    },
-                    {
-                        title: '联系人电话',
-                        key: 'contactPhone',
-                        width: 200,
-                        align: 'center'
                     }
                 ]
             };
@@ -115,7 +78,6 @@
             this.loadFactoryList();
         },
         computed: {
-
         },
         methods: {
             validateSearch: function (e) {
@@ -123,29 +85,39 @@
             },
             searchFactory () {
                 var self = this;
+                self.tabLoading = true;
                 util.ajax.post('/factory/search', {search: this.searchFactoryVal})
                     .then(function (response) {
+                        self.tabLoading = false;
                         self.factoryData = response.data;
+                        self.currFactoryId = '';
+                        self.$refs.factoryTable.clearCurrentRow();
                     })
                     .catch(function (error) {
-                        console.log(error);
+                        self.tabLoading = false;
+                        util.errorProcessor(self, error);
                     });
             },
             loadFactoryList () {
                 var self = this;
+                self.tabLoading = true;
                 util.ajax.get('/factory/list')
                     .then(function (response) {
+                        self.tabLoading = false;
                         self.factoryData = response.data;
+                        self.currFactoryId = '';
+                        self.$refs.factoryTable.clearCurrentRow();
                     })
                     .catch(function (error) {
-                        console.log(error);
+                        self.tabLoading = false;
+                        util.errorProcessor(self, error);
                     });
             },
             addFactory () {
-                this.$router.push({ name: 'factory-info' });
+                this.currFactoryId = '';
+                this.$refs.factoryTable.clearCurrentRow();
             },
             delFactory () {
-                // TODO add confirm
                 var row = this.$refs.factoryTable.getSelection();
                 if (row && row.length > 0) {
                     var self = this;
@@ -153,16 +125,41 @@
                     for (var i = 0; i < row.length; i++) {
                         delArr.push(row[i].id);
                     }
-                    util.ajax.post('/factory/remove', {ids: delArr})
-                        .then(function (response) {
-                            self.loadFactoryList();
-                        })
-                        .catch(function (error) {
-                            console.log(error);
-                        });
+                    self.$Modal.confirm({
+                        title: '删除确认',
+                        content: '确认删除选中的厂家信息?',
+                        onOk: () => {
+                            util.ajax.post('/factory/remove', {ids: delArr})
+                                .then(function (response) {
+                                    self.loadFactoryList();
+                                })
+                                .catch(function (error) {
+                                    util.errorProcessor(self, error);
+                                });
+                        },
+                        onCancel: () => {}
+                    });
                 } else {
                     this.$Message.warning('请选择一个生产企业后操作');
                 }
+            },
+            tabRowClick(row) {
+                this.currFactoryId = row.id;
+            },
+            factorySaveOk(data, action) {
+                if (action === 'edit') {
+                    if (data && data.id) {
+                        let self = this;
+                        self.factoryData.forEach((item, index) => {
+                            if (item.id === data.id) {
+                                self.$set(self.factoryData, index, data);
+                            }
+                        });
+                    }
+                }else {
+                    this.searchFactory();
+                }
+                
             }
         }
     };

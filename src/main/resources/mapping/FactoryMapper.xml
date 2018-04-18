@@ -29,12 +29,13 @@
     <result column="updated_time" property="updatedTime" jdbcType="TIMESTAMP" />
     <result column="updated_by" property="updatedBy" jdbcType="VARCHAR" />
     <result column="company_id" property="companyId" jdbcType="INTEGER" />
+    <result column="file_no" property="fileNo" jdbcType="VARCHAR" />
   </resultMap>
   <sql id="Base_Column_List" >
     id, name, origin, permit, permit_exp, license, license_exp, pinyin, address, city, 
     postcode, phone, fax, email, contact, contact_phone, employee, is_gmp, bank_name, 
     bank_account, tax_number, comment, created_time, created_by, updated_time, updated_by, 
-    company_id
+    company_id, file_no
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
     select 
@@ -74,7 +75,7 @@
       contact_phone, employee, is_gmp, 
       bank_name, bank_account, tax_number, 
       comment, created_time, created_by, 
-      updated_time, updated_by, company_id
+      updated_time, updated_by, company_id, file_no
       )
     values (#{name,jdbcType=VARCHAR}, #{origin,jdbcType=VARCHAR},
       #{permit,jdbcType=VARCHAR}, #{permitExp,jdbcType=DATE}, #{license,jdbcType=VARCHAR}, 
@@ -84,7 +85,8 @@
       #{contactPhone,jdbcType=VARCHAR}, #{employee,jdbcType=VARCHAR}, #{isGmp,jdbcType=BIT}, 
       #{bankName,jdbcType=VARCHAR}, #{bankAccount,jdbcType=VARCHAR}, #{taxNumber,jdbcType=VARCHAR}, 
       #{comment,jdbcType=VARCHAR}, #{createdTime,jdbcType=TIMESTAMP}, #{createdBy,jdbcType=VARCHAR}, 
-      #{updatedTime,jdbcType=TIMESTAMP}, #{updatedBy,jdbcType=VARCHAR}, #{companyId,jdbcType=INTEGER}
+      #{updatedTime,jdbcType=TIMESTAMP}, #{updatedBy,jdbcType=VARCHAR}, #{companyId,jdbcType=INTEGER},
+      #{fileNo,jdbcType=VARCHAR}
       )
   </insert>
   <insert id="insertSelective" parameterType="com.yiban.erp.entities.Factory" useGeneratedKeys="true" keyProperty="id">
@@ -168,6 +170,9 @@
       <if test="companyId != null" >
         company_id,
       </if>
+      <if test="fileNo != null" >
+        file_no,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides="," >
       <if test="name != null" >
@@ -247,6 +252,9 @@
       </if>
       <if test="companyId != null" >
         #{companyId,jdbcType=INTEGER},
+      </if>
+      <if test="fileNo != null" >
+        #{fileNo,jdbcType=VARCHAR},
       </if>
     </trim>
   </insert>
@@ -331,6 +339,9 @@
       <if test="companyId != null" >
         company_id = #{companyId,jdbcType=INTEGER},
       </if>
+      <if test="fileNo != null" >
+        file_no = #{fileNo,jdbcType=VARCHAR},
+      </if>
     </set>
     where id = #{id,jdbcType=BIGINT}
   </update>
@@ -361,7 +372,8 @@
       created_by = #{createdBy,jdbcType=VARCHAR},
       updated_time = #{updatedTime,jdbcType=TIMESTAMP},
       updated_by = #{updatedBy,jdbcType=VARCHAR},
-      company_id = #{companyId,jdbcType=INTEGER}
+      company_id = #{companyId,jdbcType=INTEGER},
+      file_no = #{fileNo,jdbcType=VARCHAR}
     where id = #{id,jdbcType=BIGINT}
   </update>
 </mapper>
