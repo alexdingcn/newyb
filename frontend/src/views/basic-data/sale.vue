@@ -1,29 +1,32 @@
 <template>
-    <Card>
-        <p slot="title">
-            <Icon type="ios-cart"></Icon> 销售员
-        </p>
-        <div slot="extra">
-            <ButtonGroup class="padding-left-20">
-                <Button type="primary" icon="android-add-circle" @click="saveBuyer">保存</Button>
-            </ButtonGroup>
-        </div>
-        <Transfer
-                :data="allUsers"
-                :target-keys="salerKeys"
-                :list-style="listStyle"
-                :render-format="render3"
-                :titles="['所有用户', '销售员']"
-                :operations="['移除','加入']"
-                filterable
+    <Row>
+        <Col span="12">
+            <Card>
+                <p slot="title">
+                    <Icon type="ios-cart"></Icon> 销售员
+                </p>
+                <div slot="extra">
+                    <ButtonGroup class="padding-left-20">
+                        <Button type="primary" icon="android-add-circle" @click="saveBuyer">保存</Button>
+                    </ButtonGroup>
+                </div>
+                <Transfer
+                        :data="allUsers"
+                        :target-keys="salerKeys"
+                        :list-style="listStyle"
+                        :render-format="render3"
+                        :titles="['所有用户', '销售员']"
+                        :operations="['移除','加入']"
+                        filterable
 
-                @on-change="handleMove">
-            <div :style="{float: 'right', margin: '5px'}">
-                <Button type="ghost" size="small" @click="reloadData">刷新</Button>
-            </div>
-        </Transfer>
-    </Card>
-
+                        @on-change="handleMove">
+                    <div :style="{float: 'right', margin: '5px'}">
+                        <Button type="ghost" size="small" @click="reloadData">刷新</Button>
+                    </div>
+                </Transfer>
+            </Card>
+        </Col>
+    </Row>
 </template>
 <script>
     import util from '@/libs/util.js';
