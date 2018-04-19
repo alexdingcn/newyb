@@ -47,8 +47,6 @@ public class CustomerCategoryController {
         category.setCompanyId(user.getCompanyId());
         category.setCreateBy(user.getNickname());
         category.setCreateTime(new Date());
-        category.setUpdateBy(user.getNickname());
-        category.setUpdateTime(new Date());
         int count = customerCategoryMapper.insertSelective(category);
         if (count > 0) {
             logger.info("user:{} success add a customer category id:", user.getId(), category.getId());

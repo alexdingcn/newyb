@@ -17,7 +17,7 @@
               </ButtonGroup>
 
               <Row>
-                <Dropdown trigger="custom" :visible="dropDawnVisible" placement="bottom-start" style="width:100%;">
+                <Dropdown trigger="custom" :visible="dropDawnVisible" placement="bottom-start" style="width:80%;">
                     <Button type="ghost" size="small" long @click="openDropDownClick">
                         选择客户分类
                         <Icon type="arrow-down-b"></Icon>
@@ -46,11 +46,7 @@
                 </ButtonGroup>
 
                 <Row type="flex" justify="center" align="middle" >
-                    <Input v-model="searchVal" >
-                        <Select v-model="searchSelectVal" slot="prepend" style="width: 80px">
-                            <Option value="searchByName">客户名称</Option>
-                            <Option value="searchByNo">客户编号</Option>
-                        </Select>
+                    <Input v-model="searchVal" placeholder="名称/编号/拼音" @on-enter="searchBtnClicked" >
                         <Button slot="append" icon="ios-search" @click="searchBtnClicked"></Button>
                     </Input>
                 </Row>
@@ -74,12 +70,10 @@
         
         <Col span="17" class="padding-left-10">
             <customer-info 
-              :action="customerAction" 
               :categorys="categorys" 
-              :editCustomer="tableCurrClickData" 
+              :customerId="currCustomerId" 
               @add-success="customerAddSuccess" 
               @update-success="customerUpdateSuccess" 
-              @add-to-edit="customerAddToEditView" 
               ></customer-info>
         </Col>
       </Row>
@@ -115,35 +109,32 @@ export default {
             customerCategoryAction: 'add',
             categorys: [],
             selectedCategory: null,
-            searchSelectVal: 'searchByName',
             searchVal: '',
             customerTableLoading: false,
             customersCount: 0,
             tableCurrPage: 1,
             tableCurrPageSize: 20,
             tableSelectionData: [],
-            tableCurrClickData: {},
+            currCustomerId: '',
             customersData: [],
             orderColumns: [
                 {
                     type: 'selection',
                     width: 60,
                     align: 'center',
-                    fixed: 'left'
                 },
                 {
                     title: '客户名称',
                     key: 'name',
                     align: 'center',
-                    fixed: 'left',
                     sortable: true
                 }
             ],
-            customerAction: 'add'
         };
     },
     mounted () {
         this.getCategoryArr();
+        this.loadCustomerList();
     },
     computed: {
         disableDelCategory () {
@@ -251,6 +242,7 @@ export default {
                 return;
             }
             if (chooseData.id <= 0) {
+                this.dropDawnVisible = false;
                 this.selectCustomerByCategory(); // 全选
                 return;
             }
@@ -272,9 +264,8 @@ export default {
             if (!delData || !delData.id || delData.id <= 0) {
                 return;
             }
-            let removeUrl = '/customer/category/remove/' + delData.id;
             util.ajax
-                .delete(removeUrl)
+                .delete('/customer/category/remove/' + delData.id)
                 .then((response) => {
                     this.$Message.success('客户类信信息删除成功');
                     this.getCategoryArr();
@@ -304,15 +295,9 @@ export default {
             let reqData = {
                 page: reqPage,
                 size: reqSize,
-                categoryId: categoryId
+                categoryId: categoryId,
+                search: this.searchVal
             };
-            if (this.searchVal && this.searchVal != '') {
-                if (this.searchSelectVal === 'searchByName') {
-                    reqData.customerName = this.searchVal;
-                } else if (this.searchSelectVal === 'searchByNo') {
-                    reqData.customerNo = this.searchVal;
-                }
-            }
             util.ajax
                 .get('/customer/list', { params: reqData })
                 .then((response) => {
@@ -320,6 +305,8 @@ export default {
                     this.customersData = result.data;
                     this.customersCount = result.count;
                     this.customerTableLoading = false;
+                    this.currCustomerId = '';
+                    this.$refs.customersTable.clearCurrentRow();
                 })
                 .catch((error) => {
                     util.errorProcessor(this, error);
@@ -339,28 +326,26 @@ export default {
         },
 
         tableRowClick (data) {
-            this.tableCurrClickData = data;
-            this.customerAction = 'edit';
+            this.currCustomerId = data.id;
         },
 
         addCustomer () {
-            this.tableCurrClickData = null;
-            this.customerAction = 'add';
-        },
-
-        customerAddToEditView () {
-            this.customerAction = 'edit';
+            this.currCustomerId = '';
+            this.$refs.customersTable.clearCurrentRow();
         },
 
         customerAddSuccess (data) {
-            if (this.changeSelectedCategory) {
-                // 新建客户信息成功，只有在选择了产品组的时候才刷新列表
-                this.searchBtnClicked();
-            }
+            this.searchBtnClicked();
         },
 
         customerUpdateSuccess (data) {
-            this.searchBtnClicked(); // 刷新客户列表数据
+            // 刷新客户列表数据
+            let self = this;
+            this.customersData.forEach((item, index) => {
+                if (data.id === item.id) {
+                    self.$set(self.customersData, index, data);
+                }
+            })
         },
 
         delCustomers () {
@@ -374,18 +359,27 @@ export default {
                 let item = this.tableSelectionData[i];
                 delData.push(item.id);
             }
-            util.ajax
-                .post('/customer/delete', delData, {headers: {'Content-Type': 'application/json'}})
-                .then((response) => {
-                    this.customerTableLoading = false;
-                    this.searchBtnClicked();
-                    let delCount = response.data.count;
-                    this.$Message.success('成功删除' + delCount + '条客户信息');
-                })
-                .catch((error) => {
-                    this.customerTableLoading = false;
-                    util.errorProcessor(this, error);
-                });
+            let self = this;
+            this.$Modal.confirm({
+                title: '删除确认',
+                content: '确认删除选着的客户信息？',
+                onOk: () => {
+                    util.ajax
+                        .post('/customer/delete', delData)
+                        .then((response) => {
+                            self.customerTableLoading = false;
+                            self.searchBtnClicked();
+                            let delCount = response.data.count;
+                            self.$Message.success('成功删除' + delCount + '条客户信息');
+                        })
+                        .catch((error) => {
+                            self.customerTableLoading = false;
+                            util.errorProcessor(self, error);
+                        });
+                },
+                onCancel: () => {}
+            });
+            
         }
 
     }

@@ -544,7 +544,7 @@ updated_time|String|修改时间
 
 
 
-### 供应商代表信息表：supplier
+### 供应商代表信息表：supplier_contact
 
 > 记录供应商代表信息
 
@@ -563,3 +563,33 @@ created_time|Datetime|创建时间
 created_by|String|创建人
 updated_by|String|修改人
 updated_time|String|修改时间
+
+
+
+### 客户分类信息表：customer_category
+
+> 记录供应商代表信息
+
+字段名|类型|描述
+-|-|-
+id|Integer|(自增类型ID pk)
+company_id|Integer|公司ID
+name|String|类型名称
+parent_id|Integer|上级Id
+sequence_no|Integer|排序
+comment|String|描述
+create_time|Datetime|创建时间
+update_time|Datetime|修改时间
+create_by|String|创建人
+update_by|String|修改人
+
+
+### 客户信息表：customer
+
+> 记录供应商代表信息
+
+字段名|类型|描述
+-|-|-
+id|Integer|(自增类型ID pk)
+company_id|Integer|公司ID
+

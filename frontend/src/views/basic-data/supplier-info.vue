@@ -382,7 +382,6 @@ import iviewArea from 'iview-area';
 import util from '@/libs/util.js';
 import optionSelect from '@/views/selector/option-select.vue';
 import fileDetail from "@/views/basic-data/file-detail.vue";
-import factoryInfoVue from './factory-info.vue';
 
 Vue.use(iviewArea);
 
@@ -573,8 +572,7 @@ export default {
                 });
         },
         onChangeName () {
-            if (this.formItem.name !== '') {
-                util.setCurrentPageTitle(this, this.formItem.name, true);
+            if (this.formItem.name && this.formItem.name !== '') {
                 var self = this;
                 util.ajax.post('/util/pinyinAbbr', { name: this.formItem.name })
                     .then(function (response) {

@@ -4,7 +4,6 @@
   <resultMap id="BaseResultMap" type="com.yiban.erp.entities.CustomerCategory" >
     <id column="id" property="id" jdbcType="INTEGER" />
     <result column="company_id" property="companyId" jdbcType="INTEGER" />
-    <result column="category_no" property="categoryNo" jdbcType="VARCHAR" />
     <result column="name" property="name" jdbcType="VARCHAR" />
     <result column="parent_id" property="parentId" jdbcType="INTEGER" />
     <result column="sequence_no" property="sequenceNo" jdbcType="INTEGER" />
@@ -15,7 +14,7 @@
     <result column="update_by" property="updateBy" jdbcType="VARCHAR" />
   </resultMap>
   <sql id="Base_Column_List" >
-    id, company_id, category_no, name, parent_id, sequence_no, comment, create_time, 
+    id, company_id, name, parent_id, sequence_no, comment, create_time,
     update_time, create_by, update_by
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
@@ -28,24 +27,12 @@
     delete from customer_category
     where id = #{id,jdbcType=INTEGER}
   </delete>
-  <insert id="insert" parameterType="com.yiban.erp.entities.CustomerCategory" keyProperty="id" useGeneratedKeys="true" >
-    insert into customer_category (company_id, category_no,
-      name, parent_id, sequence_no, 
-      comment, create_time, update_time, 
-      create_by, update_by)
-    values (#{companyId,jdbcType=INTEGER}, #{categoryNo,jdbcType=VARCHAR},
-      #{name,jdbcType=VARCHAR}, #{parentId,jdbcType=INTEGER}, #{sequenceNo,jdbcType=INTEGER}, 
-      #{comment,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, 
-      #{createBy,jdbcType=VARCHAR}, #{updateBy,jdbcType=VARCHAR})
-  </insert>
+
   <insert id="insertSelective" parameterType="com.yiban.erp.entities.CustomerCategory"  keyProperty="id" useGeneratedKeys="true" >
     insert into customer_category
     <trim prefix="(" suffix=")" suffixOverrides="," >
       <if test="companyId != null" >
         company_id,
-      </if>
-      <if test="categoryNo != null" >
-        category_no,
       </if>
       <if test="name != null" >
         name,
@@ -76,9 +63,6 @@
       <if test="companyId != null" >
         #{companyId,jdbcType=INTEGER},
       </if>
-      <if test="categoryNo != null" >
-        #{categoryNo,jdbcType=VARCHAR},
-      </if>
       <if test="name != null" >
         #{name,jdbcType=VARCHAR},
       </if>
@@ -108,9 +92,6 @@
   <update id="updateByPrimaryKeySelective" parameterType="com.yiban.erp.entities.CustomerCategory" >
     update customer_category
     <set >
-      <if test="categoryNo != null" >
-        category_no = #{categoryNo,jdbcType=VARCHAR},
-      </if>
       <if test="name != null" >
         name = #{name,jdbcType=VARCHAR},
       </if>
@@ -136,20 +117,6 @@
         update_by = #{updateBy,jdbcType=VARCHAR},
       </if>
     </set>
-    where id = #{id,jdbcType=INTEGER}
-  </update>
-  <update id="updateByPrimaryKey" parameterType="com.yiban.erp.entities.CustomerCategory" >
-    update customer_category
-    set
-      category_no = #{categoryNo,jdbcType=VARCHAR},
-      name = #{name,jdbcType=VARCHAR},
-      parent_id = #{parentId,jdbcType=INTEGER},
-      sequence_no = #{sequenceNo,jdbcType=INTEGER},
-      comment = #{comment,jdbcType=VARCHAR},
-      create_time = #{createTime,jdbcType=TIMESTAMP},
-      update_time = #{updateTime,jdbcType=TIMESTAMP},
-      create_by = #{createBy,jdbcType=VARCHAR},
-      update_by = #{updateBy,jdbcType=VARCHAR}
     where id = #{id,jdbcType=INTEGER}
   </update>
 
