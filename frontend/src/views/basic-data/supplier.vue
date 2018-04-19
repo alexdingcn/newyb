@@ -6,7 +6,7 @@
 <template>
     <div class="access">
         <Row>
-            <Col span="10">
+            <Col span="8">
                 <Card>
                     <p slot="title">
                         <Icon type="android-contacts"></Icon> 供应商
@@ -22,12 +22,14 @@
                     </div>
 
                     <Row type="flex" justify="center" align="middle" class="advanced-router margin-top-8">
-                        <Table border highlight-row :columns="orderColumns" :data="supplierData" ref="supplierTable" style="width: 100%;" size="small"></Table>
+                        <Table border highlight-row :columns="orderColumns" 
+                            @on-row-click="chooseItem"
+                            :data="supplierData" ref="supplierTable" style="width: 100%;" size="small"></Table>
                     </Row>
                 </Card>
             </Col>
-            <Col span="12" style="margin-left: 20px;">
-                <supplier-info ></supplier-info>
+            <Col span="14" style="margin-left: 20px;">
+                <supplier-info :supplierId="currSupplierId" @save-ok="supplierSaveOk"></supplier-info>
             </Col>            
         </Row>
     </div>
@@ -59,10 +61,13 @@
                         sortable: true
                     },
                     {
-                        title: '产地',
-                        key: 'origin',
+                        title: '是否可用',
+                        key: 'enabled',
                         width: 100,
-                        sortable: true
+                        sortable: true,
+                        render: (h, params) => {
+                            return params.row.enabled ? '可用' : '禁用';
+                        }
                     },
                     {
                         title: '拼音简称',
@@ -86,15 +91,14 @@
                         key: 'contactPhone',
                         width: 200
                     }
-                ]
+                ],
+                currSupplierId: ''
             };
         },
         mounted () {
             this.searchSupplier();
         },
-        computed: {
-
-        },
+       
         methods: {
             validateSearch: function (e) {
                 this.searchSupplier();
@@ -104,13 +108,15 @@
                 util.ajax.post('/supplier/search', {search: this.searchSupplierVal})
                     .then(function (response) {
                         self.supplierData = response.data;
+                        self.addSupplier();
                     })
                     .catch(function (error) {
                         util.errorProcessor(self, error);
                     });
             },
             addSupplier () {
-                
+                this.currSupplierId = '';
+                this.$refs.supplierTable.clearCurrentRow();
             },
             delSupplier () {
                 var row = this.$refs.supplierTable.getSelection();
@@ -136,6 +142,23 @@
                     });
                 } else {
                     this.$Message.warning('请选择一个供应商后操作');
+                }
+            },
+
+            chooseItem(row) {
+                this.currSupplierId = row.id;
+            },
+
+            supplierSaveOk(data, action) {
+                if (action === 'edit') {
+                    let self = this;
+                    this.supplierData.forEach((item, index) => {
+                        if(item.id == data.id) {
+                            self.$set(self.supplierData, index, data);
+                        }
+                    })
+                }else {
+                    this.searchSupplier();
                 }
             }
         }

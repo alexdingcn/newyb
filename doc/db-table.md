@@ -490,6 +490,7 @@ file_no|String|生产商档案编号
 字段名|类型|描述
 -|-|-
 id|Long|(自增类型ID pk)
+company_id|Integer|公司ID
 name|String|供应商名称
 pinyin|String|拼音
 enabled|Boolean|是否可用
@@ -503,7 +504,7 @@ email|String|电子邮件
 contact|String|联系人
 contact_phone|String|联系人电话
 employee|String|负责人
-legal_persion|String|法人代表
+legal_person|String|法人代表
 discount|Decimal(5,2)|折扣率
 bank_account|String|银行账户
 bank_name|String|银行名称
@@ -541,3 +542,24 @@ created_by|String|创建人
 updated_by|String|修改人
 updated_time|String|修改时间
 
+
+
+### 供应商代表信息表：supplier
+
+> 记录供应商代表信息
+
+字段名|类型|描述
+-|-|-
+id|Long|(自增类型ID pk)
+supplier_id|Long|供应商ID
+name|String|供应商代表名称
+idcard|String|身份证号
+enabled|Boolean|是否启用
+phone|String|联系方式
+city|String|所在城市(带城市编号)
+business_scope|String|经营区域
+comment|String|备注
+created_time|Datetime|创建时间
+created_by|String|创建人
+updated_by|String|修改人
+updated_time|String|修改时间

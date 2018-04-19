@@ -114,7 +114,7 @@
                         </Col>
                     </Row>
 
-                    <Tabs value="general" type="card">
+                    <Tabs value="general" type="card" style="height: 450px;">
                         <TabPane label="基本信息" name="general" icon="ios-paper">
                             <Row>
                                 <Col span="6">
@@ -305,7 +305,7 @@
                             </Row>
 
                         </TabPane>
-                        <TabPane label="证书信息" name="cert" icon="bookmark">
+                        <TabPane label="证书信息" name="cert" icon="bookmark" >
                             <Row>
                                 <Col span="1">
                                     <strong>注册证书:</strong>
@@ -352,7 +352,7 @@
                                 </Col>
                             </Row>
                             <hr style="width:75%; margin-bottom: 15px;" size="2"/>
-                            <Row>
+                            <Row >
                                 <Col span="1">
                                     <strong >批注文号: </strong>
                                 </Col>
