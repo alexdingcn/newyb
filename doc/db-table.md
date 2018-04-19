@@ -586,10 +586,72 @@ update_by|String|修改人
 
 ### 客户信息表：customer
 
-> 记录供应商代表信息
+> 记录客户信息
 
 字段名|类型|描述
 -|-|-
 id|Integer|(自增类型ID pk)
 company_id|Integer|公司ID
+customer_no|String|系统编号
+category_id|Integer|客户类型
+name|String|客户名称
+pinyin|String|拼音
+status|String|状态(NORMAL, DELETE)
+enabled|Boolean|是否启用
+can_sale_special|Boolean|是否可以经营特殊产品
+is_limit_special|Boolean|含麻黄碱药品限购
+city|String|所在城市
+address|String|详细地址
+postcode|String|邮编
+legal_person|String|法人代表
+employee|String|负责人
+contact_phone|String|联系电话
+contact_fax|String|传真
+email|String|邮箱
+is_direction|Boolean|是否直调企业
+sale_area|String|销售区域
+sale_man|String|业务员
+member_level|String|会员等级
+class_att_one|String|分类属性1
+class_att_two|String|分类属性2
+stamp_template|String|印章模本编号
+bill_template|String|票据模本编号
+is_cold_business|Boolean|冷链经营
+is_two_ticket|Boolean|是否两票制
+business_scope|String|经营范围
+account_term|Integer|账期
+account_name|String|银行账户
+bank_account|String|银行账号
+bank_name|String|开户行
+tax_account|String|税号
+qua_check|String|资格审查
+file_no|String|档案编号
+supervise_no|String|电子监管码
+comment|String|备注
+create_time|Datetime|创建时间
+update_time|Datetime|修改时间
+create_by|String|创建人
+update_by|String|修改人
+
+
+
+### 客户代表信息表：customer
+
+> 记录客户的代表人信息,收货地址信息
+
+字段名|类型|描述
+-|-|-
+id|Integer|(自增类型ID pk)
+customer_id|Integer|客户ID
+name|String|名称
+contact_phone|String|联系电话
+repertory_address|String|收货地址
+postcode|String|邮编
+enabled|Boolean|是否启用
+default_time|Datetime|设置默认值使用的时间
+comment|String|备注
+create_time|Datetime|创建时间
+update_time|Datetime|修改时间
+create_by|String|创建人
+update_by|String|修改人
 
