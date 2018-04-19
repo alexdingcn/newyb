@@ -26,7 +26,7 @@
                     </Col>
                     <Col span="12">
                         <FormItem label="档案编号">
-                            <Input size="small" type="text" v-model="formData.fileNo" placeholder="由系统自动生成" readonly />
+                            <Input size="small" type="text" v-model="formData.fileNo" placeholder="由系统自动生成" disabled />
                         </FormItem>
                     </Col>
                 </Row>
@@ -38,7 +38,7 @@
                     </Col>
                     <Col span="12">
                         <FormItem label="操作时间">
-                            <DatePicker size="small" type="datetime" v-model="formData.updateTime" format="yyyy-MM-dd HH:mm" readonly></DatePicker>
+                            <DatePicker size="small" type="datetime" v-model="formData.updateTime" format="yyyy-MM-dd HH:mm" disabled></DatePicker>
                         </FormItem>
                     </Col>
                 </Row>

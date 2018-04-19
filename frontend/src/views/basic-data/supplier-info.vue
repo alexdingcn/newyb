@@ -438,9 +438,16 @@ export default {
                     key: 'enabled',
                     title: '启用/禁用',
                     align: 'center',
-                    width: 100,
+                    width: 120,
                     render: (h, params) => {
-                        return params.row.enabled ? '启用' : '禁用';
+                        let color = params.row.enabled ? 'green' : 'red';
+                        let label = params.row.enabled ? '启用' : '禁用';
+                        return h('Tag', {
+                            props: {
+                                type: 'dot',
+                                color: color
+                            }
+                        }, label);
                     }
                 },
                 {
