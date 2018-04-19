@@ -655,3 +655,32 @@ update_time|Datetime|修改时间
 create_by|String|创建人
 update_by|String|修改人
 
+
+
+### 承运公司信息表：ship_company
+
+> 记录承运公司基础信息
+
+字段名|类型|描述
+-|-|-
+id|Integer|(自增类型ID pk)
+company_id|Integer|公司ID
+name|String|名称
+enabled|Boolean|是否启用
+license|String|执照编号
+license_exp|Date|执照有效期至
+file_no|String|档案编号
+employee|String|负责人
+phone|String|联系电话
+fax|String|传真
+email|String|邮箱
+contact_user|String|联系人
+contact_phone|String|联系人电话
+postcode|String|邮编
+address|String|详细地址
+comment|String|备注
+create_by|String|创建人
+create_time|Datetime|创建时间
+update_by|String|修改人
+update_time|Datetime|修改时间
+

@@ -111,7 +111,7 @@
                         </Col>
                         <Col span="8">
                             <FormItem label="许可证期限" prop="permitExp">
-                                <DatePicker type="date" placeholder="许可证到期日" v-model="formItem.permitExp"/>
+                                <DatePicker type="date" placement="top-start" placeholder="许可证到期日" v-model="formItem.permitExp"/>
                             </FormItem>
                         </Col>
                     </Row>
@@ -123,7 +123,7 @@
                         </Col>
                         <Col span="8">
                             <FormItem label="执照到期日" prop="licenseExp">
-                                <DatePicker type="date" placeholder="营业执照到期日" v-model="formItem.licenseExp"/>
+                                <DatePicker type="date" placement="top-start" placeholder="营业执照到期日" v-model="formItem.licenseExp"/>
                             </FormItem>
                         </Col>
                         <Col span="8">

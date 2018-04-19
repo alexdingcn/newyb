@@ -28,7 +28,7 @@
                     </Row>
                 </Card>
             </Col>
-            <Col span="14" style="margin-left: 20px;">
+            <Col span="15" style="margin-left: 10px;">
                 <supplier-info :supplierId="currSupplierId" @save-ok="supplierSaveOk"></supplier-info>
             </Col>            
         </Row>

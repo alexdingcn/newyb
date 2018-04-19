@@ -12,21 +12,15 @@ public interface ShipCompanyMapper {
 
     int insert(ShipCompany record);
 
-    int insertSelective(ShipCompany record);
-
     ShipCompany selectByPrimaryKey(Integer id);
 
     int updateByPrimaryKeySelective(ShipCompany record);
 
-    int updateByPrimaryKey(ShipCompany record);
-
     Integer getListCount(@Param("companyId") Integer companyId,
-                              @Param("name") String name,
-                              @Param("license") String license);
+                         @Param("search") String search);
 
     List<ShipCompany> getList(@Param("companyId") Integer companyId,
-                                     @Param("name") String name,
-                                     @Param("license") String license,
-                                     @Param("offset") Integer offset,
-                                     @Param("limit") Integer limit);
+                             @Param("search") String search,
+                             @Param("offset") Integer offset,
+                             @Param("limit") Integer limit);
 }

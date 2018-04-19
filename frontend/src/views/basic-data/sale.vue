@@ -1,14 +1,11 @@
 <template>
     <Row>
-        <Col span="12">
+        <Col>
             <Card>
                 <p slot="title">
                     <Icon type="ios-cart"></Icon> 销售员
                 </p>
                 <div slot="extra">
-                    <ButtonGroup class="padding-left-20">
-                        <Button type="primary" icon="android-add-circle" @click="saveBuyer">保存</Button>
-                    </ButtonGroup>
                 </div>
                 <Transfer
                         :data="allUsers"
@@ -18,10 +15,10 @@
                         :titles="['所有用户', '销售员']"
                         :operations="['移除','加入']"
                         filterable
-
                         @on-change="handleMove">
                     <div :style="{float: 'right', margin: '5px'}">
-                        <Button type="ghost" size="small" @click="reloadData">刷新</Button>
+                        <Button type="ghost" size="small" icon="refresh" :loading="loading" @click="reloadData">刷新</Button>
+                        <Button type="success" icon="checkmark" size="small" :loading="loading" @click="saveBuyer">保存</Button>
                     </div>
                 </Transfer>
             </Card>
@@ -34,6 +31,7 @@
     export default {
         data () {
             return {
+                loading: false,
                 allUsers: [],
                 salerKeys: [],
                 salers: {},
@@ -46,11 +44,12 @@
         methods: {
             getUserList () {
                 var self = this;
+                self.loading = true;
                 util.ajax.get('/user/list')
                     .then(function (response) {
+                        self.loading = false;
                         if (response.status === 200 && response.data) {
                             var list = response.data;
-
                             let uList = [];
                             for (let i = 0; i < list.length; i++) {
                                 uList.push({
@@ -67,13 +66,16 @@
                         }
                     })
                     .catch(function (error) {
+                        self.loading = false;
                         util.errorProcessor(self, error);
                     });
             },
             getSalerList () {
                 var self = this;
+                self.loading = true;
                 util.ajax.get('/userrole/list', {params: {roleQuery: 'ROLE_SALE'} })
                     .then(function (response) {
+                        self.loading = false;
                         if (response.status === 200 && response.data) {
                             var list = response.data;
                             let uList = [];
@@ -87,6 +89,7 @@
                         }
                     })
                     .catch(function (error) {
+                        self.loading = false;
                         util.errorProcessor(self, error);
                     });
             },
@@ -122,14 +125,17 @@
                     roleTypes: ['ROLE_SALE'],
                     roles: params
                 };
+                self.loading = true;
                 util.ajax.post('/userrole/save', reqData)
                     .then(function (response) {
+                        self.loading = false;
                         if (response.status === 200 && response.data) {
-                            self.$Message.info('保存销售员列表成功');
+                            self.$Message.success('保存销售员列表成功');
                             self.getUserList();
                         }
                     })
                     .catch(function (error) {
+                        self.loading = false;
                         util.errorProcessor(self, error);
                     });
             }
