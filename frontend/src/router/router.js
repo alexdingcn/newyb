@@ -25,7 +25,7 @@ export const loanApplyRouter = {
         path: '/loan/apply',
         name: 'loan_apply',
         meta: {
-            title: '融资申请-医伴金服',
+            title: '医站通注册',
             noAuth: true
         },
         component: () => import('@/views/loan/apply.vue')
@@ -34,7 +34,7 @@ export const loanBizlicenseRouter = {
         path: '/loan/bizlicense',
         name: 'loan_bizlicense',
         meta: {
-            title: '融资申请-医伴金服',
+            title: '医站通注册',
             noAuth: true
         },
         component: () => import('@/views/loan/bizlicense.vue')
@@ -158,25 +158,27 @@ export const appRouter = [
             { path: "in-check", title: '入库审核', name: 'in-check', component: () => import('@/views/repertory/in-check.vue')},
         ]
     },
-{
-    path: '/checkplan',
+/*
+    {
+        path: '/checkplan',
         icon: 'social-buffer',
-    name: 'checkplan',
-    title: '库存盘点',
-    component: Main,
-    children: [
-        { path: 'store_check_index', title: '盘点单记录', name: 'store_check_index', component: () => import('@/views/checkplan/store_check_index.vue') },
+        name: 'checkplan',
+        title: '库存盘点',
+        component: Main,
+        children: [
+            { path: 'store_check_index', title: '盘点单记录', name: 'store_check_index', component: () => import('@/views/checkplan/store_check_index.vue') },
             { path: 'store_check_index_detail', title: '盘点单明細-不显示', name: 'store_check_index_detail', component: () => import('@/views/checkplan/store_check_index_detail.vue') },
-        { path: 'store_check_add', title: '盘点制单', name: 'store_check_add', component: () => import('@/views/checkplan/store_check_add.vue') },
-        { path: 'store_check_do_list', title: '执行盘点', name: 'store_check_do_list', component: () => import('@/views/checkplan/store_check_do_list.vue') },
+            { path: 'store_check_add', title: '盘点制单', name: 'store_check_add', component: () => import('@/views/checkplan/store_check_add.vue') },
+            { path: 'store_check_do_list', title: '执行盘点', name: 'store_check_do_list', component: () => import('@/views/checkplan/store_check_do_list.vue') },
             { path: 'store_check_do_detail', title: '盘点执行进度', name: 'store_check_do_detail', component: () => import('@/views/checkplan/store_check_do_detail.vue') },
-      //  { path: 'store_check_part_index', title: '盘点表执行进度-不显示', name: 'store_check_part_index', component: () => import('@/views/checkplan/store_check_part_index.vue') },
+          //  { path: 'store_check_part_index', title: '盘点表执行进度-不显示', name: 'store_check_part_index', component: () => import('@/views/checkplan/store_check_part_index.vue') },
             { path: 'store_check_part_add',  title: '录入盘点信息-不显示', name: 'store_check_part_add', component: () => import('@/views/checkplan/store_check_part_add.vue') },
-        { path: "store_check_pass_list", title: '盘点审核', name: 'store_check_pass_list', component: () => import('@/views/checkplan/store_check_pass_list.vue')},
-        { path: "store_check_pass_detail", title: '盘点审核明细-不显示', name: 'store_check_pass_detail', component: () => import('@/views/checkplan/store_check_pass_detail.vue')},
-        //  { path: "store_check_info", title: '盘点审核明细-不显示', name: 'store_check_info', component: () => import('@/views/checkplan/store_check_info.vue')},
-        ]
-},
+            { path: "store_check_pass_list", title: '盘点审核', name: 'store_check_pass_list', component: () => import('@/views/checkplan/store_check_pass_list.vue')},
+            { path: "store_check_pass_detail", title: '盘点审核明细-不显示', name: 'store_check_pass_detail', component: () => import('@/views/checkplan/store_check_pass_detail.vue')},
+            //  { path: "store_check_info", title: '盘点审核明细-不显示', name: 'store_check_info', component: () => import('@/views/checkplan/store_check_info.vue')},
+            ]
+    },
+*/
 {
         path: '/access',
         icon: 'key',
