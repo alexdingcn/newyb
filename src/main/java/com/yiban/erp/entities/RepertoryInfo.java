@@ -67,9 +67,9 @@ public class RepertoryInfo {
     private String jx;
     private String spec;
     private String unitName;
-    private Long permitId;
-    private Integer baseMedId;
-    private String storageCondition;
+    private String permitNo;
+    private String baseMedName;
+    private String storageConditionName;
 
     public void setGoods(Goods goods) {
         this.goods = goods;
@@ -77,12 +77,12 @@ public class RepertoryInfo {
             this.goodName = goods.getName();
             this.factoryName = goods.getFactory();
             this.origin = goods.getOrigin();
-            this.jx = goods.getJx();
+            this.jx = goods.getJxName();
             this.spec = goods.getSpec();
             this.unitName = goods.getUnitName();
-            this.permitId = goods.getPermitId();
-            this.baseMedId = goods.getBaseMedId();
-            this.storageCondition = goods.getStorageCondition();
+            this.permitNo = goods.getPermitNo();
+            this.baseMedName = goods.getBaseMedName();
+            this.storageConditionName = goods.getStorageConditionName();
         }
     }
 
@@ -354,27 +354,27 @@ public class RepertoryInfo {
         this.unitName = unitName;
     }
 
-    public Long getPermitId() {
-        return permitId;
+    public String getPermitNo() {
+        return permitNo;
     }
 
-    public void setPermitId(Long permitId) {
-        this.permitId = permitId;
+    public void setPermitNo(String permitNo) {
+        this.permitNo = permitNo;
     }
 
-    public Integer getBaseMedId() {
-        return baseMedId;
+    public String getBaseMedName() {
+        return baseMedName;
     }
 
-    public void setBaseMedId(Integer baseMedId) {
-        this.baseMedId = baseMedId;
+    public void setBaseMedName(String baseMedName) {
+        this.baseMedName = baseMedName;
     }
 
-    public String getStorageCondition() {
-        return storageCondition;
+    public String getStorageConditionName() {
+        return storageConditionName;
     }
 
-    public void setStorageCondition(String storageCondition) {
-        this.storageCondition = storageCondition;
+    public void setStorageConditionName(String storageConditionName) {
+        this.storageConditionName = storageConditionName;
     }
 }

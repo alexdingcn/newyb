@@ -32,12 +32,12 @@ public enum ErrorCode {
     // 12xx - 商品
     GOODS_CATEGORY_ID_MISSING(1201, "缺失商品分类ID"),
     GOODS_REMAINED_IN_CATEGORY(1200, "该分类下还有商品,请先移除商品后操作"),
+    GOODS_CATEGORY_NAME_MISS(1202, "商品类别名称不能为空"),
 
     // 13xx - 采购
     BUY_ORDER_NOT_EXISTED(1300, "采购订单不存在"),
     BUY_ORDER_PARAMS_INVALID(1301, "采购订单参数错误"),
     BUY_ORDER_IS_CHECKED(1302, "采购订单已审核不可修改"),
-
 
 
     // 15xx - 盘点
@@ -47,6 +47,10 @@ public enum ErrorCode {
     CHECK_PLAN_DETAIL_MORE_ERROR(1503, "盘盈记录添加失败-盘盈数据异常"),
     CHECK_PLAN_PASS_ERROR(1504, "盘点单审核失败-盘点单中没有明细记录"),
     CHECK_PLAN_PASS_STATE_ERROR(1505, "盘点单审核失败-盘点单包含异常未处理或已经审核的明细"),
+    CHECK_PLAN_PASS_REPET_ERROR(1506, "已审核过盘点单，无法重复审核"),
+    CHECK_PLAN_PASS_OUT_ERROR(1507, "盘点审核，盘亏数量超过库存数量无法出库"),
+    CHECK_PLAN_PASS_VALIDATE_ERROR(1510, "盘点审核失败-缺少必要参数"),
+
     // 20xx - 客户
     CUSTOMER_GET_FAIL(2000, "获取客户信息失败"),
     CUSTOMER_DEL_PARAMS_EMPTY(2001, "请选择需要删除的客户"),

@@ -91,8 +91,6 @@ export const otherRouter = {
     children: [
         { path: 'home', title: {i18n: 'home'}, name: 'home_index', component: () => import('@/views/home/home.vue') },
         { path: 'message', title: '消息中心', name: 'message', component: () => import('@/views/message/message.vue') },
-        { path: 'goods/:goods_id', title: '商品详情', name: 'goods-info', component: () => import('@/views/basic-data/goods-info.vue') }, // 商品详情
-        { path: 'factory/:factory_id', title: '生产企业详情', name: 'factory-info', component: () => import('@/views/basic-data/factory-info.vue') }, // 生产企业详情
         { path: 'supplier/:supplier_id', title: '供应商详情', name: 'supplier-info', component: () => import('@/views/basic-data/supplier-info.vue') }, // 供应商详情
         { path: 'ownspace', title: '个人中心', name: 'ownspace_index', component: () => import('@/views/own-space/own-space.vue') },
         { path: 'order/:order_id', title: '订单详情', name: 'order-info', component: () => import('@/views/advanced-router/component/order-info.vue') }, // 用于展示动态路由
@@ -132,8 +130,6 @@ export const appRouter = [
             { path: 'order', title: '采购制单', name: 'buy_order', component: () => import('@/views/buy/buy-order.vue') },
             { path: 'review', title: '采购单审核', name: 'buy_order_review', component: () => import('@/views/buy/buy-order-list.vue') },
             { path: 'receive', title: '采购收货', name: 'buy_receive', component: () => import('@/views/repertory/in-make.vue') },
-            { path: "buy-quality-check", title: '入库质量验收', name: 'buy-quality-check', component: () => import('@/views/repertory/in-quality-check.vue')},
-            { path: "in-check", title: '入库审核', name: 'receive-in-check', component: () => import('@/views/repertory/in-check.vue')},
         ]
     },
     {

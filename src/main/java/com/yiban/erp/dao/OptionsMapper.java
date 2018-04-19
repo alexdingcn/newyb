@@ -22,4 +22,6 @@ public interface OptionsMapper {
 
     List<Options> findByTypes(@Param("companyId") Integer companyId,
                               @Param("types") List<String> options);
+
+    List<Options> getByIds(@Param("ids") Long[] ids);
 }

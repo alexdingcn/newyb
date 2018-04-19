@@ -11,9 +11,10 @@
     <result column="updated_time" property="updatedTime" jdbcType="TIMESTAMP" />
     <result column="created_by" property="createdBy" jdbcType="VARCHAR" />
     <result column="updated_by" property="updatedBy" jdbcType="VARCHAR" />
+    <result column="company_id" property="companyId" jdbcType="INTEGER" />
   </resultMap>
   <sql id="Base_Column_List" >
-    id, name, parent, sequence, comment, created_time, updated_time, created_by, updated_by
+    id, name, parent, sequence, comment, created_time, updated_time, created_by, updated_by, company_id
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
     select 
@@ -32,18 +33,15 @@
     delete from good_category
     where id = #{id,jdbcType=INTEGER}
   </delete>
-  <delete id="deleteByName" parameterType="java.lang.String">
-     delete from good_category
-     where name = #{name, jdbcType=VARCHAR}
-  </delete>
+
   <insert id="insert" parameterType="com.yiban.erp.entities.GoodCategory" keyProperty="id"
           useGeneratedKeys="true">
     insert into good_category (name, parent, sequence,
       comment, created_time, updated_time, 
-      created_by, updated_by)
+      created_by, updated_by, company_id)
     values (#{name,jdbcType=VARCHAR}, #{parent,jdbcType=INTEGER}, #{sequence,jdbcType=INTEGER},
       #{comment,jdbcType=VARCHAR}, #{createdTime,jdbcType=TIMESTAMP}, #{updatedTime,jdbcType=TIMESTAMP}, 
-      #{createdBy,jdbcType=VARCHAR}, #{updatedBy,jdbcType=VARCHAR})
+      #{createdBy,jdbcType=VARCHAR}, #{updatedBy,jdbcType=VARCHAR}, #{companyId, jdbcType=INTEGER})
   </insert>
   <insert id="insertSelective" parameterType="com.yiban.erp.entities.GoodCategory" keyProperty="id"
           useGeneratedKeys="true">
@@ -73,6 +71,9 @@
       <if test="updatedBy != null" >
         updated_by,
       </if>
+      <if test="companyId != null">
+        company_id,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides="," >
       <if test="name != null" >
@@ -98,6 +99,9 @@
       </if>
       <if test="updatedBy != null" >
         #{updatedBy,jdbcType=VARCHAR},
+      </if>
+      <if test="companyId != null">
+        #{companyId, jdbcType=INTEGER},
       </if>
     </trim>
   </insert>

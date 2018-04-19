@@ -5,6 +5,8 @@ import java.util.Date;
 public class GoodCategory {
     private Integer id;
 
+    private Integer companyId;
+
     private String name;
 
     private Integer parent;
@@ -27,6 +29,14 @@ public class GoodCategory {
 
     public void setId(Integer id) {
         this.id = id;
+    }
+
+    public Integer getCompanyId() {
+        return companyId;
+    }
+
+    public void setCompanyId(Integer companyId) {
+        this.companyId = companyId;
     }
 
     public String getName() {

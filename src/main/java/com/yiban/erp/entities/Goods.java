@@ -1,12 +1,14 @@
 package com.yiban.erp.entities;
 
+import com.yiban.erp.constant.OptionsType;
+
 import java.math.BigDecimal;
-import java.util.Date;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class Goods {
-    private Long id;
 
-    private String name;
+    private Long id;
 
     private Integer companyId;
 
@@ -14,70 +16,59 @@ public class Goods {
 
     private String categoryName;
 
+    private String name;
+
     private String fullName;
 
     private String origin;
-
-    private String jx;
 
     private String spec;
 
     private String serial;
 
-    private String code;
-
     private Boolean enable;
+
+    private Boolean isProxy;
 
     private Long factoryId;
 
     private String factory;
 
-    private Integer unit;
+    private Long unit;
 
-    private String unitName;
+    private Long packUnit;
 
-    private Integer packUnit;
+    private BigDecimal mediumPack;
 
-    private String packUnitName;
-
-    private Integer mediumPack;
-
-    private Integer bigPack;
+    private BigDecimal bigPack;
 
     private String pinyin;
 
-    private String storageCondition;
-
-    private String storageDescription;
+    private Long storageCondition;
 
     private String comment;
 
-    // 注册证
-    private Long certId;
+    private String certNo;
 
-    // 商标
-    private Integer brandId;
+    private Date certExpDate;
 
-    // 批准文号
-    private Long permitId;
+    private String certFileNo;
 
-    // 剂型属性
-    private Integer jxId;
+    private String brandNo;
 
-    // 进口/国产
-    private Boolean isForeign;
+    private Date brandExpDate;
 
-    // 中西药属性
-    private Integer medType;
+    private String brandFileNo;
 
-    // 处方/非处方
-    private Boolean isPrescription;
+    private String permitNo;
 
-    // 入库验收
+    private Date permitExpDate;
+
+    private String permitFileNo;
+
+    private String archiveNo;
+
     private Boolean inCheck;
-
-    // 社保目录内
-    private Boolean isShebao;
 
     private Boolean firstCheck;
 
@@ -85,51 +76,127 @@ public class Goods {
 
     private Boolean needCare;
 
-    // 预警天数
-    private Integer warningDays;
-    // 进项税率16%
     private BigDecimal inTax;
-    // 销项税率16%
-    private BigDecimal outTax;
-    // 有效月份
-    private Integer validMonths;
-    // 联系方式
-    private String contact;
-    // 档案号
-    private String archiveNumber;
-    // 主治功能
-    private String cureRange;
-    // 销售策略
-    private String salePolicy;
-    // 特殊管理属性
-    private Integer specialManageId;
-    // 给药途径
-    private Integer medicationId;
-    // 功能分类属性
-    private Integer functionCategoryId;
-    // 新特药
-    private Integer specificMedId;
-    // 养护标记
-    private Integer careTimeId;
-    // GMP属性
-    private Integer gmpTypeId;
-    // 经营范围属性
-    private Integer scopeId;
-    // 基药属性
-    private Integer baseMedId;
 
-    // 价格信息
-    private Long priceConfId;
-    // 库位信息
-    private Long posId;
+    private BigDecimal outTax;
+
+    private Integer validMonths;
+
+    private Integer warningDays;
+
+    private String contact;
+
+    private String cureRange;
+
+    private String salePolicy;
+
+    private Boolean isForeign;
+
+    private Long prescriptionId;
+
+    private Long medTypeId;
+
+    private Boolean isShebao;
+
+    private Long specificMedId;
+
+    private Long jxId;
+
+    private Long baseMedId;
+
+    private Long funcCatId;
+
+    private Long medicationId;
+
+    private Long careTimeId;
+
+    private Long gmpTypeId;
+
+    private Long abcTypeId;
+
+    private Long scopeId;
+
+    private Long newTypeId;
+
+    private BigDecimal retailPrice;
+
+    private BigDecimal batchPrice;
+
+    private BigDecimal memberPrice;
+
+    private BigDecimal onlinePrice;
+
+    private BigDecimal splitPrice;
+
+    private BigDecimal lowPrice;
+
+    private BigDecimal hightPrice;
+
+    private String createdBy;
+
+    private String updatedBy;
 
     private Date createdTime;
 
     private Date updatedTime;
 
-    private String createdBy;
+    // Option value
+    private String storageConditionName;
+    private String unitName;
+    private String packUnitName;
+    private String specificMedName;
+    private String jxName;
+    private String baseMedName;
+    private String funcCatName;
+    private String medicationName;
+    private String careTimeName;
+    private String gmpTypeName;
+    private String abcTypeName;
+    private String scopeName;
+    private String newTypeName;
 
-    private String updatedBy;
+
+    public void setOptionName(List<Options> options) {
+        if (options == null || options.isEmpty()) {
+            return;
+        }
+        Map<Long, Options> optionMap = new HashMap<>();
+        options.stream().forEach(item -> {
+            optionMap.put(item.getId(), item);
+        });
+        this.setStorageConditionName(optionMap.get(this.getStorageCondition()) != null ? optionMap.get(this.getStorageCondition()).getValue() : null);
+        this.setUnitName(optionMap.get(this.getUnit()) != null ? optionMap.get(this.getUnit()).getValue() : null);
+        this.setPackUnitName(optionMap.get(this.getPackUnit()) != null ? optionMap.get(this.getPackUnit()).getValue() : null);
+        this.setSpecificMedName(optionMap.get(this.getSpecificMedId()) != null ? optionMap.get(this.getSpecificMedId()).getValue() : null);
+        this.setJxName(optionMap.get(this.getJxId()) != null ? optionMap.get(this.getJxId()).getValue() : null);
+        this.setBaseMedName(optionMap.get(this.getBaseMedId()) != null ? optionMap.get(this.getBaseMedId()).getValue() : null);
+        this.setFuncCatName(optionMap.get(this.getFuncCatId()) != null ? optionMap.get(this.getFuncCatId()).getValue() : null);
+        this.setMedicationName(optionMap.get(this.getMedicationId()) != null ? optionMap.get(this.getMedicationId()).getValue() : null);
+        this.setCareTimeName(optionMap.get(this.getCareTimeId()) != null ? optionMap.get(this.getCareTimeId()).getValue() : null);
+        this.setGmpTypeName(optionMap.get(this.getGmpTypeId()) != null ? optionMap.get(this.getCareTimeId()).getValue() : null);
+        this.setAbcTypeName(optionMap.get(this.getAbcTypeId()) != null ? optionMap.get(this.getAbcTypeId()).getValue() : null);
+        this.setScopeName(optionMap.get(this.getScopeId()) != null ? optionMap.get(this.getScopeId()).getValue() : null);
+        this.setNewTypeName(optionMap.get(this.getNewTypeId()) != null ? optionMap.get(this.getNewTypeId()).getValue() : null);
+    }
+
+    public Set<Long> getOptionIdList() {
+        Set<Long> optionIdSet = new HashSet<>();
+        optionIdSet.add(this.getStorageCondition() != null ? this.getStorageCondition() : 0);
+        optionIdSet.add(this.getUnit() != null ? this.getUnit() : 0);
+        optionIdSet.add(this.getPackUnit() != null ? this.getPackUnit() : 0);
+        optionIdSet.add(this.getSpecificMedId() != null ? this.getSpecificMedId() : 0);
+        optionIdSet.add(this.getJxId() != null ? this.getJxId() : 0);
+        optionIdSet.add(this.getBaseMedId() != null ? this.getBaseMedId() : 0);
+        optionIdSet.add(this.getFuncCatId() != null ? this.getFuncCatId() : 0);
+        optionIdSet.add(this.getMedicationId() != null ? this.getMedicationId() : 0);
+        optionIdSet.add(this.getCareTimeId() != null ? this.getCareTimeId() : 0);
+        optionIdSet.add(this.getGmpTypeId() != null ? this.getGmpTypeId() : 0);
+        optionIdSet.add(this.getAbcTypeId() != null ? this.getAbcTypeId() : 0);
+        optionIdSet.add(this.getScopeId() != null ? this.getScopeId() : 0);
+        optionIdSet.add(this.getNewTypeId() != null ? this.getNewTypeId() : 0);
+
+        return optionIdSet;
+    }
 
     public Long getId() {
         return id;
@@ -137,14 +204,6 @@ public class Goods {
 
     public void setId(Long id) {
         this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name == null ? null : name.trim();
     }
 
     public Integer getCompanyId() {
@@ -163,12 +222,28 @@ public class Goods {
         this.categoryId = categoryId;
     }
 
+    public String getCategoryName() {
+        return categoryName;
+    }
+
+    public void setCategoryName(String categoryName) {
+        this.categoryName = categoryName;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
     public String getFullName() {
         return fullName;
     }
 
     public void setFullName(String fullName) {
-        this.fullName = fullName == null ? null : fullName.trim();
+        this.fullName = fullName;
     }
 
     public String getOrigin() {
@@ -176,15 +251,7 @@ public class Goods {
     }
 
     public void setOrigin(String origin) {
-        this.origin = origin == null ? null : origin.trim();
-    }
-
-    public String getJx() {
-        return jx;
-    }
-
-    public void setJx(String jx) {
-        this.jx = jx == null ? null : jx.trim();
+        this.origin = origin;
     }
 
     public String getSpec() {
@@ -192,7 +259,7 @@ public class Goods {
     }
 
     public void setSpec(String spec) {
-        this.spec = spec == null ? null : spec.trim();
+        this.spec = spec;
     }
 
     public String getSerial() {
@@ -200,15 +267,7 @@ public class Goods {
     }
 
     public void setSerial(String serial) {
-        this.serial = serial == null ? null : serial.trim();
-    }
-
-    public String getCode() {
-        return code;
-    }
-
-    public void setCode(String code) {
-        this.code = code == null ? null : code.trim();
+        this.serial = serial;
     }
 
     public Boolean getEnable() {
@@ -219,6 +278,14 @@ public class Goods {
         this.enable = enable;
     }
 
+    public Boolean getProxy() {
+        return isProxy;
+    }
+
+    public void setProxy(Boolean proxy) {
+        isProxy = proxy;
+    }
+
     public Long getFactoryId() {
         return factoryId;
     }
@@ -227,35 +294,43 @@ public class Goods {
         this.factoryId = factoryId;
     }
 
-    public Integer getUnit() {
+    public String getFactory() {
+        return factory;
+    }
+
+    public void setFactory(String factory) {
+        this.factory = factory;
+    }
+
+    public Long getUnit() {
         return unit;
     }
 
-    public void setUnit(Integer unit) {
+    public void setUnit(Long unit) {
         this.unit = unit;
     }
 
-    public Integer getPackUnit() {
+    public Long getPackUnit() {
         return packUnit;
     }
 
-    public void setPackUnit(Integer packUnit) {
+    public void setPackUnit(Long packUnit) {
         this.packUnit = packUnit;
     }
 
-    public Integer getMediumPack() {
+    public BigDecimal getMediumPack() {
         return mediumPack;
     }
 
-    public void setMediumPack(Integer mediumPack) {
+    public void setMediumPack(BigDecimal mediumPack) {
         this.mediumPack = mediumPack;
     }
 
-    public Integer getBigPack() {
+    public BigDecimal getBigPack() {
         return bigPack;
     }
 
-    public void setBigPack(Integer bigPack) {
+    public void setBigPack(BigDecimal bigPack) {
         this.bigPack = bigPack;
     }
 
@@ -264,23 +339,15 @@ public class Goods {
     }
 
     public void setPinyin(String pinyin) {
-        this.pinyin = pinyin == null ? null : pinyin.trim();
+        this.pinyin = pinyin;
     }
 
-    public String getStorageCondition() {
+    public Long getStorageCondition() {
         return storageCondition;
     }
 
-    public void setStorageCondition(String storageCondition) {
-        this.storageCondition = storageCondition == null ? null : storageCondition.trim();
-    }
-
-    public String getStorageDescription() {
-        return storageDescription;
-    }
-
-    public void setStorageDescription(String storageDescription) {
-        this.storageDescription = storageDescription == null ? null : storageDescription.trim();
+    public void setStorageCondition(Long storageCondition) {
+        this.storageCondition = storageCondition;
     }
 
     public String getComment() {
@@ -288,63 +355,87 @@ public class Goods {
     }
 
     public void setComment(String comment) {
-        this.comment = comment == null ? null : comment.trim();
+        this.comment = comment;
     }
 
-    public Long getCertId() {
-        return certId;
+    public String getCertNo() {
+        return certNo;
     }
 
-    public void setCertId(Long certId) {
-        this.certId = certId;
+    public void setCertNo(String certNo) {
+        this.certNo = certNo;
     }
 
-    public Integer getBrandId() {
-        return brandId;
+    public Date getCertExpDate() {
+        return certExpDate;
     }
 
-    public void setBrandId(Integer brandId) {
-        this.brandId = brandId;
+    public void setCertExpDate(Date certExpDate) {
+        this.certExpDate = certExpDate;
     }
 
-    public Long getPermitId() {
-        return permitId;
+    public String getCertFileNo() {
+        return certFileNo;
     }
 
-    public void setPermitId(Long permitId) {
-        this.permitId = permitId;
+    public void setCertFileNo(String certFileNo) {
+        this.certFileNo = certFileNo;
     }
 
-    public Integer getJxId() {
-        return jxId;
+    public String getBrandNo() {
+        return brandNo;
     }
 
-    public void setJxId(Integer jxId) {
-        this.jxId = jxId;
+    public void setBrandNo(String brandNo) {
+        this.brandNo = brandNo;
     }
 
-    public Boolean getIsForeign() {
-        return isForeign;
+    public Date getBrandExpDate() {
+        return brandExpDate;
     }
 
-    public void setIsForeign(Boolean isForeign) {
-        this.isForeign = isForeign;
+    public void setBrandExpDate(Date brandExpDate) {
+        this.brandExpDate = brandExpDate;
     }
 
-    public Integer getMedType() {
-        return medType;
+    public String getBrandFileNo() {
+        return brandFileNo;
     }
 
-    public void setMedType(Integer medType) {
-        this.medType = medType;
+    public void setBrandFileNo(String brandFileNo) {
+        this.brandFileNo = brandFileNo;
     }
 
-    public Boolean getIsPrescription() {
-        return isPrescription;
+    public String getPermitNo() {
+        return permitNo;
     }
 
-    public void setIsPrescription(Boolean isPrescription) {
-        this.isPrescription = isPrescription;
+    public void setPermitNo(String permitNo) {
+        this.permitNo = permitNo;
+    }
+
+    public Date getPermitExpDate() {
+        return permitExpDate;
+    }
+
+    public void setPermitExpDate(Date permitExpDate) {
+        this.permitExpDate = permitExpDate;
+    }
+
+    public String getPermitFileNo() {
+        return permitFileNo;
+    }
+
+    public void setPermitFileNo(String permitFileNo) {
+        this.permitFileNo = permitFileNo;
+    }
+
+    public String getArchiveNo() {
+        return archiveNo;
+    }
+
+    public void setArchiveNo(String archiveNo) {
+        this.archiveNo = archiveNo;
     }
 
     public Boolean getInCheck() {
@@ -379,78 +470,6 @@ public class Goods {
         this.needCare = needCare;
     }
 
-    public Integer getWarningDays() {
-        return warningDays;
-    }
-
-    public void setWarningDays(Integer warningDays) {
-        this.warningDays = warningDays;
-    }
-
-    public Date getCreatedTime() {
-        return createdTime;
-    }
-
-    public void setCreatedTime(Date createdTime) {
-        this.createdTime = createdTime;
-    }
-
-    public Date getUpdatedTime() {
-        return updatedTime;
-    }
-
-    public void setUpdatedTime(Date updatedTime) {
-        this.updatedTime = updatedTime;
-    }
-
-    public String getCreatedBy() {
-        return createdBy;
-    }
-
-    public void setCreatedBy(String createdBy) {
-        this.createdBy = createdBy == null ? null : createdBy.trim();
-    }
-
-    public String getUpdatedBy() {
-        return updatedBy;
-    }
-
-    public void setUpdatedBy(String updatedBy) {
-        this.updatedBy = updatedBy == null ? null : updatedBy.trim();
-    }
-
-    public String getCategoryName() {
-        return categoryName;
-    }
-
-    public void setCategoryName(String categoryName) {
-        this.categoryName = categoryName;
-    }
-
-    public String getFactory() {
-        return factory;
-    }
-
-    public void setFactory(String factory) {
-        this.factory = factory;
-    }
-
-    public String getUnitName() {
-        return unitName;
-    }
-
-    public void setUnitName(String unitName) {
-        this.unitName = unitName;
-    }
-
-    public String getPackUnitName() {
-        return packUnitName;
-    }
-
-    public void setPackUnitName(String packUnitName) {
-        this.packUnitName = packUnitName;
-    }
-
     public BigDecimal getInTax() {
         return inTax;
     }
@@ -475,20 +494,20 @@ public class Goods {
         this.validMonths = validMonths;
     }
 
+    public Integer getWarningDays() {
+        return warningDays;
+    }
+
+    public void setWarningDays(Integer warningDays) {
+        this.warningDays = warningDays;
+    }
+
     public String getContact() {
         return contact;
     }
 
     public void setContact(String contact) {
-        this.contact = contact == null ? null : contact.trim();
-    }
-
-    public String getArchiveNumber() {
-        return archiveNumber;
-    }
-
-    public void setArchiveNumber(String archiveNumber) {
-        this.archiveNumber = archiveNumber == null ? null : archiveNumber.trim();
+        this.contact = contact;
     }
 
     public String getCureRange() {
@@ -496,7 +515,7 @@ public class Goods {
     }
 
     public void setCureRange(String cureRange) {
-        this.cureRange = cureRange == null ? null : cureRange.trim();
+        this.cureRange = cureRange;
     }
 
     public String getSalePolicy() {
@@ -504,94 +523,310 @@ public class Goods {
     }
 
     public void setSalePolicy(String salePolicy) {
-        this.salePolicy = salePolicy == null ? null : salePolicy.trim();
+        this.salePolicy = salePolicy;
     }
 
-    public Integer getSpecialManageId() {
-        return specialManageId;
+    public Boolean getForeign() {
+        return isForeign;
     }
 
-    public void setSpecialManageId(Integer specialManageId) {
-        this.specialManageId = specialManageId;
+    public void setForeign(Boolean foreign) {
+        isForeign = foreign;
     }
 
-    public Integer getMedicationId() {
-        return medicationId;
+    public Long getPrescriptionId() {
+        return prescriptionId;
     }
 
-    public void setMedicationId(Integer medicationId) {
-        this.medicationId = medicationId;
+    public void setPrescriptionId(Long prescriptionId) {
+        this.prescriptionId = prescriptionId;
     }
 
-    public Integer getFunctionCategoryId() {
-        return functionCategoryId;
+    public Long getMedTypeId() {
+        return medTypeId;
     }
 
-    public void setFunctionCategoryId(Integer functionCategoryId) {
-        this.functionCategoryId = functionCategoryId;
+    public void setMedTypeId(Long medTypeId) {
+        this.medTypeId = medTypeId;
     }
 
-    public Integer getSpecificMedId() {
-        return specificMedId;
-    }
-
-    public void setSpecificMedId(Integer specificMedId) {
-        this.specificMedId = specificMedId;
-    }
-
-    public Integer getCareTimeId() {
-        return careTimeId;
-    }
-
-    public void setCareTimeId(Integer careTimeId) {
-        this.careTimeId = careTimeId;
-    }
-
-    public Integer getGmpTypeId() {
-        return gmpTypeId;
-    }
-
-    public void setGmpTypeId(Integer gmpTypeId) {
-        this.gmpTypeId = gmpTypeId;
-    }
-
-    public Integer getScopeId() {
-        return scopeId;
-    }
-
-    public void setScopeId(Integer scopeId) {
-        this.scopeId = scopeId;
-    }
-
-    public Integer getBaseMedId() {
-        return baseMedId;
-    }
-
-    public void setBaseMedId(Integer baseMedId) {
-        this.baseMedId = baseMedId;
-    }
-
-    public Long getPriceConfId() {
-        return priceConfId;
-    }
-
-    public void setPriceConfId(Long priceConfId) {
-        this.priceConfId = priceConfId;
-    }
-
-    public Long getPosId() {
-        return posId;
-    }
-
-    public void setPosId(Long posId) {
-        this.posId = posId;
-    }
-
-    public Boolean getShebao() {
+    public Boolean getIsShebao() {
         return isShebao;
     }
 
-    public void setShebao(Boolean shebao) {
-        isShebao = shebao;
+    public void setIsShebao(Boolean isShebao) {
+        this.isShebao = isShebao;
+    }
+
+    public Long getSpecificMedId() {
+        return specificMedId;
+    }
+
+    public void setSpecificMedId(Long specificMedId) {
+        this.specificMedId = specificMedId;
+    }
+
+    public Long getJxId() {
+        return jxId;
+    }
+
+    public void setJxId(Long jxId) {
+        this.jxId = jxId;
+    }
+
+    public Long getBaseMedId() {
+        return baseMedId;
+    }
+
+    public void setBaseMedId(Long baseMedId) {
+        this.baseMedId = baseMedId;
+    }
+
+    public Long getFuncCatId() {
+        return funcCatId;
+    }
+
+    public void setFuncCatId(Long funcCatId) {
+        this.funcCatId = funcCatId;
+    }
+
+    public Long getMedicationId() {
+        return medicationId;
+    }
+
+    public void setMedicationId(Long medicationId) {
+        this.medicationId = medicationId;
+    }
+
+    public Long getCareTimeId() {
+        return careTimeId;
+    }
+
+    public void setCareTimeId(Long careTimeId) {
+        this.careTimeId = careTimeId;
+    }
+
+    public Long getGmpTypeId() {
+        return gmpTypeId;
+    }
+
+    public void setGmpTypeId(Long gmpTypeId) {
+        this.gmpTypeId = gmpTypeId;
+    }
+
+    public Long getAbcTypeId() {
+        return abcTypeId;
+    }
+
+    public void setAbcTypeId(Long abcTypeId) {
+        this.abcTypeId = abcTypeId;
+    }
+
+    public Long getScopeId() {
+        return scopeId;
+    }
+
+    public void setScopeId(Long scopeId) {
+        this.scopeId = scopeId;
+    }
+
+    public Long getNewTypeId() {
+        return newTypeId;
+    }
+
+    public void setNewTypeId(Long newTypeId) {
+        this.newTypeId = newTypeId;
+    }
+
+    public BigDecimal getRetailPrice() {
+        return retailPrice;
+    }
+
+    public void setRetailPrice(BigDecimal retailPrice) {
+        this.retailPrice = retailPrice;
+    }
+
+    public BigDecimal getBatchPrice() {
+        return batchPrice;
+    }
+
+    public void setBatchPrice(BigDecimal batchPrice) {
+        this.batchPrice = batchPrice;
+    }
+
+    public BigDecimal getMemberPrice() {
+        return memberPrice;
+    }
+
+    public void setMemberPrice(BigDecimal memberPrice) {
+        this.memberPrice = memberPrice;
+    }
+
+    public BigDecimal getOnlinePrice() {
+        return onlinePrice;
+    }
+
+    public void setOnlinePrice(BigDecimal onlinePrice) {
+        this.onlinePrice = onlinePrice;
+    }
+
+    public BigDecimal getSplitPrice() {
+        return splitPrice;
+    }
+
+    public void setSplitPrice(BigDecimal splitPrice) {
+        this.splitPrice = splitPrice;
+    }
+
+    public BigDecimal getLowPrice() {
+        return lowPrice;
+    }
+
+    public void setLowPrice(BigDecimal lowPrice) {
+        this.lowPrice = lowPrice;
+    }
+
+    public BigDecimal getHightPrice() {
+        return hightPrice;
+    }
+
+    public void setHightPrice(BigDecimal hightPrice) {
+        this.hightPrice = hightPrice;
+    }
+
+    public String getCreatedBy() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(String createdBy) {
+        this.createdBy = createdBy;
+    }
+
+    public String getUpdatedBy() {
+        return updatedBy;
+    }
+
+    public void setUpdatedBy(String updatedBy) {
+        this.updatedBy = updatedBy;
+    }
+
+    public Date getCreatedTime() {
+        return createdTime;
+    }
+
+    public void setCreatedTime(Date createdTime) {
+        this.createdTime = createdTime;
+    }
+
+    public Date getUpdatedTime() {
+        return updatedTime;
+    }
+
+    public void setUpdatedTime(Date updatedTime) {
+        this.updatedTime = updatedTime;
+    }
+
+    public String getStorageConditionName() {
+        return storageConditionName;
+    }
+
+    public void setStorageConditionName(String storageConditionName) {
+        this.storageConditionName = storageConditionName;
+    }
+
+    public String getUnitName() {
+        return unitName;
+    }
+
+    public void setUnitName(String unitName) {
+        this.unitName = unitName;
+    }
+
+    public String getPackUnitName() {
+        return packUnitName;
+    }
+
+    public void setPackUnitName(String packUnitName) {
+        this.packUnitName = packUnitName;
+    }
+
+    public String getSpecificMedName() {
+        return specificMedName;
+    }
+
+    public void setSpecificMedName(String specificMedName) {
+        this.specificMedName = specificMedName;
+    }
+
+    public String getJxName() {
+        return jxName;
+    }
+
+    public void setJxName(String jxName) {
+        this.jxName = jxName;
+    }
+
+    public String getBaseMedName() {
+        return baseMedName;
+    }
+
+    public void setBaseMedName(String baseMedName) {
+        this.baseMedName = baseMedName;
+    }
+
+    public String getFuncCatName() {
+        return funcCatName;
+    }
+
+    public void setFuncCatName(String funcCatName) {
+        this.funcCatName = funcCatName;
+    }
+
+    public String getMedicationName() {
+        return medicationName;
+    }
+
+    public void setMedicationName(String medicationName) {
+        this.medicationName = medicationName;
+    }
+
+    public String getCareTimeName() {
+        return careTimeName;
+    }
+
+    public void setCareTimeName(String careTimeName) {
+        this.careTimeName = careTimeName;
+    }
+
+    public String getGmpTypeName() {
+        return gmpTypeName;
+    }
+
+    public void setGmpTypeName(String gmpTypeName) {
+        this.gmpTypeName = gmpTypeName;
+    }
+
+    public String getAbcTypeName() {
+        return abcTypeName;
+    }
+
+    public void setAbcTypeName(String abcTypeName) {
+        this.abcTypeName = abcTypeName;
+    }
+
+    public String getScopeName() {
+        return scopeName;
+    }
+
+    public void setScopeName(String scopeName) {
+        this.scopeName = scopeName;
+    }
+
+    public String getNewTypeName() {
+        return newTypeName;
+    }
+
+    public void setNewTypeName(String newTypeName) {
+        this.newTypeName = newTypeName;
     }
 }

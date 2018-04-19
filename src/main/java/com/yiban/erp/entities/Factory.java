@@ -62,6 +62,8 @@ public class Factory {
 
     private Integer companyId;
 
+    private String fileNo;
+
     public Long getId() {
         return id;
     }
@@ -289,5 +291,13 @@ public class Factory {
 
     public void setPlaceCodes(List<PlaceCode> placeCodes) {
         this.placeCodes = placeCodes;
+    }
+
+    public String getFileNo() {
+        return fileNo;
+    }
+
+    public void setFileNo(String fileNo) {
+        this.fileNo = fileNo;
     }
 }

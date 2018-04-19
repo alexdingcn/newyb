@@ -20,7 +20,7 @@ public interface FactoryMapper {
 
     int updateByPrimaryKey(Factory record);
 
-    List<Factory> selectAll();
+    List<Factory> selectAll(Integer companyId);
 
     List<Factory> searchByNameOrContact(
             @Param(value = "companyId") Integer companyId,

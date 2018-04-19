@@ -7,10 +7,10 @@
             <Button type="ghost" icon="ios-settings-strong" @click="optionModalShow = true;"></Button>
         </div>
 
-        <Modal v-model="optionModalShow">
+        <Modal v-model="optionModalShow" class="option-modal-position-show">
             <p slot="header">
                 <Icon type="ios-settings-strong"></Icon>
-                <span>商品属性配置</span>
+                <span>{{showTitle || '属性配置'}}</span>
             </p>
 
             <div style="text-align:center">
@@ -32,10 +32,10 @@
             </div>
         </Modal>
 
-        <Modal v-model="optionModalAdd" width="300px">
+        <Modal v-model="optionModalAdd" width="300px" class="option-modal-position-add">
             <p slot="header">
                 <Icon type="ios-settings-strong"></Icon>
-                <span>新增商品属性</span>
+                <span>新增属性</span>
             </p>
             <div style="text-align:center">
                 <Form>
@@ -51,7 +51,6 @@
                 <Button type="primary" @click="addNewProperty">保存</Button>
             </div>
         </Modal>
-
     </div>
 </template>
 
@@ -67,6 +66,10 @@ export default {
         canEditTable
     },
     props: {
+        value: {
+            tpye: Number|String,
+            default: ''
+        },
         disabled: {
             type: Boolean,
             default: false
@@ -76,13 +79,19 @@ export default {
             required: true
         },
         size: {
-            validator (value) {
-                return oneOf(value, ['small', 'large', 'default']);
+            validator (data) {
+                return oneOf(data, ['small', 'large', 'default']);
             }
         },
     },
+    watch: {
+        value(data) {
+            this.optionId = data;
+        }
+    },
     data () {
         return {
+            allTypes: [],
             prefixCls: prefixCls,
             optionId: '',
             newPropertyName: '',
@@ -115,6 +124,7 @@ export default {
         };
     },
     mounted() {
+        this.initOptionType();
         this.loadOptionList();
     },
     computed: {
@@ -129,13 +139,36 @@ export default {
                 }
             ];
         },
+        showTitle () {
+            if (this.optionType && this.allTypes && this.allTypes.length > 0) {
+                for (let i=0; i<this.allTypes.length; i++) {
+                    if (this.optionType === this.allTypes[i].value) {
+                        return this.allTypes[i].desc;
+                    }
+                }
+            }
+        }
     },
     methods: {
+        initOptionType() {
+            util.ajax.get('/options/type')
+                .then ((response) => {
+                    this.allTypes = response.data;
+                })
+                .catch((error) => {
+                    util.errorProcessor(this, error);
+                })
+        },
+
         loadOptionList() {
             let reqData = [this.optionType];
             util.ajax.post("/options/list", reqData)
                 .then(response => {
-                    this.optionList = response.data[this.optionType];
+                    if (response.data[this.optionType]) {
+                        this.optionList = response.data[this.optionType];
+                    }else {
+                        this.optionList = [];
+                    }
                 })
                 .catch(error => {
                     util.errorProcessor(this, error);
@@ -170,5 +203,16 @@ export default {
 
 };
 </script>
-<style>
+<style lang="less">
+
+.option-modal-position-show {
+    position: fixed;
+    z-index: 2000;
+}
+
+.option-modal-position-add {
+    position: fixed;
+    z-index: 3000;
+}
+
 </style>

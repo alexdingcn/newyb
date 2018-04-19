@@ -6,7 +6,7 @@
 <template>
     <div class="layout">
         <Layout :style="{minHeight: '100vh'}">
-            <Sider collapsible defaultCollapsed :collapsed-width="150" :style="{background: '#fff'}" v-show="sidebarVisible">
+            <Sider collapsible defaultCollapsed :collapsed-width="200" :style="{background: '#fff'}" v-show="sidebarVisible">
                 <Card :bordered="false" dis-hover>
                     <p slot="title">
                         <Icon type="android-options"></Icon> 商品分类
@@ -15,7 +15,7 @@
                     <div class="good-category-con">
                         <ButtonGroup slot="extra">
                             <Button type="primary" icon="android-add-circle" size="small" @click="addCategory">添加</Button>
-                            <Button type="success" icon="edit" size="small" @click="addCategory" :disabled="disableDelCategory"></Button>
+                            <Button type="success" icon="edit" size="small" @click="editCategory" :disabled="disableDelCategory"></Button>
                             <Button type="error" icon="android-remove-circle" size="small" @click="delCategory" :disabled="disableDelCategory"></Button>
                         </ButtonGroup>
 
@@ -32,14 +32,19 @@
                     <div slot="extra">
                         <Input v-model="searchGoodsVal" icon="search" placeholder="商品名称/拼音简称" style="width: 300px"></Input>
                         <ButtonGroup>
-                            <Button type="primary" icon="android-add-circle" @click="addGoods">添加</Button>
+                            <Button type="success" icon="android-add-circle" @click="addGoods">添加</Button>
+                            <Button type="primary" icon="edit" @click="editGoods">修改</Button>
                             <Button type="error" icon="android-remove-circle" @click="delGoods">删除</Button>
                             <Button type="ghost" icon="ios-download-outline" @click="exportData">导出当前页数据</Button>
                         </ButtonGroup>
                     </div>
 
                     <Row type="flex" align="middle" class="advanced-router margin-top-8">
-                        <Table border stripe highlight-row :loading="goodsTableLoading" :columns="orderColumns" :data="goodsData" ref="goodsTable" style="width: 100%;" size="small"></Table>
+                        <Table border stripe highlight-row :loading="goodsTableLoading" 
+                            :columns="orderColumns" :data="goodsData" ref="goodsTable" 
+                            @on-row-click="goodsTabRowClick"
+                            @on-row-dblclick="goodsTabRowDblClick" 
+                            style="width: 100%;" size="small"></Table>
                     </Row>
                     <Row class="margin-top-8">
                         <div style="float: right;">
@@ -50,16 +55,25 @@
                 </Card>
             </Layout>
         </Layout>
+
+        <Modal v-model="checkModalShow" title="商品基础信息维护" :mask-closable="false" width="80">
+            <goods-info :goodsId="currentGoodsId" @save-ok="saveGoodsOk" ></goods-info>
+            <div slot="footer"></div>
+        </Modal>
+
     </div>
 </template>
 
 <script>
-import axios from 'axios';
 import util from '@/libs/util.js';
+import goodsInfo from './goods-info.vue';
 import _ from 'lodash';
 
 export default {
     name: 'goods',
+    components: {
+        goodsInfo
+    },
     data () {
         return {
             sidebarVisible: true,
@@ -67,7 +81,7 @@ export default {
             searchGoodsVal: '',
             totalGoodsCount: 0,
             currentPage: 1,
-            goodCat: [ {title: '全部', id: 0, selected: true} ],
+            goodCat: [],
             selectedCategory: {},
             disableDelCategory: true,
             goodsTableLoading: false,
@@ -85,103 +99,149 @@ export default {
                     fixed: 'left'
                 },
                 {
+                    title: '货号',
+                    key: 'id',
+                    width: 80,
+                    fixed: 'left'
+                },
+                {
                     title: '商品名称',
                     key: 'name',
-                    align: 'center',
                     width: 220,
                     sortable: true,
-                    fixed: 'left',
-                    render: (h, params) => {
-                        return h('Button', {
-                            props: {
-                                type: 'text',
-                                size: 'small'
-                            },
-                            on: {
-                                click: () => {
-                                    let argu = { goods_id: params.row.id };
-                                    this.$router.push({
-                                        name: 'goods-info',
-                                        params: argu
-                                    });
-                                }
-                            }
-                        }, params.row.name);
-                    }
+                    fixed: 'left'
                 },
                 {
                     title: '类别',
                     key: 'categoryName',
-                    width: 100,
-                    align: 'center'
+                    width: 100
                 },
                 {
                     title: '产地',
-                    key: 'origin',
-                    width: 100,
-                    align: 'center'
+                    width: 150,
+                    key: 'origin'
                 },
                 {
                     title: '计量单位',
-                    key: 'unitName',
-                    width: 80,
-                    align: 'center'
+                    width: 90,
+                    key: 'unitName'
                 },
                 {
                     title: '剂型',
-                    key: 'jx',
-                    width: 80,
-                    align: 'center'
+                    width: 120,
+                    key: 'jxName'
                 },
                 {
                     title: '规格',
                     key: 'spec',
-                    width: 200,
-                    align: 'center',
-                    sortable: true
+                    sortable: true,
+                    width: 120
                 },
                 {
                     title: '生产企业',
                     key: 'factory',
-                    width: 200,
-                    align: 'center'
+                    width: 160,
                 },
                 {
-                    title: '库存',
-                    key: 'factory',
+                    title: '是否可用',
+                    key: 'enable',
                     width: 100,
-                    align: 'center'
+                    render: (h, params) => {
+                        return h('span', params.row.enable ? '是' : '否');
+                    }
                 },
                 {
-                    title: '在单数',
-                    key: 'factory',
+                    title: '是否代销',
+                    key: 'proxy',
                     width: 100,
-                    align: 'center'
+                    render: (h, params) => {
+                        return h('span', params.row.proxy ? '是' : '否');
+                    }
+                },
+                {
+                    title: '重点养护',
+                    key: 'needCare',
+                    width: 100,
+                    render: (h, params) => {
+                        return h('span', params.row.needCare ? '是':'否');
+                    }
+                },
+                {
+                    title: '条形码',
+                    width: 120,
+                    key: 'serial'
+                },
+                {
+                    title: '进项税%',
+                    width: 100,
+                    key: 'inTax'
+                },
+                {
+                    title: '销项税%',
+                    width: 100,
+                    key: 'outTax'
+                },
+                {
+                    title: '预警天数',
+                    width: 100,
+                    key: 'warningDays'
+                },
+                {
+                    title: '效期(月)',
+                    width: 100,
+                    key: 'validMonths'
+                },
+                {
+                    title: '批准文号',
+                    width: 120,
+                    key: 'permitNo'
+                },
+                {
+                    title: '注册商标',
+                    width: 120,
+                    key: 'brandNo'
+                },
+                {
+                    title: '注册证',
+                    width: 120,
+                    key: 'certNo'
+                },
+                {
+                    title: '最低价',
+                    width: 100,
+                    key: 'lowPrice'
+                },
+                {
+                    title: '最高价',
+                    width: 100,
+                    key: 'hightPrice'
+                },
+                {
+                    title: '批发价',
+                    width: 100,
+                    key: 'batchPrice'
                 }
             ],
-            goodsData: []
+            goodsData: [],
+            checkModalShow: false,
+            currentGoodsId: ''
         };
-    },
-    activated () {
-        this.loadTree();
     },
     mounted () {
         this.loadTree();
         this.loadGoodsData();
-    },
-    computed: {
-
     },
     methods: {
         loadTree () {
             var self = this;
             util.ajax.get('/good/category/tree')
                 .then(function (response) {
-                    self.goodCat = self.goodCat.slice(0, 1);
-                    self.goodCat = self.goodCat.concat(response.data);
+                    self.goodCat = response.data;
+                    self.selectedCategory = {};
+                    self.disableDelCategory = true;
                 })
                 .catch(function (error) {
-                    console.log(error);
+                    util.errorProcessor(self, error);
                 });
         },
         loadGoodsData () {
@@ -202,10 +262,12 @@ export default {
                     self.goodsTableLoading = false;
                     self.goodsData = response.data.data;
                     self.totalGoodsCount = response.data.total;
+                    self.currentGoodsId = '';
+                    self.$refs.goodsTable.clearCurrentRow();
                 })
                 .catch(function (error) {
                     self.goodsTableLoading = false;
-                    console.log(error);
+                    util.errorProcessor(self, error);
                 });
         },
         onTreeNodeSelected (items) {
@@ -217,21 +279,69 @@ export default {
                 this.disableDelCategory = true;
             }
         },
+        
+        doEditCategory(newCategory) {
+            if (!this.selectedCategory.id || !newCategory) {
+                this.$$Message.warning('获取数据失败');
+                return;
+            }
+            let reqData = {
+                id: this.selectedCategory.id,
+                name: newCategory
+            };
+            let self = this;
+            util.ajax.put('/good/category/edit', reqData)
+                .then((response) => {
+                    self.loadTree();
+                })
+                .catch((error) => {
+                    util.errorProcessor(self, error);
+                })
+        },
+
+        editCategory() {
+            if(!this.selectedCategory || !this.selectedCategory.id) {
+                this.$Message.warning('请先选择需要修改的产品组类别');
+                return;
+            }
+            var inputVal = '';
+            let self = this;
+            this.$Modal.confirm({
+                onOk: () => {
+                    self.doEditCategory(inputVal);
+                },
+                render: (h) => {
+                    return h('Input', {
+                        props: {
+                            autofocus: true,
+                            maxlength: 20,
+                            value: self.selectedCategory.title
+                        },
+                        on: {
+                            input: (val) => {
+                                inputVal = val;
+                            }
+                        }
+                    });
+                }
+            });
+        },
+
         doAddCategory (newCategory) {
             var self = this;
             if (!newCategory) {
                 this.$Message.warning('商品分类名称不能为空');
                 return;
             }
-
             util.ajax.post('/good/category/add', { name: newCategory })
                 .then(function (response) {
                     self.loadTree();
                 })
                 .catch(function (error) {
-                    console.log(error);
+                    util.errorProcessor(self, error);
                 });
         },
+
         addCategory () {
             var inputVal = '';
             this.$Modal.confirm({
@@ -261,7 +371,7 @@ export default {
                     self.loadTree();
                 })
                 .catch(function (error) {
-                    self.$Message.warning(error.response.data.message);
+                    util.errorProcessor(self, error);
                 });
         },
         exportData () {
@@ -270,23 +380,38 @@ export default {
             });
         },
         addGoods () {
-            let argu = { goods_category: this.selectedCategory.id };
-            this.$router.push({
-                name: 'goods-info',
-                params: argu
-            });
+            this.currentGoodsId = '';
+            this.checkModalShow = true;
+        },
+        editGoods () {
+            if (!this.currentGoodsId) {
+                this.$Message.warning('请先选择对应的商品信息');
+                return;
+            }
+            this.checkModalShow = true;
+        },
+        saveGoodsOk() {
+            this.loadGoodsData();
+            this.checkModalShow = false;
         },
         delGoods () {
             var row = this.$refs.goodsTable.getSelection();
             if (row && row.length > 0) {
                 var self = this;
-                util.ajax.post('/goods/remove/' + row[0].id)
-                    .then(function (response) {
-                        self.loadTree();
-                    })
-                    .catch(function (error) {
-                        console.log(error);
-                    });
+                this.$Modal.confirm({
+                    title: '商品删除确认',
+                    content: '是否确认删除选择商品?',
+                    onOk: () => {
+                        util.ajax.post('/goods/remove/' + row[0].id)
+                            .then(function (response) {
+                                self.loadTree();
+                            })
+                            .catch(function (error) {
+                                self.errorProcessor(self, error);
+                            });
+                    },
+                    onCancel: () => {}
+                });
             } else {
                 this.$Message.warning('请选择一个商品后操作');
             }
@@ -295,8 +420,12 @@ export default {
             this.currentPage = pageNumber;
             this.loadGoodsData();
         },
-        handleSearchGoods (value) {
-            console.log(value);
+        goodsTabRowClick(data) {
+            this.currentGoodsId = data.id;
+        },
+        goodsTabRowDblClick(data) {
+            this.currentGoodsId = data.id;
+            this.editGoods();
         }
     },
     watch: {
