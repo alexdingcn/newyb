@@ -493,7 +493,7 @@ id|Long|(自增类型ID pk)
 company_id|Integer|公司ID
 name|String|供应商名称
 pinyin|String|拼音
-enabled|Boolean|是否可用
+enabled|Boolean|是否可用(默认启用)
 term|Integer|账期
 city|String|归属地区,包含地区码
 address|String|详细地址
@@ -554,7 +554,7 @@ id|Long|(自增类型ID pk)
 supplier_id|Long|供应商ID
 name|String|供应商代表名称
 idcard|String|身份证号
-enabled|Boolean|是否启用
+enabled|Boolean|是否启用(默认启用)
 phone|String|联系方式
 city|String|所在城市(带城市编号)
 business_scope|String|经营区域

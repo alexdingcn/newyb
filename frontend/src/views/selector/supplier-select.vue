@@ -9,7 +9,7 @@
             placeholder="供应商名称/拼音"
             :remote-method="querySupplier"
             :loading="supplierLoading">
-        <Option v-for="option in supplierOptions" :value="option.id" :label="option.name" :key="option.id">{{option.name}}</Option>
+        <Option v-for="option in supplierOptions" :value="option.id" :label="option.name" :disabled="!option.enabled" :key="option.id">{{option.name}}</Option>
     </Select>
 </template>
 

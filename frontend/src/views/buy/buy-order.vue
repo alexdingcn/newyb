@@ -1,6 +1,5 @@
 <style lang="less">
     @import '../../styles/common.less';
-	@import './buy-order.less';
 </style>
 
 <template>
@@ -19,111 +18,64 @@
 			<Form :label-width="85" :rules="ruleValidate" :model="buyOrder" ref="buyOrderForm">
 				<Row>
 					<Col span="6">
-					<FormItem label="供应商" prop="supplierId" >
-						<Select
-								v-model="buyOrder.supplierId"
-								filterable
-								clearable
-								remote
-								size="small"
-								@on-change="onSelectSupplier"
-								placeholder="供应商名称/拼音"
-								:remote-method="querySupplier"
-								:loading="supplierLoading">
-							<Option v-for="option in supplierOptions" :value="option.id" :label="option.name" :key="option.id">{{option.name}}</Option>
-						</Select>
-					</FormItem>
+                        <FormItem label="供应商" prop="supplierId" >
+                            <supplier-select v-model="buyOrder.supplierId" ></supplier-select>
+                        </FormItem>
 					</Col>
 					<Col span="5">
-					<FormItem label="供应商代表" prop="supplierContactId" >
-						<Select ref="supplierContactSelect"
-								v-model="buyOrder.supplierContactId"
-								clearable
-								size="small"
-								placeholder="供应商代表"
-								:disabled="supplierContactOptions.length === 0"
-								:loading="supplierContactLoading">
-							<Option v-for="option in supplierContactOptions" :value="option.id" :label="option.name" :key="option.id">{{option.name}}</Option>
-						</Select>
-					</FormItem>
+                        <FormItem label="供应商代表" prop="supplierContactId" >
+                            <supplier-contact-select v-model="buyOrder.supplierContactId" :disabled="!buyOrder.supplierId" :supplierId="buyOrder.supplierId"></supplier-contact-select>
+                        </FormItem>
 					</Col>
 					<Col span="6">
 					<FormItem label="采购员" prop="buyerId">
-						<Select
-								v-model="buyOrder.buyerId"
-								clearable
-								size="small"
-								placeholder="采购员">
-							<Option v-for="option in buyerOptions" :value="option.userId" :label="option.nickname" :key="option.userId">
-								{{option.nickname}}
-								{{option.realname||''}}
-							</Option>
-						</Select>
+                        <buyer-select v-model="buyOrder.buyerId" ></buyer-select>
 					</FormItem>
 					</Col>
 					<Col span="6">
 					<FormItem label="自定单号" prop="refNo">
-						<Input v-model="buyOrder.refNo" size="small"/>
+						<Input v-model="buyOrder.refNo" />
 					</FormItem>
 					</Col>
 				</Row>
 				<Row>
 					<Col span="6">
 					<FormItem label="运输方式" prop="shipMethodId">
-                        <ship-method-select v-model="buyOrder.shipMethodId" size="small" ></ship-method-select>
+                        <option-select v-model="buyOrder.shipMethodId" optionType="SHIP_METHOD"></option-select>
 					</FormItem>
 					</Col>
 					<Col span="5">
 					<FormItem label="运输工具" prop="shipToolId">
-                        <ship-tool-select v-model="buyOrder.shipToolId" size="small"></ship-tool-select>
+                        <option-select v-model="buyOrder.shipToolId" optionType="SHIP_TOOL"></option-select>
 					</FormItem>
 					</Col>
 					<Col span="6">
 					<FormItem label="温控方式" prop="temperControlId">
-                        <temper-control-select v-model="buyOrder.temperControlId" size="small"></temper-control-select>
+                        <option-select v-model="buyOrder.temperControlId" optionType="TEMPER_CONTROL"></option-select>
 					</FormItem>
 					</Col>
 					<Col span="6">
 					<FormItem label="仓库点" prop="warehouseId">
-                        <warehouse-select v-model="buyOrder.warehouseId" size="small"></warehouse-select>
+                        <warehouse-select v-model="buyOrder.warehouseId" ></warehouse-select>
 					</FormItem>
 					</Col>
 				</Row>
 				<Row>
 					<Col span="6">
 						<FormItem label="选择商品">
-							<Select
-									ref="goodsSelect"
-									filterable
-									clearable
-									remote
-									placeholder="商品名称/拼音"
-									size="small"
-									@on-change="onSelectGoods"
-									:remote-method="queryGoods"
-									:loading="goodsLoading">
-								<Option v-for="option in goodsOptions" :value="option.id" :label="option.name" :key="option.id">
-									<span class="option-goods-name">{{ option.name }}</span>
-									<span class="option-goods-spec">{{ option.spec }} | {{option.factory}}</span>
-								</Option>
-							</Select>
+                            <good-select :disabled="!buyOrder.warehouseId" ref="goodsSelect" @on-change="onSelectGoods" ></good-select>
 						</FormItem>
 					</Col>
 					<Col span="5">
 						<FormItem label="预到货日期" prop="eta">
-							<DatePicker type="date" v-model="buyOrder.eta" size="small"/>
+							<DatePicker type="date" v-model="buyOrder.eta" />
 						</FormItem>
 					</Col>
 					<Col span="12">
 						<FormItem label="备注" prop="comment">
-							<Input v-model="buyOrder.comment" size="small"/>
+							<Input v-model="buyOrder.comment" />
 						</FormItem>
 					</Col>
-					<!--
-                    <Col span="6">
-                        <Button type="primary" icon="ios-list-outline" class="margin-left-5"></Button>
-                    </Col>
-                    -->
 				</Row>
 
 				<Table border highlight-row
@@ -155,37 +107,29 @@
     import axios from 'axios';
     import moment from 'moment';
     import util from '@/libs/util.js';
-    import shipToolSelect from "@/views/selector/ship-tool-select.vue";
-    import shipMethodSelect from "@/views/selector/ship-method-select.vue";
-    import temperControlSelect from "@/views/selector/temper-control-select.vue";
-    import warehouseSelect from "@/views/selector/warehouse-select.vue"
+    import supplierSelect from '@/views/selector/supplier-select.vue';
+    import supplierContactSelect from '@/views/selector/supplier-contact-select.vue';
+    import buyerSelect from '@/views/selector/buyer-select.vue';
+    import optionSelect from '@/views/selector/option-select.vue';
+    import warehouseSelect from "@/views/selector/warehouse-select.vue";
+    import goodSelect from '@/views/selector/good-select.vue';
 
     export default {
         name: 'buy_order',
         components: {
-            shipToolSelect,
-            shipMethodSelect,
-            temperControlSelect,
+            supplierSelect,
+            supplierContactSelect,
+            buyerSelect,
+            optionSelect,
+            goodSelect,
             warehouseSelect
         },
         data () {
             return {
                 saving: false,
-            	supplierLoading: false,
-            	supplierOptions: [],
-            	goodsLoading: false,
-            	goodsOptions: [],
-                buyerOptions: [],
-                supplierContactLoading: false,
-                supplierContactOptions: [],
             	totalAmount: 0,
             	edittingRow: {},
                 closeConfirm: false,
-            	fapiaoTypes: [
-            		{ value: 'PP', label: '普通发票'},
-            		{ value: 'ZZS', label: '增值税发票'}
-            	],
-                searchFactoryVal: '',
                 orderItems: [],
                 buyOrder: {
                     supplierId: null,
@@ -196,63 +140,57 @@
                     {
                         type: 'index',
                         title: '',
-                        align: 'center',
                         width: 30
                     },
                     {
                         title: '货号',
-                        align: 'center',
                         key: 'id',
                         width: 50
                     },
                     {
                         title: '商品名称',
                         key: 'name',
-                        align: 'center',
-                        width: 150,
+                        width: 200,
                         sortable: true
                     },
                     {
                         title: '产地',
                         key: 'origin',
-                        align: 'center',
-                        width: 60
+                        width: 100
                     },
                     {
                         title: '剂型',
-                        key: 'jx',
-                        align: 'center',
-                        width: 60
+                        key: 'jxName',
+                        width: 120
                     },
                     {
                         title: '规格',
                         key: 'spec',
-                        align: 'center',
-                        width: 80
+                        width: 120
                     },
                     {
                         title: '生产企业',
                         key: 'factory',
-                        align: 'center',
-                        width: 120
+                        width: 150
                     },
                     {
                         title: '单位',
                         key: 'unitName',
                         align: 'center',
-                        width: 50
+                        width: 80
                     },
 
                     {
                         title: '数量',
                         key: 'quantity',
                         align: 'center',
-                        width: 80,
+                        width: 100,
                         render: (h, params) => {
                         	var self = this;
                             return h('Input', {
                                 props: {
-								  	value: self.orderItems[params.index][params.column.key]
+								  	value: self.orderItems[params.index][params.column.key],
+                                      number: true
                                 },
                                 on: {
                                     'on-change' (event) {
@@ -281,15 +219,16 @@
                         }
                     },
                     {
-                        title: '单价',
+                        title: '采购单价',
                         key: 'price',
                         align: 'center',
-                        width: 80,
+                        width: 100,
                         render: (h, params) => {
                         	var self = this;
                             return h('Input', {
                                 props: {
-								  	value: self.orderItems[params.index][params.column.key]
+								  	value: self.orderItems[params.index][params.column.key],
+                                    number: true
                                 },
                                 on: {
                                     'on-change' (event) {
@@ -330,19 +269,19 @@
                         title: '金额',
                         key: 'amount',
                         align: 'center',
-                        width: 80
+                        width: 100
                     },
                     {
                         title: '整件单位',
                         key: 'packUnitName',
                         align: 'center',
-                        width: 60
+                        width: 100
                     },
                     {
                         title: '大件装量',
                         key: 'bigPack',
                         align: 'center',
-                        width: 60
+                        width: 80
                     },
                     {
                         title: '库存',
@@ -352,27 +291,36 @@
                     },
                     {
                         title: '在单数',
-                        key: 'ongoing',
+                        key: 'buyOrderCount',
+                        align: 'center',
+                        width: 100
+                    },
+                    {
+                        title: '在单总数',
+                        key: 'ongoingCount',
                         align: 'center',
                         width: 100
                     },
                     {
                         title: '最近采购价',
-                        key: 'last',
+                        key: 'lastPrice',
                         align: 'center',
                         width: 100
                     },
                     {
-                        title: '批号',
-                        key: 'batch',
-                        align: 'center',
-                        width: 100
+                        title: '存储条件',
+                        key: 'storageConditionName',
+                        width: 120
                     },
                     {
-                        title: '有效期',
-                        key: 'exp',
-                        align: 'center',
-                        width: 100
+                        title: '药基',
+                        key: 'baseMedName',
+                        width: 120
+                    },
+                    {
+                        title: '批准文号',
+                        key: 'permitNo',
+                        width: 200
                     }
         	],
                 ruleValidate: {
@@ -395,11 +343,10 @@
             };
         },
         mounted () {
-            this.queryBuyers();
         },
-    activated () {
-            this.clearData();
-    },
+        activated () {
+                this.clearData();
+        },
         watch: {
         	orderItems: function () {
         		this.totalAmount = this.orderItems.reduce(function (total, item) { return total + parseFloat(item.amount); }, 0);
@@ -408,76 +355,6 @@
         methods: {
             moment: function () {
                 return moment();
-            },
-            querySupplier (query) {
-                var self = this;
-                if (query !== '') {
-                    this.supplierLoading = true;
-                    util.ajax.post('/supplier/search', {search: query})
-                        .then(function (response) {
-                        	self.supplierLoading = false;
-                            self.supplierOptions = response.data;
-                        })
-                        .catch(function (error) {
-                            console.log(error);
-                        });
-                } else {
-                    this.supplierOptions = [];
-                }
-            },
-            queryBuyers () {
-                var self = this;
-                util.ajax.get('/userrole/list', {params: {roleQuery: 'ROLE_BUYER;ROLE_BUYER_SPECIAL'} })
-                    .then(function (response) {
-                        if (response.status === 200 && response.data) {
-                            self.buyerOptions = response.data;
-                        }
-                    })
-                    .catch(function (error) {
-                        console.log(error);
-                    });
-            },
-            onSelectSupplier (item) {
-                this.$refs.supplierContactSelect.clearSingleSelect();
-                this.querySupplierContact(item);
-            },
-            querySupplierContact (supplierId) {
-                var self = this;
-                if (supplierId) {
-                    this.supplierContactLoading = true;
-                    util.ajax.get('/supplier/contact/list', {params: {supplierId: supplierId}})
-                        .then(function (response) {
-                            self.supplierContactLoading = false;
-                            self.supplierContactOptions = response.data;
-                            if (self.supplierContactOptions.length === 1) {
-                                self.buyOrder.supplierContactId = self.supplierContactOptions[0].id;
-                            }
-                        })
-                        .catch(function (error) {
-                            console.log(error);
-                        });
-                } else {
-                    this.supplierContactOptions = [];
-                }
-            },
-            queryGoods (query) {
-                var self = this;
-                if (query !== '') {
-                    this.goodsLoading = true;
-                    util.ajax.get('/goods/list',
-                    	{ params:
-                    		{search: query, page: 1, size: 10}
-                    	})
-                        .then(function (response) {
-                        	self.goodsLoading = false;
-                            self.goodsOptions = response.data.data;
-                        })
-                        .catch(function (error) {
-                            console.log(error);
-                        });
-                } else {
-                    this.goodsOptions = [];
-                }
             },
             handleRowDbClick (row) {
             	this.$Modal.confirm({
@@ -496,44 +373,81 @@
                     }
                 });
             },
-            onSelectGoods (goodsId) {
-            	var goods = this.goodsOptions.filter(o => o.id === goodsId);
-            	if (goods && goods.length == 1) {
-            		var index = this.buyOrder.orderItemIds.indexOf(goodsId);
-            		if (index < 0) {
-            			var obj = goods[0];
-            			obj['amount'] = 0;
-            			this.orderItems.push(goods[0]);
-            			this.buyOrder.orderItemIds.push(goodsId);
-            			var self = this;
-            			setTimeout(function () {
-            				self.$refs.buyOrderTable.$el.querySelector('.ivu-table-body tr:last-child input').focus();
-            			}, 400);
-            		} else {
-            			this.$Message.warning('该商品已经添加');
-            		}
+            onSelectGoods (goodsId, goods) {
+                var index = this.buyOrder.orderItemIds.indexOf(goods.id);
+                if (index < 0) {
+                    this.setGoodsBalance(goods);
+                } else {
+                    this.$Message.warning('该商品已经添加');
                 }
                 this.$refs.goodsSelect.clearSingleSelect();
             },
-            doSave () {
-                var self = this;
-                this.saving = true;
-                util.ajax.post('/buy/add', this.buyOrder)
-                    .then(function (response) {
-                        if (response.status === 200 && response.data) {
-                            self.buyOrder.id = response.data.orderId;
-                            self.buyOrder.status = response.data.status;
-                            self.$Message.info('采购入库订单保存成功');
-                            self.closeConfirm = true;
+
+            setGoodsBalance(goods) {
+                if(!goods.id) {
+                    return;
+                }
+                //根据当前仓库和商品ID获取最近价格和库存信息
+                let reqDate = {
+                    warehouseId: this.buyOrder.warehouseId,
+                    goodsIdList: JSON.stringify([goods.id])
+                };
+                util.ajax.get("/repertory/in/current/balance", {params: reqDate})
+                    .then((response) => {
+                        let data = response.data;
+                        let record ='';
+                        if(data) {
+                            record = data[goods.id];
                         }
-                        self.saving = false;
+                        goods['lastPrice'] = record ? record.lastPrice : '';
+                        goods['buyOrderCount'] = record ? record.buyOrderCount : '';
+                        goods['balance'] = record ? record.balance : '';
+                        goods['ongoingCount'] = record ? record.ongoingCount : '';
+                        goods['amount'] = 0;
+                        this.orderItems.push(goods);
+                        this.buyOrder.orderItemIds.push(goods.id);
+                        var self = this;
+                        setTimeout(function () {
+                            self.$refs.buyOrderTable.$el.querySelector('.ivu-table-body tr:last-child input').focus();
+                        }, 400);
                     })
-                    .catch(function (error) {
-                        console.log(error);
-                        self.saving = false;
-                        self.$Message.error('保存采购订单错误');
-                    //							self.$Message.error('保存采购订单错误 ' + error.data.message);
+                    .catch((error) => {
+                        util.errorProcessor(this, error);
+                        goods['amount'] = 0;
+                        this.orderItems.push(goods);
+                        this.buyOrder.orderItemIds.push(goods.id);
+                        var self = this;
+                        setTimeout(function () {
+                            self.$refs.buyOrderTable.$el.querySelector('.ivu-table-body tr:last-child input').focus();
+                        }, 400);
                     });
+            },
+
+            doSave () {
+                this.$Modal.confirm({
+                    title: '提交确认',
+                    content: '是否确认采购数据录入完全正确, 提交后不可修改.',
+                    onCancel:() => {},
+                    onOk:() => {
+                        var self = this;
+                        this.saving = true;
+                        util.ajax.post('/buy/add', this.buyOrder)
+                            .then(function (response) {
+                                if (response.status === 200 && response.data) {
+                                    self.buyOrder.id = response.data.orderId;
+                                    self.buyOrder.status = response.data.status;
+                                    self.$Message.info('采购入库订单保存成功');
+                                    self.closeConfirm = true;
+                                }
+                                self.saving = false;
+                            })
+                            .catch(function (error) {
+                                self.saving = false;
+                                self.$Message.error('保存采购订单错误');
+                                util.erorProcessor(self, error);
+                            });
+                    }
+                });
             },
             clearData () {
                 this.buyOrder = {
@@ -541,6 +455,7 @@
                     eta: moment().add(1, 'd').format('YYYY-MM-DD'),
                     orderItemIds: []
                 };
+                this.orderItems = [];
             },
             closeTab () {
                 this.clearData();
@@ -564,5 +479,20 @@
 </script>
 
 <style>
+.option-goods-spec {
+  float: right;
+  color: #999;
+}
+.ivu-form-item {
+    margin-bottom: 15px;
+}
+
+.ivu-table-cell {
+    padding-left: 5px;
+    padding-right: 5px;
+}
+th .ivu-table-cell {
+	width-space: nowrap;
+}
 
 </style>

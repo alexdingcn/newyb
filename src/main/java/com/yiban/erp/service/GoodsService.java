@@ -1,5 +1,6 @@
 package com.yiban.erp.service;
 
+import com.yiban.erp.dao.GoodsMapper;
 import com.yiban.erp.dao.OptionsMapper;
 import com.yiban.erp.entities.Goods;
 import com.yiban.erp.entities.Options;
@@ -8,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -19,6 +21,8 @@ public class GoodsService {
 
     @Autowired
     private OptionsMapper optionsMapper;
+    @Autowired
+    private GoodsMapper goodsMapper;
 
 
     public void setGoodsOptionName(List<Goods> goodsList) {
@@ -48,6 +52,24 @@ public class GoodsService {
         set.toArray(ids);
         List<Options> options = optionsMapper.getByIds(ids);
         goods.setOptionName(options);
+    }
+
+    public List<Goods> getGoodsById(List<Long> ids) {
+        if (ids == null || ids.isEmpty()) {
+            return Collections.emptyList();
+        }
+        List<Goods> goodsList = goodsMapper.selectByIdList(ids);
+        setGoodsOptionName(goodsList);
+        return goodsList;
+    }
+
+    public Goods getGoodsById(Long id) {
+        if (id == null || id <= 0) {
+            return null;
+        }
+        Goods goods = goodsMapper.selectByPrimaryKey(id);
+        setGoodsOptionName(goods);
+        return goods;
     }
 
 

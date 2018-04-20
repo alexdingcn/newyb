@@ -63,10 +63,17 @@
                     {
                         title: '是否可用',
                         key: 'enabled',
-                        width: 100,
+                        width: 120,
                         sortable: true,
                         render: (h, params) => {
-                            return params.row.enabled ? '可用' : '禁用';
+                            let color = params.row.enabled ? 'green' : 'red';
+                            let lable = params.row.enabled ? '可用' : '禁用';
+                            return h('Tag', {
+                                props:{
+                                    type: 'dot',
+                                    color: color
+                                }
+                            }, lable);
                         }
                     },
                     {

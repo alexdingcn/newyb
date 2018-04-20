@@ -44,6 +44,10 @@ public class BuyOrder {
 
     private Date updatedTime;
 
+    private String checkBy; //审核人
+    private String checkResult; //审核结论
+    private Date checkTime; //审核时间
+
     private List<BuyOrderDetail> details;
 
     private List<BuyOrderRequest> orderItems;
@@ -208,6 +212,30 @@ public class BuyOrder {
         this.updatedTime = updatedTime;
     }
 
+    public String getCheckBy() {
+        return checkBy;
+    }
+
+    public void setCheckBy(String checkBy) {
+        this.checkBy = checkBy;
+    }
+
+    public String getCheckResult() {
+        return checkResult;
+    }
+
+    public void setCheckResult(String checkResult) {
+        this.checkResult = checkResult;
+    }
+
+    public Date getCheckTime() {
+        return checkTime;
+    }
+
+    public void setCheckTime(Date checkTime) {
+        this.checkTime = checkTime;
+    }
+
     public List<BuyOrderRequest> getOrderItems() {
         return orderItems;
     }
@@ -234,7 +262,6 @@ public class BuyOrder {
                 detail.setQuantity(req.getQuantity());
                 detail.setBuyPrice(req.getPrice());
                 detail.setAmount(req.getAmount());
-                detail.setUnitId(req.getUnit());
                 detail.setShippedQuantity(BigDecimal.ZERO);
                 detail.setBuyOrderId(this.getId());
                 detail.setAlreadyFapiao(false);

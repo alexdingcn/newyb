@@ -3,7 +3,7 @@
    <Select v-model="id" filterable clearable :disabled="disabled" placeholder="请选择采购员" 
         :size="size" 
         @on-change="onChange">
-        <Option v-for="item in optionList" :value="item.userId" :key="item.userId">{{item.nickname}}{{item.realname||''}}</Option>
+        <Option v-for="item in optionList" :value="item.userId" :key="item.userId">{{item.nickname}}{{item.realname ? '---' + item.realname : ''}}</Option>
     </Select>
 </template>
 

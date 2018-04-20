@@ -14,13 +14,9 @@ public interface BuyOrderMapper {
 
     int insert(BuyOrder record);
 
-    int insertSelective(BuyOrder record);
-
     BuyOrder selectByPrimaryKey(Long id);
 
     int updateByPrimaryKeySelective(BuyOrder record);
-
-    int updateByPrimaryKey(BuyOrder record);
 
     List<BuyOrder> queryOrders(BuyOrderQuery buyOrder);
 

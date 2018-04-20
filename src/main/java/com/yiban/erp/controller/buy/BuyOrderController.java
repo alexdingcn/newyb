@@ -6,11 +6,12 @@ import com.yiban.erp.constant.BuyOrderStatus;
 import com.yiban.erp.constant.OrderNumberType;
 import com.yiban.erp.dao.BuyOrderDetailMapper;
 import com.yiban.erp.dao.BuyOrderMapper;
-import com.yiban.erp.entities.BuyOrder;
-import com.yiban.erp.entities.BuyOrderDetail;
-import com.yiban.erp.entities.BuyOrderQuery;
-import com.yiban.erp.entities.User;
+import com.yiban.erp.dao.RepertoryInfoMapper;
+import com.yiban.erp.dto.CurrentBalanceResp;
+import com.yiban.erp.entities.*;
 import com.yiban.erp.exception.ErrorCode;
+import com.yiban.erp.service.GoodsService;
+import com.yiban.erp.service.warehouse.RepertoryInService;
 import com.yiban.erp.util.UtilTool;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.time.DateUtils;
@@ -24,9 +25,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/buy")
@@ -35,9 +35,12 @@ public class BuyOrderController {
 
     @Autowired
     private BuyOrderMapper buyOrderMapper;
-
+    @Autowired
+    private GoodsService goodsService;
     @Autowired
     private BuyOrderDetailMapper buyOrderDetailMapper;
+    @Autowired
+    private RepertoryInfoMapper repertoryInfoMapper;
 
     @RequestMapping(value = "/list", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> list(@AuthenticationPrincipal User user, @RequestBody BuyOrderQuery buyOrderQuery) {
@@ -60,6 +63,26 @@ public class BuyOrderController {
     @RequestMapping(value = "/orderdetail/{orderId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> list(@AuthenticationPrincipal User user, @PathVariable Long orderId) {
         List<BuyOrderDetail> buyDetailList = buyOrderDetailMapper.findByOrderId(orderId, user.getCompanyId());
+        List<Long> goodsIdList = new ArrayList<>();
+        if (buyDetailList != null && !buyDetailList.isEmpty()) {
+            //嵌入商品信息
+            buyDetailList.stream().forEach(item -> goodsIdList.add(item.getGoodsId()));
+            List<Goods> goods = goodsService.getGoodsById(goodsIdList);
+            Map<Long, Goods> goodsMap = new HashMap<>();
+            goods.stream().forEach(item -> goodsMap.put(item.getId(), item)); //按ID转Map
+            //嵌入当前库存信息
+            Integer warehouseId = buyDetailList.get(0).getWarehouseId(); //逻辑上同一个订单的仓库ID相同
+            List<CurrentBalanceResp> balanceResp = repertoryInfoMapper.getBalance(warehouseId, goodsIdList);
+            Map<Long, List<CurrentBalanceResp>> balanceMap = balanceResp.stream().collect(Collectors.groupingBy(CurrentBalanceResp::getGoodsId));
+
+            buyDetailList.forEach(item -> {
+                item.setGoods(goodsMap.get(item.getGoodsId()));
+                CurrentBalanceResp resp = balanceMap.get(item.getGoodsId()) == null ? null : balanceMap.get(item.getGoodsId()).get(0); //如果不为空，逻辑上只有一个
+                if (resp != null) {
+                    item.setBalance(resp.getBalance());
+                }
+            });
+        }
         return ResponseEntity.ok().body(JSON.toJSONString(buyDetailList));
     }
 
@@ -73,7 +96,12 @@ public class BuyOrderController {
             return ResponseEntity.badRequest().body(ErrorCode.ACCESS_PERMISSION.toString());
         }
         order.setStatus(query.getOrderStatus());
-        int result = buyOrderMapper.updateByPrimaryKey(order);
+        order.setCheckBy(user.getNickname());
+        order.setCheckResult(query.getCheckResult());
+        order.setCheckTime(new Date());
+        order.setUpdatedTime(new Date());
+        order.setUpdatedBy(user.getNickname());
+        int result = buyOrderMapper.updateByPrimaryKeySelective(order);
         if (result > 0) {
             return ResponseEntity.ok().build();
         }
@@ -85,8 +113,6 @@ public class BuyOrderController {
     public ResponseEntity<String> add(@AuthenticationPrincipal User user,
                                       @RequestBody BuyOrder buyOrder) {
         logger.info("ADD new buy order, userId={}", user.getId());
-
-        // TODO: add validate
         if (!validateBuyOrder(buyOrder)) {
             return ResponseEntity.badRequest().body(ErrorCode.BUY_ORDER_PARAMS_INVALID.toString());
         }

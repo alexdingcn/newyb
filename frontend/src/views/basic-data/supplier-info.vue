@@ -198,7 +198,7 @@
                         <Col span="10">
                             <FormItem label="档案编号" prop="fileNo">
                                 <Input v-model="formItem.fileNo" readonly>
-                                    <Button slot="append" type="text" icon="upload" :disabled="!formItem.id" @click="uploadFileInfo"></Button>
+                                    <Button slot="append" type="text" icon="upload" @click="uploadFileInfo"></Button>
                                 </Input>
                             </FormItem>
                         </Col>
