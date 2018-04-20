@@ -11,6 +11,7 @@ import com.yiban.erp.entities.*;
 import com.yiban.erp.exception.BizException;
 import com.yiban.erp.exception.BizRuntimeException;
 import com.yiban.erp.exception.ErrorCode;
+import com.yiban.erp.service.GoodsService;
 import com.yiban.erp.util.UtilTool;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -40,7 +41,7 @@ public class RepertoryInService {
     @Autowired
     private BuyOrderDetailMapper buyOrderDetailMapper;
     @Autowired
-    private GoodsMapper goodsMapper;
+    private GoodsService goodsService;
     @Autowired
     private FileInfoMapper fileInfoMapper;
 
@@ -195,31 +196,45 @@ public class RepertoryInService {
         if (orders == null || orders.isEmpty()) {
             return orders;
         }
-        List<Long> orderIdList = new ArrayList<>();
-        //获取option进行设置
-        List<String> queryOptions = Arrays.asList(
-                OptionsType.TEMPER_CONTROL.name(),
-                OptionsType.TEMPER_STATUS.name(),
-                OptionsType.SHIP_TOOL.name(),
-                OptionsType.PAY_METHOD.name(),
-                OptionsType.SHIP_METHOD.name(),
-                OptionsType.BUY_TYPE.name(),
-                OptionsType.BILL_TYPE.name()
-        );
-        List<Options> options = optionsMapper.findByTypes(listReq.getCompanyId(), queryOptions);
-        orders.stream().forEach(item -> {item.setOptions(options); orderIdList.add(item.getId());});
-        //获取所有订单对应的详情信息
-        List<RepertoryInDetail> details = repertoryInDetailMapper.getByOrderIdList(orderIdList);
-        if (details ==null || details.isEmpty()) {
-            return orders;
-        }
-        Map<Long, List<RepertoryInDetail>> detailMap = details.stream().collect(Collectors.groupingBy(RepertoryInDetail::getInOrderId));
-        orders.stream().forEach(item -> item.setDetails(detailMap.get(item.getId())));
+        setOptionsName(orders);
         return orders;
     }
 
+    private void setOptionsName(List<RepertoryIn> orders) {
+        if (orders == null || orders.isEmpty()) {
+            return;
+        }
+        Set<Long> optionIdSet = new HashSet<>();
+        orders.stream().forEach(item -> optionIdSet.addAll(item.getOptionIdList()));
+        Long[] ids = new Long[optionIdSet.size()];
+        optionIdSet.toArray(ids);
+        List<Options> options = optionsMapper.getByIds(ids);
+        orders.stream().forEach(item -> item.setOptionName(options));
+    }
+
+    private void setOptionsName(RepertoryIn order) {
+        if (order == null || order.getOptionIdList() == null || order.getOptionIdList().isEmpty()) {
+            return;
+        }
+        Set<Long> optionIdSet = order.getOptionIdList();
+        Long[] ids = new Long[optionIdSet.size()];
+        optionIdSet.toArray(ids);
+        List<Options> options = optionsMapper.getByIds(ids);
+        order.setOptionName(options);
+    }
+
     public List<RepertoryInDetail> getDetailList(Long orderId) {
-        return repertoryInDetailMapper.getByOrderId(orderId);
+        List<RepertoryInDetail> details = repertoryInDetailMapper.getByOrderId(orderId);
+        if (details == null || details.isEmpty()) {
+            return Collections.emptyList();
+        }
+        List<Long> goodsIdList = new ArrayList<>();
+        details.stream().forEach(item -> goodsIdList.add(item.getGoodsId()));
+        List<Goods> goods = goodsService.getGoodsById(goodsIdList);
+        Map<Long, Goods> goodsMap = new HashMap<>();
+        goods.stream().forEach(item -> goodsMap.put(item.getId(), item));
+        details.stream().forEach(item -> item.setGoods(goodsMap.get(item.getGoodsId())));
+        return details;
     }
 
     public void removeById(User user, Long id) throws BizException{
@@ -263,25 +278,9 @@ public class RepertoryInService {
             logger.info("buy order is not exist in receive order. buy order id:{}", buyOrderId);
             return makeReceiveOrderByBuyOrder(user, buyOrder);
         }else {
-            //获取option进行设置
-            List<String> queryOptions = Arrays.asList(
-                    OptionsType.TEMPER_CONTROL.name(),
-                    OptionsType.TEMPER_STATUS.name(),
-                    OptionsType.SHIP_TOOL.name(),
-                    OptionsType.PAY_METHOD.name(),
-                    OptionsType.SHIP_METHOD.name(),
-                    OptionsType.BUY_TYPE.name(),
-                    OptionsType.BILL_TYPE.name()
-            );
-            List<Options> options = optionsMapper.findByTypes(user.getCompanyId(), queryOptions);
-            order.setOptions(options);
             //获取所有订单对应的详情信息
-            List<RepertoryInDetail> details = repertoryInDetailMapper.getByOrderId(order.getId());
-            if (details ==null || details.isEmpty()) {
-                return order;
-            }
-            Map<Long, List<RepertoryInDetail>> detailMap = details.stream().collect(Collectors.groupingBy(RepertoryInDetail::getInOrderId));
-            order.setDetails(detailMap.get(order.getId()));
+            List<RepertoryInDetail> details = getDetailList(order.getId());
+            order.setDetails(details);
             return order;
         }
     }
@@ -296,9 +295,9 @@ public class RepertoryInService {
         order.setSupplierContactId(buyOrder.getSupplierContactId());
         order.setSupplierContactName(buyOrder.getSupplierContact());
         order.setBuyerId(buyOrder.getBuyerId());
-        order.setTempControlMethod(buyOrder.getTemperControlId() == null ? null : Long.valueOf(buyOrder.getTemperControlId()));
-        order.setShipMethod(buyOrder.getShipMethodId() == null ? null : Long.valueOf(buyOrder.getShipMethodId()));
-        order.setShipTool(buyOrder.getShipToolId() == null ? null : Long.valueOf(buyOrder.getShipToolId()));
+        order.setTempControlMethod(buyOrder.getTemperControlId() == null ? null : buyOrder.getTemperControlId());
+        order.setShipMethod(buyOrder.getShipMethodId() == null ? null : buyOrder.getShipMethodId());
+        order.setShipTool(buyOrder.getShipToolId() == null ? null : buyOrder.getShipToolId());
         order.setShipEndDate(buyOrder.getEta());
         order.setWarehouseId(buyOrder.getWarehouseId());
         order.setWarehouseName(buyOrder.getWarehouse());
@@ -310,20 +309,22 @@ public class RepertoryInService {
         }
         List<Long> goodsIdList = new ArrayList<>();
         buyOrderDetails.stream().forEach(item -> goodsIdList.add(item.getGoodsId()));
-        List<Goods> goodsList = goodsMapper.selectByIdList(goodsIdList);
+        List<Goods> goodsList = goodsService.getGoodsById(goodsIdList);
         Map<Long, Goods> goodsMap = new HashMap<>();
         goodsList.stream().forEach(item -> goodsMap.put(item.getId(), item));
 
         List<RepertoryInDetail> details = new ArrayList<>();
 
         buyOrderDetails.stream().forEach(item -> {
+            Goods goods = goodsMap.get(item.getGoodsId());
             RepertoryInDetail detail = new RepertoryInDetail();
             detail.setGoodsId(item.getGoodsId());
-            detail.setGoods(goodsMap.get(item.getGoodsId()));
+            detail.setGoods(goods);
             detail.setReceiveQuality(item.getQuantity() == null ? BigDecimal.ZERO : item.getQuantity());
-            detail.setBigQuality(BigDecimal.ZERO);
+            detail.setBigQuality(item.getQuantity() == null ? BigDecimal.ZERO : item.getQuantity());
             detail.setPrice(item.getBuyPrice());
             detail.setAmount(item.getAmount());
+            detail.setTaxRate(goods != null ? goods.getInTax() : BigDecimal.ZERO);
             details.add(detail);
         });
 

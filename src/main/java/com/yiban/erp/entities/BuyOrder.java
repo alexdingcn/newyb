@@ -20,11 +20,11 @@ public class BuyOrder {
 
     private String status;
 
-    private Integer shipMethodId;
+    private Long shipMethodId;
 
-    private Integer shipToolId;
+    private Long shipToolId;
 
-    private Integer temperControlId;
+    private Long temperControlId;
 
     private Integer warehouseId;
 
@@ -116,27 +116,27 @@ public class BuyOrder {
         this.status = status == null ? null : status.name();
     }
 
-    public Integer getShipMethodId() {
+    public Long getShipMethodId() {
         return shipMethodId;
     }
 
-    public void setShipMethodId(Integer shipMethodId) {
+    public void setShipMethodId(Long shipMethodId) {
         this.shipMethodId = shipMethodId;
     }
 
-    public Integer getShipToolId() {
+    public Long getShipToolId() {
         return shipToolId;
     }
 
-    public void setShipToolId(Integer shipToolId) {
+    public void setShipToolId(Long shipToolId) {
         this.shipToolId = shipToolId;
     }
 
-    public Integer getTemperControlId() {
+    public Long getTemperControlId() {
         return temperControlId;
     }
 
-    public void setTemperControlId(Integer temperControlId) {
+    public void setTemperControlId(Long temperControlId) {
         this.temperControlId = temperControlId;
     }
 

@@ -25,8 +25,6 @@ public interface RepertoryInDetailMapper {
 
     int insertBatch(@Param("details") List<RepertoryInDetail> details);
 
-    List<RepertoryInDetail> getByOrderIdList(@Param("orderIdList") List<Long> orderIdList);
-
     List<RepertoryInDetail> getByOrderId(Long orderId);
 
     int setCheckByOrder(ReceiveSetReq setReq); //一次验收一笔订单

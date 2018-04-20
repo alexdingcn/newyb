@@ -8,9 +8,9 @@
     <result column="supplier_contact_id" property="supplierContactId" jdbcType="BIGINT" />
     <result column="buyer_id" property="buyerId" jdbcType="BIGINT" />
     <result column="status" property="status" jdbcType="VARCHAR" />
-    <result column="ship_method_id" property="shipMethodId" jdbcType="INTEGER" />
-    <result column="ship_tool_id" property="shipToolId" jdbcType="INTEGER" />
-    <result column="temper_control_id" property="temperControlId" jdbcType="INTEGER" />
+    <result column="ship_method_id" property="shipMethodId" jdbcType="BIGINT" />
+    <result column="ship_tool_id" property="shipToolId" jdbcType="BIGINT" />
+    <result column="temper_control_id" property="temperControlId" jdbcType="BIGINT" />
     <result column="warehouse_id" property="warehouseId" jdbcType="INTEGER" />
     <result column="eta" property="eta" jdbcType="TIMESTAMP" />
     <result column="ref_no" property="refNo" jdbcType="VARCHAR" />
@@ -90,8 +90,8 @@
       company_id, created_by, updated_by, 
       created_time, updated_time, check_by, check_result, check_time)
     values (#{orderNumber, jdbcType=VARCHAR}, #{supplierId,jdbcType=BIGINT}, #{supplierContactId,jdbcType=BIGINT},
-      #{buyerId,jdbcType=BIGINT}, #{status,jdbcType=VARCHAR}, #{shipMethodId,jdbcType=INTEGER}, 
-      #{shipToolId,jdbcType=INTEGER}, #{temperControlId,jdbcType=INTEGER}, #{warehouseId,jdbcType=INTEGER}, 
+      #{buyerId,jdbcType=BIGINT}, #{status,jdbcType=VARCHAR}, #{shipMethodId,jdbcType=BIGINT},
+      #{shipToolId,jdbcType=BIGINT}, #{temperControlId,jdbcType=BIGINT}, #{warehouseId,jdbcType=INTEGER},
       #{eta,jdbcType=TIMESTAMP}, #{refNo,jdbcType=VARCHAR}, #{comment,jdbcType=VARCHAR},
       #{companyId,jdbcType=INTEGER}, #{createdBy,jdbcType=VARCHAR}, #{updatedBy,jdbcType=VARCHAR}, 
       #{createdTime,jdbcType=TIMESTAMP}, #{updatedTime,jdbcType=TIMESTAMP},
@@ -117,13 +117,13 @@
         status = #{status,jdbcType=VARCHAR},
       </if>
       <if test="shipMethodId != null" >
-        ship_method_id = #{shipMethodId,jdbcType=INTEGER},
+        ship_method_id = #{shipMethodId,jdbcType=BIGINT},
       </if>
       <if test="shipToolId != null" >
-        ship_tool_id = #{shipToolId,jdbcType=INTEGER},
+        ship_tool_id = #{shipToolId,jdbcType=BIGINT},
       </if>
       <if test="temperControlId != null" >
-        temper_control_id = #{temperControlId,jdbcType=INTEGER},
+        temper_control_id = #{temperControlId,jdbcType=BIGINT},
       </if>
       <if test="warehouseId != null" >
         warehouse_id = #{warehouseId,jdbcType=INTEGER},
