@@ -37,20 +37,18 @@
 				    no-data-text="输入查询条件, 点击上方查询按钮进行查询">
                 </Table>
           </div>
-
-          <div class="detail-div">
-              <Table border highlight-row height="300" 
-                   :columns="detailColumns" :data="detailList" size="small" 
-                   ref="detailTable" style="width: 100%;" 
-                   no-data-text="点击上方订单后查看明细">
-                <div slot="footer">
-                    <h3 class="detail-count-content" >
-                        <b class="detail-count-content-b">入库数量:</b> {{ totalInCount }}
-                        <b class="detail-count-content-b">不合格数量:</b> {{ totalErrorCount }}
-                    </h3>
-                </div>
-            </Table>
-          </div>
+          <Row type="flex" justify="start" style="margin-top:15px;">
+              <h4 class="detail-count-content" >
+                    <b class="detail-count-content-b">总金额:</b> {{ totalAmount }}
+                    <b class="detail-count-content-b">入库数量:</b> {{ totalInCount }}
+                    <b class="detail-count-content-b">不合格数量:</b> {{ totalErrorCount }}
+                </h4>
+          </Row>
+          <Table border highlight-row height="300" :loading="detailLoading" 
+                :columns="detailColumns" :data="detailList" size="small" 
+                ref="detailTable" style="width: 100%;" 
+                no-data-text="点击上方订单后查看明细">
+        </Table>
       </Card>
 
       <Modal v-model="checkFileModal" title="检验报告档案" :mask-closable="false" width="50">
@@ -77,6 +75,7 @@ export default {
     data() {
         return {
             orderLoading: false,
+            detailLoading: false,
             statusOptions: [
                 {key: 'ALL', name: '所有'},
                 {key: 'CHECKED', name: '未审查'},
@@ -105,6 +104,25 @@ export default {
                     }
                 },
                 {
+                    title: '状态',
+                    key: 'status',
+                    width: 120,
+                    render: (h, params) => {
+                        let color = params.row.status === 'IN_CHECKED' ? 'green' : '#ff9900';
+                        let label = params.row.status === 'IN_CHECKED' ? '已审查' : '未审查';
+                        return  h('Tag', {
+                            props: {
+                                type: 'dot',
+                                color: color
+                            }
+                        }, label);
+                    }
+                },
+                {
+                    title: '入库方式',
+                    key: 'refTypeName'
+                },
+                {
                     title: '入库仓库',
                     key: 'warehouseName',
                 },
@@ -130,21 +148,6 @@ export default {
                     }
                 },
                 {
-                    title: '金额',
-                    key: 'amount',
-                    render: (h, params) => {
-                        let details = params.row.details;
-                        if (!details || details.length <= 0) {
-                            return h('span', 0);
-                        }
-                        let amount = 0;
-                        amount = details.reduce((total, item) => {
-                            return item.amount ? total + parseFloat(item.amount) : total + 0;
-                        }, 0);
-                        return h('span', amount);
-                    }
-                },
-                {
                     title: '收货员',
                     key: 'createBy'
                 },
@@ -161,8 +164,8 @@ export default {
                     key: 'orderNumber'
                 },
                 {
-                    title: '入库方式',
-                    key: 'buyTypeName'
+                    title: '采购属性',
+                    key: 'buyTypeName',
                 },
                 {
                     title: '到货时间',
@@ -348,6 +351,7 @@ export default {
                     }
                 }
             ],
+            totalAmount: 0,
             totalInCount: 0,
             totalErrorCount: 0,
             currentChooseOrder: {},
@@ -360,7 +364,9 @@ export default {
             if(!data || data.length <= 0) {
                 this.totalInCount = 0;
                 this.totalErrorCount = 0;
+                this.totalAmount = 0;
             }else {
+                this.totalAmount = data.reduce((total, item) => {return item.amount ? total + item.amount : total + 0 }, 0);
                 this.totalInCount = data.reduce((total, item) => {return item.inCount ? total + item.inCount : total + 0}, 0);
                 this.totalErrorCount = data.reduce((total, item) => {return item.errorCount ? total + item.errorCount : total + 0}, 0);
             }
@@ -405,7 +411,24 @@ export default {
                 return;
             }
             this.currentChooseOrder = rowData;
-            this.detailList = rowData.details;
+            this.reloadOrderDetail();
+        },
+
+        reloadOrderDetail() {
+            this.detailLoading = true;
+            util.ajax.get('/repertory/in/detail/' + this.currentChooseOrder.id)
+                .then((response) => {
+                    this.detailLoading = false;
+                    let data = response.data;
+                    if (data) {
+                        this.detailList = data;
+                        this.currentChooseOrder.details = this.detailList;
+                    }
+                })
+                .catch((error) => {
+                    this.detailLoading = false;
+                    util.errorProcessor(this, error);
+                });
         },
 
         checkOk() {

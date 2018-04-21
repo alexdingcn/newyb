@@ -287,6 +287,19 @@ public class BuyOrder {
         return false;
     }
 
+    public boolean canUpdateStatus() {
+        BuyOrderStatus orderStatus = getOrderStatus();
+        switch (orderStatus) {
+            case INIT:
+            case CHECKED:
+            case REJECTED:
+            case CHECKING:
+                return true;
+            default:
+                return false;
+        }
+    }
+
     public String getSupplierContact() {
         return supplierContact;
     }

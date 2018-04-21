@@ -110,6 +110,8 @@ public enum ErrorCode {
     RECEIVE_DETAIL_SAVE_PARAMS_ERROR(2410, "订单详情参数与订单信息不匹配", ErrorDisplay.NOTICE),
     RECEIVE_ORDER_STATUS_NOT_CHECKED(2411, "订单未处于验收通过的状态，不能审核通过"),
     RECEIVE_ORDER_DETAIL_EMPTY(2412, "获取订单商品信息失败"),
+    RECEIVE_ORDER_WAREHOUSE_NULL(2413, "仓库信息错误，系统异常", ErrorDisplay.NOTICE),
+    RECEIVE_ORDER_WAREHOUSE_FROZEN(2413, "当前仓库正在盘库冻结，不能做入库操作", ErrorDisplay.NOTICE),
 
     WAREHOUSE_LOCATION_EXIST(2501, "仓库位置已经存在, 不能添加同名库位"),
 

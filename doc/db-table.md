@@ -190,6 +190,7 @@ update_time|Datetime|最近一次修改时间
 
 
 
+
 ### 入库订单详情：repertory_in_detail
 
 > 入库单详情信息
@@ -232,6 +233,7 @@ create_by|String|创建人nickname
 create_time|Datetime|创建时间
 update_by|String|修改人
 update_time|Datetime|最近一次修改时间
+buy_order_quality|Decimal(14,3)|采购数量
 
 
 ### 出库订单表：repertory_out
@@ -482,6 +484,116 @@ file_no|String|生产商档案编号
 
 
 
+### 档案类型表：file_type
+
+> 记录档案的类型信息
+
+字段名|类型|描述
+-|-|-
+id|Integer|(自增类型ID pk)
+company_id|Integer|公司ID
+type_name|String|类型名称
+create_by|String|创建人
+update_by|String|修改人
+create_time|Datetime|创建时间
+update_time|Datetime|修改时间
+
+
+
+### 档案信息表：file_info
+
+> 记录档案信息
+
+字段名|类型|描述
+-|-|-
+id|Integer|(自增类型ID pk)
+company_id|Integer|公司ID
+file_no|String|档案编号
+file_status|String|档案状态
+file_name|String|档案名称
+file_type|String|档案类型
+comment|String|描述
+create_by|String|创建人
+create_time|Datetime|创建时间
+update_by|String|修改人
+update_time|Datetime|修改时间
+
+
+
+### 档案详情信息表：file_upload
+
+> 记录档案的上传文件的详情
+
+字段名|类型|描述
+-|-|-
+id|Integer|(自增类型ID pk)
+file_id|Integer|档案ID
+comment|String|文件备注
+original_name|String|上传文件的名称
+location|String|存档位置
+load_url|String|访问路径
+expiration|Datetime|过期时间
+create_by|String|创建人
+update_by|String|修改人
+create_time|Datetime|创建时间
+update_time|Datetime|修改时间
+
+
+### 系统基础选择项信息表: options
+
+> 记录各种自建的选择项的信息
+
+字段名|类型|描述
+-|-|-
+id|Long|(自增类型ID pk)
+company_id|Integer|公司ID
+type|String|类型
+value|String|值
+description|String|描述信息
+enabled|Boolean|是否可用
+created_by|String|创建人
+updated_by|String|修改人
+created_time|Datetime|创建时间
+updated_time|Datetime|修改时间
+
+
+
+### 消息信息表：message_info
+
+> 记录各种消息信息的表
+
+字段名|类型|描述
+-|-|-
+id|Long|(自增类型ID pk)
+company_id|Integer|公司ID
+status|String|消息状态
+role_type|String|可见的角色类型
+title|String|消息标题
+content|String|消息内容
+create_by|String|创建人
+create_time|Datetime|创建时间
+update_by|String|修改人
+update_time|Datetime|修改时间
+
+
+
+### 消息信息表：message_option
+
+> 记录各种消息信息备注信息
+
+字段名|类型|描述
+-|-|-
+id|Long|(自增类型ID pk)
+user_id|Long|用户ID
+message_id|Long|消息ID
+option_status|String|状态
+option_result|String|评论结果
+create_by|String|创建人
+create_time|Datetime|创建时间
+update_by|String|修改人
+update_time|Datetime|修改时间
+
+
 
 ### 供应商信息表：supplier
 
@@ -683,4 +795,56 @@ create_by|String|创建人
 create_time|Datetime|创建时间
 update_by|String|修改人
 update_time|Datetime|修改时间
+
+
+### 采购订单表：buy_order
+
+> 记录采购订单的信息
+
+字段名|类型|描述
+-|-|-
+id|Long|(自增类型ID pk)
+company_id|Integer|公司ID
+order_number|String|系统单号
+supplier_id|Long|供应商ID
+supplier_contact_id|Long|供应商代表
+buyer_id|Long|采购员ID
+status|String|当前状态
+ship_method_id|Long|运输方式
+ship_tool_id|Long|运输工具
+temper_control_id|Long|温控方式
+warehouse_id|Integer|仓库ID
+eta||Datetime|预计到货时间
+ref_no|String|自定义单号
+comment|String|备注
+created_by|String|创建人
+updated_by|String|修改人
+created_time|Datetime|创建时间
+updated_time|Datetime|修改时间
+check_by|String|审查员
+check_result|String|审查结果
+check_time|String|审查时间
+
+
+
+### 采购订单详情表：buy_order_detail
+
+> 记录采购订单详情信息
+
+字段名|类型|描述
+-|-|-
+id|Long|(自增类型ID pk)
+buy_order_id|Long|采购单ID
+goods_id|Long|商品ID
+goods_name|String|商品名称
+quantity|Decimal(14,3)|采购数量
+buy_price|Decimal(14,3)|采购单价
+amount|Decimal(14,3)|金额
+shipped_quantity|Decimal(14,3)|到货数量
+already_fapiao|Boolean|是否收到发票
+created_by|String|创建人
+updated_by|String|修改人
+created_time|Datetime|创建时间
+updated_time|Datetime|修改时间
+
 

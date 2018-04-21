@@ -162,7 +162,7 @@
 					</Col>
 				</Row>
                 <Row>
-                    <Col span="8">
+                    <Col span="10">
                         <FormItem label="商品" >
                             <good-select ref="goodSelector" size="small" @on-change="onSelectGoods"></good-select>
                         </FormItem>
@@ -257,7 +257,6 @@
 
             return {
                 saving: false,
-            	// totalAmount: 0,
             	edittingRow: {},
                 closeConfirm: false,
                 orderItems: [],
@@ -332,6 +331,12 @@
                         width: 60
                     },
                     {
+                        title: '采购数',
+                        key: 'buyOrderQuality',
+                        align: 'center',
+                        width: 120
+                    },
+                    {
                         title: '本次收货数量',
                         key: 'receiveQuality',
                         align: 'center',
@@ -340,6 +345,7 @@
                         	var self = this;
                             return h('Input', {
                                 props: {
+                                    number: true,
 								  	value: self.orderItems[params.index][params.column.key]
                                 },
                                 on: {
@@ -424,23 +430,21 @@
                         }
                     },
                     {
-                        title: '有效期至',
-                        key: 'expDate',
+                        title: '金额',
+                        key: 'amount',
                         align: 'center',
-                        width: 150,
+                        width: 130,
                         render: (h, params) => {
-                            let self = this;
-                            return h('DatePicker', {
+                        	var self = this;
+                            return h('Input', {
                                 props: {
-                                    type: 'date',
-                                    placement: 'top',
-                                    value: params.row.expDate
+								  	value: self.orderItems[params.index][params.column.key]
                                 },
                                 on: {
-                                    'on-change': (date) =>{
-                                        let row = self.orderItems[params.index];
-                                        row[params.column.key] = date; 
-                                    }
+ 									'on-blur' (event) {
+ 										let row = self.orderItems[params.index];
+                                        row[params.column.key] = event.target.value;
+ 									}
                                 }
                             });
                         }
@@ -457,6 +461,28 @@
                                     type: 'date',
                                     placement: 'top',
                                     value: params.row.productDate
+                                },
+                                on: {
+                                    'on-change': (date) =>{
+                                        let row = self.orderItems[params.index];
+                                        row[params.column.key] = date; 
+                                    }
+                                }
+                            });
+                        }
+                    },
+                    {
+                        title: '有效期至',
+                        key: 'expDate',
+                        align: 'center',
+                        width: 150,
+                        render: (h, params) => {
+                            let self = this;
+                            return h('DatePicker', {
+                                props: {
+                                    type: 'date',
+                                    placement: 'top',
+                                    value: params.row.expDate
                                 },
                                 on: {
                                     'on-change': (date) =>{
@@ -486,12 +512,6 @@
                                 }
                             });
                         }
-                    },
-                    {
-                        title: '金额',
-                        key: 'amount',
-                        align: 'center',
-                        width: 100
                     },
                     {
                         title: '货位号',

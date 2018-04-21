@@ -58,7 +58,7 @@
               </Col>
               <Col span="12">
                 <FormItem label="注册商标">
-                    <Input v-model="formItem.certId" size="small" :readonly="true"/>
+                    <Input v-model="formItem.brandNo" size="small" :readonly="true"/>
                 </FormItem>
               </Col>
           </Row>
@@ -81,8 +81,8 @@
                 </FormItem>
               </Col>
               <Col span="12">
-                <FormItem label="入库数量">
-                    <Input v-model="formItem.inCount" size="small" :readonly="true"/>
+                <FormItem label="收货数量">
+                    <Input v-model="formItem.receiveQuality" size="small" :readonly="true"/>
                 </FormItem>
               </Col>
           </Row>
@@ -98,6 +98,8 @@
                 </FormItem>
               </Col>
           </Row>
+          <h4 style="margin-top:20px;">抽样检查信息</h4>
+          <hr size=1 style="margin-bottom: 10px; width: 80%"/>
           <Row type="flex" justify="center">
               <Col span="12">
                 <FormItem label="抽样日期" prop="surveyDate">
@@ -218,11 +220,11 @@ export default {
             this.formItem.goodsName = data.goodsName;
             this.formItem.spec = data.spec;
             this.formItem.factory = data.factory;
-            this.formItem.certId = data.certId;
+            this.formItem.brandNo = data.brandNo;
             this.formItem.permit = data.permit;
             this.formItem.storageCondition = data.storageCondition;
             this.formItem.batchCode = data.batchCode;
-            this.formItem.inCount = data.inCount;
+            this.formItem.receiveQuality = data.receiveQuality;
             this.formItem.productDate = data.productDate;
             this.formItem.expDate = data.expDate;
             this.formItem.surveyDate = data.surveyDate ? data.surveyDate : moment().format('YYYY-MM-DD HH:mm');
@@ -243,15 +245,18 @@ export default {
                     this.$Message.warning('必输项未输入完整');
                     return;
                 }else {
+                    console.log(this.formItem.surveyDate);
+                    console.log(moment());
                     let reqData = {
                         detailId: this.formItem.detailId,
-                        surveyDate: this.formItem.surveyDate ? moment(this.formItem.surveyDate, 'YYYY-MM-DD HH:mm') : null,
+                        surveyDate: this.formItem.surveyDate ? this.formItem.surveyDate : moment(),
                         surveyQuality: this.formItem.surveyQuality,
                         surveyUser: this.formItem.surveyUser,
                         surveyAddress: this.formItem.surveyAddress,
                         surveyResult: this.formItem.surveyResult,
                         surveyTarget: this.formItem.surveyTarget
                     };
+                    
                     util.ajax.post("/repertory/in/set/survey", reqData)
                         .then((response) => {
                             this.$Message.success('添加抽样检查结论成功');

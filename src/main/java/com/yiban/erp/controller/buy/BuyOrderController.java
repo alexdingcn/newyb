@@ -9,6 +9,8 @@ import com.yiban.erp.dao.BuyOrderMapper;
 import com.yiban.erp.dao.RepertoryInfoMapper;
 import com.yiban.erp.dto.CurrentBalanceResp;
 import com.yiban.erp.entities.*;
+import com.yiban.erp.exception.BizException;
+import com.yiban.erp.exception.BizRuntimeException;
 import com.yiban.erp.exception.ErrorCode;
 import com.yiban.erp.service.GoodsService;
 import com.yiban.erp.service.warehouse.RepertoryInService;
@@ -87,13 +89,17 @@ public class BuyOrderController {
     }
 
     @RequestMapping(value = "/status", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> updateStatus(@AuthenticationPrincipal User user, @RequestBody BuyOrderQuery query) {
+    public ResponseEntity<String> updateStatus(@AuthenticationPrincipal User user,
+                                               @RequestBody BuyOrderQuery query) throws Exception {
         BuyOrder order = buyOrderMapper.selectByPrimaryKey(query.getOrderId());
         if (order == null) {
-            return ResponseEntity.badRequest().body(ErrorCode.BUY_ORDER_NOT_EXISTED.toString());
+            throw new BizException(ErrorCode.BUY_ORDER_NOT_EXISTED);
         }
         if (!order.getCompanyId().equals(user.getCompanyId())) {
-            return ResponseEntity.badRequest().body(ErrorCode.ACCESS_PERMISSION.toString());
+            throw new BizRuntimeException(ErrorCode.ACCESS_PERMISSION);
+        }
+        if (!order.canUpdateStatus()) {
+            throw new BizException(ErrorCode.BUY_ORDER_IS_CHECKED);
         }
         order.setStatus(query.getOrderStatus());
         order.setCheckBy(user.getNickname());

@@ -44,6 +44,8 @@ public class RepertoryInService {
     private GoodsService goodsService;
     @Autowired
     private FileInfoMapper fileInfoMapper;
+    @Autowired
+    private WarehouseMapper warehouseMapper;
 
     /**
      * 获取某商品当前库存和申购订单信息
@@ -325,6 +327,7 @@ public class RepertoryInService {
             detail.setPrice(item.getBuyPrice());
             detail.setAmount(item.getAmount());
             detail.setTaxRate(goods != null ? goods.getInTax() : BigDecimal.ZERO);
+            detail.setBuyOrderQuality(item.getQuantity());
             details.add(detail);
         });
 
@@ -524,9 +527,7 @@ public class RepertoryInService {
             detail.setInCount(mergeItem.getInCount());
             detail.setRightCount(mergeItem.getRightCount());
             detail.setErrorCount(mergeItem.getErrorCount());
-            BigDecimal price = detail.getPrice();
-            BigDecimal receiveQuality = detail.getReceiveQuality() != null ? detail.getReceiveQuality() : BigDecimal.ZERO;
-            detail.setAmount(price.multiply(receiveQuality));
+            detail.setAmount(mergeItem.getAmount());
             detail.setWarehouseLocation(mergeItem.getWarehouseLocation());
             int result = repertoryInDetailMapper.updateByPrimaryKeySelective(detail);
             count += result;
@@ -578,7 +579,16 @@ public class RepertoryInService {
             logger.warn("order detail have check status is false. orderId:{}", orderId);
             throw new BizException(ErrorCode.RECEIVE_ORDER_STATUS_NOT_CHECKED);
         }
-        //TODO 验证是否在盘库状态，如果正在盘库，不能进行操作
+        Warehouse warehouse = warehouseMapper.selectByPrimaryKey(order.getWarehouseId());
+        if (warehouse == null) {
+            logger.error("order get warehouse fail.");
+            throw new BizException(ErrorCode.RECEIVE_ORDER_WAREHOUSE_NULL);
+        }
+        if (!WarehouseStatus.NORMAL.name().equalsIgnoreCase(warehouse.getStatus())) {
+            logger.warn("warehouse is frozen now, status is not normal. can not do repertory in. warehouse:{} order:{}",
+                    order.getWarehouseId(), order.getId());
+            throw new BizException(ErrorCode.RECEIVE_ORDER_WAREHOUSE_FROZEN);
+        }
 
         //如果审核通过，修改状态
         int count = repertoryInMapper.setCheckStatus(order.getId(),

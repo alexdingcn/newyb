@@ -13,13 +13,9 @@ public interface RepertoryInDetailMapper {
 
     int insert(RepertoryInDetail record);
 
-    int insertSelective(RepertoryInDetail record);
-
     RepertoryInDetail selectByPrimaryKey(Long id);
 
     int updateByPrimaryKeySelective(RepertoryInDetail record);
-
-    int updateByPrimaryKey(RepertoryInDetail record);
 
     int deleteByOrderId(Long id);
 

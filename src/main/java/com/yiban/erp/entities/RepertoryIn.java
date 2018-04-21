@@ -1,6 +1,7 @@
 package com.yiban.erp.entities;
 
 import com.yiban.erp.constant.RepertoryInStatus;
+import com.yiban.erp.constant.RepertoryRefType;
 
 import java.math.BigDecimal;
 import java.util.*;
@@ -13,6 +14,8 @@ public class RepertoryIn {
     private Long refOrderId;
 
     private String refType;
+
+    private String refTypeName;
 
     private String orderNumber;
 
@@ -158,6 +161,11 @@ public class RepertoryIn {
 
     public void setRefType(String refType) {
         this.refType = refType == null ? null : refType.trim();
+    }
+
+    public String getRefTypeName() {
+        RepertoryRefType type = RepertoryRefType.getByName(this.getRefType());
+        return type == null ? null : type.getDesc();
     }
 
     public String getOrderNumber() {

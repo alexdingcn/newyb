@@ -78,6 +78,8 @@ public class RepertoryInDetail {
 
     private Date updateTime;
 
+    //采购单的采购数量
+    private BigDecimal buyOrderQuality;
 
     private Goods goods;
 
@@ -90,8 +92,13 @@ public class RepertoryInDetail {
     private String packUnitName;
     private BigDecimal bigPack;
     private String permit;
+    private String brandNo; //商标编号
     private String storageCondition;
     private Boolean specialManaged;
+
+    public String getBrandNo() {
+        return this.goods == null ? null : this.goods.getBrandNo();
+    }
 
     public Boolean getSpecialManaged() {
         return this.goods == null ? null : this.goods.getSpecialManaged();
@@ -265,16 +272,23 @@ public class RepertoryInDetail {
         this.taxRate = taxRate;
     }
 
+    public BigDecimal getBuyOrderQuality() {
+        return buyOrderQuality;
+    }
+
+    public void setBuyOrderQuality(BigDecimal buyOrderQuality) {
+        this.buyOrderQuality = buyOrderQuality;
+    }
+
     public BigDecimal getInCount() {
+        if (this.inCount == null) {
+            return this.getReceiveQuality();
+        }
         return inCount;
     }
 
     public void setInCount(BigDecimal inCount) {
-        if (inCount == null) {
-            this.inCount = this.receiveQuality;
-        }else {
-            this.inCount = inCount;
-        }
+        this.inCount = inCount;
     }
 
     public BigDecimal getRightCount() {
