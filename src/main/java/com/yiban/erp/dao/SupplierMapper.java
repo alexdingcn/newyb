@@ -12,15 +12,12 @@ public interface SupplierMapper {
 
     int insert(Supplier record);
 
-    int insertSelective(Supplier record);
-
     Supplier selectByPrimaryKey(Long id);
 
     int updateByPrimaryKeySelective(Supplier record);
 
-    int updateByPrimaryKey(Supplier record);
+    List<Supplier> selectAll(Integer companyId);
 
-    List<Supplier> selectAll();
-
-    List<Supplier> searchByNameOrContact(@Param("searchStr") String searchStr);
+    List<Supplier> searchByNameOrContact(@Param("companyId") Integer companyId,
+                                         @Param("searchStr") String searchStr);
 }

@@ -13,19 +13,13 @@ public interface RepertoryInDetailMapper {
 
     int insert(RepertoryInDetail record);
 
-    int insertSelective(RepertoryInDetail record);
-
     RepertoryInDetail selectByPrimaryKey(Long id);
 
     int updateByPrimaryKeySelective(RepertoryInDetail record);
 
-    int updateByPrimaryKey(RepertoryInDetail record);
-
     int deleteByOrderId(Long id);
 
     int insertBatch(@Param("details") List<RepertoryInDetail> details);
-
-    List<RepertoryInDetail> getByOrderIdList(@Param("orderIdList") List<Long> orderIdList);
 
     List<RepertoryInDetail> getByOrderId(Long orderId);
 

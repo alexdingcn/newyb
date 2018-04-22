@@ -17,6 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -30,19 +31,18 @@ public class ShipCompanyController {
     private ShipCompanyMapper shipCompanyMapper;
 
     @RequestMapping(value = "/list", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> list(@RequestParam(name = "name", required = false) String name,
-                                       @RequestParam(name = "license", required =  false) String license,
+    public ResponseEntity<String> list(@RequestParam(name = "search", required = false) String search,
                                        @RequestParam(name = "page", required = false) Integer page,
                                        @RequestParam(name = "pageSize", required = false) Integer pageSize,
                                        @AuthenticationPrincipal User user) {
         Integer limit = pageSize == null || pageSize <= 0 ? null : pageSize;
         Integer offset = (pageSize != null && page != null && page > 0) ? (page -1) * limit : null;
-        String reqName = StringUtils.isBlank(name) ? null : name;
-        String reqLicense = StringUtils.isBlank(license) ? null : license;
-        List<ShipCompany> shipCompanies = shipCompanyMapper.getList(user.getCompanyId(), reqName, reqLicense, offset, limit);
-        int count = 0;
-        if (!shipCompanies.isEmpty()) {
-            count = shipCompanyMapper.getListCount(user.getCompanyId(), reqName, reqLicense);
+        String searchVal = StringUtils.isBlank(search) ? null : search;
+
+        List<ShipCompany> shipCompanies = Collections.emptyList();
+        int count = shipCompanyMapper.getListCount(user.getCompanyId(), searchVal);
+        if (count > 0) {
+            shipCompanies = shipCompanyMapper.getList(user.getCompanyId(), searchVal, offset, limit);
         }
         JSONObject response = new JSONObject();
         response.put("data", shipCompanies);
@@ -50,28 +50,32 @@ public class ShipCompanyController {
         return ResponseEntity.ok().body(response.toJSONString());
     }
 
+    @RequestMapping(value = "/{shipId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> getById(@PathVariable Integer shipId) {
+        ShipCompany shipCompany = shipCompanyMapper.selectByPrimaryKey(shipId);
+        return ResponseEntity.ok().body(JSON.toJSONString(shipCompany));
+    }
+
     @RequestMapping(value = "/save", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> save(@RequestBody ShipCompany shipCompany,
                                        @AuthenticationPrincipal User user) throws Exception {
-        ShipCompany reqBody = UtilTool.trimString(shipCompany);
-        if (reqBody == null || reqBody.getName() == null) {
+        if (shipCompany == null || shipCompany.getName() == null) {
             logger.warn("user:{} save ship company info but params is error.");
             throw new BizException(ErrorCode.SHIP_SAVE_PARAMS_ERROR);
         }
-        if (reqBody.getId() == null) {
-            logger.info("user:{} create a ship company info:{}", user.getId(), JSON.toJSONString(reqBody));
-            reqBody.setCompanyId(user.getCompanyId());
-            reqBody.setCreateBy(user.getNickname());
-            reqBody.setCreateTime(new Date());
-            shipCompanyMapper.insertSelective(reqBody);
+        if (shipCompany.getId() == null) {
+            logger.info("user:{} create a ship company info:{}", user.getId(), JSON.toJSONString(shipCompany));
+            shipCompany.setCompanyId(user.getCompanyId());
+            shipCompany.setCreateBy(user.getNickname());
+            shipCompany.setCreateTime(new Date());
+            shipCompanyMapper.insert(shipCompany);
         }else {
-            logger.info("user:{} update a ship company info:{}", user.getId(), JSON.toJSONString(reqBody));
-            reqBody.setUpdateBy(user.getNickname());
-            reqBody.setUpdateTime(new Date());
-            shipCompanyMapper.updateByPrimaryKeySelective(reqBody);
+            logger.info("user:{} update a ship company info:{}", user.getId(), JSON.toJSONString(shipCompany));
+            shipCompany.setUpdateBy(user.getNickname());
+            shipCompany.setUpdateTime(new Date());
+            shipCompanyMapper.updateByPrimaryKeySelective(shipCompany);
         }
-        return ResponseEntity.ok().body(JSON.toJSONString(reqBody));
+        return ResponseEntity.ok().body(JSON.toJSONString(shipCompany));
     }
-
 
 }

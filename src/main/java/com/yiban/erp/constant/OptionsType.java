@@ -16,6 +16,9 @@ public enum OptionsType {
     WAREHOUSE_CHECK_TYPE("盘点类型"),
     WAREHOUSE_CHECK_STATE("盘点单状态"),
 
+    BILLING_METHOD("结算方式"),
+    SUPPLIER_TYPE("供应商类型"),
+
     STORAGE_METHOD("存储方式"),
     SPECIAL_MED("特殊管理属性"),
     GOODS_UNIT("商品计量单位"),

@@ -1,6 +1,5 @@
 <style lang="less">
     @import '../../styles/common.less';
-	@import './buy-order.less';
 </style>
 
 <template>
@@ -29,17 +28,17 @@
 				</Row>
 			</div>
 			<Table border highlight-row disabled-hover height="250"
-                   :columns="orderListColumns" :data="orderList"
+                   :columns="orderListColumns" :data="orderList" :loading="orderLoading" 
 				   ref="buyOrderListTable" size="small"
                    @on-row-click="handleSelectBuyOrder" 
-                   @on-row-dblclick="choosedItem" 
+                   @on-row-dblclick="dblChoosedItem" 
 				   no-data-text="使用右上方输入搜索条件">
 			</Table>
 		</Card>
 
 		<Card class="margin-top-8">
             <Table border highlight-row height="300"
-                   class="margin-top-8"
+                   class="margin-top-8" :loading="detailLoading" 
                    :columns="orderColumns" :data="orderItems"
                    ref="buyOrderTable" style="width: 100%;" size="small"
                    no-data-text="点击上方订单后查看采购明细">
@@ -105,15 +104,10 @@
                 checkModalShow: false,
                 orderListColumns: [
                     {
-                        type: this.chooseModal ? '' : 'selection',
-                        width: this.chooseModal ? 0 : 60,
-                        align: 'center',
-                    },
-                    {
                         key: 'id',
                         title: '#',
                         align: 'center',
-                        width: 30
+                        width: 100
                     },
                     {
                         title: '订单日期',
@@ -134,7 +128,7 @@
                         title: '供应商',
                         align: 'center',
                         key: 'supplier',
-                        width: 150
+                        width: 170
                     },
                     {
                         title: '供应商代表',
@@ -152,12 +146,33 @@
                         title: '状态',
                         align: 'center',
                         key: 'status',
-                        width: 120,
+                        width: 150,
                         render: (h, params) => {
                             const row = params.row;
-                            const color = row.status === 'INIT' ? 'blue' : row.status === 'CHECKED' ? 'green' : 'red';
-                            const text = row.status === 'INIT' ? '待审' : row.status === 'CHECKED' ? '已审' : '拒绝';
-
+                            let color = 'blue';
+                            let text = '待审';
+                            switch (row.status) {
+                                case 'INIT': 
+                                    color = 'blue';
+                                    text = '待审';
+                                    break;
+                                case 'CHECKED': 
+                                    color = 'green';
+                                    text = '审核通过';
+                                    break;
+                                case 'REJECTED':
+                                    color = 'red';
+                                    text = '审核拒绝';
+                                    break;
+                                case 'SHIPPED': 
+                                    color = '#ff9900';
+                                    text = '已收货';
+                                    break;
+                                default: 
+                                     color = '#80848f';
+                                     text = '未知状态';
+                                     break;
+                            };
                             return h('Tag', {
                                 props: {
                                     type: 'dot',
@@ -175,7 +190,7 @@
                     {
                         title: '审核人',
                         align: 'center',
-                        key: 'checkedBy',
+                        key: 'checkBy',
                         width: 120
                     },
                     {
@@ -184,14 +199,14 @@
                         key: 'checkTime',
                         width: 120,
                         render: (h, params) => {
-                            return moment(params.row.checkTime).format('YYYY-MM-DD');
+                            return params.row.checkTime ? moment(params.row.checkTime).format('YYYY-MM-DD') : '';
                         }
                     },
                     {
                         title: '订单号',
                         align: 'center',
                         key: 'orderNumber',
-                        width: 120
+                        width: 150
                     },
                     {
                         title: '预计到货日',
@@ -217,7 +232,7 @@
                     {
                         title: '运输工具',
                         align: 'center',
-                        key: 'shipTools',
+                        key: 'shipTool',
                         width: 100
                     },
                     {
@@ -227,96 +242,114 @@
                         width: 100
                     }
                 ],
-
                 orderColumns: [
                     {
                         type: 'index',
                         title: '',
                         align: 'center',
-                        width: 30
+                        width: 60
                     },
                     {
                         title: '货号',
                         align: 'center',
                         key: 'goodsId',
-                        width: 50
                     },
                     {
                         title: '商品名称',
                         key: 'goodsName',
                         align: 'center',
-                        width: 150,
                         sortable: true
                     },
                     {
                         title: '产地',
                         key: 'origin',
                         align: 'center',
-                        width: 60
+                        render: (h, params) => {
+                            return params.row.goods.origin;
+                        }
                     },
                     {
                         title: '剂型',
-                        key: 'jx',
+                        key: 'jxName',
                         align: 'center',
-                        width: 60
+                        render: (h, params) => {
+                            return params.row.goods.jxName;
+                        }
                     },
                     {
                         title: '规格',
                         key: 'spec',
                         align: 'center',
-                        width: 80
+                        render: (h, params) => {
+                            return params.row.goods.spec;
+                        }
                     },
                     {
                         title: '生产企业',
                         key: 'factory',
                         align: 'center',
-                        width: 120
+                        render: (h, params) => {
+                            return params.row.goods.factory;
+                        }
                     },
                     {
                         title: '单位',
                         key: 'unitName',
                         align: 'center',
-                        width: 50
+                        render: (h, params) => {
+                            return params.row.goods.unitName;
+                        }
                     },
 
                     {
                         title: '数量',
                         key: 'quantity',
-                        align: 'center',
-                        width: 80
+                        align: 'center'
                     },
                     {
                         title: '单价',
                         key: 'buyPrice',
-                        align: 'center',
-                        width: 80
+                        align: 'center'
                     },
                     {
                         title: '金额',
                         key: 'amount',
-                        align: 'center',
-                        width: 80
+                        align: 'center'
                     },
                     {
                         title: '大件装量',
                         key: 'bigPack',
                         align: 'center',
-                        width: 60
-                    },
-                    {
-                        title: '库存',
-                        key: 'balance',
-                        align: 'center',
-                        width: 100
+                        render: (h, params) => {
+                            return params.row.goods.bigPack;
+                        }
                     },
                     {
                         title: '零售价',
                         key: 'retailPrice',
                         align: 'center',
+                        render: (h, params) => {
+                            return params.row.goods.retailPrice;
+                        }
+                    },
+                    {
+                        title: '批发价',
+                        key: 'batchPrice',
+                        align: 'center',
+                        render: (h, params) => {
+                            return params.row.goods.batchPrice;
+                        }
+                    },
+                    {
+                        title: '当前库存',
+                        key: 'balance',
+                        align: 'center',
                         width: 100
                     }
                 ],
-                currchooseItem: ''
+                currchooseItem: '',
+                orderLoading: false,
+                detailLoading: false
             };
         },
         mounted () {
@@ -331,12 +364,6 @@
         	}
         },
         methods: {
-            rowClassName (row, index) {
-                if (row.status) {
-                    return 'table-row-' + row.status.toLowerCase();
-                }
-                return '';
-            },
             queryOrderList () {
                 var self = this;
                 this.orderList = [];
@@ -348,16 +375,18 @@
                 if(this.chooseModal) {
                     this.query['status'] = 'CHECKED'; //选择模式下,只查询审核通过的订单类型
                 }
+                this.orderLoading = true;
                 util.ajax.post('/buy/list', this.query)
                     .then(function (response) {
+                        self.orderLoading = false;
                         if (response.status === 200 && response.data) {
                             self.orderList = response.data;
-                            if (self.orderList && self.orderList.length > 0) {
-                                self.handleSelectBuyOrder(self.orderList[0]);
-                            }
                         }
+                        self.currchooseItem = {};
+                        self.$refs.buyOrderListTable.clearCurrentRow();
                     })
                     .catch(function (error) {
+                        self.orderLoading = false;
                         util.errorProcessor(self, error);
                     });
             },
@@ -365,53 +394,64 @@
             handleSelectBuyOrder (row) {
                 this.currchooseItem = row;
                 var self = this;
+                self.detailLoading = true;
                 util.ajax.get('/buy/orderdetail/' + row.id)
                     .then(function (response) {
+                        self.detailLoading = false;
                         if (response.status === 200 && response.data) {
                             self.orderItems = response.data;
                         }
                     })
                     .catch(function (error) {
+                        self.detailLoading = false;
                         util.errorProcessor(self, error);
                     });
             },
+
             showCheckModal () {
-                var rows = this.$refs.buyOrderListTable.getSelection();
-                if (!rows || rows.length === 0) {
+                if (!this.currchooseItem || !this.currchooseItem.id) {
                     this.$Message.warning('请选择订单');
-                } else if (rows.length > 1) {
-                    this.$Message.warning('请一次选择一条订单');
                 } else {
-                    this.orderTitle = '订单ID:' + rows[0].id + ' 供应商:' + rows[0].supplier;
+                    this.orderTitle = '订单ID:' + this.currchooseItem.id + ' 供应商:' + this.currchooseItem.supplier;
                     this.checkModalShow = true;
                 }
             },
+
             setChecked (result) {
-                var self = this;
-                var rows = this.$refs.buyOrderListTable.getSelection();
-                if (!rows || rows.length === 0) {
-                    this.$Message.warning('请选择订单');
-                } else if (rows.length > 1) {
-                    this.$Message.warning('请一次选择一条订单');
-                } else if (rows.length == 1) {
-                    util.ajax.post('/buy/status', {
-                        orderId: rows[0].id,
-                        orderStatus: result ? 'CHECKED' : 'REJECTED',
-                        checkResult: this.checkResult
-                    })
-                        .then(function (response) {
-                            self.checkModalShow = false;
-                            if (response.status === 200) {
-                                self.queryOrderList();
-                            }
-                        })
-                        .catch(function (error) {
-                            self.checkModalShow = false;
-                            util.errorProcessor(self, error);
-                        });
+                if (!this.currchooseItem || !this.currchooseItem.id) {
+                    this.$Message.warning('请选选择需要审核的订单');
+                    return;
                 }
+                let self = this;
+                this.$Modal.confirm({
+                    title: '审批确认',
+                    content: '是否确认采购订单信息正确，确认提交审核结果？',
+                    onCancel: () => {},
+                    onOk: () => {
+                        util.ajax.post('/buy/status', {
+                            orderId: self.currchooseItem.id,
+                            orderStatus: result ? 'CHECKED' : 'REJECTED',
+                            checkResult: this.checkResult
+                            })
+                            .then(function (response) {
+                                self.checkModalShow = false;
+                                self.$Message.success('审核结果提交成功');
+                                if (response.status === 200) {
+                                    self.queryOrderList();
+                                }
+                            })
+                            .catch(function (error) {
+                                self.checkModalShow = false;
+                                util.errorProcessor(self, error);
+                            });
+                    }
+                });
             },
 
+            dblChoosedItem(data) {
+                this.currchooseItem = data;
+                this.choosedItem();
+            },
             choosedItem() {
                 if (!this.currchooseItem || !this.currchooseItem.id) {
                     this.$Message.warning('请先选择对应订单信息');

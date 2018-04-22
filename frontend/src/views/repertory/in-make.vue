@@ -16,20 +16,20 @@
                     <Button type="info" icon="filing" @click="getTempOrderBtnClick" > 暂挂提取 </Button>
                     <Button type="ghost" icon="ios-printer" :loading="saving">打印</Button>
 				</ButtonGroup>
-			</div>      
+			</div>
 
 			<Form :label-width="85" :rules="ruleValidate" :model="order" ref="orderForm">
 				<Row>
 					<Col span="6">
                         <FormItem label="供应商" prop="supplierId" >
-                            <Input v-if="editView" v-model="order.supplierName" :disabled="true"></Input>
+                            <Input v-if="editView" v-model="order.supplierName" size="small" :disabled="true"></Input>
                             <supplier-select v-if="!editView" v-model="order.supplierId" size="small" ></supplier-select>
                         </FormItem>
 					</Col>
 					<Col span="6">
                         <FormItem label="供应商代表" prop="supplierContactId" >
                             <supplier-contact-select v-model="order.supplierContactId" 
-                                :supplierId="order.supplierId" 
+                                :supplierId="order.supplierId" :disabled="!order.supplierId" 
                                 size="small"></supplier-contact-select>
                         </FormItem>
 					</Col>
@@ -69,7 +69,7 @@
 					</Col>
 					<Col span="6">
                         <FormItem label="温控方式" >
-                            <temper-control-select v-model="order.tempControlMethod" size="small"></temper-control-select>
+                            <option-select optionType="TEMPER_CONTROL" v-model="order.tempControlMethod" size="small"></option-select>
                         </FormItem>
 					</Col>
                     <Col span="6">
@@ -79,7 +79,7 @@
 					</Col>
                     <Col span="6">
                         <FormItem label="温控状态" >
-                            <temper-status-select v-model="order.tempControlStatus"  size="small"></temper-status-select>
+                            <option-select optionType="TEMPER_STATUS" v-model="order.tempControlStatus" size="small"></option-select>
                         </FormItem>
 					</Col>
 				</Row>
@@ -96,12 +96,12 @@
 					</Col>
                     <Col span="6">
                         <FormItem label="运输方式" prop="shipMethod">
-                            <ship-method-select v-model="order.shipMethod" size="small"></ship-method-select>
+                            <option-select optionType="SHIP_METHOD" v-model="order.shipMethod" size="small"></option-select>
                         </FormItem>
 					</Col>
 					<Col span="6">
                         <FormItem label="运输工具" prop="shipTool">
-                            <ship-tool-select v-model="order.shipTool" size="small" ></ship-tool-select>
+                            <option-select optionType="SHIP_TOOL" v-model="order.shipTool" size="small"></option-select>
                         </FormItem>
 					</Col>
 				</Row>
@@ -147,22 +147,22 @@
 					</Col>
                     <Col span="6">
                         <FormItem label="采购属性" >
-                            <buy-type-select v-model="order.buyType" size="small"></buy-type-select>
+                            <option-select optionType="BUY_TYPE" v-model="order.buyType" size="small"></option-select>
                         </FormItem>
 					</Col>
 					<Col span="6">
                         <FormItem label="发票种类" >
-                            <bill-type-select v-model="order.billType" size="small"></bill-type-select>
+                            <option-select optionType="BILL_TYPE" v-model="order.billType" size="small"></option-select>
                         </FormItem>
 					</Col>
                     <Col span="6">
                         <FormItem label="账期" >
-                            <Input v-model="order.term" size="small" />
+                            <Input number v-model="order.term" size="small" />
                         </FormItem>
 					</Col>
 				</Row>
                 <Row>
-                    <Col span="12">
+                    <Col span="10">
                         <FormItem label="商品" >
                             <good-select ref="goodSelector" size="small" @on-change="onSelectGoods"></good-select>
                         </FormItem>
@@ -213,18 +213,13 @@
     import supplierSelect from "@/views/selector/supplier-select.vue";
     import supplierContactSelect from "@/views/selector/supplier-contact-select.vue";
     import buyerSelect from "@/views/selector/buyer-select.vue";
-    import shipToolSelect from "@/views/selector/ship-tool-select.vue";
-    import shipMethodSelect from "@/views/selector/ship-method-select.vue";
-    import temperControlSelect from "@/views/selector/temper-control-select.vue";
-    import temperStatusSelect from "@/views/selector/temper-status-select.vue";
     import warehouseSelect from "@/views/selector/warehouse-select.vue";
     import shipCompanySelect from "@/views/selector/ship-company-select.vue";
-    import buyTypeSelect from "@/views/selector/buy-type-select.vue";
-    import billTypeSelect from "@/views/selector/bill-type-select.vue";
     import goodSelect from "@/views/selector/good-select.vue";
     import inTemp from "./in-temp.vue";
     import buyOrderList from "@/views/buy/buy-order-list.vue";
     import warehouseLocationModal from "@/views/selector/warehouse-location-modal.vue";
+    import optionSelect from "@/views/selector/option-select.vue";
 
     export default {
         name: 'in-make',
@@ -232,18 +227,13 @@
             supplierSelect,
             supplierContactSelect,
             buyerSelect,
-            shipToolSelect,
-            shipMethodSelect,
-            temperControlSelect,
-            temperStatusSelect,
             shipCompanySelect,
             warehouseSelect,
-            buyTypeSelect,
-            billTypeSelect,
             goodSelect,
             inTemp,
             buyOrderList,
-            warehouseLocationModal
+            warehouseLocationModal,
+            optionSelect
         },
         data () {
             const addWarehouseLocation = (h, location, rowData, index) => {
@@ -258,7 +248,6 @@
                         },
                         on: {
                             'click': () => {
-                                
                                 this.openChooseLocation(rowData, index);
                             }
                         }
@@ -268,12 +257,12 @@
 
             return {
                 saving: false,
-            	totalAmount: 0,
             	edittingRow: {},
                 closeConfirm: false,
                 orderItems: [],
                 order: {
                     supplierId: null,
+                    receiveDate: moment().format('YYYY-MM-DD'),
                 	orderItemIds: []
                 },
                 currEditLocationRow: {},
@@ -342,6 +331,12 @@
                         width: 60
                     },
                     {
+                        title: '采购数',
+                        key: 'buyOrderQuality',
+                        align: 'center',
+                        width: 120
+                    },
+                    {
                         title: '本次收货数量',
                         key: 'receiveQuality',
                         align: 'center',
@@ -350,6 +345,7 @@
                         	var self = this;
                             return h('Input', {
                                 props: {
+                                    number: true,
 								  	value: self.orderItems[params.index][params.column.key]
                                 },
                                 on: {
@@ -434,23 +430,21 @@
                         }
                     },
                     {
-                        title: '有效期至',
-                        key: 'expDate',
+                        title: '金额',
+                        key: 'amount',
                         align: 'center',
-                        width: 150,
+                        width: 130,
                         render: (h, params) => {
-                            let self = this;
-                            return h('DatePicker', {
+                        	var self = this;
+                            return h('Input', {
                                 props: {
-                                    type: 'date',
-                                    placement: 'top',
-                                    value: params.row.expDate
+								  	value: self.orderItems[params.index][params.column.key]
                                 },
                                 on: {
-                                    'on-change': (date) =>{
-                                        let row = self.orderItems[params.index];
-                                        row[params.column.key] = date; 
-                                    }
+ 									'on-blur' (event) {
+ 										let row = self.orderItems[params.index];
+                                        row[params.column.key] = event.target.value;
+ 									}
                                 }
                             });
                         }
@@ -467,6 +461,28 @@
                                     type: 'date',
                                     placement: 'top',
                                     value: params.row.productDate
+                                },
+                                on: {
+                                    'on-change': (date) =>{
+                                        let row = self.orderItems[params.index];
+                                        row[params.column.key] = date; 
+                                    }
+                                }
+                            });
+                        }
+                    },
+                    {
+                        title: '有效期至',
+                        key: 'expDate',
+                        align: 'center',
+                        width: 150,
+                        render: (h, params) => {
+                            let self = this;
+                            return h('DatePicker', {
+                                props: {
+                                    type: 'date',
+                                    placement: 'top',
+                                    value: params.row.expDate
                                 },
                                 on: {
                                     'on-change': (date) =>{
@@ -496,12 +512,6 @@
                                 }
                             });
                         }
-                    },
-                    {
-                        title: '金额',
-                        key: 'amount',
-                        align: 'center',
-                        width: 100
                     },
                     {
                         title: '货位号',
@@ -620,10 +630,15 @@
         activated () {
                 this.clearData();
         },
+        computed: {
+            totalAmount() {
+                return this.orderItems.reduce(function (total, item) { return total + parseFloat(item.amount); }, 0);
+            }
+        },
         watch: {
-        	orderItems: function () {
-        		this.totalAmount = this.orderItems.reduce(function (total, item) { return total + parseFloat(item.amount); }, 0);
-        	}
+        	// orderItems: function () {
+        	// 	this.totalAmount = this.orderItems.reduce(function (total, item) { return total + parseFloat(item.amount); }, 0);
+        	// }
         },
         methods: {
             moment: function () {
@@ -656,7 +671,6 @@
                 let free = row["free"] && !isNaN(row["free"]) ? row["free"] : 0;
                 let num = receiveQuality - free > 0 ? receiveQuality - free : 0;
                 row.amount = (num * price).toFixed(2);
-                this.$set(this.orderItems, index, row);
             },
 
             onSelectGoods (goodsId, goodItem) {
@@ -701,7 +715,7 @@
                     goodsId: goodItem.id,
                     goodsName: goodItem.name,
                     origin: goodItem.origin,
-                    jx: goodItem.jx,
+                    jx: goodItem.jxName,
                     spec: goodItem.spec,
                     factory: goodItem.factory,
                     unitName: goodItem.unitName,
@@ -715,14 +729,14 @@
                     expDate: '',
                     productDate: '',
                     batchCode: '',
-                    amount: '',
+                    amount: 0,
                     warehouseLocation: '',
-                    buyOrderCount: record ? record.buyOrderCount : 0,
-                    balance: record ? record.balance : 0,
-                    ongoingCount: record ? record.ongoingCount : 0,
+                    buyOrderCount: record ? record.buyOrderCount : '',
+                    balance: record ? record.balance : '',
+                    ongoingCount: record ? record.ongoingCount : '',
                     rejectQuality: 0,
                     rejectComment: '',
-                    taxRate: 0
+                    taxRate: goodItem.inTax
                 };
                 this.orderItems.push(obj);
                 this.order.orderItemIds.push(goodItem.id);

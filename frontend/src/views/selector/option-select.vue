@@ -1,31 +1,29 @@
 <template>
-    <div :class="wrapClasses">
-        <Select v-model="optionId" :placeholder="selectPlaceHolder" @on-change="onChange">
-            <Option v-for="item in optionList" :value="item.id" :key="item.id">{{ item.value }}</Option>
-        </Select>
-        <div :class="[prefixCls + '-group-append']">
-            <Button type="ghost" icon="ios-settings-strong" @click="optionModalShow = true;"></Button>
-        </div>
+    <div>
+        <Row>
+            <Col span="20">
+                <Select style="width:100%;" v-model="optionId" clearable filterable :size="size" :placeholder="selectPlaceHolder" @on-change="onChange">
+                    <Option v-for="item in optionList" :value="item.id" :key="item.id">{{ item.value }}</Option>
+                </Select>
+            </Col>
+            <Col span="4">
+                <Button type="ghost" :size="size" icon="ios-settings-strong" @click="optionModalShow = true;"></Button>
+            </Col>
+        </Row>
 
         <Modal v-model="optionModalShow" class="option-modal-position-show">
             <p slot="header">
                 <Icon type="ios-settings-strong"></Icon>
                 <span>{{showTitle || '属性配置'}}</span>
             </p>
-
             <div style="text-align:center">
                 <Row type="flex" justify="end">
-                    <Button type="primary" @click="optionModalAdd = true" >新增</Button>
+                    <Button type="primary" size="small" @click="openAddModal" >新增</Button>
                 </Row>
                 <Row class="margin-top-10 searchable-table-con1">
-                    <can-edit-table
-                            size="small"
-                            refs="table4"
-                            v-model="optionList"
-                            @on-change="handleChange"
-                            :editIncell="true"
-                            :columns-list="unitColumns"
-                    ></can-edit-table>
+                    <Table ref="optionTab" size="small" style="width: 100%" border highlight-row 
+                        :columns="unitColumns" :data="optionList">
+                    </Table>
                 </Row>
             </div>
             <div slot="footer">
@@ -35,7 +33,7 @@
         <Modal v-model="optionModalAdd" width="300px" class="option-modal-position-add">
             <p slot="header">
                 <Icon type="ios-settings-strong"></Icon>
-                <span>新增属性</span>
+                <span>{{newProperty.id ? '维护属性' : '新增属性'}}</span>
             </p>
             <div style="text-align:center">
                 <Form>
@@ -79,9 +77,8 @@ export default {
             required: true
         },
         size: {
-            validator (data) {
-                return oneOf(data, ['small', 'large', 'default']);
-            }
+            type: String,
+            default: 'default'
         },
     },
     watch: {
@@ -102,20 +99,31 @@ export default {
             unitColumns: [
                 {
                     key: 'value',
-                    title: '属性名称',
-                    editable: true
+                    title: '属性名称'
                 },
                 {
                     key: 'description',
-                    title: '属性名称',
-                    editable: true
+                    title: '属性名称'
                 },
                 {
                     title: '操作',
                     align: 'center',
                     width: 180,
-                    key: 'handle',
-                    handle: ['edit','delete']
+                    render: (h, params) => {
+                        return h('Button', {
+                            props: {
+                                type: 'text',
+                                icon: 'edit',
+                                size: 'small'
+                            },
+                            on: {
+                                click: () => {
+                                    this.newProperty = params.row;
+                                    this.optionModalAdd = true;
+                                }
+                            }
+                        }, '修改');
+                    }
                 }
             ],
             optionModalAdd: false,
@@ -128,17 +136,6 @@ export default {
         this.loadOptionList();
     },
     computed: {
-        wrapClasses () {
-            return [
-                `${prefixCls}-wrapper`,
-                {
-                    [`${prefixCls}-wrapper-${this.size}`]: !!this.size,
-                    [`${prefixCls}-group`]: true,
-                    [`${prefixCls}-group-${this.size}`]: !!this.size,
-                    [`${prefixCls}-group-with-append`]: true,
-                }
-            ];
-        },
         showTitle () {
             if (this.optionType && this.allTypes && this.allTypes.length > 0) {
                 for (let i=0; i<this.allTypes.length; i++) {
@@ -162,23 +159,21 @@ export default {
 
         loadOptionList() {
             let reqData = [this.optionType];
+            let typeName = this.optionType;
             util.ajax.post("/options/list", reqData)
-                .then(response => {
-                    if (response.data[this.optionType]) {
-                        this.optionList = response.data[this.optionType];
+                .then((response) => {
+                    this.newProperty = {
+                        type: this.optionType
+                    };
+                    if (response.data && response.data[typeName]) {
+                        this.optionList = response.data[typeName];
                     }else {
                         this.optionList = [];
                     }
                 })
-                .catch(error => {
+                .catch((error) => {
                     util.errorProcessor(this, error);
                 });
-        },
-        handleCellChange (val, index, key) {
-            this.$Message.success('修改了第 ' + (index + 1) + ' 行列名为 ' + key + ' 的数据');
-        },
-        handleChange (val, index) {
-            this.$Message.success('修改了第' + (index + 1) + '行数据');
         },
         onChange (data) {
             let items = this.optionList.filter(item => item.id === data);
@@ -188,6 +183,12 @@ export default {
             }
             this.$emit('input', data);
             this.$emit('on-change', data, item);
+        },
+        openAddModal() {
+            this.optionModalAdd = true;
+            this.newProperty = {
+                type: this.optionType
+            };
         },
         addNewProperty() {
             util.ajax.post("/options/add", this.newProperty)

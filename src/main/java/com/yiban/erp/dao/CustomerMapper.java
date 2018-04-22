@@ -18,13 +18,9 @@ public interface CustomerMapper {
 
     int insert(Customer record);
 
-    int insertSelective(Customer record);
-
     Customer selectByPrimaryKey(Integer id);
 
     int updateByPrimaryKeySelective(Customer record);
-
-    int updateByPrimaryKey(Customer record);
 
     Customer getCustomerDetailById(@Param("companyId") Integer companyId,
                                    @Param("customerId") Integer customerId);
@@ -36,13 +32,13 @@ public interface CustomerMapper {
                        @Param("categoryId") Integer categoryId,
                        @Param("customerName") String customerName,
                        @Param("customerNo") String customerNo,
-                       @Param("shorName") String shorName);
+                       @Param("search") String search);
 
     List<Customer> selectAll(@Param("companyId") Integer companyId,
                              @Param("categoryId") Integer categoryId,
                              @Param("customerName") String customerName,
                              @Param("customerNo") String customerNo,
-                             @Param("shorName") String shorName,
+                             @Param("search") String search,
                              @Param("limit") Integer limit,
                              @Param("offset") Integer offset);
 

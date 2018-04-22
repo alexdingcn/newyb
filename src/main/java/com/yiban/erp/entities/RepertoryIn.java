@@ -1,12 +1,10 @@
 package com.yiban.erp.entities;
 
 import com.yiban.erp.constant.RepertoryInStatus;
+import com.yiban.erp.constant.RepertoryRefType;
 
 import java.math.BigDecimal;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class RepertoryIn {
     private Long id;
@@ -16,6 +14,8 @@ public class RepertoryIn {
     private Long refOrderId;
 
     private String refType;
+
+    private String refTypeName;
 
     private String orderNumber;
 
@@ -106,18 +106,29 @@ public class RepertoryIn {
         return false;
     }
 
-    public void setOptions(List<Options> optionsList) {
+    public void setOptionName(List<Options> optionsList) {
         if (optionsList == null || optionsList.isEmpty()) {
             return;
         }
-        Map<Long, Options> optionsMap = new HashMap<>();
-        optionsList.stream().forEach(item -> optionsMap.put(item.getId(), item));
-        this.tempControlMethodName = optionsMap.get(this.tempControlMethod) != null ? optionsMap.get(this.tempControlMethod).getValue() : null;
-        this.tempControlStatusName = optionsMap.get(this.tempControlStatus) != null ? optionsMap.get(this.tempControlStatus).getValue() : null;
-        this.shipMethodName = optionsMap.get(this.shipMethod) != null ? optionsMap.get(this.shipMethod).getValue() : null;
-        this.shipToolName = optionsMap.get(this.shipToolName) != null ? optionsMap.get(this.shipToolName).getValue() : null;
-        this.buyTypeName = optionsMap.get(this.buyType) != null ? optionsMap.get(this.buyType).getValue() : null;
-        this.billTypeName = optionsMap.get(this.billType) != null ? optionsMap.get(this.billType).getValue() : null;
+        Map<Long, Options> map = new HashMap<>();
+        optionsList.stream().forEach(item -> map.put(item.getId(), item));
+        this.tempControlMethodName = map.get(this.getTempControlMethod()) != null ? map.get(this.getTempControlMethod()).getValue() : null;
+        this.tempControlStatusName = map.get(this.getTempControlStatus()) != null ? map.get(this.getTempControlStatus()).getValue() : null;
+        this.shipMethodName = map.get(this.getShipMethod()) != null ? map.get(this.getShipMethod()).getValue() : null;
+        this.shipToolName = map.get(this.getShipTool()) != null ? map.get(this.getShipTool()).getValue() : null;
+        this.buyTypeName = map.get(this.getBuyType()) != null ? map.get(this.getBuyType()).getValue() : null;
+        this.billTypeName = map.get(this.getBillType()) != null ? map.get(this.getBillType()).getValue() : null;
+    }
+
+    public Set<Long> getOptionIdList() {
+        Set<Long> optionIdSet = new HashSet<>();
+        optionIdSet.add(this.tempControlMethod != null ? this.tempControlMethod : 0);
+        optionIdSet.add(this.tempControlStatus != null ? this.tempControlStatus : 0);
+        optionIdSet.add(this.shipMethod != null ? this.shipMethod : 0);
+        optionIdSet.add(this.shipTool != null ? this.shipTool : 0);
+        optionIdSet.add(this.buyType != null ? this.buyType : 0);
+        optionIdSet.add(this.billType != null ? this.billType : 0);
+        return optionIdSet;
     }
 
     public Long getId() {
@@ -150,6 +161,11 @@ public class RepertoryIn {
 
     public void setRefType(String refType) {
         this.refType = refType == null ? null : refType.trim();
+    }
+
+    public String getRefTypeName() {
+        RepertoryRefType type = RepertoryRefType.getByName(this.getRefType());
+        return type == null ? null : type.getDesc();
     }
 
     public String getOrderNumber() {

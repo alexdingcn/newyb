@@ -469,7 +469,7 @@
       o.order_number as orderNumber, o.ref_no as refNo, o.supplier_id as supplierId, o.supplier_contact_id as supplierContactId,
       o.buyer_id as buyerId, o.status as status, o.key_word as keyWord, o.receive_date as receiveDate,
       o.pay_date as payDate, o.goods_bill_no as goodsBillNo, o.temp_control_method as tempControlMethod,
-      o.receive_temp as receive_temp, o.check_temp as checkTemp, o.temp_control_status as tempControlStatus,
+      o.receive_temp as receiveTemp, o.check_temp as checkTemp, o.temp_control_status as tempControlStatus,
       o.ship_company_id as shipCompanyId, o.ship_method as shipMethod, ship_tool as shipTool,
       o.ship_car_no as shipCardNo, o.ship_driver_name as shipDriverName, o.ship_start_date as shipStartDate,
       o.ship_end_date as shipEndDate, o.ship_entrust_no as shipEntrustNo, o.ship_start_address as shipStartAddress,

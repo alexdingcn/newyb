@@ -12,13 +12,9 @@ public interface SupplierContactMapper {
 
     int insert(SupplierContact record);
 
-    int insertSelective(SupplierContact record);
-
     SupplierContact selectByPrimaryKey(Integer id);
 
     int updateByPrimaryKeySelective(SupplierContact record);
-
-    int updateByPrimaryKey(SupplierContact record);
 
     List<SupplierContact> getSupplierContacts(@Param("supplierId") Long supplierId);
 }

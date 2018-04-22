@@ -9,8 +9,6 @@
     <result column="quantity" property="quantity" jdbcType="DECIMAL" />
     <result column="buy_price" property="buyPrice" jdbcType="DECIMAL" />
     <result column="amount" property="amount" jdbcType="DECIMAL" />
-    <result column="unit_id" property="unitId" jdbcType="INTEGER" />
-    <result column="retail_price" property="retailPrice" jdbcType="DECIMAL" />
     <result column="shipped_quantity" property="shippedQuantity" jdbcType="DECIMAL" />
     <result column="already_fapiao" property="alreadyFapiao" jdbcType="BIT" />
     <result column="created_by" property="createdBy" jdbcType="VARCHAR" />
@@ -19,7 +17,7 @@
     <result column="updated_time" property="updatedTime" jdbcType="TIMESTAMP" />
   </resultMap>
   <sql id="Base_Column_List" >
-    id, buy_order_id, goods_id, goods_name, quantity, buy_price, amount, unit_id, retail_price, 
+    id, buy_order_id, goods_id, goods_name, quantity, buy_price, amount, retail_price,
     shipped_quantity, already_fapiao, created_by, updated_by, created_time, updated_time
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
@@ -30,17 +28,10 @@
   </select>
   <select id="findByOrderId" resultMap="BaseResultMap" parameterType="java.lang.Long" >
     select
-    bd.*,
-      g.origin, g.jx, g.spec,
-      g.factory_id as factoryId, f.name as factory, g.storage_condition as storageCondition,
-      g.unit as goodsUnit, un.name as unitName, g.big_pack as bigPack, g.medium_pack as mediumPack
-    from factory f, buy_order_detail bd, buy_order bo, goods g
-      left join unit un on g.unit = un.id
+      bd.*, bo.warehouse_id as warehouseId
+    from buy_order_detail bd, buy_order bo
     where
-      g.id = bd.goods_id
-      and bd.buy_order_id = bo.id
-      and f.id = g.factory_id
-      and un.id = g.unit
+      bd.buy_order_id = bo.id
       and bd.buy_order_id = #{buyOrderId,jdbcType=BIGINT}
       <if test="companyId != null" >
           and bo.company_id = #{companyId, jdbcType=INTEGER}
@@ -60,111 +51,18 @@
 
   <insert id="insert" parameterType="com.yiban.erp.entities.BuyOrderDetail" useGeneratedKeys="true" keyProperty="id">
     insert into buy_order_detail (buy_order_id, goods_id,
-      goods_name, quantity, buy_price, 
-      amount, unit_id, retail_price, 
+      goods_name, quantity, buy_price, amount,
       shipped_quantity, already_fapiao, created_by, 
       updated_by, created_time, updated_time
       )
     values (#{buyOrderId,jdbcType=BIGINT}, #{goodsId,jdbcType=BIGINT},
       #{goodsName,jdbcType=VARCHAR}, #{quantity,jdbcType=DECIMAL}, #{buyPrice,jdbcType=DECIMAL}, 
-      #{amount,jdbcType=DECIMAL}, #{unitId,jdbcType=INTEGER}, #{retailPrice,jdbcType=DECIMAL}, 
+      #{amount,jdbcType=DECIMAL},
       #{shippedQuantity,jdbcType=DECIMAL}, #{alreadyFapiao,jdbcType=BIT}, #{createdBy,jdbcType=VARCHAR}, 
       #{updatedBy,jdbcType=VARCHAR}, #{createdTime,jdbcType=TIMESTAMP}, #{updatedTime,jdbcType=TIMESTAMP}
       )
   </insert>
-  <insert id="insertSelective" parameterType="com.yiban.erp.entities.BuyOrderDetail" useGeneratedKeys="true" keyProperty="id">
-    insert into buy_order_detail
-    <trim prefix="(" suffix=")" suffixOverrides="," >
 
-      <if test="buyOrderId != null" >
-        buy_order_id,
-      </if>
-      <if test="goodsId != null" >
-        goods_id,
-      </if>
-      <if test="goodsName != null" >
-        goods_name,
-      </if>
-      <if test="quantity != null" >
-        quantity,
-      </if>
-      <if test="buyPrice != null" >
-        buy_price,
-      </if>
-      <if test="amount != null" >
-        amount,
-      </if>
-      <if test="unitId != null" >
-        unit_id,
-      </if>
-      <if test="retailPrice != null" >
-        retail_price,
-      </if>
-      <if test="shippedQuantity != null" >
-        shipped_quantity,
-      </if>
-      <if test="alreadyFapiao != null" >
-        already_fapiao,
-      </if>
-      <if test="createdBy != null" >
-        created_by,
-      </if>
-      <if test="updatedBy != null" >
-        updated_by,
-      </if>
-      <if test="createdTime != null" >
-        created_time,
-      </if>
-      <if test="updatedTime != null" >
-        updated_time,
-      </if>
-    </trim>
-    <trim prefix="values (" suffix=")" suffixOverrides="," >
-
-      <if test="buyOrderId != null" >
-        #{buyOrderId,jdbcType=BIGINT},
-      </if>
-      <if test="goodsId != null" >
-        #{goodsId,jdbcType=BIGINT},
-      </if>
-      <if test="goodsName != null" >
-        #{goodsName,jdbcType=VARCHAR},
-      </if>
-      <if test="quantity != null" >
-        #{quantity,jdbcType=DECIMAL},
-      </if>
-      <if test="buyPrice != null" >
-        #{buyPrice,jdbcType=DECIMAL},
-      </if>
-      <if test="amount != null" >
-        #{amount,jdbcType=DECIMAL},
-      </if>
-      <if test="unitId != null" >
-        #{unitId,jdbcType=INTEGER},
-      </if>
-      <if test="retailPrice != null" >
-        #{retailPrice,jdbcType=DECIMAL},
-      </if>
-      <if test="shippedQuantity != null" >
-        #{shippedQuantity,jdbcType=DECIMAL},
-      </if>
-      <if test="alreadyFapiao != null" >
-        #{alreadyFapiao,jdbcType=BIT},
-      </if>
-      <if test="createdBy != null" >
-        #{createdBy,jdbcType=VARCHAR},
-      </if>
-      <if test="updatedBy != null" >
-        #{updatedBy,jdbcType=VARCHAR},
-      </if>
-      <if test="createdTime != null" >
-        #{createdTime,jdbcType=TIMESTAMP},
-      </if>
-      <if test="updatedTime != null" >
-        #{updatedTime,jdbcType=TIMESTAMP},
-      </if>
-    </trim>
-  </insert>
   <update id="updateByPrimaryKeySelective" parameterType="com.yiban.erp.entities.BuyOrderDetail" >
     update buy_order_detail
     <set >
@@ -185,12 +83,6 @@
       </if>
       <if test="amount != null" >
         amount = #{amount,jdbcType=DECIMAL},
-      </if>
-      <if test="unitId != null" >
-        unit_id = #{unitId,jdbcType=INTEGER},
-      </if>
-      <if test="retailPrice != null" >
-        retail_price = #{retailPrice,jdbcType=DECIMAL},
       </if>
       <if test="shippedQuantity != null" >
         shipped_quantity = #{shippedQuantity,jdbcType=DECIMAL},
@@ -213,22 +105,5 @@
     </set>
     where id = #{id,jdbcType=BIGINT}
   </update>
-  <update id="updateByPrimaryKey" parameterType="com.yiban.erp.entities.BuyOrderDetail" >
-    update buy_order_detail
-    set buy_order_id = #{buyOrderId,jdbcType=BIGINT},
-      goods_id = #{goodsId,jdbcType=BIGINT},
-      goods_name = #{goodsName,jdbcType=VARCHAR},
-      quantity = #{quantity,jdbcType=DECIMAL},
-      buy_price = #{buyPrice,jdbcType=DECIMAL},
-      amount = #{amount,jdbcType=DECIMAL},
-      unit_id = #{unitId,jdbcType=INTEGER},
-      retail_price = #{retailPrice,jdbcType=DECIMAL},
-      shipped_quantity = #{shippedQuantity,jdbcType=DECIMAL},
-      already_fapiao = #{alreadyFapiao,jdbcType=BIT},
-      created_by = #{createdBy,jdbcType=VARCHAR},
-      updated_by = #{updatedBy,jdbcType=VARCHAR},
-      created_time = #{createdTime,jdbcType=TIMESTAMP},
-      updated_time = #{updatedTime,jdbcType=TIMESTAMP}
-    where id = #{id,jdbcType=BIGINT}
-  </update>
+
 </mapper>

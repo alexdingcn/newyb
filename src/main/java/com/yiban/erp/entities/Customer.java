@@ -1,5 +1,9 @@
 package com.yiban.erp.entities;
 
+import com.alibaba.fastjson.JSON;
+import org.apache.commons.lang3.StringUtils;
+
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -10,15 +14,15 @@ public class Customer {
 
     private String customerNo;
 
-    private String name;
+    private Integer categoryId;
 
-    private String shorName;
+    private String name;
 
     private String pinyin;
 
     private String status;
 
-    private Boolean isDisable; //是否禁用 true-警用，false-启用
+    private Boolean enabled;
 
     private Boolean canSaleSpecial;
 
@@ -26,13 +30,13 @@ public class Customer {
 
     private String city;
 
+    private List<PlaceCode> placeCodes;
+
     private String address;
 
     private String postcode;
 
-    private Integer categoryId;
-
-    private String legalPersion;
+    private String legalPerson;
 
     private String employee;
 
@@ -46,7 +50,7 @@ public class Customer {
 
     private String saleArea;
 
-    private String salesman;
+    private String saleMan;
 
     private String memberLevel;
 
@@ -54,13 +58,19 @@ public class Customer {
 
     private String classAttTwo;
 
-    private String sealModel;
+    private String stampTemplate;
 
-    private String billModel;
+    private String billTemplate;
+
+    private Boolean isColdBusiness;
+
+    private Boolean isTwoTicket;
 
     private String businessScope;
 
-    private Integer accountPeriod;
+    private List<Long> businessScopeIdList;
+
+    private Integer accountTerm;
 
     private String accountName;
 
@@ -68,7 +78,7 @@ public class Customer {
 
     private String bankName;
 
-    private String dutyAccount;
+    private String taxAccount;
 
     private String quaCheck;
 
@@ -88,9 +98,42 @@ public class Customer {
 
     private CustomerCategory customerCategory; //客户分类信息
 
-    private List<CustomerCert> customerCerts;   //客户证件列表
-
     private List<CustomerRep> customerReps; //客户代表人信息列表
+
+    public List<Long> getBusinessScopeIdList() {
+        if (StringUtils.isNotBlank(this.getBusinessScope())) {
+            return JSON.parseArray(this.getBusinessScope(), Long.class);
+        }
+        return Collections.emptyList();
+    }
+
+    public void setBusinessScopeIdList(List<Long> businessScopeIdList) {
+        this.businessScopeIdList = businessScopeIdList;
+        if (businessScopeIdList != null && !businessScopeIdList.isEmpty()) {
+            this.setBusinessScope(JSON.toJSONString(businessScopeIdList));
+        }
+    }
+
+    public String getCity() {
+        return this.placeCodes == null ? "" : JSON.toJSONString(placeCodes);
+    }
+
+    public void setCity(String city) {
+        if (city != null) {
+            this.city = city.trim();
+            this.placeCodes = JSON.parseArray(this.city, PlaceCode.class);
+        } else {
+            this.city = null;
+        }
+    }
+
+    public List<PlaceCode> getPlaceCodes() {
+        return placeCodes;
+    }
+
+    public void setPlaceCodes(List<PlaceCode> placeCodes) {
+        this.placeCodes = placeCodes;
+    }
 
     public Integer getId() {
         return id;
@@ -116,20 +159,20 @@ public class Customer {
         this.customerNo = customerNo;
     }
 
+    public Integer getCategoryId() {
+        return categoryId;
+    }
+
+    public void setCategoryId(Integer categoryId) {
+        this.categoryId = categoryId;
+    }
+
     public String getName() {
         return name;
     }
 
     public void setName(String name) {
-        this.name = name == null ? null : name.trim();
-    }
-
-    public String getShorName() {
-        return shorName;
-    }
-
-    public void setShorName(String shorName) {
-        this.shorName = shorName == null ? null : shorName.trim();
+        this.name = name;
     }
 
     public String getPinyin() {
@@ -137,7 +180,7 @@ public class Customer {
     }
 
     public void setPinyin(String pinyin) {
-        this.pinyin = pinyin == null ? null : pinyin.trim();
+        this.pinyin = pinyin;
     }
 
     public String getStatus() {
@@ -148,12 +191,12 @@ public class Customer {
         this.status = status;
     }
 
-    public Boolean getDisable() {
-        return isDisable;
+    public Boolean getEnabled() {
+        return enabled;
     }
 
-    public void setDisable(Boolean disable) {
-        isDisable = disable;
+    public void setEnabled(Boolean enabled) {
+        this.enabled = enabled;
     }
 
     public Boolean getCanSaleSpecial() {
@@ -164,20 +207,12 @@ public class Customer {
         this.canSaleSpecial = canSaleSpecial;
     }
 
-    public Boolean getIsLimitSpecial() {
+    public Boolean getLimitSpecial() {
         return isLimitSpecial;
     }
 
-    public void setIsLimitSpecial(Boolean isLimitSpecial) {
-        this.isLimitSpecial = isLimitSpecial;
-    }
-
-    public String getCity() {
-        return city;
-    }
-
-    public void setCity(String city) {
-        this.city = city == null ? null : city.trim();
+    public void setLimitSpecial(Boolean limitSpecial) {
+        isLimitSpecial = limitSpecial;
     }
 
     public String getAddress() {
@@ -185,7 +220,7 @@ public class Customer {
     }
 
     public void setAddress(String address) {
-        this.address = address == null ? null : address.trim();
+        this.address = address;
     }
 
     public String getPostcode() {
@@ -193,23 +228,15 @@ public class Customer {
     }
 
     public void setPostcode(String postcode) {
-        this.postcode = postcode == null ? null : postcode.trim();
+        this.postcode = postcode;
     }
 
-    public Integer getCategoryId() {
-        return categoryId;
+    public String getLegalPerson() {
+        return legalPerson;
     }
 
-    public void setCategoryId(Integer categoryId) {
-        this.categoryId = categoryId;
-    }
-
-    public String getLegalPersion() {
-        return legalPersion;
-    }
-
-    public void setLegalPersion(String legalPersion) {
-        this.legalPersion = legalPersion == null ? null : legalPersion.trim();
+    public void setLegalPerson(String legalPerson) {
+        this.legalPerson = legalPerson;
     }
 
     public String getEmployee() {
@@ -217,7 +244,7 @@ public class Customer {
     }
 
     public void setEmployee(String employee) {
-        this.employee = employee == null ? null : employee.trim();
+        this.employee = employee;
     }
 
     public String getContactPhone() {
@@ -225,7 +252,7 @@ public class Customer {
     }
 
     public void setContactPhone(String contactPhone) {
-        this.contactPhone = contactPhone == null ? null : contactPhone.trim();
+        this.contactPhone = contactPhone;
     }
 
     public String getContactFax() {
@@ -233,7 +260,7 @@ public class Customer {
     }
 
     public void setContactFax(String contactFax) {
-        this.contactFax = contactFax == null ? null : contactFax.trim();
+        this.contactFax = contactFax;
     }
 
     public String getEmail() {
@@ -241,15 +268,15 @@ public class Customer {
     }
 
     public void setEmail(String email) {
-        this.email = email == null ? null : email.trim();
+        this.email = email;
     }
 
-    public Boolean getIsDirection() {
+    public Boolean getDirection() {
         return isDirection;
     }
 
-    public void setIsDirection(Boolean isDirection) {
-        this.isDirection = isDirection;
+    public void setDirection(Boolean direction) {
+        isDirection = direction;
     }
 
     public String getSaleArea() {
@@ -257,15 +284,15 @@ public class Customer {
     }
 
     public void setSaleArea(String saleArea) {
-        this.saleArea = saleArea == null ? null : saleArea.trim();
+        this.saleArea = saleArea;
     }
 
-    public String getSalesman() {
-        return salesman;
+    public String getSaleMan() {
+        return saleMan;
     }
 
-    public void setSalesman(String salesman) {
-        this.salesman = salesman == null ? null : salesman.trim();
+    public void setSaleMan(String saleMan) {
+        this.saleMan = saleMan;
     }
 
     public String getMemberLevel() {
@@ -273,7 +300,7 @@ public class Customer {
     }
 
     public void setMemberLevel(String memberLevel) {
-        this.memberLevel = memberLevel == null ? null : memberLevel.trim();
+        this.memberLevel = memberLevel;
     }
 
     public String getClassAttOne() {
@@ -281,7 +308,7 @@ public class Customer {
     }
 
     public void setClassAttOne(String classAttOne) {
-        this.classAttOne = classAttOne == null ? null : classAttOne.trim();
+        this.classAttOne = classAttOne;
     }
 
     public String getClassAttTwo() {
@@ -289,23 +316,39 @@ public class Customer {
     }
 
     public void setClassAttTwo(String classAttTwo) {
-        this.classAttTwo = classAttTwo == null ? null : classAttTwo.trim();
+        this.classAttTwo = classAttTwo;
     }
 
-    public String getSealModel() {
-        return sealModel;
+    public String getStampTemplate() {
+        return stampTemplate;
     }
 
-    public void setSealModel(String sealModel) {
-        this.sealModel = sealModel;
+    public void setStampTemplate(String stampTemplate) {
+        this.stampTemplate = stampTemplate;
     }
 
-    public String getBillModel() {
-        return billModel;
+    public String getBillTemplate() {
+        return billTemplate;
     }
 
-    public void setBillModel(String billModel) {
-        this.billModel = billModel;
+    public void setBillTemplate(String billTemplate) {
+        this.billTemplate = billTemplate;
+    }
+
+    public Boolean getColdBusiness() {
+        return isColdBusiness;
+    }
+
+    public void setColdBusiness(Boolean coldBusiness) {
+        isColdBusiness = coldBusiness;
+    }
+
+    public Boolean getTwoTicket() {
+        return isTwoTicket;
+    }
+
+    public void setTwoTicket(Boolean twoTicket) {
+        isTwoTicket = twoTicket;
     }
 
     public String getBusinessScope() {
@@ -313,15 +356,15 @@ public class Customer {
     }
 
     public void setBusinessScope(String businessScope) {
-        this.businessScope = businessScope == null ? null : businessScope.trim();
+        this.businessScope = businessScope;
     }
 
-    public Integer getAccountPeriod() {
-        return accountPeriod;
+    public Integer getAccountTerm() {
+        return accountTerm;
     }
 
-    public void setAccountPeriod(Integer accountPeriod) {
-        this.accountPeriod = accountPeriod;
+    public void setAccountTerm(Integer accountTerm) {
+        this.accountTerm = accountTerm;
     }
 
     public String getAccountName() {
@@ -329,7 +372,7 @@ public class Customer {
     }
 
     public void setAccountName(String accountName) {
-        this.accountName = accountName == null ? null : accountName.trim();
+        this.accountName = accountName;
     }
 
     public String getBankAccount() {
@@ -337,7 +380,7 @@ public class Customer {
     }
 
     public void setBankAccount(String bankAccount) {
-        this.bankAccount = bankAccount == null ? null : bankAccount.trim();
+        this.bankAccount = bankAccount;
     }
 
     public String getBankName() {
@@ -345,15 +388,31 @@ public class Customer {
     }
 
     public void setBankName(String bankName) {
-        this.bankName = bankName == null ? null : bankName.trim();
+        this.bankName = bankName;
     }
 
-    public String getDutyAccount() {
-        return dutyAccount;
+    public String getTaxAccount() {
+        return taxAccount;
     }
 
-    public void setDutyAccount(String dutyAccount) {
-        this.dutyAccount = dutyAccount == null ? null : dutyAccount.trim();
+    public void setTaxAccount(String taxAccount) {
+        this.taxAccount = taxAccount;
+    }
+
+    public String getQuaCheck() {
+        return quaCheck;
+    }
+
+    public void setQuaCheck(String quaCheck) {
+        this.quaCheck = quaCheck;
+    }
+
+    public String getFileNo() {
+        return fileNo;
+    }
+
+    public void setFileNo(String fileNo) {
+        this.fileNo = fileNo;
     }
 
     public String getSuperviseNo() {
@@ -361,7 +420,7 @@ public class Customer {
     }
 
     public void setSuperviseNo(String superviseNo) {
-        this.superviseNo = superviseNo == null ? null : superviseNo.trim();
+        this.superviseNo = superviseNo;
     }
 
     public String getComment() {
@@ -369,7 +428,7 @@ public class Customer {
     }
 
     public void setComment(String comment) {
-        this.comment = comment == null ? null : comment.trim();
+        this.comment = comment;
     }
 
     public Date getCreateTime() {
@@ -393,7 +452,7 @@ public class Customer {
     }
 
     public void setCreateBy(String createBy) {
-        this.createBy = createBy == null ? null : createBy.trim();
+        this.createBy = createBy;
     }
 
     public String getUpdateBy() {
@@ -401,7 +460,7 @@ public class Customer {
     }
 
     public void setUpdateBy(String updateBy) {
-        this.updateBy = updateBy == null ? null : updateBy.trim();
+        this.updateBy = updateBy;
     }
 
     public CustomerCategory getCustomerCategory() {
@@ -412,35 +471,11 @@ public class Customer {
         this.customerCategory = customerCategory;
     }
 
-    public List<CustomerCert> getCustomerCerts() {
-        return customerCerts;
-    }
-
-    public void setCustomerCerts(List<CustomerCert> customerCerts) {
-        this.customerCerts = customerCerts;
-    }
-
     public List<CustomerRep> getCustomerReps() {
         return customerReps;
     }
 
     public void setCustomerReps(List<CustomerRep> customerReps) {
         this.customerReps = customerReps;
-    }
-
-    public String getQuaCheck() {
-        return quaCheck;
-    }
-
-    public void setQuaCheck(String quaCheck) {
-        this.quaCheck = quaCheck;
-    }
-
-    public String getFileNo() {
-        return fileNo;
-    }
-
-    public void setFileNo(String fileNo) {
-        this.fileNo = fileNo;
     }
 }

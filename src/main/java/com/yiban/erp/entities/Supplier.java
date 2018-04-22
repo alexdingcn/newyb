@@ -1,42 +1,37 @@
 package com.yiban.erp.entities;
 
 import com.alibaba.fastjson.JSON;
+import org.apache.commons.lang3.StringUtils;
 
+import java.math.BigDecimal;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
 public class Supplier {
     private Long id;
 
+    private Integer companyId;
+
     private String name;
-
-    private String shortName;
-
-    private Boolean enabled;
-
-    private String origin;
-
-    private String permit;
-
-    private Date permitExp;
-
-    private String license;
-
-    private Date licenseExp;
 
     private String pinyin;
 
-    private String address;
+    private Boolean enabled;
+
+    private Integer term;
 
     private String city;
 
     private List<PlaceCode> placeCodes;
 
+    private String address;
+
     private String postcode;
 
-    private String phone;
-
     private String fax;
+
+    private String phone;
 
     private String email;
 
@@ -46,123 +41,82 @@ public class Supplier {
 
     private String employee;
 
-    private Boolean isGmp;
+    private String legalPerson;
 
-    private String bankName;
+    private BigDecimal discount;
 
     private String bankAccount;
 
+    private String bankName;
+
+    private String bankNumber;
+
     private String taxNumber;
 
-    private String comment;
+    private Long billingMethodId;
 
-    private Date createdTime;
+    private Long supplierTypeId;
 
-    private String createdBy;
+    private Boolean haveStamp;
 
-    private Date updatedTime;
+    private Boolean haveBillTemplate;
 
-    private String updatedBy;
+    private Boolean checkFirst;
 
-    private Integer companyId;
+    private Boolean isFactory;
 
-    private String digitalAuditCode;
+    private Boolean isDirectSupplier;
 
-    private String warehouseAddr;
+    private Boolean isColdBusiness;
+
+    private Boolean canSpecial;
+
+    private String warehouseAddress;
 
     private String businessScope;
 
-    private String archiveNumber;
+    private List<Long> businessScopeIdList;
 
-    private Boolean needFirstCheck;
+    private String comment;
 
-    public Long getId() {
-        return id;
-    }
+    private String license;
 
-    public void setId(Long id) {
-        this.id = id;
-    }
+    private Date licenseExp;
 
-    public String getName() {
-        return name;
-    }
+    private String organizationNo;
 
-    public void setName(String name) {
-        this.name = name == null ? null : name.trim();
-    }
+    private Date organizationExp;
 
-    public String getShortName() {
-        return shortName;
-    }
+    private String gspGmpNo;
 
-    public void setShortName(String shortName) {
-        this.shortName = shortName == null ? null : shortName.trim();
-    }
+    private Date gspGmpExp;
 
-    public Boolean getEnabled() {
-        return enabled;
-    }
+    private String qualityProtocolNo;
 
-    public void setEnabled(Boolean enabled) {
-        this.enabled = enabled;
-    }
+    private Date qualityProtocolExp;
 
-    public String getOrigin() {
-        return origin;
-    }
+    private String saleProtocolNo;
 
-    public void setOrigin(String origin) {
-        this.origin = origin == null ? null : origin.trim();
-    }
+    private Date saleProtocolExp;
 
-    public String getPermit() {
-        return permit;
-    }
+    private String legalProtocolNo;
 
-    public void setPermit(String permit) {
-        this.permit = permit == null ? null : permit.trim();
-    }
+    private Date legalProtocolExp;
 
-    public Date getPermitExp() {
-        return permitExp;
-    }
+    private String otherProtocolNo;
 
-    public void setPermitExp(Date permitExp) {
-        this.permitExp = permitExp;
-    }
+    private Date otherProtocolExp;
 
-    public String getLicense() {
-        return license;
-    }
+    private String fileNo;
 
-    public void setLicense(String license) {
-        this.license = license == null ? null : license.trim();
-    }
+    private String createdBy;
 
-    public Date getLicenseExp() {
-        return licenseExp;
-    }
+    private String updatedBy;
 
-    public void setLicenseExp(Date licenseExp) {
-        this.licenseExp = licenseExp;
-    }
+    private Date createdTime;
 
-    public String getPinyin() {
-        return pinyin;
-    }
+    private Date updatedTime;
 
-    public void setPinyin(String pinyin) {
-        this.pinyin = pinyin == null ? null : pinyin.trim();
-    }
-
-    public String getAddress() {
-        return address;
-    }
-
-    public void setAddress(String address) {
-        this.address = address == null ? null : address.trim();
-    }
 
     public String getCity() {
         return this.placeCodes == null ? "" : JSON.toJSONString(placeCodes);
@@ -177,132 +131,34 @@ public class Supplier {
         }
     }
 
-    public String getPostcode() {
-        return postcode;
+    public List<Long> getBusinessScopeIdList() {
+        if (StringUtils.isNotBlank(this.getBusinessScope())) {
+            return JSON.parseArray(this.getBusinessScope(), Long.class);
+        }
+        return Collections.emptyList();
     }
 
-    public void setPostcode(String postcode) {
-        this.postcode = postcode == null ? null : postcode.trim();
+    public void setBusinessScopeIdList(List<Long> businessScopeIdList) {
+        this.businessScopeIdList = businessScopeIdList;
+        if (businessScopeIdList != null && !businessScopeIdList.isEmpty()) {
+            this.setBusinessScope(JSON.toJSONString(businessScopeIdList));
+        }
     }
 
-    public String getPhone() {
-        return phone;
+    public String getBusinessScope() {
+        return businessScope;
     }
 
-    public void setPhone(String phone) {
-        this.phone = phone == null ? null : phone.trim();
+    public void setBusinessScope(String businessScope) {
+        this.businessScope = businessScope;
     }
 
-    public String getFax() {
-        return fax;
+    public Long getId() {
+        return id;
     }
 
-    public void setFax(String fax) {
-        this.fax = fax == null ? null : fax.trim();
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email == null ? null : email.trim();
-    }
-
-    public String getContact() {
-        return contact;
-    }
-
-    public void setContact(String contact) {
-        this.contact = contact == null ? null : contact.trim();
-    }
-
-    public String getContactPhone() {
-        return contactPhone;
-    }
-
-    public void setContactPhone(String contactPhone) {
-        this.contactPhone = contactPhone == null ? null : contactPhone.trim();
-    }
-
-    public String getEmployee() {
-        return employee;
-    }
-
-    public void setEmployee(String employee) {
-        this.employee = employee == null ? null : employee.trim();
-    }
-
-    public Boolean getIsGmp() {
-        return isGmp;
-    }
-
-    public void setIsGmp(Boolean isGmp) {
-        this.isGmp = isGmp;
-    }
-
-    public String getBankName() {
-        return bankName;
-    }
-
-    public void setBankName(String bankName) {
-        this.bankName = bankName == null ? null : bankName.trim();
-    }
-
-    public String getBankAccount() {
-        return bankAccount;
-    }
-
-    public void setBankAccount(String bankAccount) {
-        this.bankAccount = bankAccount == null ? null : bankAccount.trim();
-    }
-
-    public String getTaxNumber() {
-        return taxNumber;
-    }
-
-    public void setTaxNumber(String taxNumber) {
-        this.taxNumber = taxNumber == null ? null : taxNumber.trim();
-    }
-
-    public String getComment() {
-        return comment;
-    }
-
-    public void setComment(String comment) {
-        this.comment = comment == null ? null : comment.trim();
-    }
-
-    public Date getCreatedTime() {
-        return createdTime;
-    }
-
-    public void setCreatedTime(Date createdTime) {
-        this.createdTime = createdTime;
-    }
-
-    public String getCreatedBy() {
-        return createdBy;
-    }
-
-    public void setCreatedBy(String createdBy) {
-        this.createdBy = createdBy == null ? null : createdBy.trim();
-    }
-
-    public Date getUpdatedTime() {
-        return updatedTime;
-    }
-
-    public void setUpdatedTime(Date updatedTime) {
-        this.updatedTime = updatedTime;
-    }
-
-    public String getUpdatedBy() {
-        return updatedBy;
-    }
-
-    public void setUpdatedBy(String updatedBy) {
-        this.updatedBy = updatedBy == null ? null : updatedBy.trim();
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public Integer getCompanyId() {
@@ -313,44 +169,36 @@ public class Supplier {
         this.companyId = companyId;
     }
 
-    public String getDigitalAuditCode() {
-        return digitalAuditCode;
+    public String getName() {
+        return name;
     }
 
-    public void setDigitalAuditCode(String digitalAuditCode) {
-        this.digitalAuditCode = digitalAuditCode == null ? null : digitalAuditCode.trim();
+    public void setName(String name) {
+        this.name = name;
     }
 
-    public String getWarehouseAddr() {
-        return warehouseAddr;
+    public String getPinyin() {
+        return pinyin;
     }
 
-    public void setWarehouseAddr(String warehouseAddr) {
-        this.warehouseAddr = warehouseAddr == null ? null : warehouseAddr.trim();
+    public void setPinyin(String pinyin) {
+        this.pinyin = pinyin;
     }
 
-    public String getBusinessScope() {
-        return businessScope;
+    public Boolean getEnabled() {
+        return enabled;
     }
 
-    public void setBusinessScope(String businessScope) {
-        this.businessScope = businessScope == null ? null : businessScope.trim();
+    public void setEnabled(Boolean enabled) {
+        this.enabled = enabled;
     }
 
-    public String getArchiveNumber() {
-        return archiveNumber;
+    public Integer getTerm() {
+        return term;
     }
 
-    public void setArchiveNumber(String archiveNumber) {
-        this.archiveNumber = archiveNumber == null ? null : archiveNumber.trim();
-    }
-
-    public Boolean getNeedFirstCheck() {
-        return needFirstCheck;
-    }
-
-    public void setNeedFirstCheck(Boolean needFirstCheck) {
-        this.needFirstCheck = needFirstCheck;
+    public void setTerm(Integer term) {
+        this.term = term;
     }
 
     public List<PlaceCode> getPlaceCodes() {
@@ -359,5 +207,359 @@ public class Supplier {
 
     public void setPlaceCodes(List<PlaceCode> placeCodes) {
         this.placeCodes = placeCodes;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    public String getPostcode() {
+        return postcode;
+    }
+
+    public void setPostcode(String postcode) {
+        this.postcode = postcode;
+    }
+
+    public String getFax() {
+        return fax;
+    }
+
+    public void setFax(String fax) {
+        this.fax = fax;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getContact() {
+        return contact;
+    }
+
+    public void setContact(String contact) {
+        this.contact = contact;
+    }
+
+    public String getContactPhone() {
+        return contactPhone;
+    }
+
+    public void setContactPhone(String contactPhone) {
+        this.contactPhone = contactPhone;
+    }
+
+    public String getEmployee() {
+        return employee;
+    }
+
+    public void setEmployee(String employee) {
+        this.employee = employee;
+    }
+
+    public String getLegalPerson() {
+        return legalPerson;
+    }
+
+    public void setLegalPerson(String legalPerson) {
+        this.legalPerson = legalPerson;
+    }
+
+    public BigDecimal getDiscount() {
+        return discount;
+    }
+
+    public void setDiscount(BigDecimal discount) {
+        this.discount = discount;
+    }
+
+    public String getBankAccount() {
+        return bankAccount;
+    }
+
+    public void setBankAccount(String bankAccount) {
+        this.bankAccount = bankAccount;
+    }
+
+    public String getBankName() {
+        return bankName;
+    }
+
+    public void setBankName(String bankName) {
+        this.bankName = bankName;
+    }
+
+    public String getBankNumber() {
+        return bankNumber;
+    }
+
+    public void setBankNumber(String bankNumber) {
+        this.bankNumber = bankNumber;
+    }
+
+    public String getTaxNumber() {
+        return taxNumber;
+    }
+
+    public void setTaxNumber(String taxNumber) {
+        this.taxNumber = taxNumber;
+    }
+
+    public Long getBillingMethodId() {
+        return billingMethodId;
+    }
+
+    public void setBillingMethodId(Long billingMethodId) {
+        this.billingMethodId = billingMethodId;
+    }
+
+    public Long getSupplierTypeId() {
+        return supplierTypeId;
+    }
+
+    public void setSupplierTypeId(Long supplierTypeId) {
+        this.supplierTypeId = supplierTypeId;
+    }
+
+    public Boolean getHaveStamp() {
+        return haveStamp;
+    }
+
+    public void setHaveStamp(Boolean haveStamp) {
+        this.haveStamp = haveStamp;
+    }
+
+    public Boolean getHaveBillTemplate() {
+        return haveBillTemplate;
+    }
+
+    public void setHaveBillTemplate(Boolean haveBillTemplate) {
+        this.haveBillTemplate = haveBillTemplate;
+    }
+
+    public Boolean getCheckFirst() {
+        return checkFirst;
+    }
+
+    public void setCheckFirst(Boolean checkFirst) {
+        this.checkFirst = checkFirst;
+    }
+
+    public Boolean getFactory() {
+        return isFactory;
+    }
+
+    public void setFactory(Boolean factory) {
+        isFactory = factory;
+    }
+
+    public Boolean getDirectSupplier() {
+        return isDirectSupplier;
+    }
+
+    public void setDirectSupplier(Boolean directSupplier) {
+        isDirectSupplier = directSupplier;
+    }
+
+    public Boolean getColdBusiness() {
+        return isColdBusiness;
+    }
+
+    public void setColdBusiness(Boolean coldBusiness) {
+        isColdBusiness = coldBusiness;
+    }
+
+    public Boolean getCanSpecial() {
+        return canSpecial;
+    }
+
+    public void setCanSpecial(Boolean canSpecial) {
+        this.canSpecial = canSpecial;
+    }
+
+    public String getWarehouseAddress() {
+        return warehouseAddress;
+    }
+
+    public void setWarehouseAddress(String warehouseAddress) {
+        this.warehouseAddress = warehouseAddress;
+    }
+
+
+
+    public String getComment() {
+        return comment;
+    }
+
+    public void setComment(String comment) {
+        this.comment = comment;
+    }
+
+    public String getLicense() {
+        return license;
+    }
+
+    public void setLicense(String license) {
+        this.license = license;
+    }
+
+    public Date getLicenseExp() {
+        return licenseExp;
+    }
+
+    public void setLicenseExp(Date licenseExp) {
+        this.licenseExp = licenseExp;
+    }
+
+    public String getOrganizationNo() {
+        return organizationNo;
+    }
+
+    public void setOrganizationNo(String organizationNo) {
+        this.organizationNo = organizationNo;
+    }
+
+    public Date getOrganizationExp() {
+        return organizationExp;
+    }
+
+    public void setOrganizationExp(Date organizationExp) {
+        this.organizationExp = organizationExp;
+    }
+
+    public String getGspGmpNo() {
+        return gspGmpNo;
+    }
+
+    public void setGspGmpNo(String gspGmpNo) {
+        this.gspGmpNo = gspGmpNo;
+    }
+
+    public Date getGspGmpExp() {
+        return gspGmpExp;
+    }
+
+    public void setGspGmpExp(Date gspGmpExp) {
+        this.gspGmpExp = gspGmpExp;
+    }
+
+    public String getQualityProtocolNo() {
+        return qualityProtocolNo;
+    }
+
+    public void setQualityProtocolNo(String qualityProtocolNo) {
+        this.qualityProtocolNo = qualityProtocolNo;
+    }
+
+    public Date getQualityProtocolExp() {
+        return qualityProtocolExp;
+    }
+
+    public void setQualityProtocolExp(Date qualityProtocolExp) {
+        this.qualityProtocolExp = qualityProtocolExp;
+    }
+
+    public String getSaleProtocolNo() {
+        return saleProtocolNo;
+    }
+
+    public void setSaleProtocolNo(String saleProtocolNo) {
+        this.saleProtocolNo = saleProtocolNo;
+    }
+
+    public Date getSaleProtocolExp() {
+        return saleProtocolExp;
+    }
+
+    public void setSaleProtocolExp(Date saleProtocolExp) {
+        this.saleProtocolExp = saleProtocolExp;
+    }
+
+    public String getLegalProtocolNo() {
+        return legalProtocolNo;
+    }
+
+    public void setLegalProtocolNo(String legalProtocolNo) {
+        this.legalProtocolNo = legalProtocolNo;
+    }
+
+    public Date getLegalProtocolExp() {
+        return legalProtocolExp;
+    }
+
+    public void setLegalProtocolExp(Date legalProtocolExp) {
+        this.legalProtocolExp = legalProtocolExp;
+    }
+
+    public String getOtherProtocolNo() {
+        return otherProtocolNo;
+    }
+
+    public void setOtherProtocolNo(String otherProtocolNo) {
+        this.otherProtocolNo = otherProtocolNo;
+    }
+
+    public Date getOtherProtocolExp() {
+        return otherProtocolExp;
+    }
+
+    public void setOtherProtocolExp(Date otherProtocolExp) {
+        this.otherProtocolExp = otherProtocolExp;
+    }
+
+    public String getFileNo() {
+        return fileNo;
+    }
+
+    public void setFileNo(String fileNo) {
+        this.fileNo = fileNo;
+    }
+
+    public String getCreatedBy() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(String createdBy) {
+        this.createdBy = createdBy;
+    }
+
+    public String getUpdatedBy() {
+        return updatedBy;
+    }
+
+    public void setUpdatedBy(String updatedBy) {
+        this.updatedBy = updatedBy;
+    }
+
+    public Date getCreatedTime() {
+        return createdTime;
+    }
+
+    public void setCreatedTime(Date createdTime) {
+        this.createdTime = createdTime;
+    }
+
+    public Date getUpdatedTime() {
+        return updatedTime;
+    }
+
+    public void setUpdatedTime(Date updatedTime) {
+        this.updatedTime = updatedTime;
     }
 }

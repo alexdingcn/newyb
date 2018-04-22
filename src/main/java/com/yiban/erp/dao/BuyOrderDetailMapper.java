@@ -12,13 +12,9 @@ public interface BuyOrderDetailMapper {
 
     int insert(BuyOrderDetail record);
 
-    int insertSelective(BuyOrderDetail record);
-
     BuyOrderDetail selectByPrimaryKey(Long id);
 
     int updateByPrimaryKeySelective(BuyOrderDetail record);
-
-    int updateByPrimaryKey(BuyOrderDetail record);
 
     List<BuyOrderDetail> findByOrderId(@Param("buyOrderId") Long buyOrderId,
                                        @Param("companyId") Integer companyId);

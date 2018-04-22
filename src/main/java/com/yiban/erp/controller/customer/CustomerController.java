@@ -9,6 +9,7 @@ import com.yiban.erp.entities.CustomerRep;
 import com.yiban.erp.entities.User;
 import com.yiban.erp.exception.*;
 import com.yiban.erp.service.customer.CustomerService;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,32 +38,36 @@ public class CustomerController {
                                      @RequestParam(name = "categoryId", required = false) Integer reqCategoryId,
                                      @RequestParam(name = "customerName", required = false) String reqCustomerName,
                                      @RequestParam(name = "customerNo", required = false) String reqCustomerNo,
-                                     @RequestParam(name= "shorName", required = false) String reqShorName,
+                                     @RequestParam(name = "search", required = false) String search,
                                      @AuthenticationPrincipal User user)  throws Exception {
-        logger.info("get customer list page:{}, size:{}, categoryId:{}, customerName:{}, customerNo:{}, shorName:{}",
-                page, size, reqCategoryId, reqCustomerName, reqCustomerNo, reqShorName);
+        logger.info("get customer list page:{}, size:{}, categoryId:{}, customerName:{}, customerNo:{}, search：{}",
+                page, size, reqCategoryId, reqCustomerName, reqCustomerNo, search);
         Integer categoryId = reqCategoryId == null || reqCategoryId <=0 ? null : reqCategoryId;
         String customerName = null;
         String customerNo = null;
-        String shorName = null;
         if (reqCustomerName != null && !"".equals(reqCustomerName.trim())) {
             customerName = reqCustomerName.trim();
         }
         if (reqCustomerNo != null && !"".equals(reqCustomerNo.trim())) {
             customerNo = reqCustomerNo.trim();
         }
-        if (reqShorName != null && !"".equals(reqShorName.trim())) {
-            shorName = reqShorName.trim();
-        }
         Integer pageSize = size == null ? 10 : size;
         Integer offset = (page == null || page <= 0 ? 0 : page - 1) * pageSize;
-
-        int count = customerMapper.selectAllCount(user.getCompanyId(), categoryId, customerName, customerNo, shorName);
-        List<Customer> customers = customerMapper.selectAll(user.getCompanyId(), categoryId, customerName, customerNo, shorName, pageSize, offset);
+        if (StringUtils.isBlank(search)) {
+            search = null;
+        }
+        int count = customerMapper.selectAllCount(user.getCompanyId(), categoryId, customerName, customerNo, search);
+        List<Customer> customers = customerMapper.selectAll(user.getCompanyId(), categoryId, customerName, customerNo, search, pageSize, offset);
         JSONObject result = new JSONObject();
         result.put("count", count);
         result.put("data", customers);
         return ResponseEntity.ok().body((JSON) result);
+    }
+
+    @RequestMapping(value = "/{customerId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> getById(@PathVariable Integer customerId) {
+        Customer customer = customerMapper.selectByPrimaryKey(customerId);
+        return ResponseEntity.ok().body(JSON.toJSONString(customer));
     }
 
     @RequestMapping(value = "/delete", method = RequestMethod.POST)
@@ -98,42 +103,6 @@ public class CustomerController {
         return ResponseEntity.ok().body(JSON.toJSONString(result));
     }
 
-    @RequestMapping(value = "/cert/list", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<JSON> getCertList(@RequestParam("customerId") Integer customerId) throws Exception {
-        logger.debug("request get customer:{} cert list", customerId);
-        List<CustomerCert> certs = customerService.getCertList(customerId);
-        return ResponseEntity.ok().body((JSON) JSON.toJSON(certs));
-    }
-
-    @RequestMapping(value = "/cert/add", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> certAdd(@RequestBody CustomerCert cert,
-                                          @AuthenticationPrincipal User user) throws Exception {
-        cert.setCreateBy(user.getNickname());
-        logger.info("user:{} request to add customer cert, customerId:", user.getId(), cert.getCustomerId());
-        CustomerCert result = customerService.addCert(cert);
-        return ResponseEntity.ok().body(JSON.toJSONString(result));
-    }
-
-    @RequestMapping(value = "/cert/update", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> certUpdate(@RequestBody CustomerCert cert,
-                                             @AuthenticationPrincipal User user) throws Exception {
-        cert.setUpdateBy(user.getNickname());
-        logger.info("user:{} request to update customer cert, id:", user.getId(), cert.getId());
-        CustomerCert result = customerService.updateCert(cert);
-        return ResponseEntity.ok().body(JSON.toJSONString(result));
-    }
-
-    @RequestMapping(value = "/cert/delete", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> certRemove(@RequestBody String removeIds,
-                                             @AuthenticationPrincipal User user) throws Exception {
-        logger.info("user:{} request to remove customer cert, ids:", user.getId(), removeIds);
-        List<Integer> idList = JSON.parseArray(removeIds, Integer.class);
-        int count = customerService.removeCerts(idList);
-        JSONObject result = new JSONObject();
-        result.put("count", count);
-        return ResponseEntity.ok().body(result.toJSONString());
-    }
-
     @RequestMapping(value = "/rep/list", method = RequestMethod.GET)
     public ResponseEntity<JSON> getRepList(@RequestParam("customerId") Integer customerId) throws Exception {
         logger.debug("get an request to get customer rep list by customerId:", customerId);
@@ -159,12 +128,11 @@ public class CustomerController {
         return ResponseEntity.ok().body(JSON.toJSONString(result));
     }
 
-    @RequestMapping(value = "/rep/delete", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> repRemove(@RequestBody String removeIds,
+    @RequestMapping(value = "/rep/delete/{repId}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> repRemove(@PathVariable Integer repId,
                                             @AuthenticationPrincipal User user) throws Exception {
-        logger.info("user:{} request to remove customer rep, ids:", user.getId(), removeIds);
-        List<Integer> idList = JSON.parseArray(removeIds, Integer.class);
-        int count = customerService.removeReps(idList);
+        logger.info("user:{} request to remove customer rep, id:", user.getId(), repId);
+        int count = customerService.removeRep(repId);
         JSONObject result = new JSONObject();
         result.put("count", count);
         return ResponseEntity.ok().body(result.toJSONString());

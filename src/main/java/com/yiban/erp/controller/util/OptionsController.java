@@ -86,7 +86,9 @@ public class OptionsController {
             option.setEnabled(true);
             result = optionsMapper.insert(option);
         } else {
-            optionsMapper.updateByPrimaryKey(option);
+            option.setUpdatedBy(user.getNickname());
+            option.setUpdatedTime(new Date());
+            result = optionsMapper.updateByPrimaryKey(option);
         }
         if (result <= 0) {
             throw new BizException(ErrorCode.FAILED_INSERT_OR_UPDATE_FROM_DB);

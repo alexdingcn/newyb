@@ -7,7 +7,7 @@ public class CurrentBalanceResp {
     private BigDecimal lastPrice; //最后一次的采购价
     private Integer buyOrderCount; //当前正在下单的数量
     private BigDecimal ongoingCount; //在推申购订单申购数量
-    private Integer balance; //当前库存量
+    private BigDecimal balance; //当前库存量
 
     private Long goodsId;
 
@@ -35,11 +35,11 @@ public class CurrentBalanceResp {
         this.buyOrderCount = buyOrderCount;
     }
 
-    public Integer getBalance() {
+    public BigDecimal getBalance() {
         return balance;
     }
 
-    public void setBalance(Integer balance) {
+    public void setBalance(BigDecimal balance) {
         this.balance = balance;
     }
 

@@ -8,13 +8,16 @@
     <result column="idcard" property="idcard" jdbcType="VARCHAR" />
     <result column="enabled" property="enabled" jdbcType="BIT" />
     <result column="phone" property="phone" jdbcType="VARCHAR" />
+    <result column="city" property="city" jdbcType="VARCHAR" />
+    <result column="business_scope" property="businessScope" jdbcType="VARCHAR" />
+    <result column="comment" property="comment" jdbcType="VARCHAR"/>
     <result column="created_by" property="createdBy" jdbcType="VARCHAR" />
     <result column="updated_by" property="updatedBy" jdbcType="VARCHAR" />
     <result column="created_time" property="createdTime" jdbcType="TIMESTAMP" />
     <result column="updated_time" property="updatedTime" jdbcType="TIMESTAMP" />
   </resultMap>
   <sql id="Base_Column_List" >
-    id, supplier_id, name, idcard, enabled, phone, created_by, updated_by, created_time, 
+    id, supplier_id, name, idcard, enabled, phone, city, business_scope, comment, created_by, updated_by, created_time,
     updated_time
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
@@ -28,9 +31,7 @@
     <include refid="Base_Column_List" />
     from supplier_contact
     where 1=1
-    <if test="supplierId != null" >
       and supplier_id = #{supplierId}
-    </if>
   </select>
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
     delete from supplier_contact
@@ -38,78 +39,16 @@
   </delete>
   <insert id="insert" parameterType="com.yiban.erp.entities.SupplierContact" useGeneratedKeys="true" keyProperty="id">
     insert into supplier_contact (supplier_id, name,
-      idcard, enabled, phone, 
+      idcard, enabled, phone, city, business_scope, comment,
       created_by, updated_by, created_time, 
       updated_time)
     values ( #{supplierId,jdbcType=BIGINT}, #{name,jdbcType=VARCHAR},
-      #{idcard,jdbcType=VARCHAR}, #{enabled,jdbcType=BIT}, #{phone,jdbcType=VARCHAR}, 
+      #{idcard,jdbcType=VARCHAR}, #{enabled,jdbcType=BIT}, #{phone,jdbcType=VARCHAR},
+      #{city,jdbcType=VARCHAR}, #{businessScope,jdbcType=VARCHAR}, #{comment,jdbcType=VARCHAR},
       #{createdBy,jdbcType=VARCHAR}, #{updatedBy,jdbcType=VARCHAR}, #{createdTime,jdbcType=TIMESTAMP}, 
       #{updatedTime,jdbcType=TIMESTAMP})
   </insert>
-  <insert id="insertSelective" parameterType="com.yiban.erp.entities.SupplierContact" useGeneratedKeys="true" keyProperty="id">
-    insert into supplier_contact
-    <trim prefix="(" suffix=")" suffixOverrides="," >
-      <if test="supplierId != null" >
-        supplier_id,
-      </if>
-      <if test="name != null" >
-        name,
-      </if>
-      <if test="idcard != null" >
-        idcard,
-      </if>
-      <if test="enabled != null" >
-        enabled,
-      </if>
-      <if test="phone != null" >
-        phone,
-      </if>
-      <if test="createdBy != null" >
-        created_by,
-      </if>
-      <if test="updatedBy != null" >
-        updated_by,
-      </if>
-      <if test="createdTime != null" >
-        created_time,
-      </if>
-      <if test="updatedTime != null" >
-        updated_time,
-      </if>
-    </trim>
-    <trim prefix="values (" suffix=")" suffixOverrides="," >
-      <if test="id != null" >
-        #{id,jdbcType=INTEGER},
-      </if>
-      <if test="supplierId != null" >
-        #{supplierId,jdbcType=BIGINT},
-      </if>
-      <if test="name != null" >
-        #{name,jdbcType=VARCHAR},
-      </if>
-      <if test="idcard != null" >
-        #{idcard,jdbcType=VARCHAR},
-      </if>
-      <if test="enabled != null" >
-        #{enabled,jdbcType=BIT},
-      </if>
-      <if test="phone != null" >
-        #{phone,jdbcType=VARCHAR},
-      </if>
-      <if test="createdBy != null" >
-        #{createdBy,jdbcType=VARCHAR},
-      </if>
-      <if test="updatedBy != null" >
-        #{updatedBy,jdbcType=VARCHAR},
-      </if>
-      <if test="createdTime != null" >
-        #{createdTime,jdbcType=TIMESTAMP},
-      </if>
-      <if test="updatedTime != null" >
-        #{updatedTime,jdbcType=TIMESTAMP},
-      </if>
-    </trim>
-  </insert>
+
   <update id="updateByPrimaryKeySelective" parameterType="com.yiban.erp.entities.SupplierContact" >
     update supplier_contact
     <set >
@@ -124,6 +63,15 @@
       </if>
       <if test="phone != null" >
         phone = #{phone,jdbcType=VARCHAR},
+      </if>
+      <if test="city != null" >
+        city = #{city,jdbcType=VARCHAR},
+      </if>
+      <if test="businessScope != null" >
+        business_scope = #{businessScope, jdbcType=VARCHAR},
+      </if>
+      <if test="comment != null">
+        comment = #{comment, jdbcType=VARCHAR},
       </if>
       <if test="createdBy != null" >
         created_by = #{createdBy,jdbcType=VARCHAR},
@@ -140,17 +88,5 @@
     </set>
     where id = #{id,jdbcType=BIGINT}
   </update>
-  <update id="updateByPrimaryKey" parameterType="com.yiban.erp.entities.SupplierContact" >
-    update supplier_contact
-    set supplier_id = #{supplierId,jdbcType=BIGINT},
-      name = #{name,jdbcType=VARCHAR},
-      idcard = #{idcard,jdbcType=VARCHAR},
-      enabled = #{enabled,jdbcType=BIT},
-      phone = #{phone,jdbcType=VARCHAR},
-      created_by = #{createdBy,jdbcType=VARCHAR},
-      updated_by = #{updatedBy,jdbcType=VARCHAR},
-      created_time = #{createdTime,jdbcType=TIMESTAMP},
-      updated_time = #{updatedTime,jdbcType=TIMESTAMP}
-    where id = #{id,jdbcType=BIGINT}
-  </update>
+
 </mapper>

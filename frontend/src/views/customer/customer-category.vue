@@ -5,9 +5,6 @@
 <template>
     <Modal v-model="isShowModal" :closable="false" :title="modalTitle">
         <Form ref="custCatForm" :model="custCatFormData" :rules="ruleValidate" label-position="right" :label-width="100" class="margin-right-10">
-            <FormItem label="分类编码" prop="categoryNo">
-                <Input type="text" v-model="custCatFormData.categoryNo" placeholder="输入客户类编码"></Input>
-            </FormItem>
             <FormItem label="类别名称" prop="name">
                 <Input type="text" v-model="custCatFormData.name" placeholder="输入客户类名称"></Input>
             </FormItem>
@@ -63,14 +60,6 @@ export default {
         }
     },
     data () {
-        const validCategoryNoExist = (rule, value, callback) => {
-            let categoryNoVal = this.custCatFormData.categoryNo;
-            if (isNaN(categoryNoVal)) {
-                callback(new Error('分类编码格式为数字'));
-            } else {
-                callback();
-            }
-        };
         const validNameExist = (rule, value, callback) => {
             if (this.custCatFormData.name && this.custCatFormData.name.toString().trim() != '') {
                 callback();
@@ -95,10 +84,6 @@ export default {
                     { required: true, message: '类别名称不能为空', trigger: 'blur' },
                     { validator: validNameExist, trigger: 'blur' }
                 ],
-                categoryNo: [
-                    { required: true, message: '分类编码不能为空', trigger: 'blur' },
-                    { validator: validCategoryNoExist, trigger: 'blur' }
-                ]
             }
         };
     },
@@ -142,7 +127,6 @@ export default {
         initUpdData () {
             if (this.action === 'edit' && this.editeData) {
                 this.custCatFormData.id = this.editeData.id;
-                this.custCatFormData.categoryNo = this.editeData.categoryNo;
                 this.custCatFormData.name = this.editeData.name;
                 this.custCatFormData.parentId = this.editeData.parentId;
                 this.custCatFormData.comment = this.editeData.comment;

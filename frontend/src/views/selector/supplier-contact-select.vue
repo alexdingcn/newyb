@@ -1,9 +1,9 @@
 
 <template>
-   <Select v-model="id" filterable clearable :disabled="optionList.length === 0"
+   <Select v-model="id" filterable clearable :disabled="disabled"
         :loading="selectLoading" placeholder="供应商代表" :size="size" 
         @on-change="onChange">
-        <Option v-for="item in optionList" :value="item.id" :key="item.id">{{ item.name }}</Option>
+        <Option v-for="item in optionList" :value="item.id" :disabled="!item.enabled" :key="item.id">{{ item.name }}</Option>
     </Select>
 </template>
 

@@ -10,15 +10,11 @@ import java.util.List;
 public interface CustomerCategoryMapper {
     int deleteByPrimaryKey(Integer id);
 
-    int insert(CustomerCategory record);
-
     int insertSelective(CustomerCategory record);
 
     CustomerCategory selectByPrimaryKey(Integer id);
 
     int updateByPrimaryKeySelective(CustomerCategory record);
-
-    int updateByPrimaryKey(CustomerCategory record);
 
     List<CustomerCategory> getAllByCompanyId(Integer companyId);
 

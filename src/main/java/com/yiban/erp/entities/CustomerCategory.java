@@ -7,8 +7,6 @@ public class CustomerCategory {
 
     private Integer companyId;
 
-    private String categoryNo;
-
     private String name;
 
     private Integer parentId;
@@ -39,14 +37,6 @@ public class CustomerCategory {
 
     public void setCompanyId(Integer companyId) {
         this.companyId = companyId;
-    }
-
-    public String getCategoryNo() {
-        return categoryNo;
-    }
-
-    public void setCategoryNo(String categoryNo) {
-        this.categoryNo = categoryNo;
     }
 
     public String getName() {

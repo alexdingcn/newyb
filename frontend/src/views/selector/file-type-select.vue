@@ -1,6 +1,6 @@
 
 <template>
-  <Select v-model="id" filterable clearable :disabled="disabled" placeholder="请选择档案类型" 
+  <Select v-model="id" filterable clearable filterable :disabled="disabled" placeholder="请选择档案类型" 
         :size="size" 
         @on-change="onChange">
         <Option v-for="item in optionList" :value="item.typeName" :key="item.typeName">{{item.typeName}}</Option>

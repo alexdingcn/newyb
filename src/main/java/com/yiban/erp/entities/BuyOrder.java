@@ -20,11 +20,11 @@ public class BuyOrder {
 
     private String status;
 
-    private Integer shipMethodId;
+    private Long shipMethodId;
 
-    private Integer shipToolId;
+    private Long shipToolId;
 
-    private Integer temperControlId;
+    private Long temperControlId;
 
     private Integer warehouseId;
 
@@ -43,6 +43,10 @@ public class BuyOrder {
     private Date createdTime;
 
     private Date updatedTime;
+
+    private String checkBy; //审核人
+    private String checkResult; //审核结论
+    private Date checkTime; //审核时间
 
     private List<BuyOrderDetail> details;
 
@@ -112,27 +116,27 @@ public class BuyOrder {
         this.status = status == null ? null : status.name();
     }
 
-    public Integer getShipMethodId() {
+    public Long getShipMethodId() {
         return shipMethodId;
     }
 
-    public void setShipMethodId(Integer shipMethodId) {
+    public void setShipMethodId(Long shipMethodId) {
         this.shipMethodId = shipMethodId;
     }
 
-    public Integer getShipToolId() {
+    public Long getShipToolId() {
         return shipToolId;
     }
 
-    public void setShipToolId(Integer shipToolId) {
+    public void setShipToolId(Long shipToolId) {
         this.shipToolId = shipToolId;
     }
 
-    public Integer getTemperControlId() {
+    public Long getTemperControlId() {
         return temperControlId;
     }
 
-    public void setTemperControlId(Integer temperControlId) {
+    public void setTemperControlId(Long temperControlId) {
         this.temperControlId = temperControlId;
     }
 
@@ -208,6 +212,30 @@ public class BuyOrder {
         this.updatedTime = updatedTime;
     }
 
+    public String getCheckBy() {
+        return checkBy;
+    }
+
+    public void setCheckBy(String checkBy) {
+        this.checkBy = checkBy;
+    }
+
+    public String getCheckResult() {
+        return checkResult;
+    }
+
+    public void setCheckResult(String checkResult) {
+        this.checkResult = checkResult;
+    }
+
+    public Date getCheckTime() {
+        return checkTime;
+    }
+
+    public void setCheckTime(Date checkTime) {
+        this.checkTime = checkTime;
+    }
+
     public List<BuyOrderRequest> getOrderItems() {
         return orderItems;
     }
@@ -234,7 +262,6 @@ public class BuyOrder {
                 detail.setQuantity(req.getQuantity());
                 detail.setBuyPrice(req.getPrice());
                 detail.setAmount(req.getAmount());
-                detail.setUnitId(req.getUnit());
                 detail.setShippedQuantity(BigDecimal.ZERO);
                 detail.setBuyOrderId(this.getId());
                 detail.setAlreadyFapiao(false);
@@ -258,6 +285,19 @@ public class BuyOrder {
             return true;
         }
         return false;
+    }
+
+    public boolean canUpdateStatus() {
+        BuyOrderStatus orderStatus = getOrderStatus();
+        switch (orderStatus) {
+            case INIT:
+            case CHECKED:
+            case REJECTED:
+            case CHECKING:
+                return true;
+            default:
+                return false;
+        }
     }
 
     public String getSupplierContact() {

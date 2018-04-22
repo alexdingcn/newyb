@@ -9,13 +9,13 @@ public class ShipCompany {
 
     private String name;
 
-    private Boolean disabled;
+    private Boolean enabled;
 
     private String license;
 
     private Date licenseExp;
 
-    private String licenseFileNo;
+    private String fileNo;
 
     private String employee;
 
@@ -29,7 +29,7 @@ public class ShipCompany {
 
     private String contactPhone;
 
-    private String posecode;
+    private String postcode;
 
     private String address;
 
@@ -67,12 +67,12 @@ public class ShipCompany {
         this.name = name == null ? null : name.trim();
     }
 
-    public Boolean getDisabled() {
-        return disabled;
+    public Boolean getEnabled() {
+        return enabled;
     }
 
-    public void setDisabled(Boolean disabled) {
-        this.disabled = disabled;
+    public void setEnabled(Boolean enabled) {
+        this.enabled = enabled;
     }
 
     public String getLicense() {
@@ -91,12 +91,12 @@ public class ShipCompany {
         this.licenseExp = licenseExp;
     }
 
-    public String getLicenseFileNo() {
-        return licenseFileNo;
+    public String getFileNo() {
+        return fileNo;
     }
 
-    public void setLicenseFileNo(String licenseFileNo) {
-        this.licenseFileNo = licenseFileNo == null ? null : licenseFileNo.trim();
+    public void setFileNo(String fileNo) {
+        this.fileNo = fileNo;
     }
 
     public String getEmployee() {
@@ -147,12 +147,12 @@ public class ShipCompany {
         this.contactPhone = contactPhone == null ? null : contactPhone.trim();
     }
 
-    public String getPosecode() {
-        return posecode;
+    public String getPostcode() {
+        return postcode;
     }
 
-    public void setPosecode(String posecode) {
-        this.posecode = posecode == null ? null : posecode.trim();
+    public void setPostcode(String postcode) {
+        this.postcode = postcode;
     }
 
     public String getAddress() {

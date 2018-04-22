@@ -6,6 +6,8 @@ import com.alibaba.fastjson.JSONObject;
 import com.yiban.erp.dao.SupplierMapper;
 import com.yiban.erp.entities.Supplier;
 import com.yiban.erp.entities.User;
+import com.yiban.erp.exception.BizRuntimeException;
+import com.yiban.erp.exception.ErrorCode;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,19 +36,20 @@ public class SupplierController {
      * @return
      */
     @RequestMapping(value = "/list", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> list() {
-        List<Supplier> supplierList = supplierMapper.selectAll();
+    public ResponseEntity<String> list(@AuthenticationPrincipal User user) {
+        List<Supplier> supplierList = supplierMapper.selectAll(user.getCompanyId());
         return ResponseEntity.ok().body(JSON.toJSONString(supplierList));
     }
 
     @RequestMapping(value = "/search", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> search(@RequestBody Map requestMap) {
+    public ResponseEntity<String> search(@RequestBody Map requestMap,
+                                         @AuthenticationPrincipal User user) {
         String searchStr = (String) requestMap.get("search");
         if (StringUtils.isNotEmpty(searchStr)) {
-            List<Supplier> supplierList = supplierMapper.searchByNameOrContact(searchStr);
+            List<Supplier> supplierList = supplierMapper.searchByNameOrContact(user.getCompanyId(), searchStr);
             return ResponseEntity.ok().body(JSON.toJSONString(supplierList));
         } else {
-            return list();
+            return list(user);
         }
     }
 
@@ -57,7 +60,9 @@ public class SupplierController {
     }
 
     @RequestMapping(value = "/remove", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> remove(@RequestBody String payload) {
+    public ResponseEntity<String> remove(@RequestBody String payload,
+                                         @AuthenticationPrincipal User user) {
+        logger.info("user:{} request to remove supplier:{}", user.getId(), payload);
         JSONObject requestParams = JSON.parseObject(payload);
         JSONArray supplierIds = requestParams.getJSONArray("ids");
         if (supplierIds != null) {
@@ -71,24 +76,24 @@ public class SupplierController {
         return ResponseEntity.ok().build();
     }
 
-    @RequestMapping(value = "/add", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/save", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> add(@AuthenticationPrincipal User user,
                                       @RequestBody Supplier supplier) {
         logger.info("ADD new supplier:{}", supplier.getName());
-
         int result = 0;
         if (supplier.getId() == null) {
+            supplier.setCompanyId(user.getCompanyId());
             supplier.setCreatedBy(user.getNickname());
             supplier.setCreatedTime(new Date());
-            result = supplierMapper.insertSelective(supplier);
+            result = supplierMapper.insert(supplier);
         } else {
             supplier.setUpdatedBy(user.getNickname());
             supplier.setUpdatedTime(new Date());
-            result = supplierMapper.updateByPrimaryKey(supplier);
+            result = supplierMapper.updateByPrimaryKeySelective(supplier);
         }
         if (result > 0) {
-            return ResponseEntity.ok().body(supplier.getId().toString());
+            return ResponseEntity.ok().body(JSON.toJSONString(supplier));
         }
-        return ResponseEntity.badRequest().body("Failed to insert/update");
+        throw new BizRuntimeException(ErrorCode.FAILED_UPDATE_FROM_DB);
     }
 }

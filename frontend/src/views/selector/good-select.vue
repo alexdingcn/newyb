@@ -7,11 +7,12 @@
         :clearable="true"
         remote
         placeholder="商品名称/拼音"
+        :disabled="disabled" 
         :size="selectSize"
         @on-change="onChange"
         :remote-method="queryGoods"
         :loading="goodsLoading">
-        <Option v-for="option in goodsOptions" :value="option.id" :label="option.name" :key="option.id">
+        <Option v-for="option in goodsOptions" :value="option.id" :label="option.name" :key="option.id" :disabled="!option.enable">
             <span class="option-goods-name">{{ option.name }}</span>
             <span class="option-goods-spec">{{option.jx}} | {{ option.spec }} | {{option.factory}}</span>
         </Option>
@@ -24,7 +25,7 @@ import util from '@/libs/util.js';
 
 export default {
     name: 'good-select',
-    props: ['value', 'size'],
+    props: ['value', 'disabled', 'size'],
     data () {
         return {
             id: '',
@@ -45,7 +46,7 @@ export default {
                 this.goodsLoading = true;
                 util.ajax.get('/goods/list',
                     { params:
-                        {search: query, page: 1, size: 50}
+                        {search: query, page: 1, size: 80}
                     })
                     .then(function (response) {
                         self.goodsLoading = false;
@@ -60,6 +61,7 @@ export default {
             }
         },
         clearSingleSelect() {
+            this.id = '';
             this.$refs.goodsSelect.clearSingleSelect();
         },
         onChange (data) {

@@ -19,7 +19,6 @@
         <Table ref="orderTable" border highlight-row disabled-hover height="250" 
             size="small" :columns="orderColumns" :data="orderData" :loading="orderLoading" 
             @on-row-click="handleSelectOrder"
-            @on-row-dblclick="handleDbClick" 
             no-data-text="使用右上方输入搜索条件">
         </Table>
 
@@ -187,7 +186,14 @@ export default {
             }else {
                 this.chooseItem = row;
                 this.chooseIndex = index;
-                this.detailData = row.details;
+                util.ajax.get('/repertory/in/detail/' + row.id)
+                    .then((response) => {
+                        this.detailData = response.data;
+                        this.chooseItem.details = response.data;
+                    })
+                    .catch((error) => {
+                        util.errorProcessor(this, error);
+                    });
             }
         },
 
@@ -211,16 +217,8 @@ export default {
                             util.errorProcessor(self, error);
                         });
                 },
-                onCancel: () => {
-                }
+                onCancel: () => {}
             });
-        },
-        handleDbClick(data, index) {
-            this.chooseItem = data;
-            this.chooseIndex = index;
-            this.detailData = data.details;
-
-            this.getConfirm();
         },
 
         getConfirm() {

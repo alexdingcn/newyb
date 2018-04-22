@@ -1,6 +1,9 @@
 package com.yiban.erp.entities;
 
+import com.alibaba.fastjson.JSON;
+
 import java.util.Date;
+import java.util.List;
 
 public class SupplierContact {
     private Long id;
@@ -14,6 +17,14 @@ public class SupplierContact {
     private Boolean enabled;
 
     private String phone;
+
+    private String city;
+
+    private List<PlaceCode> placeCodes;
+
+    private String businessScope;
+
+    private String comment;
 
     private String createdBy;
 
@@ -101,5 +112,42 @@ public class SupplierContact {
 
     public void setUpdatedTime(Date updatedTime) {
         this.updatedTime = updatedTime;
+    }
+
+    public String getBusinessScope() {
+        return businessScope;
+    }
+
+    public void setBusinessScope(String businessScope) {
+        this.businessScope = businessScope;
+    }
+
+    public String getCity() {
+        return this.placeCodes == null ? "" : JSON.toJSONString(placeCodes);
+    }
+
+    public void setCity(String city) {
+        if (city != null) {
+            this.city = city.trim();
+            this.placeCodes = JSON.parseArray(this.city, PlaceCode.class);
+        } else {
+            this.city = null;
+        }
+    }
+
+    public List<PlaceCode> getPlaceCodes() {
+        return placeCodes;
+    }
+
+    public void setPlaceCodes(List<PlaceCode> placeCodes) {
+        this.placeCodes = placeCodes;
+    }
+
+    public String getComment() {
+        return comment;
+    }
+
+    public void setComment(String comment) {
+        this.comment = comment;
     }
 }

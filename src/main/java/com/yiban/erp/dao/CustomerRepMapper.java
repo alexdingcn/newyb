@@ -13,13 +13,9 @@ public interface CustomerRepMapper {
 
     int insert(CustomerRep record);
 
-    int insertSelective(CustomerRep record);
-
     CustomerRep selectByPrimaryKey(Integer id);
 
     int updateByPrimaryKeySelective(CustomerRep record);
-
-    int updateByPrimaryKey(CustomerRep record);
 
     CustomerRep getDefault(Integer customerId);
 
@@ -28,5 +24,4 @@ public interface CustomerRepMapper {
 
     List<CustomerRep> getByCustomerId(Integer customerId);
 
-    int removeByIds(@Param("ids") List<Integer> idList);
 }

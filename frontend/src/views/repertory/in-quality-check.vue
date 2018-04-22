@@ -55,7 +55,8 @@
                    no-data-text="点击上方订单后查看明细">
                 <div slot="footer">
                     <h3 class="detail-count-content" >
-                        <b>到货数量:</b> {{ totalReceiveCount }} 
+                        <b>总金额:</b> {{ totalAmount }} 
+                        <b class="detail-count-content-b">收货数量:</b> {{ totalReceiveCount }}
                         <b class="detail-count-content-b">入库数量:</b> {{ totalInCount }}
                         <b class="detail-count-content-b">合格数量:</b> {{ totalRightCount }}
                         <b class="detail-count-content-b">不合格数量:</b> {{ totalErrorCount }}
@@ -78,16 +79,30 @@
           <Form ref="checkForm" :model="checkFormItem" :label-width="100">
               <Row v-if="checkDetail">
                   <Col span="12">
+                    <FormItem label="采购数量">
+                        <Input :number="true" v-model="checkFormItem.buyOrderQuality" :readonly="true"/>
+                    </FormItem>
+                  </Col>
+                  <Col span="12">
                     <FormItem label="到货数量">
                         <Input :number="true" v-model="checkFormItem.receiveQuality" :readonly="true"/>
                     </FormItem>
                   </Col>
+              </Row>
+              <Row v-if="checkDetail">
                   <Col span="12">
                     <FormItem label="入库数量">
                         <Input :number="true" v-model="checkFormItem.inCount" :readonly="true"/>
                     </FormItem>
                   </Col>
+                  <Col span="12">
+                    <FormItem label="抽样数量">
+                        <Input :number="true" v-model="checkFormItem.surveyQuality" :readonly="true"/>
+                    </FormItem>
+                  </Col>
               </Row>
+              <h4 style="margin-top:20px;">验收结果</h4>
+              <hr size="1" style="width: 80%; margin-bottom: 10px;"/>
               <Row v-if="checkDetail">
                   <Col span="12">
                     <FormItem label="合格数量">
@@ -233,6 +248,10 @@ export default {
                     }
                 },
                 {
+                    title: '入库方式',
+                    key: 'refTypeName',
+                },
+                {
                     title: '入库仓库',
                     key: 'warehouseName',
                 },
@@ -255,21 +274,6 @@ export default {
                         }else {
                             return h('span', saleNickName);
                         }
-                    }
-                },
-                {
-                    title: '金额',
-                    key: 'amount',
-                    render: (h, params) => {
-                        let details = params.row.details;
-                        if (!details || details.length <= 0) {
-                            return h('span', 0);
-                        }
-                        let amount = 0;
-                        amount = details.reduce((total, item) => {
-                            return item.amount ? total + parseFloat(item.amount) : total + 0;
-                        }, 0);
-                        return h('span', amount);
                     }
                 },
                 {
@@ -308,7 +312,7 @@ export default {
                     key: 'orderNumber',
                 },
                 {
-                    title: '入库方式',
+                    title: '采购属性',
                     key: 'buyTypeName',
                 },
                 {
@@ -456,17 +460,22 @@ export default {
                     }
                 },
                 {
-                    title: '单价',
-                    width: 120,
-                    key: 'price'
+                    title: '采购数量',
+                    key: 'buyOrderQuality',
+                    width: 140
                 },
                 {
-                    title: '金额',
+                    title: '拒收数量',
                     width: 120,
-                    key: 'amount'
+                    key: 'rejectQuality'
                 },
                 {
-                    title: "到货数量",
+                    title: '拒收原因',
+                    width: 150,
+                    key: 'rejectComment'
+                },
+                {
+                    title: "收货数量",
                     width: 140,
                     key: 'receiveQuality',
                     render: (h, params) => {
@@ -493,6 +502,16 @@ export default {
                     }
                 },
                 {
+                    title: '单价',
+                    width: 120,
+                    key: 'price'
+                },
+                {
+                    title: '金额',
+                    width: 120,
+                    key: 'amount'
+                },
+                {
                     title: "入库数量",
                     key: 'inCount',
                     width: 140
@@ -508,7 +527,7 @@ export default {
                     width: 140
                 },
                 {
-                    title: "采集数量",
+                    title: "抽样数量",
                     key: 'surveyQuality',
                     width: 140,
                     render: (h, params) => {
@@ -579,6 +598,7 @@ export default {
                 }
             ],
             currChooseDetail: {},
+            totalAmount: 0,
             totalReceiveCount: 0,
             totalInCount: 0,
             totalRightCount: 0,
@@ -595,12 +615,14 @@ export default {
     watch: {
         detailList(data) {
             if(!data || data.length <= 0) {
+                this.totalAmount = 0;
                 this.totalReceiveCount = 0;
                 this.totalInCount = 0;
                 this.totalRightCount = 0;
                 this.totalErrorCount = 0;
                 this.totalSurveyQuality = 0;
             }else {
+                this.totalAmount = data.reduce((total, item) => {return item.amount ? total + item.amount : total + 0}, 0);
                 this.totalReceiveCount = data.reduce((total, item) => {return item.receiveQuality ? total + item.receiveQuality : total + 0}, 0);
                 this.totalInCount = data.reduce((total, item) => {return item.inCount ? total + item.inCount : total + 0}, 0);
                 this.totalRightCount = data.reduce((total, item) => {return item.rightCount ? total + item.rightCount : total + 0}, 0);
@@ -663,8 +685,7 @@ export default {
                 return;
             }
             this.currentChooseOrder = rowData;
-            this.detailList = rowData.details;
-            this.currChooseDetail = {};
+            this.reloadOrderDetail();
             this.checkFileNo = '';
         },
 
@@ -735,7 +756,9 @@ export default {
             let errorCount = receiveQuality - rightCount;
             this.checkFormItem = {
                 detailId: this.currChooseDetail.id,
+                buyOrderQuality: this.currChooseDetail.buyOrderQuality,
                 receiveQuality: receiveQuality,
+                surveyQuality: this.currChooseDetail.surveyQuality,
                 inCount: rightCount,
                 rightCount: rightCount,
                 errorCount: errorCount,

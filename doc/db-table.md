@@ -190,6 +190,7 @@ update_time|Datetime|最近一次修改时间
 
 
 
+
 ### 入库订单详情：repertory_in_detail
 
 > 入库单详情信息
@@ -232,6 +233,7 @@ create_by|String|创建人nickname
 create_time|Datetime|创建时间
 update_by|String|修改人
 update_time|Datetime|最近一次修改时间
+buy_order_quality|Decimal(14,3)|采购数量
 
 
 ### 出库订单表：repertory_out
@@ -480,5 +482,369 @@ updated_by|String|修改人
 updated_time|String|修改时间
 file_no|String|生产商档案编号
 
+
+
+### 档案类型表：file_type
+
+> 记录档案的类型信息
+
+字段名|类型|描述
+-|-|-
+id|Integer|(自增类型ID pk)
+company_id|Integer|公司ID
+type_name|String|类型名称
+create_by|String|创建人
+update_by|String|修改人
+create_time|Datetime|创建时间
+update_time|Datetime|修改时间
+
+
+
+### 档案信息表：file_info
+
+> 记录档案信息
+
+字段名|类型|描述
+-|-|-
+id|Integer|(自增类型ID pk)
+company_id|Integer|公司ID
+file_no|String|档案编号
+file_status|String|档案状态
+file_name|String|档案名称
+file_type|String|档案类型
+comment|String|描述
+create_by|String|创建人
+create_time|Datetime|创建时间
+update_by|String|修改人
+update_time|Datetime|修改时间
+
+
+
+### 档案详情信息表：file_upload
+
+> 记录档案的上传文件的详情
+
+字段名|类型|描述
+-|-|-
+id|Integer|(自增类型ID pk)
+file_id|Integer|档案ID
+comment|String|文件备注
+original_name|String|上传文件的名称
+location|String|存档位置
+load_url|String|访问路径
+expiration|Datetime|过期时间
+create_by|String|创建人
+update_by|String|修改人
+create_time|Datetime|创建时间
+update_time|Datetime|修改时间
+
+
+### 系统基础选择项信息表: options
+
+> 记录各种自建的选择项的信息
+
+字段名|类型|描述
+-|-|-
+id|Long|(自增类型ID pk)
+company_id|Integer|公司ID
+type|String|类型
+value|String|值
+description|String|描述信息
+enabled|Boolean|是否可用
+created_by|String|创建人
+updated_by|String|修改人
+created_time|Datetime|创建时间
+updated_time|Datetime|修改时间
+
+
+
+### 消息信息表：message_info
+
+> 记录各种消息信息的表
+
+字段名|类型|描述
+-|-|-
+id|Long|(自增类型ID pk)
+company_id|Integer|公司ID
+status|String|消息状态
+role_type|String|可见的角色类型
+title|String|消息标题
+content|String|消息内容
+create_by|String|创建人
+create_time|Datetime|创建时间
+update_by|String|修改人
+update_time|Datetime|修改时间
+
+
+
+### 消息信息表：message_option
+
+> 记录各种消息信息备注信息
+
+字段名|类型|描述
+-|-|-
+id|Long|(自增类型ID pk)
+user_id|Long|用户ID
+message_id|Long|消息ID
+option_status|String|状态
+option_result|String|评论结果
+create_by|String|创建人
+create_time|Datetime|创建时间
+update_by|String|修改人
+update_time|Datetime|修改时间
+
+
+
+### 供应商信息表：supplier
+
+> 记录供应商信息
+
+字段名|类型|描述
+-|-|-
+id|Long|(自增类型ID pk)
+company_id|Integer|公司ID
+name|String|供应商名称
+pinyin|String|拼音
+enabled|Boolean|是否可用(默认启用)
+term|Integer|账期
+city|String|归属地区,包含地区码
+address|String|详细地址
+postcode|String|邮编
+fax|String|传真
+phone|String|联系电话
+email|String|电子邮件
+contact|String|联系人
+contact_phone|String|联系人电话
+employee|String|负责人
+legal_person|String|法人代表
+discount|Decimal(5,2)|折扣率
+bank_account|String|银行账户
+bank_name|String|银行名称
+bank_number|String|银行账号
+tax_number|String|税号
+billing_method_id|Long|结算方式
+supplier_type_id|Long|类型
+have_stamp|Boolean|是否有印章
+have_bill_template|Boolean|是否有票据模板
+check_first|Boolean|是否首营检查
+is_factory|Boolean|是否生产企业
+is_direct_supplier|Boolean|是否直调供应商
+is_cold_business|Boolean|是否冷链经营
+can_special|Boolean|是否可以经营特殊商品
+warehouse_address|String|仓库地址
+business_scope|String|经营范围
+comment|String|备注
+license|String|营业执照
+license_exp|Date|营业执照有效期
+organization_no|String|组织机构代码证
+organization_exp|Date|组织机构代码证有效期
+gsp_gmp_no|String|GSP/GMP证件号
+gsp_gmp_exp|Date|GSP/GMP证有效期
+quality_protocol_no|String|质量保证协议
+quality_protocol_exp|Date|质量保证协议有效期
+sale_protocol_no|String|购销协议
+sale_protocol_exp|Date|购销协议有效期
+legal_protocol_no|String|法人委托书
+legal_protocol_exp|Date|法人委托书有效期
+other_protocol_no|String|其他协议
+other_protocol_exp|Date|其他协议有效期
+file_no|String|档案编号
+created_time|Datetime|创建时间
+created_by|String|创建人
+updated_by|String|修改人
+updated_time|String|修改时间
+
+
+
+### 供应商代表信息表：supplier_contact
+
+> 记录供应商代表信息
+
+字段名|类型|描述
+-|-|-
+id|Long|(自增类型ID pk)
+supplier_id|Long|供应商ID
+name|String|供应商代表名称
+idcard|String|身份证号
+enabled|Boolean|是否启用(默认启用)
+phone|String|联系方式
+city|String|所在城市(带城市编号)
+business_scope|String|经营区域
+comment|String|备注
+created_time|Datetime|创建时间
+created_by|String|创建人
+updated_by|String|修改人
+updated_time|String|修改时间
+
+
+
+### 客户分类信息表：customer_category
+
+> 记录供应商代表信息
+
+字段名|类型|描述
+-|-|-
+id|Integer|(自增类型ID pk)
+company_id|Integer|公司ID
+name|String|类型名称
+parent_id|Integer|上级Id
+sequence_no|Integer|排序
+comment|String|描述
+create_time|Datetime|创建时间
+update_time|Datetime|修改时间
+create_by|String|创建人
+update_by|String|修改人
+
+
+### 客户信息表：customer
+
+> 记录客户信息
+
+字段名|类型|描述
+-|-|-
+id|Integer|(自增类型ID pk)
+company_id|Integer|公司ID
+customer_no|String|系统编号
+category_id|Integer|客户类型
+name|String|客户名称
+pinyin|String|拼音
+status|String|状态(NORMAL, DELETE)
+enabled|Boolean|是否启用
+can_sale_special|Boolean|是否可以经营特殊产品
+is_limit_special|Boolean|含麻黄碱药品限购
+city|String|所在城市
+address|String|详细地址
+postcode|String|邮编
+legal_person|String|法人代表
+employee|String|负责人
+contact_phone|String|联系电话
+contact_fax|String|传真
+email|String|邮箱
+is_direction|Boolean|是否直调企业
+sale_area|String|销售区域
+sale_man|String|业务员
+member_level|String|会员等级
+class_att_one|String|分类属性1
+class_att_two|String|分类属性2
+stamp_template|String|印章模本编号
+bill_template|String|票据模本编号
+is_cold_business|Boolean|冷链经营
+is_two_ticket|Boolean|是否两票制
+business_scope|String|经营范围
+account_term|Integer|账期
+account_name|String|银行账户
+bank_account|String|银行账号
+bank_name|String|开户行
+tax_account|String|税号
+qua_check|String|资格审查
+file_no|String|档案编号
+supervise_no|String|电子监管码
+comment|String|备注
+create_time|Datetime|创建时间
+update_time|Datetime|修改时间
+create_by|String|创建人
+update_by|String|修改人
+
+
+
+### 客户代表信息表：customer
+
+> 记录客户的代表人信息,收货地址信息
+
+字段名|类型|描述
+-|-|-
+id|Integer|(自增类型ID pk)
+customer_id|Integer|客户ID
+name|String|名称
+contact_phone|String|联系电话
+repertory_address|String|收货地址
+postcode|String|邮编
+enabled|Boolean|是否启用
+default_time|Datetime|设置默认值使用的时间
+comment|String|备注
+create_time|Datetime|创建时间
+update_time|Datetime|修改时间
+create_by|String|创建人
+update_by|String|修改人
+
+
+
+### 承运公司信息表：ship_company
+
+> 记录承运公司基础信息
+
+字段名|类型|描述
+-|-|-
+id|Integer|(自增类型ID pk)
+company_id|Integer|公司ID
+name|String|名称
+enabled|Boolean|是否启用
+license|String|执照编号
+license_exp|Date|执照有效期至
+file_no|String|档案编号
+employee|String|负责人
+phone|String|联系电话
+fax|String|传真
+email|String|邮箱
+contact_user|String|联系人
+contact_phone|String|联系人电话
+postcode|String|邮编
+address|String|详细地址
+comment|String|备注
+create_by|String|创建人
+create_time|Datetime|创建时间
+update_by|String|修改人
+update_time|Datetime|修改时间
+
+
+### 采购订单表：buy_order
+
+> 记录采购订单的信息
+
+字段名|类型|描述
+-|-|-
+id|Long|(自增类型ID pk)
+company_id|Integer|公司ID
+order_number|String|系统单号
+supplier_id|Long|供应商ID
+supplier_contact_id|Long|供应商代表
+buyer_id|Long|采购员ID
+status|String|当前状态
+ship_method_id|Long|运输方式
+ship_tool_id|Long|运输工具
+temper_control_id|Long|温控方式
+warehouse_id|Integer|仓库ID
+eta||Datetime|预计到货时间
+ref_no|String|自定义单号
+comment|String|备注
+created_by|String|创建人
+updated_by|String|修改人
+created_time|Datetime|创建时间
+updated_time|Datetime|修改时间
+check_by|String|审查员
+check_result|String|审查结果
+check_time|String|审查时间
+
+
+
+### 采购订单详情表：buy_order_detail
+
+> 记录采购订单详情信息
+
+字段名|类型|描述
+-|-|-
+id|Long|(自增类型ID pk)
+buy_order_id|Long|采购单ID
+goods_id|Long|商品ID
+goods_name|String|商品名称
+quantity|Decimal(14,3)|采购数量
+buy_price|Decimal(14,3)|采购单价
+amount|Decimal(14,3)|金额
+shipped_quantity|Decimal(14,3)|到货数量
+already_fapiao|Boolean|是否收到发票
+created_by|String|创建人
+updated_by|String|修改人
+created_time|Datetime|创建时间
+updated_time|Datetime|修改时间
 
 

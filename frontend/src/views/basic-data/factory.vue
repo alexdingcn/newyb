@@ -6,21 +6,23 @@
 <template>
     <div class="access">
         <Row>
-            <Col span="10">
+            <Col span="9">
                 <Card>
                     <p slot="title">
                         <Icon type="ios-flask-outline"></Icon> 生产企业
                     </p>
                     <div slot="extra">
-                        <Input v-model="searchFactoryVal" placeholder="企业名称/联系人/拼音简称" clearable style="width: 300px"
-                            @on-enter="validateSearch"></Input>
-                        <Button type="primary" shape="circle" icon="ios-search" @click="searchFactory"></Button>
-                        <ButtonGroup class="padding-left-20">
+                        <ButtonGroup size="small" class="padding-left-20">
                             <Button type="primary" icon="android-add-circle" @click="addFactory">添加</Button>
                             <Button type="error" icon="android-remove-circle"  @click="delFactory">删除</Button>
                         </ButtonGroup>
                     </div>
-
+                    <Row type="flex" justify="end">
+                        <Input size="small" v-model="searchFactoryVal" placeholder="企业名称/联系人/拼音简称" clearable 
+                            @on-enter="validateSearch">
+                            <Button slot="append" size="small" type="primary" shape="circle" icon="ios-search" @click="searchFactory"></Button>
+                        </Input>
+                    </Row>
                     <Row type="flex" justify="center" align="middle" class="advanced-router margin-top-8">
                         <Table border highlight-row :columns="orderColumns" :loading="tabLoading" 
                             @on-row-click="tabRowClick" 
@@ -28,7 +30,7 @@
                     </Row>
                 </Card>
             </Col>
-            <Col span="12" style="margin-left: 20px;">
+            <Col span="14" style="margin-left: 5px;">
                 <factoty-info ref="factoryInfo" :factoryId="currFactoryId" @save-ok="factorySaveOk" ></factoty-info>
             </Col>
         </Row>
@@ -58,17 +60,20 @@
                     {
                         title: '名称',
                         key: 'name',
-                        sortable: true
+                        sortable: true,
+                        width: 200
                     },
                     {
                         title: '产地',
                         key: 'origin',
-                        sortable: true
+                        sortable: true,
+                        width: 120
                     },
                     {
                         title: '拼音简称',
                         key: 'pinyin',
                         align: 'center',
+                        width: 150,
                         sortable: true
                     }
                 ]
