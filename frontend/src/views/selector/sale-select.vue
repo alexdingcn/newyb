@@ -1,6 +1,6 @@
 
 <template>
-   <Select v-model="id" filterable clearable :disabled="disabled" placeholder="请选择销售人员" @on-change="onChange">
+   <Select v-model="id" :size="size" filterable clearable :disabled="disabled" placeholder="请选择销售人员" @on-change="onChange">
         <Option v-for="item in optionList" :value="item.userId" :key="item.userId">{{ item.nickname }}{{item.realname ? (' - [' + item.realname + ']') : ''}}</Option>
     </Select>
 </template>

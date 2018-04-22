@@ -41,14 +41,14 @@ public class SellOrderDetail {
     private Date checkDate;
 
     private RepertoryInfo repertoryInfo;
-    private Long goodId;  //在设置repertoryInfo时设置, 辅助前端展示
-    private String goodName; //在设置repertoryInfo时设置, 辅助前端展示
+    private Long goodsId;  //在设置repertoryInfo时设置, 辅助前端展示
+    private String goodsName; //在设置repertoryInfo时设置, 辅助前端展示
     private BigDecimal repertoryQuantity; //在设置repertoryInfo时设置, 辅助前端展示
     private String factoryName; //在设置repertoryInfo时设置, 辅助前端展示
 
     private Date createOrderDate;
-    private String salerNickName;
-    private String salerRealName;
+    private String saleNickName;
+    private String saleRealName;
     private String customerName;
 
     public Long getId() {
@@ -211,20 +211,20 @@ public class SellOrderDetail {
         this.createOrderDate = createOrderDate;
     }
 
-    public String getSalerNickName() {
-        return salerNickName;
+    public String getSaleNickName() {
+        return saleNickName;
     }
 
-    public void setSalerNickName(String salerNickName) {
-        this.salerNickName = salerNickName;
+    public void setSaleNickName(String saleNickName) {
+        this.saleNickName = saleNickName;
     }
 
-    public String getSalerRealName() {
-        return salerRealName;
+    public String getSaleRealName() {
+        return saleRealName;
     }
 
-    public void setSalerRealName(String salerRealName) {
-        this.salerRealName = salerRealName;
+    public void setSaleRealName(String saleRealName) {
+        this.saleRealName = saleRealName;
     }
 
     public String getCustomerName() {
@@ -243,27 +243,27 @@ public class SellOrderDetail {
         this.repertoryInfo = repertoryInfo;
         if (repertoryInfo != null && repertoryInfo.getGoods() != null) {
             Goods goods = repertoryInfo.getGoods();
-            this.goodId = goods.getId();
-            this.goodName = goods.getName();
+            this.goodsId = goods.getId();
+            this.goodsName = goods.getName();
             this.repertoryQuantity = repertoryInfo.getQuantity();
             this.factoryName = goods.getFactory();
         }
     }
 
-    public Long getGoodId() {
-        return goodId;
+    public Long getGoodsId() {
+        return goodsId;
     }
 
-    public void setGoodId(Long goodId) {
-        this.goodId = goodId;
+    public void setGoodsId(Long goodId) {
+        this.goodsId = goodId;
     }
 
-    public String getGoodName() {
-        return goodName;
+    public String getGoodsName() {
+        return goodsName;
     }
 
-    public void setGoodName(String goodName) {
-        this.goodName = goodName;
+    public void setGoodsName(String goodsName) {
+        this.goodsName = goodsName;
     }
 
     public BigDecimal getRepertoryQuantity() {

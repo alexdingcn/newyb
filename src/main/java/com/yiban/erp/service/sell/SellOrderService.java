@@ -42,11 +42,11 @@ public class SellOrderService {
     @Autowired
     private OptionsMapper optionsMapper;
 
-    public List<SellOrder> getList(Integer companyId, Integer customerId, Integer salerId,
+    public List<SellOrder> getList(Integer companyId, Integer customerId, Integer saleId,
                                             String refNo, String status, Date createOrderDate, Integer page, Integer size) {
         int limit = (size == null || size <= 0) ? 10 : size;
         int offset = (page == null || page <= 0 ? 0 : page - 1) * limit;
-        return sellOrderMapper.getList(companyId, customerId, salerId, refNo, status,createOrderDate, limit, offset);
+        return sellOrderMapper.getList(companyId, customerId, saleId, refNo, status,createOrderDate, limit, offset);
     }
 
     public SellOrder orderSave(User user, SellOrder sellOrder) throws BizException {
@@ -57,7 +57,7 @@ public class SellOrderService {
         List<SellOrderDetail> details = sellOrder.getDetails();
         //验证客户是否允许经营特殊管理药品
         List<Long> goodIdList = new ArrayList<>();
-        details.stream().forEach(item -> goodIdList.add(item.getGoodId()));
+        details.stream().forEach(item -> goodIdList.add(item.getGoodsId()));
         if(!isCustomerCanSellGoods(sellOrder.getCustomerId(), goodIdList)) {
             logger.warn("user: {} save sell order detail good have special managed but customer:{} can not shell.", user.getId(), sellOrder.getCustomerId());
             throw new BizException(ErrorCode.SELL_ORDER_CUSTOMER_CANNOT_SELL_GOOD);
@@ -70,7 +70,7 @@ public class SellOrderService {
             sellOrder.setOrderNumber(orderNumber);
             sellOrder.setCreateBy(user.getNickname());
             sellOrder.setCreateTime(new Date());
-            int count = sellOrderMapper.insertSelective(sellOrder);
+            int count = sellOrderMapper.insert(sellOrder);
             if (count > 0 && sellOrder.getId() > 0) {
                 //保存详情信息
                 details.stream().forEach(item -> {
@@ -119,7 +119,7 @@ public class SellOrderService {
             logger.warn("customer rep id is null.");
             return false;
         }
-        if (order.getSalerId() == null) {
+        if (order.getSaleId() == null) {
             logger.warn("saler id is null.");
             return false;
         }
@@ -357,32 +357,11 @@ public class SellOrderService {
         if (order == null) {
             return null;
         }
-        List<String> queryOptions = Arrays.asList(
-                OptionsType.TEMPER_CONTROL.name(),
-                OptionsType.SHIP_TOOL.name(),
-                OptionsType.PAY_METHOD.name(),
-                OptionsType.SHIP_METHOD.name());
-        List<Options> options = optionsMapper.findByTypes(order.getCompanyId(), queryOptions);
-        if (options != null && !options.isEmpty()) {
-            Map<Integer, Options> optionsMap = new HashMap<>();
-            options.stream().forEach(item -> optionsMap.put(Long.valueOf(item.getId()).intValue(), item));
-            Options options1 = optionsMap.get(order.getTemperControlId());
-            if (options1 != null) {
-                order.setTemperControlName(options1.getValue());
-            }
-            Options options2 = optionsMap.get(order.getPayMethod());
-            if (options2 != null) {
-                order.setPayMethodName(options2.getValue());
-            }
-            Options options3 = optionsMap.get(order.getShipMethod());
-            if (options3 != null) {
-                order.setShipMethodName(options3.getValue());
-            }
-            Options options4 = optionsMap.get(order.getShipTool());
-            if (options4 != null) {
-                order.setShipToolName(options4.getValue());
-            }
-        }
+        Set<Long> optionIdSet = order.getOptionsIds();
+        Long[] optionsIds = new Long[optionIdSet.size()];
+        optionIdSet.toArray(optionsIds);
+        List<Options> options = optionsMapper.getByIds(optionsIds);
+        order.setOptionsName(options);
         List<SellOrderDetail> details = getDetailList(orderId);
         order.setDetails(details);
         return order;

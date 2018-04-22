@@ -1,8 +1,7 @@
 package com.yiban.erp.entities;
 
 import java.math.BigDecimal;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 public class SellOrder {
     private Long id;
@@ -19,11 +18,11 @@ public class SellOrder {
 
     private Integer customerRepId;
 
-    private Integer salerId;
+    private Integer saleId;
     private String saleNickName;
     private String saleRealName;
 
-    private Integer temperControlId;
+    private Long temperControlId;
     private String temperControlName;
 
     private Date createOrderDate;
@@ -32,22 +31,15 @@ public class SellOrder {
 
     private Date payOrderDate;
 
-    private Integer payMethod;
-    private String payMethodName;
-
-    private String payFileNo;
-
     private BigDecimal markUpRate;
 
-    private BigDecimal payAmount;
-
-    private BigDecimal notSmallAmount;
-
-    private Integer shipMethod;
+    private Long shipMethod;
     private String shipMethodName;
 
-    private Integer shipTool;
+    private Long shipTool;
     private String shipToolName;
+
+    private Integer shipCompanyId;
 
     private String comment;
 
@@ -73,6 +65,26 @@ public class SellOrder {
     private String customerRepName;
     private String customerRepContactPhone;
     private String customerRepRepertoryAddress;
+
+
+    public Set<Long> getOptionsIds() {
+        Set<Long> set = new HashSet<>();
+        set.add(this.shipMethod != null ? this.shipMethod : 0L);
+        set.add(this.shipTool != null ? this.shipTool : 0L);
+        set.add(this.temperControlId != null ? this.temperControlId : 0L);
+        return set;
+    }
+
+    public void setOptionsName(List<Options> options) {
+        if (options == null || options.isEmpty()) {
+            return;
+        }
+        Map<Long, Options> optionsMap = new HashMap<>();
+        options.stream().forEach(item -> optionsMap.put(item.getId(), item));
+        this.setTemperControlName(optionsMap.get(this.temperControlId) != null ? optionsMap.get(this.temperControlId).getValue() : null);
+        this.setTemperControlName(optionsMap.get(this.shipMethod) != null ? optionsMap.get(this.shipMethod).getValue() : null);
+        this.setTemperControlName(optionsMap.get(this.shipTool) != null ? optionsMap.get(this.shipTool).getValue() : null);
+    }
 
     public Long getId() {
         return id;
@@ -130,12 +142,12 @@ public class SellOrder {
         this.customerRepId = customerRepId;
     }
 
-    public Integer getSalerId() {
-        return salerId;
+    public Integer getSaleId() {
+        return saleId;
     }
 
-    public void setSalerId(Integer salerId) {
-        this.salerId = salerId;
+    public void setSaleId(Integer saleId) {
+        this.saleId = saleId;
     }
 
     public String getSaleNickName() {
@@ -154,11 +166,11 @@ public class SellOrder {
         this.saleRealName = saleRealName;
     }
 
-    public Integer getTemperControlId() {
+    public Long getTemperControlId() {
         return temperControlId;
     }
 
-    public void setTemperControlId(Integer temperControlId) {
+    public void setTemperControlId(Long temperControlId) {
         this.temperControlId = temperControlId;
     }
 
@@ -186,22 +198,6 @@ public class SellOrder {
         this.payOrderDate = payOrderDate;
     }
 
-    public Integer getPayMethod() {
-        return payMethod;
-    }
-
-    public void setPayMethod(Integer payMethod) {
-        this.payMethod = payMethod;
-    }
-
-    public String getPayFileNo() {
-        return payFileNo;
-    }
-
-    public void setPayFileNo(String payFileNo) {
-        this.payFileNo = payFileNo == null ? null : payFileNo.trim();
-    }
-
     public BigDecimal getMarkUpRate() {
         return markUpRate;
     }
@@ -210,35 +206,19 @@ public class SellOrder {
         this.markUpRate = markUpRate;
     }
 
-    public BigDecimal getPayAmount() {
-        return payAmount;
-    }
-
-    public void setPayAmount(BigDecimal payAmount) {
-        this.payAmount = payAmount;
-    }
-
-    public BigDecimal getNotSmallAmount() {
-        return notSmallAmount;
-    }
-
-    public void setNotSmallAmount(BigDecimal notSmallAmount) {
-        this.notSmallAmount = notSmallAmount;
-    }
-
-    public Integer getShipMethod() {
+    public Long getShipMethod() {
         return shipMethod;
     }
 
-    public void setShipMethod(Integer shipMethod) {
+    public void setShipMethod(Long shipMethod) {
         this.shipMethod = shipMethod;
     }
 
-    public Integer getShipTool() {
+    public Long getShipTool() {
         return shipTool;
     }
 
-    public void setShipTool(Integer shipTool) {
+    public void setShipTool(Long shipTool) {
         this.shipTool = shipTool;
     }
 
@@ -374,14 +354,6 @@ public class SellOrder {
         this.temperControlName = temperControlName;
     }
 
-    public String getPayMethodName() {
-        return payMethodName;
-    }
-
-    public void setPayMethodName(String payMethodName) {
-        this.payMethodName = payMethodName;
-    }
-
     public String getShipMethodName() {
         return shipMethodName;
     }
@@ -396,5 +368,13 @@ public class SellOrder {
 
     public void setShipToolName(String shipToolName) {
         this.shipToolName = shipToolName;
+    }
+
+    public Integer getShipCompanyId() {
+        return shipCompanyId;
+    }
+
+    public void setShipCompanyId(Integer shipCompanyId) {
+        this.shipCompanyId = shipCompanyId;
     }
 }

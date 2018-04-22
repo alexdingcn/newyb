@@ -32,8 +32,8 @@
                         </FormItem>
                     </Col>
                     <Col span="6">
-                        <FormItem label="销售人员" prop="salerId">
-                          <sale-select v-model="sellOrderFormData.salerId" ></sale-select>
+                        <FormItem label="销售人员" prop="saleId">
+                          <sale-select v-model="sellOrderFormData.saleId" ></sale-select>
                         </FormItem>
                     </Col>
                     <Col span="6">
@@ -211,7 +211,7 @@ export default {
             trigger: "change"
           }
         ],
-        salerId: [
+        saleId: [
           {
             required: true,
             type: "number",
@@ -271,15 +271,17 @@ export default {
           }
         },
         {
-          title: "药名",
+          title: "商品名称",
           key: "goodsName",
           align: "center",
           sortable: true,
+          width: 180
         },
         {
           title: "生产企业",
           key: "factoryName",
           align: "center",
+          width: 180,
           render: (h, params) => {
             let goods = params.row.repertoryInfo.goods;
             if(goods) {
@@ -293,6 +295,7 @@ export default {
           title: "产地",
           key: "origin",
           align: "center",
+          width: 120,
           render: (h, params) => {
             let goods = params.row.repertoryInfo.goods;
             if(goods) {
@@ -306,6 +309,7 @@ export default {
           title: "规格",
           key: "spec",
           align: "center",
+          width: 120,
           render: (h, params) => {
             let goods = params.row.repertoryInfo.goods;
             if(goods) {
@@ -319,6 +323,7 @@ export default {
           title: "剂型",
           key: "jx",
           align: "center",
+          width: 120,
           render: (h, params) => {
             let goods = params.row.repertoryInfo.goods;
             if(goods) {
@@ -331,12 +336,14 @@ export default {
         {
           title: "库存量",
           key: "repertoryQuantity",
+          width: 100,
           align: "center"
         },
         {
           title: "销售数量",
           key: "quantity",
           align: "center",
+          width: 120,
           render: (h, params) => {
             let self = this;
             return h("Input", {
@@ -357,12 +364,14 @@ export default {
         {
           title: "定价",
           key: "fixPrice",
+          width: 100,
           align: "center"
         },
         {
           title: "折扣",
           key: "disPrice",
           align: "center",
+          width: 120,
           render: (h, params) => {
             let self = this;
             return h("Input", {
@@ -384,6 +393,7 @@ export default {
           title: "赠送",
           key: "free",
           align: "center",
+          width: 120,
           render: (h, params) => {
             let self = this;
             return h("Input", {
@@ -432,17 +442,20 @@ export default {
         {
           title: "件单价",
           key: "singlePrice",
+          width: 100,
           align: "center"
         },
         {
           title: "金额",
           key: "amount",
+          width: 120,
           align: "center"
         },
         {
           title: "税率",
           key: "taxRate",
           align: "center",
+          width: 120,
           render: (h, params) => {
             let self = this;
             return h("Input", {
@@ -472,17 +485,16 @@ export default {
   },
   watch: {
     detailsData: function() {
-      console.log(this.detailsData);
       if(this.detailsData && this.detailsData.length > 0) {
         this.warehouseDisable = true;
         this.totalQuantity = this.detailsData.reduce((total, item) => {
           if (item.quantity && !isNaN(item.quantity)) {
-            return total + item.quantity;
+            return total + parseFloat(item.quantity);
           }
         }, 0);
         this.totalAmount = this.detailsData.reduce((total, item) => {
           if (item.amount && !isNaN(item.amount)) {
-            return total + item.amount;
+            return total + parseFloat(item.amount);
           }
         }, 0);
       }else {
@@ -625,12 +637,20 @@ export default {
       //检查客户是否是可经营特殊管控的商品的，如果不是，需要检查选择的商品列表中是否存在特殊管控的商品
       if (!this.currChooseCustomer || !this.currChooseCustomer.canSaleSpecial) {
         for (let i=0; i<this.detailsData.length; i++) {
-          let goodItem = this.detailsData[i].repertoryInfo ? this.detailsData[i].repertoryInfo.goods : null;
-          if (goodItem && goodItem !== null && goodItem.SpecialManaged) {
+          let detailItem = this.detailsData[i].repertoryInfo ? this.detailsData[i].repertoryInfo.goods : null;
+          if (detailItem && detailItem !== null && detailItem.SpecialManaged) {
               this.$Modal.error(
                 {
                   title: '客户商品选择限制', 
-                  content: this.currChooseCustomer.name + '不能经营特殊管控商品, 但是商品列表中存在管控商品:' + goodItem.name
+                  content: this.currChooseCustomer.name + '不能经营特殊管控商品, 但是商品列表中存在管控商品:' + detailItem.goodsName
+                });
+              return false;
+          }
+          if (detailItem.repertoryQuantity < detailItem.quantity) {
+            this.$Modal.error(
+                {
+                  title: '商品库存量不足', 
+                  content: detailItem.goodsName + '库存量不足'
                 });
               return false;
           }
@@ -664,38 +684,17 @@ export default {
       this.editeOnlyDisable = true; //编辑模式下的客户信息不能修改
       this.warehouseDisable = true;
       this.refreshCustomerRepList(data.customerId, data.customerRepId);
-      this.refreshGoodsData(data.id);
+      this.refreshDetailsData(data.id);
     },
     orderFormChangeToAddModel() {
       this.editeOnlyDisable = false;
       this.warehouseDisable = false;
       this.sellOrderFormData = {
-        id: "",
-        customerId: "",
-        customerName: "",
-        customerRepId: '',
-        contactPhone: "",
-        repertoryAddress: "",
-        salerId: "",
-        refNo: "",
-        temperControlId: "",
-        shipMethod: "",
-        shipTool: "",
-        createOrderDate: "",
-        takeGoodsUser: "",
-        payOrderDate: "",
-        payMethod: "",
-        payFileNo: "",
-        markUpRate: 0,
-        payAmount: 0,
-        notSmallAmount: 0,
-        warehouseId: "",
-        comment: "",
-        details: ''
+        createOrderDate: moment().format('YYYY-MM-DD'),
       };
       this.detailsData = [];
     },
-    refreshGoodsData(sellOrderId) {
+    refreshDetailsData(sellOrderId) {
       if (sellOrderId && sellOrderId > 0) {
         let reqData = { sellOrderId: sellOrderId };
         this.saveGoodBtnLoading = true;
@@ -820,25 +819,23 @@ export default {
         row["quantity"] && !isNaN(row["quantity"]) ? row["quantity"] : 0;
       let num = quantity - free > 0 ? quantity - free : 0;
       row.amount = (num * realPrice * (1 - disPrice / 100)).toFixed(2);
+      this.$set(this.detailsData, index, row);
     },
-
     
     handleRowDbClick(data, index) {
       this.$Modal.confirm({
           title: '确认删除商品？',
-          content: '<p>确认删除商品 ' + data.goodName + '?</p>',
+          content: '<p>确认删除商品 ' + data.goodsName + '?</p>',
           onOk: () => {
             if (data.id) {
-              this.goodRemoveItem(data.id);
+              this.detailRemoveItem(data.id);
             }
             this.detailsData.splice(index, 1);
           },
-          onCancel: () => {
-              
-          }
+          onCancel: () => {}
       });
     },
-    goodRemoveItem(removeId) {
+    detailRemoveItem(removeId) {
       if (removeId) {
         //联动删除数据库中的值
         util.ajax

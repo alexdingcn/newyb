@@ -1,6 +1,8 @@
 package com.yiban.erp.controller.warehouse;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.yiban.erp.constant.RepertoryCounterStatus;
 import com.yiban.erp.constant.RepertorySaleStatus;
 import com.yiban.erp.constant.RepertoryStoreStatus;
@@ -41,7 +43,7 @@ public class RepertoryController {
     public ResponseEntity<String> list(@AuthenticationPrincipal User user,
                                        @RequestBody RepertoryQuery repertoryQuery) {
         JSONObject result=repertoryService.getStoreNowPage(user,repertoryQuery);
-        return ResponseEntity.ok().body(result.toJSONString());
+        return ResponseEntity.ok().body(JSON.toJSONString(result, SerializerFeature.DisableCircularReferenceDetect));
     }
 
 
@@ -73,7 +75,7 @@ public class RepertoryController {
         JSONObject result = new JSONObject();
         result.put("data", list);
         result.put("count", count);
-        return ResponseEntity.ok().body(result.toJSONString());
+        return ResponseEntity.ok().body(JSON.toJSONString(result, SerializerFeature.DisableCircularReferenceDetect));
     }
 
 }

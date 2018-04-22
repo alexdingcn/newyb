@@ -2,6 +2,7 @@ package com.yiban.erp.controller.sell;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.yiban.erp.dao.SellOrderMapper;
 import com.yiban.erp.dto.SellOrderAllAction;
 import com.yiban.erp.dto.SellReviewAction;
@@ -41,30 +42,30 @@ public class SellOrderController {
                                                @AuthenticationPrincipal User user) throws Exception {
 
         String reqCustomerId = request.getParameter("customerId");
-        String reqSalerId = request.getParameter("salerId");
+        String reqSaleId = request.getParameter("saleId");
         String refNo = request.getParameter("refNo");
         String status = request.getParameter("status");
         String reqDate = request.getParameter("createOrderDate");
         String reqPage = request.getParameter("page");
         String reqSize = request.getParameter("size");
         Integer customerId = StringUtils.isBlank(reqCustomerId) ? null : Integer.parseInt(reqCustomerId);
-        Integer salerId = StringUtils.isBlank(reqSalerId) ? null : Integer.parseInt(reqSalerId);
+        Integer saleId = StringUtils.isBlank(reqSaleId) ? null : Integer.parseInt(reqSaleId);
         Integer page = StringUtils.isBlank(reqPage) ? 1 : Integer.parseInt(reqPage);
         Integer size = StringUtils.isBlank(reqSize) ? 10 : Integer.parseInt(reqSize);
         String reqRefNo = StringUtils.isBlank(refNo) ? null : refNo.trim();
         String reqStatus = StringUtils.isBlank(status) ? null : status;
         Date createOrderDate = StringUtils.isBlank(reqDate) ? null : new Date(Long.valueOf(reqDate));
-        List<SellOrder> sellOrders = sellOrderService.getList(user.getCompanyId(), customerId, salerId, reqRefNo, reqStatus, createOrderDate, page, size);
+        List<SellOrder> sellOrders = sellOrderService.getList(user.getCompanyId(), customerId, saleId, reqRefNo, reqStatus, createOrderDate, page, size);
         JSONObject result = new JSONObject();
         if (!sellOrders.isEmpty()) {
-            Integer count = sellOrderMapper.getListCount(user.getCompanyId(), customerId, salerId, reqRefNo, reqStatus, createOrderDate);
+            Integer count = sellOrderMapper.getListCount(user.getCompanyId(), customerId, saleId, reqRefNo, reqStatus, createOrderDate);
             result.put("count", count == null ? 0 : count);
             result.put("data", sellOrders);
         }else {
             result.put("count", 0);
             result.put("data", new ArrayList<SellOrder>());
         }
-        return ResponseEntity.ok().body(result.toJSONString());
+        return ResponseEntity.ok().body(JSON.toJSONString(result, SerializerFeature.DisableCircularReferenceDetect));
     }
 
     @RequestMapping(value = "/order/save", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -73,7 +74,7 @@ public class SellOrderController {
         logger.info("user:{} save sell order info.", user.getId());
         SellOrder result = sellOrderService.orderSave(user, sellOrder);
         logger.info("user:{} success save sell order info.", user.getId());
-        return ResponseEntity.ok().body(JSON.toJSONString(result));
+        return ResponseEntity.ok().body(JSON.toJSONString(result, SerializerFeature.DisableCircularReferenceDetect));
     }
 
     @RequestMapping(value = "/order/remove/{id}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -87,7 +88,7 @@ public class SellOrderController {
     @RequestMapping(value = "/detail/list", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> detailList(@RequestParam("sellOrderId") Long sellOrderId) throws Exception {
         List<SellOrderDetail> details = sellOrderService.getDetailList(sellOrderId);
-        return ResponseEntity.ok().body(JSON.toJSONString(details));
+        return ResponseEntity.ok().body(JSON.toJSONString(details, SerializerFeature.DisableCircularReferenceDetect));
     }
 
     @RequestMapping(value = "/detail/history", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -123,7 +124,7 @@ public class SellOrderController {
                                                   @AuthenticationPrincipal User user) {
         query.setCompanyId(user.getCompanyId());
         List<SellOrder> result = sellOrderService.getReviewOrderList(query);
-        return ResponseEntity.ok().body(JSON.toJSONString(result));
+        return ResponseEntity.ok().body(JSON.toJSONString(result, SerializerFeature.DisableCircularReferenceDetect));
     }
 
     @RequestMapping(value = "/order/review/quality/check", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -137,7 +138,7 @@ public class SellOrderController {
         sellOrderService.qualityCheck(user, reviewAction);
         //如果没有报错，则重新根据sellOrderId 获取详情列表
         SellOrder order = sellOrderService.reviewDetail(sellOrderId);
-        return ResponseEntity.ok().body(JSON.toJSONString(order));
+        return ResponseEntity.ok().body(JSON.toJSONString(order, SerializerFeature.DisableCircularReferenceDetect));
     }
 
     @RequestMapping(value = "/order/review/quality/cancel", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -151,7 +152,7 @@ public class SellOrderController {
         sellOrderService.qualityCheckCancel(user, reviewAction);
         //如果没有报错，则重新根据sellOrderId 获取详情列表
         SellOrder order = sellOrderService.reviewDetail(sellOrderId);
-        return ResponseEntity.ok().body(JSON.toJSONString(order));
+        return ResponseEntity.ok().body(JSON.toJSONString(order, SerializerFeature.DisableCircularReferenceDetect));
     }
 
     @RequestMapping(value = "/order/review/sale/ok", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -171,14 +172,14 @@ public class SellOrderController {
             logger.warn("get order detail fail by id:{}", orderId);
             throw new BizException(ErrorCode.SELL_ORDER_DETAIL_GET_FAIL);
         }else {
-            return ResponseEntity.ok().body(JSON.toJSONString(order));
+            return ResponseEntity.ok().body(JSON.toJSONString(order, SerializerFeature.DisableCircularReferenceDetect));
         }
     }
 
     @RequestMapping(value = "/order/ship/list", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> getShipList(@RequestParam("orderId") Long orderId) throws Exception {
         List<SellOrderShip> ships = sellOrderService.getOrderShipRecords(orderId);
-        return ResponseEntity.ok().body(JSON.toJSONString(ships));
+        return ResponseEntity.ok().body(JSON.toJSONString(ships, SerializerFeature.DisableCircularReferenceDetect));
     }
 
     @RequestMapping(value = "/order/ship/save", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -186,7 +187,7 @@ public class SellOrderController {
                                                  @AuthenticationPrincipal User user) throws Exception {
         logger.info("user:{} request save ship record.", user.getId());
         SellOrderShip result = sellOrderService.saveOrderShip(user, ship);
-        return ResponseEntity.ok().body(JSON.toJSONString(result));
+        return ResponseEntity.ok().body(JSON.toJSONString(result, SerializerFeature.DisableCircularReferenceDetect));
     }
 
     @RequestMapping(value = "/order/ship/remove/{id}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -214,7 +215,7 @@ public class SellOrderController {
         JSONObject response = new JSONObject();
         response.put("data", result);
         response.put("count", count);
-        return ResponseEntity.ok().body(response.toJSONString());
+        return ResponseEntity.ok().body(JSON.toJSONString(response, SerializerFeature.DisableCircularReferenceDetect));
     }
 
 }

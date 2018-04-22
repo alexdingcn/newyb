@@ -15,7 +15,7 @@
                         </Col>
                         <Col span="6">
                             <FormItem label="销售员">
-                                <sale-select size="small" v-model="formItem.salerId"></sale-select>
+                                <sale-select size="small" v-model="formItem.saleId"></sale-select>
                             </FormItem>
                         </Col>
                         <Col span="6">
@@ -90,7 +90,7 @@ export default {
             isShowModal: false,
             formItem: {
                 customerId: '',
-                salerId: '',
+                saleId: '',
                 refNo: '',
                 createOrderDate: ''
             },
@@ -115,8 +115,13 @@ export default {
                 },
                 {
                     title: '销售人员',
-                    key: "salerId",
+                    key: "saleId",
                     align: "center",
+                    render: (h, params) => {
+                        let saleNickName = params.row.saleNickName ? params.row.saleNickName : '';
+                        let saleRealName = params.row.saleRealName ? params.row.saleRealName : '';
+                        return saleNickName + (saleRealName ? '---' + saleRealName : '');
+                    }
                 },
                 {
                     title: '自定单号',
@@ -130,11 +135,7 @@ export default {
                     sortable: true,
                     render: (h, params) => {
                         let date = params.row.createOrderDate;
-                        if (!date || isNaN(date)) {
-                            return h('span', '');
-                        }else {
-                            return moment(date).format('YYYY-MM-DD');
-                        }
+                        return date ? moment(date).format('YYYY-MM-DD') : '';
                     }
                 },
                 {
@@ -144,11 +145,7 @@ export default {
                     sortable: true,
                     render: (h, params) => {
                         let date = params.row.payOrderDate;
-                        if (!date || isNaN(date)) {
-                            return h('span', '');
-                        }else {
-                            return moment(date).format('YYYY-MM-DD');
-                        }
+                        return date ? moment(date).format('YYYY-MM-DD') : '';
                     }
                 }
             ]
@@ -172,7 +169,7 @@ export default {
         searchBtnClicked() {
             let reqData = {
                 customerId: this.formItem.customerId,
-                salerId: this.formItem.salerId,
+                saleId: this.formItem.saleId,
                 refNo: this.formItem.refNo
             };
             reqData.page = this.currentPage;
@@ -187,15 +184,16 @@ export default {
             }
             util.ajax.get('/sell/order/list', {params: reqData})
                 .then((response) => {
+                    this.tableLoading = false;
                     this.tabData = response.data.data;
                     this.totalCount = response.data.count;
                     this.currChooseItem = null;
                 })
                 .catch((error) => {
+                    this.tableLoading = false;
                     util.errorProcessor(this, error);
                 }
             );
-            this.tableLoading = false;
         },
 
         pageChange(data) {
