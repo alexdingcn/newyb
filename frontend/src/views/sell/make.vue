@@ -1,6 +1,5 @@
 <style lang="less">
 @import "../../styles/common.less";
-@import "./make.less";
 </style>
 
 <template>
@@ -17,137 +16,114 @@
                 <Button type="ghost" icon="ios-printer">打印</Button>
             </ButtonGroup>
 
-            <Row type="flex" justify="center">
-                <Form ref="sellOrderForm" :model="sellOrderFormData" :label-width="100" :rules="sellOrderFormValidate">
-                    <Row type="flex" justify="center">
-                        <Col span="8">
-                            <FormItem label="客户" prop="customerId">
-                                <customer-select v-if="!editeOnlyDisable" :disabled="editeOnlyDisable" v-model="sellOrderFormData.customerId" @on-change="customerChange"></customer-select>
-                                <Input v-else type="text" :disabled="editeOnlyDisable" v-model="sellOrderFormData.customerName"></Input>
-                            </FormItem>
-                        </Col>
-                        <Col span="8">
-                            <FormItem label="客户代表" prop="customerRepId">
-                                <Select v-model="sellOrderFormData.customerRepId" filterable clearable placeholder="请选择客户代表" @on-change="customerRepSelChange">
-                                    <Option v-for="item in customerRepList" :value="item.id" :key="item.id">{{ item.name }}</Option>
-                                </Select>
-                            </FormItem>
-                        </Col>
-                        <Col span="8">
-                            <FormItem label="销售人员" prop="salerId">
-                              <sale-select v-model="sellOrderFormData.salerId" ></sale-select>
-                            </FormItem>
-                        </Col>
-                    </Row>
+            <Form ref="sellOrderForm" :model="sellOrderFormData" :label-width="100" :rules="sellOrderFormValidate">
+                <Row type="flex" justify="start">
+                    <Col span="6">
+                        <FormItem label="客户" prop="customerId">
+                            <customer-select v-if="!editeOnlyDisable" :disabled="editeOnlyDisable" v-model="sellOrderFormData.customerId" @on-change="customerChange"></customer-select>
+                            <Input v-else type="text" :disabled="editeOnlyDisable" v-model="sellOrderFormData.customerName"></Input>
+                        </FormItem>
+                    </Col>
+                    <Col span="6">
+                        <FormItem label="客户代表" prop="customerRepId">
+                            <Select v-model="sellOrderFormData.customerRepId" filterable clearable placeholder="请选择客户代表" @on-change="customerRepSelChange">
+                                <Option v-for="item in customerRepList" :value="item.id" :key="item.id">{{ item.name }}</Option>
+                            </Select>
+                        </FormItem>
+                    </Col>
+                    <Col span="6">
+                        <FormItem label="销售人员" prop="salerId">
+                          <sale-select v-model="sellOrderFormData.salerId" ></sale-select>
+                        </FormItem>
+                    </Col>
+                    <Col span="6">
+                        <FormItem label="加价率" >
+                            <Input v-model="sellOrderFormData.markUpRate" number ></Input>
+                        </FormItem>
+                    </Col>
+                </Row>
 
-                    <Row type="flex" justify="center">
-                        <Col span="8">
-                            <FormItem label="收货电话" prop="contactPhone">
-                                <Input type="text" readonly v-model="sellOrderFormData.contactPhone" ></Input>
-                            </FormItem>
-                        </Col>
-                        <Col span="16">
-                            <FormItem label="收货地址" prop="repertoryAddress">
-                                <Input type="text" readonly v-model="sellOrderFormData.repertoryAddress" ></Input>
-                            </FormItem>
-                        </Col>
-                    </Row>
+                <Row type="flex" justify="start">
+                    <Col span="8">
+                        <FormItem label="收货电话" prop="contactPhone">
+                            <Input type="text" readonly v-model="sellOrderFormData.contactPhone" ></Input>
+                        </FormItem>
+                    </Col>
+                    <Col span="16">
+                        <FormItem label="收货地址" prop="repertoryAddress">
+                            <Input type="text" readonly v-model="sellOrderFormData.repertoryAddress" ></Input>
+                        </FormItem>
+                    </Col>
+                </Row>
 
-                    <Row type="flex" justify="center">
-                        <Col span="8">
-                            <FormItem label="自定单号" >
-                                <Input type="text" v-model="sellOrderFormData.refNo" ></Input>
-                            </FormItem>
-                        </Col>
-                        <Col span="8">
-                            <FormItem label="制单日期" >
-                                <DatePicker v-model="sellOrderFormData.createOrderDate" type="date" placeholder="请选择制单日期" ></DatePicker>
-                            </FormItem>
-                        </Col>
-                        <Col span="8">
-                            <FormItem label="提货人" >
-                                <Input type="text" v-model="sellOrderFormData.takeGoodsUser" placeholder="请输入提货人"></Input>
-                            </FormItem>
-                        </Col>
-                    </Row>
+                <Row type="flex" justify="start">
+                    <Col span="6">
+                        <FormItem label="自定单号" >
+                            <Input type="text" v-model="sellOrderFormData.refNo" ></Input>
+                        </FormItem>
+                    </Col>
+                    <Col span="6">
+                        <FormItem label="制单日期" >
+                            <DatePicker v-model="sellOrderFormData.createOrderDate" type="date" placeholder="请选择制单日期" ></DatePicker>
+                        </FormItem>
+                    </Col>
+                    <Col span="6">
+                      <FormItem label="收款期限" >
+                            <DatePicker v-model="sellOrderFormData.payOrderDate" type="date" placeholder="请选择收款期限" ></DatePicker>
+                        </FormItem>
+                    </Col>
+                    <Col span="6">
+                        <FormItem label="提货人" >
+                            <Input type="text" v-model="sellOrderFormData.takeGoodsUser" placeholder="请输入提货人"></Input>
+                        </FormItem>
+                    </Col>
+                </Row>
 
-                    <Row type="flex" justify="center">
-                        <Col span="8">
-                            <FormItem label="湿控方式" >
-                              <temper-control-select v-model="sellOrderFormData.temperControlId"></temper-control-select>
-                            </FormItem>
-                        </Col>
-                        <Col span="8">
-                            <FormItem label="运输方式" >
-                              <ship-method-select v-model="sellOrderFormData.shipMethod"></ship-method-select>
-                            </FormItem>
-                        </Col>
-                        <Col span="8">
-                            <FormItem label="运输工具" >
-                              <ship-tool-select v-model="sellOrderFormData.shipTool"></ship-tool-select>
-                            </FormItem>
-                        </Col>
-                    </Row>
+                <Row type="flex" justify="start">
+                    <Col span="6">
+                        <FormItem label="湿控方式" >
+                          <option-select optionType="TEMPER_CONTROL" v-model="sellOrderFormData.temperControlId"></option-select>
+                        </FormItem>
+                    </Col>
+                    <Col span="6">
+                        <FormItem label="运输方式" >
+                          <option-select optionType="SHIP_METHOD" v-model="sellOrderFormData.shipMethod"></option-select>
+                        </FormItem>
+                    </Col>
+                    <Col span="6">
+                        <FormItem label="运输工具" >
+                          <option-select optionType="SHIP_TOOL" v-model="sellOrderFormData.shipTool"></option-select>
+                        </FormItem>
+                    </Col>
+                    <Col span="6">
+                        <FormItem label="承运公司" >
+                          <ship-company-select v-model="sellOrderFormData.shipCompanyId"></ship-company-select>
+                        </FormItem>
+                    </Col>
+                </Row>
 
-                    <Row type="flex" justify="center">
-                        <Col span="8">
-                            <FormItem label="收款日期" >
-                                <DatePicker v-model="sellOrderFormData.payOrderDate" type="date" placeholder="请选择收款日期" ></DatePicker>
-                            </FormItem>
-                        </Col>
-                        <Col span="8">
-                            <FormItem label="收款方式" >
-                              <pay-method-select v-model="sellOrderFormData.payMethod"></pay-method-select>
-                            </FormItem>
-                        </Col>
-                        <Col span="8">
-                            <FormItem label="收款档案编号" >
-                                <Input type="text" v-model="sellOrderFormData.payFileNo" ></Input>
-                            </FormItem>
-                        </Col>
-                    </Row>
-
-                    <Row type="flex" justify="center">
-                        <Col span="8">
-                            <FormItem label="加价率" >
-                                <InputNumber v-model="sellOrderFormData.markUpRate" :precision="2" style="width:100%"></InputNumber>
-                            </FormItem>
-                        </Col>
-                        <Col span="8">
-                            <FormItem label="收款金额" >
-                                <InputNumber v-model="sellOrderFormData.payAmount" :precision="2" style="width:100%"></InputNumber>
-                            </FormItem>
-                        </Col>
-                        <Col span="8">
-                            <FormItem label="抹零" >
-                                <InputNumber v-model="sellOrderFormData.notSmallAmount" :precision="2" style="width:100%"></InputNumber>
-                            </FormItem>
-                        </Col>
-                    </Row>
-
-                    <Row type="flex" justify="center">
-                        <Col span="8">
-                            <FormItem label="仓库点" prop="warehouseId">
-                                <warehouse-select v-model="sellOrderFormData.warehouseId" :disabled="warehouseDisable" @on-change="warehouseChange"></warehouse-select>
-                            </FormItem>
-                        </Col>
-                        <Col span="16">
-                            <FormItem label="备注" >
-                                <Input type="text" v-model="sellOrderFormData.comment" placeholder="请输入备注"></Input>
-                            </FormItem>
-                        </Col>
-                    </Row>
-                </Form>
-            </Row>
+                <Row type="flex" justify="start">
+                    <Col span="8">
+                        <FormItem label="仓库点" prop="warehouseId">
+                            <warehouse-select v-model="sellOrderFormData.warehouseId" :disabled="warehouseDisable" @on-change="warehouseChange"></warehouse-select>
+                        </FormItem>
+                    </Col>
+                    <Col span="16">
+                        <FormItem label="备注" >
+                            <Input type="text" v-model="sellOrderFormData.comment" placeholder="请输入备注"></Input>
+                        </FormItem>
+                    </Col>
+                </Row>
+            </Form>
             <Tabs type="line">
                 <TabPane label="商品信息" name="goodInfo">
                     <Row type="flex" justify="start">
                         <ButtonGroup size="small">
-                            <Button type="primary"  @click="addGoodBtnClick">添加商品</Button>
+                            <Button type="primary" :disabled="!sellOrderFormData.warehouseId"  @click="addGoodBtnClick">添加商品</Button>
                         </ButtonGroup>
                     </Row>
                     <Table border highlight-row :loading="saveGoodBtnLoading" 
-                        :columns="goodTableColumn" :data="goodTableData" 
+                        :columns="detailsColumns" :data="detailsData" 
                         no-data-text="在保存订单信息后点击添加商品按钮添加"
                         ref="sellOrderGoodTable" style="width: 100%;" size="small"
                         @on-row-dblclick="handleRowDbClick">
@@ -195,10 +171,8 @@ import goodExpand from "@/views/good/good-expand.vue";
 import sellGoodHistory from "./sell-good-history.vue";
 import warehouseSelect from "@/views/selector/warehouse-select.vue";
 import saleSelect from "@/views/selector/sale-select.vue";
-import temperControlSelect from "@/views/selector/temper-control-select.vue";
-import payMethodSelect from "@/views/selector/pay-method-select.vue";
-import shipMethodSelect from "@/views/selector/ship-method-select.vue";
-import shipToolSelect from "@/views/selector/ship-tool-select.vue";
+import optionSelect from "@/views/selector/option-select.vue";
+import shipCompanySelect from "@/views/selector/ship-company-select.vue";
 
 export default {
   name: "sell_order_make",
@@ -210,37 +184,15 @@ export default {
     sellGoodHistory,
     warehouseSelect,
     saleSelect,
-    temperControlSelect,
-    payMethodSelect,
-    shipToolSelect,
-    shipMethodSelect
+    optionSelect,
+    shipCompanySelect
   },
   data() {
     return {
       editeOnlyDisable: false,
       sellOrderFormData: {
-        id: "",
-        customerId: "",
-        customerName: "",
         customerRepId: -1,
-        contactPhone: "",
-        repertoryAddress: "",
-        salerId: "",
-        refNo: "",
-        temperControlId: "",
-        shipMethod: "",
-        shipTool: "",
-        createOrderDate: "",
-        takeGoodsUser: "",
-        payOrderDate: "",
-        payMethod: "",
-        payFileNo: "",
-        markUpRate: 0,
-        payAmount: 0,
-        notSmallAmount: 0,
-        warehouseId: "",
-        comment: "",
-        details: ''
+        createOrderDate: moment().format('YYYY-MM-DD'),
       },
       sellOrderFormValidate: {
         customerId: [
@@ -289,17 +241,16 @@ export default {
       goodSearchModal: false,
       saveGoodBtnLoading: false,
       warehouseDisable: false,
-      goodTableData: [],
-      goodTableColumn: [
+      detailsData: [],
+      detailsColumns: [
         {
           type: "expand",
           width: 50,
-          fixed: "left",
           render: (h, params) => {
             let repertoryInfo = params.row.repertoryInfo;
-            let good = {};
+            let goods = {};
             if (repertoryInfo) {
-              good = repertoryInfo.goods;
+              goods = repertoryInfo.goods;
             }
             let productDate = '';
             if (repertoryInfo.productDate) {
@@ -311,7 +262,7 @@ export default {
             }
             return h(goodExpand, {
               props: {
-                good: good,
+                good: goods,
                 repertoryInfo: repertoryInfo,
                 productDate: productDate,
                 expDate: expDate
@@ -321,10 +272,61 @@ export default {
         },
         {
           title: "药名",
-          key: "goodName",
+          key: "goodsName",
           align: "center",
           sortable: true,
-          fixed: "left"
+        },
+        {
+          title: "生产企业",
+          key: "factoryName",
+          align: "center",
+          render: (h, params) => {
+            let goods = params.row.repertoryInfo.goods;
+            if(goods) {
+              return goods.factory;
+            }else {
+              return '';
+            }
+          }
+        },
+        {
+          title: "产地",
+          key: "origin",
+          align: "center",
+          render: (h, params) => {
+            let goods = params.row.repertoryInfo.goods;
+            if(goods) {
+              return goods.origin;
+            }else {
+              return '';
+            }
+          }
+        },
+        {
+          title: "规格",
+          key: "spec",
+          align: "center",
+          render: (h, params) => {
+            let goods = params.row.repertoryInfo.goods;
+            if(goods) {
+              return goods.spec;
+            }else {
+              return '';
+            }
+          }
+        },
+        {
+          title: "剂型",
+          key: "jx",
+          align: "center",
+          render: (h, params) => {
+            let goods = params.row.repertoryInfo.goods;
+            if(goods) {
+              return goods.jxName;
+            }else {
+              return '';
+            }
+          }
         },
         {
           title: "库存量",
@@ -332,18 +334,19 @@ export default {
           align: "center"
         },
         {
-          title: "数量",
+          title: "销售数量",
           key: "quantity",
           align: "center",
           render: (h, params) => {
             let self = this;
             return h("Input", {
               props: {
-                value: self.goodTableData[params.index][params.column.key]
+                number: true,
+                value: self.detailsData[params.index][params.column.key]
               },
               on: {
                 "on-blur"(event) {
-                  let row = self.goodTableData[params.index];
+                  let row = self.detailsData[params.index];
                   row[params.column.key] = event.target.value;
                   self.resetGoodSDataAmount(params.index);
                 }
@@ -364,11 +367,12 @@ export default {
             let self = this;
             return h("Input", {
               props: {
-                value: self.goodTableData[params.index][params.column.key]
+                number: true,
+                value: self.detailsData[params.index][params.column.key]
               },
               on: {
                 "on-blur"(event) {
-                  let row = self.goodTableData[params.index];
+                  let row = self.detailsData[params.index];
                   row[params.column.key] = event.target.value;
                   self.resetGoodSDataAmount(params.index);
                 }
@@ -384,11 +388,12 @@ export default {
             let self = this;
             return h("Input", {
               props: {
-                value: self.goodTableData[params.index][params.column.key]
+                number: true,
+                value: self.detailsData[params.index][params.column.key]
               },
               on: {
                 "on-blur"(event) {
-                  let row = self.goodTableData[params.index];
+                  let row = self.detailsData[params.index];
                   row[params.column.key] = event.target.value;
                   self.resetGoodSDataAmount(params.index);
                 }
@@ -405,12 +410,13 @@ export default {
             let self = this;
             return h("Input", {
               props: {
-                value: self.goodTableData[params.index][params.column.key],
+                number: true,
+                value: self.detailsData[params.index][params.column.key],
                 icon: "eye"
               },
               on: {
                 "on-blur"(event) {
-                  let row = self.goodTableData[params.index];
+                  let row = self.detailsData[params.index];
                   row[params.column.key] = event.target.value;
                   row["singlePrice"] = event.target.value;
                   self.resetGoodSDataAmount(params.index);
@@ -441,11 +447,12 @@ export default {
             let self = this;
             return h("Input", {
               props: {
-                value: self.goodTableData[params.index][params.column.key]
+                number: true,
+                value: self.detailsData[params.index][params.column.key]
               },
               on: {
                 "on-blur"(event) {
-                  let row = self.goodTableData[params.index];
+                  let row = self.detailsData[params.index];
                   row[params.column.key] = event.target.value;
                 }
               }
@@ -464,17 +471,18 @@ export default {
     };
   },
   watch: {
-    goodTableData(data) {
-      if (data && data.length > 0) {
+    detailsData: function() {
+      console.log(this.detailsData);
+      if(this.detailsData && this.detailsData.length > 0) {
         this.warehouseDisable = true;
-        this.totalQuantity = data.reduce((count, item) => {
+        this.totalQuantity = this.detailsData.reduce((total, item) => {
           if (item.quantity && !isNaN(item.quantity)) {
-            return count + parseInt(item.quantity);
+            return total + item.quantity;
           }
         }, 0);
-        this.totalAmount = data.reduce((total, item) => {
+        this.totalAmount = this.detailsData.reduce((total, item) => {
           if (item.amount && !isNaN(item.amount)) {
-            return total + parseFloat(item.amount);
+            return total + item.amount;
           }
         }, 0);
       }else {
@@ -558,7 +566,7 @@ export default {
           this.$Message.warning('必输信息需要输入');
           return;
         }
-        if (!this.goodTableData || this.goodTableData.length <= 0) {
+        if (!this.detailsData || this.detailsData.length <= 0) {
           this.$Message.warning('需要添加商品');
           return;
         }
@@ -573,7 +581,7 @@ export default {
     saveSellOrder(status) {
       this.sellOrderSaveLoading = true;
       this.sellOrderFormData.status = status;
-      this.sellOrderFormData.details = this.goodTableData;
+      this.sellOrderFormData.details = this.detailsData;
       util.ajax.post("/sell/order/save", this.sellOrderFormData)
         .then((response) => {
           this.sellOrderSaveLoading = false;
@@ -593,7 +601,7 @@ export default {
           this.$Message.warning('必输信息需要输入');
           return;
         }
-        if (!this.goodTableData || this.goodTableData.length <= 0) {
+        if (!this.detailsData || this.detailsData.length <= 0) {
           this.$$Message.warning('需要添加商品');
           return;
         }
@@ -616,8 +624,8 @@ export default {
     customerCanSaleGoodValidate() {
       //检查客户是否是可经营特殊管控的商品的，如果不是，需要检查选择的商品列表中是否存在特殊管控的商品
       if (!this.currChooseCustomer || !this.currChooseCustomer.canSaleSpecial) {
-        for (let i=0; i<this.goodTableData.length; i++) {
-          let goodItem = this.goodTableData[i].repertoryInfo ? this.goodTableData[i].repertoryInfo.goods : null;
+        for (let i=0; i<this.detailsData.length; i++) {
+          let goodItem = this.detailsData[i].repertoryInfo ? this.detailsData[i].repertoryInfo.goods : null;
           if (goodItem && goodItem !== null && goodItem.SpecialManaged) {
               this.$Modal.error(
                 {
@@ -685,7 +693,7 @@ export default {
         comment: "",
         details: ''
       };
-      this.goodTableData = [];
+      this.detailsData = [];
     },
     refreshGoodsData(sellOrderId) {
       if (sellOrderId && sellOrderId > 0) {
@@ -694,7 +702,7 @@ export default {
         util.ajax
           .get("/sell/detail/list", { params: reqData })
           .then(response => {
-            this.goodTableData = response.data;
+            this.detailsData = response.data;
             this.getGoodHistoryPrice();
           })
           .catch(error => {
@@ -723,9 +731,9 @@ export default {
       }
       let self = this;
       let chooseList = repertoryList.filter(item => {
-        if (self.goodTableData) {
-          for (let i = 0; i < self.goodTableData.length; i++) {
-            let temp = self.goodTableData[i];
+        if (self.detailsData) {
+          for (let i = 0; i < self.detailsData.length; i++) {
+            let temp = self.detailsData[i];
             if (temp.repertoryId === item.id) {
               return false;
             }
@@ -737,30 +745,30 @@ export default {
         return;
       }
       let addList = chooseList.map(item => {
+        let goods = item.goods;
         let temp = {
-          id: "",
           sellOrderId: self.sellOrderFormData.id,
           repertoryId: item.id,
-          goodId: item.goodId,
-          goodName: item.goodName,
+          goodsId: item.goodsId,
+          goodsName: item.goodsName,
           repertoryQuantity: item.quantity,
           quantity: 0,
-          fixPrice: item.salePrice,
+          fixPrice: goods ? goods.batchPrice : 0,
           disPrice: 0,
           free: 0,
-          realPrice: item.salePrice,
-          singlePrice: item.salePrice,
+          realPrice: goods ? goods.batchPrice : 0,
+          singlePrice: goods ? goods.batchPrice : 0,
           amount: 0,
-          taxRate: 0,
+          taxRate: goods ? goods.outTax : 0,
           repertoryInfo: item
         };
         return temp;
       });
-      addList.map(item => this.goodTableData.push(item));
+      addList.map(item => this.detailsData.push(item));
       this.getGoodHistoryPrice();
     },
     getGoodHistoryPrice() {
-      let list = this.goodTableData;
+      let list = this.detailsData;
       if (!list || list.length <= 0) {
         return;
       }
@@ -802,7 +810,7 @@ export default {
       this.goodHistoryModal = true;
     },
     resetGoodSDataAmount(index) {
-      let row = this.goodTableData[index];
+      let row = this.detailsData[index];
       let realPrice =
         row["realPrice"] && !isNaN(row["realPrice"]) ? row["realPrice"] : 0;
       let disPrice =
@@ -812,7 +820,6 @@ export default {
         row["quantity"] && !isNaN(row["quantity"]) ? row["quantity"] : 0;
       let num = quantity - free > 0 ? quantity - free : 0;
       row.amount = (num * realPrice * (1 - disPrice / 100)).toFixed(2);
-      this.$set(this.goodTableData, index, row);
     },
 
     
@@ -824,7 +831,7 @@ export default {
             if (data.id) {
               this.goodRemoveItem(data.id);
             }
-            this.goodTableData.splice(index, 1);
+            this.detailsData.splice(index, 1);
           },
           onCancel: () => {
               
@@ -850,6 +857,10 @@ export default {
 </script>
 
 <style>
+
+.ivu-form-item {
+    margin-bottom: 20px;
+}
 
 </style>
 

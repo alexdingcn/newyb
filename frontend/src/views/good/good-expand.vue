@@ -15,10 +15,10 @@
             </Col>
             <Col span="4">
                 <span class="label-key">货号: </span>
-                <span class="label-value">{{good.code}}</span>
+                <span class="label-value">{{good.id}}</span>
             </Col>
             <Col span="4">
-                <span class="label-key">商品编号: </span>
+                <span class="label-key">商品条码: </span>
                 <span class="label-value">{{good.serial}}</span>
             </Col>
             <Col span="8"></Col>
@@ -28,20 +28,23 @@
                 <span class="label-key">商品名称: </span>
                 <span class="label-value">{{good.fullName}}</span>
             </Col>
-            <Col span="6">
+            <Col span="4">
                 <span class="label-key">生产企业: </span>
                 <span class="label-value">{{good.factory}}</span>
             </Col>
-            <Col span="6">
+            <Col span="4">
                 <span class="label-key">产地: </span>
                 <span class="label-value">{{good.origin}}</span>
             </Col>
-            <Col span="8"></Col>
+            <Col span="12">
+                <span class="label-key">主治功能: </span>
+                <span class="label-value">{{good.cureRange}}</span>
+            </Col>
         </Row>
         <Row >
             <Col span="4">
                 <span class="label-key">剂型: </span>
-                <span class="label-value">{{good.jx}}</span>
+                <span class="label-value">{{good.jxName}}</span>
             </Col>
             <Col span="4">
                 <span class="label-key">规格: </span>
@@ -60,26 +63,34 @@
         <Row >
             <Col span="4">
                 <span class="label-key">储藏条件: </span>
-                <span class="label-value">{{good.storageCondition}}</span>
+                <span class="label-value">{{good.storageConditionName}}</span>
             </Col>
             <Col span="4">
-                <span class="label-key">储藏描述: </span>
-                <span class="label-value">{{good.storageDescription}}</span>
+                <span class="label-key">药基: </span>
+                <span class="label-value">{{good.baseMedName}}</span>
             </Col>
             <Col span="4">
                 <span class="label-key">是否进口: </span>
-                <span class="label-value">{{good.isForeign ? '是' : '否'}}</span>
+                <span class="label-value">{{good.foreign ? '是' : '否'}}</span>
             </Col>
             <Col span="4">
-                <span class="label-key">中西药: </span>
-                <span class="label-value">{{good.isTcm ? '中药': '西药'}}</span>
+                <span class="label-key">中/西药属性: </span>
+                <span class="label-value">{{good.medTypeName}}</span>
             </Col>
-            <Col span="8"></Col>
+            <Col span="4">
+                <span class="label-key">处方/非处方属性: </span>
+                <span class="label-value">{{good.prescriptionName}}</span>
+            </Col>
+            <Col span="4"></Col>
         </Row>
         <Row >
             <Col span="4">
                 <span class="label-key">批准文号: </span>
-                <span class="label-value">{{good.permitId}}</span>
+                <span class="label-value">{{good.permitNo}}</span>
+            </Col>
+            <Col span="4">
+                <span class="label-key">注册商标: </span>
+                <span class="label-value">{{good.brandNo}}</span>
             </Col>
             <Col span="4">
                 <span class="label-key">生产日期: </span>
@@ -88,10 +99,6 @@
             <Col span="4">
                 <span class="label-key">有效期至: </span>
                 <span class="label-value"> {{expDate}} </span>
-            </Col>
-            <Col span="4">
-                <span class="label-key">是否处方药: </span>
-                <span class="label-value">{{good.isPrescription ? '是' : '否'}}</span>
             </Col>
             <Col span="4">
                 <span class="label-key">是否特殊管控: </span>

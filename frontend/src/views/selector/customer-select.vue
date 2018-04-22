@@ -7,7 +7,7 @@
             filterable clearable remote :remote-method="searchByName" 
             :loading="searchLoading" 
             @on-change="onChange" :size="selectSize">
-        <Option v-for="item in customerList" :value="item.id" :key="item.id"> {{item.name}} </Option>
+        <Option v-for="item in customerList" :value="item.id" :key="item.id" :disabled="!item.enabled"> {{item.name}} </Option>
     </Select>
 </template>
 

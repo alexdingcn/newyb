@@ -154,6 +154,8 @@ public class Goods {
     private String abcTypeName;
     private String scopeName;
     private String newTypeName;
+    private String prescriptionName; //处方/非处方属性
+    private String medTypeName; //中西药属性
 
 
     public void setOptionName(List<Options> options) {
@@ -177,6 +179,8 @@ public class Goods {
         this.setAbcTypeName(optionMap.get(this.getAbcTypeId()) != null ? optionMap.get(this.getAbcTypeId()).getValue() : null);
         this.setScopeName(optionMap.get(this.getScopeId()) != null ? optionMap.get(this.getScopeId()).getValue() : null);
         this.setNewTypeName(optionMap.get(this.getNewTypeId()) != null ? optionMap.get(this.getNewTypeId()).getValue() : null);
+        this.setPrescriptionName(optionMap.get(this.getPrescriptionId()) != null ? optionMap.get(this.getPrescriptionId()).getValue() : null);
+        this.setMedTypeName(optionMap.get(this.getMedTypeId()) != null ? optionMap.get(this.getMedTypeId()).getValue() : null);
     }
 
     public Set<Long> getOptionIdList() {
@@ -194,6 +198,8 @@ public class Goods {
         optionIdSet.add(this.getAbcTypeId() != null ? this.getAbcTypeId() : 0);
         optionIdSet.add(this.getScopeId() != null ? this.getScopeId() : 0);
         optionIdSet.add(this.getNewTypeId() != null ? this.getNewTypeId() : 0);
+        optionIdSet.add(this.getPrescriptionId() != null ? this.getPrescriptionId() : 0);
+        optionIdSet.add(this.getMedTypeId() != null ? this.getMedTypeId() : 0);
 
         return optionIdSet;
     }
@@ -828,5 +834,21 @@ public class Goods {
 
     public void setNewTypeName(String newTypeName) {
         this.newTypeName = newTypeName;
+    }
+
+    public String getPrescriptionName() {
+        return prescriptionName;
+    }
+
+    public void setPrescriptionName(String prescriptionName) {
+        this.prescriptionName = prescriptionName;
+    }
+
+    public String getMedTypeName() {
+        return medTypeName;
+    }
+
+    public void setMedTypeName(String medTypeName) {
+        this.medTypeName = medTypeName;
     }
 }

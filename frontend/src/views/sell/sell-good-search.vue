@@ -42,15 +42,11 @@
             </Row>
 
             <div slot="footer">
-                <Row >
-                    <Col span="5" offset="6">
-                        <Button size="small" type="primary" @click="ok" long>
-                            <span >确定</span>
-                        </Button>
-                    </Col>
-                    <Col span=5 class="padding-left-10">
-                        <Button size="small" @click="closedModal" long>取消</Button>
-                    </Col>
+                <Row type="flex" justify="end">
+                    <ButtonGroup shape="circle">
+                        <Button type="success" icon="checkmark" @click="ok">确定</Button>
+                        <Button type="ghost" icon="reply" @click="closedModal">取消</Button>
+                    </ButtonGroup>
                 </Row>
             </div>
       </Modal>
@@ -95,80 +91,38 @@ export default {
               },
               {
                   title: '货号',
-                  key: 'code',
+                  key: 'goodsId',
                   width: 120,
-                  sortable: true,
-                  fixed: 'left'
+                  sortable: true
               },
               {
                   title: '商品名称',
-                  key: 'goodName',
+                  key: 'goodsName',
                   width: 200,
-                  sortable: true,
-                  fixed: 'left',
-                  render: (h, params) => {
-                      let good = params.row.goods;
-                      if (good) {
-                          return h('span', good.name);
-                      }else {
-                          return h('span', '获取产品信息失败');
-                      }
-                  }
+                  sortable: true
               },
               {
                   title: '剂型',
                   key: 'jx',
-                  width: 100,
-                  render: (h, params) => {
-                      let good = params.row.goods;
-                      if (good) {
-                          return h('span', good.jx);
-                      }else {
-                          return h('span', '');
-                      }
-                  }
+                  width: 100
               },
               {
                   title: '规格',
                   key: 'spec',
-                  width: 100,
-                  render: (h, params) => {
-                      let good = params.row.goods;
-                      if (good) {
-                          return h('span', good.spec);
-                      }else {
-                          return h('span', '');
-                      }
-                  }
+                  width: 100
               },
               {
                   title: '生产企业',
                   key: 'factoryName',
-                  width: 200,
-                  render: (h, params) => {
-                      let good = params.row.goods;
-                      if (good) {
-                          return h('span', good.factory);
-                      }else {
-                          return h('span', '');
-                      }
-                  }
+                  width: 200
               },
               {
                   title: '单位',
                   key: 'unitName',
-                  width: 80,
-                  render: (h, params) => {
-                      let good = params.row.goods;
-                      if (good) {
-                          return h('span', good.unitName);
-                      }else {
-                          return h('span', '');
-                      }
-                  }
+                  width: 100
               }, 
               {
-                  title: '数量',
+                  title: '库存数量',
                   key: 'quantity',
                   width: 120
               },
@@ -177,7 +131,7 @@ export default {
                   key: 'expDate',
                   width: 120, 
                   render: (h, params) => {
-                    return moment(params.row.expDate).format('YYYY-MM-DD');
+                    return params.row.expDate ? moment(params.row.expDate).format('YYYY-MM-DD') : '';
                   }
               },
               {
@@ -185,18 +139,23 @@ export default {
                   key: 'productDate',
                   width: 120, 
                   render: (h, params) => {
-                    return moment(params.row.productDate).format('YYYY-MM-DD');
+                    return params.row.productDate ? moment(params.row.productDate).format('YYYY-MM-DD') : '';
                   }
               },
               {
                   title: '批次号',
                   key: 'batchCode',
-                  width: 120
+                  width: 140
+              }, 
+              {
+                  title: '批准文号',
+                  key: 'permitNo',
+                  width: 140
               }
           ],
           totalCount: 0,
           currentPage: 1,
-          tableCurrPageSize: 10,
+          tableCurrPageSize: 50,
           tabCurrChooseList: [],
           choonseNumber: 0,
       }
@@ -215,7 +174,7 @@ export default {
         },
   },
   methods: {
-      initData() {
+      initData() { 
           this.totalCount = 0;
           this.tabData = [];
       },
