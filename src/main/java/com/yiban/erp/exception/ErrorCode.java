@@ -50,7 +50,7 @@ public enum ErrorCode {
     CHECK_PLAN_PASS_REPET_ERROR(1506, "已审核过盘点单，无法重复审核"),
     CHECK_PLAN_PASS_OUT_ERROR(1507, "盘点审核，盘亏数量超过库存数量无法出库"),
     CHECK_PLAN_PASS_VALIDATE_ERROR(1510, "盘点审核失败-缺少必要参数"),
-
+    CHECK_PLAN_FORM_MORE(1511, "盘点登记失败，系统内同一张单据存在多个盘点表"),
     // 20xx - 客户
     CUSTOMER_GET_FAIL(2000, "获取客户信息失败"),
     CUSTOMER_DEL_PARAMS_EMPTY(2001, "请选择需要删除的客户"),

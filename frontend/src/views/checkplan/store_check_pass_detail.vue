@@ -148,7 +148,6 @@
     </div>
 </template>
 <script>
-    import axios from 'axios';
     import moment from 'moment';
     import util from '@/libs/util.js';
     export default {
@@ -352,9 +351,8 @@
 
 
             },handlePlanPass(){
-
-                alert(  JSON.stringify(this.checkPass));
                 util.ajax.post('/repertory/check/checkPlanPass' ,{
+                    planId:this.checkPlanId,
                     state:this.checkPass.state,
                     comment:this.checkPass.comment,
                     manager:this.checkPass.manager,
@@ -364,14 +362,15 @@
                 })
                     .then(function (response) {
                         self.repertoryCheckDetailItems = [];
+                        self.passModalShow=false;
                         if (response.status === 200 && response.data) {
                             self.repertoryCheckDetailItems = response.data.checkDetailList;
                             self.storeCheck=response.data.data;
-
                         }
                     })
-                    .catch(function (error) {
-                        console.log(error);
+                    .catch(error => {
+                        self.passModalShow=false;
+                        util.errorProcessor(this, error);
                     });
             }
 

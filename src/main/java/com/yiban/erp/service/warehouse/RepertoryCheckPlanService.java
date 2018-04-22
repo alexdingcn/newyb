@@ -3,10 +3,7 @@ package com.yiban.erp.service.warehouse;
 import com.alibaba.fastjson.JSONObject;
 import com.yiban.erp.constant.CheckPlanConstant;
 import com.yiban.erp.constant.OrderNumberType;
-import com.yiban.erp.dao.GoodsMapper;
-import com.yiban.erp.dao.RepertoryCheckPlanDetailMapper;
-import com.yiban.erp.dao.RepertoryCheckPlanMapper;
-import com.yiban.erp.dao.RepertoryInfoMapper;
+import com.yiban.erp.dao.*;
 import com.yiban.erp.entities.*;
 import com.yiban.erp.exception.BizException;
 import com.yiban.erp.exception.ErrorCode;
@@ -36,6 +33,8 @@ public class RepertoryCheckPlanService {
     private RepertoryInfoMapper repertoryInfoMapper;
     @Autowired
     private GoodsMapper goodsMapper;
+    @Autowired
+    private RepertoryCheckFormMapper repertoryCheckFormMapper;
     /**
      * 保存盘点单信息
      * @param user
@@ -259,15 +258,54 @@ public class RepertoryCheckPlanService {
     }
 
     //根据人员和盘点单id查询人员相关信息
+    @Transactional
     public JSONObject getCheckPlanAndDetailJSONByUser(User user,Long checkPlanId)throws BizException{
         JSONObject result = new JSONObject();
+        RepertoryCheckForm checkFormInfo=new RepertoryCheckForm();
         RepertoryCheckPlan checkinfo= repertoryCheckPlanMapper.selectByPrimaryKey(checkPlanId);
         Map<String, Object> requestMap = new HashMap<>();
         requestMap.put("checkPlanId", checkPlanId);
         requestMap.put("makeUserId",user.getId());
+        List<RepertoryCheckForm> checkFormList=repertoryCheckFormMapper.getCheckPlanFormList(requestMap);
+        //第一次登记创建盘点单
+        if(null==checkFormList||checkFormList.size()==0){
+
+            RepertoryCheckForm checkForm=new RepertoryCheckForm();
+
+            checkForm.setCheckPlanId(checkPlanId);
+            //checkForm.setCheckNote();
+            checkForm.setCreateBy(user.getNickname());
+            checkForm.setCreateTime(new Date());
+            checkForm.setMakeUserId(user.getId());
+            //巡检表单号=巡检单+userid
+            checkForm.setFormNo(checkinfo.getCheckCode()+user.getId());
+            checkForm.setFormState(CheckPlanConstant.PLAN_TABLE_UNCHECK);
+            repertoryCheckFormMapper.insert(checkForm);
+            checkFormInfo=checkForm;
+        }else if(checkFormList.size()>1){
+            throw new BizException(ErrorCode.CHECK_PLAN_FORM_MORE);
+        }else if(checkFormList.size()==1){
+            checkFormInfo=checkFormList.get(0);
+        }
+
         List<RepertoryCheckPlanDetail>  cdlist=repertoryCheckPlanDetailMapper.getCheckPlanDetailList(requestMap);
         cdlist=setRepertoryToList(cdlist);
         result.put("data", checkinfo);
+        result.put("checkFormInfo", checkFormInfo);
+        result.put("checkDetailList", cdlist);
+        return result;
+    }
+    //根据人员和盘点单id查询人员相关信息
+    @Transactional
+    public JSONObject getCheckPlanAndDetailJSONByFormId(User user,Long formId)throws BizException{
+        JSONObject result = new JSONObject();
+        Map<String, Object> requestMap = new HashMap<>();
+        requestMap.put("formId", formId);
+        RepertoryCheckForm  checkFormInfo=repertoryCheckFormMapper.selectByPrimaryKey(formId);
+
+        List<RepertoryCheckPlanDetail>  cdlist=repertoryCheckPlanDetailMapper.getCheckPlanDetailList(requestMap);
+        cdlist=setRepertoryToList(cdlist);
+        result.put("checkFormInfo", checkFormInfo);
         result.put("checkDetailList", cdlist);
         return result;
     }
@@ -406,6 +444,7 @@ public class RepertoryCheckPlanService {
         }
         return resultjson;
     }
+
     @Transactional
     public void setCheckPlanPass(User user,Long planId,String comment, String manager,String managerNote,String finance,String financeNote) throws BizException {
         if (planId==null ) {
@@ -499,4 +538,24 @@ public class RepertoryCheckPlanService {
         }
     }
 
+    @Transactional
+    public void setCheckFormPass(User user,RepertoryCheckForm checkForm) throws BizException {
+        if (checkForm.getId()==null ) {
+            throw new BizException(ErrorCode.CHECK_PLAN_PASS_VALIDATE_ERROR);
+        }
+        RepertoryCheckForm formObj= repertoryCheckFormMapper.selectByPrimaryKey(checkForm.getId());
+
+        if(CheckPlanConstant.PLAN_CHECK.equals(formObj.getFormState())){
+            throw new BizException(ErrorCode.CHECK_PLAN_PASS_REPET_ERROR);
+        }
+        //更新cp信息
+        formObj.setFormState(CheckPlanConstant.PLAN_CHECK);
+        formObj.setUpdateBy(user.getNickname());
+        formObj.setUpdateTime(new Date());
+        formObj.setCheckNote(checkForm.getCheckNote());
+        repertoryCheckFormMapper.updateByPrimaryKeySelective(formObj);
+        //批量处理工单明细
+        Map<String, Object> requestMap = new HashMap<>();
+        requestMap.put("formId", checkForm.getId());
+    }
 }

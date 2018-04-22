@@ -40,9 +40,14 @@
             <Form :label-width="85" :rules="ruleValidate" :model="storeCheck" ref="CheckPartDetailForm">
                 <Row>
                     <Col span="6">
-                        <FormItem label="盘点表编号" prop="partNo">
-                            <Input v-model="storeCheck.partNo" size="small"></Input>
+                        <FormItem label="盘点表编号" prop="formNo">
+                            <Input v-model="storeCheck.formNo" size="small" :disabled=true></Input>
                         </FormItem>
+                    </Col>
+                    <Col span="6">
+                    <FormItem label="备注" prop="checkNote">
+                        <Input v-model="storeCheck.checkNote" size="small"   ></Input>
+                    </FormItem>
                     </Col>
                     <Col span="18">
                     <FormItem label="添加已盘物品">
@@ -374,6 +379,8 @@
                                 self.checkMore.checkPlanId=self.checkPlanId;
                                 self.storeCheck=response.data.data;
                                 self.orderItems=response.data.checkDetailList;
+                                self.storeCheck.formNo=response.data.checkFormInfo.formNo;
+                                self.storeCheck.checkNote=response.data.checkFormInfo.checkNote;
                                 self.storeCheck.orderItemIds=[];
                                 for (var i = 0; i < self.orderItems.length; i++) {
                                     self.storeCheck.orderItemIds.push(self.orderItems[i].id);

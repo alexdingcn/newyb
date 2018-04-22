@@ -8,6 +8,7 @@ public class RepertoryCheckPlanDetail {
 
     private Long checkPlanId;
     private Long makeUserId;
+    private Long formId;
     private String formNo;
 
     private String formStatus;
@@ -68,6 +69,14 @@ public class RepertoryCheckPlanDetail {
 
     public void setCheckPlanId(Long checkPlanId) {
         this.checkPlanId = checkPlanId;
+    }
+
+    public Long getFormId() {
+        return formId;
+    }
+
+    public void setFormId(Long formId) {
+        this.formId = formId;
     }
 
     public String getFormNo() {

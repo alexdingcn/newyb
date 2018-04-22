@@ -10,11 +10,11 @@
             </p>
 
             <div slot="extra">
+                <!--<ButtonGroup >-->
+                    <!--<Button type="primary" icon="android-add-circle" @click="showDoDetail" >盘点表确认</Button>-->
+                <!--</ButtonGroup>-->
                 <ButtonGroup >
-                    <Button type="primary" icon="android-add-circle" @click="showDoDetail" >盘点进度</Button>
-                </ButtonGroup>
-                <ButtonGroup >
-                <Button type="primary" icon="android-add-circle" @click="doCheckOrder" >执行盘点</Button>
+                <Button type="primary" icon="android-add-circle" @click="doCheckOrder" >制定/执行盘点表</Button>
                 </ButtonGroup>
                 <!--<ButtonGroup >-->
                 <!--<Button type="primary" icon="android-add-circle" @click="" >盘点表审核</Button>-->
@@ -186,7 +186,8 @@
                     this.$Message.warning('请一次选择一条盘点单');
                 } else if (rows.length == 1) {
                     this.$router.push({
-                        name: 'store_check_do_detail',
+                        //name: 'store_check_do_detail',
+                        name: 'store_check_part_index',
                         params:{checkPlanId:rows[0].id,warehouseName:rows[0].warehouseName}
                     });
                 }

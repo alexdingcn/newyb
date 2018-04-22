@@ -5,6 +5,7 @@
     <id column="id" property="id" jdbcType="BIGINT" />
     <result column="check_plan_id" property="checkPlanId" jdbcType="BIGINT" />
     <result column="make_user_id" property="makeUserId" jdbcType="BIGINT" />
+    <result column="form_id" property="formId" jdbcType="BIGINT" />
     <result column="form_no" property="formNo" jdbcType="VARCHAR" />
     <result column="form_status" property="formStatus" jdbcType="VARCHAR" />
     <result column="repertory_info_id" property="repertoryInfoId" jdbcType="BIGINT" />
@@ -24,7 +25,7 @@
     <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
   </resultMap>
   <sql id="Base_Column_List" >
-    id, check_plan_id, make_user_id,form_no, form_status, repertory_info_id, goods_id, batch_code,
+    id, check_plan_id, make_user_id,formId,form_no, form_status, repertory_info_id, goods_id, batch_code,
     acc_limit, check_limit, check_note, check_status, price, amount, product_date, exp_date, 
     create_by, create_time, update_by, update_time
   </sql>
@@ -39,14 +40,14 @@
     where id = #{id,jdbcType=BIGINT}
   </delete>
   <insert id="insert" parameterType="com.yiban.erp.entities.RepertoryCheckPlanDetail"  useGeneratedKeys="true" keyProperty="id">
-    insert into repertory_check_plan_detail (id, check_plan_id, make_user_id,form_no,
+    insert into repertory_check_plan_detail (id, check_plan_id, make_user_id,form_id,form_no,
       form_status, repertory_info_id, goods_id, 
       batch_code, acc_limit, check_limit, 
       check_note, check_status, price, 
       amount, product_date, exp_date, 
       create_by, create_time, update_by, 
       update_time)
-    values (#{id,jdbcType=BIGINT}, #{checkPlanId,jdbcType=BIGINT}, #{makeUserId,jdbcType=BIGINT},#{formNo,jdbcType=VARCHAR},
+    values (#{id,jdbcType=BIGINT}, #{checkPlanId,jdbcType=BIGINT}, #{makeUserId,jdbcType=BIGINT}, #{formId,jdbcType=BIGINT},#{formNo,jdbcType=VARCHAR},
       #{formStatus,jdbcType=VARCHAR}, #{repertoryInfoId,jdbcType=BIGINT}, #{goodsId,jdbcType=BIGINT}, 
       #{batchCode,jdbcType=VARCHAR}, #{accLimit,jdbcType=DECIMAL}, #{checkLimit,jdbcType=DECIMAL}, 
       #{checkNote,jdbcType=VARCHAR}, #{checkStatus,jdbcType=INTEGER}, #{price,jdbcType=DECIMAL}, 
@@ -65,6 +66,9 @@
       </if>
       <if test="makeUserId != null" >
         make_user_id,
+      </if>
+      <if test="formId != null" >
+        form_id,
       </if>
       <if test="formNo != null" >
         form_no,
@@ -128,6 +132,9 @@
       <if test="makeUserId != null" >
         #{makeUserId,jdbcType=BIGINT},
       </if>
+      <if test="formId != null" >
+        #{formId,jdbcType=BIGINT},
+      </if>
       <if test="formNo != null" >
         #{formNo,jdbcType=VARCHAR},
       </if>
@@ -190,6 +197,9 @@
       <if test="makeUserId != null" >
         make_user_id = #{makeUserId,jdbcType=BIGINT},
       </if>
+      <if test="formId != null" >
+        form_id = #{formId,jdbcType=BIGINT},
+      </if>
       <if test="formNo != null" >
         form_no = #{formNo,jdbcType=VARCHAR},
       </if>
@@ -248,6 +258,7 @@
     update repertory_check_plan_detail
     set check_plan_id = #{checkPlanId,jdbcType=BIGINT},
       make_user_id = #{makeUserId,jdbcType=BIGINT},
+      form_id = #{formId,jdbcType=BIGINT},
       form_no = #{formNo,jdbcType=VARCHAR},
       form_status = #{formStatus,jdbcType=VARCHAR},
       repertory_info_id = #{repertoryInfoId,jdbcType=BIGINT},
@@ -278,6 +289,9 @@
     </if>
     <if test="makeUserId  != null" >
       and a.make_user_id = #{makeUserId ,jdbcType=BIGINT}
+    </if>
+    <if test="formId  != null" >
+      and a.form_id = #{formId ,jdbcType=BIGINT}
     </if>
     <if test="goodSearch != null">
       <bind name="pattern" value="'%' + goodSearch + '%'" />

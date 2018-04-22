@@ -91,12 +91,9 @@ export const otherRouter = {
     children: [
         { path: 'home', title: {i18n: 'home'}, name: 'home_index', component: () => import('@/views/home/home.vue') },
         { path: 'message', title: '消息中心', name: 'message', component: () => import('@/views/message/message.vue') },
-        { path: 'supplier/:supplier_id', title: '供应商详情', name: 'supplier-info', component: () => import('@/views/basic-data/supplier-info.vue') }, // 供应商详情
         { path: 'ownspace', title: '个人中心', name: 'ownspace_index', component: () => import('@/views/own-space/own-space.vue') },
         { path: 'order/:order_id', title: '订单详情', name: 'order-info', component: () => import('@/views/advanced-router/component/order-info.vue') }, // 用于展示动态路由
         { path: 'shopping', title: '购物详情', name: 'shopping', component: () => import('@/views/advanced-router/component/shopping-info.vue') }, // 用于展示带参路由
-
-
     ]
 };
 
@@ -115,7 +112,6 @@ export const appRouter = [
             { path: 'customer', title: '客户档案', name: 'basic_data_customer', component: () => import('@/views/basic-data/customer.vue') },
             { path: 'buyer', title: '采购员', name: 'basic_data_buyer', component: () => import('@/views/basic-data/buyer.vue') },
             { path: 'sale', title: '销售员', name: 'basic_data_sale', component: () => import('@/views/basic-data/sale.vue') },
-            { path: 'price', title: '价格设置', name: 'basic_data_price', component: () => import('@/views/basic-data/price.vue') },
             { path: 'file', title: '档案管理', name: 'basic_data_file', component: () => import('@/views/basic-data/file.vue') },
             { path: 'ship', title: '运输公司档案', name: 'basic_data_ship', component: () => import('@/views/basic-data/ship.vue') }
         ]
@@ -161,7 +157,6 @@ export const appRouter = [
             { path: "in-check", title: '入库审核', name: 'in-check', component: () => import('@/views/repertory/in-check.vue')},
         ]
     },
-/*
     {
         path: '/checkplan',
         icon: 'social-buffer',
@@ -173,15 +168,32 @@ export const appRouter = [
             { path: 'store_check_index_detail', title: '盘点单明細-不显示', name: 'store_check_index_detail', component: () => import('@/views/checkplan/store_check_index_detail.vue') },
             { path: 'store_check_add', title: '盘点制单', name: 'store_check_add', component: () => import('@/views/checkplan/store_check_add.vue') },
             { path: 'store_check_do_list', title: '执行盘点', name: 'store_check_do_list', component: () => import('@/views/checkplan/store_check_do_list.vue') },
+            { path: 'store_check_table_list', title: '盘点表确认', name: 'store_check_table_list', component: () => import('@/views/checkplan/store_check_table_list.vue') },
+            { path: 'store_check_part_pass', title: '执行盘点表确认', name: 'store_check_part_pass', component: () => import('@/views/checkplan/store_check_part_pass.vue') },
+
+
             { path: 'store_check_do_detail', title: '盘点执行进度', name: 'store_check_do_detail', component: () => import('@/views/checkplan/store_check_do_detail.vue') },
-          //  { path: 'store_check_part_index', title: '盘点表执行进度-不显示', name: 'store_check_part_index', component: () => import('@/views/checkplan/store_check_part_index.vue') },
+          //  { path: 'store_check_table_detail', title: '盘点表信息', name: 'store_check_table_detail', component: () => import('@/views/checkplan/store_check_table_detail.vue') },
+
+             { path: 'store_check_part_index', title: '盘点表执行进度-不显示', name: 'store_check_part_index', component: () => import('@/views/checkplan/store_check_part_index.vue') },
             { path: 'store_check_part_add',  title: '录入盘点信息-不显示', name: 'store_check_part_add', component: () => import('@/views/checkplan/store_check_part_add.vue') },
             { path: "store_check_pass_list", title: '盘点审核', name: 'store_check_pass_list', component: () => import('@/views/checkplan/store_check_pass_list.vue')},
             { path: "store_check_pass_detail", title: '盘点审核明细-不显示', name: 'store_check_pass_detail', component: () => import('@/views/checkplan/store_check_pass_detail.vue')},
             //  { path: "store_check_info", title: '盘点审核明细-不显示', name: 'store_check_info', component: () => import('@/views/checkplan/store_check_info.vue')},
-            ]
+        ]
     },
-*/
+    // {
+    //     path: '/account',
+    //     icon: 'social-buffer',
+    //     name: 'accountrecord',
+    //     title: '财务管理',
+    //     component: Main,
+    //     children: [
+    //         { path: 'account_collection_index', title: '销售收款', name: 'account_collection_index', component: () => import('@/views/account/account_collection_index.vue') },
+    //      { path: 'account_pay_index', title: '财务付款', name: 'account_pay_index', component: () => import('@/views/account/account_pay_index.vue') },
+    //      { path: 'current_account_index', title: '往来账记录', name: 'current_account_index', component: () => import('@/views/account/current_account_index.vue') },
+    //     ]
+    // },
 {
         path: '/access',
         icon: 'key',

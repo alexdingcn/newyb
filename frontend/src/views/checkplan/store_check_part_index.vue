@@ -27,11 +27,11 @@
             <div slot="extra">
 
                 <ButtonGroup >
-                    <Button type="primary" icon="android-add-circle" @click="addCheckPart" >盘点表录入</Button>
+                    <Button type="primary" icon="android-add-circle" @click="showCheckPartDetail" >确认详细信息</Button>
                 </ButtonGroup>
-                <ButtonGroup >
-                    <Button type="primary" icon="android-add-circle" @click="" >盘点表审核</Button>
-                </ButtonGroup>
+                <!--<ButtonGroup >-->
+                    <!--<Button type="primary" icon="android-add-circle" @click="" >盘点表审核</Button>-->
+                <!--</ButtonGroup>-->
             </div>
             <Form :label-width="85" :model="storeCheck" ref="storeCheckForm">
                 <Row>
@@ -137,59 +137,72 @@
                 },
                 repertoryColumns: [
                     {
-                        type: 'index',
-                        title: 'id',
+                        type: 'selection',
+                        key: 'id',
                         align: 'center',
-                        width: 30
-                    }, {
+                        width: 60
+                    },
+                    // {
+                    //     type: 'index',
+                    //     title: 'id',
+                    //     align: 'center',
+                    //     width: 30
+                    // },
+                    {
                         title: '状态',
                         align: 'center',
-                        key: 'state',
+                        key: 'formState',
                         width: 120,
                         render: (h, params) => {
-                            let state  = params.row.state;
+                            let state  = params.row.formState;
                             if (0==state) {
-                                return h('Tag', {props: {color: 'yellow'}}, '待审核');
+                                return h('Tag', {props: {color: 'yellow'}}, '待确认');
                             }else if (1==state) {
-                                return h('Tag', {props: {color: 'yellow'}}, '已完成');
+                                return h('Tag', {props: {color: 'green'}}, '已确认');
                             }
                         }
                     },
                     {
                         title: '盘点表编号',
                         align: 'center',
-                        key: 'checkNo',
+                        key: 'formNo',
                         width: 200
                     },
                     {
                         title: '制表人',
                         align: 'center',
-                        key: 'createdBy',
+                        key: 'createBy',
                         width: 120
                     },
 
                     {
                         title: '制表时间',
-                        key: 'createdTime',
+                        key: 'createTime',
                         align: 'center',
-                        width: 120
+                        width: 120,
+                        render: (h, params) => {
+                            return moment(params.row.createTime).format('YYYY-MM-DD');
+                        }
                     },
                     {
                         title: '审核人',
-                        key: 'processUserName',
+                        key: 'updateBy',
                         align: 'center',
                         width: 120
                     },
                     {
                         title: '审核时间',
-                        key: 'prcoessDate',
+                        key: 'updateTime',
                         align: 'center',
-                        width: 120
+                        width: 120,
+                        render: (h, params) => {
+                            return moment(params.row.updateTime).format('YYYY-MM-DD');
+                        }
                     },
 
                     {
                         title: '审核结果',
-                        key: 'processResult',
+                        key: 'checkNote',
                         align: 'center',
                         width: 400
                     }
@@ -211,6 +224,7 @@
                             if (response.status === 200 && response.data) {
                                 self.repertoryCheckPartItems = response.data.checkPartList;
                                 self.storeCheck=response.data.data;
+                                self.storeCheck.checkPlanId=checkPlanId;
                                 let checkType  = self.storeCheck.checkType;
                                 if (0==checkType) {
                                     self.storeCheck.checkType="库存盘点";
@@ -223,9 +237,7 @@
                                 let state  = self.storeCheck.state;
                                 if (0==state) {
                                     self.storeCheck.state="待处理";
-                                }else if (1==state) {
-                                    self.storeCheck.state="处理中";
-                                }else if (2==state){
+                                }if (1==state){
                                     self.storeCheck.state="已审核";
                                 }
 
@@ -240,11 +252,30 @@
                 }
 
 
-            },addCheckPart(){
-                this.$router.push({
-                    name: 'store_check_part_add',
-                    params:{checkPlanId: this.storeCheck.id,warehouseName:this.storeCheck.warehouseName}
-                });
+            },showCheckPartDetail(){
+
+
+                var self = this;
+                var rows = this.$refs.storeCheckTable.getSelection();
+                if (!rows || rows.length === 0) {
+                    this.$Message.warning('请选择盘点表记录');
+                } else if (rows.length > 1) {
+                    this.$Message.warning('请一次选择一条盘点表记录');
+                } else if (rows.length == 1) {
+                    if(rows[0].formState==1){
+                        this.$Message.warning('该盘点表已经确认');
+                    }else{
+                        this.$router.push({
+                            name: 'store_check_part_pass',
+                            params:{
+                                formId:rows[0].id,
+                                checkPlanId:this.storeCheck.checkPlanId
+                            }
+                        });
+                    }
+
+
+                }
             }
         }, mounted () {
         this.initPartIndex();
