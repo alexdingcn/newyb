@@ -9,6 +9,7 @@ import com.yiban.erp.dto.RepertoryQuery;
 import com.yiban.erp.entities.Goods;
 import com.yiban.erp.entities.RepertoryInfo;
 import com.yiban.erp.entities.User;
+import com.yiban.erp.service.GoodsService;
 import com.yiban.erp.util.DateUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,12 +27,13 @@ public class RepertoryService {
     @Autowired
     private RepertoryInfoMapper repertoryInfoMapper;
     @Autowired
-    private GoodsMapper goodsMapper;
+    private GoodsService goodsService;
 
     public List<RepertoryInfo> getSearchList(Map<String, Object> requestMap) {
         List<RepertoryInfo> list = repertoryInfoMapper.getDetailList(requestMap);
         return setGoodsToList(list);
     }
+
     public JSONObject getStoreNowPage(User user, RepertoryQuery repertoryQuery) {
         JSONObject result = new JSONObject();
         Integer pageSize = repertoryQuery.getSize() == null ? 10 : repertoryQuery.getSize();
@@ -68,12 +70,12 @@ public class RepertoryService {
 
     private List<RepertoryInfo> setGoodsToList(List<RepertoryInfo> list) {
         if (list == null || list.isEmpty()) {
-            return Collections.emptyList();
+            return list;
         }
         //获取对应的商品基础信息
         List<Long> goodIdList = new ArrayList<>();
         list.stream().forEach(item -> goodIdList.add(item.getGoodsId()));
-        List<Goods> goodsList = goodsMapper.selectByIdList(goodIdList);
+        List<Goods> goodsList = goodsService.getGoodsById(goodIdList);
         final Map<Long, Goods> goodMap = new HashMap<>();
         goodsList.stream().forEach(item -> goodMap.put(item.getId(), item));
         list.stream().forEach(item -> {

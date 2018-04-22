@@ -61,7 +61,7 @@ public class RepertoryInfo {
 
     //展示字段
     private String warehouseName;
-    private String goodName;
+    private String goodsName;
     private String factoryName;
     private String origin;
     private String jx;
@@ -70,11 +70,12 @@ public class RepertoryInfo {
     private String permitNo;
     private String baseMedName;
     private String storageConditionName;
+    private BigDecimal taxRate;
 
     public void setGoods(Goods goods) {
         this.goods = goods;
         if (goods != null) {
-            this.goodName = goods.getName();
+            this.goodsName = goods.getName();
             this.factoryName = goods.getFactory();
             this.origin = goods.getOrigin();
             this.jx = goods.getJxName();
@@ -83,6 +84,7 @@ public class RepertoryInfo {
             this.permitNo = goods.getPermitNo();
             this.baseMedName = goods.getBaseMedName();
             this.storageConditionName = goods.getStorageConditionName();
+            this.taxRate = goods.getOutTax();
         }
     }
 
@@ -306,12 +308,20 @@ public class RepertoryInfo {
         this.warehouseName = warehouseName;
     }
 
-    public String getGoodName() {
-        return goodName;
+    public String getGoodsName() {
+        return goodsName;
     }
 
-    public void setGoodName(String goodName) {
-        this.goodName = goodName;
+    public void setGoodsName(String goodsName) {
+        this.goodsName = goodsName;
+    }
+
+    public BigDecimal getTaxRate() {
+        return taxRate;
+    }
+
+    public void setTaxRate(BigDecimal taxRate) {
+        this.taxRate = taxRate;
     }
 
     public String getFactoryName() {

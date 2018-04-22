@@ -398,8 +398,8 @@
     where status != 'delete'
       and company_id = #{companyId}
       <bind name="nameVal" value="'%' + name + '%'"/>
-      and (name like #{nameVal} or pinyin like #{nameVal} )
-      order by id desc;
+      and (name like #{nameVal} or lower(pinyin) like lower(#{nameVal}) )
+      order by enabled desc, id desc;
   </select>
 
 </mapper>
