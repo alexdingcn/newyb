@@ -4,7 +4,6 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.yiban.erp.dao.CustomerMapper;
 import com.yiban.erp.entities.Customer;
-import com.yiban.erp.entities.CustomerCert;
 import com.yiban.erp.entities.CustomerRep;
 import com.yiban.erp.entities.User;
 import com.yiban.erp.exception.*;

@@ -2,14 +2,10 @@ package com.yiban.erp.service.customer;
 
 import com.yiban.erp.constant.CustomerStatus;
 import com.yiban.erp.constant.OrderNumberType;
-import com.yiban.erp.dao.CustomerCertMapper;
 import com.yiban.erp.dao.CustomerMapper;
 import com.yiban.erp.dao.CustomerRepMapper;
-import com.yiban.erp.dao.FileInfoMapper;
 import com.yiban.erp.entities.Customer;
-import com.yiban.erp.entities.CustomerCert;
 import com.yiban.erp.entities.CustomerRep;
-import com.yiban.erp.entities.FileInfo;
 import com.yiban.erp.exception.BizException;
 import com.yiban.erp.exception.BizRuntimeException;
 import com.yiban.erp.exception.ErrorCode;
