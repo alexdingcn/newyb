@@ -53,6 +53,9 @@ public class SellOrder {
 
     private Integer warehouseId;
 
+    private BigDecimal totalQuantity;
+    private BigDecimal totalAmount;
+
     private String warehouseName;
 
     private Customer customer;
@@ -376,5 +379,21 @@ public class SellOrder {
 
     public void setShipCompanyId(Integer shipCompanyId) {
         this.shipCompanyId = shipCompanyId;
+    }
+
+    public BigDecimal getTotalQuantity() {
+        return totalQuantity;
+    }
+
+    public void setTotalQuantity(BigDecimal totalQuantity) {
+        this.totalQuantity = totalQuantity;
+    }
+
+    public BigDecimal getTotalAmount() {
+        return totalAmount;
+    }
+
+    public void setTotalAmount(BigDecimal totalAmount) {
+        this.totalAmount = totalAmount;
     }
 }

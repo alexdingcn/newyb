@@ -189,6 +189,16 @@ export default {
                     width: 120
                 },
                 {
+                    title: '总计数量',
+                    key: 'totalQuantity',
+                    width: 100
+                },
+                {
+                    title: '总计金额',
+                    key: 'totalAmount',
+                    width: 100
+                },
+                {
                     title: '温控方式',
                     key: 'temperControlName',
                     align: 'center',

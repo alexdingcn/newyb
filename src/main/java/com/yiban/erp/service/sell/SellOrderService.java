@@ -21,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.*;
 
 @Service
@@ -60,9 +61,15 @@ public class SellOrderService {
             throw new BizException(ErrorCode.SELL_ORDER_PARAM_ERROR);
         }
         List<SellOrderDetail> details = sellOrder.getDetails();
-        //验证客户是否允许经营特殊管理药品
+        //验证客户是否允许经营特殊管理药品 同时统计总销售数量和总金额
+        BigDecimal totalQuantity = BigDecimal.ZERO;
+        BigDecimal totalAmount = BigDecimal.ZERO;
         List<Long> goodIdList = new ArrayList<>();
-        details.stream().forEach(item -> goodIdList.add(item.getGoodsId()));
+        for (SellOrderDetail item : details) {
+            goodIdList.add(item.getGoodsId());
+            totalQuantity = totalQuantity.add(item.getQuantity() == null ? BigDecimal.ZERO : item.getQuantity());
+            totalAmount = totalAmount.add(item.getAmount() == null ? BigDecimal.ZERO : item.getAmount());
+        }
         if(!isCustomerCanSellGoods(sellOrder.getCustomerId(), goodIdList)) {
             logger.warn("user: {} save sell order detail good have special managed but customer:{} can not shell.", user.getId(), sellOrder.getCustomerId());
             throw new BizException(ErrorCode.SELL_ORDER_CUSTOMER_CANNOT_SELL_GOOD);
@@ -71,10 +78,13 @@ public class SellOrderService {
         if (sellOrder.getId() == null) {
             logger.info("new sell order save.");
             String orderNumber = UtilTool.makeOrderNumber(user.getCompanyId(), OrderNumberType.SELL);
+            //计算订单的总数量和总金额
             sellOrder.setCompanyId(user.getCompanyId());
             sellOrder.setOrderNumber(orderNumber);
             sellOrder.setCreateBy(user.getNickname());
             sellOrder.setCreateTime(new Date());
+            sellOrder.setTotalQuantity(totalQuantity);
+            sellOrder.setTotalAmount(totalAmount);
             int count = sellOrderMapper.insert(sellOrder);
             if (count > 0 && sellOrder.getId() > 0) {
                 //保存详情信息
@@ -88,6 +98,8 @@ public class SellOrderService {
                 sellOrderDetailMapper.replaceBatch(details);
             }
         }else {
+            sellOrder.setTotalQuantity(totalQuantity);
+            sellOrder.setTotalAmount(totalAmount);
             sellOrder.setUpdateTime(new Date());
             sellOrder.setUpdateBy(user.getNickname());
             int count = sellOrderMapper.updateByPrimaryKeySelective(sellOrder);
@@ -108,7 +120,6 @@ public class SellOrderService {
         afterOrder.setDetails(resultdetails);
         return afterOrder;
     }
-
 
 
     private boolean validateSellOrder(SellOrder order) {

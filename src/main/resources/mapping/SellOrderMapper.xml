@@ -24,12 +24,14 @@
     <result column="update_by" property="updateBy" jdbcType="VARCHAR" />
     <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
     <result column="warehouse_id" property="warehouseId" jdbcType="INTEGER" />
+    <result column="total_quantity" property="totalQuantity" jdbcType="DECIMAL" />
+    <result column="total_amount" property="totalAmount" jdbcType="DECIMAL" />
   </resultMap>
   <sql id="Base_Column_List" >
     id, company_id, order_number, ref_no, status, customer_id, customer_rep_id, sale_id,
     temper_control_id, create_order_date, take_goods_user, pay_order_date, mark_up_rate,
     ship_method, ship_tool, ship_company_id, comment, create_by, create_time,
-    update_by, update_time, warehouse_id
+    update_by, update_time, warehouse_id, total_quantity, total_amount
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
     select 
@@ -48,7 +50,7 @@
       create_order_date, take_goods_user, pay_order_date,
       mark_up_rate, ship_method, ship_tool, ship_company_id,
       comment, create_by, create_time, 
-      update_by, update_time, warehouse_id)
+      update_by, update_time, warehouse_id, total_quantity, total_amount)
     values (#{companyId,jdbcType=INTEGER}, #{orderNumber,jdbcType=VARCHAR},
       #{refNo,jdbcType=VARCHAR}, #{status,jdbcType=VARCHAR}, #{customerId,jdbcType=INTEGER}, 
       #{customerRepId,jdbcType=INTEGER}, #{saleId,jdbcType=BIGINT}, #{temperControlId,jdbcType=BIGINT},
@@ -56,7 +58,8 @@
       #{markUpRate,jdbcType=DECIMAL}, #{shipMethod,jdbcType=BIGINT},
       #{shipTool,jdbcType=BIGINT}, #{shipCompanyId, jdbcType=INTEGER},
       #{comment,jdbcType=VARCHAR}, #{createBy,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, 
-      #{updateBy,jdbcType=VARCHAR}, #{updateTime,jdbcType=TIMESTAMP}, #{warehouseId,jdbcType=INTEGER})
+      #{updateBy,jdbcType=VARCHAR}, #{updateTime,jdbcType=TIMESTAMP}, #{warehouseId,jdbcType=INTEGER},
+      #{totalQuantity,jdbcType=DECIMAL}, #{totalAmount,jdbcType=DECIMAL})
   </insert>
 
   <update id="updateByPrimaryKeySelective" parameterType="com.yiban.erp.entities.SellOrder" >
@@ -119,6 +122,12 @@
       <if test="warehouseId != null">
         warehouse_id = #{warehouseId, jdbcType=INTEGER},
       </if>
+      <if test="totalQuantity != null">
+        total_quantity = #{totalQuantity,jdbcType=DECIMAL},
+      </if>
+      <if test="totalAmount != null" >
+        total_amount = #{totalAmount,jdbcType=DECIMAL},
+      </if>
     </set>
     where id = #{id,jdbcType=BIGINT}
   </update>
@@ -169,6 +178,8 @@
     <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
     <result column="warehouse_id" property="warehouseId" jdbcType="INTEGER" />
     <result column="warehouse_name" property="warehouseName" jdbcType="VARCHAR" />
+    <result column="total_quantity" property="totalQuantity" jdbcType="DECIMAL" />
+    <result column="total_amount" property="totalAmount" jdbcType="DECIMAL" />
     <result column="sale_nick_name" property="saleNickName" jdbcType="VARCHAR" />
     <result column="sale_real_name" property="saleRealName" jdbcType="VARCHAR" />
     <association property="customer" javaType="com.yiban.erp.entities.Customer">
@@ -187,7 +198,8 @@
     s.id, s.company_id, s.order_number, s.ref_no, s.status, s.customer_id, s.customer_rep_id, s.sale_id,
     s.temper_control_id, s.create_order_date, s.take_goods_user, s.pay_order_date, s.mark_up_rate,
     s.ship_method, s.ship_tool, s.ship_company_id, s.comment, s.create_by, s.create_time,
-    s.update_by, s.update_time, s.warehouse_id, w.name as warehouse_name, c.name as cust_name,
+    s.update_by, s.update_time, s.warehouse_id, s.total_quantity, s.total_amount,
+    w.name as warehouse_name, c.name as cust_name,
     r.id as rep_id, r.name as rep_name, r.contact_phone as rep_contact_phone,
     r.repertory_address as rep_repertory_address,
     u.nickname as sale_nick_name, u.realname as sale_real_name

@@ -30,6 +30,16 @@
                 </Row>
                 <Row class="content-row">
                     <Col span="6">
+                        <span class="label-key">总计数量:</span>
+                        <span class="label-value">{{orderDetail.totalQuantity}}</span>
+                    </Col>
+                    <Col span="6">
+                        <span class="label-key">总计金额:</span>
+                        <span class="label-value">{{orderDetail.totalAmount}}</span>
+                    </Col>
+                </Row>
+                <Row class="content-row">
+                    <Col span="6">
                         <span class="label-key">销售员:</span>
                         <span class="label-value">{{orderDetail.saleNickName}}</span>
                     </Col>
@@ -78,72 +88,11 @@
                         <span class="label-value">{{orderDetail.comment}}</span>
                     </Col>
                 </Row>
-
-                <div v-for="(item, index) in detailsData" :key="item.id">
-                    <Row class="title-show margin-top-20">
-                        <span>订单商品详细->{{index + 1}}</span>
-                        <hr/>
-                    </Row>
-                    <Row class="content-row">
-                        <Col span="6">
-                            <span class="label-key">商品名称:</span>
-                            <span class="label-value">{{item.goodsName}}</span>
-                        </Col>
-                        <Col span="6">
-                            <span class="label-key">仓库:</span>
-                            <span class="label-value">{{orderDetail.warehouseName}}</span>
-                        </Col>
-                        <Col span="6">
-                            <span class="label-key">库位:</span>
-                            <span class="label-value">{{item.repertoryInfo.location || ''}}</span>
-                        </Col>
-                        <Col span="6">
-                            <span class="label-key">批次号:</span>
-                            <span class="label-value">{{item.repertoryInfo.batchCode || ''}}</span>
-                        </Col>
-                    </Row>
-                    <Row class="content-row">
-                        <Col span="6">
-                            <span class="label-key">销售数量:</span>
-                            <span class="label-value">{{item.quantity}}</span>
-                        </Col>
-                        <Col span="6">
-                            <span class="label-key">定价:</span>
-                            <span class="label-value">{{item.fixPrice}}</span>
-                        </Col>
-                        <Col span="6">
-                            <span class="label-key">实价:</span>
-                            <span class="label-value">{{item.realPrice}}</span>
-                        </Col>
-                        <Col span="6">
-                            <span class="label-key">折扣:</span>
-                            <span class="label-value">{{item.disPrice}}</span>
-                        </Col>
-                    </Row>
-                    <Row class="content-row">
-                        <Col span="6">
-                            <span class="label-key">赠送:</span>
-                            <span class="label-value">{{item.free}}</span>
-                        </Col>
-                        <Col span="6">
-                            <span class="label-key">件单价:</span>
-                            <span class="label-value">{{item.singlePrice}}</span>
-                        </Col>
-                        <Col span="6">
-                            <span class="label-key">金额:</span>
-                            <span class="label-value">{{item.amount}}</span>
-                        </Col>
-                        <Col span="6">
-                            <span class="label-key">税率:</span>
-                            <span class="label-value">{{item.taxRate}}</span>
-                        </Col>
-                    </Row>
-                    <good-expand :good="getGoodDetail(item)" 
-                        :repertoryInfo="item.repertoryInfo" 
-                        :productDate="getGoodProductDate(item.repertoryInfo)" 
-                        :expDate="getGoodExpDate(item.repertoryInfo)"></good-expand>
-                </div>
-
+                <h3 style="margin-top:20px;">订单详情信息</h3>
+                <hr size="1" style="width:100%; margin-bottom: 10px;"/>
+                <Table ref="detailTable" size="small" border highlight-row style="width: 100%;" 
+                    :columns="tabColumns" :data="detailsData">
+                </Table>
             </Col>
         </Row>
     </div>
@@ -166,6 +115,182 @@ export default {
       return {
           orderDetail: '',
           detailsData: [],
+          tabColumns: [
+              {
+                  title: '货号',
+                  key: 'goodsId',
+                  width: 100
+              },
+              {
+                  title: '商品名称',
+                  key: 'goodsName',
+                  width: 160,
+              },
+              {
+                  title: '生产企业',
+                  key: 'factoryName',
+                  width: 160,
+              },
+              {
+                  title: '生产企业',
+                  key: 'factoryName',
+                  width: 160,
+              },
+              {
+                    title: '批次号',
+                    key: 'batch',
+                    align: 'center',
+                    width: 160,
+                    render: (h, params) => {
+                        return params.row.repertoryInfo.batchCode;
+                    }
+                },
+                {
+                    title: '剂型',
+                    key: 'jx',
+                    width: 100,
+                    render: (h, params) => {
+                        let goods = params.row.repertoryInfo.goods;
+                        if(goods) {
+                            return goods.jxName;
+                        }else {
+                            return '';
+                        }
+                    }
+                },
+                {
+                    title: '规格',
+                    key: 'spec',
+                    width: 100,
+                    render: (h, params) => {
+                        let goods = params.row.repertoryInfo.goods;
+                        if(goods) {
+                            return goods.spec;
+                        }else {
+                            return '';
+                        }
+                    }
+                },
+                {
+                    title: '生产日期',
+                    width: 120,
+                    key: 'productData',
+                    render: (h, params) => {
+                        let repertoryInfo = params.row.repertoryInfo;
+                        if (repertoryInfo && repertoryInfo.productDate) {
+                            return moment(repertoryInfo.productDate).format('YYYY-MM-DD');
+                        }
+                    }
+                },
+                {
+                    title: '有效期至',
+                    key: 'expDate',
+                    width: 120,
+                    render: (h, params) => {
+                        let repertoryInfo = params.row.repertoryInfo;
+                        if (repertoryInfo && repertoryInfo.expDate) {
+                            return moment(repertoryInfo.expDate).format('YYYY-MM-DD');
+                        }
+                    }
+                },
+                {
+                    title: '单位',
+                    key: 'unitName',
+                    width: 90,
+                    render: (h, params) => {
+                        let goods = params.row.repertoryInfo.goods;
+                        if(goods) {
+                            return goods.unitName;
+                        }else {
+                            return '';
+                        }
+                    }
+                },
+                {
+                    title: '数量',
+                    width: 90,
+                    key: 'quantity'
+                },
+                {
+                    title: '价格',
+                    width: 90,
+                    key: 'realPrice'
+                },
+                {
+                    title: "折扣",
+                    key: "disPrice",
+                    align: "center",
+                    width: 100
+                },
+                {
+                    title: "赠送",
+                    key: "free",
+                    align: "center",
+                    width: 100
+                },
+                {
+                    title: '金额',
+                    width: 100,
+                    key: 'amount'
+                },
+                {
+                    title: "税率",
+                    key: "taxRate",
+                    align: "center",
+                    width: 100
+                },
+                {
+                    title: '库位',
+                    key: 'location',
+                    width: 100,
+                    render: (h, params) => {
+                        return params.row.repertoryInfo.location;
+                    }
+                },
+                {
+                    title: '质量审核状态',
+                    width: 120,
+                    key: 'checkStatus',
+                    render: (h, params) => {
+                        const checkStatus = params.row.checkStatus;
+                        const color = !checkStatus ? 'blue' : checkStatus === 'OK' ? 'green' : 'red';
+                        const text = !checkStatus ? '待审' : checkStatus === 'OK' ? '通过' : '拒绝';
+                        return h('Tag', {
+                            props: {
+                                type: 'dot',
+                                color: color
+                            }
+                        }, text);
+                    }
+                },
+                {
+                    title: '质量审核人',
+                    width: 100,
+                    key: 'checkUser',
+                    render: (h, params) => {
+                        const checkUser = params.row.checkUser ? params.row.checkUser : '';
+                        return h('span', checkUser);
+                    }
+                },
+                {
+                    title: '质量审核日期',
+                    width: 120,
+                    key: 'checkDate',
+                    render: (h, params) => {
+                        let checkDate = params.row.checkDate;
+                        return h('span', checkDate ? moment(checkDate).format('YYYY-MM-DD HH:mm') : '');
+                    }
+                },
+                {
+                    title: '质量审核结论',
+                    width: 180,
+                    key: 'checkResult',
+                    render: (h, params) => {
+                        const checkResult = params.row.checkResult ? params.row.checkResult : '';
+                        return h('span', checkResult);
+                    }
+                }
+          ]
       }
   },
   watch: {

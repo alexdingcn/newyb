@@ -210,6 +210,16 @@ export default {
                     align: 'center'
                 },
                 {
+                    title: '总计数量',
+                    key: 'totalQuantity',
+                    width: 100
+                },
+                {
+                    title: '总计金额',
+                    key: 'totalAmount',
+                    width: 100
+                },
+                {
                     title: '提货员',
                     key: 'takeGoodsUser',
                     width: 100,
