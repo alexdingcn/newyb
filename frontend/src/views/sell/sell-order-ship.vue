@@ -5,10 +5,10 @@
 <template>
     <div>
         
-        <Form ref="form" :model="formItem" :label-width="100" :rules="formValidate">
+    <Form ref="form" :model="formItem" :label-width="100" >
 		<Row type="flex" justify="start">
 			<Col span="6">
-				<FormItem label="发货时间">
+			    <FormItem label="发货时间">
 					<DatePicker v-model="formItem.issuanceDate" type="datetime" 
                         format="yyyy-MM-dd HH:mm" placeholder="请选择发货日期" ></DatePicker>
 				</FormItem>
@@ -24,37 +24,59 @@
 				</FormItem>
 			</Col>
 		</Row>
-		<Row type="flex" justify="start">
-			<Col span="6">
-				<FormItem label="存储条件">
-                    <temper-control-select v-model="formItem.storageMethod"></temper-control-select>
+        <Row type="flex" justify="start">
+            <Col span="6">
+			    <FormItem label="收货人">
+					<Input type="text" v-model="formItem.receiveUserName" placeholder="请输入货单号"></Input>
 				</FormItem>
 			</Col>
 			<Col span="6">
-				<FormItem label="运输工具">
-                    <ship-tool-select v-model="formItem.shipToolId"></ship-tool-select>
+				<FormItem label="收货人电话">
+					<Input type="text" v-model="formItem.receiveUserPhone" placeholder="请输入货单号"></Input>
 				</FormItem>
 			</Col>
 			<Col span="12">
+				<FormItem label="收货地址">
+					<Input type="text" v-model="formItem.receiveAddress" placeholder="请输入发货地址"></Input>
+				</FormItem>
+			</Col>
+        </Row>
+		<Row type="flex" justify="start">
+			<Col span="6">
+				<FormItem label="温控方式">
+                    <option-select optionType="TEMPER_CONTROL" v-model="formItem.temperControlId" ></option-select>
+				</FormItem>
+			</Col>
+			<Col span="6">
+                <FormItem label="运输方式">
+                    <option-select optionType="SHIP_METHOD" v-model="formItem.shipMethod" ></option-select>
+				</FormItem>
+			</Col>
+			<Col span="6">
 				<FormItem label="承运单位" prop="shipCompanyId">
                     <ship-company-select v-model="formItem.shipCompanyId"></ship-company-select>
 				</FormItem>
 			</Col>
-		</Row>
-		<Row type="flex" justify="start">
-			<Col span="6">
-				<FormItem label="车牌号">
-					<Input type="text" v-model="formItem.carNumber" placeholder="请输入车牌号"></Input>
-				</FormItem>
-			</Col>
-			<Col span="6">
-				<FormItem label="运输方式">
-                    <ship-method-select v-model="formItem.shipMethod"></ship-method-select>
-				</FormItem>
-			</Col>
-			<Col span="6">
+            <Col span="6">
 				<FormItem label="承运电话">
 					<Input type="text" v-model="formItem.shipPhone" placeholder="请输入承运电话"></Input>
+				</FormItem>
+			</Col>
+		</Row>
+		<Row type="flex" justify="start">
+            <Col span="6">
+				<FormItem label="委托经办人">
+					<Input type="text" v-model="formItem.operator" placeholder="请输入委托经办人"></Input>
+				</FormItem>
+			</Col>
+			<Col span="6">
+				<FormItem label="运输工具">
+                    <option-select optionType="SHIP_TOOL" v-model="formItem.shipToolId" ></option-select>
+				</FormItem>
+			</Col>
+            <Col span="6">
+				<FormItem label="车牌号">
+					<Input type="text" v-model="formItem.carNumber" placeholder="请输入车牌号"></Input>
 				</FormItem>
 			</Col>
 			<Col span="6">
@@ -65,32 +87,30 @@
 		</Row>
 		<Row type="flex" justify="start">
             <Col span="6">
-				<FormItem label="驾驶证档案编号">
-					<Input type="text" v-model="formItem.driverFileNo" placeholder="请输入驾驶证档案编号"></Input>
+				<FormItem label="驾驶证档案">
+					<Input type="text" v-model="formItem.driverFileNo" readonly>
+                        <Button slot="append" type="text" icon='upload' @click="uploadFileInfo(formItem.driverFileNo)"></Button>
+                    </Input>
 				</FormItem>
 			</Col>
 			<Col span="6">
 				<FormItem label="起运温度(℃)">
-					<Input type="text" v-model="formItem.shipTemper" placeholder="请输入车牌号"></Input>
+					<Input number v-model="formItem.shipTemper" placeholder="请输入车牌号"></Input>
 				</FormItem>
 			</Col>
 			<Col span="6">
 				<FormItem label="件数">
-					<InputNumber v-model="formItem.shipQuantity" :min="0"></InputNumber>
+					<Input number v-model="formItem.shipQuantity" ></Input>
 				</FormItem>
 			</Col>
-			<Col span="6">
-				<FormItem label="委托经办人">
-					<Input type="text" v-model="formItem.operator" placeholder="请输入委托经办人"></Input>
+			
+            <Col span="6">
+				<FormItem label="运行里程(km)">
+					<Input number v-model="formItem.mileage" ></Input>
 				</FormItem>
 			</Col>
 		</Row>
 		<Row type="flex" justify="start">
-            <Col span="6">
-				<FormItem label="运行里程(km)">
-					<InputNumber v-model="formItem.mileage" :min="0"></InputNumber>
-				</FormItem>
-			</Col>
 			<Col span="6">
 				<FormItem label="计划启运时间">
 					<DatePicker v-model="formItem.shipStartTime" 
@@ -100,12 +120,12 @@
 			</Col>
 			<Col span="6">
 				<FormItem label="计划到货时间">
-					<DatePicker v-model="formItem.shipEndTime" 
+			    	<DatePicker v-model="formItem.shipEndTime" 
 						type="datetime" format="yyyy-MM-dd HH:mm" placeholder="请选择计划到货时间" >
 					</DatePicker>
 				</FormItem>
 			</Col>
-			<Col span="6">
+			<Col span="12">
 				<FormItem label="备注">
 					<Input type="text" v-model="formItem.comment" ></Input>
 				</FormItem>
@@ -125,59 +145,39 @@
         </Table>
     </Row>
 
+    <Modal v-model="fileUploadModal" title="客户档案上传" :mask-closable="false" width="50" class="file-upload-modal" >
+        <file-detail :fileNo="fileNo" @add-file-success="addFileSuccess" ></file-detail>
+        <div slot="footer"></div>
+    </Modal>
+
     </div>
 </template>
 
 <script>
 import util from '@/libs/util.js';
 import moment from 'moment';
-import temperControlSelect from "@/views/selector/temper-control-select.vue";
-import shipToolSelect from "@/views/selector/ship-tool-select.vue";
-import shipMethodSelect from "@/views/selector/ship-method-select.vue";
 import shipCompanySelect from "@/views/selector/ship-company-select.vue";
+import optionSelect from "@/views/selector/option-select.vue";
+import fileDetail from "@/views/basic-data/file-detail.vue";
 
 export default {
     name: 'sell-order-ship',
     props: {
-        orderId: {
-            type: Number,
+        order: {
+            type: Object,
             required: true
         }
     },
     components: {
-        temperControlSelect,
-        shipToolSelect,
-        shipMethodSelect,
-        shipCompanySelect
+        shipCompanySelect,
+        optionSelect,
+        fileDetail
     },
     data () {
         return {
             formItem: {
-                id: '',
-                sellOrderId: this.orderId,
-                issuanceDate: '',
-                shipNumber: '',
-                shipAddress: '',
-                storageMethod: '',
-                shipToolId: '',
-                shipCompanyId: '',
-                carNumber: '',
-                shipMethod: '',
-                shipPhone: '',
-                driverName: '',
-                driverFileNo: '',
-                shipTemper: '',
-                shipQuantity: 0,
-                operator: '',
-                mileage: 0,
-                shipStartTime: '',
-                shipEndTime: '',
-                comment: ''
-            },
-            formValidate: {
-                shipCompanyId: [
-                    {required: true, type: 'number', message: '承运单位必输', trigger: 'change'}
-                ]
+                sellOrderId: this.order.id,
+                issuanceDate: moment().format('YYYY-MM-DD HH:mm'),
             },
             tabLoading: false,
             tabData: [],
@@ -185,16 +185,14 @@ export default {
                 {
                     title: '货单号',
                     key: 'shipNumber',
-                    width: 120,
-                    align: 'center',
-                    fixed: 'left'
+                    width: 150,
+                    align: 'center'
                 },
                 {
                     title: '发货时间',
                     key: 'issuanceDate',
-                    width: 120,
+                    width: 150,
                     align: 'center',
-                    fixed: 'left',
                     render: (h, params) => {
                         let issuanceDate = params.row.issuanceDate;
                         return issuanceDate ? moment(issuanceDate).format('YYYY-MM-DD HH:mm') : '';
@@ -213,8 +211,26 @@ export default {
                     align: 'center'
                 },
                 {
-                    title: '存储条件',
-                    key: 'storageMethodName',
+                    title: '收货人',
+                    key: 'receiveUserName',
+                    width: 200,
+                    align: 'center'
+                },
+                {
+                    title: '收货人电话',
+                    key: 'receiveUserPhone',
+                    width: 150,
+                    align: 'center'
+                },
+                {
+                    title: '收货地址',
+                    key: 'receiveAddress',
+                    width: 200,
+                    align: 'center'
+                },
+                {
+                    title: '温控方式',
+                    key: 'temperControlName',
                     width: 150,
                     align: 'center'
                 },
@@ -257,8 +273,23 @@ export default {
                 {
                     title: '驾驶员档案',
                     key: 'driverFileNo',
-                    width: 120,
-                    align: 'center'
+                    width: 180,
+                    align: 'center',
+                    render: (h, params) => {
+                        let driverFileNo = params.row.driverFileNo;
+                        return h('Button', {
+                            props: {
+                                type: 'text',
+                                size: 'small',
+                                icon: 'upload'
+                            },
+                            on: {
+                                'click': () => {
+                                    this.uploadFileInfo(driverFileNo);
+                                }
+                            }
+                        }, driverFileNo);
+                    }
                 },
                 {
                     title: '起运温度',
@@ -323,11 +354,13 @@ export default {
                         }, '删除');
                     }
                 }
-            ]
+            ],
+            fileUploadModal: false,
+            fileNo: ''
         };
     },
     watch: {
-        orderId (data) {
+        order (data) {
             this.refreshTableData();
         }
     },
@@ -339,58 +372,50 @@ export default {
                     return;
                 }
                 this.tabLoading = true;
-                this.formItem.sellOrderId = this.orderId;
+                this.formItem.sellOrderId = this.order.id;
                 util.ajax.post('/sell/order/ship/save', this.formItem)
                     .then((response) => {
+                        this.tabLoading = false;
                         this.$Message.success('新建成功');
                         this.refreshTableData();
                         this.initFormItem();
                     })
                     .catch((error) => {
+                        this.tabLoading = false;
                         util.errorProcessor(this, error);
                     });
-                this.tabLoading = false;
             });
         },
 
         initFormItem () {
             this.formItem = {
-                id: '',
-                sellOrderId: this.orderId,
-                issuanceDate: '',
-                shipNumber: '',
-                shipAddress: '',
-                storageMethod: '',
-                shipToolId: '',
-                shipCompanyId: '',
-                carNumber: '',
-                shipMethod: '',
-                shipPhone: '',
-                driverName: '',
-                driverFileNo: '',
-                shipTemper: '',
-                shipQuantity: 0,
-                operator: '',
-                mileage: 0,
-                shipStartTime: '',
-                shipEndTime: '',
-                comment: ''
+                sellOrderId: this.order.id,
+                issuanceDate: moment().format('YYYY-MM-DD HH:mm'),
+                temperControlId: this.order.temperControlId,
+                shipMethod: this.order.shipMethod,
+                shipToolId: this.order.shipTool,
+                shipCompanyId: this.order.shipCompanyId,
+                receiveUserName: this.order.customerRepName,
+                receiveUserPhone: this.order.customerRepContactPhone,
+                receiveAddress: this.order.customerRepRepertoryAddress
             };
         },
 
         refreshTableData () {
-            if (!this.orderId || this.orderId < 0) {
+            if (!this.order.id || this.order.id < 0) {
                 return;
             }
+            this.initFormItem();
             this.tabLoading = true;
-            util.ajax.get('/sell/order/ship/list', {params: {orderId: this.orderId}})
+            util.ajax.get('/sell/order/ship/list', {params: {orderId: this.order.id}})
                 .then((response) => {
+                    this.tabLoading = false;
                     this.tabData = response.data;
                 })
                 .catch((error) => {
+                    this.tabLoading = false;
                     util.errorProcessor(this, error);
                 });
-            this.tabLoading = false;
         },
 
         removeShipRecord (id) {
@@ -405,6 +430,14 @@ export default {
                 .catch((error) => {
                     util.errorProcessor(this, error);
                 });
+        },
+
+        uploadFileInfo(data) {
+            this.fileUploadModal = true;
+            this.fileNo = data;
+        },
+        addFileSuccess(data) {
+            this.formItem.driverFileNo = data.fileNo;
         }
     }
 
@@ -417,6 +450,11 @@ export default {
     height: 2px;
     color: #5cadff;
     margin-top: 10px;
+}
+
+.file-upload-modal {
+    position: fixed;
+    z-index: 3000;
 }
 
 </style>

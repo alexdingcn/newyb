@@ -11,13 +11,9 @@ public interface SellOrderShipMapper {
 
     int insert(SellOrderShip record);
 
-    int insertSelective(SellOrderShip record);
-
     SellOrderShip selectByPrimaryKey(Long id);
 
     int updateByPrimaryKeySelective(SellOrderShip record);
-
-    int updateByPrimaryKey(SellOrderShip record);
 
     List<SellOrderShip> getBySellOrderId(Long orderId);
 }

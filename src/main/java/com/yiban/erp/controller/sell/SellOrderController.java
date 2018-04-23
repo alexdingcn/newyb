@@ -201,13 +201,13 @@ public class SellOrderController {
     @RequestMapping(value = "/order/all/list", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> allList(@RequestBody SellOrderAllAction allAction,
                                           @AuthenticationPrincipal User user) throws Exception {
-        Integer limit = allAction.getSize() == null ? 10 : allAction.getSize();
+        Integer limit = allAction.getSize() == null ? 50 : allAction.getSize();
         Integer pageNum = allAction.getPage() == null ? 1 : allAction.getPage();
         Integer offset = (pageNum -1) * limit;
         allAction.setCompanyId(user.getCompanyId());
         allAction.setOffset(offset);
         allAction.setLimit(limit);
-        List<SellOrder> result = sellOrderMapper.getAllList(allAction);
+        List<SellOrder> result = sellOrderService.getAllList(allAction);
         int count = 0;
         if (result.size() > 0) {
             count = sellOrderMapper.getAllCount(allAction);

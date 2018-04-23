@@ -18,7 +18,7 @@
                 <Row>
                     <Col span="8">
                         <FormItem label="销售员">
-                            <sale-select v-model="query.salerId"></sale-select>
+                            <sale-select v-model="query.saleId"></sale-select>
                         </FormItem>
                     </Col>
                     <Col span="8" >
@@ -46,21 +46,27 @@
 
         <div class="table-div">
             <Row type="flex" justify="start">
-                <ButtonGroup size="small">
-                    <Button type="success" icon="checkmark-round" :loading="detailLoading" @click="reviewOkBtnClick">审核通过</Button>
-                    <Button type="error" icon="close-round" :loading="detailLoading" @click="reviewCancelBtnClick">取消审核</Button>
-                </ButtonGroup>
+                <Col span="12">
+                    <Row type="flex" justify="start">
+                        <h4 class="padding-left-20" >
+                            <b>合计数量:</b> ￥{{ totalCount }} <b class="margin-left-30">合计金额:</b> ￥{{ totalAmount }}
+                        </h4>
+                    </Row>
+                </Col>
+                <Col span="12">
+                    <Row type="flex" justify="end">
+                        <ButtonGroup size="small">
+                            <Button type="success" icon="checkmark-round" :loading="detailLoading" @click="reviewOkBtnClick">审核通过</Button>
+                            <Button type="error" icon="close-round" :loading="detailLoading" @click="reviewCancelBtnClick">取消审核</Button>
+                        </ButtonGroup>
+                    </Row>
+                </Col>
             </Row>
             <Table border highlight-row height="300" :loading="detailLoading" 
-                   :columns="sellGoodColumns" :data="sellGoodList"
+                   :columns="sellDetailColumns" :data="sellDetailList"
                    ref="sellGoodTable" style="width: 100%;" size="small"
                    @on-selection-change="detailSelectionChange"
                    no-data-text="点击上方订单后查看销售明细">
-                <div slot="header">
-                    <h3 class="padding-left-20" >
-                        <b>合计数量:</b> ￥{{ totalCount }} <b class="margin-left-30">合计金额:</b> ￥{{ totalAmount }}
-                    </h3>
-                </div>
             </Table>
         </div>
 
@@ -114,9 +120,7 @@ export default {
                 moment().format('YYYY-MM-DD'),
             ],
             query: {
-                customerId: '',
                 status: 'INIT',
-                salerId: ''
             },
             sellOrderLoading: false,
             orderList: [],
@@ -141,28 +145,28 @@ export default {
                     title: '仓库点',
                     key: 'warehouseName',
                     align: "center",
-                    width: 90
+                    width: 100
                 },
                 {
                     title: '客户',
                     key: 'customerName',
                     align: "center",
-                    width: 150
+                    width: 160
                 },
                 {
                     title: '销售员',
-                    key: 'salerId',
-                    width: 90,
+                    key: 'saleId',
+                    width: 100,
                     align: "center",
                     render: (h, params) => {
                         let nickName = params.row.saleNickName;
                         let realName = params.row.saleRealName;
                         if (nickName && nickName) {
-                            return h('span', realName + '[' + nickName+']');
+                            return h('span', realName + '---' + nickName);
                         }else if(nickName) {
                             return h('span', nickName);
                         }else {
-                            return h('span', params.row.salerId);
+                            return h('span', params.row.saleId);
                         }
                     }
                 },
@@ -170,23 +174,23 @@ export default {
                     title: '制单人',
                     key: 'createBy',
                     align: "center",
-                    width: 90
+                    width: 100
                 },
                 {
                     title: '提货员',
                     key: 'takeGoodsUser',
                     align: "center",
-                    width: 90
-                },
-                {
-                    title: '收款金额',
-                    key: 'payAmount',
-                    align: 'center',
-                    width: 90
+                    width: 100
                 },
                 {
                     title: '销售单号',
                     key: 'orderNumber',
+                    align: 'center',
+                    width: 120
+                },
+                {
+                    title: '温控方式',
+                    key: 'temperControlName',
                     align: 'center',
                     width: 120
                 },
@@ -206,21 +210,33 @@ export default {
                     title: '收货地址',
                     key: 'customerRepRepertoryAddress',
                     align: "center",
-                    width: 150
+                    width: 200
+                }, 
+                {
+                    title: '运输方式',
+                    key: 'shipMethodName',
+                    align: "center",
+                    width: 110
+                },
+                {
+                    title: '运输工具',
+                    key: 'shipToolName',
+                    align: "center",
+                    width: 110
                 }
             ],
             detailLoading: false,
-            sellGoodList: [],
+            sellDetailList: [],
             detailChooseItems: [],
-            sellGoodColumns: [
+            sellDetailColumns: [
                 {
                     type: "expand",
                     width: 50,
                     render: (h, params) => {
                         let repertoryInfo = params.row.repertoryInfo;
-                        let good = {};
+                        let goods = {};
                         if (repertoryInfo) {
-                        good = repertoryInfo.goods;
+                        goods = repertoryInfo.goods;
                         }
                         let productDate = '';
                         if (repertoryInfo.productDate) {
@@ -232,7 +248,7 @@ export default {
                         }
                         return h(goodExpand, {
                             props: {
-                                good: good,
+                                good: goods,
                                 repertoryInfo: repertoryInfo,
                                 productDate: productDate,
                                 expDate: expDate
@@ -247,7 +263,7 @@ export default {
                 },
                 {
                     title: '商品名称',
-                    key: 'goodName',
+                    key: 'goodsName',
                     width: 150
                 },
                 {
@@ -256,13 +272,24 @@ export default {
                     width: 150
                 },
                 {
+                    title: '批次号',
+                    key: 'batch',
+                    align: 'center',
+                    width: 160,
+                    render: (h, params) => {
+                        return params.row.repertoryInfo.batchCode;
+                    }
+                },
+                {
                     title: '剂型',
                     key: 'jx',
                     width: 100,
                     render: (h, params) => {
-                        let repertoryInfo = params.row.repertoryInfo;
-                        if (repertoryInfo) {
-                            return h('span', repertoryInfo.jx);
+                        let goods = params.row.repertoryInfo.goods;
+                        if(goods) {
+                            return goods.jxName;
+                        }else {
+                            return '';
                         }
                     }
                 },
@@ -271,9 +298,11 @@ export default {
                     key: 'spec',
                     width: 100,
                     render: (h, params) => {
-                        let repertoryInfo = params.row.repertoryInfo;
-                        if (repertoryInfo) {
-                            return h('span', repertoryInfo.spec);
+                        let goods = params.row.repertoryInfo.goods;
+                        if(goods) {
+                            return goods.spec;
+                        }else {
+                            return '';
                         }
                     }
                 },
@@ -304,14 +333,22 @@ export default {
                     key: 'unitName',
                     width: 90,
                     render: (h, params) => {
-                        let repertoryInfo = params.row.repertoryInfo;
-                        if (repertoryInfo) {
-                            return h('span', repertoryInfo.unitName);
+                        let goods = params.row.repertoryInfo.goods;
+                        if(goods) {
+                            return goods.unitName;
+                        }else {
+                            return '';
                         }
                     }
                 },
                 {
-                    title: '数量',
+                    title: "库存量",
+                    key: "repertoryQuantity",
+                    width: 100,
+                    align: "center"
+                },
+                {
+                    title: '销售数量',
                     width: 90,
                     key: 'quantity'
                 },
@@ -321,9 +358,27 @@ export default {
                     key: 'realPrice'
                 },
                 {
+                    title: "折扣",
+                    key: "disPrice",
+                    align: "center",
+                    width: 100
+                },
+                {
+                    title: "赠送",
+                    key: "free",
+                    align: "center",
+                    width: 100
+                },
+                {
                     title: '金额',
                     width: 100,
                     key: 'amount'
+                },
+                {
+                    title: "税率",
+                    key: "taxRate",
+                    align: "center",
+                    width: 100
                 },
                 {
                     title: '审核状态',
@@ -377,7 +432,7 @@ export default {
         }
     },
     watch: {
-        sellGoodList(data) {
+        sellDetailList(data) {
             if (data && data.length > 0)  {
                 this.totalCount = data.reduce((totalCount, item) => {
                     let count = item.quantity ? item.quantity : 0;
@@ -393,8 +448,8 @@ export default {
     methods: {
         querySellOrderList() {
             let reqData = {
-                goodId: this.query.goodId,
-                salerId: this.query.salerId
+                customerId: this.query.customerId,
+                saleId: this.query.saleId
             };
             let statusList = [];
             if (this.query.status === 'ALL') {
@@ -427,9 +482,9 @@ export default {
                     this.detailLoading = false;
                     let order = response.data;
                     if (order && order.details) {
-                        this.sellGoodList = order.details;
+                        this.sellDetailList = order.details;
                     }else {
-                        this.sellGoodList = [];
+                        this.sellDetailList = [];
                     }
                 })
                 .catch((error) => {
@@ -475,9 +530,9 @@ export default {
                     this.detailLoading = false;
                     let order = response.data;
                     if (order && order.details) {
-                        this.sellGoodList = order.details;
+                        this.sellDetailList = order.details;
                     }else {
-                        this.sellGoodList = [];
+                        this.sellDetailList = [];
                     }
                     this.$Message.success("提交成功");
                     this.reviewOkModal = false;
@@ -502,9 +557,9 @@ export default {
                     this.detailLoading = false;
                     let order = response.data;
                     if (order && order.details) {
-                        this.sellGoodList = order.details;
+                        this.sellDetailList = order.details;
                     }else {
-                        this.sellGoodList = [];
+                        this.sellDetailList = [];
                     }
                     this.$Message.success("取消成功");
                 })
@@ -533,6 +588,7 @@ export default {
 }
 .table-div {
     background-color: #fff;
+    padding-top: 10px;
     margin-top: 10px;
 }
 </style>

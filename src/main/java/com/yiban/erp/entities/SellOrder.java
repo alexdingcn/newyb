@@ -82,8 +82,8 @@ public class SellOrder {
         Map<Long, Options> optionsMap = new HashMap<>();
         options.stream().forEach(item -> optionsMap.put(item.getId(), item));
         this.setTemperControlName(optionsMap.get(this.temperControlId) != null ? optionsMap.get(this.temperControlId).getValue() : null);
-        this.setTemperControlName(optionsMap.get(this.shipMethod) != null ? optionsMap.get(this.shipMethod).getValue() : null);
-        this.setTemperControlName(optionsMap.get(this.shipTool) != null ? optionsMap.get(this.shipTool).getValue() : null);
+        this.setShipMethodName(optionsMap.get(this.shipMethod) != null ? optionsMap.get(this.shipMethod).getValue() : null);
+        this.setShipToolName(optionsMap.get(this.shipTool) != null ? optionsMap.get(this.shipTool).getValue() : null);
     }
 
     public Long getId() {

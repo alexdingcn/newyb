@@ -9,7 +9,7 @@ import java.util.List;
 public class SellReviewOrderQuery {
 
     private Integer customerId;
-    private Integer salerId;
+    private Integer saleId;
     private List<String> statusList;
     private Date startDate;
     private Date endDate;
@@ -24,12 +24,12 @@ public class SellReviewOrderQuery {
         this.customerId = customerId;
     }
 
-    public Integer getSalerId() {
-        return salerId;
+    public Integer getSaleId() {
+        return saleId;
     }
 
     public void setSalerId(Integer salerId) {
-        this.salerId = salerId;
+        this.saleId = salerId;
     }
 
     public List<String> getStatusList() {

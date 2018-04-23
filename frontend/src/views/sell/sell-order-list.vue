@@ -16,7 +16,7 @@
                         </Col>
                         <Col span="12" >
                             <FormItem label="制单日期">
-                                <DatePicker size="small" v-model="dateRange" type="daterange" placement="bottom-start" placeholder="制单日期" style="width:180px"></DatePicker>
+                                <DatePicker size="small" v-model="dateRange" type="daterange" placement="bottom-start" placeholder="制单日期" style="width:200px"></DatePicker>
                             </FormItem>
                         </Col>
                         <Col span="4"></Col>
@@ -29,7 +29,7 @@
                         </Col>
                         <Col span="8" >
                             <FormItem label="销售员" >
-                                <sale-select size="small" v-model="searchFormItem.salerId"></sale-select>
+                                <sale-select size="small" v-model="searchFormItem.saleId"></sale-select>
                             </FormItem>
                         </Col>
                         <Col span="3" offset="1" >
@@ -61,7 +61,7 @@
         </Modal>
 
         <Modal v-model="showShipDetailView" :width="75" :mask-closable="false" :title="shipDetailTitle" @on-cancel="ShowShipDetailViewClose">
-            <sell-order-ship :orderId="shipOrderId" ></sell-order-ship>
+            <sell-order-ship :order="shipOrder" ></sell-order-ship>
             <div slot="footer"></div>
         </Modal>
 
@@ -86,11 +86,40 @@ export default {
     },
 
     data () {
+        const stautsShow = function(h, status) {
+            let label = '';
+            let color = '';
+            switch (status) {
+                case 'INIT':
+                    label = '制单初始';
+                    color = '#2d8cf0'
+                    break;
+                case 'QUALITY_CHECKED':
+                    label = '质量审核完成';
+                    color = '#ff9900'
+                    break;
+                case 'SALE_CHECKED':
+                    label = '销售审核完成';
+                    color = '#19be6b';
+                    break;
+                default:
+                    label = '';
+                    color = '';
+                    break;
+            }
+            return h('Tag', {
+                props: {
+                    type: 'dot',
+                    color: color
+                }
+            }, label);
+        }
+
         return {
             searchFormItem: {
                 customerId: '',
                 orderNumber: '',
-                salerId: ''
+                saleId: ''
             },
             dateRange: [
                 moment().add(-1,'w').format('YYYY-MM-DD'),
@@ -120,22 +149,27 @@ export default {
                 },
                 {
                     title: '订单编号',
-                    width: 170,
+                    width: 180,
                     key: 'orderNumber',
                     align: 'center',
-                    sortable: true,
-                    fixed: 'left'
+                    sortable: true
                 },
                 {
                     title: '制单日',
                     key: 'createOrderDate',
-                    width: 100,
+                    width: 120,
                     align: 'center',
                     sortable: true,
                     render: (h, params) => {
                         let createOrderDate = params.row.createOrderDate;
                         return h('span', createOrderDate ? moment(createOrderDate).format('YYYY-MM-DD') : '');
                     }
+                },
+                {
+                    title: '仓库点',
+                    key: 'warehouseName',
+                    align: "center",
+                    width: 100
                 },
                 {
                     title: '客户',
@@ -149,14 +183,25 @@ export default {
                     width: 150,
                     align: 'center',
                     render: (h, params) => {
-                        return h('span', this.statusDescription(params.row.status));
+                        return stautsShow(h, params.row.status);
                     }
                 },
                 {
                     title: '销售员',
-                    key: 'salerId',
-                    width: 100,
-                    align: 'center'
+                    key: 'saleId',
+                    width: 120,
+                    align: 'center',
+                    render: (h, params) => {
+                        let nickName = params.row.saleNickName;
+                        let realName = params.row.saleRealName;
+                        if (nickName && nickName) {
+                            return h('span', realName + '---' + nickName);
+                        }else if(nickName) {
+                            return h('span', nickName);
+                        }else {
+                            return h('span', params.row.saleId);
+                        }
+                    }
                 },
                 {
                     title: '制单人',
@@ -167,12 +212,6 @@ export default {
                 {
                     title: '提货员',
                     key: 'takeGoodsUser',
-                    width: 100,
-                    align: 'center'
-                },
-                {
-                    title: '收款金额',
-                    key: 'payAmount',
                     width: 100,
                     align: 'center'
                 },
@@ -195,6 +234,24 @@ export default {
                     align: 'center'
                 },
                 {
+                    title: '温控方式',
+                    key: 'temperControlName',
+                    align: 'center',
+                    width: 120
+                },
+                {
+                    title: '运输方式',
+                    key: 'shipMethodName',
+                    align: "center",
+                    width: 110
+                },
+                {
+                    title: '运输工具',
+                    key: 'shipToolName',
+                    align: "center",
+                    width: 110
+                },
+                {
                     title: '补录运输记录',
                     align: 'center',
                     width: 100,
@@ -207,7 +264,7 @@ export default {
                             },
                             on: {
                                 click: () => {
-                                    this.openShowShipDetailView(params.row.id, params.row.orderNumber);
+                                    this.openShowShipDetailView(params.row);
                                 }
                             }
                         }, '运输记录');
@@ -218,32 +275,15 @@ export default {
             showDetailViewId: -1,
             totalCount: 0,
             currentPage: 1,
-            pageSize: 20,
+            pageSize: 50,
             showShipDetailView: false,
-            shipOrderId: -1,
+            shipOrder: {},
             shipDetailTitle: ''
         };
     },
     methods: {
 
-        statusDescription(data) {
-            let result = '';
-            switch (data) {
-                case 'INIT':
-                    result = '制单初始';
-                    break;
-                case 'QUALITY_CHECKED':
-                    result = '出库质量审核完成';
-                    break;
-                case 'SALE_CHECKED':
-                    result = '销售审核完成';
-                    break;
-                default:
-                    result = '';
-                    break;
-            }
-            return result;
-        },
+        
         searchBtnClick () {
             this.currentPage = 1;
             this.refreshTableData();
@@ -252,7 +292,7 @@ export default {
             let reqData = {
                 customerId: this.searchFormItem.customerId,
                 orderNumber: this.searchFormItem.orderNumber,
-                salerId: this.searchFormItem.salerId,
+                saleId: this.searchFormItem.saleId,
                 page: this.currentPage,
                 size: this.pageSize
             };
@@ -281,9 +321,9 @@ export default {
             this.currentPage = data;
             this.refreshTableData();
         },
-        openShowShipDetailView (orderId, orderNumber) {
-            this.shipOrderId = orderId;
-            this.shipDetailTitle = '订单运输记录 ->' + orderNumber;
+        openShowShipDetailView (order) {
+            this.shipOrder = order;
+            this.shipDetailTitle = '订单运输记录 ->' + order.orderNumber;
             this.showShipDetailView = true;
         },
         ShowShipDetailViewClose () {

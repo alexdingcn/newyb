@@ -12,18 +12,23 @@ public class SellOrderShip {
     private String shipCompanyName;
 
     private String shipNumber;
+
     private Date issuanceDate;
 
-    private Long storageMethod;
-    private String storageMethodName;
+    private String shipAddress;
+
+    private String receiveUserName;
+    private String receiveUserPhone;
+    private String receiveAddress;
+
+    private Long temperControlId;
+    private String temperControlName;
 
     private Long shipToolId;
     private String shipToolName;
 
     private Long shipMethod;
     private String shipMethodName;
-
-    private String shipAddress;
 
     private String carNumber;
 
@@ -35,7 +40,7 @@ public class SellOrderShip {
 
     private BigDecimal shipTemper;
 
-    private Integer shipQuantity;
+    private BigDecimal shipQuantity;
 
     private String operator;
 
@@ -93,14 +98,6 @@ public class SellOrderShip {
 
     public void setIssuanceDate(Date issuanceDate) {
         this.issuanceDate = issuanceDate;
-    }
-
-    public Long getStorageMethod() {
-        return storageMethod;
-    }
-
-    public void setStorageMethod(Long storageMethod) {
-        this.storageMethod = storageMethod;
     }
 
     public Long getShipToolId() {
@@ -191,14 +188,6 @@ public class SellOrderShip {
         this.shipTemper = shipTemper;
     }
 
-    public Integer getShipQuantity() {
-        return shipQuantity;
-    }
-
-    public void setShipQuantity(Integer shipQuantity) {
-        this.shipQuantity = shipQuantity;
-    }
-
     public String getOperator() {
         return operator;
     }
@@ -263,19 +252,59 @@ public class SellOrderShip {
         this.updateTime = updateTime;
     }
 
-    public String getStorageMethodName() {
-        return storageMethodName;
-    }
-
-    public void setStorageMethodName(String storageMethodName) {
-        this.storageMethodName = storageMethodName;
-    }
-
     public String getComment() {
         return comment;
     }
 
     public void setComment(String comment) {
         this.comment = comment;
+    }
+
+    public String getReceiveUserName() {
+        return receiveUserName;
+    }
+
+    public void setReceiveUserName(String receiveUserName) {
+        this.receiveUserName = receiveUserName;
+    }
+
+    public String getReceiveUserPhone() {
+        return receiveUserPhone;
+    }
+
+    public void setReceiveUserPhone(String receiveUserPhone) {
+        this.receiveUserPhone = receiveUserPhone;
+    }
+
+    public String getReceiveAddress() {
+        return receiveAddress;
+    }
+
+    public void setReceiveAddress(String receiveAddress) {
+        this.receiveAddress = receiveAddress;
+    }
+
+    public Long getTemperControlId() {
+        return temperControlId;
+    }
+
+    public void setTemperControlId(Long temperControlId) {
+        this.temperControlId = temperControlId;
+    }
+
+    public String getTemperControlName() {
+        return temperControlName;
+    }
+
+    public void setTemperControlName(String temperControlName) {
+        this.temperControlName = temperControlName;
+    }
+
+    public void setShipQuantity(BigDecimal shipQuantity) {
+        this.shipQuantity = shipQuantity;
+    }
+
+    public BigDecimal getShipQuantity() {
+        return shipQuantity;
     }
 }

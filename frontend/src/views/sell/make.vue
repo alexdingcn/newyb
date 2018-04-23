@@ -81,7 +81,7 @@
 
                 <Row type="flex" justify="start">
                     <Col span="6">
-                        <FormItem label="湿控方式" >
+                        <FormItem label="温控方式" >
                           <option-select optionType="TEMPER_CONTROL" v-model="sellOrderFormData.temperControlId"></option-select>
                         </FormItem>
                     </Col>
@@ -303,6 +303,15 @@ export default {
             }else {
               return '';
             }
+          }
+        },
+        {
+          title: '批次号',
+          key: 'batch',
+          align: 'center',
+          width: 160,
+          render: (h, params) => {
+            return params.row.repertoryInfo.batchCode;
           }
         },
         {

@@ -93,6 +93,7 @@ public enum ErrorCode {
     SELL_ORDER_CHECK_SALE_HAVE_UNOK_DETAIL(2213, "存在出库质量检查未通过的商品，不能审核通过", ErrorDisplay.NOTICE),
     SELL_ORDER_QUANTITY_NOT_ENOUGH(2214, "存在库存不足的商品:", ErrorDisplay.MODAL),
     SELL_ORDER_SALE_CHECK_STATUS_ERROR(2215, "订单状态不是质检通过状态，不能进行审核通过", ErrorDisplay.NOTICE),
+    SELL_ORDER_WAREHOUSE_FROZEN(2215, "当前仓库正在盘库冻结，不能做出库操作"),
 
     // 23xx -承运公司
     SHIP_SAVE_PARAMS_ERROR(2301, "必输参数校验失败"),

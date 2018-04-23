@@ -4,7 +4,9 @@ import com.alibaba.fastjson.JSON;
 import com.yiban.erp.constant.OrderNumberType;
 import com.yiban.erp.constant.SellOrderStatus;
 import com.yiban.erp.constant.OptionsType;
+import com.yiban.erp.constant.WarehouseStatus;
 import com.yiban.erp.dao.*;
+import com.yiban.erp.dto.SellOrderAllAction;
 import com.yiban.erp.dto.SellReviewAction;
 import com.yiban.erp.dto.SellReviewOrderQuery;
 import com.yiban.erp.entities.*;
@@ -17,6 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 
@@ -41,6 +44,8 @@ public class SellOrderService {
     private RepertoryInfoMapper repertoryInfoMapper;
     @Autowired
     private OptionsMapper optionsMapper;
+    @Autowired
+    private WarehouseMapper warehouseMapper;
 
     public List<SellOrder> getList(Integer companyId, Integer customerId, Integer saleId,
                                             String refNo, String status, Date createOrderDate, Integer page, Integer size) {
@@ -246,9 +251,24 @@ public class SellOrderService {
         if (query.getStatusList() == null || query.getStatusList().isEmpty()) {
             query.setStatusList(null);
         }
-        return sellOrderMapper.getReviewOrderList(query);
+        List<SellOrder> sellOrders = sellOrderMapper.getReviewOrderList(query);
+        setOptions(sellOrders);
+        return sellOrders;
     }
 
+    private void setOptions(List<SellOrder> sellOrders) {
+        if (sellOrders == null || sellOrders.isEmpty()) {
+            return;
+        }
+        Set<Long> set = new HashSet<>();
+        sellOrders.stream().forEach(item -> set.addAll(item.getOptionsIds()));
+        Long[] ids = new Long[set.size()];
+        set.toArray(ids);
+        List<Options> options = optionsMapper.getByIds(ids);
+        sellOrders.stream().forEach(item -> item.setOptionsName(options));
+    }
+
+    @Transactional
     public void qualityCheck(User user, SellReviewAction reviewAction) throws BizException {
         if (reviewAction == null) {
             logger.warn("submit order review info but params is null.");
@@ -313,6 +333,7 @@ public class SellOrderService {
         return count;
     }
 
+    @Transactional
     public void sellOrderCheckOk(User user, Long sellOrderId) throws BizException {
         if (sellOrderId == null) {
             logger.warn("user:{} check sell order sale but id is null", user.getId());
@@ -334,6 +355,15 @@ public class SellOrderService {
             logger.warn("user:{} check sell order but have quality check un ok.", user.getId());
             throw new BizException(ErrorCode.SELL_ORDER_CHECK_SALE_HAVE_UNOK_DETAIL);
         }
+
+        //验证当前仓库是否在正常状态，如果不在正常状态不能提交
+        Warehouse warehouse = warehouseMapper.selectByPrimaryKey(order.getWarehouseId());
+        if (!WarehouseStatus.NORMAL.name().equalsIgnoreCase(warehouse.getStatus())) {
+            logger.warn("warehouse status is not normal.");
+            throw new BizException(ErrorCode.SELL_ORDER_WAREHOUSE_FROZEN);
+        }
+
+        // TODO 生成一笔出库单信息
 
         //先减去库存数据，如果库存不足，不能审批通过
         //获取库存不足的产品名称
@@ -375,8 +405,8 @@ public class SellOrderService {
     }
 
     public SellOrderShip saveOrderShip(User user, SellOrderShip sellOrderShip) throws BizException  {
-        SellOrderShip reqShip = UtilTool.trimString(sellOrderShip);
-        if (reqShip == null || reqShip.getSellOrderId() == null ||reqShip.getShipCompanyId() == null) {
+        SellOrderShip reqShip = sellOrderShip;
+        if (reqShip == null || reqShip.getSellOrderId() == null) {
             logger.warn("user:{} save ship info but sell order id or ship company id is null", user.getId());
             throw new BizException(ErrorCode.SELL_ORDER_SHIP_PARAMS);
         }
@@ -393,7 +423,7 @@ public class SellOrderService {
         }else {
             reqShip.setCreateBy(user.getNickname());
             reqShip.setCreateTime(new Date());
-            sellOrderShipMapper.insertSelective(reqShip);
+            sellOrderShipMapper.insert(reqShip);
             return reqShip;
         }
     }
@@ -410,4 +440,9 @@ public class SellOrderService {
         return sellOrderShipMapper.deleteByPrimaryKey(id);
     }
 
+    public List<SellOrder> getAllList(SellOrderAllAction allAction) {
+        List<SellOrder> sellOrders = sellOrderMapper.getAllList(allAction);
+        setOptions(sellOrders);
+        return sellOrders;
+    }
 }

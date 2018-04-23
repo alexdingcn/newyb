@@ -55,23 +55,23 @@
                         <span class="label-key">收款日期:</span>
                         <span class="label-value">{{orderDetail.payOrderDate | dateFormat}}</span>
                     </Col>
-                    <Col span="6">
-                        <span class="label-key">收款方式:</span>
-                        <span class="label-value">{{orderDetail.payMethodName}}</span>
+                     <Col span="6">
+                        <span class="label-key">加价率:</span>
+                        <span class="label-value">{{orderDetail.markUpRate}}</span>
                     </Col>
                 </Row>
                 <Row class="content-row">
                     <Col span="6">
-                        <span class="label-key">收款金额:</span>
-                        <span class="label-value">{{orderDetail.payAmount}}</span>
+                        <span class="label-key">制单人:</span>
+                        <span class="label-value">{{orderDetail.createBy}}</span>
                     </Col>
                     <Col span="6">
-                        <span class="label-key">加价率:</span>
-                        <span class="label-value">{{orderDetail.markUpRate}}</span>
+                        <span class="label-key">运输方式:</span>
+                        <span class="label-value">{{orderDetail.shipMethodName}}</span>
                     </Col>
                     <Col span="6">
-                        <span class="label-key">抹零:</span>
-                        <span class="label-value">{{orderDetail.notSmallAmount}}</span>
+                        <span class="label-key">运输工具:</span>
+                        <span class="label-value">{{orderDetail.shipToolName}}</span>
                     </Col>
                     <Col span="6">
                         <span class="label-key">备注信息:</span>
@@ -79,48 +79,61 @@
                     </Col>
                 </Row>
 
-                <div v-for="(item, index) in goodTableData" :key="item.id">
+                <div v-for="(item, index) in detailsData" :key="item.id">
                     <Row class="title-show margin-top-20">
                         <span>订单商品详细->{{index + 1}}</span>
                         <hr/>
                     </Row>
                     <Row class="content-row">
                         <Col span="6">
-                            <span class="label-key">药名:</span>
-                            <span class="label-value">{{item.goodName}}</span>
+                            <span class="label-key">商品名称:</span>
+                            <span class="label-value">{{item.goodsName}}</span>
                         </Col>
                         <Col span="6">
-                            <span class="label-key">数量:</span>
+                            <span class="label-key">仓库:</span>
+                            <span class="label-value">{{orderDetail.warehouseName}}</span>
+                        </Col>
+                        <Col span="6">
+                            <span class="label-key">库位:</span>
+                            <span class="label-value">{{item.repertoryInfo.location || ''}}</span>
+                        </Col>
+                        <Col span="6">
+                            <span class="label-key">批次号:</span>
+                            <span class="label-value">{{item.repertoryInfo.batchCode || ''}}</span>
+                        </Col>
+                    </Row>
+                    <Row class="content-row">
+                        <Col span="6">
+                            <span class="label-key">销售数量:</span>
                             <span class="label-value">{{item.quantity}}</span>
                         </Col>
                         <Col span="6">
                             <span class="label-key">定价:</span>
                             <span class="label-value">{{item.fixPrice}}</span>
                         </Col>
-                        
-                    </Row>
-                    <Row class="content-row">
-                        <Col span="4">
-                            <span class="label-key">折扣:</span>
-                            <span class="label-value">{{item.disPrice}}</span>
-                        </Col>
-                        <Col span="4">
-                            <span class="label-key">赠送:</span>
-                            <span class="label-value">{{item.free}}</span>
-                        </Col>
-                        <Col span="4">
+                        <Col span="6">
                             <span class="label-key">实价:</span>
                             <span class="label-value">{{item.realPrice}}</span>
                         </Col>
-                        <Col span="4">
+                        <Col span="6">
+                            <span class="label-key">折扣:</span>
+                            <span class="label-value">{{item.disPrice}}</span>
+                        </Col>
+                    </Row>
+                    <Row class="content-row">
+                        <Col span="6">
+                            <span class="label-key">赠送:</span>
+                            <span class="label-value">{{item.free}}</span>
+                        </Col>
+                        <Col span="6">
                             <span class="label-key">件单价:</span>
                             <span class="label-value">{{item.singlePrice}}</span>
                         </Col>
-                        <Col span="4">
+                        <Col span="6">
                             <span class="label-key">金额:</span>
                             <span class="label-value">{{item.amount}}</span>
                         </Col>
-                        <Col span="4">
+                        <Col span="6">
                             <span class="label-key">税率:</span>
                             <span class="label-value">{{item.taxRate}}</span>
                         </Col>
@@ -152,7 +165,7 @@ export default {
   data() {
       return {
           orderDetail: '',
-          goodTableData: [],
+          detailsData: [],
       }
   },
   watch: {
@@ -174,7 +187,7 @@ export default {
             .then((response) => {
                 this.orderDetail = response.data;
                 if (this.orderDetail && this.orderDetail.details) {
-                    this.goodTableData = this.orderDetail.details;
+                    this.detailsData = this.orderDetail.details;
                 }
             })
             .catch(error => {
