@@ -49,7 +49,7 @@ public class SellOrderController {
         String reqPage = request.getParameter("page");
         String reqSize = request.getParameter("size");
         Integer customerId = StringUtils.isBlank(reqCustomerId) ? null : Integer.parseInt(reqCustomerId);
-        Integer saleId = StringUtils.isBlank(reqSaleId) ? null : Integer.parseInt(reqSaleId);
+        Long saleId = StringUtils.isBlank(reqSaleId) ? null : Long.parseLong(reqSaleId);
         Integer page = StringUtils.isBlank(reqPage) ? 1 : Integer.parseInt(reqPage);
         Integer size = StringUtils.isBlank(reqSize) ? 10 : Integer.parseInt(reqSize);
         String reqRefNo = StringUtils.isBlank(refNo) ? null : refNo.trim();

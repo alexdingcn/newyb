@@ -9,7 +9,7 @@
     <result column="status" property="status" jdbcType="VARCHAR" />
     <result column="customer_id" property="customerId" jdbcType="INTEGER" />
     <result column="customer_rep_id" property="customerRepId" jdbcType="INTEGER" />
-    <result column="sale_id" property="saleId" jdbcType="INTEGER" />
+    <result column="sale_id" property="saleId" jdbcType="BIGINT" />
     <result column="temper_control_id" property="temperControlId" jdbcType="BIGINT" />
     <result column="create_order_date" property="createOrderDate" jdbcType="DATE" />
     <result column="take_goods_user" property="takeGoodsUser" jdbcType="VARCHAR" />
@@ -51,7 +51,7 @@
       update_by, update_time, warehouse_id)
     values (#{companyId,jdbcType=INTEGER}, #{orderNumber,jdbcType=VARCHAR},
       #{refNo,jdbcType=VARCHAR}, #{status,jdbcType=VARCHAR}, #{customerId,jdbcType=INTEGER}, 
-      #{customerRepId,jdbcType=INTEGER}, #{saleId,jdbcType=INTEGER}, #{temperControlId,jdbcType=BIGINT},
+      #{customerRepId,jdbcType=INTEGER}, #{saleId,jdbcType=BIGINT}, #{temperControlId,jdbcType=BIGINT},
       #{createOrderDate,jdbcType=DATE}, #{takeGoodsUser,jdbcType=VARCHAR}, #{payOrderDate,jdbcType=DATE},
       #{markUpRate,jdbcType=DECIMAL}, #{shipMethod,jdbcType=BIGINT},
       #{shipTool,jdbcType=BIGINT}, #{shipCompanyId, jdbcType=INTEGER},
@@ -75,7 +75,7 @@
         customer_rep_id = #{customerRepId,jdbcType=INTEGER},
       </if>
       <if test="saleId != null" >
-        sale_id = #{saleId,jdbcType=INTEGER},
+        sale_id = #{saleId,jdbcType=BIGINT},
       </if>
       <if test="temperControlId != null" >
         temper_control_id = #{temperControlId,jdbcType=BIGINT},
@@ -153,7 +153,7 @@
     <result column="status" property="status" jdbcType="VARCHAR" />
     <result column="customer_id" property="customerId" jdbcType="INTEGER" />
     <result column="customer_rep_id" property="customerRepId" jdbcType="INTEGER" />
-    <result column="sale_id" property="saleId" jdbcType="INTEGER" />
+    <result column="sale_id" property="saleId" jdbcType="BIGINT" />
     <result column="temper_control_id" property="temperControlId" jdbcType="BIGINT" />
     <result column="create_order_date" property="createOrderDate" jdbcType="DATE" />
     <result column="take_goods_user" property="takeGoodsUser" jdbcType="VARCHAR" />

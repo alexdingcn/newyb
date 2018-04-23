@@ -22,14 +22,14 @@ public interface SellOrderMapper {
 
     Integer getListCount(@Param("companyId") Integer companyId,
                             @Param("customerId") Integer customerId,
-                            @Param("saleId") Integer saleId,
+                            @Param("saleId") Long saleId,
                             @Param("refNo") String refNo,
                             @Param("status") String status,
                          @Param("createOrderDate") Date createOrderDate);
 
     List<SellOrder> getList(@Param("companyId") Integer companyId,
                             @Param("customerId") Integer customerId,
-                            @Param("saleId") Integer saleId,
+                            @Param("saleId") Long saleId,
                             @Param("refNo") String refNo,
                             @Param("status") String status,
                             @Param("createOrderDate") Date createOrderDate,

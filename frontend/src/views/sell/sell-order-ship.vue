@@ -298,7 +298,7 @@ export default {
                     align: 'center'
                 },
                 {
-                    title: '数量',
+                    title: '运输数量',
                     key: 'shipQuantity',
                     width: 100,
                     align: 'center'

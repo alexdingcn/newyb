@@ -7,7 +7,7 @@ public class SellOrderAllAction {
     private String status;
     private Integer customerId;
     private String orderNumber;
-    private Integer saleId;
+    private Long saleId;
     private Date startDate;
     private Date endDate;
     private Integer page;
@@ -42,12 +42,12 @@ public class SellOrderAllAction {
         this.orderNumber = orderNumber;
     }
 
-    public Integer getSaleId() {
+    public Long getSaleId() {
         return saleId;
     }
 
-    public void setSaleId(Integer salerId) {
-        this.saleId = salerId;
+    public void setSaleId(Long saleId) {
+        this.saleId = saleId;
     }
 
     public Date getStartDate() {

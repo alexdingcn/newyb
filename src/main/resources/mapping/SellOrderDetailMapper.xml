@@ -5,7 +5,7 @@
     <id column="id" property="id" jdbcType="BIGINT" />
     <result column="sell_order_id" property="sellOrderId" jdbcType="BIGINT" />
     <result column="repertory_id" property="repertoryId" jdbcType="BIGINT" />
-    <result column="quantity" property="quantity" jdbcType="INTEGER" />
+    <result column="quantity" property="quantity" jdbcType="DECIMAL" />
     <result column="fix_price" property="fixPrice" jdbcType="DECIMAL" />
     <result column="dis_price" property="disPrice" jdbcType="DECIMAL" />
     <result column="free" property="free" jdbcType="DECIMAL" />
@@ -47,7 +47,7 @@
       check_user
       )
     values (#{sellOrderId,jdbcType=BIGINT}, #{repertoryId,jdbcType=BIGINT},
-      #{quantity,jdbcType=INTEGER}, #{fixPrice,jdbcType=DECIMAL}, #{disPrice,jdbcType=DECIMAL}, 
+      #{quantity,jdbcType=DECIMAL}, #{fixPrice,jdbcType=DECIMAL}, #{disPrice,jdbcType=DECIMAL},
       #{free,jdbcType=DECIMAL}, #{realPrice,jdbcType=DECIMAL}, #{singlePrice,jdbcType=DECIMAL}, 
       #{amount,jdbcType=DECIMAL}, #{taxRate,jdbcType=DECIMAL}, #{createBy,jdbcType=VARCHAR}, 
       #{createTime,jdbcType=TIMESTAMP}, #{updateBy,jdbcType=VARCHAR}, #{updateTime,jdbcType=TIMESTAMP},
@@ -68,7 +68,7 @@
     values
     <foreach collection="detailList" item="item" open="(" close=")" separator="), (">
       #{item.sellOrderId,jdbcType=BIGINT}, #{item.repertoryId,jdbcType=BIGINT},
-      #{item.quantity,jdbcType=INTEGER}, #{item.fixPrice,jdbcType=DECIMAL}, #{item.disPrice,jdbcType=DECIMAL},
+      #{item.quantity,jdbcType=DECIMAL}, #{item.fixPrice,jdbcType=DECIMAL}, #{item.disPrice,jdbcType=DECIMAL},
       #{item.free,jdbcType=DECIMAL}, #{item.realPrice,jdbcType=DECIMAL}, #{item.singlePrice,jdbcType=DECIMAL},
       #{item.amount,jdbcType=DECIMAL}, #{item.taxRate,jdbcType=DECIMAL}, #{item.createBy,jdbcType=VARCHAR},
       #{item.createTime,jdbcType=TIMESTAMP}, #{item.updateBy,jdbcType=VARCHAR}, #{item.updateTime,jdbcType=TIMESTAMP},
@@ -143,7 +143,7 @@
         #{repertoryId,jdbcType=BIGINT},
       </if>
       <if test="quantity != null" >
-        #{quantity,jdbcType=INTEGER},
+        #{quantity,jdbcType=DECIMAL},
       </if>
       <if test="fixPrice != null" >
         #{fixPrice,jdbcType=DECIMAL},
@@ -202,7 +202,7 @@
         repertory_id = #{repertoryId,jdbcType=BIGINT},
       </if>
       <if test="quantity != null" >
-        quantity = #{quantity,jdbcType=INTEGER},
+        quantity = #{quantity,jdbcType=DECIMAL},
       </if>
       <if test="fixPrice != null" >
         fix_price = #{fixPrice,jdbcType=DECIMAL},
@@ -256,7 +256,7 @@
     update sell_order_detail
     set sell_order_id = #{sellOrderId,jdbcType=BIGINT},
       repertory_id = #{repertoryId,jdbcType=BIGINT},
-      quantity = #{quantity,jdbcType=INTEGER},
+      quantity = #{quantity,jdbcType=DECIMAL},
       fix_price = #{fixPrice,jdbcType=DECIMAL},
       dis_price = #{disPrice,jdbcType=DECIMAL},
       free = #{free,jdbcType=DECIMAL},

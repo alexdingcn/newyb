@@ -47,7 +47,7 @@ public class SellOrderService {
     @Autowired
     private WarehouseMapper warehouseMapper;
 
-    public List<SellOrder> getList(Integer companyId, Integer customerId, Integer saleId,
+    public List<SellOrder> getList(Integer companyId, Integer customerId, Long saleId,
                                             String refNo, String status, Date createOrderDate, Integer page, Integer size) {
         int limit = (size == null || size <= 0) ? 10 : size;
         int offset = (page == null || page <= 0 ? 0 : page - 1) * limit;

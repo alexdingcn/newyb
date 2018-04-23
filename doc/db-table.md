@@ -848,3 +848,97 @@ created_time|Datetime|创建时间
 updated_time|Datetime|修改时间
 
 
+
+### 销售订单表：sell_order
+
+> 记录销售订单的信息
+
+字段名|类型|描述
+-|-|-
+id|Long|(自增类型ID pk)
+commpany_id|Integer|公司ID
+order_number|String|订单编号
+ref_no|String|自定义单号
+status|String|订单状态
+customer_id|Integer|客户ID
+customer_rep_id|Integer|客户代表ID
+sale_id|Long|销售员ID
+warehouse_id|Integer|仓库ID
+temper_control_id|Long|温控方式
+create_order_date|Date|制单日
+take_goods_user|String|提货员
+pay_order_date|Date|预计付款日
+mark_up_rate|Decimal(14,3)|加价率
+ship_method|Long|运输方式
+ship_tool|Long|运输工具
+ship_company_id|Integer|承运公司
+comment|String|备注
+create_by|String|创建人
+update_by|String|修改人
+create_time|Datetime|创建时间
+update_time|Datetime|修改时间
+
+
+
+### 销售订单详情表：sell_order_detail
+
+> 记录销售订单详细信息
+
+字段名|类型|描述
+-|-|-
+id|Long|(自增类型ID pk)
+sell_order_id|Long|订单ID
+repertory_id|Long|存库ID
+quantity|Decimal(14,3)|销售数量
+fix_price|Decimal(14,3)|定价
+dis_price|Decimal(14,3)|折扣
+free|Decimal(14,3)|赠送数量
+real_price|Decimal(14,3)|实价
+single_price|Decimal(14,3)|单价
+amount|Decimal(14,3)|金额
+tax_rate|Decimal(14,3)|税率
+check_status|String|检查状态
+check_result|String|检查结果
+check_date|Datetime|检查时间
+check_user|String|检查员
+create_by|String|创建人
+update_by|String|修改人
+create_time|Datetime|创建时间
+update_time|Datetime|修改时间
+
+
+
+### 销售订单运输记录表：sell_order_ship
+
+> 记录销售订单的运输记录信息
+
+字段名|类型|描述
+-|-|-
+id|Long|(自增类型ID pk)
+sell_order_id|Long|运输记录
+ship_company_id|Integer|运输公司ID
+issuance_date|Datetime|发货时间
+ship_number|String|运输单号
+temper_control_id|Long|温控方式
+ship_tool_id|Long|运输工具
+ship_method|Long|运输方式
+ship_address|String|发货地址
+receive_user_name|String|收货人
+receive_user_phone|String|收货人电话
+receive_address|String|收货地址
+car_number|String|车牌号
+ship_phone|String|承运电话
+driver_name|String|驾驶员
+driver_file_no|String|驾驶证档案
+ship_temper|Decimal(6,3)|启运温度
+ship_quantity|Decimal(6,3)|运输数量
+operator|String|经办人
+mileage|Decimal(10,3)|里程数
+ship_start_time|Datetime|启运时间
+ship_end_time|Datetime|到货时间
+comment|String|备注
+create_by|String|创建人
+update_by|String|修改人
+create_time|Datetime|创建时间
+update_time|Datetime|修改时间
+

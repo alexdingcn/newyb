@@ -11,7 +11,7 @@ public class SellOrderDetail {
 
     private Long repertoryId;
 
-    private Integer quantity;
+    private BigDecimal quantity;
 
     private BigDecimal fixPrice;
 
@@ -75,11 +75,11 @@ public class SellOrderDetail {
         this.repertoryId = repertoryId;
     }
 
-    public Integer getQuantity() {
+    public BigDecimal getQuantity() {
         return quantity;
     }
 
-    public void setQuantity(Integer quantity) {
+    public void setQuantity(BigDecimal quantity) {
         this.quantity = quantity;
     }
 

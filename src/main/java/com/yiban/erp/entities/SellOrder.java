@@ -18,7 +18,7 @@ public class SellOrder {
 
     private Integer customerRepId;
 
-    private Integer saleId;
+    private Long saleId;
     private String saleNickName;
     private String saleRealName;
 
@@ -142,11 +142,11 @@ public class SellOrder {
         this.customerRepId = customerRepId;
     }
 
-    public Integer getSaleId() {
+    public Long getSaleId() {
         return saleId;
     }
 
-    public void setSaleId(Integer saleId) {
+    public void setSaleId(Long saleId) {
         this.saleId = saleId;
     }
 
