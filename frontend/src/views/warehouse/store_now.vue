@@ -165,7 +165,7 @@
                     },
                     {
                         title: '商品名称',
-                        key: 'goodName',
+                        key: 'goodsName',
                         align: 'center',
                         width: 150
 
