@@ -1,16 +1,14 @@
 package com.yiban.erp.service.sell;
 
 import com.alibaba.fastjson.JSON;
-import com.yiban.erp.constant.OrderNumberType;
-import com.yiban.erp.constant.SellOrderStatus;
-import com.yiban.erp.constant.OptionsType;
-import com.yiban.erp.constant.WarehouseStatus;
+import com.yiban.erp.constant.*;
 import com.yiban.erp.dao.*;
 import com.yiban.erp.dto.SellOrderAllAction;
 import com.yiban.erp.dto.SellReviewAction;
 import com.yiban.erp.dto.SellReviewOrderQuery;
 import com.yiban.erp.entities.*;
 import com.yiban.erp.exception.BizException;
+import com.yiban.erp.exception.BizRuntimeException;
 import com.yiban.erp.exception.ErrorCode;
 import com.yiban.erp.service.warehouse.RepertoryService;
 import com.yiban.erp.util.UtilTool;
@@ -47,6 +45,11 @@ public class SellOrderService {
     private OptionsMapper optionsMapper;
     @Autowired
     private WarehouseMapper warehouseMapper;
+    @Autowired
+    private RepertoryOutMapper repertoryOutMapper;
+    @Autowired
+    private RepertoryOutDetailMapper repertoryOutDetailMapper;
+
 
     public List<SellOrder> getList(Integer companyId, Integer customerId, Long saleId,
                                             String refNo, String status, Date createOrderDate, Integer page, Integer size) {
@@ -350,7 +353,7 @@ public class SellOrderService {
             logger.warn("user:{} check sell order sale but id is null", user.getId());
             throw new BizException(ErrorCode.SELL_ORDER_DETAIL_GET_FAIL);
         }
-        SellOrder order = sellOrderMapper.selectByPrimaryKey(sellOrderId);
+        SellOrder order = sellOrderMapper.getReviewDetailById(sellOrderId);
         if (order == null) {
             logger.warn("user:{} check sell order sale but get order result is null", user.getId());
             throw new BizException(ErrorCode.SELL_ORDER_DETAIL_GET_FAIL);
@@ -361,10 +364,17 @@ public class SellOrderService {
             throw new BizException(ErrorCode.SELL_ORDER_SALE_CHECK_STATUS_ERROR);
         }
         //验证订单的质量检查是否都已经全部通过，只有全部通过，才能进行审核通过
-        List<Long> detailIds = sellOrderDetailMapper.getUnCheckDetailIdList(sellOrderId);
-        if (detailIds != null && !detailIds.isEmpty()) {
-            logger.warn("user:{} check sell order but have quality check un ok.", user.getId());
-            throw new BizException(ErrorCode.SELL_ORDER_CHECK_SALE_HAVE_UNOK_DETAIL);
+        List<SellOrderDetail> details = getDetailList(order.getId());
+        if (details == null || details.isEmpty()) {
+            logger.warn("get sell order detail fail.");
+            throw new BizException(ErrorCode.SELL_ORDER_DETAIL_GET_FAIL);
+        }
+        //验证是否都已经质量检查通过
+        for (SellOrderDetail detail : details) {
+            if (!SellOrderDetailCheckStatus.OK.name().equalsIgnoreCase(detail.getCheckStatus())) {
+                logger.warn("user:{} check sell order but have quality check un ok.", user.getId());
+                throw new BizException(ErrorCode.SELL_ORDER_CHECK_SALE_HAVE_UNOK_DETAIL);
+            }
         }
 
         //验证当前仓库是否在正常状态，如果不在正常状态不能提交
@@ -373,8 +383,6 @@ public class SellOrderService {
             logger.warn("warehouse status is not normal.");
             throw new BizException(ErrorCode.SELL_ORDER_WAREHOUSE_FROZEN);
         }
-
-        // TODO 生成一笔出库单信息
 
         //先减去库存数据，如果库存不足，不能审批通过
         //获取库存不足的产品名称
@@ -387,10 +395,70 @@ public class SellOrderService {
         //减库存
         int count = repertoryInfoMapper.sellOrderConsumeQuantity(sellOrderId, user.getNickname(), new Date());
         logger.info("user:{} consume repertory quantity update record success count:{}, orderId:{}", user.getId(), count, sellOrderId);
+        //变更状态
         order.setStatus(SellOrderStatus.SALE_CHECKED.name());
         order.setUpdateBy(user.getNickname());
         order.setUpdateTime(new Date());
         sellOrderMapper.updateByPrimaryKeySelective(order);
+
+        // 生成一笔出库单信息 和发出对应事件，使之生成对应的财务往来账
+        checkOkAfter(user, order, details);
+    }
+
+    private void checkOkAfter(User user, SellOrder order, List<SellOrderDetail> details) {
+        RepertoryOut out = new RepertoryOut();
+        out.setCompanyId(order.getCompanyId());
+        out.setWarehouseId(order.getWarehouseId());
+        out.setRefType(RepertoryRefType.SELL_BATCH.name());
+        out.setOutDate(new Date());
+        out.setRefOrderId(order.getId());
+        out.setRefOrderNumber(order.getOrderNumber());
+        out.setCustomerId(order.getCustomerId());
+        out.setCustomerName(order.getCustomerName());
+        out.setCustomerRepId(order.getCustomerRepId());
+        out.setCustomerRepName(order.getCustomerRepName());
+        out.setGoTo(order.getCustomerName());
+        out.setTotalQuantity(order.getTotalQuantity());
+        out.setTotalAmount(order.getTotalAmount());
+        out.setMakeOrderUser(order.getCreateBy());
+        out.setCheckOrderUser(user.getNickname());
+        out.setCheckDate(new Date());
+        out.setComment(order.getComment());
+        out.setCreatedBy(user.getNickname());
+        out.setCreatedTime(new Date());
+        int count = repertoryOutMapper.insert(out);
+        if (count <= 0 || out.getId() == null || out.getId() <= 0) {
+            logger.error("insert repertory out record fail. orderId:{}", order.getId());
+            throw new BizRuntimeException(ErrorCode.FAILED_INSERT_FROM_DB); //注意是RuntimeException,使上面修改回滚
+        }
+        List<RepertoryOutDetail> outDetails = new ArrayList<>();
+        for (SellOrderDetail orderDetail : details) {
+            RepertoryInfo info = orderDetail.getRepertoryInfo();
+            RepertoryOutDetail outDetail = new RepertoryOutDetail();
+            outDetail.setRepertoryOutId(out.getId());
+            outDetail.setRepertoryInfoId(orderDetail.getRepertoryId());
+            outDetail.setGoodsId(orderDetail.getGoodsId());
+            outDetail.setBatchCode(info != null ? info.getBatchCode() : null);
+            outDetail.setLocation(info != null ? info.getLocation() : null);
+            outDetail.setProductDate(info != null ? info.getProductDate() : null);
+            outDetail.setExpDate(info != null ? info.getExpDate() : null);
+            outDetail.setQuantity(orderDetail.getQuantity());
+            outDetail.setFree(orderDetail.getFree());
+            outDetail.setPrice(orderDetail.getRealPrice());
+            outDetail.setDisPrice(orderDetail.getDisPrice());
+            outDetail.setAmount(orderDetail.getAmount());
+            outDetail.setTaxRate(orderDetail.getTaxRate());
+            outDetail.setCheckUser(orderDetail.getCheckUser());
+            outDetail.setCheckDate(orderDetail.getCheckDate());
+            outDetail.setCheckResult(orderDetail.getCheckResult());
+            outDetail.setCreatedBy(user.getNickname());
+            outDetail.setCreatedTime(new Date());
+            outDetails.add(outDetail);
+        }
+        int detailCount = repertoryOutDetailMapper.insertBatch(outDetails);
+        logger.info("repertory out:{} insert details size:{}", out.getId(), detailCount);
+
+        // TODO make financial record
     }
 
     public SellOrder reviewDetail(Long orderId) {

@@ -8,6 +8,16 @@ import org.apache.commons.lang3.StringUtils;
 public enum RepertoryRefType {
 
     BUY_ORDER("采购入库"),
+    BUY_BACK("采购退货"),
+    SELL_BATCH("批发出库"),
+    SELL_BACK("批发退货"),
+    CHECK_LOSE("盘亏出库"),
+    CHECK_SURPLUS("盘盈入库"),
+    MOVE_OUT("转库出库"),
+    MOVE_IN("转库入库"),
+    DIRECT_IN("直调入库"),
+    DIRECT_OUT("直调出库"),
+    DAMAGE_OUT("破损出库")
     ;
 
     private String desc;

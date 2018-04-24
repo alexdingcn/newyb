@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.yiban.erp.dao.RepertoryOutDetailMapper" >
+  <resultMap id="BaseResultMap" type="com.yiban.erp.entities.RepertoryOutDetail" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="repertory_out_id" property="repertoryOutId" jdbcType="BIGINT" />
+    <result column="repertory_info_id" property="repertoryInfoId" jdbcType="BIGINT" />
+    <result column="goods_id" property="goodsId" jdbcType="BIGINT" />
+    <result column="batch_code" property="batchCode" jdbcType="VARCHAR"/>
+    <result column="location" property="location" jdbcType="VARCHAR"/>
+    <result column="product_date" property="productDate" jdbcType="DATE"/>
+    <result column="exp_date" property="expDate" jdbcType="DATE"/>
+    <result column="quantity" property="quantity" jdbcType="DECIMAL" />
+    <result column="free" property="free" jdbcType="DECIMAL" />
+    <result column="price" property="price" jdbcType="DECIMAL" />
+    <result column="dis_price" property="disPrice" jdbcType="DECIMAL" />
+    <result column="amount" property="amount" jdbcType="DECIMAL" />
+    <result column="tax_rate" property="taxRate" jdbcType="DECIMAL" />
+    <result column="check_user" property="checkUser" jdbcType="VARCHAR" />
+    <result column="check_date" property="checkDate" jdbcType="TIMESTAMP" />
+    <result column="check_result" property="checkResult" jdbcType="VARCHAR" />
+    <result column="created_by" property="createdBy" jdbcType="VARCHAR" />
+    <result column="updated_by" property="updatedBy" jdbcType="VARCHAR" />
+    <result column="created_time" property="createdTime" jdbcType="TIMESTAMP" />
+    <result column="updated_time" property="updatedTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, repertory_out_id, repertory_info_id, goods_id, batch_code, location, product_date, exp_date,
+    quantity, free, price, dis_price, amount, tax_rate,
+    check_user, check_date, check_result, created_by, updated_by, created_time, updated_time
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select 
+    <include refid="Base_Column_List" />
+    from repertory_out_detail
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
+    delete from repertory_out_detail
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="com.yiban.erp.entities.RepertoryOutDetail" keyProperty="id" useGeneratedKeys="true">
+    insert into repertory_out_detail (repertory_out_id, repertory_info_id, goods_id,
+      batch_code, location, product_date, exp_date,
+      quantity, free, price, 
+      dis_price, amount, tax_rate, 
+      check_user, check_date, check_result, 
+      created_by, updated_by, created_time, 
+      updated_time)
+    values (#{repertoryOutId,jdbcType=BIGINT}, #{repertoryInfoId,jdbcType=BIGINT}, #{goodsId,jdbcType=BIGINT},
+      #{batchCode,jdbcType=VARCHAR}, #{location,jdbcType=VARCHAR},
+      #{productDate,jdbcType=DATE}, #{expDate,jdbcType=DATE},
+      #{quantity,jdbcType=DECIMAL}, #{free,jdbcType=DECIMAL}, #{price,jdbcType=DECIMAL}, 
+      #{disPrice,jdbcType=DECIMAL}, #{amount,jdbcType=DECIMAL}, #{taxRate,jdbcType=DECIMAL}, 
+      #{checkUser,jdbcType=VARCHAR}, #{checkDate,jdbcType=TIMESTAMP}, #{checkResult,jdbcType=VARCHAR}, 
+      #{createdBy,jdbcType=VARCHAR}, #{updatedBy,jdbcType=VARCHAR}, #{createdTime,jdbcType=TIMESTAMP}, 
+      #{updatedTime,jdbcType=TIMESTAMP})
+  </insert>
+
+  <insert id="insertBatch" parameterType="map" keyProperty="id" useGeneratedKeys="true">
+    insert into repertory_out_detail (repertory_out_id, repertory_info_id, goods_id,
+      batch_code, location, product_date, exp_date,
+      quantity, free, price,
+      dis_price, amount, tax_rate,
+      check_user, check_date, check_result,
+      created_by, updated_by, created_time,
+      updated_time)
+    values
+     <foreach collection="details" separator="), (" open="(" close=")" item="item">
+       #{item.repertoryOutId,jdbcType=BIGINT}, #{item.repertoryInfoId,jdbcType=BIGINT}, #{item.goodsId,jdbcType=BIGINT},
+       #{item.batchCode,jdbcType=VARCHAR}, #{item.location,jdbcType=VARCHAR},
+       #{item.productDate,jdbcType=DATE}, #{item.expDate,jdbcType=DATE},
+       #{item.quantity,jdbcType=DECIMAL}, #{item.free,jdbcType=DECIMAL}, #{item.price,jdbcType=DECIMAL},
+       #{item.disPrice,jdbcType=DECIMAL}, #{item.amount,jdbcType=DECIMAL}, #{item.taxRate,jdbcType=DECIMAL},
+       #{item.checkUser,jdbcType=VARCHAR}, #{item.checkDate,jdbcType=TIMESTAMP}, #{item.checkResult,jdbcType=VARCHAR},
+       #{item.createdBy,jdbcType=VARCHAR}, #{item.updatedBy,jdbcType=VARCHAR}, #{item.createdTime,jdbcType=TIMESTAMP},
+       #{item.updatedTime,jdbcType=TIMESTAMP}
+     </foreach>
+  </insert>
+
+  <update id="updateByPrimaryKeySelective" parameterType="com.yiban.erp.entities.RepertoryOutDetail" >
+    update repertory_out_detail
+    <set >
+      <if test="repertoryOutId != null" >
+        repertory_out_id = #{repertoryOutId,jdbcType=BIGINT},
+      </if>
+      <if test="repertoryInfoId != null" >
+        repertory_info_id = #{repertoryInfoId,jdbcType=BIGINT},
+      </if>
+      <if test="goodsId != null" >
+        goods_id = #{goodsId,jdbcType=BIGINT},
+      </if>
+      <if test="batchCode != null">
+        batch_code = #{batchCode,jdbcType=VARCHAR},
+      </if>
+      <if test="location != null" >
+        location = #{location,jdbcType=VARCHAR},
+      </if>
+      <if test="productDate != null" >
+        product_date = #{productDate,jdbcType=DATE},
+      </if>
+      <if test="expDate != null" >
+        exp_date = #{expDate,jdbcType=DATE},
+      </if>
+      <if test="quantity != null" >
+        quantity = #{quantity,jdbcType=DECIMAL},
+      </if>
+      <if test="free != null" >
+        free = #{free,jdbcType=DECIMAL},
+      </if>
+      <if test="price != null" >
+        price = #{price,jdbcType=DECIMAL},
+      </if>
+      <if test="disPrice != null" >
+        dis_price = #{disPrice,jdbcType=DECIMAL},
+      </if>
+      <if test="amount != null" >
+        amount = #{amount,jdbcType=DECIMAL},
+      </if>
+      <if test="taxRate != null" >
+        tax_rate = #{taxRate,jdbcType=DECIMAL},
+      </if>
+      <if test="checkUser != null" >
+        check_user = #{checkUser,jdbcType=VARCHAR},
+      </if>
+      <if test="checkDate != null" >
+        check_date = #{checkDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="checkResult != null" >
+        check_result = #{checkResult,jdbcType=VARCHAR},
+      </if>
+      <if test="createdBy != null" >
+        created_by = #{createdBy,jdbcType=VARCHAR},
+      </if>
+      <if test="updatedBy != null" >
+        updated_by = #{updatedBy,jdbcType=VARCHAR},
+      </if>
+      <if test="createdTime != null" >
+        created_time = #{createdTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updatedTime != null" >
+        updated_time = #{updatedTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+
+</mapper>

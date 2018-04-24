@@ -42,5 +42,8 @@
         <mapper resource="mapping/RepertoryCheckPlanMapper.xml"/>
         <mapper resource="mapping/RepertoryCheckPlanDetailMapper.xml"/>
         <mapper resource="mapping/RepertoryCheckFormMapper.xml"/>
+        <mapper resource="mapping/RepertoryOutMapper.xml"/>
+        <mapper resource="mapping/RepertoryOutDetailMapper.xml"/>
+
     </mappers>
 </configuration>

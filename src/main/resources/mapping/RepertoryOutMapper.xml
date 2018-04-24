@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.yiban.erp.dao.RepertoryOutMapper" >
+  <resultMap id="BaseResultMap" type="com.yiban.erp.entities.RepertoryOut" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="company_id" property="companyId" jdbcType="INTEGER" />
+    <result column="warehouse_id" property="warehouseId" jdbcType="INTEGER" />
+    <result column="ref_type" property="refType" jdbcType="VARCHAR" />
+    <result column="out_date" property="outDate" jdbcType="DATE" />
+    <result column="ref_order_id" property="refOrderId" jdbcType="BIGINT" />
+    <result column="ref_order_number" property="refOrderNumber" jdbcType="VARCHAR" />
+    <result column="customer_id" property="customerId" jdbcType="INTEGER" />
+    <result column="customer_name" property="customerName" jdbcType="VARCHAR" />
+    <result column="customer_rep_id" property="customerRepId" jdbcType="INTEGER" />
+    <result column="customer_rep_name" property="customerRepName" jdbcType="VARCHAR" />
+    <result column="go_to" property="goTo" jdbcType="VARCHAR" />
+    <result column="total_quantity" property="totalQuantity" jdbcType="DECIMAL" />
+    <result column="total_amount" property="totalAmount" jdbcType="DECIMAL" />
+    <result column="make_order_user" property="makeOrderUser" jdbcType="VARCHAR" />
+    <result column="check_order_user" property="checkOrderUser" jdbcType="VARCHAR" />
+    <result column="check_date" property="checkDate" jdbcType="TIMESTAMP" />
+    <result column="file_no" property="fileNo" jdbcType="VARCHAR" />
+    <result column="comment" property="comment" jdbcType="VARCHAR" />
+    <result column="created_by" property="createdBy" jdbcType="VARCHAR" />
+    <result column="updated_by" property="updatedBy" jdbcType="VARCHAR" />
+    <result column="created_time" property="createdTime" jdbcType="TIMESTAMP" />
+    <result column="updated_time" property="updatedTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, company_id, warehouse_id, ref_type, out_date, ref_order_id, ref_order_number, 
+    customer_id, customer_name, customer_rep_id, customer_rep_name, go_to, total_quantity, 
+    total_amount, make_order_user, check_order_user, check_date, file_no, comment, created_by, 
+    updated_by, created_time, updated_time
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select 
+    <include refid="Base_Column_List" />
+    from repertory_out
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
+    delete from repertory_out
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="com.yiban.erp.entities.RepertoryOut" keyProperty="id" useGeneratedKeys="true">
+    insert into repertory_out (company_id, warehouse_id,
+      ref_type, out_date, ref_order_id, 
+      ref_order_number, customer_id, customer_name, 
+      customer_rep_id, customer_rep_name, go_to, 
+      total_quantity, total_amount, make_order_user, 
+      check_order_user, check_date, file_no, 
+      comment, created_by, updated_by, 
+      created_time, updated_time)
+    values (#{companyId,jdbcType=INTEGER}, #{warehouseId,jdbcType=INTEGER},
+      #{refType,jdbcType=VARCHAR}, #{outDate,jdbcType=DATE}, #{refOrderId,jdbcType=BIGINT}, 
+      #{refOrderNumber,jdbcType=VARCHAR}, #{customerId,jdbcType=INTEGER}, #{customerName,jdbcType=VARCHAR}, 
+      #{customerRepId,jdbcType=INTEGER}, #{customerRepName,jdbcType=VARCHAR}, #{goTo,jdbcType=VARCHAR}, 
+      #{totalQuantity,jdbcType=DECIMAL}, #{totalAmount,jdbcType=DECIMAL}, #{makeOrderUser,jdbcType=VARCHAR},
+      #{checkOrderUser,jdbcType=VARCHAR}, #{checkDate,jdbcType=TIMESTAMP}, #{fileNo,jdbcType=VARCHAR},
+      #{comment,jdbcType=VARCHAR}, #{createdBy,jdbcType=VARCHAR}, #{updatedBy,jdbcType=VARCHAR}, 
+      #{createdTime,jdbcType=TIMESTAMP}, #{updatedTime,jdbcType=TIMESTAMP})
+  </insert>
+
+  <update id="updateByPrimaryKeySelective" parameterType="com.yiban.erp.entities.RepertoryOut" >
+    update repertory_out
+    <set >
+      <if test="companyId != null" >
+        company_id = #{companyId,jdbcType=INTEGER},
+      </if>
+      <if test="warehouseId != null" >
+        warehouse_id = #{warehouseId,jdbcType=INTEGER},
+      </if>
+      <if test="refType != null" >
+        ref_type = #{refType,jdbcType=VARCHAR},
+      </if>
+      <if test="outDate != null" >
+        out_date = #{outDate,jdbcType=DATE},
+      </if>
+      <if test="refOrderId != null" >
+        ref_order_id = #{refOrderId,jdbcType=BIGINT},
+      </if>
+      <if test="refOrderNumber != null" >
+        ref_order_number = #{refOrderNumber,jdbcType=VARCHAR},
+      </if>
+      <if test="customerId != null" >
+        customer_id = #{customerId,jdbcType=INTEGER},
+      </if>
+      <if test="customerName != null" >
+        customer_name = #{customerName,jdbcType=VARCHAR},
+      </if>
+      <if test="customerRepId != null" >
+        customer_rep_id = #{customerRepId,jdbcType=INTEGER},
+      </if>
+      <if test="customerRepName != null" >
+        customer_rep_name = #{customerRepName,jdbcType=VARCHAR},
+      </if>
+      <if test="goTo != null" >
+        go_to = #{goTo,jdbcType=VARCHAR},
+      </if>
+      <if test="totalQuantity != null" >
+        total_quantity = #{totalQuantity,jdbcType=DECIMAL},
+      </if>
+      <if test="totalAmount != null" >
+        total_amount = #{totalAmount,jdbcType=DECIMAL},
+      </if>
+      <if test="makeOrderUser != null" >
+        make_order_user = #{makeOrderUser,jdbcType=VARCHAR},
+      </if>
+      <if test="checkOrderUser != null" >
+        check_order_user = #{checkOrderUser,jdbcType=VARCHAR},
+      </if>
+      <if test="checkDate != null" >
+        check_date = #{checkDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="fileNo != null" >
+        file_no = #{fileNo,jdbcType=VARCHAR},
+      </if>
+      <if test="comment != null" >
+        comment = #{comment,jdbcType=VARCHAR},
+      </if>
+      <if test="createdBy != null" >
+        created_by = #{createdBy,jdbcType=VARCHAR},
+      </if>
+      <if test="updatedBy != null" >
+        updated_by = #{updatedBy,jdbcType=VARCHAR},
+      </if>
+      <if test="createdTime != null" >
+        created_time = #{createdTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updatedTime != null" >
+        updated_time = #{updatedTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+
+</mapper>
