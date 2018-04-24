@@ -244,9 +244,28 @@ buy_order_quality|Decimal(14,3)|采购数量
 -|-|-
 id|Long|(自增类型ID pk)
 company_id|Integer|公司ID
-ref_order_id|Long|上级来源订单ID(可以存在不同的出库库原始订单)
-order_number|String|出库库单编号
-ref_no|String|出库单自定义编号
+warehouse_id|Integer|仓库ID
+ref_type|String|出库方式
+out_date|Date|出库日期
+ref_order_id|Long|出库关联的ID
+ref_order_number|String|出库单编号
+customer_id|Integer|客户ID
+customer_name|String|客户名称
+customer_rep_i|Integer|客户代表ID
+customer_rep_name|String|客户代表名称
+go_to|String|去向
+total_quantity|Decimal(14,3)|总计数量
+total_amount|Decimal(14,3)|总计金额
+make_order_user|String|制单人
+check_order_user|String|审核人
+check_date|Datetime|审核时间
+file_no|String|档案信息
+comment|String|描述
+created_by|String|创建人
+updated_by|String|修改人
+created_time|Datetime|创建时间
+updated_time|Datetime|修改时间
+
 
 
 ### 出库订单表：repertory_out_detail
@@ -256,8 +275,26 @@ ref_no|String|出库单自定义编号
 字段名|类型|描述
 -|-|-
 id|Long|(自增类型ID pk)
-out_order_id|Long|出库单ID
-
+repertory_out_id|Long|出库单ID
+repertory_info_id|Long|库存记录ID
+goods_id|Long|商品ID
+batch_code|String|批次号
+location|String|库位
+product_date|Date|生产日期
+exp_date|Date|有效期至
+quantity|Decimal(14,3)|数量
+free|Decimal(14,3)|免费数量
+price|Decimal(14,3)|价格
+dis_price|Decimal(14,3)|折扣
+amount|Decimal(14,3)|金额
+tax_price|Decimal(14,3)|税率
+check_user|String|检查员
+check_date|Datetime|检查时间
+check_result|String|检查结果
+created_by|String|创建人
+updated_by|String|修改人
+created_time|Datetime|创建时间
+updated_time|Datetime|修改时间
 
 
 
