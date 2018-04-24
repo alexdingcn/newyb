@@ -25,7 +25,7 @@
     <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
   </resultMap>
   <sql id="Base_Column_List" >
-    id, check_plan_id, make_user_id,formId,form_no, form_status, repertory_info_id, goods_id, batch_code,
+    id, check_plan_id, make_user_id,form_no, form_id,form_status, repertory_info_id, goods_id, batch_code,
     acc_limit, check_limit, check_note, check_status, price, amount, product_date, exp_date, 
     create_by, create_time, update_by, update_time
   </sql>
@@ -40,7 +40,7 @@
     where id = #{id,jdbcType=BIGINT}
   </delete>
   <insert id="insert" parameterType="com.yiban.erp.entities.RepertoryCheckPlanDetail"  useGeneratedKeys="true" keyProperty="id">
-    insert into repertory_check_plan_detail (id, check_plan_id, make_user_id,form_id,form_no,
+    insert into repertory_check_plan_detail (id, check_plan_id, make_user_id,form_no,form_id,
       form_status, repertory_info_id, goods_id, 
       batch_code, acc_limit, check_limit, 
       check_note, check_status, price, 
