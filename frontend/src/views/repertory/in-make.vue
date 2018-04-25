@@ -438,6 +438,7 @@
                         	var self = this;
                             return h('Input', {
                                 props: {
+                                    number: true,
 								  	value: self.orderItems[params.index][params.column.key]
                                 },
                                 on: {

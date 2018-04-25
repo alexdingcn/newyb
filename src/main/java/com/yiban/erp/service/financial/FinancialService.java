@@ -1,10 +1,27 @@
 package com.yiban.erp.service.financial;
 
-import com.yiban.erp.entities.BuyOrder;
-import com.yiban.erp.entities.SellOrder;
+import com.alibaba.fastjson.JSON;
+import com.yiban.erp.constant.*;
+import com.yiban.erp.dao.CompanyMapper;
+import com.yiban.erp.dao.CustomerMapper;
+import com.yiban.erp.dao.FinancialFlowMapper;
+import com.yiban.erp.dao.SupplierMapper;
+import com.yiban.erp.dto.FinancialReq;
+import com.yiban.erp.entities.*;
+import com.yiban.erp.exception.BizException;
+import com.yiban.erp.exception.BizRuntimeException;
+import com.yiban.erp.exception.ErrorCode;
+import com.yiban.erp.service.util.LockService;
+import com.yiban.erp.util.UtilTool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.math.BigDecimal;
+import java.util.Date;
+import java.util.List;
 
 /**
  * 财务
@@ -14,22 +31,375 @@ public class FinancialService {
 
     private static final Logger logger = LoggerFactory.getLogger(FinancialService.class);
 
+    private static final String FINANCIAL_KEY_PRE = "FINANCIAL-";
+
+    @Autowired
+    private FinancialFlowMapper financialFlowMapper;
+    @Autowired
+    private CustomerMapper customerMapper;
+    @Autowired
+    private LockService lockService;
+    @Autowired
+    private CompanyMapper companyMapper;
+    @Autowired
+    private SupplierMapper supplierMapper;
+
+
     /**
      * 根据销售单创建一笔往来账流水记录
      * @param sellOrder
      */
-    public void createFlowBySellOrder(SellOrder sellOrder) {
+    public void createFlowBySellOrder(SellOrder sellOrder) throws BizException {
+        if (sellOrder == null || !SellOrderStatus.SALE_CHECKED.name().equalsIgnoreCase(sellOrder.getStatus())) {
+            logger.warn("sell order is null or sell order status is not SALE_CHECKED");
+            throw new BizException(ErrorCode.FINANCIAL_SELL_ORDER_ERROR);
+        }
+        //验证下当前销售单是否已经记录过往来账，如果记录过，给出错误提示
+        List<FinancialFlow> flows = financialFlowMapper.getByRefId(sellOrder.getId());
+        if (flows != null && !flows.isEmpty()) {
+            logger.warn("sell order:{} financial flow is already exist, can not add on this sell order. ", sellOrder.getId());
+            throw new BizException(ErrorCode.FINANCIAL_SELL_ORDER_EXIST);
+        }
 
+        FinancialReq req = new FinancialReq();
+        req.setCompanyId(sellOrder.getCompanyId());
+        req.setLogUserName(sellOrder.getUpdateBy());
+        req.setCustType(FinancialReq.CUST_CUSTOMER);
+        req.setCustId(sellOrder.getCustomerId());
+        req.setBizType(FinancialBizType.SELL_BATCH.name());
+        req.setBizRefId(sellOrder.getId()); //关联单ID取采购订单的ID
+        req.setBizRefNo(sellOrder.getOrderNumber());
+        req.setLogAmount(sellOrder.getTotalAmount());
+        req.setLogDate(new Date());
+        req.setLogAccount(sellOrder.getCustomerName());
+        req.setKeyWord("销售单生成的往来账流水"); //入库方式的描述信息
 
-
+        doFinancialRecord(req);  //登记往来账逻辑
     }
 
     /**
-     * 根据采购单创建一笔往来账流水记录
-     * @param buyOrder
+     * 采购入库，根据采购的入库单，进行建立对应的财务往来账
+     * @param repertoryIn
      */
-    public void createFlowByBuyOrder(BuyOrder buyOrder) {
+    public void createFlowByBuyOrder(RepertoryIn repertoryIn) throws BizException {
+        //只针对两种类型的入库进行统计对应的财务往来账
+        if (repertoryIn == null || !RepertoryInStatus.IN_CHECKED.name().equalsIgnoreCase(repertoryIn.getStatus())) {
+            logger.warn("repertory in order record financial record but order is null or status is not IN_CHECKED");
+            throw new BizException(ErrorCode.FINANCIAL_IN_ORDER_ERROR);
+        }
+        if (!RepertoryRefType.BUY_ORDER.name().equalsIgnoreCase(repertoryIn.getStatus()) &&
+                !RepertoryRefType.BUY_DIRECT.name().equalsIgnoreCase(repertoryIn.getStatus())) {
+            //当前方法只能统计采购单入库和直调入库的入库单信息
+            logger.warn("repertory in order ref type is not BUY_ORDER or BUY_DIRECT. orderId:{}", repertoryIn.getId());
+            throw new BizException(ErrorCode.FINANCIAL_IN_ORDER_ERROR);
+        }
+        //验证下当前销售单是否已经记录过往来账，如果记录过，给出错误提示
+        List<FinancialFlow> flows = financialFlowMapper.getByRefId(repertoryIn.getId());
+        if (flows != null && !flows.isEmpty()) {
+            logger.warn("repertory in order:{} financial flow is already exist, can not add on this order.", repertoryIn.getId());
+            throw new BizException(ErrorCode.FINANCIAL_SELL_ORDER_EXIST);
+        }
+        FinancialReq req = new FinancialReq();
+        req.setCompanyId(repertoryIn.getCompanyId());
+        req.setLogUserName(repertoryIn.getUpdateBy());
+        req.setCustType(FinancialReq.CUST_SUPPLIER);
+        req.setCustId(repertoryIn.getSupplierId());
+        req.setBizType(FinancialBizType.BUY_IN.name());
+        req.setBizRefId(repertoryIn.getId()); //关联单ID取入库单的ID
+        req.setBizRefNo(repertoryIn.getOrderNumber());
+        req.setLogAmount(repertoryIn.getTotalAmount());
+        req.setLogDate(new Date());
+        req.setLogAccount(repertoryIn.getSupplierName());
+        req.setKeyWord(repertoryIn.getRefTypeName()); //入库方式的描述信息
 
+        doFinancialRecord(req);  //登记往来账逻辑
+    }
+
+    /**
+     * 预收款往来账记录
+     * @param financialReq
+     * @throws BizException
+     */
+    public void preReceiveFinancial(FinancialReq financialReq) throws BizException {
+        if (financialReq == null) {
+            throw new BizException(ErrorCode.PARAMETER_MISSING);
+        }
+        FinancialBizType bizType = FinancialBizType.getByName(financialReq.getBizType());
+        if (!FinancialBizType.PRE_RECEIVE.name().equals(bizType.name())) {
+            throw new BizException(ErrorCode.FINANCIAL_BIZ_TYPE_ERROR);
+        }
+        //预收款不需要验证其他信息，直接获取交易锁后记账
+        doFinancialRecord(financialReq);
+    }
+
+    /**
+     * 针对的是操作员的操作，系统的在发起时自行认证
+     * @param financialReq
+     * @throws BizException
+     */
+    public void validateAndDoFinancialRecord(FinancialReq financialReq) throws BizException{
+        if (financialReq == null) {
+            logger.warn("request params is null.");
+            throw new BizException(ErrorCode.PARAMETER_MISSING);
+        }
+        FinancialBizType bizType = FinancialBizType.getByName(financialReq.getBizType());
+        if (bizType == null) {
+            logger.warn("request params bizType is error.");
+            throw new BizException(ErrorCode.FINANCIAL_BIZ_TYPE_ERROR);
+        }
+        //根据各种操作的不同，验证通过进行各种验证后进行登记往来账流水
+        switch (bizType) {
+            case RECEIVE:
+            case PAY:
+            case PRE_PAID:
+            case PRE_RECEIVE:
+            case RECORD_RECEIVE:
+            case RECORD_PAY:
+                //这些交易不需要特殊验证一些信息，直接提交给登记流水逻辑
+                doFinancialRecord(financialReq);
+                break;
+            case OFFSET:
+                // 冲销操作，需要验证对应账户的余额是否足够做冲销交易，如果不足够，不能操作
+                if(isCanDoOffsetAction(financialReq)) {
+                    doFinancialRecord(financialReq);
+                }else {
+                    throw new BizException(ErrorCode.FINANCIAL_CANNOT_OFFSET);
+                }
+                break;
+            case RECEIVE_CANCEL:
+            case PAY_CANCEL:
+            case RECORD_RECEIVE_CANCEL:
+            case RECORD_PAID_CANCEL:
+            case PRE_RECEIVE_CANCEL:
+            case PRE_PAID_CANCEL:
+                //取消操作，需要验证被取消的记录是否已经被取消过，每一笔只能取消一次，取消操作本身不能做取消操作
+                if(isCanDoCancelAction(financialReq)) {
+                    doFinancialRecord(financialReq);
+                }else {
+                    throw new BizException(ErrorCode.FINANCIAL_CANNOT_CANCEL);
+                }
+                break;
+            default:
+                // 其他的操作目前不支持使用该方法(后续可以考虑加上)
+                throw new BizRuntimeException(ErrorCode.FINANCIAL_ACTION_ERROR);
+        }
+    }
+
+    private boolean isCanDoOffsetAction(FinancialReq financialReq) {
+        // TODO 相关的账户预付款必须足够才能做冲销操作(预付款预收款记录需要多一个表)
+
+        return true;
+    }
+
+    private boolean isCanDoCancelAction(FinancialReq financialReq) {
+        //取消单操作的关联单必须存在, 并且取消操作不能针对取消类型的操作
+        if (financialReq.getBizRefId() == null) {
+            logger.warn("cancel action bizRefId must exist.");
+            return false;
+        }
+        //获取关联的订单信息，
+        FinancialFlow flow = financialFlowMapper.selectByPrimaryKey(financialReq.getBizRefId());
+        if (flow == null) {
+            logger.warn("get ref flows fail, and one flow can do one times cancel. refId:{}", financialReq.getBizRefId());
+            return false;
+        }
+        //验证下当前关联单的类型是否可以做取消操作
+        FinancialBizType bizType = FinancialBizType.getByName(flow.getBizType());
+        if (bizType == null || !bizType.isCanCancel()) {
+            logger.warn("bizType:{} can not do cancel action. refId:{}", flow.getBizType(), flow.getId());
+            return false;
+        }
+        List<FinancialFlow> flows = financialFlowMapper.getByRefId(flow.getId());
+        for (FinancialFlow item : flows) {
+            if (item.getBizType().equalsIgnoreCase(financialReq.getCustType())) {
+                logger.warn("当前流水已经做过取消操作，不能再次做取消操作。flowId:{}, itemId:{}", flow.getId(), item.getId());
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private boolean validateFinancialReq(FinancialReq req) {
+        if (req == null) {
+            return false;
+        }
+        if (req.getCompanyId() == null) {
+            logger.warn("request params companyId is null.");
+            return false;
+        }
+        if (req.getLogUserName() == null) {
+            logger.warn("request params logUserName is null");
+            return false;
+        }
+        if (req.getCustId() == null) {
+            logger.warn("request params custId is null.");
+            return false;
+        }
+        if (!FinancialReq.CUST_CUSTOMER.equalsIgnoreCase(req.getCustType())
+                && !FinancialReq.CUST_SUPPLIER.equalsIgnoreCase(req.getCustType())) {
+            logger.warn("request params custType is error, custType:{}", req.getCustType());
+            return false;
+        }
+        if (req.getLogDate() == null) {
+            logger.warn("request params logDate is null.");
+            return false;
+        }
+        if (req.getLogAmount() == null || BigDecimal.ZERO.compareTo(req.getLogAmount()) >= 0) {
+            logger.warn("request params logAmount is null or logAmount <= 0");
+            return false;
+        }
+        if (req.getLogAccount() == null) {
+            logger.warn("request params logAccount is null");
+            return false;
+        }
+        FinancialBizType type = FinancialBizType.getByName(req.getBizType());
+        if (type == null) {
+            logger.warn("request params biz type is error. {}", req.getBizType());
+            return false;
+        }
+        return true;
+    }
+
+    protected void doFinancialRecord(FinancialReq financialReq){
+        if (validateFinancialReq(financialReq)) {
+            logger.warn("financial request params validate fail. {}", JSON.toJSONString(financialReq));
+            throw new BizRuntimeException(ErrorCode.PARAMETER_MISSING);
+        }
+        String lockKey = FINANCIAL_KEY_PRE + financialReq.getCompanyId();
+        boolean lock = lockService.lock(lockKey);
+        if (lock) {
+            try {
+                addNewFinancialRecord(financialReq);
+            } catch (Exception e){
+                logger.error("do financial record have exception. {}", JSON.toJSONString(financialReq), e);
+                // TODO 发送警告邮件
+            }finally {
+                lockService.closeLock(lockKey);
+            }
+        }else {
+            logger.error("get financial lock fail by key:{}", lockKey);
+            // TODO 发送警告邮件信息
+        }
+    }
+
+    /**
+     * 直接操作新建逻辑，必须在改操作之前做好加锁操作
+     * @param financialReq
+     */
+    @Transactional
+    protected void addNewFinancialRecord(FinancialReq financialReq) {
+        Company company = companyMapper.selectByPrimaryKey(financialReq.getCompanyId());
+        if (company == null) {
+            logger.error("get company by companyId:{} result is null.",financialReq.getCompanyId());
+            throw new BizRuntimeException(ErrorCode.COMPANY_MISS);
+        }
+        Customer customer = null;
+        Supplier supplier = null;
+        // 如果记账的客户类型是客户，则获取客户信息, 如果是供应商，获取供应商的信息
+        if (FinancialReq.CUST_SUPPLIER.equalsIgnoreCase(financialReq.getCustType())) {
+            supplier = supplierMapper.selectByPrimaryKey(financialReq.getCustId());
+            if (supplier == null) {
+                throw new BizRuntimeException(ErrorCode.CUSTOMER_GET_FAIL);
+            }
+            financialReq.setLogAccount(supplier.getName()); //直接设置为供应商名称
+        }else if (FinancialReq.CUST_CUSTOMER.equalsIgnoreCase(financialReq.getCustType())) {
+            customer = customerMapper.selectByPrimaryKey(financialReq.getCustId());
+            if (customer == null) {
+                throw new BizRuntimeException(ErrorCode.CUSTOMER_GET_FAIL);
+            }
+            financialReq.setLogAccount(customer.getName()); //直接设置为客户名称
+        }
+        BigDecimal inAmount = null;
+        BigDecimal outAmount = null;
+        BigDecimal logAmount = financialReq.getLogAmount() == null ? BigDecimal.ZERO : financialReq.getLogAmount();
+        FinancialBizType bizType = FinancialBizType.getByName(financialReq.getBizType());
+        switch (bizType) {
+            case BUY_IN:
+            case SELL_BACK:
+            case RECEIVE:
+            case PRE_RECEIVE:
+            case RECORD_PAY:
+            case PAY_CANCEL:
+                outAmount = logAmount; //应付
+                break;
+            case BUY_BACK:
+            case SELL_BATCH:
+            case PAY:
+            case PRE_PAID:
+            case RECORD_RECEIVE:
+            case RECEIVE_CANCEL:
+                inAmount = logAmount; //应收
+                break;
+            case OFFSET:
+                inAmount = logAmount.negate(); //取反
+                outAmount = logAmount.negate(); //取反
+                break;
+            case RECORD_RECEIVE_CANCEL:
+            case PRE_RECEIVE_CANCEL:
+                inAmount = logAmount.negate(); //应收记账取负
+                break;
+            case RECORD_PAID_CANCEL:
+            case PRE_PAID_CANCEL:
+                outAmount = logAmount.negate(); //记账应付取消时，应付取一个负数
+                break;
+            default:
+                throw new BizRuntimeException(ErrorCode.FINANCIAL_BIZ_TYPE_ERROR);
+        }
+
+        //公司的账户余额：公司账户余额 = 原公司账户余额 + 应收账款 - 应付账款
+        BigDecimal companyAccountAmount = company.getAccountAmount() == null ? BigDecimal.ZERO : company.getAccountAmount();
+        BigDecimal companyAmount = companyAccountAmount.add(inAmount == null ? BigDecimal.ZERO : inAmount).subtract(outAmount == null ? BigDecimal.ZERO : outAmount);
+        //修改公司账户的余额
+        int companyUpdate = companyMapper.updateAccountAmount(company.getId(), companyAmount);
+        if (companyUpdate <= 0) {
+            logger.warn("update company account amount fail.");
+            throw new BizRuntimeException(ErrorCode.FAILED_UPDATE_FROM_DB);
+        }
+        BigDecimal custAmount = null;
+        if (FinancialReq.CUST_SUPPLIER.equalsIgnoreCase(financialReq.getCustType())) {
+            BigDecimal supplierAmount = supplier.getAccountAmount() == null ? BigDecimal.ZERO : supplier.getAccountAmount();
+            custAmount = supplierAmount.add(outAmount == null ? BigDecimal.ZERO : outAmount).subtract(inAmount == null ? BigDecimal.ZERO : inAmount);
+            int supplierUpdate = supplierMapper.updateAccountAmount(supplier.getId(), custAmount);
+            if (supplierUpdate <= 0) {
+                logger.warn("update supplier account amount fail.");
+                throw new BizRuntimeException(ErrorCode.FAILED_UPDATE_FROM_DB);
+            }
+        }else if (FinancialReq.CUST_CUSTOMER.equalsIgnoreCase(financialReq.getCustType())) {
+            BigDecimal customerAmount = customer.getAccountAmount() == null ? BigDecimal.ZERO : customer.getAccountAmount();
+            custAmount = customerAmount.add(outAmount == null ? BigDecimal.ZERO : outAmount).subtract(inAmount == null ? BigDecimal.ZERO : inAmount);
+            int customerUpdate = customerMapper.updateAccountAmount(customer.getId(), custAmount);
+            if (customerUpdate <= 0) {
+                logger.warn("update customer account amount fail.");
+                throw new BizRuntimeException(ErrorCode.FAILED_UPDATE_FROM_DB);
+            }
+        }
+        //登记往来账记录
+        FinancialFlow flow = new FinancialFlow();
+        flow.setBizNo(UtilTool.makeOrderNumber(company.getId(), OrderNumberType.FINANCIAL_FLOW));
+        flow.setLogDate(financialReq.getLogDate());
+        flow.setLogAccount(financialReq.getLogAccount());
+        flow.setDocNo(financialReq.getDocNo());
+        flow.setFileNo(financialReq.getFileNo());
+        flow.setBizType(financialReq.getBizType());
+        flow.setBizRefId(financialReq.getBizRefId());
+        flow.setBizRefNo(financialReq.getBizRefNo());
+        flow.setKeyWord(financialReq.getKeyWord() == null ? bizType.getDesc() : financialReq.getKeyWord());
+        flow.setLogAmount(financialReq.getLogAmount());
+        flow.setInAmount(inAmount);
+        flow.setOutAmount(outAmount);
+        flow.setCompanyAmount(companyAmount);
+        flow.setCustAmount(custAmount);
+        flow.setPayMethod(financialReq.getPayMethod());
+        flow.setPayAccount(financialReq.getPayAccount());
+        flow.setReceiveAccount(financialReq.getReceiveAccount());
+        flow.setCreatedBy(financialReq.logUserName);
+        flow.setCreatedTime(new Date());
+        int financialCount = financialFlowMapper.insert(flow);
+        if (financialCount <= 0) {
+            logger.warn("insert financial fail. {}", JSON.toJSONString(flow));
+            throw new BizRuntimeException(ErrorCode.FAILED_INSERT_FROM_DB);
+        }
     }
 
 }

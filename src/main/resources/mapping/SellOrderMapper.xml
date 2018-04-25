@@ -7,7 +7,7 @@
     <result column="order_number" property="orderNumber" jdbcType="VARCHAR" />
     <result column="ref_no" property="refNo" jdbcType="VARCHAR" />
     <result column="status" property="status" jdbcType="VARCHAR" />
-    <result column="customer_id" property="customerId" jdbcType="INTEGER" />
+    <result column="customer_id" property="customerId" jdbcType="BIGINT" />
     <result column="customer_rep_id" property="customerRepId" jdbcType="INTEGER" />
     <result column="sale_id" property="saleId" jdbcType="BIGINT" />
     <result column="temper_control_id" property="temperControlId" jdbcType="BIGINT" />
@@ -52,7 +52,7 @@
       comment, create_by, create_time, 
       update_by, update_time, warehouse_id, total_quantity, total_amount)
     values (#{companyId,jdbcType=INTEGER}, #{orderNumber,jdbcType=VARCHAR},
-      #{refNo,jdbcType=VARCHAR}, #{status,jdbcType=VARCHAR}, #{customerId,jdbcType=INTEGER}, 
+      #{refNo,jdbcType=VARCHAR}, #{status,jdbcType=VARCHAR}, #{customerId,jdbcType=BIGINT},
       #{customerRepId,jdbcType=INTEGER}, #{saleId,jdbcType=BIGINT}, #{temperControlId,jdbcType=BIGINT},
       #{createOrderDate,jdbcType=DATE}, #{takeGoodsUser,jdbcType=VARCHAR}, #{payOrderDate,jdbcType=DATE},
       #{markUpRate,jdbcType=DECIMAL}, #{shipMethod,jdbcType=BIGINT},
@@ -72,7 +72,7 @@
         status = #{status,jdbcType=VARCHAR},
       </if>
       <if test="customerId != null" >
-        customer_id = #{customerId,jdbcType=INTEGER},
+        customer_id = #{customerId,jdbcType=BIGINT},
       </if>
       <if test="customerRepId != null" >
         customer_rep_id = #{customerRepId,jdbcType=INTEGER},
@@ -160,7 +160,7 @@
     <result column="order_number" property="orderNumber" jdbcType="VARCHAR" />
     <result column="ref_no" property="refNo" jdbcType="VARCHAR" />
     <result column="status" property="status" jdbcType="VARCHAR" />
-    <result column="customer_id" property="customerId" jdbcType="INTEGER" />
+    <result column="customer_id" property="customerId" jdbcType="BIGINT" />
     <result column="customer_rep_id" property="customerRepId" jdbcType="INTEGER" />
     <result column="sale_id" property="saleId" jdbcType="BIGINT" />
     <result column="temper_control_id" property="temperControlId" jdbcType="BIGINT" />

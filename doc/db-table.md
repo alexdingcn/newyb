@@ -312,6 +312,7 @@ created_time|Datetime|创建时间
 updated_time|Datetime|修改时间
 created_by|String|创建人
 updated_by|String|修改人
+account_amount|Decimal(14,3)|账户余额
 
 
 ### 用户表：users
@@ -690,6 +691,7 @@ created_time|Datetime|创建时间
 created_by|String|创建人
 updated_by|String|修改人
 updated_time|String|修改时间
+account_amount|Decimal(14,3)|账户余额
 
 
 
@@ -781,6 +783,7 @@ create_time|Datetime|创建时间
 update_time|Datetime|修改时间
 create_by|String|创建人
 update_by|String|修改人
+account_amount|Decimal(14,3)|账户余额
 
 
 

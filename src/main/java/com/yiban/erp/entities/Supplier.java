@@ -117,8 +117,9 @@ public class Supplier {
 
     private Date updatedTime;
 
+    private BigDecimal accountAmount;
 
-    public String getCity() {
+   public String getCity() {
         return this.placeCodes == null ? "" : JSON.toJSONString(placeCodes);
     }
 
@@ -561,5 +562,13 @@ public class Supplier {
 
     public void setUpdatedTime(Date updatedTime) {
         this.updatedTime = updatedTime;
+    }
+
+    public BigDecimal getAccountAmount() {
+        return accountAmount;
+    }
+
+    public void setAccountAmount(BigDecimal accountAmount) {
+        this.accountAmount = accountAmount;
     }
 }

@@ -9,7 +9,7 @@
     <result column="out_date" property="outDate" jdbcType="DATE" />
     <result column="ref_order_id" property="refOrderId" jdbcType="BIGINT" />
     <result column="ref_order_number" property="refOrderNumber" jdbcType="VARCHAR" />
-    <result column="customer_id" property="customerId" jdbcType="INTEGER" />
+    <result column="customer_id" property="customerId" jdbcType="BIGINT" />
     <result column="customer_name" property="customerName" jdbcType="VARCHAR" />
     <result column="customer_rep_id" property="customerRepId" jdbcType="INTEGER" />
     <result column="customer_rep_name" property="customerRepName" jdbcType="VARCHAR" />
@@ -53,7 +53,7 @@
       created_time, updated_time)
     values (#{companyId,jdbcType=INTEGER}, #{warehouseId,jdbcType=INTEGER},
       #{refType,jdbcType=VARCHAR}, #{outDate,jdbcType=DATE}, #{refOrderId,jdbcType=BIGINT}, 
-      #{refOrderNumber,jdbcType=VARCHAR}, #{customerId,jdbcType=INTEGER}, #{customerName,jdbcType=VARCHAR}, 
+      #{refOrderNumber,jdbcType=VARCHAR}, #{customerId,jdbcType=BIGINT}, #{customerName,jdbcType=VARCHAR},
       #{customerRepId,jdbcType=INTEGER}, #{customerRepName,jdbcType=VARCHAR}, #{goTo,jdbcType=VARCHAR}, 
       #{totalQuantity,jdbcType=DECIMAL}, #{totalAmount,jdbcType=DECIMAL}, #{makeOrderUser,jdbcType=VARCHAR},
       #{checkOrderUser,jdbcType=VARCHAR}, #{checkDate,jdbcType=TIMESTAMP}, #{fileNo,jdbcType=VARCHAR},
@@ -83,7 +83,7 @@
         ref_order_number = #{refOrderNumber,jdbcType=VARCHAR},
       </if>
       <if test="customerId != null" >
-        customer_id = #{customerId,jdbcType=INTEGER},
+        customer_id = #{customerId,jdbcType=BIGINT},
       </if>
       <if test="customerName != null" >
         customer_name = #{customerName,jdbcType=VARCHAR},

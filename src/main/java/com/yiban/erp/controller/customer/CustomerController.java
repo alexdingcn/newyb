@@ -64,7 +64,7 @@ public class CustomerController {
     }
 
     @RequestMapping(value = "/{customerId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> getById(@PathVariable Integer customerId) {
+    public ResponseEntity<String> getById(@PathVariable Long customerId) {
         Customer customer = customerMapper.selectByPrimaryKey(customerId);
         return ResponseEntity.ok().body(JSON.toJSONString(customer));
     }
@@ -103,7 +103,7 @@ public class CustomerController {
     }
 
     @RequestMapping(value = "/rep/list", method = RequestMethod.GET)
-    public ResponseEntity<JSON> getRepList(@RequestParam("customerId") Integer customerId) throws Exception {
+    public ResponseEntity<JSON> getRepList(@RequestParam("customerId") Long customerId) throws Exception {
         logger.debug("get an request to get customer rep list by customerId:", customerId);
         List<CustomerRep> reps = customerService.getRepList(customerId);
         return ResponseEntity.ok().body((JSON) JSON.toJSON(reps));
@@ -144,7 +144,7 @@ public class CustomerController {
         return ResponseEntity.ok().body(JSON.toJSONString(customers));
     }
     @RequestMapping(value = "/search/id", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> searchById(@RequestParam("customerId") Integer id) {
+    public ResponseEntity<String> searchById(@RequestParam("customerId") Long id) {
         Customer customer = customerMapper.selectByPrimaryKey(id);
         return ResponseEntity.ok().body(JSON.toJSONString(customer));
     }

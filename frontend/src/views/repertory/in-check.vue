@@ -148,6 +148,14 @@ export default {
                     }
                 },
                 {
+                    title: '总计入库数量',
+                    key: 'totalQuantity'
+                },
+                {
+                    title: '总计金额',
+                    key: 'totalAmount'
+                },
+                {
                     title: '收货员',
                     key: 'createBy'
                 },
@@ -271,6 +279,11 @@ export default {
                     title: "到货数量",
                     width: 140,
                     key: 'receiveQuality'
+                },
+                {
+                    title: '赠送数量',
+                    width: 140,
+                    key: 'free'
                 },
                 {
                     title: "入库数量",

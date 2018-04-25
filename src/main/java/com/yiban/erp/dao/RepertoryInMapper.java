@@ -14,13 +14,9 @@ public interface RepertoryInMapper {
 
     int insert(RepertoryIn record);
 
-    int insertSelective(RepertoryIn record);
-
     RepertoryIn selectByPrimaryKey(Long id);
 
     int updateByPrimaryKeySelective(RepertoryIn record);
-
-    int updateByPrimaryKey(RepertoryIn record);
 
     List<RepertoryIn> getList(ReceiveListReq listReq);
 

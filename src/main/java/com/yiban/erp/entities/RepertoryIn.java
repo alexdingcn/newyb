@@ -83,6 +83,9 @@ public class RepertoryIn {
 
     private Date updateTime;
 
+    private BigDecimal totalQuantity;
+    private BigDecimal totalAmount;
+
     private String supplierName;
     private String supplierContactName;
     private String warehouseName;
@@ -526,5 +529,21 @@ public class RepertoryIn {
 
     public void setDetails(List<RepertoryInDetail> details) {
         this.details = details;
+    }
+
+    public BigDecimal getTotalQuantity() {
+        return totalQuantity;
+    }
+
+    public void setTotalQuantity(BigDecimal totalQuantity) {
+        this.totalQuantity = totalQuantity;
+    }
+
+    public BigDecimal getTotalAmount() {
+        return totalAmount;
+    }
+
+    public void setTotalAmount(BigDecimal totalAmount) {
+        this.totalAmount = totalAmount;
     }
 }

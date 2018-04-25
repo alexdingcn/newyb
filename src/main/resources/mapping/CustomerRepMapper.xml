@@ -3,7 +3,7 @@
 <mapper namespace="com.yiban.erp.dao.CustomerRepMapper" >
   <resultMap id="BaseResultMap" type="com.yiban.erp.entities.CustomerRep" >
     <id column="id" property="id" jdbcType="INTEGER" />
-    <result column="customer_id" property="customerId" jdbcType="INTEGER" />
+    <result column="customer_id" property="customerId" jdbcType="BIGINT" />
     <result column="name" property="name" jdbcType="VARCHAR" />
     <result column="contact_phone" property="contactPhone" jdbcType="VARCHAR" />
     <result column="repertory_address" property="repertoryAddress" jdbcType="VARCHAR" />
@@ -36,7 +36,7 @@
       enabled, default_time, comment,
       create_time, update_time, create_by, 
       update_by)
-    values (#{customerId,jdbcType=INTEGER}, #{name,jdbcType=VARCHAR},
+    values (#{customerId,jdbcType=BIGINT}, #{name,jdbcType=VARCHAR},
       #{contactPhone,jdbcType=VARCHAR}, #{repertoryAddress,jdbcType=VARCHAR}, #{postcode,jdbcType=VARCHAR}, 
       #{enabled,jdbcType=BIT}, #{defaultTime,jdbcType=TIMESTAMP}, #{comment,jdbcType=VARCHAR},
       #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, #{createBy,jdbcType=VARCHAR}, 
@@ -47,7 +47,7 @@
     update customer_rep
     <set >
       <if test="customerId != null" >
-        customer_id = #{customerId,jdbcType=INTEGER},
+        customer_id = #{customerId,jdbcType=BIGINT},
       </if>
       <if test="name != null" >
         name = #{name,jdbcType=VARCHAR},
@@ -86,7 +86,7 @@
     where id = #{id,jdbcType=INTEGER}
   </update>
 
-  <select id="getDefault" parameterType="java.lang.Integer" resultMap="BaseResultMap" >
+  <select id="getDefault" parameterType="java.lang.Long" resultMap="BaseResultMap" >
     select <include refid="Base_Column_List"/>
     from customer_rep
     where customer_id = #{customerId}
@@ -100,7 +100,7 @@
     where id = #{id}
   </update>
 
-  <select id="getByCustomerId" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+  <select id="getByCustomerId" parameterType="java.lang.Long" resultMap="BaseResultMap">
     select
       <include refid="Base_Column_List"/>
     from customer_rep

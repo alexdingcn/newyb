@@ -51,7 +51,7 @@ public class SellOrderService {
     private RepertoryOutDetailMapper repertoryOutDetailMapper;
 
 
-    public List<SellOrder> getList(Integer companyId, Integer customerId, Long saleId,
+    public List<SellOrder> getList(Integer companyId, Long customerId, Long saleId,
                                             String refNo, String status, Date createOrderDate, Integer page, Integer size) {
         int limit = (size == null || size <= 0) ? 10 : size;
         int offset = (page == null || page <= 0 ? 0 : page - 1) * limit;
@@ -191,7 +191,7 @@ public class SellOrderService {
         return details;
     }
 
-    public Map<Long,List<SellOrderDetail>> getDetailHistory(Integer companyId, Integer customerId, List<Long> goodIds) {
+    public Map<Long,List<SellOrderDetail>> getDetailHistory(Integer companyId, Long customerId, List<Long> goodIds) {
         if (companyId == null || customerId == null || goodIds == null || goodIds.isEmpty()) {
             return null;
         }
@@ -224,7 +224,7 @@ public class SellOrderService {
     }
 
 
-    public boolean isCustomerCanSellGoods(Integer customerId, List<Long> goodIds) throws BizException {
+    public boolean isCustomerCanSellGoods(Long customerId, List<Long> goodIds) throws BizException {
         Customer customer = customerMapper.selectByPrimaryKey(customerId);
         if (customer == null) {
             throw new BizException(ErrorCode.CUSTOMER_GET_FAIL);

@@ -117,6 +117,15 @@ public enum ErrorCode {
     WAREHOUSE_LOCATION_EXIST(2501, "仓库位置已经存在, 不能添加同名库位"),
 
 
+    // 31xx财务账
+    FINANCIAL_SELL_ORDER_ERROR(3101, "当前销售单不能生成往来账信息"),
+    FINANCIAL_SELL_ORDER_EXIST(3102, "当前销售单已经存在对应的往来账流水，不能再次建立"),
+    FINANCIAL_IN_ORDER_ERROR(3103, "当前入库单不能生成往来账信息"),
+    FINANCIAL_BIZ_TYPE_ERROR(3104, "财务记账业务类型错误."),
+    FINANCIAL_ACTION_ERROR(3105, "系统异常，不支持当前业务类型的操作"),
+    FINANCIAL_CANCEL_REF_ID_EMPTY(3106, "取消操作必须存在关联单"),
+    FINANCIAL_CANNOT_CANCEL(3017, "当前交易不能做取消操作"),
+    FINANCIAL_CANNOT_OFFSET(3018, "冲销交易条件不足，例如金额不足等"),
 
     // 41xx - 贷款
     SEND_VERIFY_CODE_FAIL(4104, "发送验证码失败"),
@@ -127,10 +136,12 @@ public enum ErrorCode {
     MOBILE_VERIFY_CODE_TOO_FREQUENT(4106, "验证码发送太频繁"),
     VERIFY_CODE_VALIDATE_FAIL(4107, "短信验证码错误"),
 
+
     ACCESS_PERMISSION(9001, "无访问权限", ErrorDisplay.MODAL),
     PARAMETER_MISSING(9002, "缺少必填字段"),
     MESSAGE_GET_FAIL(9003, "获取消息信息失败"),
     LOGIN_STATUS_MISS(9004, "登录态失效", ErrorDisplay.NOTICE),
+    COMPANY_MISS(9005, "获取公司信息失败", ErrorDisplay.MODAL),
     ;
 
     private Integer code;

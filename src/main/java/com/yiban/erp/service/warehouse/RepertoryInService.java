@@ -18,6 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.*;
@@ -103,8 +104,12 @@ public class RepertoryInService {
         if (!saveValidate(order)) {
             throw new BizException(ErrorCode.RECEIVE_SAVE_PRAMS_INVALID);
         }
+        setRepertoryInTotalAmount(order, order.getDetails()); //保存的之前先对订单的总入库数和总金额计算
         if (order.getId() == null) {
             //新建
+            if (order.getRefType() == null) {
+                order.setRefType(RepertoryRefType.BUY_DIRECT.name()); //如果没有设置，也就是不是采购入库，直接设置为直调入库
+            }
             order.setCompanyId(user.getCompanyId());
             order.setOrderNumber(UtilTool.makeOrderNumber(user.getCompanyId(), OrderNumberType.IN_CHECK));
             order.setCreateBy(user.getNickname());
@@ -151,6 +156,27 @@ public class RepertoryInService {
                 buyOrderMapper.updateByPrimaryKeySelective(buyOrder);
             }
         }
+    }
+
+    /**
+     * 注意order 和 details 的匹配
+     * @param order
+     * @param details
+     */
+    private void setRepertoryInTotalAmount(RepertoryIn order, List<RepertoryInDetail> details) {
+        if (order == null || details == null || details.isEmpty()) {
+            return;
+        }
+        BigDecimal totalQuantity = BigDecimal.ZERO;
+        BigDecimal totalAmount = BigDecimal.ZERO;
+        for (RepertoryInDetail detail : details) {
+            if (order.getId().equals(detail.getInOrderId())) {
+                totalQuantity = totalQuantity.add(detail.getInCount()); //入库数量
+                totalAmount = totalAmount.add(detail.getAmount()); //金额
+            }
+        }
+        order.setTotalQuantity(totalQuantity);
+        order.setTotalAmount(totalAmount);
     }
 
     private int saveOrderDetail(User user, RepertoryIn order) {
@@ -411,6 +437,11 @@ public class RepertoryInService {
             logger.warn("get order detail fail by id:{}", setReq.getDetailId());
             throw new BizException(ErrorCode.RECEIVE_ORDER_GET_FAIL);
         }
+        RepertoryIn repertoryIn = repertoryInMapper.selectByPrimaryKey(detail.getInOrderId());
+        if (repertoryIn == null) {
+            logger.warn("get order fail by id:{}", detail.getInOrderId());
+            throw new BizException(ErrorCode.RECEIVE_ORDER_GET_FAIL);
+        }
         //直接调用验收逻辑
         setReq.setUpdateBy(user.getNickname());
         setReq.setUpdateTime(new Date());
@@ -421,6 +452,9 @@ public class RepertoryInService {
 
         //验证订单的是否意见全部验证通过，如果是，需要把订单修改为已经验收完毕的状态
         List<RepertoryInDetail> details = repertoryInDetailMapper.getByOrderId(detail.getInOrderId());
+        setRepertoryInTotalAmount(repertoryIn, details);
+
+
         boolean checked = true;
         for (RepertoryInDetail item : details) {
             if (item.getCheckStatus() != null && !item.getCheckStatus()) {
@@ -430,8 +464,9 @@ public class RepertoryInService {
         }
         if (checked) {
             logger.warn("user:{} check order detail:{} then order check over. orderId:{}", user.getId(), detail.getId(), detail.getInOrderId());
-            repertoryInMapper.setCheckStatus(detail.getInOrderId(), RepertoryInStatus.CHECKED.name(), user.getNickname(), new Date());
+            repertoryIn.setStatus(RepertoryInStatus.CHECKED.name());
         }
+        repertoryInMapper.updateByPrimaryKeySelective(repertoryIn);
     }
 
     public void setUncheckOrder(User user, Long orderId) throws BizException {
@@ -483,6 +518,7 @@ public class RepertoryInService {
         repertoryInDetailMapper.deleteByPrimaryKey(detailId);
     }
 
+    @Transactional
     public int setSaveDetail(User user, ReceiveSetReq setReq) throws BizException {
         RepertoryIn order = repertoryInMapper.selectByPrimaryKey(setReq.getOrderId());
         if (order == null) {
@@ -514,6 +550,8 @@ public class RepertoryInService {
             logger.info("order detail is all checked, can not update.");
             return 0;
         }
+        setRepertoryInTotalAmount(order, details);
+        repertoryInMapper.updateByPrimaryKeySelective(order); //重新保存总数和金额
         int count = 0;
         for (RepertoryInDetail detail : canUpdateList) {
             RepertoryInDetail mergeItem = updateMap.get(detail.getId());
