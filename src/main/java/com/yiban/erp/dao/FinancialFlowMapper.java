@@ -1,5 +1,6 @@
 package com.yiban.erp.dao;
 
+import com.yiban.erp.dto.FinancialQuery;
 import com.yiban.erp.entities.FinancialFlow;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -16,5 +17,9 @@ public interface FinancialFlowMapper {
     int updateByPrimaryKeySelective(FinancialFlow record);
 
     List<FinancialFlow> getByRefId(@Param("bizRefId") Long bizRefId);
+
+    List<FinancialFlow> getFlowList(FinancialQuery query);
+
+    Integer getFlowListCount(FinancialQuery query);
 
 }

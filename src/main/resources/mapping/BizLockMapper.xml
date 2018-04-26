@@ -25,7 +25,7 @@
   </delete>
 
   <delete id="deleteByLockKey" parameterType="java.lang.String">
-    delete from biz_lock where id = #{lockKey,jdbcType=VARCHAR}
+    delete from biz_lock where lock_key = #{lockKey,jdbcType=VARCHAR}
   </delete>
 
 </mapper>

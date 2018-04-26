@@ -27,8 +27,8 @@ public class FinancialReq {
     private String keyWord; //摘要信息
 
     private Long payMethod; //支付方式
-    private String payAccount; //支付账号
-    private String receiveAccount; //收款账号
+    private String companyAccount; //公司账号(清算账号)
+    private String custAccount; //客户账号
 
     public Integer getCompanyId() {
         return companyId;
@@ -142,19 +142,19 @@ public class FinancialReq {
         this.payMethod = payMethod;
     }
 
-    public String getPayAccount() {
-        return payAccount;
+    public String getCompanyAccount() {
+        return companyAccount;
     }
 
-    public void setPayAccount(String payAccount) {
-        this.payAccount = payAccount;
+    public void setCompanyAccount(String companyAccount) {
+        this.companyAccount = companyAccount;
     }
 
-    public String getReceiveAccount() {
-        return receiveAccount;
+    public String getCustAccount() {
+        return custAccount;
     }
 
-    public void setReceiveAccount(String receiveAccount) {
-        this.receiveAccount = receiveAccount;
+    public void setCustAccount(String custAccount) {
+        this.custAccount = custAccount;
     }
 }

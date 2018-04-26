@@ -182,18 +182,18 @@ export const appRouter = [
             //  { path: "store_check_info", title: '盘点审核明细-不显示', name: 'store_check_info', component: () => import('@/views/checkplan/store_check_info.vue')},
         ]
     },
-    // {
-    //     path: '/account',
-    //     icon: 'social-buffer',
-    //     name: 'accountrecord',
-    //     title: '财务管理',
-    //     component: Main,
-    //     children: [
-    //         { path: 'account_collection_index', title: '销售收款', name: 'account_collection_index', component: () => import('@/views/account/account_collection_index.vue') },
-    //      { path: 'account_pay_index', title: '财务付款', name: 'account_pay_index', component: () => import('@/views/account/account_pay_index.vue') },
-    //      { path: 'current_account_index', title: '往来账记录', name: 'current_account_index', component: () => import('@/views/account/current_account_index.vue') },
-    //     ]
-    // },
+    {
+        path: '/financial',
+        icon: 'social-buffer',
+        name: 'financial',
+        title: '财务管理',
+        component: Main,
+        children: [
+            { path: 'pre-receive', title: '预收款', name: 'financial-pre-receive', component: () => import('@/views/financial/financial-pre-receive.vue') },
+            { path: 'pre-paid', title: '预付款', name: 'financial-pre-paid', component: () => import('@/views/financial/financial-pre-paid.vue') },
+            { path: 'flow', title: '往来账', name: 'financial-flow', component: () => import('@/views/financial/financial-flow.vue') },
+        ]
+    },
 {
         path: '/access',
         icon: 'key',

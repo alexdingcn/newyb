@@ -261,8 +261,8 @@ public class FinancialService {
         return true;
     }
 
-    protected void doFinancialRecord(FinancialReq financialReq){
-        if (validateFinancialReq(financialReq)) {
+    private void doFinancialRecord(FinancialReq financialReq) throws BizException{
+        if (!validateFinancialReq(financialReq)) {
             logger.warn("financial request params validate fail. {}", JSON.toJSONString(financialReq));
             throw new BizRuntimeException(ErrorCode.PARAMETER_MISSING);
         }
@@ -274,21 +274,24 @@ public class FinancialService {
             } catch (Exception e){
                 logger.error("do financial record have exception. {}", JSON.toJSONString(financialReq), e);
                 // TODO 发送警告邮件
+                throw e; //往上层抛出
             }finally {
                 lockService.closeLock(lockKey);
             }
         }else {
             logger.error("get financial lock fail by key:{}", lockKey);
+            throw new BizException(ErrorCode.FINANCIAL_GET_LOCK_FAIL);
             // TODO 发送警告邮件信息
         }
     }
 
     /**
      * 直接操作新建逻辑，必须在改操作之前做好加锁操作
+     * 改方法虽然是public 的方法，主要是用户回滚事物的，不要直接调用，除非所有数据都已经验证通过
      * @param financialReq
      */
     @Transactional
-    protected void addNewFinancialRecord(FinancialReq financialReq) {
+    public void addNewFinancialRecord(FinancialReq financialReq) {
         Company company = companyMapper.selectByPrimaryKey(financialReq.getCompanyId());
         if (company == null) {
             logger.error("get company by companyId:{} result is null.",financialReq.getCompanyId());
@@ -376,6 +379,9 @@ public class FinancialService {
         }
         //登记往来账记录
         FinancialFlow flow = new FinancialFlow();
+        flow.setCompanyId(financialReq.getCompanyId());
+        flow.setCustType(financialReq.getCustType());
+        flow.setCustId(financialReq.getCustId());
         flow.setBizNo(UtilTool.makeOrderNumber(company.getId(), OrderNumberType.FINANCIAL_FLOW));
         flow.setLogDate(financialReq.getLogDate());
         flow.setLogAccount(financialReq.getLogAccount());
@@ -391,8 +397,8 @@ public class FinancialService {
         flow.setCompanyAmount(companyAmount);
         flow.setCustAmount(custAmount);
         flow.setPayMethod(financialReq.getPayMethod());
-        flow.setPayAccount(financialReq.getPayAccount());
-        flow.setReceiveAccount(financialReq.getReceiveAccount());
+        flow.setCompanyAccount(financialReq.getCompanyAccount());
+        flow.setCustAccount(financialReq.getCustAccount());
         flow.setCreatedBy(financialReq.logUserName);
         flow.setCreatedTime(new Date());
         int financialCount = financialFlowMapper.insert(flow);

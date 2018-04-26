@@ -7,7 +7,7 @@ public enum OptionsType {
     SHIP_TOOL("运输工具"),
     TEMPER_CONTROL("温控方式"),
     TEMPER_STATUS("温控状况"),
-    PAY_METHOD("收款方式"),
+    PAY_METHOD("收/付款方式"),
     SELL_ORDER_REVIEW("销售订单审核方式"),
     BUY_TYPE("采购属性"),
     BILL_TYPE("发票种类"),

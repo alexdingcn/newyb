@@ -6,9 +6,15 @@ import java.util.Date;
 public class FinancialFlow {
     private Long id;
 
+    private Integer companyId;
+
     private String bizNo;
 
     private Date logDate;
+
+    private String custType;
+
+    private Long custId;
 
     private String logAccount;
 
@@ -36,9 +42,11 @@ public class FinancialFlow {
 
     private Long payMethod;
 
-    private String payAccount;
+    private String payMethodName;
 
-    private String receiveAccount;
+    private String companyAccount;
+
+    private String custAccount;
 
     private String createdBy;
 
@@ -56,6 +64,14 @@ public class FinancialFlow {
         this.id = id;
     }
 
+    public Integer getCompanyId() {
+        return companyId;
+    }
+
+    public void setCompanyId(Integer companyId) {
+        this.companyId = companyId;
+    }
+
     public String getBizNo() {
         return bizNo;
     }
@@ -66,6 +82,22 @@ public class FinancialFlow {
 
     public Date getLogDate() {
         return logDate;
+    }
+
+    public String getCustType() {
+        return custType;
+    }
+
+    public void setCustType(String custType) {
+        this.custType = custType;
+    }
+
+    public Long getCustId() {
+        return custId;
+    }
+
+    public void setCustId(Long custId) {
+        this.custId = custId;
     }
 
     public void setLogDate(Date logDate) {
@@ -176,20 +208,28 @@ public class FinancialFlow {
         this.payMethod = payMethod;
     }
 
-    public String getPayAccount() {
-        return payAccount;
+    public String getPayMethodName() {
+        return payMethodName;
     }
 
-    public void setPayAccount(String payAccount) {
-        this.payAccount = payAccount == null ? null : payAccount.trim();
+    public void setPayMethodName(String payMethodName) {
+        this.payMethodName = payMethodName;
     }
 
-    public String getReceiveAccount() {
-        return receiveAccount;
+    public String getCompanyAccount() {
+        return companyAccount;
     }
 
-    public void setReceiveAccount(String receiveAccount) {
-        this.receiveAccount = receiveAccount == null ? null : receiveAccount.trim();
+    public void setCompanyAccount(String companyAccount) {
+        this.companyAccount = companyAccount;
+    }
+
+    public String getCustAccount() {
+        return custAccount;
+    }
+
+    public void setCustAccount(String custAccount) {
+        this.custAccount = custAccount;
     }
 
     public String getCreatedBy() {

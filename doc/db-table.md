@@ -187,6 +187,8 @@ create_by|String|创建人nickname
 create_time|Datetime|创建时间
 update_by|String|修改人
 update_time|Datetime|最近一次修改时间
+total_quantity|Decimal(14,3)|总计入库数量
+total_amount|Decimal(14,3)|总计金额
 
 
 
@@ -741,7 +743,7 @@ update_by|String|修改人
 
 字段名|类型|描述
 -|-|-
-id|Integer|(自增类型ID pk)
+id|Long|(自增类型ID pk)
 company_id|Integer|公司ID
 customer_no|String|系统编号
 category_id|Integer|客户类型
@@ -794,7 +796,7 @@ account_amount|Decimal(14,3)|账户余额
 字段名|类型|描述
 -|-|-
 id|Integer|(自增类型ID pk)
-customer_id|Integer|客户ID
+customer_id|Long|客户ID
 name|String|名称
 contact_phone|String|联系电话
 repertory_address|String|收货地址
@@ -900,7 +902,7 @@ commpany_id|Integer|公司ID
 order_number|String|订单编号
 ref_no|String|自定义单号
 status|String|订单状态
-customer_id|Integer|客户ID
+customer_id|Long|客户ID
 customer_rep_id|Integer|客户代表ID
 sale_id|Long|销售员ID
 warehouse_id|Integer|仓库ID
@@ -917,6 +919,8 @@ create_by|String|创建人
 update_by|String|修改人
 create_time|Datetime|创建时间
 update_time|Datetime|修改时间
+total_quantity|Decimal(14,3)|总计数量
+total_amount|Decimal(14,3)|总计金额
 
 
 

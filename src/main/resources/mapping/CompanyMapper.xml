@@ -71,7 +71,7 @@
   </update>
 
   <update id="updateAccountAmount" parameterType="map" >
-    update customer
+    update company
       set account_amount = #{accountAmount}
     where id = #{id}
   </update>

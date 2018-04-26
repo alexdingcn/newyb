@@ -126,6 +126,7 @@ public enum ErrorCode {
     FINANCIAL_CANCEL_REF_ID_EMPTY(3106, "取消操作必须存在关联单"),
     FINANCIAL_CANNOT_CANCEL(3017, "当前交易不能做取消操作"),
     FINANCIAL_CANNOT_OFFSET(3018, "冲销交易条件不足，例如金额不足等"),
+    FINANCIAL_GET_LOCK_FAIL(3019, "获取交易锁失败, 请联系运营人员查看具体原因"),
 
     // 41xx - 贷款
     SEND_VERIFY_CODE_FAIL(4104, "发送验证码失败"),
