@@ -36,6 +36,9 @@ public class FinancialFlow {
 
     private BigDecimal inAmount;
 
+    private BigDecimal surplusInAmount; //公司应收余额
+    private BigDecimal surplusOutAmount; //公司应付余额
+
     private BigDecimal companyAmount;
 
     private BigDecimal custAmount;
@@ -182,6 +185,22 @@ public class FinancialFlow {
 
     public void setInAmount(BigDecimal inAmount) {
         this.inAmount = inAmount;
+    }
+
+    public BigDecimal getSurplusInAmount() {
+        return surplusInAmount;
+    }
+
+    public void setSurplusInAmount(BigDecimal surplusInAmount) {
+        this.surplusInAmount = surplusInAmount;
+    }
+
+    public BigDecimal getSurplusOutAmount() {
+        return surplusOutAmount;
+    }
+
+    public void setSurplusOutAmount(BigDecimal surplusOutAmount) {
+        this.surplusOutAmount = surplusOutAmount;
     }
 
     public BigDecimal getCompanyAmount() {

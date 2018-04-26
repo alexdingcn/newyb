@@ -20,7 +20,9 @@ public class Company {
 
     private String updatedBy;
 
-    private BigDecimal accountAmount;
+    private BigDecimal accountAmount; //公司账户余额
+    private BigDecimal inAmount; //公司应收余额
+    private BigDecimal outAmount; //公司应付余额
 
     public Integer getId() {
         return id;
@@ -92,5 +94,21 @@ public class Company {
 
     public void setAccountAmount(BigDecimal accountAmount) {
         this.accountAmount = accountAmount;
+    }
+
+    public BigDecimal getInAmount() {
+        return inAmount;
+    }
+
+    public void setInAmount(BigDecimal inAmount) {
+        this.inAmount = inAmount;
+    }
+
+    public BigDecimal getOutAmount() {
+        return outAmount;
+    }
+
+    public void setOutAmount(BigDecimal outAmount) {
+        this.outAmount = outAmount;
     }
 }

@@ -18,5 +18,7 @@ public interface CompanyMapper {
     Company getByLicense(String license);
 
     int updateAccountAmount(@Param("id") Integer id,
-                            @Param("accountAmount")BigDecimal accountAmount);
+                            @Param("accountAmount")BigDecimal accountAmount,
+                            @Param("inAmount") BigDecimal inAmount,
+                            @Param("outAmount") BigDecimal outAmount);
 }

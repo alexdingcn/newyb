@@ -11,9 +11,11 @@
     <result column="created_by" property="createdBy" jdbcType="VARCHAR" />
     <result column="updated_by" property="updatedBy" jdbcType="VARCHAR" />
     <result column="account_amount" property="accountAmount" jdbcType="DECIMAL" />
+    <result column="in_amount" property="inAmount" jdbcType="DECIMAL" />
+    <result column="out_amount" property="outAmount" jdbcType="DECIMAL" />
   </resultMap>
   <sql id="Base_Column_List" >
-    id, name, license, enabled, created_time, updated_time, created_by, updated_by, account_amount
+    id, name, license, enabled, created_time, updated_time, created_by, updated_by, account_amount, in_amount, out_amount
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
     select 
@@ -36,10 +38,11 @@
   <insert id="insert" parameterType="com.yiban.erp.entities.Company" keyProperty="id" useGeneratedKeys="true" >
     insert into company (name, license,
       enabled, created_time, updated_time, 
-      created_by, updated_by, account_amount)
+      created_by, updated_by, account_amount, in_amount, out_amount)
     values (#{name,jdbcType=VARCHAR}, #{license,jdbcType=VARCHAR},
       #{enabled,jdbcType=BIT}, #{createdTime,jdbcType=TIMESTAMP}, #{updatedTime,jdbcType=TIMESTAMP},
-      #{createdBy,jdbcType=VARCHAR}, #{updatedBy,jdbcType=VARCHAR}, #{accountAmount, jdbcType=DECIMAL})
+      #{createdBy,jdbcType=VARCHAR}, #{updatedBy,jdbcType=VARCHAR}, #{accountAmount, jdbcType=DECIMAL},
+      #{inAmount, jdbcType=DECIMAL}, #{outAmount, jdbcType=DECIMAL})
   </insert>
 
   <update id="updateByPrimaryKeySelective" parameterType="com.yiban.erp.entities.Company" >
@@ -72,7 +75,9 @@
 
   <update id="updateAccountAmount" parameterType="map" >
     update company
-      set account_amount = #{accountAmount}
+      set account_amount = #{accountAmount},
+          in_amount = #{inAmount},
+          out_amount = #{outAmount}
     where id = #{id}
   </update>
 </mapper>

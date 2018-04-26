@@ -282,12 +282,18 @@ export default {
                     width: 120
                 },
                 {
-                    title: '应收余额(公司余额)',
-                    key: 'companyAmount',
-                    width: 150
+                    title: '应收账款余额',
+                    key: 'surplusInAmount',
+                    width: 160
                 },
                 {
-                    title: '应付余额(账户余额)',
+                    title: '应付账款余额',
+                    key: 'surplusOutAmount',
+                    width: 160
+                },
+                {
+                    // 大于0代表客户欠公司的钱，小于0代表公司欠客户钱
+                    title: '往来账户余额',
                     key: 'custAmount',
                     width: 150
                 },

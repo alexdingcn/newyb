@@ -18,6 +18,8 @@
     <result column="log_amount" property="logAmount" jdbcType="DECIMAL" />
     <result column="out_amount" property="outAmount" jdbcType="DECIMAL" />
     <result column="in_amount" property="inAmount" jdbcType="DECIMAL" />
+    <result column="surplus_in_amount" property="surplusInAmount" jdbcType="DECIMAL" />
+    <result column="surplus_out_amount" property="surplusOutAmount" jdbcType="DECIMAL" />
     <result column="company_amount" property="companyAmount" jdbcType="DECIMAL"/>
     <result column="cust_amount" property="custAmount" jdbcType="DECIMAL" />
     <result column="pay_method" property="payMethod" jdbcType="BIGINT" />
@@ -30,7 +32,7 @@
   </resultMap>
   <sql id="Base_Column_List" >
     id, company_id, biz_no, log_date, cust_type, cust_id, log_account, doc_no, file_no, biz_type, biz_ref_id, biz_ref_no, key_word,
-    log_amount, out_amount, in_amount, company_amount, cust_amount, pay_method, company_account, cust_account, created_by,
+    log_amount, out_amount, in_amount, surplus_in_amount, surplus_out_amount, company_amount, cust_amount, pay_method, company_account, cust_account, created_by,
     updated_by, created_time, updated_time
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
@@ -44,7 +46,7 @@
     insert into financial_flow (company_id, biz_no, log_date,
       cust_type, cust_id, log_account, doc_no, file_no,
       biz_type, biz_ref_id, biz_ref_no, key_word,
-      log_amount, out_amount, in_amount, company_amount, cust_amount,
+      log_amount, out_amount, in_amount, surplus_in_amount, surplus_out_amount, company_amount, cust_amount,
       pay_method, company_account, cust_account,
       created_by, updated_by, created_time, 
       updated_time)
@@ -52,6 +54,7 @@
       #{custId,jdbcType=BIGINT}, #{logAccount,jdbcType=VARCHAR}, #{docNo,jdbcType=VARCHAR}, #{fileNo,jdbcType=VARCHAR},
       #{bizType,jdbcType=VARCHAR}, #{bizRefId,jdbcType=BIGINT}, #{bizRefNo,jdbcType=VARCHAR}, #{keyWord,jdbcType=VARCHAR},
       #{logAmount,jdbcType=DECIMAL}, #{outAmount,jdbcType=DECIMAL}, #{inAmount,jdbcType=DECIMAL},
+      #{surplusInAmount,jdbcType=DECIMAL}, #{surplusOutAmount,jdbcType=DECIMAL},
       #{companyAmount,jdbcType=DECIMAL}, #{custAmount,jdbcType=DECIMAL},
       #{payMethod,jdbcType=BIGINT}, #{companyAccount,jdbcType=VARCHAR}, #{custAccount,jdbcType=VARCHAR},
       #{createdBy,jdbcType=VARCHAR}, #{updatedBy,jdbcType=VARCHAR}, #{createdTime,jdbcType=TIMESTAMP}, 
@@ -99,6 +102,12 @@
       </if>
       <if test="inAmount != null" >
         in_amount = #{inAmount,jdbcType=DECIMAL},
+      </if>
+      <if test="surplusInAmount != null">
+        surplus_in_amount = #{surplusInAmount,jdbcType=DECIMAL},
+      </if>
+      <if test="surplusOutAmount != null">
+        surplus_out_amount = #{surplusOutAmount,jdbcType=DECIMAL},
       </if>
       <if test="companyAmount != null" >
         company_amount = #{companyAmount},

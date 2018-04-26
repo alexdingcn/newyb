@@ -313,54 +313,30 @@ public class FinancialService {
             }
             financialReq.setLogAccount(customer.getName()); //直接设置为客户名称
         }
-        BigDecimal inAmount = null;
-        BigDecimal outAmount = null;
+
         BigDecimal logAmount = financialReq.getLogAmount() == null ? BigDecimal.ZERO : financialReq.getLogAmount();
         FinancialBizType bizType = FinancialBizType.getByName(financialReq.getBizType());
-        switch (bizType) {
-            case BUY_IN:
-            case SELL_BACK:
-            case RECEIVE:
-            case PRE_RECEIVE:
-            case RECORD_PAY:
-            case PAY_CANCEL:
-                outAmount = logAmount; //应付
-                break;
-            case BUY_BACK:
-            case SELL_BATCH:
-            case PAY:
-            case PRE_PAID:
-            case RECORD_RECEIVE:
-            case RECEIVE_CANCEL:
-                inAmount = logAmount; //应收
-                break;
-            case OFFSET:
-                inAmount = logAmount.negate(); //取反
-                outAmount = logAmount.negate(); //取反
-                break;
-            case RECORD_RECEIVE_CANCEL:
-            case PRE_RECEIVE_CANCEL:
-                inAmount = logAmount.negate(); //应收记账取负
-                break;
-            case RECORD_PAID_CANCEL:
-            case PRE_PAID_CANCEL:
-                outAmount = logAmount.negate(); //记账应付取消时，应付取一个负数
-                break;
-            default:
-                throw new BizRuntimeException(ErrorCode.FINANCIAL_BIZ_TYPE_ERROR);
-        }
+        BigDecimal inAmount = getActionAmount(bizType, logAmount, 1);
+        BigDecimal outAmount = getActionAmount(bizType, logAmount, -1);
 
         //公司的账户余额：公司账户余额 = 原公司账户余额 + 应收账款 - 应付账款
+        //公司的应收余额：公司应收余额 = 原始应收余额 + 应收账款
+        //公司的应付余额：公司应付余额 = 原始应付余额 + 应付账款
         BigDecimal companyAccountAmount = company.getAccountAmount() == null ? BigDecimal.ZERO : company.getAccountAmount();
-        BigDecimal companyAmount = companyAccountAmount.add(inAmount == null ? BigDecimal.ZERO : inAmount).subtract(outAmount == null ? BigDecimal.ZERO : outAmount);
+        BigDecimal companyInAmount = company.getInAmount() == null ? BigDecimal.ZERO : company.getInAmount();
+        BigDecimal companyOutAmount = company.getOutAmount() == null ? BigDecimal.ZERO : company.getOutAmount();
+        BigDecimal companyNewAmount = companyAccountAmount.add(inAmount == null ? BigDecimal.ZERO : inAmount).subtract(outAmount == null ? BigDecimal.ZERO : outAmount);
+        BigDecimal companyNewInAmount = companyInAmount.add(inAmount == null ? BigDecimal.ZERO : inAmount);
+        BigDecimal companyNewOutAmount = companyOutAmount.add(outAmount == null ? BigDecimal.ZERO : outAmount);
         //修改公司账户的余额
-        int companyUpdate = companyMapper.updateAccountAmount(company.getId(), companyAmount);
+        int companyUpdate = companyMapper.updateAccountAmount(company.getId(), companyNewAmount, companyNewInAmount, companyNewOutAmount);
         if (companyUpdate <= 0) {
             logger.warn("update company account amount fail.");
             throw new BizRuntimeException(ErrorCode.FAILED_UPDATE_FROM_DB);
         }
         BigDecimal custAmount = null;
         if (FinancialReq.CUST_SUPPLIER.equalsIgnoreCase(financialReq.getCustType())) {
+            //客户的账户余额：客户账户余额 = 原始客户账户余额 + 应付账款 - 应收账款
             BigDecimal supplierAmount = supplier.getAccountAmount() == null ? BigDecimal.ZERO : supplier.getAccountAmount();
             custAmount = supplierAmount.add(outAmount == null ? BigDecimal.ZERO : outAmount).subtract(inAmount == null ? BigDecimal.ZERO : inAmount);
             int supplierUpdate = supplierMapper.updateAccountAmount(supplier.getId(), custAmount);
@@ -369,6 +345,7 @@ public class FinancialService {
                 throw new BizRuntimeException(ErrorCode.FAILED_UPDATE_FROM_DB);
             }
         }else if (FinancialReq.CUST_CUSTOMER.equalsIgnoreCase(financialReq.getCustType())) {
+            //客户的账户余额：客户账户余额 = 原始客户账户余额 + 应付账款 - 应收账款
             BigDecimal customerAmount = customer.getAccountAmount() == null ? BigDecimal.ZERO : customer.getAccountAmount();
             custAmount = customerAmount.add(outAmount == null ? BigDecimal.ZERO : outAmount).subtract(inAmount == null ? BigDecimal.ZERO : inAmount);
             int customerUpdate = customerMapper.updateAccountAmount(customer.getId(), custAmount);
@@ -394,8 +371,10 @@ public class FinancialService {
         flow.setLogAmount(financialReq.getLogAmount());
         flow.setInAmount(inAmount);
         flow.setOutAmount(outAmount);
-        flow.setCompanyAmount(companyAmount);
-        flow.setCustAmount(custAmount);
+        flow.setSurplusInAmount(companyNewInAmount); //公司的应收账款余额
+        flow.setSurplusOutAmount(companyNewOutAmount); //公司的应付账款余额
+        flow.setCompanyAmount(companyNewAmount); //公司账户余额(大于0代表盈利)
+        flow.setCustAmount(custAmount); //客户账户余额(大于0代表客户欠公司的钱，小于0代表公司欠客户钱)
         flow.setPayMethod(financialReq.getPayMethod());
         flow.setCompanyAccount(financialReq.getCompanyAccount());
         flow.setCustAccount(financialReq.getCustAccount());
@@ -406,6 +385,87 @@ public class FinancialService {
             logger.warn("insert financial fail. {}", JSON.toJSONString(flow));
             throw new BizRuntimeException(ErrorCode.FAILED_INSERT_FROM_DB);
         }
+    }
+
+    private BigDecimal getActionAmount(FinancialBizType bizType, BigDecimal logAmount, int inOrOutType) {
+        BigDecimal inAmount = null; //应收
+        BigDecimal outAmount = null; //应付
+        switch (bizType) {
+            case BUY_IN:
+                //采购入库：需要付钱给客户，所以应付增加, 应收不变
+                outAmount = logAmount;
+                break;
+            case BUY_BACK:
+                //采购退货：需要收回付给客户的钱, 所以应收增加，应付不变
+                inAmount = logAmount;
+                break;
+            case SELL_BACK:
+                //销售退货：需要付给客户多收的钱, 所以应付增加，应收不变
+                outAmount = logAmount;
+                break;
+            case SELL_BATCH:
+                //销售出库：需要收客户的钱, 所以应收增加，应付不变
+                inAmount = logAmount;
+                break;
+            case RECEIVE:
+                //收款：应该收客户的钱减少，所以应收减少，应付不变
+                inAmount = logAmount.negate(); //取反为负数，发生额(logAmount)都为大于0的数
+                break;
+            case RECEIVE_CANCEL:
+                //收款取消：应该收客户的钱加回来，所以应收增加，应付不变
+                inAmount = logAmount;
+                break;
+            case PAY:
+                //付款：应该付给客户的钱减少, 所以应付减少，应收不变
+                outAmount = logAmount.negate();
+                break;
+            case PAY_CANCEL:
+                //付款取消：应该付给客户的钱需要加回来，所以应付增加，应收不变
+                outAmount = logAmount;
+                break;
+            case PRE_RECEIVE:
+                //预收款：预先收客户的钱，相当于多了一笔应付款，借钱给客户的意思，应收增加，应付不变
+                inAmount = logAmount;
+                break;
+            case PRE_RECEIVE_CANCEL:
+                //预收款取消：预先收款取消，需要把预收款的应收取消，应收减少，应付不变
+                inAmount = logAmount.negate();
+                break;
+            case PRE_PAID:
+                //预付款：预先付款给客户，相当于多了一笔应收款，应收增加，应付不变
+                inAmount = logAmount;
+                break;
+            case PRE_PAID_CANCEL:
+                //预付款取消：预先付款取消，相当于需要把应收款取消，应收减少，应付不变
+                inAmount = logAmount.negate();
+                break;
+            case RECORD_PAY:
+                //记账应付：记录一笔应该付给客户多少钱，直接记在应付上，应付增加，应收不变
+                outAmount = logAmount;
+                break;
+            case RECORD_PAID_CANCEL:
+                //记账应付取消：需要把记录的一笔应付取消，应付减少，应收不变
+                outAmount = logAmount.negate();
+                break;
+            case RECORD_RECEIVE:
+                //记账应收：记录一笔应该收客户多少钱，直接记录在应收上，应收增加，应付不变
+                inAmount = logAmount;
+                break;
+            case RECORD_RECEIVE_CANCEL:
+                //记账应收取消：记录的应收取消，所以应收减少，应付不变
+                inAmount = logAmount.negate();
+                break;
+            case OFFSET:
+                //冲销操作: 有两种冲销，冲销只能针对预收款和预付款;
+                //预收款冲销：相当于原来应该收的钱减少了，应该付的钱拿回来了(减少)
+                //预付款冲销：相当于原来应该付的钱减少了，应该收的钱拿回来了(减少)
+                inAmount = logAmount.negate();
+                outAmount = logAmount.negate();
+                break;
+            default:
+                throw new BizRuntimeException(ErrorCode.FINANCIAL_BIZ_TYPE_ERROR);
+        }
+        return inOrOutType > 0 ? inAmount : outAmount;  // 大于0表示去应收金额，否则去应付金额
     }
 
 }
