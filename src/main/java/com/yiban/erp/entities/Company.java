@@ -1,5 +1,6 @@
 package com.yiban.erp.entities;
 
+import java.math.BigDecimal;
 import java.util.Date;
 
 public class Company {
@@ -18,6 +19,10 @@ public class Company {
     private String createdBy;
 
     private String updatedBy;
+
+    private BigDecimal accountAmount; //公司账户余额
+    private BigDecimal inAmount; //公司应收余额
+    private BigDecimal outAmount; //公司应付余额
 
     public Integer getId() {
         return id;
@@ -81,5 +86,29 @@ public class Company {
 
     public void setUpdatedBy(String updatedBy) {
         this.updatedBy = updatedBy == null ? null : updatedBy.trim();
+    }
+
+    public BigDecimal getAccountAmount() {
+        return accountAmount;
+    }
+
+    public void setAccountAmount(BigDecimal accountAmount) {
+        this.accountAmount = accountAmount;
+    }
+
+    public BigDecimal getInAmount() {
+        return inAmount;
+    }
+
+    public void setInAmount(BigDecimal inAmount) {
+        this.inAmount = inAmount;
+    }
+
+    public BigDecimal getOutAmount() {
+        return outAmount;
+    }
+
+    public void setOutAmount(BigDecimal outAmount) {
+        this.outAmount = outAmount;
     }
 }

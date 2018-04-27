@@ -5,7 +5,7 @@ import java.util.Date;
 public class CustomerRep {
     private Integer id;
 
-    private Integer customerId;
+    private Long customerId;
 
     private String name;
 
@@ -39,11 +39,11 @@ public class CustomerRep {
         this.id = id;
     }
 
-    public Integer getCustomerId() {
+    public Long getCustomerId() {
         return customerId;
     }
 
-    public void setCustomerId(Integer customerId) {
+    public void setCustomerId(Long customerId) {
         this.customerId = customerId;
     }
 

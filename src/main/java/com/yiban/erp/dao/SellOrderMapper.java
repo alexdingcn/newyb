@@ -21,14 +21,14 @@ public interface SellOrderMapper {
     int updateByPrimaryKeySelective(SellOrder record);
 
     Integer getListCount(@Param("companyId") Integer companyId,
-                            @Param("customerId") Integer customerId,
+                            @Param("customerId") Long customerId,
                             @Param("saleId") Long saleId,
                             @Param("refNo") String refNo,
                             @Param("status") String status,
                          @Param("createOrderDate") Date createOrderDate);
 
     List<SellOrder> getList(@Param("companyId") Integer companyId,
-                            @Param("customerId") Integer customerId,
+                            @Param("customerId") Long customerId,
                             @Param("saleId") Long saleId,
                             @Param("refNo") String refNo,
                             @Param("status") String status,

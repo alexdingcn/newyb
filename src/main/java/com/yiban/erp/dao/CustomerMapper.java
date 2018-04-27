@@ -4,6 +4,7 @@ import com.yiban.erp.entities.Customer;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
@@ -18,12 +19,12 @@ public interface CustomerMapper {
 
     int insert(Customer record);
 
-    Customer selectByPrimaryKey(Integer id);
+    Customer selectByPrimaryKey(Long id);
 
     int updateByPrimaryKeySelective(Customer record);
 
     Customer getCustomerDetailById(@Param("companyId") Integer companyId,
-                                   @Param("customerId") Integer customerId);
+                                   @Param("customerId") Long customerId);
 
     List<Customer> getByCategoryId(@Param("companyId") Integer companyId,
                                    @Param("categoryId") Integer categoryId);
@@ -44,4 +45,7 @@ public interface CustomerMapper {
 
     List<Customer> searchLike(@Param("companyId") Integer companyId,
                                 @Param("name") String name);
+
+    int updateAccountAmount(@Param("id") Long id,
+                            @Param("accountAmount")BigDecimal accountAmount);
 }

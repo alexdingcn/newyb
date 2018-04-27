@@ -3,12 +3,13 @@ package com.yiban.erp.entities;
 import com.alibaba.fastjson.JSON;
 import org.apache.commons.lang3.StringUtils;
 
+import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
 public class Customer {
-    private Integer id;
+    private Long id;
 
     private Integer companyId;
 
@@ -96,6 +97,8 @@ public class Customer {
 
     private String updateBy;
 
+    private BigDecimal accountAmount;
+
     private CustomerCategory customerCategory; //客户分类信息
 
     private List<CustomerRep> customerReps; //客户代表人信息列表
@@ -135,11 +138,11 @@ public class Customer {
         this.placeCodes = placeCodes;
     }
 
-    public Integer getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -477,5 +480,13 @@ public class Customer {
 
     public void setCustomerReps(List<CustomerRep> customerReps) {
         this.customerReps = customerReps;
+    }
+
+    public BigDecimal getAccountAmount() {
+        return accountAmount;
+    }
+
+    public void setAccountAmount(BigDecimal accountAmount) {
+        this.accountAmount = accountAmount;
     }
 }

@@ -277,6 +277,14 @@ export default {
                     }
                 },
                 {
+                    title: '总计入库数量',
+                    key: 'totalQuantity'
+                },
+                {
+                    title: '总计金额',
+                    key: 'totalAmount'
+                },
+                {
                     title: '收货员',
                     key: 'createBy'
                 },
@@ -494,12 +502,19 @@ export default {
                                         row[params.column.key] = event.target.value;
                                         row['inCount'] = row[params.column.key];
                                         let price = params.row.price ? params.row.price : 0;
-                                        row['amount'] = event.target.value * price;
+                                        let free = params.row.free ? params.row.free : 0;
+                                        let count = (event.target.value - free) > 0 ? (event.target.value - free) : 0;
+                                        row['amount'] =  count * price;
                                     }
                                 }
                             });
                         }
                     }
+                },
+                {
+                    title: '赠送数量',
+                    width: 140,
+                    key: 'free'
                 },
                 {
                     title: '单价',
@@ -508,8 +523,23 @@ export default {
                 },
                 {
                     title: '金额',
-                    width: 120,
-                    key: 'amount'
+                    width: 140,
+                    key: 'amount',
+                    render: (h, params) => {
+                        var self = this;
+                        return h('Input', {
+                            props: {
+                                number: true,
+                                value: self.detailList[params.index][params.column.key]
+                            },
+                            on: {
+                                'on-blur' (event) {
+                                    let row = self.detailList[params.index];
+                                    row[params.column.key] = event.target.value;
+                                }
+                            }
+                        });
+                    }
                 },
                 {
                     title: "入库数量",

@@ -48,7 +48,7 @@ public class SellOrderController {
         String reqDate = request.getParameter("createOrderDate");
         String reqPage = request.getParameter("page");
         String reqSize = request.getParameter("size");
-        Integer customerId = StringUtils.isBlank(reqCustomerId) ? null : Integer.parseInt(reqCustomerId);
+        Long customerId = StringUtils.isBlank(reqCustomerId) ? null : Long.parseLong(reqCustomerId);
         Long saleId = StringUtils.isBlank(reqSaleId) ? null : Long.parseLong(reqSaleId);
         Integer page = StringUtils.isBlank(reqPage) ? 1 : Integer.parseInt(reqPage);
         Integer size = StringUtils.isBlank(reqSize) ? 10 : Integer.parseInt(reqSize);
@@ -96,10 +96,10 @@ public class SellOrderController {
                                                    @AuthenticationPrincipal User user) throws Exception {
         String customerIdStr = request.getParameter("customerId");
         String goodIdStr = request.getParameter("goodIds");
-        Integer customerId = null;
+        Long customerId = null;
         List<Long> goodIds = new ArrayList<>();
         if (StringUtils.isNotBlank(customerIdStr)) {
-            customerId = Integer.parseInt(customerIdStr);
+            customerId = Long.parseLong(customerIdStr);
         }
         if (StringUtils.isNotBlank(goodIdStr)) {
             goodIds = JSON.parseArray(goodIdStr, Long.class);

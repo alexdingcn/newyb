@@ -5,7 +5,7 @@ import java.util.Date;
 public class SellOrderAllAction {
 
     private String status;
-    private Integer customerId;
+    private Long customerId;
     private String orderNumber;
     private Long saleId;
     private Date startDate;
@@ -26,11 +26,11 @@ public class SellOrderAllAction {
         this.status = status;
     }
 
-    public Integer getCustomerId() {
+    public Long getCustomerId() {
         return customerId;
     }
 
-    public void setCustomerId(Integer customerId) {
+    public void setCustomerId(Long customerId) {
         this.customerId = customerId;
     }
 

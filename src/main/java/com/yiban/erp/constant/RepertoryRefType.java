@@ -8,6 +8,7 @@ import org.apache.commons.lang3.StringUtils;
 public enum RepertoryRefType {
 
     BUY_ORDER("采购入库"),
+    BUY_DIRECT("直调入库"), //直接录入入库单，没有关联到对应的采购单
     BUY_BACK("采购退货"),
     SELL_BATCH("批发出库"),
     SELL_BACK("批发退货"),

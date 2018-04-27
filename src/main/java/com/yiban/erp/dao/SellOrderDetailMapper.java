@@ -25,7 +25,7 @@ public interface SellOrderDetailMapper {
     List<SellOrderDetail> getDetailList(Long sellOrderId);
 
     List<SellOrderDetail> getDetailHistory(@Param("companyId") Integer companyId,
-                                           @Param("customerId") Integer customerId,
+                                           @Param("customerId") Long customerId,
                                            @Param("goodIds") List<Long> goodIds,
                                            @Param("offset") Integer offset,
                                            @Param("limit") Integer limit);

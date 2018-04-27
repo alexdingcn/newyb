@@ -14,7 +14,7 @@ public class SellOrder {
 
     private String status;
 
-    private Integer customerId;
+    private Long customerId;
 
     private Integer customerRepId;
 
@@ -129,11 +129,11 @@ public class SellOrder {
         this.status = status == null ? null : status.trim();
     }
 
-    public Integer getCustomerId() {
+    public Long getCustomerId() {
         return customerId;
     }
 
-    public void setCustomerId(Integer customerId) {
+    public void setCustomerId(Long customerId) {
         this.customerId = customerId;
     }
 

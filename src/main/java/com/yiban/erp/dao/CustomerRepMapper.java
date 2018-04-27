@@ -17,11 +17,11 @@ public interface CustomerRepMapper {
 
     int updateByPrimaryKeySelective(CustomerRep record);
 
-    CustomerRep getDefault(Integer customerId);
+    CustomerRep getDefault(Long customerId);
 
     int setDefault(@Param("id") Integer id,
                    @Param("defaultTime")Date defaultTime);
 
-    List<CustomerRep> getByCustomerId(Integer customerId);
+    List<CustomerRep> getByCustomerId(Long customerId);
 
 }

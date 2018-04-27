@@ -18,7 +18,7 @@ public class RepertoryOut {
 
     private String refOrderNumber;
 
-    private Integer customerId;
+    private Long customerId;
 
     private String customerName;
 
@@ -106,11 +106,11 @@ public class RepertoryOut {
         this.refOrderNumber = refOrderNumber == null ? null : refOrderNumber.trim();
     }
 
-    public Integer getCustomerId() {
+    public Long getCustomerId() {
         return customerId;
     }
 
-    public void setCustomerId(Integer customerId) {
+    public void setCustomerId(Long customerId) {
         this.customerId = customerId;
     }
 

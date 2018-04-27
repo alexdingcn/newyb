@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.yiban.erp.dao.CustomerMapper" >
   <resultMap id="BaseResultMap" type="com.yiban.erp.entities.Customer" >
-    <id column="id" property="id" jdbcType="INTEGER" />
+    <id column="id" property="id" jdbcType="BIGINT" />
     <result column="company_id" property="companyId" jdbcType="INTEGER" />
     <result column="customer_no" property="customerNo" jdbcType="VARCHAR" />
     <result column="category_id" property="categoryId" jdbcType="INTEGER" />
@@ -44,6 +44,7 @@
     <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
     <result column="create_by" property="createBy" jdbcType="VARCHAR" />
     <result column="update_by" property="updateBy" jdbcType="VARCHAR" />
+    <result column="account_amount" property="accountAmount" jdbcType="DECIMAL" />
   </resultMap>
   <sql id="Base_Column_List" >
     id, company_id, customer_no, category_id, name, pinyin, status, enabled, can_sale_special,
@@ -51,17 +52,17 @@
     contact_phone, contact_fax, email, is_direction, sale_area, sale_man, member_level,
     class_att_one, class_att_two, stamp_template, bill_template,is_cold_business, is_two_ticket, business_scope, account_term,
     account_name, bank_account, bank_name, tax_account, qua_check, file_no, supervise_no, comment, create_time,
-    update_time, create_by, update_by
+    update_time, create_by, update_by, account_amount
   </sql>
-  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
     select 
     <include refid="Base_Column_List" />
     from customer
-    where id = #{id,jdbcType=INTEGER}
+    where id = #{id,jdbcType=BIGINT}
   </select>
-  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
     delete from customer
-    where id = #{id,jdbcType=INTEGER}
+    where id = #{id,jdbcType=BIGINT}
   </delete>
   <insert id="insert" parameterType="com.yiban.erp.entities.Customer" keyProperty="id" useGeneratedKeys="true" >
     insert into customer (company_id, customer_no, category_id,
@@ -76,7 +77,7 @@
       account_term, account_name, bank_account,
       bank_name, tax_account, qua_check, file_no, supervise_no,
       comment, create_time, update_time, 
-      create_by, update_by)
+      create_by, update_by, account_amount)
     values (#{companyId,jdbcType=INTEGER}, #{customerNo,jdbcType=VARCHAR}, #{categoryId,jdbcType=INTEGER},
       #{name,jdbcType=VARCHAR}, #{pinyin,jdbcType=VARCHAR}, #{status,jdbcType=VARCHAR},
       #{enabled,jdbcType=BIT}, #{canSaleSpecial,jdbcType=BIT}, #{isLimitSpecial,jdbcType=BIT},
@@ -91,7 +92,7 @@
       #{bankName,jdbcType=VARCHAR}, #{taxAccount,jdbcType=VARCHAR},
       #{quaCheck,jdbcType=VARCHAR}, #{fileNo,jdbcType=VARCHAR}, #{superviseNo,jdbcType=VARCHAR},
       #{comment,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, 
-      #{createBy,jdbcType=VARCHAR}, #{updateBy,jdbcType=VARCHAR})
+      #{createBy,jdbcType=VARCHAR}, #{updateBy,jdbcType=VARCHAR}, #{accountAmount,jdbcType=DECIMAL})
   </insert>
 
   <update id="updateByPrimaryKeySelective" parameterType="com.yiban.erp.entities.Customer" >
@@ -218,11 +219,11 @@
         update_by = #{updateBy,jdbcType=VARCHAR},
       </if>
     </set>
-    where id = #{id,jdbcType=INTEGER}
+    where id = #{id,jdbcType=BIGINT}
   </update>
 
   <resultMap id="CUSTOMER_DETAIL_MAP" type="com.yiban.erp.entities.Customer">
-    <id column="id" property="id" jdbcType="INTEGER" />
+    <id column="id" property="id" jdbcType="BIGINT" />
     <result column="company_id" property="companyId" jdbcType="INTEGER" />
     <result column="customer_no" property="customerNo" jdbcType="VARCHAR" />
     <result column="category_id" property="categoryId" jdbcType="INTEGER" />
@@ -264,6 +265,7 @@
     <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
     <result column="create_by" property="createBy" jdbcType="VARCHAR" />
     <result column="update_by" property="updateBy" jdbcType="VARCHAR" />
+    <result column="account_amount" property="accountAmount" jdbcType="DECIMAL"/>
     <association property="customerCategory" javaType="com.yiban.erp.entities.CustomerCategory">
       <id column="category_id" property="id" jdbcType="INTEGER" />
       <result column="company_id" property="companyId" jdbcType="INTEGER" />
@@ -275,7 +277,7 @@
     </association>
     <collection property="customerReps" ofType="com.yiban.erp.entities.CustomerRep">
       <id column="rep_id" property="id" jdbcType="INTEGER" />
-      <result column="rep_customer_id" property="customerId" jdbcType="INTEGER" />
+      <result column="rep_customer_id" property="customerId" jdbcType="BIGINT" />
       <result column="rep_name" property="name" jdbcType="VARCHAR" />
       <result column="rep_contact_phone" property="contactPhone" jdbcType="VARCHAR" />
       <result column="rep_repertory_address" property="repertoryAddress" jdbcType="VARCHAR" />
@@ -298,7 +300,7 @@
     t1.business_scope, t1.account_term,
     t1.account_name, t1.bank_account, t1.bank_name, t1.tax_account,
     t1.qua_check, t1.file_no, t1.supervise_no, t1.comment, t1.create_time,
-    t1.update_time, t1.create_by, t1.update_by,
+    t1.update_time, t1.create_by, t1.update_by, t1.account_amount,
     t2.category_no, t2.name as cat_name, t2.parent_id, t2.sequence_no, t2.comment as cat_comment,
     t4.id as rep_id, t4.customer_id as rep_customer_id, t4.name as rep_name,
     t4.contact_phone as rep_contact_phone, t4.repertory_address as rep_repertory_address,
@@ -401,5 +403,11 @@
       and (name like #{nameVal} or lower(pinyin) like lower(#{nameVal}) )
       order by enabled desc, id desc;
   </select>
+
+  <update id="updateAccountAmount" parameterType="map" >
+    update customer
+      set account_amount = #{accountAmount}
+    where id = #{id}
+  </update>
 
 </mapper>

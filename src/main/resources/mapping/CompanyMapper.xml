@@ -10,9 +10,12 @@
     <result column="updated_time" property="updatedTime" jdbcType="TIMESTAMP" />
     <result column="created_by" property="createdBy" jdbcType="VARCHAR" />
     <result column="updated_by" property="updatedBy" jdbcType="VARCHAR" />
+    <result column="account_amount" property="accountAmount" jdbcType="DECIMAL" />
+    <result column="in_amount" property="inAmount" jdbcType="DECIMAL" />
+    <result column="out_amount" property="outAmount" jdbcType="DECIMAL" />
   </resultMap>
   <sql id="Base_Column_List" >
-    id, name, license, enabled, created_time, updated_time, created_by, updated_by
+    id, name, license, enabled, created_time, updated_time, created_by, updated_by, account_amount, in_amount, out_amount
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
     select 
@@ -35,60 +38,13 @@
   <insert id="insert" parameterType="com.yiban.erp.entities.Company" keyProperty="id" useGeneratedKeys="true" >
     insert into company (name, license,
       enabled, created_time, updated_time, 
-      created_by, updated_by)
+      created_by, updated_by, account_amount, in_amount, out_amount)
     values (#{name,jdbcType=VARCHAR}, #{license,jdbcType=VARCHAR},
       #{enabled,jdbcType=BIT}, #{createdTime,jdbcType=TIMESTAMP}, #{updatedTime,jdbcType=TIMESTAMP},
-      #{createdBy,jdbcType=VARCHAR}, #{updatedBy,jdbcType=VARCHAR})
+      #{createdBy,jdbcType=VARCHAR}, #{updatedBy,jdbcType=VARCHAR}, #{accountAmount, jdbcType=DECIMAL},
+      #{inAmount, jdbcType=DECIMAL}, #{outAmount, jdbcType=DECIMAL})
   </insert>
-  <insert id="insertSelective" parameterType="com.yiban.erp.entities.Company" keyProperty="id" useGeneratedKeys="true">
-    insert into company
-    <trim prefix="(" suffix=")" suffixOverrides="," >
-      <if test="name != null" >
-        name,
-      </if>
-      <if test="license != null" >
-        license,
-      </if>
-      <if test="enabled != null" >
-        enabled,
-      </if>
-      <if test="createdTime != null" >
-        created_time,
-      </if>
-      <if test="updatedTime != null" >
-        updated_time,
-      </if>
-      <if test="createdBy != null" >
-        created_by,
-      </if>
-      <if test="updatedBy != null" >
-        updated_by,
-      </if>
-    </trim>
-    <trim prefix="values (" suffix=")" suffixOverrides="," >
-      <if test="name != null" >
-        #{name,jdbcType=VARCHAR},
-      </if>
-      <if test="license != null" >
-        #{license,jdbcType=VARCHAR},
-      </if>
-      <if test="enabled != null" >
-        #{enabled,jdbcType=BIT},
-      </if>
-      <if test="createdTime != null" >
-        #{createdTime,jdbcType=TIMESTAMP},
-      </if>
-      <if test="updatedTime != null" >
-        #{updatedTime,jdbcType=TIMESTAMP},
-      </if>
-      <if test="createdBy != null" >
-        #{createdBy,jdbcType=VARCHAR},
-      </if>
-      <if test="updatedBy != null" >
-        #{updatedBy,jdbcType=VARCHAR},
-      </if>
-    </trim>
-  </insert>
+
   <update id="updateByPrimaryKeySelective" parameterType="com.yiban.erp.entities.Company" >
     update company
     <set >
@@ -116,15 +72,12 @@
     </set>
     where id = #{id,jdbcType=INTEGER}
   </update>
-  <update id="updateByPrimaryKey" parameterType="com.yiban.erp.entities.Company" >
+
+  <update id="updateAccountAmount" parameterType="map" >
     update company
-    set name = #{name,jdbcType=VARCHAR},
-      license = #{license,jdbcType=VARCHAR},
-      enabled = #{enabled,jdbcType=BIT},
-      created_time = #{createdTime,jdbcType=TIMESTAMP},
-      updated_time = #{updatedTime,jdbcType=TIMESTAMP},
-      created_by = #{createdBy,jdbcType=VARCHAR},
-      updated_by = #{updatedBy,jdbcType=VARCHAR}
-    where id = #{id,jdbcType=INTEGER}
+      set account_amount = #{accountAmount},
+          in_amount = #{inAmount},
+          out_amount = #{outAmount}
+    where id = #{id}
   </update>
 </mapper>

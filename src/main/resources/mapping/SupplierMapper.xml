@@ -54,6 +54,7 @@
     <result column="updated_by" property="updatedBy" jdbcType="VARCHAR" />
     <result column="created_time" property="createdTime" jdbcType="TIMESTAMP" />
     <result column="updated_time" property="updatedTime" jdbcType="TIMESTAMP" />
+    <result column="account_amount" property="accountAmount" jdbcType="DECIMAL" />
   </resultMap>
   <sql id="Base_Column_List" >
     id, company_id, name, pinyin, enabled, term, city, address, postcode, fax, phone,
@@ -63,7 +64,7 @@
     business_scope, comment, license, license_exp, organization_no, organization_exp,
     gsp_gmp_no, gsp_gmp_exp, quality_protocol_no, quality_protocol_exp, sale_protocol_no,
     sale_protocol_exp, legal_protocol_no, legal_protocol_exp, other_protocol_no, other_protocol_exp,
-    file_no, created_by, updated_by, created_time, updated_time
+    file_no, created_by, updated_by, created_time, updated_time, account_amount
   </sql>
   <select id="selectAll" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
     select
@@ -112,7 +113,7 @@
       sale_protocol_exp, legal_protocol_no, legal_protocol_exp,
       other_protocol_no, other_protocol_exp, file_no,
       created_by, updated_by, created_time,
-      updated_time)
+      updated_time, account_amount)
     values (#{companyId,jdbcType=INTEGER}, #{name,jdbcType=VARCHAR},
       #{pinyin,jdbcType=VARCHAR}, #{enabled,jdbcType=BIT}, #{term,jdbcType=INTEGER},
       #{city,jdbcType=VARCHAR}, #{address,jdbcType=VARCHAR}, #{postcode,jdbcType=VARCHAR},
@@ -130,7 +131,7 @@
       #{saleProtocolExp,jdbcType=DATE}, #{legalProtocolNo,jdbcType=VARCHAR}, #{legalProtocolExp,jdbcType=DATE},
       #{otherProtocolNo,jdbcType=VARCHAR}, #{otherProtocolExp,jdbcType=DATE}, #{fileNo,jdbcType=VARCHAR},
       #{createdBy,jdbcType=VARCHAR}, #{updatedBy,jdbcType=VARCHAR}, #{createdTime,jdbcType=TIMESTAMP},
-      #{updatedTime,jdbcType=TIMESTAMP})
+      #{updatedTime,jdbcType=TIMESTAMP}, #{accountAmount, jdbcType=DECIMAL})
   </insert>
 
   <update id="updateByPrimaryKeySelective" parameterType="com.yiban.erp.entities.Supplier" >
@@ -288,6 +289,12 @@
       </if>
     </set>
     where id = #{id,jdbcType=BIGINT}
+  </update>
+
+  <update id="updateAccountAmount" parameterType="map" >
+    update supplier
+      set account_amount = #{accountAmount}
+    where id = #{id}
   </update>
 
 </mapper>

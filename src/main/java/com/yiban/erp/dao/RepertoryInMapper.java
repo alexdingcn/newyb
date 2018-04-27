@@ -14,13 +14,9 @@ public interface RepertoryInMapper {
 
     int insert(RepertoryIn record);
 
-    int insertSelective(RepertoryIn record);
-
     RepertoryIn selectByPrimaryKey(Long id);
 
     int updateByPrimaryKeySelective(RepertoryIn record);
-
-    int updateByPrimaryKey(RepertoryIn record);
 
     List<RepertoryIn> getList(ReceiveListReq listReq);
 
@@ -32,5 +28,7 @@ public interface RepertoryInMapper {
                        @Param("status") String name,
                        @Param("updateBy") String nickname,
                        @Param("updateTime") Date date);
+
+    RepertoryIn getByIdWithSupplierInfo(Long id);
 
 }

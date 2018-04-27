@@ -31,7 +31,7 @@ public class CustomerService {
     @Autowired
     private CustomerRepMapper customerRepMapper;
 
-    public Customer getDetail(Integer companyId, Integer id) {
+    public Customer getDetail(Integer companyId, Long id) {
         Customer customer = customerMapper.getCustomerDetailById(companyId, id);
         if (customer != null) {
             //设置代表人的使用默认标识
@@ -95,7 +95,7 @@ public class CustomerService {
     }
 
 
-    public CustomerRep getDefaultCustomerRep(Integer customerId) {
+    public CustomerRep getDefaultCustomerRep(Long customerId) {
         CustomerRep rep = customerRepMapper.getDefault(customerId);
         if (rep != null) {
             rep.setIsDefault(true);
@@ -116,10 +116,10 @@ public class CustomerService {
             return;
         }
         //先按客户好分组
-        Map<Integer, List<CustomerRep>> tempMap = reps.stream()
+        Map<Long, List<CustomerRep>> tempMap = reps.stream()
                 .collect(Collectors.groupingBy(CustomerRep::getCustomerId));
-        for (Map.Entry<Integer, List<CustomerRep>> entry : tempMap.entrySet()) {
-            Integer customerId = entry.getKey();
+        for (Map.Entry<Long, List<CustomerRep>> entry : tempMap.entrySet()) {
+            Long customerId = entry.getKey();
             List<CustomerRep> list = entry.getValue();
             CustomerRep defaultValue = getDefaultCustomerRep(customerId);
             if (defaultValue == null || list.isEmpty()) {
@@ -135,7 +135,7 @@ public class CustomerService {
         }
     }
 
-    public List<CustomerRep> getRepList(Integer customerId) throws BizException {
+    public List<CustomerRep> getRepList(Long customerId) throws BizException {
         if (customerId == null) {
             return Collections.emptyList();
         }
