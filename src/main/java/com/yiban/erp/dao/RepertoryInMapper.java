@@ -29,4 +29,6 @@ public interface RepertoryInMapper {
                        @Param("updateBy") String nickname,
                        @Param("updateTime") Date date);
 
+    RepertoryIn getByIdWithSupplierInfo(Long id);
+
 }

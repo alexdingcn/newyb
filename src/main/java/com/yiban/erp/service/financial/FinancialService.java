@@ -87,8 +87,8 @@ public class FinancialService {
             logger.warn("repertory in order record financial record but order is null or status is not IN_CHECKED");
             throw new BizException(ErrorCode.FINANCIAL_IN_ORDER_ERROR);
         }
-        if (!RepertoryRefType.BUY_ORDER.name().equalsIgnoreCase(repertoryIn.getStatus()) &&
-                !RepertoryRefType.BUY_DIRECT.name().equalsIgnoreCase(repertoryIn.getStatus())) {
+        if (!RepertoryRefType.BUY_ORDER.name().equalsIgnoreCase(repertoryIn.getRefType()) &&
+                !RepertoryRefType.BUY_DIRECT.name().equalsIgnoreCase(repertoryIn.getRefType())) {
             //当前方法只能统计采购单入库和直调入库的入库单信息
             logger.warn("repertory in order ref type is not BUY_ORDER or BUY_DIRECT. orderId:{}", repertoryIn.getId());
             throw new BizException(ErrorCode.FINANCIAL_IN_ORDER_ERROR);

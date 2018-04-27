@@ -10,6 +10,7 @@ import com.yiban.erp.entities.*;
 import com.yiban.erp.exception.BizException;
 import com.yiban.erp.exception.BizRuntimeException;
 import com.yiban.erp.exception.ErrorCode;
+import com.yiban.erp.service.financial.FinancialService;
 import com.yiban.erp.service.warehouse.RepertoryService;
 import com.yiban.erp.util.UtilTool;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -21,6 +22,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.*;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 @Service
 public class SellOrderService {
@@ -49,6 +53,9 @@ public class SellOrderService {
     private RepertoryOutMapper repertoryOutMapper;
     @Autowired
     private RepertoryOutDetailMapper repertoryOutDetailMapper;
+    @Autowired
+    private FinancialService financialService;
+
 
 
     public List<SellOrder> getList(Integer companyId, Long customerId, Long saleId,
@@ -459,6 +466,20 @@ public class SellOrderService {
         logger.info("repertory out:{} insert details size:{}", out.getId(), detailCount);
 
         // TODO make financial record
+        recordFinancial(order);
+    }
+
+
+    private void recordFinancial(final SellOrder order) {
+        //当前方法先使用线程方式促发销售单创建财务记录，后面换成使用事件方式
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        executor.submit(() -> {
+            try {
+                financialService.createFlowBySellOrder(order);
+            }catch (Exception e) {
+                logger.error("financial record fail for sell order:{}", order.getId());
+            }
+        });
     }
 
     public SellOrder reviewDetail(Long orderId) {

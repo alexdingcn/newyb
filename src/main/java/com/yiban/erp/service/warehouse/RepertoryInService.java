@@ -12,6 +12,7 @@ import com.yiban.erp.exception.BizException;
 import com.yiban.erp.exception.BizRuntimeException;
 import com.yiban.erp.exception.ErrorCode;
 import com.yiban.erp.service.GoodsService;
+import com.yiban.erp.service.financial.FinancialService;
 import com.yiban.erp.util.UtilTool;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -22,6 +23,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
 @Service
@@ -47,6 +50,8 @@ public class RepertoryInService {
     private FileInfoMapper fileInfoMapper;
     @Autowired
     private WarehouseMapper warehouseMapper;
+    @Autowired
+    private FinancialService financialService;
 
     /**
      * 获取某商品当前库存和申购订单信息
@@ -639,6 +644,21 @@ public class RepertoryInService {
         List<RepertoryInfo> infoList = createRepertoryInfos(user, order, details);
         int inCount = repertoryInfoMapper.insertBatch(infoList);
         logger.info("insert repertory info count:{}", inCount);
+
+        //TODO 统计财务信息
+        recordFinancial(order);
+    }
+
+    private void recordFinancial(final RepertoryIn order) {
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        final RepertoryIn in = repertoryInMapper.getByIdWithSupplierInfo(order.getId());
+        executor.submit(() -> {
+            try {
+                financialService.createFlowByBuyOrder(in);
+            }catch (Exception e) {
+                logger.error("repertoryIn record financial fail. orderId:{}", in.getId(), e);
+            }
+        });
     }
 
     private List<RepertoryInfo> createRepertoryInfos(User user, RepertoryIn order, List<RepertoryInDetail> detailList) {
