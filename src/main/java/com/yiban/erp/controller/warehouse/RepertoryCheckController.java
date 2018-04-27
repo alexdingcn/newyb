@@ -5,6 +5,8 @@ import com.yiban.erp.constant.CheckPlanConstant;
 import com.yiban.erp.dao.RepertoryCheckFormMapper;
 import com.yiban.erp.dao.RepertoryCheckPlanDetailMapper;
 import com.yiban.erp.dao.RepertoryCheckPlanMapper;
+import com.yiban.erp.dto.CheckPlanFormListReq;
+import com.yiban.erp.dto.CheckPlanListReq;
 import com.yiban.erp.entities.*;
 import com.yiban.erp.service.warehouse.RepertoryCheckPlanService;
 import org.slf4j.Logger;
@@ -35,20 +37,11 @@ public class RepertoryCheckController {
     @Autowired
     private RepertoryCheckFormMapper repertoryCheckFormMapper;
     //根据条件获取入库单list
-    @RequestMapping(value = "/list", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> list(@AuthenticationPrincipal User user,
-        @RequestParam(name = "checkType", required = false) Integer checkType,
-        @RequestParam(name = "warehouseId",required = false) Integer warehouseId,
-        @RequestParam(name = "startDate", required = false) Date startDate,
-        @RequestParam(name = "endDate", required = false) Date endDate
-    ){
-        Map<String, Object> requestMap = new HashMap<>();
-        requestMap.put("companyId", user.getCompanyId());
-        requestMap.put("checkType", checkType);
-        requestMap.put("warehouseId", warehouseId);
-        requestMap.put("startDate", startDate);
-        requestMap.put("endDate", endDate);
-        List<RepertoryCheckPlan> list = repertoryCheckPlanMapper.getCheckPlanList(requestMap);
+    @RequestMapping(value = "/list", method = RequestMethod.POST, name = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> list(@RequestBody CheckPlanListReq listReq,
+    @AuthenticationPrincipal User user) throws Exception{
+
+        List<RepertoryCheckPlan> list = repertoryCheckPlanMapper.getCheckPlanList(listReq);
         JSONObject result = new JSONObject();
         result.put("data", list);
         return ResponseEntity.ok().body(result.toJSONString());
@@ -58,21 +51,11 @@ public class RepertoryCheckController {
 
     //查询待执行的盘点计划
     @RequestMapping(value = "/doList", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> doList(@AuthenticationPrincipal User user,
-                                       @RequestParam(name = "checkType", required = false) Integer checkType,
-                                       @RequestParam(name = "warehouseId",required = false) Integer warehouseId,
-                                       @RequestParam(name = "startDate", required = false) Date startDate,
-                                       @RequestParam(name = "endDate", required = false) Date endDate
-    ){
-        Map<String, Object> requestMap = new HashMap<>();
-        requestMap.put("companyId", user.getCompanyId());
-        //待处理计划状态=0
-        requestMap.put("state", CheckPlanConstant.PLAN_UNCHECK);
-        requestMap.put("checkType", checkType);
-        requestMap.put("warehouseId", warehouseId);
-        requestMap.put("startDate", startDate);
-        requestMap.put("endDate", endDate);
-        List<RepertoryCheckPlan> list = repertoryCheckPlanMapper.getCheckPlanList(requestMap);
+    public ResponseEntity<String> doList(@AuthenticationPrincipal User user){
+        CheckPlanListReq listReq=new CheckPlanListReq();
+        listReq.setCompanyId(user.getCompanyId());
+        listReq.setState(CheckPlanConstant.PLAN_UNCHECK);
+        List<RepertoryCheckPlan> list = repertoryCheckPlanMapper.getCheckPlanList(listReq);
         JSONObject result = new JSONObject();
         result.put("data", list);
         return ResponseEntity.ok().body(result.toJSONString());
@@ -91,6 +74,29 @@ public class RepertoryCheckController {
         JSONObject result = new JSONObject();
         result.put("data", checkinfo);
         result.put("checkPartList", partlist);
+        return ResponseEntity.ok().body(result.toJSONString());
+    }
+
+    @RequestMapping(value = "/orderPartDoList", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> orderPartDoList(@RequestBody CheckPlanFormListReq listReq, @AuthenticationPrincipal User user
+        ){
+        Map<String, Object> requestMap = new HashMap<>();
+        requestMap.put("formState",listReq.getFormState());
+        requestMap.put("startDate",listReq.getStartDate());
+        requestMap.put("endDate",listReq.getEndDate());
+        List<RepertoryCheckForm>  partlist = repertoryCheckFormMapper.getCheckPlanFormList(requestMap);
+        JSONObject result = new JSONObject();
+        result.put("checkPartList", partlist);
+        return ResponseEntity.ok().body(result.toJSONString());
+    }
+
+    //查询盘点单全部信息
+    @RequestMapping(value = "/getCheckFormDetailList", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> getCheckFormDetailList(@AuthenticationPrincipal User user,
+                                                @RequestParam(name = "formId", required = true) Long formId
+    ) throws Exception {
+        JSONObject result = new JSONObject();
+        result =repertoryCheckPlanService.getCheckPlanAndDetailJSONByFormId(user,formId);
         return ResponseEntity.ok().body(result.toJSONString());
     }
 
@@ -156,9 +162,36 @@ public class RepertoryCheckController {
     public ResponseEntity<String> add(@AuthenticationPrincipal User user,
         @RequestBody RepertoryCheckPlan repertoryCheckPlan)throws Exception  {
         logger.info("ADD new repertoryCheckPlan order, userId={}", user.getId());
-        repertoryCheckPlanService.saveCheckPlan(user,repertoryCheckPlan);
-        return ResponseEntity.ok().build();
+        JSONObject result = new JSONObject();
+        if(null !=repertoryCheckPlan.getId() && repertoryCheckPlan.getId()>0){
+            result=repertoryCheckPlanService.updateCheckPlan(user,repertoryCheckPlan);
+        }else{
+            result=repertoryCheckPlanService.saveCheckPlan(user,repertoryCheckPlan);
+        }
+
+        return ResponseEntity.ok().body(result.toJSONString());
     }
+
+
+
+
+    //更新
+    @RequestMapping(value = "/addOrUpdateForm", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> addOrUpdateForm(@AuthenticationPrincipal User user,
+                                      @RequestBody RepertoryCheckForm repertoryCheckForm)throws Exception  {
+        logger.info("ADD new repertoryCheckPlan order, userId={}", user.getId());
+        JSONObject result = new JSONObject();
+        if(null !=repertoryCheckForm.getId() && repertoryCheckForm.getId()>0){
+            RepertoryCheckForm   newForm= repertoryCheckFormMapper.selectByPrimaryKey(repertoryCheckForm.getId());
+            newForm.setCheckNote(repertoryCheckForm.getCheckNote());
+            repertoryCheckFormMapper.updateByPrimaryKeySelective(newForm);
+        }else{
+            repertoryCheckFormMapper.insert(repertoryCheckForm);
+        }
+        result.put("RepertoryCheckForm",  repertoryCheckForm);
+        return ResponseEntity.ok().body(result.toJSONString());
+    }
+
 
     @RequestMapping(value = "/doCheckDetail", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> doCheckDetail(@AuthenticationPrincipal User user,
@@ -201,23 +234,22 @@ public class RepertoryCheckController {
     public ResponseEntity<String> checkPlanPass(@RequestBody Map requestMap,
                                          @AuthenticationPrincipal User user) throws Exception{
 
-        //Integer state = (Integer) requestMap.get("state");
         String comment = (String) requestMap.get("comment");
         String manager = (String) requestMap.get("manager");
         String managerNote = (String) requestMap.get("managerNote");
         String finance = (String) requestMap.get("finance");
         String financeNote = (String) requestMap.get("financeNote");
         Long planId = new Long((String)requestMap.get("planId"));
-        repertoryCheckPlanService.setCheckPlanPass(user,planId,comment,manager,managerNote,finance,financeNote);
-        return ResponseEntity.ok().build();
+        JSONObject result=repertoryCheckPlanService.setCheckPlanPass(user,planId,comment,manager,managerNote,finance,financeNote);
+        return ResponseEntity.ok().body(result.toJSONString());
     }
 
     @RequestMapping(value = "/checkFormPass", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> checkFormPass(@AuthenticationPrincipal User user,
                                                 @RequestBody RepertoryCheckForm checkForm
                                                 ) throws Exception{
-        repertoryCheckPlanService.setCheckFormPass(user,checkForm);
-        return ResponseEntity.ok().build();
+        JSONObject result=repertoryCheckPlanService.setCheckFormPass(user,checkForm);
+        return ResponseEntity.ok().body(result.toJSONString());
     }
 
 }

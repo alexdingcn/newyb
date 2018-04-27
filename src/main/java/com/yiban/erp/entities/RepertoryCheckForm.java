@@ -5,6 +5,10 @@ import java.util.Date;
 public class RepertoryCheckForm {
     private Long id;
 
+    private Integer companyId;
+
+    private Integer warehouseId;
+
     private Long checkPlanId;
 
     private Long makeUserId;
@@ -101,5 +105,21 @@ public class RepertoryCheckForm {
 
     public void setUpdateTime(Date updateTime) {
         this.updateTime = updateTime;
+    }
+
+    public Integer getCompanyId() {
+        return companyId;
+    }
+
+    public void setCompanyId(Integer companyId) {
+        this.companyId = companyId;
+    }
+
+    public Integer getWarehouseId() {
+        return warehouseId;
+    }
+
+    public void setWarehouseId(Integer warehouseId) {
+        this.warehouseId = warehouseId;
     }
 }

@@ -21,43 +21,44 @@
 <template>
     <div>
 
-    <Row>
-        <Card>
-            <p slot="title" >
-                <Icon type="document"></Icon>盘点制单
-            </p>
-            <div slot="extra">
-                <ButtonGroup >
-                    <Button type="primary" icon="android-add-circle" @click="addCheckOrder" >保存盘点单</Button>
-                </ButtonGroup>
-            </div>
+        <Row>
+            <Card>
+                <p slot="title" >
+                    <Icon type="document"></Icon>盘点制单
+                </p>
+                <div slot="extra">
+                    <ButtonGroup >
+                        <Button type="info" size="small" icon="android-bulb" @click="addCheckOrder">保存盘点计划</Button>
+                        <Button type="success" size="small" icon="android-checkbox-outline"  @click="CheckPlanGetBtnClick">载入盘点计划</Button>
+                        <!--<Button type="error" size="small" icon="android-checkbox-outline"  @click="removeCheckPlan">撤销盘点计划</Button>-->
+                    </ButtonGroup>
+                </div>
 
-            <Form :label-width="85" :rules="ruleValidate" :model="storeCheck" ref="CheckOrderForm">
-                <Row>
-                    <Col span="5">
-                    <FormItem label="仓库点" prop="warehouseId">
-                        <warehouse-select v-model="storeCheck.warehouseId" size="small"></warehouse-select>
-                    </FormItem>
-                    </Col>
-                    <Col span="5">
-                    <FormItem label="盘点类型" prop="checkType">
-                        <Select v-model="storeCheck.checkType" size="small"  prop="checkType"   @on-change="onSelectCheckType">
-                            <Option v-for="option in checkTypeOptions" :value="option.id" :label="option.name" :key="option.id">
-                                {{option.name}}
-                            </Option>
-                        </Select>
-                    </FormItem>
-                    </Col>
-                    <Col span="6">
-                    <FormItem label="盘点日期" prop="inDate">
-                        <DatePicker type="date" v-model="storeCheck.checkDate" size="small"/>
-                    </FormItem>
-                    </Col>
+                <Form :label-width="85" :rules="ruleValidate" :model="storeCheck" ref="CheckOrderForm">
+                    <Row>
+                        <Col span="5">
+                        <FormItem label="仓库点" prop="warehouseId">
+                            <warehouse-select v-model="storeCheck.warehouseId" size="small" :disabled="disable_warehouse"></warehouse-select>
+                        </FormItem>
+                        </Col>
+                        <Col span="5">
+                        <FormItem label="盘点类型" prop="checkType">
+                            <Select v-model="storeCheck.checkType" size="small"  prop="checkType"   @on-change="onSelectCheckType" :disabled="disable_checktype">
+                                <Option v-for="option in checkTypeOptions" :value="option.id" :label="option.name" :key="option.id">
+                                    {{option.name}}
+                                </Option>
+                            </Select>
+                        </FormItem>
+                        </Col>
+                        <Col span="6">
+                        <FormItem label="盘点日期" prop="checkDate" :disabled="disable_checkdate">
+                            <DatePicker type="date" v-model="storeCheck.checkDate" size="small"/>
+                        </FormItem>
+                        </Col>
 
-                </Row>
-                <Row>
-                    <Col span="5">
-
+                    </Row>
+                    <Row>
+                        <Col span="5">
                         <FormItem label="添加单品">
                             <Select
                                     ref="goodsSelect"
@@ -76,31 +77,38 @@
                                 </Option>
                             </Select>
                         </FormItem>
-                    </Col>
-                    <Col span="5">
-                    <FormItem label="备注" prop="note">
-                        <Input v v-model="storeCheck.note" size="small"></Input>
+                        </Col>
+                        <Col span="5">
+                        <FormItem label="备注" prop="comment">
+                            <Input v v-model="storeCheck.comment" size="small"    :disabled="disable_note"></Input>
 
-                    </FormItem>
-                    </Col>
-                </Row>
-                <Row>
-                    <p class="ivu-card-head" >
-                        添加盘点单品
-                    </p>
-                </Row>
-                <Table border highlight-row
-                       class="margin-top-8"
-                       :columns="orderColumns" :data="orderItems"
-                       ref="checkOrderTable" style="width: 100%;" size="small"
-                       no-data-text="在商品输入框选择后添加"
-                      >
-                </Table>
+                        </FormItem>
+                        </Col>
+                        <Col span="5">   <FormItem label="计划号：">{{checkPlanNo}}   </FormItem></Col>
+                    </Row>
+                    <Row>
+                        <p class="ivu-card-head" >
+                            添加盘点单品
+                        </p>
+                    </Row>
+                    <Table border highlight-row
+                           class="margin-top-8"
+                           :columns="orderColumns" :data="orderItems"
+                           :loading="detailLoading"
+                           ref="checkOrderTable" style="width: 100%;"  height="300" size="small"
+                           no-data-text="在商品输入框选择后添加"
+                    >
+                    </Table>
 
-            </Form>
-        </Card>
+                </Form>
+            </Card>
 
-    </Row>
+        </Row>
+
+        <Modal v-model="checkPlanListModel" title="盘点计划提取" :mask-closable="false" width="70">
+            <check-plan-list  :chooseModal="true" @on-choosed="checkPlanChoose" ></check-plan-list>
+            <div slot="footer"></div>
+        </Modal>
 
     </div>
 </template>
@@ -111,24 +119,35 @@
     import moment from 'moment';
     import util from '@/libs/util.js';
     import warehouseSelect from "@/views/selector/warehouse-select.vue";
+    import checkPlanList from "@/views/checkplan/check-plan-list.vue";
     export default {
         name: 'store_check_add',
         components: {
-            warehouseSelect
+            warehouseSelect,
+            checkPlanList,
         },
         data () {
             return {
 
                 saving: false,
-                disableGoos:true,  //默认商品信息不可以添加
+                detailLoading:false,
+                disableGoos:true,
+                disable_warehouse:false,
+                disable_checktype:false,
+                disable_checkdate:false,
+                disable_note:false,
+
                 goodsOptions:[],
                 checkTypeOptions:[{ id: 0, name:'库存盘点'},{ id: 1, name:'直接盘库'},{ id: 2, name:'单品盘点'}],
                 counterOptions:[{ id: 'ALL', name:'全部'}],
                 goodsLoading: false,
+                checkPlanListModel: false,
                 edittingRow: {},
-
+                checkPlanId:'',
+                checkPlanNo:'',
                 orderItems: [],
                 storeCheck: {
+                    id:'',
                     checkType:0,
                     checkDate:moment().format('YYYY-MM-DD'),
                     orderItemIds:[]
@@ -141,14 +160,14 @@
                         width: 30
                     },
                     {
-                        title: '货号',
+                        title: '批号',
                         align: 'center',
-                        key: 'id',
-                        width: 60
+                        key: 'batchCode',
+                        width: 120
                     },
                     {
                         title: '商品名称',
-                        key: 'name',
+                        key: 'goodsName',
                         align: 'center',
                         width: 150,
                         sortable: true
@@ -174,7 +193,7 @@
                     },
                     {
                         title: '生产企业',
-                        key: 'factory',
+                        key: 'factoryName',
                         align: 'center',
                         width: 160
                     },
@@ -199,13 +218,13 @@
                     },
                     {
                         title: '库存',
-                        key: 'balance',
+                        key: 'accLimit',
                         align: 'center',
                         width: 100
                     },
                     {
-                        title: '在单数',
-                        key: 'ongoing',
+                        title: '盘点数',
+                        key: 'checkLimit',
                         align: 'center',
                         width: 100
                     }
@@ -255,7 +274,6 @@
                 }
             },onSelectCheckType(){
 
-
                 if(this.storeCheck.checkType == 2){
                     this.disableGoos =false;
                 }else{
@@ -264,8 +282,6 @@
                     this.storeCheck.orderItemIds=[];
 
                 }
-
-
             },
             onSelectGoods (goodsId) {
                 if(this.storeCheck.checkType!=2){
@@ -293,20 +309,21 @@
             doSave () {
                 var self = this;
                 this.saving = true;
-                util.ajax.post('/repertory/check/add', this.storeCheck)
-                    .then(function (response) {
-                        if (response.status === 200 ) {
-                            self.$Message.info('盘点单添加成功');
-                            self.$router.push({
-                                name: 'store_check_index'
-                            });
-                        }
-                        self.saving = false;
-                    })
-                    .catch(function (error) {
-                        self.saving = false;
-                        self.$Message.error('盘点单添加失败 '+error);
-                    });
+                    util.ajax.post('/repertory/check/add', this.storeCheck)
+                        .then(function (response) {
+                            if (response.status === 200 ) {
+                                self.checkPlanId=response.data.checkPlanId;
+                                self.$Message.info("盘点计划创建/更新成功");
+                                self.checkPlanNo=response.data.checkPlanNo;
+                                self.refreshCheck( self.checkPlanId);
+                            }
+                            self.saving = false;
+                        })
+                        .catch(function (error) {
+                            self.saving = false;
+                            self.$Message.error('盘点单添加/更新失败 '+error);
+                        });
+
             },
             addCheckOrder () {
                 this.storeCheck.orderItems = this.orderItems;
@@ -317,6 +334,52 @@
                         this.doSave();
                     }
                 });
+            },
+            refreshCheck(checkPlanId){
+                var self=this;
+                this.detailLoading = true;
+                util.ajax.post('/repertory/check/orderinfoList?checkPlanId='+checkPlanId)
+                    .then(function (response) {
+                        self.detailLoading = false;
+                        let data = response.data;
+                        if (data) {
+                            self.checkPlanId=checkPlanId;
+                            self.checkPlanNo=data.data.checkCode;
+                            self.storeCheck.warehouseId=data.data.warehouseId;
+                            self.storeCheck.checkType=data.data.checkType;
+                            self.storeCheck.checkDate=data.data.checkDate;
+                            self.storeCheck.comment=data.data.comment;
+                            self.orderItems = data.checkDetailList;
+                            if(data.data.checkType===0||data.data.checkType===1){
+                                self.disableGoos=true;
+                                self.disable_warehouse=true;
+                                self.disable_checktype=true;
+                                self.disable_checkdate=false;
+                                self.disable_note=false;
+                            } if (data.data.checkType===2){
+                                self.disableGoos=false;
+                                self.disable_warehouse=true;
+                                self.disable_checktype=true;
+                                self.disable_checkdate=false;
+                                self.disable_note=false;
+                            }
+                        }
+                    })
+                    .catch((error) => {
+                        self.detailLoading = false;
+                    });
+            }, CheckPlanGetBtnClick() {
+                //提取盘点计划列表
+                this.checkPlanListModel = true;
+            },checkPlanChoose(checkPlan) {
+            this.checkPlanListModel=false;
+                if(!checkPlan || !checkPlan.id) {
+                    this.$Message.warning('获取选取的订单信息失败');
+                    return;
+                }
+                this.refreshCheck(checkPlan.id);
+            },removeCheckPlan(){
+                alert(this.checkPlanId+"==="+this.checkPlanNo);
             }
         }
     };

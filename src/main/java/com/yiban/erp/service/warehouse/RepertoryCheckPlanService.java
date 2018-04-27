@@ -47,7 +47,9 @@ public class RepertoryCheckPlanService {
 
 
     @Transactional
-    public void saveCheckPlan(User user, RepertoryCheckPlan repertoryCheckPlan) throws BizException {
+    public JSONObject saveCheckPlan(User user, RepertoryCheckPlan repertoryCheckPlan) throws BizException {
+        JSONObject result = new JSONObject();
+
         if (!saveValidate(repertoryCheckPlan)) {
             throw new BizException(ErrorCode.FAILED_INSERT_FROM_DB);
         }
@@ -95,13 +97,39 @@ public class RepertoryCheckPlanService {
                 rcheckDetail.setCreateTime(new Date());
                 repertoryCheckPlanDetailMapper.insert(rcheckDetail);
             }
-
+            result.put("checkPlanId",  rcheck.getId());
+            result.put("checkPlanNo",  rcheck.getCheckCode());
         }else{
             throw new BizException(ErrorCode.CHECK_PLAN_TYPE_ERROR);
         }
+        return result;
     }
 
 
+    @Transactional
+    public JSONObject updateCheckPlan(User user, RepertoryCheckPlan repertoryCheckPlan) throws BizException {
+        JSONObject result = new JSONObject();
+
+        RepertoryCheckPlan rp=repertoryCheckPlanMapper.selectByPrimaryKey(repertoryCheckPlan.getId());
+        rp.setComment(repertoryCheckPlan.getComment());
+        rp.setCheckDate(repertoryCheckPlan.getCheckDate());
+        repertoryCheckPlanMapper.updateByPrimaryKeySelective(rp);
+        result.put("checkPlanId",  rp.getId());
+        result.put("checkPlanNo",  rp.getCheckCode());
+        return result;
+    }
+
+    @Transactional
+    public JSONObject updateCheckPlanDetail(User user, RepertoryCheckPlanDetail repertoryCheckPlanDetail) throws BizException {
+        JSONObject result = new JSONObject();
+
+        RepertoryCheckPlanDetail rpdetail=repertoryCheckPlanDetailMapper.selectByPrimaryKey(repertoryCheckPlanDetail.getId());
+        rpdetail.setCheckNote(rpdetail.getCheckNote());
+        repertoryCheckPlanDetailMapper.updateByPrimaryKeySelective(rpdetail);
+        result.put("checkPlanId",  rpdetail.getId());
+        result.put("formNo",  rpdetail.getFormNo());
+        return result;
+    }
 
     public void saveCheckPlanDetail(User user, RepertoryCheckPlanDetail repertoryCheckPlanDetail) throws BizException {
         //盘盈登记
@@ -139,6 +167,16 @@ public class RepertoryCheckPlanService {
         return result;
     }
 
+    public JSONObject getCheckPlanDetailJSONByFormId(Long formId)throws BizException{
+        JSONObject result = new JSONObject();
+//        RepertoryCheckPlan checkinfo= repertoryCheckPlanMapper.selectByPrimaryKey(checkPlanId);
+        Map<String, Object> requestMap = new HashMap<>();
+        requestMap.put("formId", formId);
+        List<RepertoryCheckPlanDetail>  cdlist=repertoryCheckPlanDetailMapper.getCheckPlanDetailList(requestMap);
+        cdlist=setRepertoryToList(cdlist);
+        result.put("checkDetailList", cdlist);
+        return result;
+    }
 
     //根据盘点计划ID查询并统计盘点汇总信息
     public JSONObject getInfo4PassJSON(Long checkPlanId)throws BizException{
@@ -271,7 +309,8 @@ public class RepertoryCheckPlanService {
         if(null==checkFormList||checkFormList.size()==0){
 
             RepertoryCheckForm checkForm=new RepertoryCheckForm();
-
+            checkForm.setCompanyId(user.getCompanyId());
+            checkForm.setWarehouseId(checkinfo.getWarehouseId());
             checkForm.setCheckPlanId(checkPlanId);
             //checkForm.setCheckNote();
             checkForm.setCreateBy(user.getNickname());
@@ -300,6 +339,7 @@ public class RepertoryCheckPlanService {
     public JSONObject getCheckPlanAndDetailJSONByFormId(User user,Long formId)throws BizException{
         JSONObject result = new JSONObject();
         Map<String, Object> requestMap = new HashMap<>();
+        requestMap.put("companyId", user.getCompanyId());
         requestMap.put("formId", formId);
         RepertoryCheckForm  checkFormInfo=repertoryCheckFormMapper.selectByPrimaryKey(formId);
 
@@ -351,16 +391,18 @@ public class RepertoryCheckPlanService {
         int result = 0;
         //盘点数量等于系统当前记录的库存数量--正常
         if( newRp.getAccLimit().compareTo(repertoryCheckPlanDetail.getCheckLimit())==0 ){
-            newRp.setCheckStatus(0);
+            newRp.setCheckStatus(CheckPlanConstant.PLAN_DETAIL_CHECK_STATUS_NORMAL);
         }
         if(newRp.getAccLimit().compareTo(repertoryCheckPlanDetail.getCheckLimit())>0 ){
-            newRp.setCheckStatus(-1);
+            newRp.setCheckStatus(CheckPlanConstant.PLAN_DETAIL_CHECK_STATUS_LOSE);
         }
         newRp.setCheckLimit(repertoryCheckPlanDetail.getCheckLimit());
+        newRp.setFormId(repertoryCheckPlanDetail.getFormId());
+        newRp.setFormNo(repertoryCheckPlanDetail.getFormNo());
         newRp.setUpdateBy(user.getNickname());
         newRp.setMakeUserId(user.getId());
         newRp.setUpdateTime(new Date());
-        //newRp.setCheckNote("");
+        newRp.setFormStatus("CHECKED");
         result= repertoryCheckPlanDetailMapper.updateByPrimaryKeySelective(newRp);
         if (result > 0) {
             resultjson.put("planDetail",newRp);
@@ -446,7 +488,8 @@ public class RepertoryCheckPlanService {
     }
 
     @Transactional
-    public void setCheckPlanPass(User user,Long planId,String comment, String manager,String managerNote,String finance,String financeNote) throws BizException {
+    public JSONObject setCheckPlanPass(User user,Long planId,String comment, String manager,String managerNote,String finance,String financeNote) throws BizException {
+        JSONObject result=new JSONObject();
         if (planId==null ) {
             throw new BizException(ErrorCode.CHECK_PLAN_PASS_VALIDATE_ERROR);
         }
@@ -510,7 +553,7 @@ public class RepertoryCheckPlanService {
                 repertoryInfoMapper.insert(repertoryInfo);
             //盘亏记录
             }else if(CheckPlanConstant.PLAN_DETAIL_CHECK_STATUS_LOSE.equals(cpdTemp.getCheckStatus())){
-            //调用盘亏出库方法
+                 //调用盘亏出库方法
                 RepertoryInfo repertoryInfo=repertoryInfoMapper.selectByPrimaryKey(cpdTemp.getRepertoryInfoId());
                 BigDecimal loseAmount=cpdTemp.getAccLimit().subtract(cpdTemp.getCheckLimit());
                 BigDecimal realAmount=repertoryInfo.getQuantity().subtract(loseAmount);
@@ -528,18 +571,23 @@ public class RepertoryCheckPlanService {
                     throw new BizException(ErrorCode.CHECK_PLAN_PASS_OUT_ERROR);
                 }
                 repertoryInfoMapper.updateByPrimaryKey(repertoryInfo);
+            }else if(CheckPlanConstant.PLAN_DETAIL_CHECK_STATUS_NORMAL.equals(cpdTemp.getCheckStatus())){
+                //盘平不做额外操作
+
             }else{
                 throw new BizException(ErrorCode.CHECK_PLAN_PASS_STATE_ERROR);
             }
             //直接更新
             repertoryCheckPlanDetailMapper.updateByPrimaryKeySelective(cpdTemp);
 
-
         }
+        result.put("CheckPlan",cp);
+        return result;
     }
 
     @Transactional
-    public void setCheckFormPass(User user,RepertoryCheckForm checkForm) throws BizException {
+    public JSONObject setCheckFormPass(User user,RepertoryCheckForm checkForm) throws BizException {
+        JSONObject result=new JSONObject();
         if (checkForm.getId()==null ) {
             throw new BizException(ErrorCode.CHECK_PLAN_PASS_VALIDATE_ERROR);
         }
@@ -554,8 +602,7 @@ public class RepertoryCheckPlanService {
         formObj.setUpdateTime(new Date());
         formObj.setCheckNote(checkForm.getCheckNote());
         repertoryCheckFormMapper.updateByPrimaryKeySelective(formObj);
-        //批量处理工单明细
-        Map<String, Object> requestMap = new HashMap<>();
-        requestMap.put("formId", checkForm.getId());
+        result.put("RepertoryCheckForm",formObj);
+        return result;
     }
 }

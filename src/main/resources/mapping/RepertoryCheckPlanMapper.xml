@@ -28,6 +28,11 @@
     make_user_id, check_user_id, state, comment, check_response_user, manager, manager_note, 
     finance, finance_note, create_by, create_time, update_by, update_time
   </sql>
+  <sql id="listSql">
+    a.id as id, a.check_type as checkType, a.check_code as checkCode, a.company_id as companyId, a.warehouse_id as warehouseId, a.warehouse_location as warehouseLocation , a.check_date as checkDate ,
+    a.make_user_id as makeUserId, a.check_user_id as checkUserId, a.state as state, a.comment as comment, a.check_response_user as checkResponseUser, a.manager as manager, a.manager_note as managerNote,
+   a.finance as finance, a.finance_note as financeNote,a.create_by as createBy , a.create_time as createTime, a.update_by as updateBy , a.update_time as updateTime
+  </sql>
   <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
     select 
     <include refid="Base_Column_List" />
@@ -268,8 +273,9 @@
     where id = #{id,jdbcType=BIGINT}
   </update>
 
-  <select id="getCheckPlanList" parameterType="map" resultMap="BaseResultMap">
-    SELECT  a.*,w.`name` AS warehouseName
+
+  <select id="getCheckPlanList" parameterType="com.yiban.erp.dto.CheckPlanListReq"  resultType="com.yiban.erp.entities.RepertoryCheckPlan">
+    SELECT   <include refid="listSql" /> ,w.`name` AS warehouseName
     FROM `repertory_check_plan`  a
     LEFT JOIN `warehouse`  w
     ON w.`id`=a.`warehouse_id`

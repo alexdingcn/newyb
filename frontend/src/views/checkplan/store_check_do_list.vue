@@ -1,238 +1,529 @@
 <style lang="less">
     @import '../../styles/common.less';
+    .option-goods-spec {
+        float: right;
+        color: #999;
+    }
+    .ivu-form-item {
+        margin-bottom: 0px;
+    }
+
+    .ivu-table-cell {
+        padding-left: 5px;
+        padding-right: 5px;
+    }
+    th .ivu-table-cell {
+        width-space: nowrap;
+    }
 </style>
 
 <template>
-    <Row>
-        <Card>
-            <p slot="title" >
-                <Icon type="document"></Icon> 待盘点计划
+    <div>
+        <Row>
+            <Card>
+                <p slot="title" >
+                    <Icon type="document"></Icon>盘点制单
+                </p>
+                <div slot="extra">
+
+                    <ButtonGroup >
+                        <Button type="primary" icon="android-add-circle" @click="saveCheckPart" >更新盘点表</Button>
+                    </ButtonGroup>
+
+                    <ButtonGroup >
+                        <Button type="primary" icon="android-add-circle" @click="getCheckPlan" >载入盘点表</Button>
+                    </ButtonGroup>
+
+                    <ButtonGroup >
+                        <Button type="primary" icon="android-add-circle" @click="backPartIndex" >返回</Button>
+                    </ButtonGroup>
+                </div>
+
+                <Form :label-width="85" :rules="ruleValidate" :model="checkFormInfo" ref="CheckPartDetailForm">
+                    <Row>
+                        <Col span="6">
+                        <FormItem label="盘点表编号" prop="formNo">
+                            <Input v-model="checkFormInfo.formNo" size="small" :disabled=true></Input>
+                        </FormItem>
+                        </Col>
+                        <Col span="6">
+                        <FormItem label="备注" prop="checkNote">
+                            <Input v-model="checkFormInfo.checkNote" size="small"   ></Input>
+                        </FormItem>
+                        </Col>
+                        <Col span="10">
+                        <FormItem label="添加已盘物品">
+                            <Select
+                                    ref="repertorySelect"
+                                    filterable
+                                    clearable
+                                    remote
+                                    placeholder="商品名称/拼音"
+                                    size="small"
+                                    @on-change="onSelectRepertory"
+                                    :remote-method="queryRepertory"
+                                    :loading="goodsLoading">
+                                <Option v-for="option in goodsOptions" :value="option.id" :label="option.name" :key="option.id">
+                                    <span class="option-goods-name">{{ option.goodsName }}| </span>
+                                    <span class="option-goods-name">{{ option.batchCode }}| </span>
+                                    <span class="option-goods-spec">{{ option.accLimit }}| </span>
+                                    <span class="option-goods-spec">{{ option.spec }} | {{option.factory}}</span>
+
+                                </Option>
+                            </Select>
+                        </FormItem>
+                        </Col>
+                    </Row>
+                    <Table border highlight-row
+                           class="margin-top-8"
+                           height="400"
+                           :columns="orderColumns" :data="orderItems"
+                           ref="checkOrderTable" style="width: 100%;" size="small"
+                           no-data-text="在商品输入框选择后添加"
+                           @on-row-dblclick="handleRowDbClick"
+                    >
+                    </Table>
+                </Form>
+            </Card>
+        </Row>
+
+        <Modal v-model="checkMoreModalShow" width="500" :mask-closable="false">
+            <p slot="header">
+                <Icon type="ios-plus-outline"></Icon>
+                <span>盘盈登记</span>
             </p>
-
-            <div slot="extra">
-                <!--<ButtonGroup >-->
-                    <!--<Button type="primary" icon="android-add-circle" @click="showDoDetail" >盘点表确认</Button>-->
-                <!--</ButtonGroup>-->
-                <ButtonGroup >
-                <Button type="primary" icon="android-add-circle" @click="doCheckOrder" >制定/执行盘点表</Button>
-                </ButtonGroup>
-                <!--<ButtonGroup >-->
-                <!--<Button type="primary" icon="android-add-circle" @click="" >盘点表审核</Button>-->
-                <!--</ButtonGroup>-->
-                <!--<ButtonGroup >-->
-                <!--<Button type="primary" icon="android-add-circle" @click="checkOrderInfo" >盘点审核</Button>-->
-                <!--</ButtonGroup>-->
+            <div >
+                <Row>盘点单ID：<Input span="8" v-model="checkMore.checkPlanId" disabled/></Row>
+                <Row>库存ID：<Input span="8" v-model="checkMore.repertoryInfoId" disabled/></Row>
+                <Row>名称：<Input span="8" v-model="checkMore.goodsName" /></Row>
+                <Row>批号：<Input v-model="checkMore.batchCode" /></Row>
+                <Row>盘盈：<Input v-model="checkMore.checkLimit" /></Row>
+                <Row>单价：<Input v-model="checkMore.price" /></Row>
+                <Row>
+                    生产日期：
+                    <DatePicker type="datetime" v-model="checkMore.productDate" format="yyyy-MM-dd HH:mm" size="small"/>
+                </Row>
+                <Row>
+                    有效日期：
+                    <DatePicker type="datetime" v-model="checkMore.expDate" format="yyyy-MM-dd HH:mm" size="small"/>
+                </Row>
+                <Row>备注：<Input v-model="checkMore.checkNote" /></Row>
             </div>
-            <Form :label-width="85" :model="storeCheck" ref="storeCheckForm">
+            <div slot="footer">
+                <Button type="primary" @click="handleAddLocation">登记盘盈信息</Button>
+            </div>
+        </Modal>
 
 
-                <Table border highlight-row
-                       class="margin-top-8"
-                       :columns="repertoryColumns" :data="repertoryCheckItems"
-                       ref="storeCheckTable" style="width: 100%;" size="small"
-                       no-data-text="当前条件下查询，无库存数据！">
-
-                </Table>
-
-            </Form>
-        </Card>
-    </Row>
+        <Modal v-model="checkPlanListModel" title="盘点计划提取" :mask-closable="false" width="70">
+            <check-plan-list  :chooseModal="true" @on-choosed="checkPlanChoose" ></check-plan-list>
+            <div slot="footer"></div>
+        </Modal>
+    </div>
 
 </template>
+
+
 <script>
     import axios from 'axios';
     import moment from 'moment';
     import util from '@/libs/util.js';
-    import warehouseSelect from "@/views/selector/warehouse-select.vue";
-    import goodSelect from "@/views/selector/good-select.vue";
+    import checkPlanList from "@/views/checkplan/check-plan-list.vue";
+
     export default {
         name: 'store_check_do_list',
         components: {
-            warehouseSelect,
-        },
-        data () {
+            checkPlanList,
+        }, data () {
             return {
                 saving: false,
+                disableGoos:true,  //默认商品信息不可以添加
+                checkMoreModalShow: false,
+                checkPlanListModel: false,
+                checkPlanId:null,
+                checkMore: {
+                    id: '',
+                    goodsId: '',
+                    checkPlanId:'',
+                    accLimit:null
 
-                repertoryCheckItems: [],
-                checkTypeOptions:[{ id: 0, name:'库存盘点'},{ id: 1, name:'直接盘库'},{ id: 2, name:'单品盘点'}],
-                counterOptions:[{ id: 'ALL', name:'全部'}],
-                storeCheck: {
-                    warehouseId: null
                 },
-                repertoryColumns: [
+                goodsOptions:[],
+                goodsLoading: false,
+                edittingRow: {},
+                closeConfirm: false,
+                orderItems: [],
+                planDetailList:[],
+                checkFormInfo:{
+                    id:'',
+                },
+                orderColumns: [
                     {
-                        type: 'selection',
+                        type: 'index',
                         title: '',
                         align: 'center',
-                        width: 60
+                        width: 30
                     },
                     {
                         title: '状态',
+                        key: 'checkStatus',
                         align: 'center',
-                        key: 'state',
-                        width: 120,
-                        render: (h, params) => {
-                            let state  = params.row.state;
-                            if (0==state) {
-                                return h('Tag', {props: {color: 'yellow'}}, '待审核');
-                            }else if (1==state) {
-                                return h('Tag', {props: {color: 'green'}}, '已审核');
+                        width: 80,
+                        render: (h, params) =>{
+                            let state = params.row.checkStatus;
+                            if (state==undefined) {
+                                return h('Tag', {props:{ color:'yellow'}}, '待处理');
+                            }else if(0==state){
+                                return h('Tag', {props:{ color:'blue'}}, '正常');
+                            }else if(1==state){
+                                return h('Tag', {props:{ color:'red'}}, '盘盈');
+                            }else if(-1==state){
+                                return h('Tag', {props:{ color:'red'}}, '盘亏');
                             }
                         }
                     },
                     {
-                        title: '盘点单号',
+                        title: '货号',
                         align: 'center',
-                        key: 'checkCode',
-                        width: 160
+                        key: 'code',
+                        width: 60
                     },
                     {
-                        title: '盘点类型',
-                        key: 'checkType',
+                        title: '商品名称',
+                        key: 'goodsName',
                         align: 'center',
-                        width: 120,
-                        render: (h, params) => {
-                            let checkType  = params.row.checkType;
-                            if (0==checkType) {
-                                return h('Tag', {props: {color: 'green'}}, '库存盘点');
-                            }else if (1==checkType) {
-                                return h('Tag', {props: {color: 'green'}}, '直接盘库');
-                            }else if (2==checkType){
-                                return h('Tag', {props: {color: 'green'}}, '单品盘点');
-                            }
-                        }
-                    },
-                    {
-                        title: '仓库',
-                        key: 'warehouseName',
-                        align: 'center',
-                        width: 100
-                    },
+                        width: 150,
+                        sortable: true
 
-                    {
-                        title: '盘点时间',
-                        key: 'checkDate',
-                        align: 'center',
-                        width: 120,
-                        render: (h, params) => {
-                            return moment(params.row.checkDate).format('YYYY-MM-DD');
-                        }
                     },
                     {
-                        title: '制单人',
-                        key: 'createBy',
+                        title: '批号',
+                        key: 'batchCode',
+                        align: 'center',
+                        width: 150
+
+                    },
+                    {
+                        title: '产地',
+                        key: 'origin',
                         align: 'center',
                         width: 80
                     },
                     {
-                        title: '备注',
-                        key: 'comment',
+                        title: '剂型',
+                        key: 'jx',
                         align: 'center',
-                        width: 150
+                        width: 80
                     },
                     {
-                        title: '总经理',
-                        key: 'manager',
+                        title: '规格',
+                        key: 'spec',
                         align: 'center',
                         width: 120
-                    },
-                    {
-                        title: '总经理意见',
-                        key: 'managerNote',
-                        align: 'center',
-                        width: 150
-                    },
-                    {
-                        title: '财务经理',
-                        key: 'finance',
-                        align: 'center',
-                        width: 120
-                    },
-                    {
-                        title: '财务经理意见',
-                        key: 'financeNote',
-                        align: 'center',
-                        width: 150
-                    }
-                ]
+                    },{
 
+                        title: '有效期至',
+                        key: 'expDate',
+                        align: 'center',
+                        width: 120,
+                        render: (h, params) => {
+                            return moment(params.row.expDate).format('YYYY-MM-DD');
+                        }
+                    },
+
+                    {
+                        title: '库存数量',
+                        key: 'accLimit',
+                        align: 'center',
+                        width: 100
+                    },
+                    {
+                        title: '盘点数量',
+                        key: 'checkLimit',
+                        align: 'center',
+                        width: 100,
+                        render: (h, params) => {
+                            var self = this;
+                            if(self.orderItems[params.index]["formStatus"]=="CHECKED"){
+                                return self.orderItems[params.index][params.column.key];
+                            }else{
+                                return h('Input', {
+                                    props: {
+                                        value: self.orderItems[params.index][params.column.key]
+                                    },
+                                    on: {'on-blur' (event) {
+                                            let row = self.orderItems[params.index];
+                                            row[params.column.key] = event.target.value;
+                                            let checkLimit=event.target.value;
+                                            self.checkMore.repertoryInfoId=row.repertoryInfoId;
+                                            self.checkMore.id=row.id;
+                                            self.checkMore.goodsId=row.goodsId;
+                                            self.checkMore.goodsName=row.goodsName;
+                                            self.checkMore.checkLimit=checkLimit;
+                                            self.checkMore.accLimit=row.accLimit;
+                                            self.checkMore.formId=self.checkFormInfo.id;
+                                            self.checkMore.formNo=self.checkFormInfo.formNo;
+                                            if(checkLimit>row.accLimit){
+                                                self.$Modal.confirm({
+                                                    title: '盘点数量超过原库存数量,请进行盘盈登记？',
+                                                    content: '<p>确认盘盈商品 ' + row.goodsName + '?</p>',
+                                                    onOk: () => {
+                                                        self.checkMore.batchCode=row.batchCode;
+                                                        self.checkMore.price=row.price;
+                                                        self.checkMore.expDate=row.expDate;
+                                                        self.checkMoreModalShow=true;
+                                                    },
+                                                    onCancel: () => {
+                                                        self.$Message.error("修改或删除此盘点记录");
+                                                    }
+                                                });
+                                            }
+                                            else if(checkLimit<row.accLimit){
+                                                self.$Modal.confirm({
+                                                    title: '注意：盘点数量小于库存数量，确定盘亏吗？',
+                                                    content: '<p>确认盘亏商品 ' + row.goodsName + '?</p>',
+                                                    onOk: () => {
+                                                        util.ajax.post('/repertory/check/doCheckDetail', self.checkMore)
+                                                            .then(function (response) {
+                                                                if (response.status === 200 && response.data) {
+                                                                    row.checkStatus= response.data.planDetail.checkStatus;
+                                                                    self.$Message.info('盘点明细保存成功');
+                                                                }
+                                                                self.saving = false;
+                                                            })
+                                                            .catch(function (error) {
+                                                                console.log(error);
+                                                                self.saving = false;
+                                                            });
+
+                                                    },
+                                                    onCancel: () => {
+
+                                                    }
+                                                });
+
+                                            }else {
+                                                util.ajax.post('/repertory/check/doCheckDetail', self.checkMore)
+                                                    .then(function (response) {
+                                                        if (response.status === 200 && response.data) {
+                                                            row.checkStatus= response.data.planDetail.checkStatus;
+                                                            self.$Message.info('盘点明细保存成功');
+                                                        }
+                                                        self.saving = false;
+                                                    })
+                                                    .catch(function (error) {
+                                                        console.log(error);
+                                                        self.saving = false;
+                                                    });
+
+                                            }
+
+                                        }
+                                    }
+                                });
+
+                            }
+
+                        }
+                    },
+                    {
+                        title: '单位',
+                        key: 'unitName',
+                        align: 'center',
+                        width: 80
+                    },
+                    {
+                        title: '价格',
+                        key: 'price',
+                        align: 'center',
+                        width: 80
+                    },
+
+                    {
+                        title: '整件单位',
+                        key: 'packUnitName',
+                        align: 'center',
+                        width: 80
+                    },
+                    {
+                        title: '大件装量',
+                        key: 'bigPack',
+                        align: 'center',
+                        width: 80
+                    },{
+                        title: '生产企业',
+                        key: 'factoryName',
+                        align: 'center',
+                        width: 160
+                    }
+
+                ],
+                ruleValidate: {
+                    checkType: [
+                        { required: true, type: 'number', message: '请选择盘点类型', trigger: 'blur' }
+                    ]
+                }
             };
-        },
-        mounted () {
-            this.queryDoList();
-        },
-        activated () {
-            this.queryDoList();
-        },
-        watch: {
-            repertoryCheckItems: function () {
-            }
         },
         methods: {
             moment: function () {
                 return moment();
             },
-            dateRange: [
-                moment().add(-1, 'w').format('YYYY-MM-DD'),
-                moment().format('YYYY-MM-DD')
-            ],
-            showDoDetail(){
+            initPart(checkPlanId,warehouseName) {
                 var self = this;
-                var rows = this.$refs.storeCheckTable.getSelection();
-                if (!rows || rows.length === 0) {
-                    this.$Message.warning('请选择盘点单');
-                } else if (rows.length > 1) {
-                    this.$Message.warning('请一次选择一条盘点单');
-                } else if (rows.length == 1) {
-                    this.$router.push({
-                        //name: 'store_check_do_detail',
-                        name: 'store_check_part_index',
-                        params:{checkPlanId:rows[0].id,warehouseName:rows[0].warehouseName}
-                    });
+                //根据盘点计划和人员id查询本次盘点中该人员已录入的信息orderinfoList
+                if(checkPlanId>0){
+                    util.ajax.post('/repertory/check/orderinfoListByUser?checkPlanId='+checkPlanId )
+                        .then(function (response) {
+                            self.storeCheck.orderItemIds=[];
+                            if (response.status === 200 && response.data) {
+                                self.checkPlanId=checkPlanId;
+                                self.checkMore.checkPlanId=self.checkPlanId;
+                                self.storeCheck=response.data.data;
+                                self.orderItems=response.data.checkDetailList;
+                                self.checkFormInfo=response.data.checkFormInfo
+
+                                // self.storeCheck.orderItemIds=[];
+                                // for (var i = 0; i < self.orderItems.length; i++) {
+                                //     self.storeCheck.orderItemIds.push(self.orderItems[i].id);
+                                // }
+                            }
+                        })
+                        .catch(function (error) {
+                            console.log(error);
+                        });
+                }else{
+                    alert("checkPlanId异常"+checkPlanId);
+                }
+            },backPartIndex(){
+                this.$router.push({
+                    name: 'store_check_do_list',
+                    params:{checkPlanId: this.checkPlanId,warehouseName:this.storeCheck.warehouseName}
+                });
+
+            }, queryRepertory(query) {
+                var self = this;
+                if (query !== '') {
+                    this.goodsLoading = true;
+                    util.ajax.post('/repertory/check/orderinfoList4Search?checkPlanId='+this.checkPlanId+"&goodSearch="+query)
+                        .then(function (response) {
+                            if (response.status === 200 && response.data) {
+                                self.goodsLoading = false;
+                                self.goodsOptions = response.data.checkDetailList;
+                            }
+                        })
+                        .catch(function (error) {
+                            console.log(error);
+                        });
+
+                } else {
+                    this.goodsOptions = [];
                 }
             },
-            queryDoList () {
+            handleRowDbClick (row) {
+                this.$Modal.confirm({
+                    title: '确认删除商品？',
+                    content: '<p>确认删除商品 ' + row.name + '?</p>',
+                    onOk: () => {
+                        for (var i = 0; i < this.orderItems.length; i++) {
+                            if (row.id === this.orderItems[i].id) {
+                                this.orderItems.splice(i, 1);
+                                this.buyOrder.orderItemIds.splice(i, 1);
+                            }
+                        }
+                    },
+                    onCancel: () => {
+
+                    }
+                });
+            },
+            onSelectRepertory (planDetailId) {
+                var planDetail = this.goodsOptions.filter(o => o.id === planDetailId);
+                //根据id选择出数据
+                if (planDetail && planDetail.length == 1) {
+                    var index = this.storeCheck.orderItemIds.indexOf(planDetailId);
+                    if (index < 0) {
+                        //var obj = planDetail[0];
+                        this.orderItems.push( planDetail[0]);
+                        this.storeCheck.orderItemIds.push(planDetailId);
+                        var self = this;
+                        setTimeout(function () {
+                            self.$refs.checkOrderTable.$el.querySelector('.ivu-table-body tr:last-child input').focus();
+                        }, 400);
+                    } else {
+                        this.$Message.warning('该商品已经添加');
+                    }
+                }
+                this.$refs.repertorySelect.clearSingleSelect();
+            },  clearData () {
+                this.orderItems=[];
+
+                this.storeCheck = {
+                    orderItemIds: []
+                };
+            },
+            saveCheckPart () {
                 var self = this;
-                let startDate = this.dateRange[0];
-                let endDate = this.dateRange[1];
-                this.storeCheck.startDate=startDate;
-                this.storeCheck.endDate=endDate;
-                this.repertoryCheckItems = [];
-                util.ajax.get('/repertory/check/doList',{ params: {
-                        checkType:  this.storeCheck.checkType,
-                        warehouseId: this.storeCheck.warehouseId,
-                        startDate: this.storeCheck.startDate,
-                        endDate: this.storeCheck.endDate
-                    }})
+                if(""!=this.checkFormInfo.id && this.checkFormInfo.id>0){
+                    this.saving = true;
+                    util.ajax.post('/repertory/check/addOrUpdateForm', this.checkFormInfo)
+                        .then(function (response) {
+                            if (response.status === 200 && response.data) {
+                                self.$Message.info('盘点表保存成功');
+                            }
+                            self.saving = false;
+                        })
+                        .catch(function (error) {
+                            console.log(error);
+                            self.saving = false;
+                            self.$Message.error('保存盘点表错误'+error);
+                        });
+                }else{
+                    this.$Message.error('请先载入一条盘点表记录再进行操作!');
+                }
+
+
+            }, handleAddLocation() {
+                var self = this;
+                util.ajax.post('/repertory/check/doCheckDetailMore', this.checkMore)
                     .then(function (response) {
                         if (response.status === 200 && response.data) {
-                            self.repertoryCheckItems = response.data.data;
+                            //row.checkStatus= response.data.planDetail.checkStatus;
+                            self.checkMoreModalShow=false;
+                            self.$Message.info('盘盈登记成功');
+                            //self.initPart();
+
                         }
+                        self.saving = false;
                     })
                     .catch(function (error) {
                         console.log(error);
+                        self.saving = false;
                     });
-            },onSelectCheckType(item){
-                this.$refs.checkTypeSelect.clearSingleSelect();
-                this.storeCheck.checkType = item;
-            },doCheckOrder(){
-                var self = this;
-                var rows = this.$refs.storeCheckTable.getSelection();
-                if (!rows || rows.length === 0) {
-                    this.$Message.warning('请选择盘点单');
-                } else if (rows.length > 1) {
-                    this.$Message.warning('请一次选择一条盘点单');
-                } else if (rows.length == 1) {
-                    this.$router.push({
-                        name: 'store_check_part_add',
-                        params:{checkPlanId: rows[0].id,warehouseName:rows[0].warehouseName}
-                    });
+            },getCheckPlan(){
+                this.checkPlanListModel = true;
+            },checkPlanChoose(checkPlan) {
+                this.checkPlanListModel=false;
+                if(!checkPlan || !checkPlan.id) {
+                    this.$Message.warning('获取选取的订单信息失败');
+                    return;
                 }
+                this.initPart(checkPlan.id,checkPlan.warehouseName);
             }
+        },mounted () {
+            this.clearData();
+        },  activated () {
+            this.clearData();
         }
+        // ,
+        // watch: {
+        //     '$route' () {
+        //         this.initPart();
+        //     }
+        // }
     };
 </script>
+
 <style>
 
 </style>

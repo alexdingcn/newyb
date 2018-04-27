@@ -11,24 +11,28 @@
 
             <div slot="extra">
                 <ButtonGroup >
-                    <Button type="primary" icon="android-add-circle" @click="addCheckOrder" >盘点启动</Button>
+                    <Button type="primary" icon="android-add-circle" @click="showPlanDetail" >盘点单明细</Button>
                 </ButtonGroup>
-                <ButtonGroup >
-                    <Button type="primary" icon="android-add-circle" @click="doCheckOrder" >执行盘点</Button>
-                </ButtonGroup>
+                <!--<ButtonGroup >-->
+                    <!--<Button type="primary" icon="android-add-circle" @click="doCheckOrder" >执行盘点</Button>-->
+                <!--</ButtonGroup>-->
                 <!--<ButtonGroup >-->
                     <!--<Button type="primary" icon="android-add-circle" @click="" >盘点表审核</Button>-->
                 <!--</ButtonGroup>-->
-                <ButtonGroup >
-                    <Button type="primary" icon="android-add-circle" @click="checkOrderInfo" >盘点审核</Button>
-                </ButtonGroup>
+                <!--<ButtonGroup >-->
+                    <!--<Button type="primary" icon="android-add-circle" @click="checkOrderInfo" >盘点审核</Button>-->
+                <!--</ButtonGroup>-->
 
             </div>
             <Form :label-width="85" :model="storeCheck" ref="storeCheckForm">
                 <Row>
                     <Col span="5">
                         <FormItem label="盘点类型" prop="checkType">
-                            <Select v-model="storeCheck.checkType" size="small"  prop="checkType">
+                            <Select ref="checkTypeSelect"
+                                    v-model="storeCheck.checkType"
+                                    size="small"
+                                    @on-change="onSelectCheckType"
+                                    prop="checkType">
                                 <Option v-for="option in checkTypeOptions" :value="option.id" :label="option.name" :key="option.id">
                                     {{option.name}}
                                 </Option>
@@ -41,15 +45,15 @@
                         </FormItem>
                     </Col>
 
-                    <Col span="4">
-                        <FormItem label="库区" >
-                            <Select v-model="storeCheck.counterState" size="small"  prop="counter_state">
-                                <Option v-for="option in counterOptions" :value="option.id" :label="option.name" :key="option.id">
-                                    {{option.name}}
-                                </Option>
-                            </Select>
-                        </FormItem>
-                    </Col>
+                    <!--<Col span="4">-->
+                        <!--<FormItem label="库区" >-->
+                            <!--<Select v-model="storeCheck.counterState" size="small"  prop="counter_state">-->
+                                <!--<Option v-for="option in counterOptions" :value="option.id" :label="option.name" :key="option.id">-->
+                                    <!--{{option.name}}-->
+                                <!--</Option>-->
+                            <!--</Select>-->
+                        <!--</FormItem>-->
+                    <!--</Col>-->
                     <Col span="6">
                         <FormItem label="盘点日期" >
                             <DatePicker v-model="dateRange" type="daterange" placement="bottom-end" placeholder="盘点日期" style="width:180px"></DatePicker>
@@ -72,6 +76,7 @@
             </Form>
         </Card>
     </Row>
+
 </template>
 <script>
     import axios from 'axios';
@@ -87,6 +92,7 @@
         data () {
             return {
                 saving: false,
+
                 repertoryCheckItems: [],
                 checkTypeOptions:[{ id: 0, name:'库存盘点'},{ id: 1, name:'直接盘库'},{ id: 2, name:'单品盘点'}],
                 counterOptions:[{ id: 'ALL', name:'全部'}],
@@ -101,25 +107,18 @@
                         width: 60
                     },
                     {
-                        type: 'index',
-                        title: 'id',
-                        align: 'center',
-                        width: 30
-                    },
-                    {
                         title: '状态',
                         align: 'center',
                         key: 'state',
-                        width: 80,
+                        width: 120,
                         render: (h, params) => {
                             let state  = params.row.state;
                             if (0==state) {
-                                return h('Tag', {props: {color: 'yellow'}}, '待处理');
+                                return h('Tag', {props: {color: 'yellow'}}, '待审核');
                             }else if (1==state) {
-                                return h('Tag', {props: {color: 'yellow'}}, '盘点中');
-                            }else if (2==state){
-                                return h('Tag', {props: {color: 'green'}}, '已完成');
+                                return h('Tag', {props: {color: 'green'}}, '已审核');
                             }
+
                         }
                     },
                     {
@@ -132,7 +131,7 @@
                         title: '盘点类型',
                         key: 'checkType',
                         align: 'center',
-                        width: 80,
+                        width: 120,
                         render: (h, params) => {
                             let checkType  = params.row.checkType;
                             if (0==checkType) {
@@ -148,14 +147,14 @@
                         title: '仓库',
                         key: 'warehouseName',
                         align: 'center',
-                        width: 80
+                        width: 100
                     },
 
                     {
                         title: '盘点时间',
                         key: 'checkDate',
                         align: 'center',
-                        width: 80,
+                        width: 120,
                         render: (h, params) => {
                             return moment(params.row.checkDate).format('YYYY-MM-DD');
                         }
@@ -176,7 +175,7 @@
                         title: '总经理',
                         key: 'manager',
                         align: 'center',
-                        width: 80
+                        width: 120
                     },
                     {
                         title: '总经理意见',
@@ -188,7 +187,7 @@
                         title: '财务经理',
                         key: 'finance',
                         align: 'center',
-                        width: 80
+                        width: 120
                     },
                     {
                         title: '财务经理意见',
@@ -204,7 +203,7 @@
             this.queryCheckListList();
         },
         activated () {
-            // this.clearData();
+            this.queryCheckListList();
         },
         watch: {
             repertoryCheckItems: function () {
@@ -218,12 +217,7 @@
                 moment().add(-1, 'w').format('YYYY-MM-DD'),
                 moment().format('YYYY-MM-DD')
             ],
-            addCheckOrder(){
-                this.$router.push({
-                    name: 'store_check_add'
-                });
-            },
-            checkOrderInfo(){
+            showPlanDetail(){
                 var self = this;
                 var rows = this.$refs.storeCheckTable.getSelection();
                 if (!rows || rows.length === 0) {
@@ -231,35 +225,25 @@
                 } else if (rows.length > 1) {
                     this.$Message.warning('请一次选择一条盘点单');
                 } else if (rows.length == 1) {
-                    console.log("选择盘点单=="+rows[0].id);
                     this.$router.push({
-                        name: 'store_check_info',
+                        name: 'store_check_index_detail',
                         params:{checkPlanId:rows[0].id,warehouseName:rows[0].warehouseName}
-                    });
-                }
-            },doCheckOrder(){
-                var self = this;
-                var rows = this.$refs.storeCheckTable.getSelection();
-                if (!rows || rows.length === 0) {
-                    this.$Message.warning('请选择盘点单');
-                } else if (rows.length > 1) {
-                    this.$Message.warning('请一次选择一条盘点单');
-                } else if (rows.length == 1) {
-                    this.$router.push({
-                        name: 'store_check_part_index',
-                        params:{checkPlanId: rows[0].id,warehouseName:rows[0].warehouseName}
                     });
                 }
             },
             queryCheckListList () {
                 var self = this;
-
                 let startDate = this.dateRange[0];
                 let endDate = this.dateRange[1];
                 this.storeCheck.startDate=startDate;
                 this.storeCheck.endDate=endDate;
                 this.repertoryCheckItems = [];
-                util.ajax.post('/repertory/check/list', this.storeCheck)
+                util.ajax.get('/repertory/check/list',{ params: {
+                        checkType:  this.storeCheck.checkType,
+                        warehouseId: this.storeCheck.warehouseId,
+                        startDate: this.storeCheck.startDate,
+                        endDate: this.storeCheck.endDate
+                    }})
                     .then(function (response) {
                         if (response.status === 200 && response.data) {
                             self.repertoryCheckItems = response.data.data;
@@ -268,6 +252,9 @@
                     .catch(function (error) {
                         console.log(error);
                     });
+            },onSelectCheckType(item){
+                this.$refs.checkTypeSelect.clearSingleSelect();
+                this.storeCheck.checkType = item;
             }
         }
     };

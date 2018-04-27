@@ -67,7 +67,7 @@ public class RepertoryCheckPlan {
     }
 
     public void setCheckCode(String checkCode) {
-        this.checkCode = checkCode == null ? null : checkCode.trim();
+        this.checkCode = checkCode;
     }
 
     public Integer getCompanyId() {
@@ -91,7 +91,7 @@ public class RepertoryCheckPlan {
     }
 
     public void setWarehouseLocation(String warehouseLocation) {
-        this.warehouseLocation = warehouseLocation == null ? null : warehouseLocation.trim();
+        this.warehouseLocation = warehouseLocation;
     }
 
     public Date getCheckDate() {
@@ -131,7 +131,7 @@ public class RepertoryCheckPlan {
     }
 
     public void setComment(String comment) {
-        this.comment = comment == null ? null : comment.trim();
+        this.comment = comment;
     }
 
     public String getCheckResponseUser() {
@@ -139,7 +139,7 @@ public class RepertoryCheckPlan {
     }
 
     public void setCheckResponseUser(String checkResponseUser) {
-        this.checkResponseUser = checkResponseUser == null ? null : checkResponseUser.trim();
+        this.checkResponseUser = checkResponseUser;
     }
 
     public String getManager() {
@@ -147,7 +147,7 @@ public class RepertoryCheckPlan {
     }
 
     public void setManager(String manager) {
-        this.manager = manager == null ? null : manager.trim();
+        this.manager = manager;
     }
 
     public String getManagerNote() {
@@ -155,7 +155,7 @@ public class RepertoryCheckPlan {
     }
 
     public void setManagerNote(String managerNote) {
-        this.managerNote = managerNote == null ? null : managerNote.trim();
+        this.managerNote = managerNote;
     }
 
     public String getFinance() {
@@ -163,7 +163,7 @@ public class RepertoryCheckPlan {
     }
 
     public void setFinance(String finance) {
-        this.finance = finance == null ? null : finance.trim();
+        this.finance = finance;
     }
 
     public String getFinanceNote() {
@@ -171,7 +171,7 @@ public class RepertoryCheckPlan {
     }
 
     public void setFinanceNote(String financeNote) {
-        this.financeNote = financeNote == null ? null : financeNote.trim();
+        this.financeNote = financeNote;
     }
 
     public String getCreateBy() {
@@ -179,7 +179,7 @@ public class RepertoryCheckPlan {
     }
 
     public void setCreateBy(String createBy) {
-        this.createBy = createBy == null ? null : createBy.trim();
+        this.createBy = createBy;
     }
 
     public Date getCreateTime() {
@@ -195,7 +195,7 @@ public class RepertoryCheckPlan {
     }
 
     public void setUpdateBy(String updateBy) {
-        this.updateBy = updateBy == null ? null : updateBy.trim();
+        this.updateBy = updateBy;
     }
 
     public Date getUpdateTime() {

@@ -3,6 +3,8 @@
 <mapper namespace="com.yiban.erp.dao.RepertoryCheckFormMapper">
   <resultMap id="BaseResultMap" type="com.yiban.erp.entities.RepertoryCheckForm">
     <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="company_id" jdbcType="INTEGER" property="companyId" />
+    <result column="warehouse_id" jdbcType="INTEGER" property="warehouseId" />
     <result column="check_plan_id" jdbcType="BIGINT" property="checkPlanId" />
     <result column="make_user_id" jdbcType="BIGINT" property="makeUserId" />
     <result column="form_no" jdbcType="VARCHAR" property="formNo" />
@@ -14,7 +16,7 @@
     <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
   </resultMap>
   <sql id="Base_Column_List">
-    id, check_plan_id, make_user_id, form_no, form_state, check_note, create_by, create_time, 
+    id,company_id, check_plan_id, warehouse_id,make_user_id, form_no, form_state, check_note, create_by, create_time,
     update_by, update_time
   </sql>
   <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
@@ -28,11 +30,11 @@
     where id = #{id,jdbcType=BIGINT}
   </delete>
   <insert id="insert" parameterType="com.yiban.erp.entities.RepertoryCheckForm"  useGeneratedKeys="true" keyProperty="id">
-    insert into repertory_check_form (id, check_plan_id, make_user_id, 
+    insert into repertory_check_form (id,company_id,warehouse_id, check_plan_id, make_user_id,
       form_no, form_state, check_note, 
       create_by, create_time, update_by, 
       update_time)
-    values (#{id,jdbcType=BIGINT}, #{checkPlanId,jdbcType=BIGINT}, #{makeUserId,jdbcType=BIGINT}, 
+    values (#{id,jdbcType=BIGINT},  #{companyId,jdbcType=INTEGER},#{warehouseId,jdbcType=INTEGER},#{checkPlanId,jdbcType=BIGINT}, #{makeUserId,jdbcType=BIGINT},
       #{formNo,jdbcType=VARCHAR}, #{formState,jdbcType=INTEGER}, #{checkNote,jdbcType=VARCHAR}, 
       #{createBy,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, #{updateBy,jdbcType=VARCHAR}, 
       #{updateTime,jdbcType=TIMESTAMP})
@@ -43,9 +45,16 @@
       <if test="id != null">
         id,
       </if>
+      <if test="companyId != null">
+        company_id,
+      </if>
+      <if test="warehouseId != null">
+        warehouse_id,
+      </if>
       <if test="checkPlanId != null">
         check_plan_id,
       </if>
+
       <if test="makeUserId != null">
         make_user_id,
       </if>
@@ -74,6 +83,12 @@
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
         #{id,jdbcType=BIGINT},
+      </if>
+      <if test="companyId != null">
+        #{companyId,jdbcType=INTEGER},
+      </if>
+      <if test="warehouseId != null">
+        #{warehouseId,jdbcType=INTEGER},
       </if>
       <if test="checkPlanId != null">
         #{checkPlanId,jdbcType=BIGINT},
@@ -107,6 +122,12 @@
   <update id="updateByPrimaryKeySelective" parameterType="com.yiban.erp.entities.RepertoryCheckForm">
     update repertory_check_form
     <set>
+      <if test="companyId != null">
+        company_id = #{companyId,jdbcType=INTEGER},
+      </if>
+      <if test="warehouseId != null">
+        warehouse_id = #{warehouseId,jdbcType=INTEGER},
+      </if>
       <if test="checkPlanId != null">
         check_plan_id = #{checkPlanId,jdbcType=BIGINT},
       </if>
@@ -139,7 +160,9 @@
   </update>
   <update id="updateByPrimaryKey" parameterType="com.yiban.erp.entities.RepertoryCheckForm">
     update repertory_check_form
-    set check_plan_id = #{checkPlanId,jdbcType=BIGINT},
+    set  company_id = #{companyId,jdbcType=INTEGER},
+      warehouse_id = #{warehouseId,jdbcType=INTEGER},
+      check_plan_id = #{checkPlanId,jdbcType=BIGINT},
       make_user_id = #{makeUserId,jdbcType=BIGINT},
       form_no = #{formNo,jdbcType=VARCHAR},
       form_state = #{formState,jdbcType=INTEGER},
@@ -155,14 +178,30 @@
     SELECT  a.*
     FROM `repertory_check_form`  a
     WHERE 1=1
+    <if test="companyId != null" >
+      and a.company_id= #{companyId,jdbcType=INTEGER}
+    </if>
+    <if test="warehouseId != null" >
+      and a.warehouse_id= #{warehouseId,jdbcType=INTEGER}
+    </if>
     <if test="checkPlanId  != null" >
       and a.check_plan_id = #{checkPlanId ,jdbcType=BIGINT}
     </if>
+    <if test="formState  != null" >
+      and a.form_state = #{formState ,jdbcType=INTEGER}
+    </if>
+
     <if test="makeUserId  != null" >
       and a.make_user_id = #{makeUserId ,jdbcType=BIGINT}
     </if>
     <if test="formNo != null">
         and a.form_no = #{formNo ,jdbcType=VARCHAR}
+    </if>
+    <if test="startDate != null">
+      and a.create_time >= #{startDate}
+    </if>
+    <if test="endDate != null">
+      and  #{endDate} >= a.create_time
     </if>
     order by a.id desc
   </select>

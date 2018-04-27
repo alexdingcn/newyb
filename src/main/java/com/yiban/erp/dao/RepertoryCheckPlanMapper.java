@@ -1,5 +1,6 @@
 package com.yiban.erp.dao;
 
+import com.yiban.erp.dto.CheckPlanListReq;
 import com.yiban.erp.entities.RepertoryCheckPlan;
 import org.apache.ibatis.annotations.Mapper;
 
@@ -20,7 +21,6 @@ public interface RepertoryCheckPlanMapper {
 
     int updateByPrimaryKey(RepertoryCheckPlan record);
 
-    //查询所有的盘点计划
-    List<RepertoryCheckPlan> getCheckPlanList( Map<String, Object> requestMap);
+    List<RepertoryCheckPlan> getCheckPlanList(CheckPlanListReq listReq);
 
 }
