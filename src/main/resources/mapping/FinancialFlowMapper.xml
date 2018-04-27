@@ -42,6 +42,14 @@
     where id = #{id,jdbcType=BIGINT}
   </select>
 
+  <select id="getIncludeOptionById" resultMap="BaseResultMap" parameterType="java.lang.Long">
+    select
+      f.*, o.value as payMethodName
+    from financial_flow f
+    left join options o on f.pay_method = o.id
+    where f.id = #{id,jdbcType=BIGINT}
+  </select>
+
   <insert id="insert" parameterType="com.yiban.erp.entities.FinancialFlow" keyProperty="id" useGeneratedKeys="true" >
     insert into financial_flow (company_id, biz_no, log_date,
       cust_type, cust_id, log_account, doc_no, file_no,

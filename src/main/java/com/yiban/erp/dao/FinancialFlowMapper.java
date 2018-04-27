@@ -14,6 +14,8 @@ public interface FinancialFlowMapper {
 
     FinancialFlow selectByPrimaryKey(Long id);
 
+    FinancialFlow getIncludeOptionById(Long id);
+
     int updateByPrimaryKeySelective(FinancialFlow record);
 
     List<FinancialFlow> getByRefId(@Param("bizRefId") Long bizRefId);

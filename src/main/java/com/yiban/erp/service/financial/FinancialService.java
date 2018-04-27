@@ -128,16 +128,65 @@ public class FinancialService {
         if (!FinancialBizType.PRE_RECEIVE.name().equals(bizType.name())) {
             throw new BizException(ErrorCode.FINANCIAL_BIZ_TYPE_ERROR);
         }
-        //预收款不需要验证其他信息，直接获取交易锁后记账
+        //TODO 登记预收款的记录后才能生成对应的流水记录
         doFinancialRecord(financialReq);
     }
 
     /**
-     * 针对的是操作员的操作，系统的在发起时自行认证
+     * 取消操作的入口，根据被取消的流水信息组织参数
+     */
+    public void flowCancel(FinancialFlow flow, User user) throws BizException {
+        FinancialFlow refFlow = financialFlowMapper.selectByPrimaryKey(flow.getId());
+        if (refFlow == null || !refFlow.getCompanyId().equals(user.getCompanyId())) {
+            logger.warn("user:{} request cancel flow:{} get fail.", user.getId(), flow.getId());
+            throw new BizException(ErrorCode.FINANCIAL_GET_FAIL);
+        }
+        //验证下当前关联单的类型是否可以做取消操作
+        FinancialBizType refBizType = FinancialBizType.getByName(refFlow.getBizType());
+        if (refBizType == null || !refBizType.isCanCancel()) {
+            logger.warn("bizType:{} can not do cancel action. refId:{}", refFlow.getBizType(), refFlow.getId());
+            throw new BizException(ErrorCode.FINANCIAL_CANNOT_CANCEL);
+        }
+        FinancialBizType currCancelBizType = FinancialBizType.getCancelBizTypeByRefBizType(refBizType);
+        if (currCancelBizType == null) {
+            logger.warn("get cancel bizType fail by refBizType:{}", refBizType.name());
+            throw new BizException(ErrorCode.FINANCIAL_CANNOT_CANCEL);
+        }
+        List<FinancialFlow> flows = financialFlowMapper.getByRefId(refFlow.getId());
+        for (FinancialFlow item : flows) {
+            if (item.getBizType().equalsIgnoreCase(currCancelBizType.name())) {
+                logger.warn("当前流水已经做过取消操作，不能再次做取消操作。flowId:{}, itemId:{}", flow.getId(), item.getId());
+                throw new BizException(ErrorCode.FINANCIAL_CANNOT_CANCEL_AGAIN);
+            }
+        }
+        //验证通过后，组织请求参数操作入库
+        FinancialReq req = new FinancialReq();
+        req.setCompanyId(refFlow.getCompanyId());
+        req.setLogUserName(user.getNickname());
+        req.setCustType(refFlow.getCustType());
+        req.setCustId(refFlow.getCustId());
+        req.setBizType(currCancelBizType.name());
+        req.setBizRefId(refFlow.getId());
+        req.setBizRefNo(refFlow.getBizNo());
+        req.setLogAmount(refFlow.getLogAmount());
+        req.setLogDate(new Date());
+        req.setLogAccount(refFlow.getLogAccount());
+        req.setCompanyAccount(refFlow.getCompanyAccount());
+        req.setCustAccount(refFlow.getCustAccount());
+        req.setDocNo(flow.getDocNo());
+        req.setFileNo(flow.getFileNo());
+        req.setKeyWord(flow.getKeyWord());
+        logger.info("do cancel insert request params: {}", JSON.toJSONString(req));
+        doFinancialRecord(req);
+    }
+
+    /**
+     * 针对的是操作员的操作
+     * 只针对：付款、收款、记账应收、记账应付着几种操作。
      * @param financialReq
      * @throws BizException
      */
-    public void validateAndDoFinancialRecord(FinancialReq financialReq) throws BizException{
+    public void payAndReceiveFinancialRecord(FinancialReq financialReq) throws BizException{
         if (financialReq == null) {
             logger.warn("request params is null.");
             throw new BizException(ErrorCode.PARAMETER_MISSING);
@@ -151,73 +200,14 @@ public class FinancialService {
         switch (bizType) {
             case RECEIVE:
             case PAY:
-            case PRE_PAID:
-            case PRE_RECEIVE:
             case RECORD_RECEIVE:
             case RECORD_PAY:
-                //这些交易不需要特殊验证一些信息，直接提交给登记流水逻辑
                 doFinancialRecord(financialReq);
                 break;
-            case OFFSET:
-                // 冲销操作，需要验证对应账户的余额是否足够做冲销交易，如果不足够，不能操作
-                if(isCanDoOffsetAction(financialReq)) {
-                    doFinancialRecord(financialReq);
-                }else {
-                    throw new BizException(ErrorCode.FINANCIAL_CANNOT_OFFSET);
-                }
-                break;
-            case RECEIVE_CANCEL:
-            case PAY_CANCEL:
-            case RECORD_RECEIVE_CANCEL:
-            case RECORD_PAID_CANCEL:
-            case PRE_RECEIVE_CANCEL:
-            case PRE_PAID_CANCEL:
-                //取消操作，需要验证被取消的记录是否已经被取消过，每一笔只能取消一次，取消操作本身不能做取消操作
-                if(isCanDoCancelAction(financialReq)) {
-                    doFinancialRecord(financialReq);
-                }else {
-                    throw new BizException(ErrorCode.FINANCIAL_CANNOT_CANCEL);
-                }
-                break;
             default:
-                // 其他的操作目前不支持使用该方法(后续可以考虑加上)
+                // 其他的操作目前不支持使用该方法
                 throw new BizRuntimeException(ErrorCode.FINANCIAL_ACTION_ERROR);
         }
-    }
-
-    private boolean isCanDoOffsetAction(FinancialReq financialReq) {
-        // TODO 相关的账户预付款必须足够才能做冲销操作(预付款预收款记录需要多一个表)
-
-        return true;
-    }
-
-    private boolean isCanDoCancelAction(FinancialReq financialReq) {
-        //取消单操作的关联单必须存在, 并且取消操作不能针对取消类型的操作
-        if (financialReq.getBizRefId() == null) {
-            logger.warn("cancel action bizRefId must exist.");
-            return false;
-        }
-        //获取关联的订单信息，
-        FinancialFlow flow = financialFlowMapper.selectByPrimaryKey(financialReq.getBizRefId());
-        if (flow == null) {
-            logger.warn("get ref flows fail, and one flow can do one times cancel. refId:{}", financialReq.getBizRefId());
-            return false;
-        }
-        //验证下当前关联单的类型是否可以做取消操作
-        FinancialBizType bizType = FinancialBizType.getByName(flow.getBizType());
-        if (bizType == null || !bizType.isCanCancel()) {
-            logger.warn("bizType:{} can not do cancel action. refId:{}", flow.getBizType(), flow.getId());
-            return false;
-        }
-        List<FinancialFlow> flows = financialFlowMapper.getByRefId(flow.getId());
-        for (FinancialFlow item : flows) {
-            if (item.getBizType().equalsIgnoreCase(financialReq.getCustType())) {
-                logger.warn("当前流水已经做过取消操作，不能再次做取消操作。flowId:{}, itemId:{}", flow.getId(), item.getId());
-                return false;
-            }
-        }
-
-        return true;
     }
 
     private boolean validateFinancialReq(FinancialReq req) {
@@ -466,6 +456,29 @@ public class FinancialService {
                 throw new BizRuntimeException(ErrorCode.FINANCIAL_BIZ_TYPE_ERROR);
         }
         return inOrOutType > 0 ? inAmount : outAmount;  // 大于0表示去应收金额，否则去应付金额
+    }
+
+    @Transactional
+    public FinancialFlow flowUpdate(FinancialFlow updateFlow, User user) throws BizException {
+        FinancialFlow flow = financialFlowMapper.getIncludeOptionById(updateFlow.getId());
+        if (flow == null || !flow.getCompanyId().equals(user.getCompanyId())) {
+            logger.warn("get need update flow fail. id:{}", updateFlow.getId());
+            throw new BizException(ErrorCode.FINANCIAL_GET_FAIL);
+        }
+        //只修改部分信息，其他信息不修改
+        flow.setKeyWord(updateFlow.getKeyWord());
+        flow.setDocNo(updateFlow.getDocNo());
+        flow.setFileNo(updateFlow.getFileNo());
+        flow.setCustAccount(updateFlow.getCustAccount());
+        flow.setCompanyAccount(updateFlow.getCompanyAccount());
+        flow.setKeyWord(updateFlow.getKeyWord());
+        flow.setUpdatedBy(user.getNickname());
+        flow.setUpdatedTime(new Date());
+        int count = financialFlowMapper.updateByPrimaryKeySelective(flow);
+        if (count > 0) {
+            return flow;
+        }
+        throw new BizRuntimeException(ErrorCode.FAILED_UPDATE_FROM_DB);
     }
 
 }

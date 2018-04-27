@@ -49,6 +49,30 @@ public enum FinancialBizType {
         return null;
     }
 
+    /**
+     * 根据关联单，获取对应的取消操作类型
+     * @param type
+     * @return
+     */
+    public static FinancialBizType getCancelBizTypeByRefBizType(FinancialBizType type) {
+        switch (type) {
+            case RECEIVE:
+                return RECEIVE_CANCEL;
+            case PAY:
+                return PAY_CANCEL;
+            case PRE_PAID:
+                return PRE_PAID_CANCEL;
+            case PRE_RECEIVE:
+                return PRE_RECEIVE_CANCEL;
+            case RECORD_RECEIVE:
+                return RECORD_RECEIVE_CANCEL;
+            case RECORD_PAY:
+                return RECORD_PAID_CANCEL;
+            default:
+                return null;
+        }
+    }
+
     public String getDesc() {
         return desc;
     }

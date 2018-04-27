@@ -50,9 +50,25 @@ public class FinancialController {
         financialReq.setCompanyId(user.getCompanyId());
         financialReq.setLogUserName(user.getNickname());
         logger.info("user:{} add financial flow by:{}", user.getId(), JSON.toJSONString(financialReq));
-        financialService.validateAndDoFinancialRecord(financialReq);
+        financialService.payAndReceiveFinancialRecord(financialReq);
         logger.info("user:{} add financial flow success.", user.getId());
         return ResponseEntity.ok().build();
+    }
+
+    @RequestMapping(value = "/flow/cancel", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> flowCancel(@RequestBody FinancialFlow flow,
+                                             @AuthenticationPrincipal User user) throws Exception {
+        logger.info("user:{} do request cancel financial flow:{}", user.getId(), JSON.toJSONString(flow));
+        financialService.flowCancel(flow, user);
+        return ResponseEntity.ok().build();
+    }
+
+    @RequestMapping(value = "/flow/update", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> flowUpdate(@RequestBody FinancialFlow flow,
+                                             @AuthenticationPrincipal User user) throws Exception {
+        logger.info("user:{} update flow:{}", user.getId(), JSON.toJSONString(flow));
+        FinancialFlow newFlow = financialService.flowUpdate(flow, user);
+        return ResponseEntity.ok().body(JSON.toJSONString(newFlow));
     }
 
 }

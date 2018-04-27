@@ -130,7 +130,7 @@
                 <Col span="12">
                     <FormItem label="档案编号" prop="fileNo">
                         <Input v-model="actionFormItem.fileNo">
-                            <Button slot="append" type="text" icon="upload" @click="updateFileFor('ACTION')"></Button>
+                            <Button slot="append" type="text" icon="upload" @click="updateFileFor('ACTION', actionFormItem.fileNo)"></Button>
                         </Input>
                     </FormItem>
                 </Col>
@@ -146,10 +146,208 @@
 
           <Row slot="footer" type="flex" justify="end">
               <ButtonGroup shape="circle" size="small">
-                  <Button type="success" icon="checkmark" @click="actionSave" >确认保存</Button>
+                  <Button type="success" icon="checkmark" @click="actionSave" :loading="actionLoading" >确认保存</Button>
                   <Button type="ghost" icon="reply" @click="actionCancel">取消</Button>
               </ButtonGroup>
           </Row>
+      </Modal>
+
+      <Modal v-model="cancelModal" width="45" :mask-closable="false" :title="cancelModalTitle" >
+          <Form ref="cancelForm" :model="cancelFormItem" :label-width="100">
+            <Row>
+                <Col span="16">
+                    <FormItem label="取消的往来账流水号" :label-width="150" >
+                        <Input type="text" readonly v-model="cancelFormItem.bizNo" readonly />
+                    </FormItem>
+                </Col>
+                <Col span="8">
+                    <FormItem label="记账类型">
+                        <Select v-model="cancelFormItem.bizType" disabled >
+                            <Option v-for="item in allBizType" :key="item.bizType" :value="item.bizType">{{item.label}}</Option>
+                        </Select>
+                    </FormItem>
+                </Col>
+            </Row> 
+            <Row>
+                <Col span="12">
+                    <FormItem label="账户类型" prrop="custType">
+                        <Select v-model="cancelFormItem.custType" disabled >
+                            <Option v-for="custTypeItem in allCustType" :key="custTypeItem.custType" :value="custTypeItem.custType">{{custTypeItem.label}}</Option>
+                        </Select>
+                    </FormItem>
+                </Col>
+                <Col span="12">
+                    <FormItem label="往来账户" >
+                        <Input v-model="cancelFormItem.logAccount" readonly />
+                    </FormItem>
+                </Col>
+            </Row>
+            <Row>
+                <Col span="12">
+                    <FormItem label="账户账号" prrop="custAccount">
+                        <Input v-model="cancelFormItem.custAccount" readonly/>
+                    </FormItem>
+                </Col>
+                <Col span="12">
+                    <FormItem label="账户余额" prop="custAmount">
+                        <Input v-model="cancelFormItem.custAmount" readonly />
+                    </FormItem>
+                </Col>
+            </Row>
+            <Row>
+                <Col span="12">
+                    <FormItem label="发生金额" prop="logAmount" >
+                        <Input v-model="cancelFormItem.logAmount" number readonly />
+                    </FormItem>
+                </Col>
+                <Col span="12">
+                    <FormItem label="发生日期" >
+                        <DatePicker type="date" v-model="cancelFormItem.logDate" disabled></DatePicker>
+                    </FormItem>
+                </Col>
+            </Row>
+            <Row >
+                <Col span="12">
+                    <FormItem label="应收">
+                        <Input v-model="cancelFormItem.inAmount" readonly/>
+                    </FormItem>
+                </Col>
+                <Col span="12">
+                    <FormItem label="应付" >
+                        <Input v-model="cancelFormItem.outAmount" readonly/>
+                    </FormItem>
+                </Col>
+            </Row>
+            <Row >
+                <Col span="12">
+                    <FormItem label="结算账号" prop="companyAccount">
+                        <Input v-model="cancelFormItem.companyAccount" readonly/>
+                    </FormItem>
+                </Col>
+                <Col span="12">
+                    <FormItem label="摘要" prrop="keyWord">
+                        <Input v-model="cancelFormItem.keyWord" readonly/>
+                    </FormItem>
+                </Col>
+            </Row>
+            <Row >
+                <Col span="12">
+                    <FormItem label="凭证号" prrop="docNo">
+                        <Input type="text" v-model="cancelFormItem.docNo" readonly/>
+                    </FormItem>
+                </Col>
+                <Col span="12">
+                    <FormItem label="档案编号" prop="fileNo">
+                        <Input v-model="cancelFormItem.fileNo" readonly></Input>
+                    </FormItem>
+                </Col>
+            </Row>
+            <h3 style="magin-top:20px;">录入取消操作的信息</h3>
+            <hr size="1" style="width: 90%; margin-bottom:10px;"/>
+            <Row >
+                <Col span="12">
+                    <FormItem label="凭证号">
+                        <Input type="text" v-model="cancelDocNo" />
+                    </FormItem>
+                </Col>
+                <Col span="12">
+                    <FormItem label="档案编号">
+                        <Input v-model="cancelFileNo">
+                            <Button slot="append" type="text" icon="upload" @click="updateFileFor('CANCEL', cancelFileNo)"></Button>
+                        </Input>
+                    </FormItem>
+                </Col>
+            </Row>
+            <Row >
+                <Col span="24">
+                    <FormItem label="摘要">
+                        <Input v-model="cancelKeyWord" />
+                    </FormItem>
+                </Col>
+            </Row>
+          </Form>
+
+          <Row slot="footer" type="flex" justify="end">
+              <ButtonGroup shape="circle" size="small">
+                  <Button type="success" icon="checkmark" @click="cancelSave" :loading="cancelLoading" >确认提交</Button>
+                  <Button type="ghost" icon="reply" @click="cancelActionCancel">取消</Button>
+              </ButtonGroup>
+          </Row>
+      </Modal>
+
+      <Modal v-model="updateModal" width="45" :mask-closable="false" title="维护往来账信息" >
+          <Form ref="updateForm" :model="updateFormItem" :label-width="100">
+                <Row>
+                    <Col span="16">
+                        <FormItem label="取消的往来账流水号" :label-width="150" >
+                            <Input type="text" readonly v-model="updateFormItem.bizNo" readonly />
+                        </FormItem>
+                    </Col>
+                    <Col span="8">
+                        <FormItem label="记账类型">
+                            <Select v-model="updateFormItem.bizType" disabled >
+                                <Option v-for="item in allBizType" :key="item.bizType" :value="item.bizType">{{item.label}}</Option>
+                            </Select>
+                        </FormItem>
+                    </Col>
+                </Row> 
+                <Row>
+                    <Col span="12">
+                        <FormItem label="账户类型" prrop="custType">
+                            <Select v-model="updateFormItem.custType" disabled >
+                                <Option v-for="custTypeItem in allCustType" :key="custTypeItem.custType" :value="custTypeItem.custType">{{custTypeItem.label}}</Option>
+                            </Select>
+                        </FormItem>
+                    </Col>
+                    <Col span="12">
+                        <FormItem label="往来账户" >
+                            <Input v-model="updateFormItem.logAccount" readonly />
+                        </FormItem>
+                    </Col>
+                </Row>
+                <h3 style="margin-top:20px;">可维护信息</h3>
+                <hr size="1" style="width: 90%; margin-bottom:10px;"/>
+                <Row >
+                    <Col span="12">
+                        <FormItem label="结算账号" prop="companyAccount">
+                            <Input v-model="updateFormItem.companyAccount"/>
+                        </FormItem>
+                    </Col>
+                    <Col span="12">
+                        <FormItem label="往来账户账号" prrop="custAccount">
+                            <Input v-model="updateFormItem.custAccount" />
+                        </FormItem>
+                    </Col>
+                </Row>
+                <Row >
+                    <Col span="12">
+                        <FormItem label="凭证号">
+                            <Input type="text" v-model="updateFormItem.docNo" />
+                        </FormItem>
+                    </Col>
+                    <Col span="12">
+                        <FormItem label="档案编号">
+                            <Input v-model="updateFormItem.fileNo" readonly>
+                                <Button slot="append" type="text" icon="upload" @click="updateFileFor('UPDATE', updateFormItem.fileNo)"></Button>
+                            </Input>
+                        </FormItem>
+                    </Col>
+                </Row>
+                <Row >
+                    <Col span="12">
+                        <FormItem label="摘要">
+                            <Input type="text" v-model="updateFormItem.keyWord" />
+                        </FormItem>
+                    </Col>
+                </Row>
+          </Form>
+
+            <Row slot="footer" type="flex" justify="end">
+                <ButtonGroup shape="circle" size="small">
+                    <Button type="success" icon="checkmark" @click="updateSave" :loading="updateLoading" >确认提交</Button>
+                    <Button type="ghost" icon="reply" @click="updateActionCancel">取消</Button>
+                </ButtonGroup>
+            </Row>
       </Modal>
 
       <Modal v-model="fileUploadModal" title="档案上传" :mask-closable="false" width="50" class="file-upload-modal">
@@ -179,23 +377,23 @@ export default {
     data() {
         return {
             allBizType: [
-                {bizType: 'BUY_IN', label: '采购入库'},
-                {bizType: 'BUY_BACK', label: '采购退货'},
-                {bizType: 'SELL_BACK', label: '销售退货'},
-                {bizType: 'SELL_BATCH', label: '批发销售'},
-                {bizType: 'RECEIVE', label: '收款'},
-                {bizType: 'PAY', label: '付款'},
-                {bizType: 'PRE_PAID', label: '预付款'},
-                {bizType: 'PRE_RECEIVE', label: '预收款'},
-                {bizType: 'RECORD_RECEIVE', label: '记账应收'},
-                {bizType: 'RECORD_PAY', label: '记账应付'},
-                {bizType: 'OFFSET', label: '冲销'},
-                {bizType: 'RECEIVE_CANCEL', label: '收款取消'},
-                {bizType: 'PAY_CANCEL', label: '付款取消'},
-                {bizType: 'PRE_PAID_CANCEL', label: '预付款取消'},
-                {bizType: 'PRE_RECEIVE_CANCEL', label: '预收款取消'},
-                {bizType: 'RECORD_RECEIVE_CANCEL', label: '记账应收取消'},
-                {bizType: 'RECORD_PAID_CANCEL', label: '记账应付取消'}
+                {bizType: 'BUY_IN', label: '采购入库', cancel: false},
+                {bizType: 'BUY_BACK', label: '采购退货', cancel: false},
+                {bizType: 'SELL_BACK', label: '销售退货', cancel: false},
+                {bizType: 'SELL_BATCH', label: '批发销售', cancel: false},
+                {bizType: 'RECEIVE', label: '收款', cancel: true},
+                {bizType: 'PAY', label: '付款', cancel: true},
+                {bizType: 'PRE_PAID', label: '预付款', cancel: true},
+                {bizType: 'PRE_RECEIVE', label: '预收款', cancel: true},
+                {bizType: 'RECORD_RECEIVE', label: '记账应收', cancel: true},
+                {bizType: 'RECORD_PAY', label: '记账应付', cancel: true},
+                {bizType: 'OFFSET', label: '冲销', cancel: false},
+                {bizType: 'RECEIVE_CANCEL', label: '收款取消', cancel: false},
+                {bizType: 'PAY_CANCEL', label: '付款取消', cancel: false},
+                {bizType: 'PRE_PAID_CANCEL', label: '预付款取消', cancel: false},
+                {bizType: 'PRE_RECEIVE_CANCEL', label: '预收款取消', cancel: false},
+                {bizType: 'RECORD_RECEIVE_CANCEL', label: '记账应收取消', cancel: false},
+                {bizType: 'RECORD_PAID_CANCEL', label: '记账应付取消', cancel: false}
             ],
             allCustType: [{custType: 'CUSTOMER', label: '客户'}, {custType: 'SUPPLIER', label: '供应商'}],
             allRecordType: [
@@ -334,7 +532,25 @@ export default {
                 {
                     title: '档案编号',
                     key: 'fileNo',
-                    width: 170
+                    width: 170,
+                    render: (h, params) => {
+                        let fileNo = params.row.fileNo;
+                        if (!fileNo) {
+                            return '';
+                        }else {
+                            return h('Button',{
+                                props: {
+                                    type: 'text'
+                                },
+                                on: {
+                                    'click': () => {
+                                        this.updateFileFor('SEE', fileNo);
+                                    }
+                                }
+                            }, fileNo);
+                        }
+                        
+                    }
                 }
             ],
             currChooseFlow: {},
@@ -351,11 +567,22 @@ export default {
                 bizType: '',
                 logDate: moment().format('YYYY-MM-DD')
             },
+            actionLoading: false,
             actionType: '',
             actionCustIdError: '',
             actionCustTypeError: '',
             actionLogAmountError: '',
             actionLogDateError: '',
+            cancelFormItem: {},
+            cancelDocNo: '',
+            cancelFileNo: '',
+            cancelKeyWord: '',
+            cancelLoading: false,
+            cancelModal: false,
+            cancelModalTitle: '',
+            updateModal: false,
+            updateFormItem: {},
+            updateLoading: false
         }
     },
     mounted() {
@@ -496,11 +723,51 @@ export default {
             this.actionModal = true;
             this.actionType = 'PAY';
         },
+        findOneOnBizTypes(bizType) {
+            for(let i=0; i<this.allBizType.length; i++) {
+                let item = this.allBizType[i];
+                if (item.bizType === bizType) {
+                    return item;
+                }
+            }
+            return null;
+        },
         cancelAction() {
-            
+            if (!this.currChooseFlow || !this.currChooseFlow.id) {
+                this.$Modal.warning({
+                    title: '操作提示',
+                    content: '请先选中需要取消的流水信息！'
+                });
+                return;
+            }
+            //判断当前流水是否可以做取消操作
+            let bizTypeItem = this.findOneOnBizTypes(this.currChooseFlow.bizType);
+            if (!bizTypeItem || !bizTypeItem.cancel) {
+                this.$Modal.warning({
+                    title: '操作提示',
+                    content: '当前流水类型：' + bizTypeItem.label + '不能做取消操作.'
+                });
+                return;
+            }
+            //打开显示流水信息模板
+            this.cancelModalTitle = '取消->' + bizTypeItem.label + ', 流水号:' + this.currChooseFlow.bizNo;
+            this.cancelModal = true;
+            this.cancelFormItem = this.currChooseFlow;
         },
         editAction() {
-            
+            if (!this.currChooseFlow || !this.currChooseFlow.id) {
+                this.$Modal.warning({
+                    title: '操作提示',
+                    content: '请先选中需要修改的流水信息！'
+                });
+                return;
+            }
+            this.updateFormItem = this.currChooseFlow;
+            this.updateModal = true;
+        },
+        updateActionCancel() {
+            this.updateFormItem = {};
+            this.updateModal = false;
         },
         actionCancel() {
             this.actionTitle = '';
@@ -515,6 +782,14 @@ export default {
                 logDate: moment().format('YYYY-MM-DD'),
                 bizType: ''
             };
+        },
+        cancelActionCancel() {
+            this.cancelFormItem = {};
+            this.cancelDocNo = '';
+            this.cancelFileNo = '';
+            this.cancelKeyWord = '';
+            this.cancelModalTitle = '';
+            this.cancelModal = false;
         },
         custTypeChange(data) {
             this.actionFormItem.custId = '';
@@ -552,13 +827,18 @@ export default {
             this.actionFormItem.bizRefId = '';
             this.actionFormItem.bizRefNo = '';
         },
-        updateFileFor(updateType) {
+        updateFileFor(updateType, fileNo) {
             this.updateType = updateType;
             this.fileUploadModal = true;
+            this.uploadfileNo = fileNo;
         },
         addFileSuccess(data) {
             if (this.updateType === 'ACTION') {
                 this.actionFormItem.fileNo = data.fileNo;
+            }else if (this.updateType === 'CANCEL') {
+                this.cancelFileNo = data.fileNo;
+            }else if (this.updateType === 'UPDATE') {
+                this.updateFormItem.fileNo = data.fileNo;
             }
         },
         isBizTypeOk(bizType) {
@@ -600,29 +880,96 @@ export default {
                 this.actionFormItem.actionLogDateError = '发生日期必输';
                 return;
             }
-            this.loading = true;
-            console.log(this.actionFormItem);
+            this.actionLoading = true;
+            let tipContent = '是否确认输入的数据正确，并且提交保存？';
+            if (this.actionFormItem.bizType === 'RECORD_RECEIVE') {
+                tipContent = '是否确认输入的数据正确，对账户：' + this.actionFormItem.logAccount + '做一笔应收款记账？';
+            }else if (this.actionFormItem.bizType === 'RECORD_PAY') {
+                tipContent = '是否确认输入的数据正确，对账户：' + this.actionFormItem.logAccount + '做一笔应付款记账？';
+            }else if (this.actionFormItem.bizType === 'RECEIVE') {
+                tipContent = '是否确认输入的数据正确，已经确认收到账户：' + this.actionFormItem.logAccount + this.actionFormItem.logAmount + '的金额？';
+            }else if (this.actionFormItem.bizType === 'PAY') {
+                tipContent = '是否确认输入的数据正确，已经确认付给账户：' + this.actionFormItem.logAccount + this.actionFormItem.logAmount + '的金额？';
+            }
+            let self = this;
             this.$Modal.confirm({
                 title: '保存确认',
-                content: '是否确认输入的数据正确，并且提交保存？',
-                onCancel: () => {},
+                content: tipContent,
+                onCancel: () => {self.actionLoading = false;},
                 onOk: () => {
-                    util.ajax.post('/financial/flow/add', this.actionFormItem)
+                    util.ajax.post('/financial/flow/add', self.actionFormItem)
                         .then((response) => {
-                            this.loading = false;
-                            this.$Message.success('保存成功');
-                            this.actionModal = false;
-                            this.refreshFlowsData();
+                            self.actionLoading = false;
+                            self.$Message.success('保存成功');
+                            self.actionModal = false;
+                            self.refreshFlowsData();
                         })
                         .catch((error) => {
-                            this.loading = false;
-                            util.errorProcessor(this, error);
+                            self.actionLoading = false;
+                            util.errorProcessor(self, error);
+                        });
+                }
+            });
+        },
+        cancelSave() {
+            if (!this.cancelFormItem.id) {
+                this.$Message.error('获取取消的账务流水失败，请重新获取.');
+                return;
+            }
+            let contentLabel = '是否确定需要取消往来账：' + this.cancelFormItem.bizNo + '？';
+            let self = this;
+            this.cancelLoading = true;
+            this.$Modal.confirm({
+                title: '取消操作确认',
+                content: contentLabel,
+                onCancel:()=>{self.cancelLoading = false;},
+                onOk:() => {
+                    let reqData = {
+                        id: self.cancelFormItem.id,
+                        docNo: self.cancelDocNo,
+                        fileNo: self.cancelFileNo,
+                        keyWord: self.cancelFileNo
+                    };
+                    util.ajax.post('/financial/flow/cancel', reqData)
+                        .then((response) => {
+                            self.cancelLoading = false;
+                            self.$Message.success('保存成功');
+                            self.cancelModal = false;
+                            self.refreshFlowsData();
+                        })
+                        .catch((error) => {
+                            self.cancelLoading = false;
+                            util.errorProcessor(self, error);
+                        })
+                }
+            });
+        },
+        updateSave() {
+            if (!this.updateFormItem.id) {
+                this.$Message.error('获取修改的账务流水失败，请重新获取.');
+                return;
+            }
+            let self = this;
+            self.updateLoading = true;
+            this.$Modal.confirm({
+                title: '修改操作确认',
+                content: '是否已经确认修改的已经正确填写完成？',
+                onCancel: () => {self.updateLoading = false;},
+                onOk:() => {
+                    util.ajax.post('/financial/flow/update', this.updateFormItem)
+                        .then((response) => {
+                            self.updateLoading = false;
+                            self.$Message.success('保存成功');
+                            self.updateModal = false;
+                            self.refreshFlowsData();
+                        })
+                        .catch((error) => {
+                            self.updateLoading = false;
+                            util.errorProcessor(self, error);
                         });
                 }
             });
         }
-
-
         
     }
 }
