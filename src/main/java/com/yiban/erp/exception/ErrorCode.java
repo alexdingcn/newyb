@@ -145,6 +145,8 @@ public enum ErrorCode {
     MESSAGE_GET_FAIL(9003, "获取消息信息失败"),
     LOGIN_STATUS_MISS(9004, "登录态失效", ErrorDisplay.NOTICE),
     COMPANY_MISS(9005, "获取公司信息失败", ErrorDisplay.MODAL),
+    RABBITMQ_CONNECTION_FAIL(9006, "系统异常, 队列连接失败"),
+    RABBITMQ_SEND_MESSAGE_FAIL(9007, "系统异常, 消息发送失败"),
     ;
 
     private Integer code;

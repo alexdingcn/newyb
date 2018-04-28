@@ -47,31 +47,31 @@ public class FinancialService {
 
     /**
      * 根据销售单创建一笔往来账流水记录
-     * @param sellOrder
+     * @param order
      */
-    public void createFlowBySellOrder(SellOrder sellOrder) throws BizException {
-        if (sellOrder == null || !SellOrderStatus.SALE_CHECKED.name().equalsIgnoreCase(sellOrder.getStatus())) {
+    public void createFlowBySellOrder(SellOrder order) throws BizException {
+        if (order == null || !SellOrderStatus.SALE_CHECKED.name().equalsIgnoreCase(order.getStatus())) {
             logger.warn("sell order is null or sell order status is not SALE_CHECKED");
             throw new BizException(ErrorCode.FINANCIAL_SELL_ORDER_ERROR);
         }
         //验证下当前销售单是否已经记录过往来账，如果记录过，给出错误提示
-        List<FinancialFlow> flows = financialFlowMapper.getByRefId(sellOrder.getId());
+        List<FinancialFlow> flows = financialFlowMapper.getByRefId(order.getId());
         if (flows != null && !flows.isEmpty()) {
-            logger.warn("sell order:{} financial flow is already exist, can not add on this sell order. ", sellOrder.getId());
+            logger.warn("sell order:{} financial flow is already exist, can not add on this sell order. ", order.getId());
             throw new BizException(ErrorCode.FINANCIAL_SELL_ORDER_EXIST);
         }
 
         FinancialReq req = new FinancialReq();
-        req.setCompanyId(sellOrder.getCompanyId());
-        req.setLogUserName(sellOrder.getUpdateBy());
+        req.setCompanyId(order.getCompanyId());
+        req.setLogUserName(order.getUpdateBy());
         req.setCustType(FinancialReq.CUST_CUSTOMER);
-        req.setCustId(sellOrder.getCustomerId());
+        req.setCustId(order.getCustomerId());
         req.setBizType(FinancialBizType.SELL_BATCH.name());
-        req.setBizRefId(sellOrder.getId()); //关联单ID取采购订单的ID
-        req.setBizRefNo(sellOrder.getOrderNumber());
-        req.setLogAmount(sellOrder.getTotalAmount());
+        req.setBizRefId(order.getId()); //关联单ID取采购订单的ID
+        req.setBizRefNo(order.getOrderNumber());
+        req.setLogAmount(order.getTotalAmount());
         req.setLogDate(new Date());
-        req.setLogAccount(sellOrder.getCustomerName());
+        req.setLogAccount(order.getCustomerName());
         req.setKeyWord("销售单生成的往来账流水"); //入库方式的描述信息
 
         doFinancialRecord(req);  //登记往来账逻辑

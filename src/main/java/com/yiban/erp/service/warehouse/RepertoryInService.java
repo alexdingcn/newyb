@@ -1,7 +1,7 @@
 package com.yiban.erp.service.warehouse;
 
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
+import com.yiban.erp.config.RabbitmqQueueConfig;
 import com.yiban.erp.constant.*;
 import com.yiban.erp.dao.*;
 import com.yiban.erp.dto.CurrentBalanceResp;
@@ -12,7 +12,6 @@ import com.yiban.erp.exception.BizException;
 import com.yiban.erp.exception.BizRuntimeException;
 import com.yiban.erp.exception.ErrorCode;
 import com.yiban.erp.service.GoodsService;
-import com.yiban.erp.service.financial.FinancialService;
 import com.yiban.erp.util.UtilTool;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -23,8 +22,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.*;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
 @Service
@@ -51,7 +48,7 @@ public class RepertoryInService {
     @Autowired
     private WarehouseMapper warehouseMapper;
     @Autowired
-    private FinancialService financialService;
+    private RabbitmqQueueConfig rabbitmqQueueConfig;
 
     /**
      * 获取某商品当前库存和申购订单信息
@@ -175,10 +172,8 @@ public class RepertoryInService {
         BigDecimal totalQuantity = BigDecimal.ZERO;
         BigDecimal totalAmount = BigDecimal.ZERO;
         for (RepertoryInDetail detail : details) {
-            if (order.getId().equals(detail.getInOrderId())) {
-                totalQuantity = totalQuantity.add(detail.getInCount()); //入库数量
-                totalAmount = totalAmount.add(detail.getAmount()); //金额
-            }
+            totalQuantity = totalQuantity.add(detail.getInCount()); //入库数量
+            totalAmount = totalAmount.add(detail.getAmount()); //金额
         }
         order.setTotalQuantity(totalQuantity);
         order.setTotalAmount(totalAmount);
@@ -645,20 +640,8 @@ public class RepertoryInService {
         int inCount = repertoryInfoMapper.insertBatch(infoList);
         logger.info("insert repertory info count:{}", inCount);
 
-        //TODO 统计财务信息
-        recordFinancial(order);
-    }
-
-    private void recordFinancial(final RepertoryIn order) {
-        ExecutorService executor = Executors.newSingleThreadExecutor();
-        final RepertoryIn in = repertoryInMapper.getByIdWithSupplierInfo(order.getId());
-        executor.submit(() -> {
-            try {
-                financialService.createFlowByBuyOrder(in);
-            }catch (Exception e) {
-                logger.error("repertoryIn record financial fail. orderId:{}", in.getId(), e);
-            }
-        });
+        // 生成一个入库信息
+        rabbitmqQueueConfig.sendMessage("RepertoryInService", RabbitmqQueueConfig.ORDER_BUY, order);
     }
 
     private List<RepertoryInfo> createRepertoryInfos(User user, RepertoryIn order, List<RepertoryInDetail> detailList) {
