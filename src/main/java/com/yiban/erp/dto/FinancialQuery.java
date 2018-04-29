@@ -18,6 +18,8 @@ public class FinancialQuery {
     private Integer page;
     private Integer pageSize;
 
+    private String status; // 预付款/预收款时查询使用
+
     private int offset;
     private int limit;
 

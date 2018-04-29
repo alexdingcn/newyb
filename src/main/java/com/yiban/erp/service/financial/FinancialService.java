@@ -2,10 +2,7 @@ package com.yiban.erp.service.financial;
 
 import com.alibaba.fastjson.JSON;
 import com.yiban.erp.constant.*;
-import com.yiban.erp.dao.CompanyMapper;
-import com.yiban.erp.dao.CustomerMapper;
-import com.yiban.erp.dao.FinancialFlowMapper;
-import com.yiban.erp.dao.SupplierMapper;
+import com.yiban.erp.dao.*;
 import com.yiban.erp.dto.FinancialReq;
 import com.yiban.erp.entities.*;
 import com.yiban.erp.exception.BizException;
@@ -43,6 +40,8 @@ public class FinancialService {
     private CompanyMapper companyMapper;
     @Autowired
     private SupplierMapper supplierMapper;
+    @Autowired
+    private FinancialPrePaidMapper financialPrePaidMapper;
 
 
     /**
@@ -113,23 +112,6 @@ public class FinancialService {
         req.setKeyWord(repertoryIn.getRefTypeName()); //入库方式的描述信息
 
         doFinancialRecord(req);  //登记往来账逻辑
-    }
-
-    /**
-     * 预收款往来账记录
-     * @param financialReq
-     * @throws BizException
-     */
-    public void preReceiveFinancial(FinancialReq financialReq) throws BizException {
-        if (financialReq == null) {
-            throw new BizException(ErrorCode.PARAMETER_MISSING);
-        }
-        FinancialBizType bizType = FinancialBizType.getByName(financialReq.getBizType());
-        if (!FinancialBizType.PRE_RECEIVE.name().equals(bizType.name())) {
-            throw new BizException(ErrorCode.FINANCIAL_BIZ_TYPE_ERROR);
-        }
-        //TODO 登记预收款的记录后才能生成对应的流水记录
-        doFinancialRecord(financialReq);
     }
 
     /**
@@ -251,7 +233,7 @@ public class FinancialService {
         return true;
     }
 
-    private void doFinancialRecord(FinancialReq financialReq) throws BizException{
+    private FinancialFlow doFinancialRecord(FinancialReq financialReq) throws BizException{
         if (!validateFinancialReq(financialReq)) {
             logger.warn("financial request params validate fail. {}", JSON.toJSONString(financialReq));
             throw new BizRuntimeException(ErrorCode.PARAMETER_MISSING);
@@ -260,7 +242,7 @@ public class FinancialService {
         boolean lock = lockService.lock(lockKey);
         if (lock) {
             try {
-                addNewFinancialRecord(financialReq);
+                return addNewFinancialRecord(financialReq);
             } catch (Exception e){
                 logger.error("do financial record have exception. {}", JSON.toJSONString(financialReq), e);
                 // TODO 发送警告邮件
@@ -281,7 +263,7 @@ public class FinancialService {
      * @param financialReq
      */
     @Transactional
-    public void addNewFinancialRecord(FinancialReq financialReq) {
+    public FinancialFlow addNewFinancialRecord(FinancialReq financialReq) {
         Company company = companyMapper.selectByPrimaryKey(financialReq.getCompanyId());
         if (company == null) {
             logger.error("get company by companyId:{} result is null.",financialReq.getCompanyId());
@@ -375,6 +357,7 @@ public class FinancialService {
             logger.warn("insert financial fail. {}", JSON.toJSONString(flow));
             throw new BizRuntimeException(ErrorCode.FAILED_INSERT_FROM_DB);
         }
+        return flow;
     }
 
     private BigDecimal getActionAmount(FinancialBizType bizType, BigDecimal logAmount, int inOrOutType) {
@@ -479,6 +462,64 @@ public class FinancialService {
             return flow;
         }
         throw new BizRuntimeException(ErrorCode.FAILED_UPDATE_FROM_DB);
+    }
+
+    private void validateAddPrePaid(FinancialPrePaid prePaid) throws BizException {
+        if (prePaid == null || prePaid.getCompanyId() == null) {
+            logger.warn("params is null or companyId is null.");
+            throw new BizException(ErrorCode.PARAMETER_MISSING);
+        }
+        if (prePaid.getLogUserId() == null || prePaid.getCreatedBy() == null) {
+            logger.warn("params do user is null.");
+            throw new BizException(ErrorCode.PARAMETER_MISSING);
+        }
+        if (prePaid.getLogAmount() == null || BigDecimal.ZERO.compareTo(prePaid.getLogAmount()) >= 0) {
+            logger.warn("params log amount must > 0");
+            throw new BizException(ErrorCode.FINANCIAL_AMOUNT_ERROR);
+        }
+        if (prePaid.getCustId() == null || prePaid.getCustName() == null) {
+            logger.warn("params cust id is null.");
+            throw new BizException(ErrorCode.FINANCIAL_CUST_ID_NULL);
+        }
+        return;
+    }
+
+    @Transactional
+    public FinancialPrePaid addPrePaid(FinancialPrePaid prePaid) throws BizException {
+        //验证信息
+        validateAddPrePaid(prePaid); // 报错就验证不过
+        Supplier supplier = supplierMapper.selectByPrimaryKey(prePaid.getCustId());
+        if (supplier == null || supplier.getEnabled() == null || !supplier.getEnabled()) {
+            logger.warn("pre paid but supplier get fail or enabled is false. supplierId:{}", prePaid.getCustId());
+            throw new BizException(ErrorCode.FINANCIAL_CUST_GET_FAIL);
+        }
+        //组织往来账流水请求body
+        FinancialReq financialReq = new FinancialReq();
+        financialReq.setCompanyId(prePaid.getCompanyId());
+        financialReq.setLogUserName(prePaid.getCreatedBy());
+        financialReq.setCustType(FinancialReq.CUST_SUPPLIER);
+        financialReq.setCustId(prePaid.getCustId());
+        financialReq.setBizType(FinancialBizType.PRE_PAID.name());
+        financialReq.setLogAmount(prePaid.getLogAmount());
+        financialReq.setLogDate(prePaid.getLogDate());
+        financialReq.setLogAccount(prePaid.getCustName());
+        financialReq.setCustAccount(prePaid.getCustAccount());
+        financialReq.setDocNo(prePaid.getDocNo());
+        financialReq.setFileNo(prePaid.getFileNo());
+        financialReq.setKeyWord(prePaid.getKeyWord());
+        logger.info("do pre paid financial flow request params: {}", JSON.toJSONString(financialReq));
+        FinancialFlow flow = doFinancialRecord(financialReq);
+        if (flow == null || flow.getId() == null) {
+            logger.warn("add financial flow fail in pre paid request.");
+            throw new BizRuntimeException(ErrorCode.FAILED_INSERT_FROM_DB);
+        }
+        //流水号建立好后,建立对应的预收款记录
+        prePaid.setFlowId(flow.getId());
+        prePaid.setBizNo(flow.getBizNo());
+        prePaid.setStatus(FinancialPreStatus.INIT.name());
+        prePaid.setCreatedTime(new Date());
+        financialPrePaidMapper.insert(prePaid);
+        return prePaid;
     }
 
 }
