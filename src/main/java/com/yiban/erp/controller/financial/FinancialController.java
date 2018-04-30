@@ -105,7 +105,7 @@ public class FinancialController {
     }
 
     @RequestMapping(value = "/pre/add", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> addPrePaid(@RequestBody FinancialPreRecord preRecord,
+    public ResponseEntity<String> addPreRecord(@RequestBody FinancialPreRecord preRecord,
                                              @AuthenticationPrincipal User user) throws Exception {
         preRecord.setCompanyId(user.getCompanyId());
         preRecord.setLogUserId(user.getId());

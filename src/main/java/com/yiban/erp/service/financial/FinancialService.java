@@ -286,7 +286,8 @@ public class FinancialService {
         return true;
     }
 
-    private FinancialFlow doFinancialRecord(FinancialReq financialReq) throws BizException{
+    @Transactional
+    public FinancialFlow doFinancialRecord(FinancialReq financialReq) throws BizException{
         if (!validateFinancialReq(financialReq)) {
             logger.warn("financial request params validate fail. {}", JSON.toJSONString(financialReq));
             throw new BizRuntimeException(ErrorCode.PARAMETER_MISSING);
@@ -634,6 +635,22 @@ public class FinancialService {
             if (refFlow == null) {
                 logger.warn("get financial flow fail by bizNo:{}", offsetReq.getRefBizNo());
                 throw new BizException(ErrorCode.FINANCIAL_OFFSET_REF_BIZNO_ERROR);
+            }
+            //如果关联的流水对应用户不是预收款的用户，不能做冲销交易
+            if (isPrePaidType) {
+                if (!FinancialReq.CUST_SUPPLIER.equalsIgnoreCase(refFlow.getCustType()) ||
+                        !refFlow.getCustId().equals(preRecord.getCustId())) {
+                    logger.warn("pre paid custId and refFlow custId must be equals. refFlowId:{}, preRecordId:{}",
+                            refFlow.getId(), preRecord.getId());
+                    throw new BizException(ErrorCode.FINANCIAL_CUST_MUST_SAME);
+                }
+            }else {
+                if (!FinancialReq.CUST_CUSTOMER.equalsIgnoreCase(refFlow.getCustType()) ||
+                        !refFlow.getCustId().equals(preRecord.getCustId())) {
+                    logger.warn("pre paid custId and refFlow custId must be equals. refFlowId:{}, preRecordId:{}",
+                            refFlow.getId(), preRecord.getId());
+                    throw new BizException(ErrorCode.FINANCIAL_CUST_MUST_SAME);
+                }
             }
         }
         //造一个请求新建冲销流水的请求体

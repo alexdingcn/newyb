@@ -134,6 +134,7 @@ public enum ErrorCode {
     FINANCIAL_PRE_STATUS_CANNOT_CANCEL(3024, "预收/付款不在未使用的状态下不能做取消操作"),
     FINANCIAL_PRE_STATUS_CANNOT_OFFSET(3025, "预收/付款不在未使用的状态下不能做冲销操作"),
     FINANCIAL_OFFSET_REF_BIZNO_ERROR(3026, "冲销关联的流水号错误，获取不到对应往来账流水"),
+    FINANCIAL_CUST_MUST_SAME(3027, "冲销交易关联的流水信息的往来账户必须与预收/付款记录的账户相同"),
 
     // 41xx - 贷款
     SEND_VERIFY_CODE_FAIL(4104, "发送验证码失败"),

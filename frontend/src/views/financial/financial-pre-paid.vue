@@ -10,8 +10,8 @@
               <ButtonGroup size="small">
                   <Button type="primary" icon="search" :loading="loading" @click="refreshTableData">查询</Button>
                   <Button type="success" icon="plus" :loading="loading" @click="addBtnClick">添加</Button>
-                  <Button type="warning" icon="shuffle" :loading="loading">冲销</Button>
-                  <Button type="error" icon="close" :loading="loading">取消预付款</Button>
+                  <Button type="warning" icon="shuffle" :loading="loading" @click="offsetBtnClick">冲销</Button>
+                  <Button type="error" icon="close" :loading="loading" @click="cancelBtnClick">取消预付款</Button>
               </ButtonGroup>
           </div>
 
@@ -41,7 +41,7 @@
                 </Page>
             </Row>
 
-            <Modal v-model="addRecordModal" title="新建预收款" :mask-closable="false" width="45" >
+            <Modal v-model="addRecordModal" title="新建预付款" :mask-closable="false" width="45" >
                 <Form ref="addForm" :model="addFormItem" :label-width="100">
                     <Row >
                         <i-col span="12">
@@ -104,6 +104,58 @@
                     <ButtonGroup shape="circle" size="small">
                         <Button type="success" icon="checkmark" @click="actionSave" :loading="addSubmitLoading" >确认保存</Button>
                         <Button type="ghost" icon="reply" @click="addCancel">取消</Button>
+                    </ButtonGroup>
+                </Row>
+            </Modal>
+
+            <Modal v-model="offsetModal" title="预付款冲销" :mask-closeable="false" width="40">
+                <Form ref="offsetForm" :model="offsetFormItem" :label-width="150">
+                    <Row>
+                        <i-col span="12">
+                            <FormItem label="做冲销的预付款流水">
+                                <Input v-model="offsetFormItem.bizNo" readonly />
+                            </FormItem>
+                        </i-col>
+                        <i-col span="12">
+                            <FormItem label="供应商">
+                                <Input v-model="offsetFormItem.custName" readonly />
+                            </FormItem>
+                        </i-col>
+                    </Row>
+                    <Row>
+                        <i-col span="12">
+                            <FormItem label="冲销金额">
+                                <Input v-model="offsetFormItem.logAmount" readonly />
+                            </FormItem>
+                        </i-col>
+                        <i-col span="12">
+                            <FormItem label="供应商账户余额">
+                                <Input v-model="offsetFormItem.custAmount" readonly />
+                            </FormItem>
+                        </i-col>
+                    </Row>
+                    <h3 style="margin-top:20px;">冲销关联信息</h3>
+                    <hr size="1" style="width:90%;margin-bottom:10px;" />
+                    <Row >
+                        <i-col span="24">
+                            <FormItem label="冲销的往来账流水号" :label-width="150">
+                                <Input v-model="offsetFormItem.refBizNo" /><br/>
+                                <strong style="color:red;">提示:建议关联往来账流水，比如采购入库的往来账流水号, 也可以没有关联, 直接对账户做冲销交易.</strong>
+                            </FormItem>
+                        </i-col>
+                    </Row>
+                    <Row >
+                        <i-col span="24">
+                            <FormItem label="冲销流水的摘要信息" :label-width="150">
+                                <Input v-model="offsetFormItem.keyWord" />
+                            </FormItem>
+                        </i-col>
+                    </Row>
+                </Form>
+                <Row slot="footer" type="flex" justify="end">
+                    <ButtonGroup shape="circle" size="small">
+                        <Button type="success" icon="checkmark" @click="offsetSubmit" :loading="offsetSubmitLoading" >确认保存</Button>
+                        <Button type="ghost" icon="reply" @click="offsetModalCancel">取消</Button>
                     </ButtonGroup>
                 </Row>
             </Modal>
@@ -174,7 +226,7 @@ export default {
                     width: 200
                 },
                 {
-                    title: '预收款金额',
+                    title: '预付款金额',
                     key: 'logAmount',
                     width: 120
                 },
@@ -282,7 +334,21 @@ export default {
             },
             addLogDateError: '',
             addCustIdError: '',
-            addLogAmountError: ''
+            addLogAmountError: '',
+            offsetModal: false,
+            offsetSubmitLoading: false,
+            offsetFormItem: {
+                bizType: 'PRE_PAID',
+                preRecordId: '',
+                refBizNo: '',
+                keyWord: '',
+                bizNo: '',
+                custName: '',
+                logAmount: '',
+                custAmount: ''
+            },
+
+
         }
     },
     mounted() {
@@ -300,10 +366,11 @@ export default {
                 custId: this.searchCustId,
                 status: this.searchStatus,
                 page: this.currentPage,
-                pageSize: this.pageSize
+                pageSize: this.pageSize,
+                preBizType: 'PRE_PAID'
             };
             this.loading = true;
-            util.ajax.post('/financial/pre/paid/list', reqData)
+            util.ajax.post('/financial/pre/list', reqData)
                 .then((response) => {
                     this.loading = false;
                     this.tableData = response.data.data;
@@ -382,15 +449,16 @@ export default {
             }
             let self = this;
             this.$Modal.confirm({
-                title: '预收款添加确认',
-                content: '是否已经确认收到供应商:' + self.addFormItem.custName + '金额' + self.addFormItem.logAmount + '元',
+                title: '预付款添加确认',
+                content: '是否已经确认付给供应商:' + self.addFormItem.custName + '金额' + self.addFormItem.logAmount + '元',
                 onCancel: () => {},
                 onOk: () => {
                     self.addSubmitLoading = true;
-                    util.ajax.post('/financial/pre/paid/add', self.addFormItem)
+                    this.addFormItem.preBizType = 'PRE_PAID'; //固定
+                    util.ajax.post('/financial/pre/add', self.addFormItem)
                         .then((response) => {
                             self.addSubmitLoading = false;
-                            self.$Message.success('添加预收款记录成功');
+                            self.$Message.success('添加预付款记录成功');
                             self.addRecordModal = false;
                             self.refreshTableData();
                         })
@@ -400,9 +468,126 @@ export default {
                         });
                 }
             });
+        },
+
+        cancelBtnClick() {
+            if (!this.currChooseRow.id) {
+                this.$Message.warning('请先选择需要取消的预付款记录');
+                return;
+            }
+            if (this.currChooseRow.status !== 'INIT') {
+                this.$Modal.warning({
+                    title: '取消操作提醒',
+                    content: '只有处于未使用状态的预付款才能进行取消操作!'
+                });
+                return
+            }
+            let self = this;
+            this.$Modal.confirm({
+                title: '取消操作确认',
+                content: '是否确认取消:' + self.currChooseRow.bizNo + "这笔预付款，取消后不能再做其他操作！",
+                onCancel: () => {},
+                onOk: () => {
+                    self.loading = true;
+                    self.currChooseRow.preBizType = 'PRE_PAID';
+                    util.ajax.post('/financial/pre/cancel', self.currChooseRow)
+                        .then((response) => {
+                            self.loading = false;
+                            self.$Message.success('取消操作保存成功');
+                            self.refreshTableData();
+                        })
+                        .catch((error) => {
+                            self.loading = false;
+                            util.errorProcessor(self, error);
+                        });
+                }
+            });
+        },
+
+        offsetBtnClick() {
+            if (!this.currChooseRow || !this.currChooseRow.id) {
+                this.$Message.warning('请先选择需要做冲销交易的预付款记录.');
+                return;
+            }
+            //先根据custId获取供应商信息
+            let self = this;
+            util.ajax.get('/supplier/' + this.currChooseRow.custId)
+                .then((response) => {
+                    let supplier = response.data;
+                    if (!supplier || !supplier.id) {
+                        self.$Message.warning('获取供应商信息失败.');
+                        return;
+                    }else {
+                        //获取到供应商信息打开冲销的面板
+                        self.offsetFormItem = {
+                            bizType: 'PRE_PAID',
+                            preRecordId: self.currChooseRow.id,
+                            refBizNo: '',
+                            keyWord: '',
+                            bizNo: self.currChooseRow.bizNo,
+                            custName: supplier.name,
+                            logAmount: self.currChooseRow.logAmount,
+                            custAmount: supplier.accountAmount
+                        };
+                        self.offsetModal = true;
+                    }
+                })
+                .catch((error) => {
+                    util.errorProcessor(self, error);
+                })
+        },
+
+        offsetModalCancel() {
+            this.offsetFormItem = {
+                bizType: 'PRE_PAID',
+                preRecordId: '',
+                refBizNo: '',
+                keyWord: '',
+                bizNo: '',
+                custName: '',
+                logAmount: '',
+                custAmount: ''
+            };
+            this.offsetModal = false;
+        },
+
+        offsetSubmit() {
+            if (this.offsetFormItem.bizType !== 'PRE_PAID' || !this.offsetFormItem.preRecordId) {
+                this.$Modal.error({
+                    title: '系统异常',
+                    content: '获取需要冲销的流水信息失败.'
+                });
+                return;
+            }
+            //判断下当前流水是否处于未使用状态
+            if (this.currChooseRow.status !== 'INIT') {
+                this.$Modal.warning({
+                    title: '冲销交易提示',
+                    content: '只有处于未使用状态的预付款才能进行冲销操作.'
+                });
+                return;
+            }
+            let self = this;
+            this.$Modal.confirm({
+                title: '冲销数据确认',
+                content: '是否确认对供应商：' + self.offsetFormItem.custName + '冲销' + self.offsetFormItem.logAmount + '元预付款, 冲销后不可取消',
+                onCancel: () => {},
+                onOk: () => {
+                    self.offsetSubmitLoading = true;
+                    util.ajax.post('/financial/pre/offset', self.offsetFormItem)
+                        .then((response) => {
+                            self.offsetSubmitLoading = false;
+                            self.$Message.success('冲销交易保存成功');
+                            self.offsetModalCancel();
+                            self.refreshTableData();
+                        })
+                        .catch((error) => {
+                            self.offsetSubmitLoading = false;
+                            util.errorProcessor(self, error);
+                        });
+                }
+            });
         }
-
-
     }
 
   

@@ -157,8 +157,8 @@
   <update id="setStatusByFlowId" parameterType="map" >
     update financial_pre_receive
     set status = #{status},
-    updated_by = #{updateBy},
-    updated_time = #{updateTime}
+    updated_by = #{updatedBy},
+    updated_time = #{updatedTime}
     where flow_id = #{flowId}
   </update>
 
