@@ -8,9 +8,8 @@ import org.apache.ibatis.annotations.Param;
 import java.util.Date;
 import java.util.List;
 
-
 @Mapper
-public interface FinancialPrePaidMapper {
+public interface FinancialPreReceiveMapper {
 
     int insert(FinancialPreRecord record);
 
@@ -33,4 +32,5 @@ public interface FinancialPrePaidMapper {
                           @Param("status") String status,
                           @Param("updatedBy") String updatedBy,
                           @Param("updatedTime") Date updatedTime);
+
 }

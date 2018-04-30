@@ -3,6 +3,7 @@ package com.yiban.erp.service.financial;
 import com.alibaba.fastjson.JSON;
 import com.yiban.erp.constant.*;
 import com.yiban.erp.dao.*;
+import com.yiban.erp.dto.FinancialOffsetReq;
 import com.yiban.erp.dto.FinancialReq;
 import com.yiban.erp.entities.*;
 import com.yiban.erp.exception.BizException;
@@ -10,6 +11,7 @@ import com.yiban.erp.exception.BizRuntimeException;
 import com.yiban.erp.exception.ErrorCode;
 import com.yiban.erp.service.util.LockService;
 import com.yiban.erp.util.UtilTool;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,6 +44,8 @@ public class FinancialService {
     private SupplierMapper supplierMapper;
     @Autowired
     private FinancialPrePaidMapper financialPrePaidMapper;
+    @Autowired
+    private FinancialPreReceiveMapper financialPreReceiveMapper;
 
 
     /**
@@ -114,9 +118,19 @@ public class FinancialService {
         doFinancialRecord(req);  //登记往来账逻辑
     }
 
+    public void preCancel(FinancialPreRecord preRecord, User user) throws BizException {
+        //根据预收款记录找到对应流水号，在流水取消逻辑中进行
+        //根据预收款记录造一个流水记录的ID,其他不需要
+        FinancialFlow flow = new FinancialFlow();
+        flow.setId(preRecord.getFlowId());
+        //直接使用取消操作逻辑
+        flowCancel(flow, user);
+    }
+
     /**
      * 取消操作的入口，根据被取消的流水信息组织参数
      */
+    @Transactional
     public void flowCancel(FinancialFlow flow, User user) throws BizException {
         FinancialFlow refFlow = financialFlowMapper.selectByPrimaryKey(flow.getId());
         if (refFlow == null || !refFlow.getCompanyId().equals(user.getCompanyId())) {
@@ -141,6 +155,24 @@ public class FinancialService {
                 throw new BizException(ErrorCode.FINANCIAL_CANNOT_CANCEL_AGAIN);
             }
         }
+        //判断是否为预收款、预付款，如果是，需要验证预收款、预付款记录的状态，只有在未使用状态INIT才能进行取消操作
+        if (FinancialBizType.PRE_PAID_CANCEL.equals(currCancelBizType)) {
+            //预付款取消
+            FinancialPreRecord prePaid = financialPrePaidMapper.getByFlowId(refFlow.getId());
+            if (prePaid == null || !FinancialPreStatus.INIT.name().equalsIgnoreCase(prePaid.getStatus())) {
+                //预付款记录的状态不在INIT状态,不能取消
+                throw new BizException(ErrorCode.FINANCIAL_PRE_STATUS_CANNOT_CANCEL);
+            }
+        }
+        if (FinancialBizType.PRE_RECEIVE_CANCEL.equals(currCancelBizType)) {
+            //预收款的取消，验证预收款记录的状态
+            FinancialPreRecord preReceive = financialPreReceiveMapper.getByFlowId(refFlow.getId());
+            if (preReceive == null || !FinancialPreStatus.INIT.name().equalsIgnoreCase(preReceive.getStatus())) {
+                //预收款记录的状态不在INIT状态,不能取消
+                throw new BizException(ErrorCode.FINANCIAL_PRE_STATUS_CANNOT_CANCEL);
+            }
+        }
+
         //验证通过后，组织请求参数操作入库
         FinancialReq req = new FinancialReq();
         req.setCompanyId(refFlow.getCompanyId());
@@ -160,6 +192,27 @@ public class FinancialService {
         req.setKeyWord(flow.getKeyWord());
         logger.info("do cancel insert request params: {}", JSON.toJSONString(req));
         doFinancialRecord(req);
+        logger.info("do cancel success for flow id:{}", refFlow.getId());
+
+        //如果是预收/付款，需要对应预收款或者预付款的记录做取消操作
+        if (FinancialBizType.PRE_PAID_CANCEL.equals(currCancelBizType)) {
+            //预付款取消
+            int count = financialPrePaidMapper.setStatusByFlowId(refFlow.getId(), FinancialPreStatus.CANCEL.name(),
+                    user.getNickname(), new Date());
+            if (count <=0 ){
+                logger.warn("update pre paid record status fail by flowId:{}", refFlow.getId());
+                throw new BizRuntimeException(ErrorCode.FAILED_UPDATE_FROM_DB);
+            }
+        }
+        if (FinancialBizType.PRE_RECEIVE_CANCEL.equals(currCancelBizType)) {
+            //预收款的取消，验证预收款记录的状态
+            int count = financialPreReceiveMapper.setStatusByFlowId(refFlow.getId(), FinancialPreStatus.CANCEL.name(),
+                    user.getNickname(), new Date());
+            if (count <=0 ){
+                logger.warn("update pre paid record status fail by flowId:{}", refFlow.getId());
+                throw new BizRuntimeException(ErrorCode.FAILED_UPDATE_FROM_DB);
+            }
+        }
     }
 
     /**
@@ -464,20 +517,25 @@ public class FinancialService {
         throw new BizRuntimeException(ErrorCode.FAILED_UPDATE_FROM_DB);
     }
 
-    private void validateAddPrePaid(FinancialPrePaid prePaid) throws BizException {
-        if (prePaid == null || prePaid.getCompanyId() == null) {
+    private void validateAddPrePaid(FinancialPreRecord preRecord) throws BizException {
+        if (preRecord == null || preRecord.getCompanyId() == null) {
             logger.warn("params is null or companyId is null.");
             throw new BizException(ErrorCode.PARAMETER_MISSING);
         }
-        if (prePaid.getLogUserId() == null || prePaid.getCreatedBy() == null) {
+        if (!FinancialBizType.PRE_PAID.name().equalsIgnoreCase(preRecord.getPreBizType()) &&
+                !FinancialBizType.PRE_RECEIVE.name().equalsIgnoreCase(preRecord.getPreBizType())) {
+            logger.warn("params pre bizType is error.");
+            throw new BizException(ErrorCode.FINANCIAL_BIZ_TYPE_ERROR);
+        }
+        if (preRecord.getLogUserId() == null || preRecord.getCreatedBy() == null) {
             logger.warn("params do user is null.");
             throw new BizException(ErrorCode.PARAMETER_MISSING);
         }
-        if (prePaid.getLogAmount() == null || BigDecimal.ZERO.compareTo(prePaid.getLogAmount()) >= 0) {
+        if (preRecord.getLogAmount() == null || BigDecimal.ZERO.compareTo(preRecord.getLogAmount()) >= 0) {
             logger.warn("params log amount must > 0");
             throw new BizException(ErrorCode.FINANCIAL_AMOUNT_ERROR);
         }
-        if (prePaid.getCustId() == null || prePaid.getCustName() == null) {
+        if (preRecord.getCustId() == null || preRecord.getCustName() == null) {
             logger.warn("params cust id is null.");
             throw new BizException(ErrorCode.FINANCIAL_CUST_ID_NULL);
         }
@@ -485,41 +543,145 @@ public class FinancialService {
     }
 
     @Transactional
-    public FinancialPrePaid addPrePaid(FinancialPrePaid prePaid) throws BizException {
+    public FinancialPreRecord addPreRecord(FinancialPreRecord preRecord) throws BizException {
         //验证信息
-        validateAddPrePaid(prePaid); // 报错就验证不过
-        Supplier supplier = supplierMapper.selectByPrimaryKey(prePaid.getCustId());
-        if (supplier == null || supplier.getEnabled() == null || !supplier.getEnabled()) {
-            logger.warn("pre paid but supplier get fail or enabled is false. supplierId:{}", prePaid.getCustId());
-            throw new BizException(ErrorCode.FINANCIAL_CUST_GET_FAIL);
+        validateAddPrePaid(preRecord); // 报错就验证不过
+        boolean isPrePaid = false;
+        if (FinancialBizType.PRE_PAID.name().equalsIgnoreCase(preRecord.getPreBizType())) {
+            //预付款
+            Supplier supplier = supplierMapper.selectByPrimaryKey(preRecord.getCustId());
+            if (supplier == null || supplier.getEnabled() == null || !supplier.getEnabled()) {
+                logger.warn("pre paid but supplier get fail or enabled is false. supplierId:{}", preRecord.getCustId());
+                throw new BizException(ErrorCode.FINANCIAL_CUST_GET_FAIL);
+            }
+            isPrePaid = true;
+        }else if (FinancialBizType.PRE_RECEIVE.name().equalsIgnoreCase(preRecord.getPreBizType())){
+            //预收款
+            Customer customer = customerMapper.selectByPrimaryKey(preRecord.getCustId());
+            if (customer == null || customer.getEnabled() == null || !customer.getEnabled()) {
+                logger.warn("pre receive but customer get fail order enabled is false. customerId:{}", preRecord.getCustId());
+            }
+            isPrePaid = false;
+        }else{
+            throw new BizException(ErrorCode.PARAMETER_MISSING);
         }
+
         //组织往来账流水请求body
         FinancialReq financialReq = new FinancialReq();
-        financialReq.setCompanyId(prePaid.getCompanyId());
-        financialReq.setLogUserName(prePaid.getCreatedBy());
-        financialReq.setCustType(FinancialReq.CUST_SUPPLIER);
-        financialReq.setCustId(prePaid.getCustId());
-        financialReq.setBizType(FinancialBizType.PRE_PAID.name());
-        financialReq.setLogAmount(prePaid.getLogAmount());
-        financialReq.setLogDate(prePaid.getLogDate());
-        financialReq.setLogAccount(prePaid.getCustName());
-        financialReq.setCustAccount(prePaid.getCustAccount());
-        financialReq.setDocNo(prePaid.getDocNo());
-        financialReq.setFileNo(prePaid.getFileNo());
-        financialReq.setKeyWord(prePaid.getKeyWord());
-        logger.info("do pre paid financial flow request params: {}", JSON.toJSONString(financialReq));
+        financialReq.setCompanyId(preRecord.getCompanyId());
+        financialReq.setLogUserName(preRecord.getCreatedBy());
+        if (isPrePaid) {
+            financialReq.setCustType(FinancialReq.CUST_SUPPLIER);
+            financialReq.setBizType(FinancialBizType.PRE_PAID.name());
+        }else {
+            financialReq.setCustType(FinancialReq.CUST_CUSTOMER);
+            financialReq.setBizType(FinancialBizType.PRE_RECEIVE.name());
+        }
+        financialReq.setCustId(preRecord.getCustId());
+        financialReq.setLogAmount(preRecord.getLogAmount());
+        financialReq.setLogDate(preRecord.getLogDate());
+        financialReq.setLogAccount(preRecord.getCustName());
+        financialReq.setCustAccount(preRecord.getCustAccount());
+        financialReq.setDocNo(preRecord.getDocNo());
+        financialReq.setFileNo(preRecord.getFileNo());
+        financialReq.setKeyWord(preRecord.getKeyWord());
+        logger.info("do pre financial flow request params: {}", JSON.toJSONString(financialReq));
         FinancialFlow flow = doFinancialRecord(financialReq);
         if (flow == null || flow.getId() == null) {
-            logger.warn("add financial flow fail in pre paid request.");
+            logger.warn("add financial flow fail in pre request.");
             throw new BizRuntimeException(ErrorCode.FAILED_INSERT_FROM_DB);
         }
         //流水号建立好后,建立对应的预收款记录
-        prePaid.setFlowId(flow.getId());
-        prePaid.setBizNo(flow.getBizNo());
-        prePaid.setStatus(FinancialPreStatus.INIT.name());
-        prePaid.setCreatedTime(new Date());
-        financialPrePaidMapper.insert(prePaid);
-        return prePaid;
+        preRecord.setFlowId(flow.getId());
+        preRecord.setBizNo(flow.getBizNo());
+        preRecord.setStatus(FinancialPreStatus.INIT.name());
+        preRecord.setCreatedTime(new Date());
+        if (isPrePaid) {
+            financialPrePaidMapper.insert(preRecord);
+        }else {
+            financialPreReceiveMapper.insert(preRecord);
+        }
+        return preRecord;
+    }
+
+    @Transactional
+    public FinancialPreRecord preOffset(FinancialOffsetReq offsetReq, User user) throws BizException {
+        if (offsetReq == null || offsetReq.getPreRecordId() == null || offsetReq.getBizType() == null) {
+            logger.warn("offset request params have null.");
+            throw new BizException(ErrorCode.PARAMETER_MISSING);
+        }
+        if (!FinancialBizType.PRE_PAID.name().equalsIgnoreCase(offsetReq.getBizType()) &&
+                !FinancialBizType.PRE_RECEIVE.name().equalsIgnoreCase(offsetReq.getBizType())) {
+            logger.warn("request bizType must be PRE_PAID OR PRE_RECEIVE.");
+            throw new BizException(ErrorCode.FINANCIAL_BIZ_TYPE_ERROR);
+        }
+        boolean isPrePaidType = FinancialBizType.PRE_PAID.name().equalsIgnoreCase(offsetReq.getBizType()) ? true : false;
+        FinancialPreRecord preRecord = null;
+        if (isPrePaidType) {
+            preRecord = financialPrePaidMapper.selectByPrimaryKey(offsetReq.getPreRecordId());
+        }else {
+            preRecord = financialPreReceiveMapper.selectByPrimaryKey(offsetReq.getPreRecordId());
+        }
+        if (preRecord == null || !FinancialPreStatus.INIT.name().equalsIgnoreCase(preRecord.getStatus())) {
+            logger.warn("get preRecord fail or pre record status is not INIT. preRecordId:{} bizType:{}",
+                    offsetReq.getPreRecordId(), offsetReq.getBizType());
+            throw new BizException(ErrorCode.FINANCIAL_PRE_STATUS_CANNOT_OFFSET);
+        }
+        FinancialFlow refFlow = null;
+        if (StringUtils.isNotBlank(offsetReq.getRefBizNo())) {
+            //如果关联的流水号存在，需要验证对应流水是否存在，如果不存在，不能继续
+            refFlow = financialFlowMapper.getByFinancialBizNo(offsetReq.getRefBizNo());
+            if (refFlow == null) {
+                logger.warn("get financial flow fail by bizNo:{}", offsetReq.getRefBizNo());
+                throw new BizException(ErrorCode.FINANCIAL_OFFSET_REF_BIZNO_ERROR);
+            }
+        }
+        //造一个请求新建冲销流水的请求体
+        FinancialReq financialReq = new FinancialReq();
+        financialReq.setCompanyId(preRecord.getCompanyId());
+        financialReq.setLogUserName(user.getNickname());
+        financialReq.setBizType(FinancialBizType.OFFSET.name());
+        financialReq.setLogDate(new Date());
+        financialReq.setLogAmount(preRecord.getLogAmount());
+        String keyWord = "";
+        if (isPrePaidType) {
+            financialReq.setCustType(FinancialReq.CUST_SUPPLIER);
+            financialReq.setCustId(preRecord.getCustId());
+            financialReq.setLogAccount(preRecord.getCustName());
+            financialReq.setCustAccount(preRecord.getCustAccount());
+            keyWord = "预付款" + preRecord.getBizNo() + "冲销";
+        }else {
+            financialReq.setCustType(FinancialReq.CUST_CUSTOMER);
+            financialReq.setCustId(preRecord.getCustId());
+            financialReq.setLogAccount(preRecord.getCustName());
+            financialReq.setCustAccount(preRecord.getCustAccount());
+            keyWord = "预付款" + preRecord.getBizNo() + "冲销";
+        }
+        if (StringUtils.isNotBlank(offsetReq.getKeyWord())) {
+            keyWord = keyWord + ", " + offsetReq.getKeyWord();
+        }
+        financialReq.setKeyWord(keyWord);
+        if (refFlow != null) {
+            financialReq.setBizRefId(refFlow.getId());
+            financialReq.setBizRefNo(refFlow.getBizNo());
+        }
+        logger.info("request add offset flow record by:{}", JSON.toJSONString(financialReq));
+        FinancialFlow offsetFlow = doFinancialRecord(financialReq);
+        if (offsetFlow == null || offsetFlow.getId() == null) {
+            logger.warn("add financial offset flow fail");
+            throw new BizRuntimeException(ErrorCode.FAILED_INSERT_FROM_DB);
+        }
+        //往来账流水添加成功后，对预收/付款记账状态做出变化登记
+        preRecord.setStatus(FinancialPreStatus.OFFSET.name());
+        preRecord.setUpdatedBy(user.getNickname());
+        preRecord.setUpdatedTime(new Date());
+        preRecord.setOffsetFlowNo(offsetFlow.getBizNo());
+        if (isPrePaidType) {
+            financialPrePaidMapper.updateByPrimaryKeySelective(preRecord);
+        }else {
+            financialPreReceiveMapper.updateByPrimaryKeySelective(preRecord);
+        }
+        return preRecord;
     }
 
 }

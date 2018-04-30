@@ -3,7 +3,7 @@ package com.yiban.erp.entities;
 import java.math.BigDecimal;
 import java.util.Date;
 
-public class FinancialPrePaid {
+public class FinancialPreRecord {
     private Long id;
 
     private Integer companyId;
@@ -43,6 +43,18 @@ public class FinancialPrePaid {
     private Date createdTime;
 
     private Date updatedTime;
+
+    private String offsetFlowNo; //做冲销时用于关联冲销的流水号
+
+    private String preBizType; //添加提交时用于区分是预收款还是预付款
+
+    public String getPreBizType() {
+        return preBizType;
+    }
+
+    public void setPreBizType(String preBizType) {
+        this.preBizType = preBizType;
+    }
 
     public Long getId() {
         return id;
@@ -202,5 +214,13 @@ public class FinancialPrePaid {
 
     public void setUpdatedTime(Date updatedTime) {
         this.updatedTime = updatedTime;
+    }
+
+    public String getOffsetFlowNo() {
+        return offsetFlowNo;
+    }
+
+    public void setOffsetFlowNo(String offsetFlowNo) {
+        this.offsetFlowNo = offsetFlowNo;
     }
 }

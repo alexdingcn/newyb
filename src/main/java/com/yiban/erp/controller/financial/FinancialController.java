@@ -2,12 +2,15 @@ package com.yiban.erp.controller.financial;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.yiban.erp.constant.FinancialBizType;
 import com.yiban.erp.dao.FinancialFlowMapper;
 import com.yiban.erp.dao.FinancialPrePaidMapper;
+import com.yiban.erp.dao.FinancialPreReceiveMapper;
+import com.yiban.erp.dto.FinancialOffsetReq;
 import com.yiban.erp.dto.FinancialQuery;
 import com.yiban.erp.dto.FinancialReq;
 import com.yiban.erp.entities.FinancialFlow;
-import com.yiban.erp.entities.FinancialPrePaid;
+import com.yiban.erp.entities.FinancialPreRecord;
 import com.yiban.erp.entities.User;
 import com.yiban.erp.service.financial.FinancialService;
 import org.slf4j.Logger;
@@ -36,6 +39,8 @@ public class FinancialController {
     private FinancialFlowMapper financialFlowMapper;
     @Autowired
     private FinancialPrePaidMapper financialPrePaidMapper;
+    @Autowired
+    private FinancialPreReceiveMapper financialPreReceiveMapper;
 
     @RequestMapping(value = "/flow/list", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> flowList(@RequestBody FinancialQuery query,
@@ -76,17 +81,22 @@ public class FinancialController {
         return ResponseEntity.ok().body(JSON.toJSONString(newFlow));
     }
 
-    @RequestMapping(value = "/pre/paid/list", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/pre/list", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> getPrePaidList(@RequestBody FinancialQuery query,
                                                  @AuthenticationPrincipal User user) throws Exception {
         query.setCompanyId(user.getCompanyId());
-        Integer count = financialPrePaidMapper.getSearchListCount(query);
-        if (count == null) {
-            count = 0;
-        }
-        List<FinancialPrePaid> data = new ArrayList<>();
-        if (count > 0) {
-            data = financialPrePaidMapper.getSearchList(query);
+        Integer count = 0;
+        List<FinancialPreRecord> data = new ArrayList<>();
+        if (FinancialBizType.PRE_RECEIVE.name().equalsIgnoreCase(query.getPreBizType())) {
+            count = financialPreReceiveMapper.getSearchListCount(query);
+            if (count > 0) {
+                data = financialPreReceiveMapper.getSearchList(query);
+            }
+        }else if (FinancialBizType.PRE_PAID.name().equalsIgnoreCase(query.getPreBizType())) {
+            count = financialPrePaidMapper.getSearchListCount(query);
+            if (count > 0) {
+                data = financialPrePaidMapper.getSearchList(query);
+            }
         }
         JSONObject response = new JSONObject();
         response.put("data", data);
@@ -94,15 +104,31 @@ public class FinancialController {
         return ResponseEntity.ok().body(response.toJSONString());
     }
 
-    @RequestMapping(value = "/pre/paid/add", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> addPrePaid(@RequestBody FinancialPrePaid prePaid,
+    @RequestMapping(value = "/pre/add", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> addPrePaid(@RequestBody FinancialPreRecord preRecord,
                                              @AuthenticationPrincipal User user) throws Exception {
-        prePaid.setCompanyId(user.getCompanyId());
-        prePaid.setLogUserId(user.getId());
-        prePaid.setCreatedBy(user.getNickname());
-        logger.info("user:{} request add pre paid record by: {}", user.getId(), JSON.toJSONString(prePaid));
-        financialService.addPrePaid(prePaid);
-        logger.info("user:{} add pre paid record success.", user.getId());
+        preRecord.setCompanyId(user.getCompanyId());
+        preRecord.setLogUserId(user.getId());
+        preRecord.setCreatedBy(user.getNickname());
+        logger.info("user:{} request add pre record by: {}", user.getId(), JSON.toJSONString(preRecord));
+        financialService.addPreRecord(preRecord);
+        logger.info("user:{} add pre record success.", user.getId());
+        return ResponseEntity.ok().build();
+    }
+
+    @RequestMapping(value = "/pre/cancel", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> preCancel(@RequestBody FinancialPreRecord preRecord,
+                                                @AuthenticationPrincipal User user) throws Exception {
+        logger.info("user:{} request cancel pre record. by:{}", user.getId(), JSON.toJSONString(preRecord));
+        financialService.preCancel(preRecord, user);
+        return ResponseEntity.ok().build();
+    }
+
+    @RequestMapping(value = "/pre/offset", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> preOffset(@RequestBody FinancialOffsetReq offsetReq,
+                                            @AuthenticationPrincipal User user) throws Exception {
+        logger.warn("user:{} request offset pre record by:{}", user.getId(), JSON.toJSONString(offsetReq));
+        financialService.preOffset(offsetReq, user);
         return ResponseEntity.ok().build();
     }
 

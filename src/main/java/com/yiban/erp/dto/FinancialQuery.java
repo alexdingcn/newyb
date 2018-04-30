@@ -19,6 +19,7 @@ public class FinancialQuery {
     private Integer pageSize;
 
     private String status; // 预付款/预收款时查询使用
+    private String preBizType; //标识预收款还是预付款, 根据该值进行区分不同的操作
 
     private int offset;
     private int limit;
@@ -115,5 +116,19 @@ public class FinancialQuery {
         return (this.pageSize == null || this.pageSize <= 0) ? 50 : this.pageSize;
     }
 
+    public String getStatus() {
+        return status;
+    }
 
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public String getPreBizType() {
+        return preBizType;
+    }
+
+    public void setPreBizType(String preBizType) {
+        this.preBizType = preBizType;
+    }
 }

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="com.yiban.erp.dao.FinancialPrePaidMapper" >
+<mapper namespace="com.yiban.erp.dao.FinancialPreReceiveMapper" >
   <resultMap id="BaseResultMap" type="com.yiban.erp.entities.FinancialPreRecord" >
     <id column="id" property="id" jdbcType="BIGINT" />
     <result column="company_id" property="companyId" jdbcType="INTEGER" />
@@ -11,7 +11,7 @@
     <result column="cust_name" property="custName" jdbcType="VARCHAR" />
     <result column="cust_account" property="custAccount" jdbcType="VARCHAR" />
     <result column="log_amount" property="logAmount" jdbcType="DECIMAL" />
-    <result column="pay_method" property="payMethod" jdbcType="BIGINT"/>
+    <result column="pay_method" property="payMethod" jdbcType="BIGINT" />
     <result column="status" property="status" jdbcType="VARCHAR" />
     <result column="doc_no" property="docNo" jdbcType="VARCHAR" />
     <result column="file_no" property="fileNo" jdbcType="VARCHAR" />
@@ -24,35 +24,36 @@
     <result column="offset_flow_no" property="offsetFlowNo" jdbcType="VARCHAR" />
   </resultMap>
   <sql id="Base_Column_List" >
-    id, company_id, flow_id, biz_no, log_date, cust_id, cust_name, cust_account, log_amount, pay_method, status,
-    doc_no, file_no, key_word, log_user_id, created_by, updated_by, created_time, updated_time, offset_flow_no
+    id, company_id, flow_id, biz_no, log_date, cust_id, cust_name, cust_account, log_amount, 
+    pay_method, status, doc_no, file_no, key_word, log_user_id, created_by, updated_by, 
+    created_time, updated_time, offset_flow_no
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
     select 
     <include refid="Base_Column_List" />
-    from financial_pre_paid
+    from financial_pre_receive
     where id = #{id,jdbcType=BIGINT}
   </select>
 
   <insert id="insert" parameterType="com.yiban.erp.entities.FinancialPreRecord" keyProperty="id" useGeneratedKeys="true" >
-    insert into financial_pre_paid (company_id, flow_id, biz_no,
-      log_date, cust_id, cust_name, 
-      cust_account, log_amount, pay_method, status,
-      doc_no, file_no, key_word, 
-      log_user_id, created_by, updated_by, 
-      created_time, updated_time, offset_flow_no)
-    values (#{companyId,jdbcType=INTEGER}, #{flowId, jdbcType=BIGINT}, #{bizNo,jdbcType=VARCHAR},
-      #{logDate,jdbcType=TIMESTAMP}, #{custId,jdbcType=BIGINT}, #{custName,jdbcType=VARCHAR}, 
-      #{custAccount,jdbcType=VARCHAR}, #{logAmount,jdbcType=DECIMAL}, #{payMethod,jdbcType=BIGINT},
-      #{status,jdbcType=VARCHAR},
-      #{docNo,jdbcType=VARCHAR}, #{fileNo,jdbcType=VARCHAR}, #{keyWord,jdbcType=VARCHAR}, 
-      #{logUserId,jdbcType=BIGINT}, #{createdBy,jdbcType=VARCHAR}, #{updatedBy,jdbcType=VARCHAR}, 
-      #{createdTime,jdbcType=TIMESTAMP}, #{updatedTime,jdbcType=TIMESTAMP},
-      #{offsetFlowNo,jdbcType=VARCHAR})
+    insert into financial_pre_receive (company_id, flow_id,
+      biz_no, log_date, cust_id, 
+      cust_name, cust_account, log_amount, 
+      pay_method, status, doc_no, 
+      file_no, key_word, log_user_id, 
+      created_by, updated_by, created_time, 
+      updated_time, offset_flow_no)
+    values (#{companyId,jdbcType=INTEGER}, #{flowId,jdbcType=BIGINT},
+      #{bizNo,jdbcType=VARCHAR}, #{logDate,jdbcType=TIMESTAMP}, #{custId,jdbcType=BIGINT}, 
+      #{custName,jdbcType=VARCHAR}, #{custAccount,jdbcType=VARCHAR}, #{logAmount,jdbcType=DECIMAL}, 
+      #{payMethod,jdbcType=BIGINT}, #{status,jdbcType=VARCHAR}, #{docNo,jdbcType=VARCHAR}, 
+      #{fileNo,jdbcType=VARCHAR}, #{keyWord,jdbcType=VARCHAR}, #{logUserId,jdbcType=BIGINT}, 
+      #{createdBy,jdbcType=VARCHAR}, #{updatedBy,jdbcType=VARCHAR}, #{createdTime,jdbcType=TIMESTAMP}, 
+      #{updatedTime,jdbcType=TIMESTAMP}, #{offsetFlowNo,jdbcType=VARCHAR})
   </insert>
 
   <update id="updateByPrimaryKeySelective" parameterType="com.yiban.erp.entities.FinancialPreRecord" >
-    update financial_pre_paid
+    update financial_pre_receive
     <set >
       <if test="logDate != null" >
         log_date = #{logDate,jdbcType=TIMESTAMP},
@@ -108,8 +109,8 @@
 
   <select id="getSearchList" parameterType="com.yiban.erp.dto.FinancialQuery" resultMap="BaseResultMap">
     select
-      f.*, o.value as payMethodName
-    from financial_pre_paid f
+    f.*, o.value as payMethodName
+    from financial_pre_receive f
     left join options o on f.pay_method = o.id
     where f.company_id = #{companyId}
     <if test="logStartDate != null" >
@@ -130,8 +131,8 @@
 
   <select id="getSearchListCount" parameterType="com.yiban.erp.dto.FinancialQuery" resultType="java.lang.Integer">
     select
-     count(1) as countNumber
-    from financial_pre_paid
+      count(1) as countNumber
+    from financial_pre_receive
     where company_id = #{companyId}
     <if test="logStartDate != null" >
       and log_date >= #{logStartDate}
@@ -149,15 +150,15 @@
 
   <select id="getByFlowId" parameterType="java.lang.Long" resultMap="BaseResultMap">
     select <include refid="Base_Column_List"/>
-    from financial_pre_paid
+    from financial_pre_receive
     where flow_id = #{flowId, jdbcType=BIGINT}
   </select>
 
   <update id="setStatusByFlowId" parameterType="map" >
-    update financial_pre_paid
-      set status = #{status},
-        updated_by = #{updateBy},
-        updated_time = #{updateTime}
+    update financial_pre_receive
+    set status = #{status},
+    updated_by = #{updateBy},
+    updated_time = #{updateTime}
     where flow_id = #{flowId}
   </update>
 
