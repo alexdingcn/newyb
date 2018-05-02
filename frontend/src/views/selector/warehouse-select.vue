@@ -1,6 +1,6 @@
 
 <template>
-  <Select v-model="warehouseId" filterable clearable :disabled="disabled" :size="size" 
+  <Select ref="warehouseSelect" v-model="warehouseId" filterable clearable :disabled="disabled" :size="size" 
         placeholder="请选择仓库点" @on-change="onChange">
         <Option v-for="item in warehouseList" :value="item.id" :key="item.id">{{ item.name }}</Option>
    </Select>
@@ -36,6 +36,10 @@ export default {
                 .catch(error => {
                 util.errorProcessor(this, error);
             });
+        },
+        clearSingleSelect() {
+            this.warehouseId = '';
+            this.$refs.warehouseSelect.clearSingleSelect();
         },
         onChange (data) {
             let items = this.warehouseList.filter(item => item.id === data);

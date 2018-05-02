@@ -8,6 +8,7 @@ import com.yiban.erp.constant.RepertorySaleStatus;
 import com.yiban.erp.constant.RepertoryStoreStatus;
 import com.yiban.erp.dao.GoodsMapper;
 import com.yiban.erp.dao.RepertoryInfoMapper;
+import com.yiban.erp.dto.RepertorySelectQuery;
 import com.yiban.erp.entities.Goods;
 import com.yiban.erp.entities.RepertoryInDetail;
 import com.yiban.erp.entities.RepertoryInfo;
@@ -36,14 +37,32 @@ public class RepertoryController {
     private RepertoryService repertoryService;
     @Autowired
     private RepertoryInfoMapper repertoryInfoMapper;
-    @Autowired
-    private GoodsMapper goodsMapper;
+
 
     @RequestMapping(value = "/list", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> list(@AuthenticationPrincipal User user,
                                        @RequestBody RepertoryQuery repertoryQuery) {
         JSONObject result=repertoryService.getStoreNowPage(user,repertoryQuery);
         return ResponseEntity.ok().body(JSON.toJSONString(result, SerializerFeature.DisableCircularReferenceDetect));
+    }
+
+
+    @RequestMapping(value = "/select", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> selectList(@RequestBody RepertorySelectQuery query,
+                                             @AuthenticationPrincipal User user) throws Exception {
+        query.setCompanyId(user.getCompanyId());
+        Integer count = repertoryInfoMapper.querySelectCount(query);
+        List<RepertoryInfo> infos = new ArrayList<>();
+        if (count == null || count <=0 ) {
+            count = 0;
+        }else {
+            infos = repertoryService.querySelectList(query);
+        }
+        JSONObject response = new JSONObject();
+        response.put("count", count);
+        response.put("data", infos);
+        return ResponseEntity.ok().body(JSON.toJSONString(response, SerializerFeature.DisableCircularReferenceDetect));
+
     }
 
 

@@ -126,6 +126,10 @@ export const appRouter = [
             { path: 'order', title: '采购制单', name: 'buy_order', component: () => import('@/views/buy/buy-order.vue') },
             { path: 'review', title: '采购单审核', name: 'buy_order_review', component: () => import('@/views/buy/buy-order-list.vue') },
             { path: 'receive', title: '采购收货', name: 'buy_receive', component: () => import('@/views/repertory/in-make.vue') },
+            { path: 'back-apply', title: '采购退出申请', name: 'back-apply', component: () => import('@/views/buy/back-apply.vue') },
+            { path: 'back-apply-check', title: '采购退出申请审核', name: 'back-apply-check', component: () => import('@/views/buy/back-apply-check.vue') },
+            { path: 'back-quality-check', title: '采购退出质量审核', name: 'back-quality-check', component: () => import('@/views/buy/back-quality-check.vue') },
+            { path: 'back-final-check', title: '采购退出终审', name: 'back-final-check', component: () => import('@/views/buy/back-final-check.vue') }
         ]
     },
     {
