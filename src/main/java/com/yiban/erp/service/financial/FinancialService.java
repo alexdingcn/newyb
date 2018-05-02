@@ -451,12 +451,12 @@ public class FinancialService {
                 outAmount = logAmount;
                 break;
             case PRE_RECEIVE:
-                //预收款：预先收客户的钱，相当于多了一笔应付款，借钱给客户的意思，应收增加，应付不变
-                inAmount = logAmount;
+                //预收款：预先收客户的钱，相当于多了一笔应付款，借钱给客户的意思，应付增加，应收不变
+                outAmount = logAmount;
                 break;
             case PRE_RECEIVE_CANCEL:
                 //预收款取消：预先收款取消，需要把预收款的应收取消，应收减少，应付不变
-                inAmount = logAmount.negate();
+                outAmount = logAmount.negate();
                 break;
             case PRE_PAID:
                 //预付款：预先付款给客户，相当于多了一笔应收款，应收增加，应付不变
