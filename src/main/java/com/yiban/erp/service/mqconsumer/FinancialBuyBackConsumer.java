@@ -3,7 +3,10 @@ package com.yiban.erp.service.mqconsumer;
 import com.alibaba.fastjson.JSON;
 import com.rabbitmq.client.*;
 import com.yiban.erp.config.RabbitmqQueueConfig;
+import com.yiban.erp.constant.RepertoryInStatus;
+import com.yiban.erp.dao.RepertoryInBackMapper;
 import com.yiban.erp.entities.RepertoryIn;
+import com.yiban.erp.entities.RepertoryInBack;
 import com.yiban.erp.service.financial.FinancialService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,6 +25,8 @@ public class FinancialBuyBackConsumer {
     private RabbitmqQueueConfig rabbitmqQueueConfig;
     @Autowired
     private FinancialService financialService;
+    @Autowired
+    private RepertoryInBackMapper repertoryInBackMapper;
 
     @PostConstruct
     public void initConsumer() {
@@ -53,8 +58,13 @@ public class FinancialBuyBackConsumer {
         public void handleDelivery(String consumerTag, Envelope envelope, AMQP.BasicProperties properties, byte[] body) {
             try {
                 logger.info("[FinancialBuyBackConsumerProcessor] get an message:{}", JSON.toJSONString(body));
-                // TODO 采购退货财务逻辑
-
+                RepertoryInBack inBack = JSON.parseObject(body, RepertoryInBack.class);
+                if (inBack == null || inBack.getId() == null) {
+                    logger.error("repertoryInBack order parse result is null.");
+                    return;
+                }
+                RepertoryInBack back = repertoryInBackMapper.getById(inBack.getId()); //包含供应商名称
+                financialService.createFlowByBuyBackOrder(back);
             }catch (Exception e) {
                 logger.error("financial buy back order mq message process have exception.", e);
             }finally {

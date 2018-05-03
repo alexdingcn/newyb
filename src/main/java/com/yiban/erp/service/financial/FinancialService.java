@@ -81,6 +81,39 @@ public class FinancialService {
     }
 
     /**
+     * 采购退货生成财务流水
+     * @param inBack
+     * @throws BizException
+     */
+    public void createFlowByBuyBackOrder(RepertoryInBack inBack) throws BizException {
+        if (inBack == null || !RepertoryInStatus.BACK_FINAL_CHECK.name().equalsIgnoreCase(inBack.getStatus())) {
+            logger.error("in back order status is not BACK_FINAL_CHECK, backId:{}", inBack.getId());
+            return;
+        }
+        //验证下当前销售单是否已经记录过往来账，如果记录过，给出错误提示
+        List<FinancialFlow> flows = financialFlowMapper.getByRefId(inBack.getId());
+        if (flows != null && !flows.isEmpty()) {
+            logger.warn("sell back order:{} financial flow is already exist, can not add on this sell back order. ", inBack.getId());
+            throw new BizException(ErrorCode.FINANCIAL_SELL_ORDER_EXIST);
+        }
+
+        FinancialReq financialReq = new FinancialReq();
+        financialReq.setCompanyId(inBack.getCompanyId());
+        financialReq.setLogUserName(inBack.getFinalCheckUser());
+        financialReq.setCustType(FinancialReq.CUST_SUPPLIER);
+        financialReq.setCustId(inBack.getSupplierId());
+        financialReq.setBizType(FinancialBizType.BUY_BACK.name());
+        financialReq.setBizRefId(inBack.getId());
+        financialReq.setBizRefNo(inBack.getOrderNumber());
+        financialReq.setLogAmount(inBack.getTotalAmount());
+        financialReq.setLogDate(inBack.getFinalCheckTime() == null ? new Date() : inBack.getFinalCheckTime());
+        financialReq.setLogAccount(inBack.getSupplierName());
+        financialReq.setKeyWord("采购退货单生成的往来账流水");
+
+        doFinancialRecord(financialReq);
+    }
+
+    /**
      * 采购入库，根据采购的入库单，进行建立对应的财务往来账
      * @param repertoryIn
      */

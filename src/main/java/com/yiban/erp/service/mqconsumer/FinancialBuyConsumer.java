@@ -58,7 +58,7 @@ public class FinancialBuyConsumer {
                 logger.info("[FinancialBuyConsumerProcessor] get an message:{}", JSON.toJSONString(body));
                 RepertoryIn repertoryIn = JSON.parseObject(body, RepertoryIn.class);
                 if (repertoryIn == null) {
-                    logger.warn("repertoryIn order parse result is null.");
+                    logger.error("repertoryIn order parse result is null.");
                     return;
                 }
                 RepertoryIn order = repertoryInMapper.getByIdWithSupplierInfo(repertoryIn.getId());

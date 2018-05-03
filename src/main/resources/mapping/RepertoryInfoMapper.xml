@@ -279,6 +279,29 @@
     where d.repertory_id = r.id and d.sell_order_id = #{sellOrderId}
   </update>
 
+    <update id="buyBackConsumeQuantity" parameterType="map" >
+        update repertory_in_back_detail b, repertory_info r
+          set r.quantity = (r.quantity - b.back_quantity),
+              r.on_way_quantity = (r.on_way_quantity - b.back_quantity),
+              r.update_time = #{updateTime},
+              r.update_by = #{updateBy}
+        where b.repertory_info_id = r.id and b.in_back_id = #{inBackId}
+    </update>
+
+    <update id="buyBackReleaseOnWayQuantity" parameterType="java.lang.Long">
+        update repertory_in_back_detail b, repertory_info r
+          set
+              r.on_way_quantity = (r.on_way_quantity - b.back_quantity)
+        where
+          b.repertory_info_id = r.id and b.in_back_id = #{inBackId}
+    </update>
+
+    <update id="updateOnWayQuantity" parameterType="map" >
+        update repertory_info
+          set on_way_quantity = IFNULL(on_way_quantity, 0) + #{onWayQuantity}
+        where id = #{id}
+    </update>
+
   <select id="getBalance" parameterType="map" resultType="com.yiban.erp.dto.CurrentBalanceResp">
     select goods_id as goodsId, sum(quantity) as balance
     from repertory_info
@@ -422,5 +445,7 @@
             limit #{offset}, #{limit}
         </if>
     </select>
+
+
 
 </mapper>

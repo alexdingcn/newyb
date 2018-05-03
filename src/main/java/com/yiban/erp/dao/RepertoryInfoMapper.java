@@ -7,6 +7,7 @@ import com.yiban.erp.dto.RepertoryQuery;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -50,4 +51,12 @@ public interface RepertoryInfoMapper {
     Integer querySelectCount(RepertorySelectQuery query); //选择存库商品列表的查询项
 
     List<RepertoryInfo> querySelectList(RepertorySelectQuery query);
+
+    int updateOnWayQuantity(@Param("id") Long id, @Param("onWayQuantity") BigDecimal backQuantity);
+
+    int buyBackConsumeQuantity(@Param("inBackId") Long inBackId,
+                               @Param("updateBy") String updateBy,
+                               @Param("updateTime") Date updateTime);
+
+    int buyBackReleaseOnWayQuantity(@Param("inBackId") Long inBackId); //释放锁定的在单数量
 }

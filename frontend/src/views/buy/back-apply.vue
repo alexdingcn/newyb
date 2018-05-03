@@ -9,23 +9,27 @@
           <div slot="extra">
               <ButtonGroup size="small">
                   <Button type="success" icon="checkmark" :loading="saveLoading" @click="applySave" >确认保存</Button>
-                  <Button type="warning" icon="edit" >单据修改</Button>
               </ButtonGroup>
           </div>
 
             <Form ref="applyForm" :model="formItem" :label-width="100" >
                 <Row class="form-item-class">
-                    <i-col span="8">
+                    <i-col span="6">
                         <FormItem label="仓库点" :error="warehouseError">
                             <warehouse-select ref="warehouseSelect" v-model="formItem.warehouseId" @on-change="warehouseChonge"></warehouse-select>
                         </FormItem>
                     </i-col>
-                    <i-col span="8">
+                    <i-col span="6">
                         <FormItem label="供应商">
                             <Input type="text" v-model="formItem.supplierName" disabled placeholder="根据选择的商品自动选择" />
                         </FormItem>
                     </i-col>
-                    <i-col span="8">
+                    <i-col span="6">
+                        <FormItem label="供应商代表">
+                            <supplier-contact-select :supplierId="formItem.supplierId" v-model="formItem.supplierContactId"></supplier-contact-select>
+                        </FormItem>
+                    </i-col>
+                    <i-col span="6">
                         <FormItem label="采购员" :error="buyerError">
                             <buyer-select v-model="formItem.buyerId" ></buyer-select>
                         </FormItem>
@@ -71,13 +75,15 @@ import moment from 'moment';
 import warehouseSelect from '@/views/selector/warehouse-select.vue';
 import repertoryInfoSelect from '@/views/selector/repertory-info-select.vue';
 import buyerSelect from '@/views/selector/buyer-select.vue';
+import supplierContactSelect from '@/views/selector/supplier-contact-select.vue';
 
 export default {
     name: 'back-apply',
     components: {
         warehouseSelect,
         repertoryInfoSelect,
-        buyerSelect
+        buyerSelect,
+        supplierContactSelect
     },
     data() {
         return {
@@ -86,6 +92,7 @@ export default {
             formItem: {
                 warehouseId: '',
                 supplierId: '',
+                supplierContactId: '',
                 supplierName: '',
                 buyerId: '',
                 backTime: moment().format('YYYY-MM-DD HH:mm'),
@@ -273,6 +280,7 @@ export default {
             this.formItem = {
                 warehouseId: '',
                 supplierId: '',
+                supplierContactId: '',
                 supplierName: '',
                 buyerId: '',
                 backTime: moment().format('YYYY-MM-DD HH:mm'),
@@ -301,6 +309,7 @@ export default {
             }
             let supplierId = data[0].supplierId; //直接取第一个作为比较值
             let supplierName = data[0].supplierName;
+            let supplierContactId = data[0].supplierContactId;
             if (this.formItem.supplierId > 0 && this.formItem.supplierId !== supplierId) {
                 this.$Modal.warning({
                     title: '添加商品提示',
@@ -311,6 +320,10 @@ export default {
             this.formItem.supplierId = supplierId; 
             this.formItem.supplierName = supplierName;
             this.formItem.buyerId = data[0].buyerId;
+            let self = this;
+            setTimeout(() => {
+                self.formItem.supplierContactId = supplierContactId;
+            }, 600);
             //验证当前supplierId是否存在，如果存在，只能添加对应供应上的商品。
             //返回列表中的所有供应上必须是同一个
             for (let i=0; i<data.length; i++) {
@@ -327,6 +340,7 @@ export default {
                     continue; //已经存在的直接跳过
                 }
                 item['backQuantity'] = 0;
+                item['repertoryInfoId'] = item.id;
                 this.tableData.push(item);
             }
         },
@@ -354,10 +368,11 @@ export default {
                     this.$Message.warning('商品对应的退出数量不能小于等于0');
                     return;
                 }
-                let oneWayCount = item.onWayQuantity ? item.onWayQuantity : 0;
+                let onWayCount = item.onWayQuantity ? item.onWayQuantity : 0;
                 let count = item.quantity ? item.quantity : 0;
-                if ((item.backQuantity + oneWayCount) > count) {
-                    this.$Message('退货数不能大于存库数减去在单数.');
+                console.log('onWayCount=' + onWayCount + ', quantity=' + count);
+                if (item.backQuantity > (count- onWayCount)) {
+                    this.$Message.warning('退货数不能大于存库数减去在单数.');
                     return;
                 }
             }
@@ -368,13 +383,15 @@ export default {
                 content: '退出商品信息是否已经确认填写完成并且数量正确?',
                 onCancel: () => {},
                 onOk: () => {
-                    this.saveLoading = true;
+                    self.saveLoading = true;
                     util.ajax.post('/buy/back/add', self.formItem)
                         .then((response) => {
+                            self.saveLoading = false;
                             self.$Message.success('采购退出申请保存成功.');
                             self.$refs.warehouseSelect.clearSingleSelect();
                         })
                         .catch((error) => {
+                            self.saveLoading = false;
                             util.errorProcessor(self, error);
                         })
                 }

@@ -38,6 +38,11 @@ public enum ErrorCode {
     BUY_ORDER_NOT_EXISTED(1300, "采购订单不存在"),
     BUY_ORDER_PARAMS_INVALID(1301, "采购订单参数错误"),
     BUY_ORDER_IS_CHECKED(1302, "采购订单已审核不可修改"),
+    BUY_BACK_SUPPLIER_ERROR(1303, "采购退出申请的供应商与详情供应商不匹配"),
+    BUY_BACK_QUANTITY_ERROR(1304, "采购退出详情的退出数量不能小于等于0"),
+    BUY_BACK_PRICE_ERROR(1305, "采购退出详情的单价不能小于0"),
+    BUY_BACK_ORDER_GET_FAIL(1306, "获取退出单信息失败"),
+    BUY_BACK_ORDER_STATUS_CANNOT_CHECK(1307, "当前状态下不能对退出单审核"),
 
 
     // 15xx - 盘点
