@@ -2,6 +2,7 @@ package com.yiban.erp.entities;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
 public class RepertoryOut {
     private Long id;
@@ -28,6 +29,8 @@ public class RepertoryOut {
 
     private String goTo;
 
+    private Long goToWarehouseId;
+
     private BigDecimal totalQuantity;
 
     private BigDecimal totalAmount;
@@ -50,6 +53,7 @@ public class RepertoryOut {
 
     private Date updatedTime;
 
+    private List<RepertoryOutDetail> outDetailList;
     public Long getId() {
         return id;
     }
@@ -233,4 +237,22 @@ public class RepertoryOut {
     public void setUpdatedTime(Date updatedTime) {
         this.updatedTime = updatedTime;
     }
+
+    public Long getGoToWarehouseId() {
+        return goToWarehouseId;
+    }
+
+    public void setGoToWarehouseId(Long goToWarehouseId) {
+        this.goToWarehouseId = goToWarehouseId;
+    }
+
+    public List<RepertoryOutDetail> getOutDetailList() {
+        return outDetailList;
+    }
+
+    public void setOutDetailList(List<RepertoryOutDetail> outDetailList) {
+        this.outDetailList = outDetailList;
+    }
+
+
 }

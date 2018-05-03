@@ -121,7 +121,8 @@ public enum ErrorCode {
 
     WAREHOUSE_LOCATION_EXIST(2501, "仓库位置已经存在, 不能添加同名库位"),
 
-
+    //26
+    REPERTORY_CHANGE_PARAMS_ERROR(2601, "必输参数校验失败"),
     // 31xx财务账
     FINANCIAL_SELL_ORDER_ERROR(3101, "当前销售单不能生成往来账信息"),
     FINANCIAL_SELL_ORDER_EXIST(3102, "当前销售单已经存在对应的往来账流水，不能再次建立"),

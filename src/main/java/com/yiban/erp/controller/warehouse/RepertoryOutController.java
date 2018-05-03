@@ -7,10 +7,12 @@ import com.yiban.erp.dto.ReceiveListReq;
 import com.yiban.erp.dto.ReceiveSetReq;
 import com.yiban.erp.entities.RepertoryIn;
 import com.yiban.erp.entities.RepertoryInDetail;
+import com.yiban.erp.entities.RepertoryOut;
 import com.yiban.erp.entities.User;
 import com.yiban.erp.exception.BizException;
 import com.yiban.erp.exception.ErrorCode;
 import com.yiban.erp.service.warehouse.RepertoryInService;
+import com.yiban.erp.service.warehouse.RepertoryOutService;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,140 +32,24 @@ public class RepertoryOutController {
     private static final Logger logger = LoggerFactory.getLogger(RepertoryOutController.class);
 
     @Autowired
-    private RepertoryInService repertoryInService;
+    private RepertoryOutService repertoryOutService;
+
+
 
     /**
-     * 获取某一产品当前采购的订单数，当前库存，和最近一次的采购价
-     * @param warehouseId
-     * @param goodsIdListStr
+     *移库出库登记信息
+     * @param repertoryOut
      * @param user
      * @return
      * @throws Exception
      */
-    @RequestMapping(value = "/current/balance", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<JSON> currentBalance(@RequestParam(name = "warehouseId") Integer warehouseId,
-                                                 @RequestParam(name = "goodsIdList") String goodsIdListStr,
-                                                 @AuthenticationPrincipal User user) throws Exception {
-        if (StringUtils.isBlank(goodsIdListStr)) {
-            return ResponseEntity.ok().build();
-        }
-        List<Long> goodsIdList = JSON.parseArray(goodsIdListStr, Long.class);
-        Map<Long, CurrentBalanceResp> resp = repertoryInService.getCurrentBalance(warehouseId, goodsIdList);
-        return ResponseEntity.ok().body((JSON) JSON.toJSON(resp));
-    }
-
-    @RequestMapping(value = "/save", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> saveOrder(@RequestBody RepertoryIn order,
-                                            @AuthenticationPrincipal User user) throws Exception {
-        logger.info("user:{} save repository order info. orderId:{}", user.getId(), order.getId());
-        repertoryInService.saveOrder(user, order);
-        return ResponseEntity.ok().build();
-    }
-
-    @RequestMapping(value = "/list", method = RequestMethod.POST, name = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> list(@RequestBody ReceiveListReq listReq,
-                                       @AuthenticationPrincipal User user) throws Exception {
-        if (listReq == null || listReq.getStatusList() == null || listReq.getStatusList().isEmpty()) {
-            throw new BizException(ErrorCode.RECEIVE_QUERY_PARAM_ERROR);
-        }
-        listReq.setCompanyId(user.getCompanyId());
-        List<RepertoryIn> result = repertoryInService.getList(listReq);
-        return ResponseEntity.ok().body(JSON.toJSONString(result));
-    }
-
-    @RequestMapping(value = "/remove/{id}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> removeOrder(@PathVariable Long id,
-                                              @AuthenticationPrincipal User user) throws Exception {
-        logger.info("user: {} remove order id:{}", user.getId(), id);
-        repertoryInService.removeById(user, id);
-        return ResponseEntity.ok().build();
-    }
-
-    @RequestMapping(value = "/buy/order/{buyOrderId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> getByBuyOrder(@PathVariable Long buyOrderId,
-                                                @AuthenticationPrincipal User user) throws Exception {
-        RepertoryIn order = repertoryInService.getByBuyOrder(user, buyOrderId);
-        return ResponseEntity.ok().body(JSON.toJSONString(order));
-    }
-
-    @RequestMapping(value = "/set/checkTemp", method = RequestMethod.PUT, name = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> setOrderCheckTemp(@RequestBody ReceiveSetReq setReq,
-                                                    @AuthenticationPrincipal User user) throws Exception {
-        logger.info("user:{} set order:{} check temp to :{}", user.getId(), setReq.getOrderId(), setReq.getCheckTemp());
-        repertoryInService.setOrderCheckTemp(setReq, user);
-        return ResponseEntity.ok().build();
-    }
-
-    @RequestMapping(value = "/set/survey", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> setDetailSurvey(@RequestBody ReceiveSetReq setReq,
-                                                  @AuthenticationPrincipal User user) throws Exception {
-        logger.info("user:{} set order detail survey params:{}", user.getId(), JSON.toJSONString(setReq));
-        repertoryInService.setDetailSurvey(user, setReq);
-        return ResponseEntity.ok().build();
-    }
-
-    @RequestMapping(value = "/detail/{orderId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> getOrderDetails(@PathVariable Long orderId) {
-        List<RepertoryInDetail> details = repertoryInService.getDetailList(orderId);
-        return ResponseEntity.ok().body(JSON.toJSONString(details));
-    }
-
-    @RequestMapping(value = "/detail/remove/{detailId}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> detailRemove(@PathVariable Long detailId,
-                                               @AuthenticationPrincipal User user) throws Exception {
-        logger.info("user:{} remove order detail by id:{}", user.getId(), detailId);
-        repertoryInService.removeDetail(user, detailId);
-        return ResponseEntity.ok().build();
-    }
-
-    @RequestMapping(value = "/set/check", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> setCheck(@RequestBody ReceiveSetReq setReq,
-                                           @AuthenticationPrincipal User user) throws Exception {
-        logger.warn("user:{} submit check info {}", user.getId(), JSON.toJSONString(setReq));
-        repertoryInService.setCheckResult(user, setReq);
-        return ResponseEntity.ok().build();
-    }
-
-    @RequestMapping(value = "/set/check/order/{orderId}", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> setUnCheckByOrder(@PathVariable Long orderId,
-                                                    @AuthenticationPrincipal User user) throws Exception {
-        logger.info("user:{} set uncheck order:{}", user.getId(), orderId);
-        repertoryInService.setUncheckOrder(user, orderId);
-        return ResponseEntity.ok().build();
-    }
-
-    @RequestMapping(value = "/set/check/detail/{detailId}", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> setUnCheckByDetail(@PathVariable Long detailId,
-                                                    @AuthenticationPrincipal User user) throws Exception {
-        logger.info("user:{} set uncheck order detail:{}", user.getId(), detailId);
-        repertoryInService.setUncheckDetail(user, detailId);
-        return ResponseEntity.ok().build();
-    }
-
-    @RequestMapping(value = "/set/save/detail", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> setSaveDetail(@RequestBody ReceiveSetReq setReq,
-                                                @AuthenticationPrincipal User user) throws Exception {
-        logger.warn("user:{} update order detail info.", user.getId());
-        int count = repertoryInService.setSaveDetail(user, setReq);
+    @RequestMapping(value = "/changeRepertoryOut", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> changeRepertoryOut(@RequestBody RepertoryOut repertoryOut, @AuthenticationPrincipal User user) throws Exception {
         JSONObject response = new JSONObject();
-        response.put("count", count);
+
+        repertoryOutService.saveChangeRepertoryOut(user,repertoryOut);
+
         return ResponseEntity.ok().body(response.toJSONString());
-    }
-
-    @RequestMapping(value = "/order/fileNo", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> setOrderFileNo(@RequestBody ReceiveSetReq setReq,
-                                                 @AuthenticationPrincipal User user) throws Exception {
-        logger.info("user:{} set order:{} fileNo:{}", user.getId(), setReq.getOrderId(), setReq.getFileNo());
-        repertoryInService.setOrderFileNo(user, setReq.getOrderId(), setReq.getFileNo());
-        return ResponseEntity.ok().build();
-    }
-
-    @RequestMapping(value = "/set/incheck", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> setOrderInCheck(@RequestBody ReceiveSetReq setReq,
-                                                  @AuthenticationPrincipal User user) throws Exception {
-        logger.info("user:{} request order in repository check for orderId:{}", user.getId(), setReq.getOrderId());
-        repertoryInService.setOrderInCheck(user, setReq.getOrderId());
-        return ResponseEntity.ok().build();
     }
 
 }

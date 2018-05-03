@@ -179,8 +179,7 @@ export const appRouter = [
         title: '库存盘点',
         component: Main,
         children: [
-            { path: 'store_check_index', title: '盘点单列表', name: 'store_check_index', component: () => import('@/views/checkplan/store_check_index.vue') },
-            { path: 'store_check_add', title: '盘点制单', name: 'store_check_add', component: () => import('@/views/checkplan/store_check_add.vue') },
+            { path: 'store_check_index', title: '盘点单列表', name: 'store_check_index', component: () => import('@/views/checkplan/store_check_index.vue') },{ path: 'store_check_add', title: '盘点制单', name: 'store_check_add', component: () => import('@/views/checkplan/store_check_add.vue') },
             { path: 'store_check_do_list', title: '执行盘点', name: 'store_check_do_list', component: () => import('@/views/checkplan/store_check_do_list.vue') },
             { path: 'store_check_table_list', title: '盘点表确认', name: 'store_check_table_list', component: () => import('@/views/checkplan/store_check_table_list.vue') },
             { path: "store_check_pass_list", title: '盘点审核', name: 'store_check_pass_list', component: () => import('@/views/checkplan/store_check_pass_list.vue')},

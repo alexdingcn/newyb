@@ -9,7 +9,7 @@ import java.util.List;
 @Mapper
 public interface RepertoryOutDetailMapper {
     int deleteByPrimaryKey(Long id);
-
+    int deleteByRepertoryOutId(Long id);
     int insert(RepertoryOutDetail record);
 
     RepertoryOutDetail selectByPrimaryKey(Long id);
