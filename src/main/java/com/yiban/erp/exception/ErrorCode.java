@@ -126,10 +126,16 @@ public enum ErrorCode {
     FINANCIAL_ACTION_ERROR(3105, "系统异常，不支持当前业务类型的操作"),
     FINANCIAL_CANCEL_REF_ID_EMPTY(3106, "取消操作必须存在关联单"),
     FINANCIAL_CANNOT_CANCEL(3017, "当前交易不能做取消操作"),
-    FINANCIAL_CANNOT_OFFSET(3018, "冲销交易条件不足，例如金额不足等"),
     FINANCIAL_GET_LOCK_FAIL(3019, "获取交易锁失败, 请联系运营人员查看具体原因"),
     FINANCIAL_GET_FAIL(3020, "获取往来账流水信息失败"),
     FINANCIAL_CANNOT_CANCEL_AGAIN(3021, "往来账流水已经做过取消操作，不能再次操作取消"),
+    FINANCIAL_AMOUNT_ERROR(3022, "发生金额必须大于0"),
+    FINANCIAL_CUST_ID_NULL(3023, "往来账户必输"),
+    FINANCIAL_CUST_GET_FAIL(3023, "往来账户获取失败"),
+    FINANCIAL_PRE_STATUS_CANNOT_CANCEL(3024, "预收/付款不在未使用的状态下不能做取消操作"),
+    FINANCIAL_PRE_STATUS_CANNOT_OFFSET(3025, "预收/付款不在未使用的状态下不能做冲销操作"),
+    FINANCIAL_OFFSET_REF_BIZNO_ERROR(3026, "冲销关联的流水号错误，获取不到对应往来账流水"),
+    FINANCIAL_CUST_MUST_SAME(3027, "冲销交易关联的流水信息的往来账户必须与预收/付款记录的账户相同"),
 
     // 41xx - 贷款
     SEND_VERIFY_CODE_FAIL(4104, "发送验证码失败"),
@@ -146,6 +152,8 @@ public enum ErrorCode {
     MESSAGE_GET_FAIL(9003, "获取消息信息失败"),
     LOGIN_STATUS_MISS(9004, "登录态失效", ErrorDisplay.NOTICE),
     COMPANY_MISS(9005, "获取公司信息失败", ErrorDisplay.MODAL),
+    RABBITMQ_CONNECTION_FAIL(9006, "系统异常, 队列连接失败"),
+    RABBITMQ_SEND_MESSAGE_FAIL(9007, "系统异常, 消息发送失败"),
     ;
 
     private Integer code;

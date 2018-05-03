@@ -50,6 +50,13 @@
     where f.id = #{id,jdbcType=BIGINT}
   </select>
 
+  <select id="getByFinancialBizNo" resultMap="BaseResultMap" parameterType="java.lang.String">
+    select
+      <include refid="Base_Column_List" />
+    from financial_flow
+    where biz_no = #{bizNo,jdbcType=VARCHAR}
+  </select>
+
   <insert id="insert" parameterType="com.yiban.erp.entities.FinancialFlow" keyProperty="id" useGeneratedKeys="true" >
     insert into financial_flow (company_id, biz_no, log_date,
       cust_type, cust_id, log_account, doc_no, file_no,

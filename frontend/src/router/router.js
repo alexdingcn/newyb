@@ -183,7 +183,7 @@ export const appRouter = [
     },
     {
         path: '/financial',
-        icon: 'social-buffer',
+        icon: 'social-yen',
         name: 'financial',
         title: '财务管理',
         component: Main,

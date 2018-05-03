@@ -1,6 +1,7 @@
 package com.yiban.erp.service.sell;
 
 import com.alibaba.fastjson.JSON;
+import com.yiban.erp.config.RabbitmqQueueConfig;
 import com.yiban.erp.constant.*;
 import com.yiban.erp.dao.*;
 import com.yiban.erp.dto.SellOrderAllAction;
@@ -10,10 +11,8 @@ import com.yiban.erp.entities.*;
 import com.yiban.erp.exception.BizException;
 import com.yiban.erp.exception.BizRuntimeException;
 import com.yiban.erp.exception.ErrorCode;
-import com.yiban.erp.service.financial.FinancialService;
 import com.yiban.erp.service.warehouse.RepertoryService;
 import com.yiban.erp.util.UtilTool;
-import org.apache.commons.lang3.RandomStringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,9 +21,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.*;
-import java.util.concurrent.Executor;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 @Service
 public class SellOrderService {
@@ -54,9 +50,7 @@ public class SellOrderService {
     @Autowired
     private RepertoryOutDetailMapper repertoryOutDetailMapper;
     @Autowired
-    private FinancialService financialService;
-
-
+    private RabbitmqQueueConfig rabbitmqQueueConfig;
 
     public List<SellOrder> getList(Integer companyId, Long customerId, Long saleId,
                                             String refNo, String status, Date createOrderDate, Integer page, Integer size) {
@@ -465,22 +459,10 @@ public class SellOrderService {
         int detailCount = repertoryOutDetailMapper.insertBatch(outDetails);
         logger.info("repertory out:{} insert details size:{}", out.getId(), detailCount);
 
-        // TODO make financial record
-        recordFinancial(order);
+        // 创造一个消息放到MQ中，用于处理后续逻辑
+        rabbitmqQueueConfig.sendMessage("SellOrderService", RabbitmqQueueConfig.ORDER_SELL, order);
     }
 
-
-    private void recordFinancial(final SellOrder order) {
-        //当前方法先使用线程方式促发销售单创建财务记录，后面换成使用事件方式
-        ExecutorService executor = Executors.newSingleThreadExecutor();
-        executor.submit(() -> {
-            try {
-                financialService.createFlowBySellOrder(order);
-            }catch (Exception e) {
-                logger.error("financial record fail for sell order:{}", order.getId());
-            }
-        });
-    }
 
     public SellOrder reviewDetail(Long orderId) {
         SellOrder order = sellOrderMapper.getReviewDetailById(orderId);

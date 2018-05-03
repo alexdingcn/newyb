@@ -45,6 +45,8 @@
         <mapper resource="mapping/RepertoryOutMapper.xml"/>
         <mapper resource="mapping/RepertoryOutDetailMapper.xml"/>
         <mapper resource="mapping/FinancialFlowMapper.xml"/>
+        <mapper resource="mapping/FinancialPrePaidMapper.xml"/>
+        <mapper resource="mapping/FinancialPreReceiveMapper.xml"/>
         <mapper resource="mapping/BizLockMapper.xml"/>
 
     </mappers>
