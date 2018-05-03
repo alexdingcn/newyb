@@ -30,39 +30,39 @@
             <Form :label-width="85" :model="changeStore" ref="changeStoreForm">
                 <Row>
                     <Col span="5">
-                    <FormItem label="转入仓库" prop="warehouseId">
-                        <warehouse-select v-model="changeStore.warehouseId"  @on-change="onReceiveStoreChange"  size="small"></warehouse-select>
+                    <FormItem label="转入仓库" prop="goToWarehouseId">
+                        <warehouse-select v-model="changeStore.goToWarehouseId"  @on-change="onReceiveStoreChange"  size="small"></warehouse-select>
                     </FormItem>
                     </Col>
 
                     <Col span="5">
-                    <FormItem label="自定义单号" prop="formNo">
-                        <Input v-model="changeStore.formNo" />
+                    <FormItem label="自定义单号" prop="refOrderNumber">
+                        <Input v-model="changeStore.refOrderNumber" />
                     </FormItem>
                     </Col>
                     <Col span="5">
-                    <FormItem label="领料员" prop="lingliao">
-                        <Input v-model="changeStore.lingliao" />
+                    <FormItem label="领料员" prop="customerName">
+                        <Input v-model="changeStore.customerName" />
                     </FormItem>
                     </Col>
                     <Col span="5">
                     <FormItem label="出库日期" prop="outDate">
-                        <Input v-model="changeStore.outDate" />
+                        <DatePicker type="datetime" v-model="changeStore.outDate" format="yyyy-MM-dd HH:mm" size="small"/>
                     </FormItem>
                     </Col>
 
                 </Row>
                 <Row>
                     <Col span="10">
-                    <FormItem label="单据摘要" prop="orderNote">
-                        <Input v-model="changeStore.orderNote" />
+                    <FormItem label="单据摘要" prop="comment">
+                        <Input v-model="changeStore.comment" />
                     </FormItem>
                     </Col>
-                    <Col span="5">
-                    <FormItem label="单据张数" prop="account">
-                        <Input v-model="changeStore.account" />
-                    </FormItem>
-                    </Col>
+                    <!--<Col span="5">-->
+                    <!--<FormItem label="单据张数" prop="account">-->
+                        <!--<Input v-model="changeStore.account" />-->
+                    <!--</FormItem>-->
+                    <!--</Col>-->
                 </Row>
                 <Table border highlight-row
                        class="margin-top-8"
@@ -135,7 +135,12 @@
             <Button type="primary" @click="choseOutStore">确定</Button>
         </div>
     </Modal>
-
+    <Modal v-model="closeConfirm"
+           title="是否继续下单"
+           @on-ok="clearData"
+           @on-cancel="closeTab">
+        <p>是否继续添加下一笔订单?</p>
+    </Modal>
 </div>
 </template>
 <script>
@@ -157,6 +162,7 @@
                 changeStoreItems: [],
                 queryStoreItems:[],
                 selectStoreModalShow:false,
+                closeConfirm: false,
                 changeStore: {
                 },
                 queryStore: {
@@ -165,7 +171,22 @@
                 selectStore:{
                     storeId:null
                 },
-
+                RepertoryOut:{
+                    id:'',
+                    warehouseId:'',
+                    outDate:'',
+                    refOrderNumber:'',
+                    goToWarehouseId:'',
+                    goTo:'',
+                    customerName:'',
+                    comment:'',
+                    detail:[]
+                },
+                RepertoryOutDetail:{
+                    repertoryId:'',
+                    amount:'',
+                    location:''
+                },
                 changeStoreColumns: [
 
                     {
@@ -176,7 +197,7 @@
                     },
                     {
                         title: '商品名称',
-                        key: 'goodName',
+                        key: 'goodsName',
                         align: 'center',
                         width: 150
 
@@ -239,6 +260,7 @@
                                 },
                                 on: {'on-blur' (event) {
                                         let row = self.changeStoreItems[params.index];
+                                        row[params.column.key] = event.target.value;
                                         let checkLimit=event.target.value;
                                         if(checkLimit>row.quantity){
                                             self.$Message.error('转移数量不能超出库存数量');
@@ -255,9 +277,10 @@
                         align: 'center',
                         width: 120,
                         render: (h, params) => {
+                            var self = this;
                             return h('Input', {
                                 props: {
-                                    //value: self.changeStoreItems[params.index][params.column.key]
+                                   value: self.changeStoreItems[params.index][params.column.key]
                                 },
                                 on: {'on-blur' (event) {
                                         let row = self.changeStoreItems[params.index];
@@ -331,7 +354,7 @@
                     },
                     {
                         title: '商品名称',
-                        key: 'goodName',
+                        key: 'goodsName',
                         align: 'center',
                         width: 150
 
@@ -426,7 +449,6 @@
                         }
                     },
 
-
                     {
                         title: '仓库点',
                         key: 'warehouseName',
@@ -463,7 +485,7 @@
             this. selectStoreModalShow=true;
         },
         activated () {
-           //this.queryCheckListList();
+            this.clearData();
         },
         watch: {
             // repertoryCheckItems: function () {
@@ -526,7 +548,7 @@
                 }
                 this.$Modal.confirm({
                     title: '确认转移此商品？',
-                    content: '<p>确认转移商品 ' + row.goodName + '?</p>',
+                    content: '<p>确认转移商品 ' + row.goodsName + '?</p>',
                     onOk: () => {
                         this.changeStoreItems.splice(0,0,row);
                     },
@@ -540,7 +562,7 @@
                     title: '确认删除商品？',
                     content: '<p>确认删除商品 ' + row.name + '?</p>',
                     onOk: () => {
-                        for (var i = 0; i < this.changeStoreItems.length; i++) {
+                        for (let i = 0; i < this.changeStoreItems.length; i++) {
                             if (row.id === this.changeStoreItems[i].id) {
                                 this.changeStoreItems.splice(i, 1);
                             }
@@ -551,10 +573,54 @@
                     }
                 });
             },
+            clearData () {
+                this.RepertoryOut = {};
+                this.RepertoryOut.outDetailList=[];
+                this.changeStoreItems = [];
+            },
+            closeTab () {
+                this.clearData();
+                let pageName = util.closeCurrentTab(this);
+                this.$router.push({
+                    name: pageName
+                });
+            },
             saveOut(){
-                //保存移库出库单
-                alert("验证出库信息");
-                alert("保存移库信息");
+                //前台验证出库信息
+                let self=this;
+                this.RepertoryOut={};
+                this.RepertoryOut.outDetailList=[];
+                this.RepertoryOut.goToWarehouseId=this.changeStore.goToWarehouseId;
+                this.RepertoryOut.warehouseId=this.selectStore.warehouseId;
+                this.RepertoryOut.refOrderNumber=this.changeStore.refOrderNumber;
+                this.RepertoryOut.outDate=this.changeStore.outDate;
+                this.RepertoryOut.comment=this.changeStore.comment;
+                for (let i = 0; i < this.changeStoreItems.length; i++) {
+                    if(this.changeStoreItems[i].quantity < this.changeStoreItems[i].outAmount){
+                        this.$Message.error(this.changeStoreItems[i].goodsName+'转移数量超过库存数量，无法进行转移，请修改后重新提交！');
+                        return;
+                    }else{
+                        let RepertoryOutDetail={};
+                        RepertoryOutDetail['repertoryInfoId']=this.changeStoreItems[i].id;
+                        RepertoryOutDetail['quantity']=this.changeStoreItems[i].outAmount;
+                        RepertoryOutDetail['location']=this.changeStoreItems[i].outLocation;
+                        this.RepertoryOut.outDetailList.push(RepertoryOutDetail)
+                    }
+                    util.ajax.post('/repertory/out/changeRepertoryOut', this.RepertoryOut)
+                        .then(function (response) {
+                            if (response.status === 200 ) {
+                                self.$Message.info('转移出库单创建成功');
+                                self.closeConfirm = true;
+                            }
+                            self.saving = false;
+                        })
+                        .catch(function (error) {
+                            console.log(error);
+                            self.saving = false;
+                            self.$Message.error('转移出库单错误');
+                        });
+                }
+
             }
         }
     };

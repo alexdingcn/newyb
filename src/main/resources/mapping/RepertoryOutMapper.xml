@@ -5,6 +5,7 @@
     <id column="id" property="id" jdbcType="BIGINT" />
     <result column="company_id" property="companyId" jdbcType="INTEGER" />
     <result column="warehouse_id" property="warehouseId" jdbcType="INTEGER" />
+    <result column="go_to_warehouse_id" property="go_to_warehouse_id" jdbcType="INTEGER" />
     <result column="ref_type" property="refType" jdbcType="VARCHAR" />
     <result column="out_date" property="outDate" jdbcType="DATE" />
     <result column="ref_order_id" property="refOrderId" jdbcType="BIGINT" />
@@ -27,7 +28,7 @@
     <result column="updated_time" property="updatedTime" jdbcType="TIMESTAMP" />
   </resultMap>
   <sql id="Base_Column_List" >
-    id, company_id, warehouse_id, ref_type, out_date, ref_order_id, ref_order_number, 
+    id, company_id, warehouse_id,go_to_warehouse_id, ref_type, out_date, ref_order_id, ref_order_number,
     customer_id, customer_name, customer_rep_id, customer_rep_name, go_to, total_quantity, 
     total_amount, make_order_user, check_order_user, check_date, file_no, comment, created_by, 
     updated_by, created_time, updated_time
@@ -43,7 +44,7 @@
     where id = #{id,jdbcType=BIGINT}
   </delete>
   <insert id="insert" parameterType="com.yiban.erp.entities.RepertoryOut" keyProperty="id" useGeneratedKeys="true">
-    insert into repertory_out (company_id, warehouse_id,
+    insert into repertory_out (company_id, warehouse_id,go_to_warehouse_id,
       ref_type, out_date, ref_order_id, 
       ref_order_number, customer_id, customer_name, 
       customer_rep_id, customer_rep_name, go_to, 
@@ -51,7 +52,7 @@
       check_order_user, check_date, file_no, 
       comment, created_by, updated_by, 
       created_time, updated_time)
-    values (#{companyId,jdbcType=INTEGER}, #{warehouseId,jdbcType=INTEGER},
+    values (#{companyId,jdbcType=INTEGER}, #{warehouseId,jdbcType=INTEGER}, #{goToWarehouseId,jdbcType=INTEGER},
       #{refType,jdbcType=VARCHAR}, #{outDate,jdbcType=DATE}, #{refOrderId,jdbcType=BIGINT}, 
       #{refOrderNumber,jdbcType=VARCHAR}, #{customerId,jdbcType=BIGINT}, #{customerName,jdbcType=VARCHAR},
       #{customerRepId,jdbcType=INTEGER}, #{customerRepName,jdbcType=VARCHAR}, #{goTo,jdbcType=VARCHAR}, 
@@ -69,6 +70,9 @@
       </if>
       <if test="warehouseId != null" >
         warehouse_id = #{warehouseId,jdbcType=INTEGER},
+      </if>
+      <if test="goToWarehouseId != null" >
+        go_to_warehouse_id = #{goToWarehouseId,jdbcType=INTEGER},
       </if>
       <if test="refType != null" >
         ref_type = #{refType,jdbcType=VARCHAR},
