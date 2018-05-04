@@ -12,6 +12,7 @@
       <result column="factory_id" property="factoryId" jdbcType="BIGINT" />
       <result column="in_quantity" property="inQuantity" jdbcType="DECIMAL" />
       <result column="quantity" property="quantity" jdbcType="DECIMAL" />
+      <result column="on_way_quantity" property="onWayQuantity" jdbcType="DECIMAL"/>
       <result column="buy_price" property="buyPrice" jdbcType="DECIMAL" />
       <result column="is_exp" property="isExp" jdbcType="BIT" />
       <result column="sale_enable" property="saleEnable" jdbcType="BIT" />
@@ -31,7 +32,7 @@
   </resultMap>
   <sql id="Base_Column_List" >
     id, company_id, warehouse_id, location, in_user_id, batch_code, goods_id, factory_id,
-    in_quantity, quantity, buy_price, is_exp, sale_enable, product_date, exp_date, in_date,
+    in_quantity, quantity, on_way_quantity, buy_price, is_exp, sale_enable, product_date, exp_date, in_date,
     supplier_id, supplier_contact_id, buyer_id, order_id, order_detail_id, sale_sate, create_by, create_time,
     update_by, update_time
   </sql>
@@ -60,7 +61,7 @@
       insert into repertory_info (company_id, warehouse_id,
       location, in_user_id, batch_code,
       goods_id, factory_id, in_quantity,
-      quantity, buy_price, is_exp,
+      quantity, on_way_quantity, buy_price, is_exp,
       sale_enable, product_date, exp_date,
       in_date, supplier_id, supplier_contact_id,
       buyer_id, order_id, order_detail_id, sale_sate,
@@ -69,7 +70,7 @@
     values (#{companyId,jdbcType=INTEGER}, #{warehouseId,jdbcType=INTEGER},
       #{location,jdbcType=VARCHAR}, #{inUserId,jdbcType=BIGINT}, #{batchCode,jdbcType=VARCHAR},
       #{goodsId,jdbcType=BIGINT}, #{factoryId,jdbcType=BIGINT}, #{inQuantity,jdbcType=DECIMAL},
-      #{quantity,jdbcType=DECIMAL}, #{buyPrice,jdbcType=DECIMAL}, #{isExp,jdbcType=BIT},
+      #{quantity,jdbcType=DECIMAL}, #{onWayQuantity,jdbcType=DECIMAL}, #{buyPrice,jdbcType=DECIMAL}, #{isExp,jdbcType=BIT},
       #{saleEnable,jdbcType=BIT}, #{productDate,jdbcType=DATE}, #{expDate,jdbcType=DATE},
       #{inDate,jdbcType=TIMESTAMP}, #{supplierId,jdbcType=BIGINT}, #{supplierContactId,jdbcType=BIGINT},
       #{buyerId,jdbcType=BIGINT}, #{orderId,jdbcType=BIGINT}, #{orderDetailId,jdbcType=BIGINT}, #{saleSate,jdbcType=BIT},
@@ -80,7 +81,7 @@
       insert into repertory_info (company_id, warehouse_id,
       location, in_user_id, batch_code,
       goods_id, factory_id, in_quantity,
-      quantity, buy_price, is_exp,
+      quantity, on_way_quantity, buy_price, is_exp,
       sale_enable, product_date, exp_date,
       in_date, supplier_id, supplier_contact_id,
       buyer_id, order_id, order_detail_id, sale_sate,
@@ -91,7 +92,7 @@
         #{item.companyId,jdbcType=INTEGER}, #{item.warehouseId,jdbcType=INTEGER},
         #{item.location,jdbcType=VARCHAR}, #{item.inUserId,jdbcType=BIGINT}, #{item.batchCode,jdbcType=VARCHAR},
         #{item.goodsId,jdbcType=BIGINT}, #{item.factoryId,jdbcType=BIGINT}, #{item.inQuantity,jdbcType=DECIMAL},
-        #{item.quantity,jdbcType=DECIMAL}, #{item.buyPrice,jdbcType=DECIMAL}, #{item.isExp,jdbcType=BIT},
+        #{item.quantity,jdbcType=DECIMAL}, #{item.onWayQuantity,jdbcType=DECIMAL}, #{item.buyPrice,jdbcType=DECIMAL}, #{item.isExp,jdbcType=BIT},
         #{item.saleEnable,jdbcType=BIT}, #{item.productDate,jdbcType=DATE}, #{item.expDate,jdbcType=DATE},
         #{item.inDate,jdbcType=TIMESTAMP}, #{item.supplierId,jdbcType=BIGINT}, #{item.supplierContactId,jdbcType=BIGINT},
         #{item.buyerId,jdbcType=BIGINT}, #{item.orderId,jdbcType=BIGINT}, #{item.orderDetailId,jdbcType=BIGINT}, #{item.saleSate,jdbcType=BIT},
@@ -100,169 +101,6 @@
     </foreach>
   </insert>
 
-  <insert id="insertSelective" parameterType="com.yiban.erp.entities.RepertoryInfo" keyProperty="id" useGeneratedKeys="true">
-      insert into repertory_info
-      <trim prefix="(" suffix=")" suffixOverrides="," >
-          <if test="id != null" >
-              id,
-          </if>
-          <if test="companyId != null" >
-              company_id,
-          </if>
-          <if test="warehouseId != null" >
-              warehouse_id,
-          </if>
-          <if test="location != null" >
-              location,
-          </if>
-          <if test="inUserId != null" >
-              in_user_id,
-          </if>
-          <if test="batchCode != null" >
-              batch_code,
-          </if>
-          <if test="goodsId != null" >
-              goods_id,
-          </if>
-          <if test="factoryId != null" >
-              factory_id,
-          </if>
-          <if test="inQuantity != null" >
-              in_quantity,
-          </if>
-          <if test="quantity != null" >
-              quantity,
-          </if>
-          <if test="buyPrice != null" >
-              buy_price,
-          </if>
-          <if test="isExp != null" >
-              is_exp,
-          </if>
-          <if test="saleEnable != null" >
-              sale_enable,
-          </if>
-          <if test="productDate != null" >
-              product_date,
-          </if>
-          <if test="expDate != null" >
-              exp_date,
-          </if>
-          <if test="inDate != null" >
-              in_date,
-          </if>
-          <if test="supplierId != null" >
-              supplier_id,
-          </if>
-          <if test="supplierContactId != null" >
-              supplier_contact_id,
-          </if>
-          <if test="buyerId != null" >
-              buyer_id,
-          </if>
-          <if test="orderId != null" >
-              order_id,
-          </if>
-          <if test="orderDetailId != null" >
-              order_detail_id,
-          </if>
-          <if test="saleSate != null" >
-              sale_sate,
-          </if>
-          <if test="createBy != null" >
-              create_by,
-          </if>
-          <if test="createTime != null" >
-              create_time,
-          </if>
-          <if test="updateBy != null" >
-              update_by,
-          </if>
-          <if test="updateTime != null" >
-              update_time,
-          </if>
-      </trim>
-      <trim prefix="values (" suffix=")" suffixOverrides="," >
-          <if test="id != null" >
-              #{id,jdbcType=BIGINT},
-          </if>
-          <if test="companyId != null" >
-              #{companyId,jdbcType=INTEGER},
-          </if>
-          <if test="warehouseId != null" >
-              #{warehouseId,jdbcType=INTEGER},
-          </if>
-          <if test="location != null" >
-              #{location,jdbcType=VARCHAR},
-          </if>
-          <if test="inUserId != null" >
-              #{inUserId,jdbcType=BIGINT},
-          </if>
-          <if test="batchCode != null" >
-              #{batchCode,jdbcType=VARCHAR},
-          </if>
-          <if test="goodsId != null" >
-              #{goodsId,jdbcType=BIGINT},
-          </if>
-          <if test="factoryId != null" >
-              #{factoryId,jdbcType=BIGINT},
-          </if>
-          <if test="inQuantity != null" >
-              #{inQuantity,jdbcType=DECIMAL},
-          </if>
-          <if test="quantity != null" >
-              #{quantity,jdbcType=DECIMAL},
-          </if>
-          <if test="buyPrice != null" >
-              #{buyPrice,jdbcType=DECIMAL},
-          </if>
-          <if test="isExp != null" >
-              #{isExp,jdbcType=BIT},
-          </if>
-          <if test="saleEnable != null" >
-              #{saleEnable,jdbcType=BIT},
-          </if>
-          <if test="productDate != null" >
-              #{productDate,jdbcType=DATE},
-          </if>
-          <if test="expDate != null" >
-              #{expDate,jdbcType=DATE},
-          </if>
-          <if test="inDate != null" >
-              #{inDate,jdbcType=TIMESTAMP},
-          </if>
-          <if test="supplierId != null" >
-              #{supplierId,jdbcType=BIGINT},
-          </if>
-          <if test="supplierContactId != null" >
-              #{supplierContactId,jdbcType=BIGINT},
-          </if>
-          <if test="buyerId != null" >
-              #{buyerId,jdbcType=BIGINT},
-          </if>
-          <if test="orderId != null" >
-              #{orderId,jdbcType=BIGINT},
-          </if>
-          <if test="orderDetailId != null" >
-              #{orderDetailId,jdbcType=BIGINT},
-          </if>
-          <if test="saleSate != null" >
-              #{saleSate,jdbcType=BIT},
-          </if>
-          <if test="createBy != null" >
-              #{createBy,jdbcType=VARCHAR},
-          </if>
-          <if test="createTime != null" >
-              #{createTime,jdbcType=TIMESTAMP},
-          </if>
-          <if test="updateBy != null" >
-              #{updateBy,jdbcType=VARCHAR},
-          </if>
-          <if test="updateTime != null" >
-              #{updateTime,jdbcType=TIMESTAMP},
-          </if>
-    </trim>
-  </insert>
   <update id="updateByPrimaryKeySelective" parameterType="com.yiban.erp.entities.RepertoryInfo" >
     update repertory_info
       <set >
@@ -292,6 +130,9 @@
           </if>
           <if test="quantity != null" >
               quantity = #{quantity,jdbcType=DECIMAL},
+          </if>
+          <if test="onWayQuantity != null">
+              on_way_quantity = #{onWayQuantity,jdbcType=DECIMAL},
           </if>
           <if test="buyPrice != null" >
               buy_price = #{buyPrice,jdbcType=DECIMAL},
@@ -342,35 +183,6 @@
               update_time = #{updateTime,jdbcType=TIMESTAMP},
           </if>
     </set>
-    where id = #{id,jdbcType=BIGINT}
-  </update>
-  <update id="updateByPrimaryKey" parameterType="com.yiban.erp.entities.RepertoryInfo" >
-    update repertory_info
-    set company_id = #{companyId,jdbcType=INTEGER},
-      warehouse_id = #{warehouseId,jdbcType=INTEGER},
-      location = #{location,jdbcType=VARCHAR},
-      in_user_id = #{inUserId,jdbcType=BIGINT},
-      batch_code = #{batchCode,jdbcType=VARCHAR},
-      goods_id = #{goodsId,jdbcType=BIGINT},
-      factory_id = #{factoryId,jdbcType=BIGINT},
-      in_quantity = #{inQuantity,jdbcType=DECIMAL},
-      quantity = #{quantity,jdbcType=DECIMAL},
-      buy_price = #{buyPrice,jdbcType=DECIMAL},
-      is_exp = #{isExp,jdbcType=BIT},
-      sale_enable = #{saleEnable,jdbcType=BIT},
-      product_date = #{productDate,jdbcType=DATE},
-      exp_date = #{expDate,jdbcType=DATE},
-      in_date = #{inDate,jdbcType=TIMESTAMP},
-      supplier_id = #{supplierId,jdbcType=BIGINT},
-      supplier_contact_id = #{supplierContactId,jdbcType=BIGINT},
-      buyer_id = #{buyerId,jdbcType=BIGINT},
-      order_id = #{orderId,jdbcType=BIGINT},
-      order_detail_id = #{orderDetailId,jdbcType=BIGINT},
-      sale_sate = #{saleSate,jdbcType=BIT},
-      create_by = #{createBy,jdbcType=VARCHAR},
-      create_time = #{createTime,jdbcType=TIMESTAMP},
-      update_by = #{updateBy,jdbcType=VARCHAR},
-      update_time = #{updateTime,jdbcType=TIMESTAMP}
     where id = #{id,jdbcType=BIGINT}
   </update>
 
@@ -466,6 +278,29 @@
           r.update_by = #{updateBy}
     where d.repertory_id = r.id and d.sell_order_id = #{sellOrderId}
   </update>
+
+    <update id="buyBackConsumeQuantity" parameterType="map" >
+        update repertory_in_back_detail b, repertory_info r
+          set r.quantity = (r.quantity - b.back_quantity),
+              r.on_way_quantity = (r.on_way_quantity - b.back_quantity),
+              r.update_time = #{updateTime},
+              r.update_by = #{updateBy}
+        where b.repertory_info_id = r.id and b.in_back_id = #{inBackId}
+    </update>
+
+    <update id="buyBackReleaseOnWayQuantity" parameterType="java.lang.Long">
+        update repertory_in_back_detail b, repertory_info r
+          set
+              r.on_way_quantity = (r.on_way_quantity - b.back_quantity)
+        where
+          b.repertory_info_id = r.id and b.in_back_id = #{inBackId}
+    </update>
+
+    <update id="updateOnWayQuantity" parameterType="map" >
+        update repertory_info
+          set on_way_quantity = IFNULL(on_way_quantity, 0) + #{onWayQuantity}
+        where id = #{id}
+    </update>
 
   <select id="getBalance" parameterType="map" resultType="com.yiban.erp.dto.CurrentBalanceResp">
     select goods_id as goodsId, sum(quantity) as balance
@@ -567,4 +402,50 @@
         </if>
         and rp.quantity >0
     </select>
+
+    <select id="querySelectCount" resultType="java.lang.Integer" parameterType="com.yiban.erp.dto.RepertorySelectQuery">
+        select count(1)
+        from repertory_info
+        where company_id = #{companyId}
+        <if test="warehouseId != null" >
+            and warehouse_id = #{warehouseId}
+        </if>
+        <if test="goodsId != null" >
+            and goods_id = #{goodsId}
+        </if>
+        <if test="supplierId != null">
+            and supplier_id = #{supplierId}
+        </if>
+        <if test="batchCode != null">
+            <bind name="pattern" value="'%' + batchCode + '%'"/>
+            and batch_code like #{pattern}
+        </if>
+    </select>
+
+    <select id="querySelectList" resultMap="BaseResultMap" parameterType="com.yiban.erp.dto.RepertorySelectQuery">
+        select
+          r.*, s.name as supplierName
+        from repertory_info r
+        left join supplier s on r.supplier_id = s.id
+        where r.company_id = #{companyId}
+        <if test="warehouseId != null" >
+            and r.warehouse_id = #{warehouseId}
+        </if>
+        <if test="goodsId != null" >
+            and r.goods_id = #{goodsId}
+        </if>
+        <if test="supplierId != null">
+            and r.supplier_id = #{supplierId}
+        </if>
+        <if test="batchCode != null">
+            <bind name="pattern" value="'%' + batchCode + '%'"/>
+            and r.batch_code like #{pattern}
+        </if>
+        <if test="offset != null and limit != null">
+            limit #{offset}, #{limit}
+        </if>
+    </select>
+
+
+
 </mapper>

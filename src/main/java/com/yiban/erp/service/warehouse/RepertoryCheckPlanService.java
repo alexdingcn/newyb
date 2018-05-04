@@ -570,7 +570,7 @@ public class RepertoryCheckPlanService {
                 if(realAmount.doubleValue()<0){
                     throw new BizException(ErrorCode.CHECK_PLAN_PASS_OUT_ERROR);
                 }
-                repertoryInfoMapper.updateByPrimaryKey(repertoryInfo);
+                repertoryInfoMapper.updateByPrimaryKeySelective(repertoryInfo);
             }else if(CheckPlanConstant.PLAN_DETAIL_CHECK_STATUS_NORMAL.equals(cpdTemp.getCheckStatus())){
                 //盘平不做额外操作
 

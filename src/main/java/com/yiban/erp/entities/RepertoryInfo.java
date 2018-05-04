@@ -25,6 +25,8 @@ public class RepertoryInfo {
 
     private BigDecimal quantity;
 
+    private BigDecimal onWayQuantity;
+
     private BigDecimal buyPrice;
 
     private Boolean isExp;
@@ -38,6 +40,8 @@ public class RepertoryInfo {
     private Date inDate;
 
     private Long supplierId;
+
+    private String supplierName;
 
     private Long supplierContactId;
 
@@ -168,6 +172,14 @@ public class RepertoryInfo {
         this.quantity = quantity;
     }
 
+    public BigDecimal getOnWayQuantity() {
+        return onWayQuantity;
+    }
+
+    public void setOnWayQuantity(BigDecimal onWayQuantity) {
+        this.onWayQuantity = onWayQuantity;
+    }
+
     public BigDecimal getBuyPrice() {
         return buyPrice;
     }
@@ -222,6 +234,14 @@ public class RepertoryInfo {
 
     public void setSupplierId(Long supplierId) {
         this.supplierId = supplierId;
+    }
+
+    public String getSupplierName() {
+        return supplierName;
+    }
+
+    public void setSupplierName(String supplierName) {
+        this.supplierName = supplierName;
     }
 
     public Long getSupplierContactId() {

@@ -37,6 +37,8 @@
         <mapper resource="mapping/BizWxApplyMapper.xml"/>
         <mapper resource="mapping/RepertoryInMapper.xml"/>
         <mapper resource="mapping/RepertoryInDetailMapper.xml"/>
+        <mapper resource="mapping/RepertoryInBackMapper.xml"/>
+        <mapper resource="mapping/RepertoryInBackDetailMapper.xml"/>
         <mapper resource="mapping/MessageInfoMapper.xml"/>
         <mapper resource="mapping/MessageOptionMapper.xml"/>
         <mapper resource="mapping/RepertoryCheckPlanMapper.xml"/>

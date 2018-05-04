@@ -657,6 +657,7 @@ public class RepertoryInService {
             item.setFactoryId(detail.getGoods() == null ? null : detail.getGoods().getFactoryId());
             item.setInQuantity(detail.getInCount());
             item.setQuantity(detail.getInCount());
+            item.setOnWayQuantity(BigDecimal.ZERO); //初始在单数全部设置为0
             item.setBuyPrice(detail.getPrice());
             item.setExp(false);
             item.setSaleEnable(true);
