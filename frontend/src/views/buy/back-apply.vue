@@ -153,6 +153,11 @@ export default {
                     width: 100
                 },
                 {
+                    title: '在单数量',
+                    key: 'onWayQuantity',
+                    width: 100
+                },
+                {
                     title: '采购数量',
                     key: 'inQuantity',
                     width: 100

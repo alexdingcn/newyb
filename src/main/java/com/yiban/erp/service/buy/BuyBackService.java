@@ -76,8 +76,8 @@ public class BuyBackService {
         repertoryIn.setStatus(RepertoryInStatus.BACK_INIT.name());
         repertoryIn.setKeyWord(addRequest.getKeyWord());
         repertoryIn.setBackTime(addRequest.getBackTime());
-        repertoryIn.setTotalAmount(totalAmount.negate()); //取一个负数
-        repertoryIn.setTotalQuantity(totalQuantity.negate()); //取一个负数
+        repertoryIn.setTotalAmount(totalAmount);
+        repertoryIn.setTotalQuantity(totalQuantity);
         repertoryIn.setWarehouseId(addRequest.getWarehouseId());
         repertoryIn.setCreatedBy(user.getNickname());
         repertoryIn.setCreatedTime(new Date());
@@ -209,8 +209,9 @@ public class BuyBackService {
         repertoryInBackMapper.updateByPrimaryKeySelective(inBack);
     }
 
-    private void doBackQualityRecheck(BuyBackReq buyBackReq, User user) throws BizException {
-        //质管经理的审核
+    @Transactional
+    public void doBackQualityRecheck(BuyBackReq buyBackReq, User user) throws BizException {
+        //质量复核
         RepertoryInBack inBack = repertoryInBackMapper.selectByPrimaryKey(buyBackReq.getBackId());
         if (inBack == null) {
             logger.warn("get buy back order fail. backId:{}", buyBackReq.getBackId());
@@ -266,6 +267,31 @@ public class BuyBackService {
 
         //发布一个事件，用户后续处理(如生成财务账)
         rabbitmqQueueConfig.sendMessage("BuyBackService", RabbitmqQueueConfig.ORDER_BUY_BACK, inBack);
+    }
+
+    @Transactional
+    public void checkCancel(Long backId, User user) throws BizException {
+        RepertoryInBack inBack = repertoryInBackMapper.selectByPrimaryKey(backId);
+        if (inBack == null) {
+            logger.warn("get in back order fail by inBack:{}", backId);
+            throw new BizException(ErrorCode.BUY_BACK_ORDER_GET_FAIL);
+        }
+        //如果当前状态不是质量复核通过的，不能进行质量复核取消
+        if (!RepertoryInStatus.BACK_QUALITY_RECHECK.name().equalsIgnoreCase(inBack.getStatus())) {
+            logger.warn("in back order status is not BACK_QUALITY_RECHECK, can not cancel check. backId:{}", backId);
+            throw new BizException(ErrorCode.BUY_BACK_CHECK_CANCEL_ERROR);
+        }
+        int count = repertoryInBackDetailMapper.cancelCheckStatus(backId, user.getNickname(), new Date());
+        if (count <= 0) {
+            logger.warn("update detail check status fail.");
+            throw new BizRuntimeException(ErrorCode.FAILED_UPDATE_FROM_DB);
+        }
+        inBack.setStatus(RepertoryInStatus.BACK_QUALITY_CHECK.name());
+        inBack.setUpdatedTime(new Date());
+        inBack.setUpdatedBy(user.getNickname());
+        inBack.setQualityCheckTime(null);
+        inBack.setQualityCheckUser(null);
+        repertoryInBackMapper.updateByPrimaryKeySelective(inBack);
     }
 
 

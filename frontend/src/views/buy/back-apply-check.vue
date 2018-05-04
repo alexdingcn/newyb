@@ -22,21 +22,21 @@
                       </FormItem>
                   </i-col>
                   <i-col span="6">
-                      <FormItem label="制单日期">
+                      <FormItem label="仓库">
                           <warehouse-select v-model="warehouseId"></warehouse-select>
                       </FormItem>
                   </i-col>
               </Row>
           </Form>
           
-          <Table border highlight-row disabled-hover height="250" style="margin-bottom: 2em;"
+          <Table border highlight-row disabled-hover height="300" style="margin-bottom: 2em;"
                    :columns="orderColumns" :data="orderList" :loading="loading" 
 				   ref="orderTable" size="small"
                    @on-row-click="handleSelectOrder" 
 				   no-data-text="使用右上方输入搜索条件">
 			</Table>
 
-            <Table border highlight-row disabled-hover height="300"
+            <Table border highlight-row disabled-hover height="350"
                    :columns="detailColumns" :data="details" :loading="detailLoading" 
 				   ref="detailTable" size="small"
 				   no-data-text="点击上方订单后查看明细">
@@ -53,7 +53,7 @@
           </Form>
           <Row slot="footer">
               <ButtonGroup>
-                  <Button type="success" icon="checkmark" :loading="checkLoading" @click="checkSubmit">通过</Button>
+                  <Button type="success" icon="checkmark" :loading="checkLoading" @click="checkSubmit">提交</Button>
                   <Button type="ghost" icon="reply" @click="checkCancel">取消</Button>
               </ButtonGroup>
           </Row>
@@ -85,7 +85,7 @@ export default {
                 {
                     title: '制单时间',
                     key: 'createdTime',
-                    width: 130,
+                    width: 140,
                     render: (h, params) => {
                         return params.row.createdTime ? moment(params.row.createdTime).format('YYYY-MM-DD HH:mm') : '';
                     }
@@ -93,7 +93,7 @@ export default {
                 {
                     title: '退货时间',
                     key: 'backTime',
-                    width: 130,
+                    width: 140,
                     render: (h, params) => {
                         return params.row.backTime ? moment(params.row.backTime).format('YYYY-MM-DD HH:mm') : '';
                     }
@@ -155,18 +155,32 @@ export default {
                     title: '总数量',
                     key: 'totalQuantity',
                     width: 120,
+                    render: (h,params) => {
+                        //显示为一个负数
+                        let label = params.row.totalQuantity ? '-' + params.row.totalQuantity : '';
+                        return h('strong',{
+                            style: {
+                                color: 'red'
+                            }
+                        }, label);
+                    }
                 },
                 {
                     title: '总金额',
                     key: 'totalAmount',
                     width: 120,
                     render: (h, params) => {
-                        return params.row.totalAmount ? '-' + params.row.totalAmount : '';
+                        let label = params.row.totalAmount ? '-' + params.row.totalAmount : '';
+                        return h('strong',{
+                            style: {
+                                color: 'red'
+                            }
+                        }, label);
                     }
                 },
                 {
                     title: '采购员',
-                    key: 'buyerUserName',
+                    key: 'buyerName',
                     width: 120
                 },
                 {
@@ -177,7 +191,7 @@ export default {
                 {
                     title: '系统单号',
                     key: 'orderNumber',
-                    width: 170,
+                    width: 180,
                 },
                 {
                     title: '操作员',

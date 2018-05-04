@@ -5,6 +5,7 @@ import com.yiban.erp.entities.RepertoryInBackDetail;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.Date;
 import java.util.List;
 
 @Mapper
@@ -22,4 +23,8 @@ public interface RepertoryInBackDetailMapper {
     List<RepertoryInBackDetail> getDetailByBackId(Long backId);
 
     int updateCheckStatus(BuyBackReq buyBackReq);
+
+    int cancelCheckStatus(@Param("backId") Long backId,
+                          @Param("updatedBy") String updatedBy,
+                          @Param("updatedTime") Date updatedTime);
 }

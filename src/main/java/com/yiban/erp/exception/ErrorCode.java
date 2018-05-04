@@ -43,6 +43,7 @@ public enum ErrorCode {
     BUY_BACK_PRICE_ERROR(1305, "采购退出详情的单价不能小于0"),
     BUY_BACK_ORDER_GET_FAIL(1306, "获取退出单信息失败"),
     BUY_BACK_ORDER_STATUS_CANNOT_CHECK(1307, "当前状态下不能对退出单审核"),
+    BUY_BACK_CHECK_CANCEL_ERROR(1308, "退出单状态不是质量复核通过，不能进行取消复核操作"),
 
 
     // 15xx - 盘点

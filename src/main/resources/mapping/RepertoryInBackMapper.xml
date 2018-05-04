@@ -157,8 +157,9 @@
 
   <select id="getList" parameterType="com.yiban.erp.dto.BuyBackReq" resultMap="BaseResultMap">
     select
-      r.*, w.name as warehouseName, s.name as supplierName, su.name as supplierContactName
+      r.*, u.nickname as buyerName, w.name as warehouseName, s.name as supplierName, su.name as supplierContactName
     from repertory_in_back r
+    left join users u on r.buyer_id = u.id
     left join warehouse w on r.warehouse_id = w.id
     left join supplier s on r.supplier_id = s.id
     left join supplier_contact su on r.supplier_contact_id = su.id

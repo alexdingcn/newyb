@@ -157,4 +157,14 @@
     where in_back_id = #{backId,jdbcType=BIGINT}
   </update>
 
+  <update id="cancelCheckStatus" parameterType="map" >
+    update repertory_in_back_detail
+      set check_status = 0,
+          check_user = null,
+          check_result = null,
+          updated_by = #{updatedBy,jdbcType=VARCHAR},
+          updated_time = #{updatedTime,jdbcType=TIMESTAMP}
+    where in_back_id = #{backId,jdbcType=BIGINT}
+  </update>
+
 </mapper>

@@ -20,6 +20,8 @@ public class RepertoryInBack {
 
     private Long buyerId;
 
+    private String buyerName;
+
     private String status;
 
     private Date backTime;
@@ -299,5 +301,13 @@ public class RepertoryInBack {
 
     public void setWarehouseName(String warehouseName) {
         this.warehouseName = warehouseName;
+    }
+
+    public String getBuyerName() {
+        return buyerName;
+    }
+
+    public void setBuyerName(String buyerName) {
+        this.buyerName = buyerName;
     }
 }

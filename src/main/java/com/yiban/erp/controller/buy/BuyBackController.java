@@ -64,6 +64,14 @@ public class BuyBackController {
         return ResponseEntity.ok().build();
     }
 
+    @RequestMapping(value = "/check/cancel/{backId}", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> checkCancel(@PathVariable Long backId,
+                                              @AuthenticationPrincipal User user) throws Exception {
+        logger.info("user:{} request check cancel backId:{}", user.getId(), backId);
+        buyBackService.checkCancel(backId, user);
+        return ResponseEntity.ok().build();
+    }
+
     @RequestMapping(value = "/{backId}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> removeBackOrder(@PathVariable Long backId,
                                                   @AuthenticationPrincipal User user) throws Exception {
@@ -71,6 +79,8 @@ public class BuyBackController {
         buyBackService.removeBackOrder(backId, user);
         return ResponseEntity.ok().build();
     }
+
+
 
 
 
