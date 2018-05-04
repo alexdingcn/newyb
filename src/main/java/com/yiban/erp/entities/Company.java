@@ -16,6 +16,8 @@ public class Company {
 
     private Date updatedTime;
 
+    private Date expiredTime;
+
     private String createdBy;
 
     private String updatedBy;
@@ -110,5 +112,13 @@ public class Company {
 
     public void setOutAmount(BigDecimal outAmount) {
         this.outAmount = outAmount;
+    }
+
+    public Date getExpiredTime() {
+        return expiredTime;
+    }
+
+    public void setExpiredTime(Date expiredTime) {
+        this.expiredTime = expiredTime;
     }
 }

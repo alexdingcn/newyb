@@ -17,10 +17,12 @@ import com.yiban.erp.exception.BizRuntimeException;
 import com.yiban.erp.exception.ErrorCode;
 import com.yiban.erp.service.util.PhoneService;
 import com.yiban.erp.util.IDCardUtil;
+import org.apache.commons.lang.time.DateUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -48,6 +50,9 @@ public class RegisterController {
     @Autowired
     private PhoneService phoneService;
 
+    @Value("${newCompany.expiredDays}")
+    private int expiredDays;
+
     @Transactional
     @RequestMapping(value = "/register", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> register(@RequestBody Map requestMap) throws Exception {
@@ -60,21 +65,23 @@ public class RegisterController {
         String idCard = (String) requestMap.getOrDefault("idCard", "");
         String verifyCode = (String) requestMap.getOrDefault("verifyCode", "");
 
-        if (StringUtils.isBlank(companyName) || StringUtils.isBlank(businessLicense) || StringUtils.isBlank(realName) || StringUtils.isBlank(idCard)) {
+        if (StringUtils.isBlank(companyName)) {
             logger.warn("required params is null.");
             throw new BizException(ErrorCode.USER_REGISTER_PARAMS);
         }
-        if (StringUtils.isBlank(username) || StringUtils.isBlank(password) || StringUtils.isBlank(mobile)) {
+        if (StringUtils.isBlank(password) || StringUtils.isBlank(mobile) || StringUtils.isBlank(verifyCode)) {
             logger.warn("required params is null.");
             throw new BizException(ErrorCode.USER_REGISTER_PARAMS);
         }
 
-        username = username.trim();
-        idCard = idCard.toUpperCase(); //字母转大写
-        //验证身份证号是否正确
-        if (!IDCardUtil.isValid(idCard)) {
-            logger.warn("register IDCard is error.");
-            throw new BizException(ErrorCode.USER_REGISTER_IDCARD_ERROR);
+        if (StringUtils.isNotBlank(username) && StringUtils.isNotBlank(idCard)) {
+            username = username.trim();
+            idCard = idCard.toUpperCase(); //字母转大写
+            //验证身份证号是否正确
+            if (!IDCardUtil.isValid(idCard)) {
+                logger.warn("register IDCard is error.");
+                throw new BizException(ErrorCode.USER_REGISTER_IDCARD_ERROR);
+            }
         }
 
         if (!phoneService.validVerifyCode(mobile, verifyCode)) {
@@ -82,30 +89,34 @@ public class RegisterController {
             throw new BizException(ErrorCode.VERIFY_CODE_VALIDATE_FAIL);
         }
 
-        //验证公司的营业执照是否存在
-        Company oldCompany = companyMapper.getByLicense(businessLicense);
-        if (oldCompany != null) {
-            if (oldCompany.getEnabled() == null || !oldCompany.getEnabled()) {
-                logger.warn("company license is register but enabled is false. companyId:{}", oldCompany.getId());
-                throw new BizException(ErrorCode.USER_REGISTER_COMPANY_ENABLED);
-            }else {
-                logger.warn("company is exist. companyId:{}", oldCompany.getId());
-                throw new BizException(ErrorCode.USER_REGISTER_COMPANY_EXIST);
-            }
-        }
         //验证用户名是否意见存在，如果存在了，提示错误
-        User oldUser = userMapper.findUserByNickName(username);
+        User oldUser = userMapper.findUserByMobile(mobile);
         if (oldUser != null) {
-            logger.warn("username is exist. username:{}", username);
-            throw new BizException(ErrorCode.USER_REGISTER_NICKNAME_EXIST);
+            logger.warn("user mobile is existed. mobile:{}", mobile);
+            throw new BizException(ErrorCode.USER_MOBILE_EXIST);
+        }
+
+        //验证公司的营业执照是否存在
+        if (StringUtils.isNotBlank(businessLicense)) {
+            Company oldCompany = companyMapper.getByLicense(businessLicense);
+            if (oldCompany != null) {
+                if (oldCompany.getEnabled() == null || !oldCompany.getEnabled()) {
+                    logger.warn("company license is register but enabled is false. companyId:{}", oldCompany.getId());
+                    throw new BizException(ErrorCode.USER_REGISTER_COMPANY_ENABLED);
+                }else {
+                    logger.warn("company is exist. companyId:{}", oldCompany.getId());
+                    throw new BizException(ErrorCode.USER_REGISTER_COMPANY_EXIST);
+                }
+            }
         }
 
         //如果验证通过，先创建公司信息
         Company company = new Company();
         company.setName(companyName);
         company.setLicense(businessLicense);
-        company.setEnabled(false);
-        company.setCreatedBy(username);
+        company.setEnabled(true);
+        company.setExpiredTime(DateUtils.addDays(new Date(), expiredDays));
+        company.setCreatedBy(mobile);
         company.setCreatedTime(new Date());
         int result = companyMapper.insert(company);
         if (result <= 0 || company.getId() == null || company.getId() <= 0) {
@@ -118,25 +129,32 @@ public class RegisterController {
         user.setNickname(username);
         user.setRealname(realName);
         user.setMobile(mobile);
-        user.setCreatedBy(username);
-        user.setIdcard(idCard);
-        user.setBirthday(IDCardUtil.getBirthday(idCard));
-        user.setSex(IDCardUtil.getSex(idCard));
+        user.setCreatedBy(mobile);
+        if (StringUtils.isNotBlank(idCard)) {
+            user.setIdcard(idCard);
+            user.setBirthday(IDCardUtil.getBirthday(idCard));
+            user.setSex(IDCardUtil.getSex(idCard));
+        }
+
         user.setStatus(UserStatus.NORMAL.getCode());
         user.setSuperUser(true); //超级管理员
         user.setCreatedTime(new Date());
         if (userMapper.insert(user) > 0) {
             String encryptedPass = new BCryptPasswordEncoder().encode(password);
 
-            UserAuth userAuth = new UserAuth();
-            userAuth.setUserId(user.getId());
-            userAuth.setIdentifierType(IdentifierType.USERNAME.name());
-            userAuth.setIdentifier(username);
-            userAuth.setCredential(encryptedPass);
-            userAuth.setVerified(true);
-            userAuth.setCreatedBy(user.getCreatedBy());
-            userAuth.setCreatedTime(new Date());
-            int usernameResult = userAuthMapper.insert(userAuth);
+            UserAuth userAuth;
+            int usernameResult = 0;
+            if (StringUtils.isNotBlank(username)) {
+                userAuth = new UserAuth();
+                userAuth.setUserId(user.getId());
+                userAuth.setIdentifierType(IdentifierType.USERNAME.name());
+                userAuth.setIdentifier(username);
+                userAuth.setCredential(encryptedPass);
+                userAuth.setVerified(true);
+                userAuth.setCreatedBy(String.valueOf(user.getId()));
+                userAuth.setCreatedTime(new Date());
+                usernameResult = userAuthMapper.insert(userAuth);
+            }
 
             userAuth = new UserAuth();
             userAuth.setUserId(user.getId());
@@ -144,7 +162,7 @@ public class RegisterController {
             userAuth.setIdentifier(mobile);
             userAuth.setCredential(encryptedPass);
             userAuth.setVerified(true);
-            userAuth.setCreatedBy(user.getCreatedBy());
+            userAuth.setCreatedBy(String.valueOf(user.getId()));
             userAuth.setCreatedTime(new Date());
             int mobileResult = userAuthMapper.insert(userAuth);
 
@@ -152,11 +170,11 @@ public class RegisterController {
             UserRoute userRoute = new UserRoute();
             userRoute.setUserId(user.getId());
             userRoute.setRouteName(Constant.ACCESS_PAGE);
-            userRoute.setCreateBy(user.getNickname());
+            userRoute.setCreateBy(String.valueOf(user.getId()));
             userRoute.setCreateTime(new Date());
             int routeCount = userRouteMapper.insert(userRoute);
 
-            if (usernameResult > 0 && mobileResult > 0 && routeCount > 0) {
+            if ((usernameResult > 0 || mobileResult > 0) && routeCount > 0) {
                 return ResponseEntity.ok().build();
             }
         }
