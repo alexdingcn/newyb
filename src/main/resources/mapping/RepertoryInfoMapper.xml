@@ -43,16 +43,6 @@
     where id = #{id,jdbcType=BIGINT}
   </select>
 
-    <select id="selectByIdList" parameterType="map" resultType="com.yiban.erp.entities.RepertoryInfo">
-        select
-        r.*
-        from repertory_info  r
-        where 1 = 1 and r.id in
-        <foreach collection="idList" item="id" open="(" close=")" separator=", ">
-            #{id}
-        </foreach>
-    </select>
-
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
     delete from repertory_info
     where id = #{id,jdbcType=BIGINT}
@@ -186,73 +176,6 @@
     where id = #{id,jdbcType=BIGINT}
   </update>
 
-  <select id="getDetailList" parameterType="map" resultType="com.yiban.erp.entities.RepertoryInfo">
-    select
-      r.id as id, r.company_id as companyId, r.warehouse_id as warehouseId, r.location as location,
-      r.in_user_id as inUserId, r.batch_code as batchCode, r.goods_id as goodsId, r.factory_id as factoryId,
-      r.in_quantity as inQuantity, r.quantity as quantity, r.buy_price as buyPrice, r.is_exp as isExp,
-      r.sale_enable as sale_enable, r.product_date as productDate, r.exp_date as expDate, r.in_date as inDate,
-      r.supplier_id as supplierId, r.supplier_contact_id as supplierContactId, r.buyer_id buyerId,
-      r.order_id as orderId, r.order_detail_id as orderDetailId, r.sale_sate as saleState, r.create_by as createBy, r.create_time as createTime,
-      r.update_by as updateBy, r.update_time as updateTime,
-      w.name as warehouseName
-    from repertory_info r
-    left join factory f on r.factory_id = f.id,
-    warehouse w, goods g
-    where r.warehouse_id = w.id and r.goods_id = g.id
-      and w.company_id = #{companyId}
-      and r.warehouse_id = #{warehouseId}
-      and r.is_exp = 0
-      <if test="saleEnable != null" >
-        and r.sale_enable = #{saleEnable}
-      </if>
-      <if test="goodsId != null" >
-        r.goods_id = #{goodsId}
-      </if>
-      <if test="goodSearch != null">
-        <bind name="pattern" value="'%' + goodSearch + '%'" />
-        and ( g.name like #{pattern} or lower(g.pinyin) like lower(#{pattern}) )
-      </if>
-      <if test="factoryId != null">
-        and f.id = #{factoryId}
-      </if>
-      <if test="limitCheck != null">
-        and r.quantity > #{limitCheck}
-      </if>
-      order by r.id desc
-      <if test="offset != null and limit !=null">
-        limit #{offset}, #{limit}
-      </if>
-  </select>
-
-  <select id="getDetailListCount" parameterType="map" resultType="java.lang.Integer">
-    select
-      count(1)
-    from repertory_info r
-    left join factory f on r.factory_id = f.id,
-    warehouse w, goods g
-    where r.warehouse_id = w.id and r.goods_id = g.id
-    and w.company_id = #{companyId}
-    and r.warehouse_id = #{warehouseId}
-    and r.is_exp = 0
-    <if test="saleEnable != null" >
-      and r.sale_enable = #{saleEnable}
-    </if>
-    <if test="goodsId != null" >
-      r.goods_id = #{goodsId}
-    </if>
-    <if test="goodSearch != null">
-      <bind name="pattern" value="'%' + goodSearch + '%'" />
-      and ( g.name like #{pattern} or lower(g.pinyin) like lower(#{pattern}) )
-    </if>
-    <if test="factoryId != null">
-      and f.id = #{factoryId}
-    </if>
-    <if test="limitCheck != null">
-          and r.quantity > #{limitCheck}
-      </if>
-  </select>
-
   <select id="getListByIdList" parameterType="map" resultMap="BaseResultMap">
     select <include refid="Base_Column_List"/>
     from repertory_info
@@ -274,6 +197,7 @@
   <update id="sellOrderConsumeQuantity" parameterType="map" >
     update sell_order_detail d, repertory_info r
       set r.quantity = (r.quantity - d.quantity),
+          r.on_way_quantity = (r.on_way_quantity - d.quantity),
           r.update_time = #{updateTime},
           r.update_by = #{updateBy}
     where d.repertory_id = r.id and d.sell_order_id = #{sellOrderId}
@@ -294,6 +218,14 @@
               r.on_way_quantity = (r.on_way_quantity - b.back_quantity)
         where
           b.repertory_info_id = r.id and b.in_back_id = #{inBackId}
+    </update>
+
+    <update id="sellOrderReleaseOnWayQuantity" parameterType="java.lang.Long">
+        update sell_order_detail s, repertory_info r
+          set
+              r.on_way_quantity = (r.on_way_quantity - s.quantity)
+        where
+          b.repertory_info_id = r.id and s.sell_order_id = #{sellOrderId}
     </update>
 
     <update id="updateOnWayQuantity" parameterType="map" >
@@ -364,7 +296,6 @@
         <if test="offset != null and offset != null">
             limit #{offset}, #{size}
         </if>
-
     </select>
 
     <select id="queryRepertoryCount"  resultType="java.lang.Integer" parameterType="com.yiban.erp.dto.RepertoryQuery" >
@@ -420,13 +351,17 @@
             <bind name="pattern" value="'%' + batchCode + '%'"/>
             and batch_code like #{pattern}
         </if>
+        <if test="minQuantity != null" >
+            and quantity > #{minQuantity}
+        </if>
     </select>
 
     <select id="querySelectList" resultMap="BaseResultMap" parameterType="com.yiban.erp.dto.RepertorySelectQuery">
         select
-          r.*, s.name as supplierName
+          r.*, s.name as supplierName, w.name as warehouseName
         from repertory_info r
         left join supplier s on r.supplier_id = s.id
+        left join warehouse w on r.warehouse_id = w.id
         where r.company_id = #{companyId}
         <if test="warehouseId != null" >
             and r.warehouse_id = #{warehouseId}
@@ -441,7 +376,10 @@
             <bind name="pattern" value="'%' + batchCode + '%'"/>
             and r.batch_code like #{pattern}
         </if>
-        <if test="offset != null and limit != null">
+        <if test="minQuantity != null" >
+            and r.quantity > #{minQuantity}
+        </if>
+        <if test="byPage != null and byPage and offset != null and limit != null">
             limit #{offset}, #{limit}
         </if>
     </select>

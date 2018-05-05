@@ -1,40 +1,68 @@
 <template>
     <div>
-        <Table ref="table" :columns="tabColumns" :data="tabData" 
-        border highlight-row size="small" style="width: 100%;" 
+        <Table ref="table" :columns="tabColumns" :data="tabData" :loading="loading"
+            border highlight-row size="small" style="width: 100%;" 
         >
         </Table>
     </div>
 </template>
 
 <script>
+import util from '@/libs/util.js';
 import moment from 'moment';
 
 export default {
   name: 'sell-good-history',
   props: {
       excludedOrderId: Number|String,
-      detailList: Array
+      customerId: Number|String,
+      goodsId: Number|String
   },
   data() {
       return {
+          details: [],
           tabData: [],
+          loading: false,
           tabColumns: [
               {
                   title: '序号',
-                  type: 'index'
-              },
-              {
-                  title: '客户',
-                  key: 'customerName'
+                  type: 'index',
+                  width: 80,
               },
               {
                   title: '商品',
-                  key: 'goodName'
+                  key: 'goodsName',
+                  width: 200
+              },
+              {
+                  title: '生产厂家',
+                  key: 'factoryName',
+                  width: 180
+              },
+              {
+                  title: '批次号',
+                  key: 'batchCode',
+                  width: 180
+              },
+              {
+                  title: '产地',
+                  key: 'origin',
+                  width: 150,
+              },
+              {
+                  title: '剂型',
+                  key: 'jx',
+                  width: 150
+              },
+              {
+                  title: '规格',
+                  key: 'spec',
+                  width: 150
               },
               {
                   title: '制单日',
                   key: 'createOrderDate',
+                  width: 150,
                   render: (h, params) => {
                       return moment(params.row.createOrderDate).format('YYYY-MM-DD');
                   }
@@ -42,9 +70,10 @@ export default {
               {
                   title: '销售员',
                   key: 'salerNickName',
+                  width: 170,
                   render: (h, params) => {
-                      let nickName = params.row.salerNickName;
-                      let realName = params.row.salerRealName;
+                      let nickName = params.row.saleNickName;
+                      let realName = params.row.saleRealName;
                       if (realName) {
                           return h('span', nickName + ' - [' + realName + ']');
                       }else {
@@ -54,97 +83,86 @@ export default {
               },
               {
                   title: '数量',
-                  key: 'quantity'
+                  key: 'quantity',
+                  width: 120
               },
               {
                   title: '实价',
-                  key: 'realPrice'
+                  key: 'realPrice',
+                  width: 120
               },
               {
                   title: '定价',
-                  key: 'fixPrice'
+                  key: 'fixPrice',
+                  width: 120
               },
               {
                   title: '折扣',
-                  key: 'disPrice'
+                  key: 'disPrice',
+                  width: 120
               },
               {
                   title: '金额',
-                  key: 'amount'
+                  key: 'amount',
+                  width: 120
               },
               {
-                  title: '生产企业',
-                  key: 'factoryName',
+                  title: '批准文号',
+                  key: 'permitNo',
+                  width: 170
               },
               {
-                  title: '剂型',
-                  key: 'jx'
-              },
-              {
-                  title: '规格',
-                  key: 'spec'
-              },
-              {
-                  title: '货号',
-                  key: 'code'
-              },
+                  title: '存储条件',
+                  key: 'storageConditionName',
+                  width: 150
+              }
           ]
       }
   },
   watch: {
-      detailList(data) {
-          this.refsetData(data);
-      }
+      goodsId(goodsId) {
+          this.refsetData();
+      },
   },
   methods: {
-      refsetData(data) {
-          if (!data || data.length <=0 ) {
+      refsetData() {
+          if (!this.goodsId || !this.customerId) {
               this.tabData = [];
           }
-          let list = new Array();
-          if (this.excludedOrderId && this.excludedOrderId > 0) {
-              for (let i=0; i<data.length; i++) {
-                  let item = data[i];
-                  if (item.sellOrderId !== this.excludedOrderId) {
-                      list.push(item);
-                  }
-              }
-              this.setShowTableData(list);
-          }else {
-              this.setShowTableData(data);
+          let reqData = {
+              customerId: this.customerId,
+              goodsId: this.goodsId
           }
+          this.loading = true;
+          util.ajax.get('/sell/detail/history', {params: reqData})
+            .then((response) => {
+                this.loading = false;
+                this.details = response.data;
+                this.setShowTableData(this.details);
+            })
+            .catch((error) => {
+                this.loading = false;
+                util.errorProcessor(this, error);
+            })
       },
-      setShowTableData(sellDetailList) {
+      setShowTableData(details) {
           this.tabData = [];
-          for (let i=0; i<sellDetailList.length; i++) {
-              let detail = sellDetailList[i];
-              let repertoryInfo = detail.repertoryInfo;
-              if (repertoryInfo) {
-                  let good = repertoryInfo.goods;
-                  let tabItem = {
-                      customerName: detail.customerName,
-                      goodName: repertoryInfo.goodName,
-                      createOrderDate: detail.createOrderDate,
-                      salerNickName: detail.salerNickName,
-                      salerRealName: detail.salerRealName,
-                      quantity: detail.quantity,
-                      realPrice: detail.realPrice,
-                      fixPrice: detail.fixPrice,
-                      disPrice: detail.disPrice,
-                      amount: detail.amount,
-                      factoryName: good ? good.factory : '',
-                      jx: good ? good.jx : '',
-                      spec: good ? good.spec : '',
-                      code: repertoryInfo.code
-                  }
-                  this.tabData.push(tabItem);
+          for (let i=0; i < details.length; i++) {
+              let detail = details[i];
+              if (this.excludedOrderId === detail.sellOrderId) {
+                  continue; //排除
               }
+              this.tabData.push(detail);
           }
       }
   }
 }
 </script>
 <style>
+
+.ivu-table td {
+    height: 2.5em;
+}
 
 </style>
 

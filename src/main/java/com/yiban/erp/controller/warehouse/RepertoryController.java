@@ -25,6 +25,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.*;
 
 @RestController
@@ -51,6 +52,7 @@ public class RepertoryController {
     public ResponseEntity<String> selectList(@RequestBody RepertorySelectQuery query,
                                              @AuthenticationPrincipal User user) throws Exception {
         query.setCompanyId(user.getCompanyId());
+        query.setByPage(true);
         Integer count = repertoryInfoMapper.querySelectCount(query);
         List<RepertoryInfo> infos = new ArrayList<>();
         if (count == null || count <=0 ) {
@@ -63,38 +65,6 @@ public class RepertoryController {
         response.put("data", infos);
         return ResponseEntity.ok().body(JSON.toJSONString(response, SerializerFeature.DisableCircularReferenceDetect));
 
-    }
-
-
-    @RequestMapping(value = "list", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> list(@AuthenticationPrincipal User user,
-                                       @RequestParam(name = "warehouseId") Integer warehouseId,
-                                       @RequestParam(name = "goodId", required = false) Long goodId,
-                                       @RequestParam(name = "goodSearch", required = false) String goodSearch,
-                                       @RequestParam(name = "factoryId", required = false) Integer factoryId,
-                                       @RequestParam(name = "page", required = false) Integer page,
-                                       @RequestParam(name = "size", required = false) Integer size) throws Exception {
-        Integer limit = size == null || size <= 0 ? 10 : size;
-        Integer offset = (page == null || page <= 0) ? 0 : (page - 1) * limit;
-        String search = StringUtils.isBlank(goodSearch) ? null: goodSearch.trim();
-        Map<String, Object> requestMap = new HashMap<>();
-        requestMap.put("companyId", user.getCompanyId());
-        requestMap.put("warehouseId", warehouseId);
-        requestMap.put("saleEnable", true);
-        requestMap.put("goodId", goodId);
-        requestMap.put("goodSearch", search);
-        requestMap.put("factoryId", factoryId);
-        requestMap.put("offset", offset);
-        requestMap.put("limit", limit);
-        List<RepertoryInfo> list = repertoryService.getSearchList(requestMap);
-        int count = 0;
-        if (!list.isEmpty()) {
-            count = repertoryService.getSearchCount(requestMap);
-        }
-        JSONObject result = new JSONObject();
-        result.put("data", list);
-        result.put("count", count);
-        return ResponseEntity.ok().body(JSON.toJSONString(result, SerializerFeature.DisableCircularReferenceDetect));
     }
 
 }

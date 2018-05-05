@@ -11,6 +11,7 @@ import com.yiban.erp.entities.*;
 import com.yiban.erp.exception.BizException;
 import com.yiban.erp.exception.BizRuntimeException;
 import com.yiban.erp.exception.ErrorCode;
+import com.yiban.erp.service.GoodsService;
 import com.yiban.erp.service.warehouse.RepertoryService;
 import com.yiban.erp.util.UtilTool;
 import org.slf4j.Logger;
@@ -32,13 +33,13 @@ public class SellOrderService {
     @Autowired
     private SellOrderDetailMapper sellOrderDetailMapper;
     @Autowired
-    private RepertoryService repertoryService;
-    @Autowired
     private SellOrderShipMapper sellOrderShipMapper;
     @Autowired
     private CustomerMapper customerMapper;
     @Autowired
     private GoodsMapper goodsMapper;
+    @Autowired
+    private GoodsService goodsService;
     @Autowired
     private RepertoryInfoMapper repertoryInfoMapper;
     @Autowired
@@ -52,13 +53,7 @@ public class SellOrderService {
     @Autowired
     private RabbitmqQueueConfig rabbitmqQueueConfig;
 
-    public List<SellOrder> getList(Integer companyId, Long customerId, Long saleId,
-                                            String refNo, String status, Date createOrderDate, Integer page, Integer size) {
-        int limit = (size == null || size <= 0) ? 10 : size;
-        int offset = (page == null || page <= 0 ? 0 : page - 1) * limit;
-        return sellOrderMapper.getList(companyId, customerId, saleId, refNo, status,createOrderDate, limit, offset);
-    }
-
+    @Transactional
     public SellOrder orderSave(User user, SellOrder sellOrder) throws BizException {
         if (!validateSellOrder(sellOrder)) {
             logger.warn("user:{} save order but order validate is error.", user.getId());
@@ -120,8 +115,15 @@ public class SellOrderService {
         }
         logger.info("user:{} save order info success.", user.getId());
         SellOrder afterOrder = sellOrderMapper.selectByPrimaryKey(sellOrder.getId());
-        List<SellOrderDetail> resultdetails = getDetailList(sellOrder.getId());
-        afterOrder.setDetails(resultdetails);
+        List<SellOrderDetail> resultDetails = getDetailList(sellOrder.getId());
+
+        //如果保存的状态为INIT状态，把库存的在单数加上
+        if (SellOrderStatus.INIT.name().equalsIgnoreCase(afterOrder.getStatus())) {
+            for (SellOrderDetail detail : resultDetails) {
+                repertoryInfoMapper.updateOnWayQuantity(detail.getRepertoryId(), detail.getQuantity());
+            }
+        }
+        afterOrder.setDetails(resultDetails);
         return afterOrder;
     }
 
@@ -151,19 +153,39 @@ public class SellOrderService {
             logger.warn("good detail is null.");
             return false;
         }
+        if (SellOrderStatus.INIT.name().equalsIgnoreCase(order.getStatus())) {
+            for (SellOrderDetail detail : order.getDetails()) {
+                //验证是否存在销售数量小于0的数据
+                if (detail.getQuantity() == null || BigDecimal.ZERO.compareTo(detail.getQuantity()) >= 0) {
+                    logger.warn("sell order detail quantity <= 0");
+                    return false;
+                }
+            }
+        }
         return true;
     }
 
+    @Transactional
     public int removeSellOrder(User user, Long id) throws BizException {
         logger.info("user:{} remove sell order id:{}, set to delete status.", user.getId(), id);
         //验证是否存在质量审核通过的商品，如果存在，不能删除
-        List<Long> checkOkDetailIds = sellOrderDetailMapper.getCheckOkDetailIdList(id);
-        if (checkOkDetailIds != null && !checkOkDetailIds.isEmpty()) {
-            logger.warn("user:{} remove sell order but have quality check ok detail:{}", user.getId(), JSON.toJSONString(checkOkDetailIds));
-            throw new BizException(ErrorCode.SELL_ORDER_REMOVE_HAVE_OK_DETAIL);
+        SellOrder order = sellOrderMapper.selectByPrimaryKey(id);
+        if (order == null) {
+            logger.warn("get order fail by id:{}", id);
+            throw new BizException(ErrorCode.SELL_ORDER_DETAIL_GET_FAIL);
         }
-        SellOrder order = new SellOrder();
-        order.setId(id);
+        if (SellOrderStatus.SALE_CHECKED.name().equalsIgnoreCase(order.getStatus())) {
+            logger.warn("sell order is already checked, can not delete. id:{}", id);
+            throw new BizException(ErrorCode.SELL_ORDER_REMOVE_STATUS_ERROR);
+        }
+        if (!SellOrderStatus.TEMP_STORAGE.name().equalsIgnoreCase(order.getStatus())) {
+            //修改存在的在单数，在暂存的状态下没有统计在单数
+            int count = repertoryInfoMapper.sellOrderReleaseOnWayQuantity(order.getId());
+            if (count <= 0) {
+                logger.warn("release sell order on way quantity fail. sellOrderId:{}", order.getId());
+                throw new BizRuntimeException(ErrorCode.FAILED_UPDATE_FROM_DB);
+            }
+        }
         order.setStatus(SellOrderStatus.DELETE.name());
         order.setUpdateBy(user.getNickname());
         order.setUpdateTime(new Date());
@@ -184,44 +206,31 @@ public class SellOrderService {
         if (details == null || details.isEmpty()) {
             return Collections.emptyList();
         }
-        //如果存在，把对应的产品信息(对应的库存信息，库存信息中关联了产品信息)查询出来关联到对应的订单详情中
-        List<Long> repertoryIds = new ArrayList<>();
-        details.stream().forEach(item -> repertoryIds.add(item.getRepertoryId()));
-        Map<Long, RepertoryInfo> repertoryInfoMap = repertoryService.getMapByIdList(repertoryIds);
-        details.stream().forEach(item -> item.setRepertoryInfo(repertoryInfoMap.get(item.getRepertoryId())));
+        //如果存在，把对应的产品信息
+        setDetailsGoods(details);
         return details;
     }
 
-    public Map<Long,List<SellOrderDetail>> getDetailHistory(Integer companyId, Long customerId, List<Long> goodIds) {
-        if (companyId == null || customerId == null || goodIds == null || goodIds.isEmpty()) {
-            return null;
+    public List<SellOrderDetail> getDetailHistory(Integer companyId, Long customerId, Long goodsId) {
+        if (companyId == null || customerId == null || goodsId == null) {
+            return Collections.emptyList();
         }
-        List<SellOrderDetail> details = sellOrderDetailMapper.getDetailHistory(companyId, customerId, goodIds, 0, 20);
+        List<SellOrderDetail> details = sellOrderDetailMapper.getDetailHistory(companyId, customerId, goodsId, 0, 50);
         if (details.isEmpty()) {
-            return null;
+            return details;
         }
-        //根据repertoryId获取对应库存产品信息
-        List<Long> repertoryIds = new ArrayList<>();
-        details.stream().forEach(item -> repertoryIds.add(item.getRepertoryId()));
-        Map<Long, RepertoryInfo> infoMap = repertoryService.getMapByIdList(repertoryIds);
-        if (infoMap != null) {
-            details.stream().forEach(item -> item.setRepertoryInfo(infoMap.get(item.getRepertoryId())));
-        }
-        //根据商品的ID，进行分组
-        Map<Long, List<SellOrderDetail>> result = new HashMap<>();
-        for (SellOrderDetail detail : details) {
-            RepertoryInfo repertoryInfo = detail.getRepertoryInfo();
-            if (repertoryInfo == null || repertoryInfo.getGoodsId() == null) {
-                continue;
-            }
-            Long goodId = repertoryInfo.getGoodsId();
-            if (!result.containsKey(goodId)) {
-                List<SellOrderDetail> itemList = new ArrayList<>();
-                result.put(goodId, itemList);
-            }
-            result.get(goodId).add(detail);
-        }
-        return result;
+        setDetailsGoods(details);
+        return details;
+    }
+
+    private void setDetailsGoods(List<SellOrderDetail> details) {
+        //设置goods信息
+        List<Long> goodsIdList = new ArrayList<>();
+        details.stream().forEach(item -> goodsIdList.add(item.getGoodsId()));
+        List<Goods> goods = goodsService.getGoodsById(goodsIdList);
+        Map<Long, Goods> goodsMap = new HashMap<>();
+        goods.stream().forEach(item -> goodsMap.put(item.getId(), item));
+        details.stream().forEach(item -> item.setGoods(goodsMap.get(item.getGoodsId())));
     }
 
 
@@ -317,6 +326,7 @@ public class SellOrderService {
         sellOrderMapper.updateByPrimaryKeySelective(sellOrder);
     }
 
+    @Transactional
     public int qualityCheckCancel(User user, SellReviewAction action) throws BizException {
         if (action == null || action.getDetailList() == null) {
             logger.warn("user:{} review cancel but params error.", user.getId());
@@ -406,7 +416,8 @@ public class SellOrderService {
         checkOkAfter(user, order, details);
     }
 
-    private void checkOkAfter(User user, SellOrder order, List<SellOrderDetail> details) {
+    @Transactional
+    public void checkOkAfter(User user, SellOrder order, List<SellOrderDetail> details) {
         RepertoryOut out = new RepertoryOut();
         out.setCompanyId(order.getCompanyId());
         out.setWarehouseId(order.getWarehouseId());
@@ -434,15 +445,14 @@ public class SellOrderService {
         }
         List<RepertoryOutDetail> outDetails = new ArrayList<>();
         for (SellOrderDetail orderDetail : details) {
-            RepertoryInfo info = orderDetail.getRepertoryInfo();
             RepertoryOutDetail outDetail = new RepertoryOutDetail();
             outDetail.setRepertoryOutId(out.getId());
             outDetail.setRepertoryInfoId(orderDetail.getRepertoryId());
             outDetail.setGoodsId(orderDetail.getGoodsId());
-            outDetail.setBatchCode(info != null ? info.getBatchCode() : null);
-            outDetail.setLocation(info != null ? info.getLocation() : null);
-            outDetail.setProductDate(info != null ? info.getProductDate() : null);
-            outDetail.setExpDate(info != null ? info.getExpDate() : null);
+            outDetail.setBatchCode(orderDetail.getBatchCode());
+            outDetail.setLocation(orderDetail.getLocation());
+            outDetail.setProductDate(orderDetail.getProductDate());
+            outDetail.setExpDate(orderDetail.getExpDate());
             outDetail.setQuantity(orderDetail.getQuantity());
             outDetail.setFree(orderDetail.getFree());
             outDetail.setPrice(orderDetail.getRealPrice());
