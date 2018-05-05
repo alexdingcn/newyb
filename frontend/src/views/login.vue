@@ -3,7 +3,7 @@
 </style>
 
 <template>
-    <div class="login" @keydown.enter="handleSubmit">
+    <div class="login" @keydown.enter="handleSubmit" :style="{ backgroundImage: 'url(' + bgImage + ')' }">
         <div class="login-con">
             <Card :bordered="false">
                 <p slot="title">
@@ -58,6 +58,7 @@ import Qs from 'qs';
 export default {
     data () {
         return {
+            bgImage: '',
             loginResponse: '',
             loading: false,
             form: {
@@ -74,7 +75,30 @@ export default {
             }
         };
     },
+    beforeMount() {
+        this.loadBackground();
+    },
     methods: {
+        loadBackground: function () {
+            var self = this;
+            util.ajax.get('https://www.bing.com/HPImageArchive.aspx', {
+                    params: {
+                        format: 'js',
+                        idx: 1,
+                        n: 10
+                    }
+                })
+                .then(function (response) {
+                    if (response.status === 200) {
+                        var imageCount = response.data.images.length;
+                        var idx = Math.floor((Math.random() * imageCount));
+                        self.bgImage = 'https://www.bing.com/' + response.data.images[idx].url;
+                    }
+                })
+                .catch(function (error) {
+                    util.errorProcessor(self, error);
+                });
+        },
         handleSubmit () {
             this.$refs.loginForm.validate((valid) => {
                 if (valid) {

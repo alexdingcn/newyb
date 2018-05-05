@@ -8,6 +8,7 @@
     <result column="enabled" property="enabled" jdbcType="BIT" />
     <result column="created_time" property="createdTime" jdbcType="TIMESTAMP" />
     <result column="updated_time" property="updatedTime" jdbcType="TIMESTAMP" />
+    <result column="expired_time" property="expiredTime" jdbcType="TIMESTAMP" />
     <result column="created_by" property="createdBy" jdbcType="VARCHAR" />
     <result column="updated_by" property="updatedBy" jdbcType="VARCHAR" />
     <result column="account_amount" property="accountAmount" jdbcType="DECIMAL" />
@@ -15,7 +16,7 @@
     <result column="out_amount" property="outAmount" jdbcType="DECIMAL" />
   </resultMap>
   <sql id="Base_Column_List" >
-    id, name, license, enabled, created_time, updated_time, created_by, updated_by, account_amount, in_amount, out_amount
+    id, name, license, enabled, created_time, updated_time, expired_time, created_by, updated_by, account_amount, in_amount, out_amount
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
     select 
@@ -37,10 +38,10 @@
   </delete>
   <insert id="insert" parameterType="com.yiban.erp.entities.Company" keyProperty="id" useGeneratedKeys="true" >
     insert into company (name, license,
-      enabled, created_time, updated_time, 
+      enabled, created_time, updated_time, expired_time,
       created_by, updated_by, account_amount, in_amount, out_amount)
     values (#{name,jdbcType=VARCHAR}, #{license,jdbcType=VARCHAR},
-      #{enabled,jdbcType=BIT}, #{createdTime,jdbcType=TIMESTAMP}, #{updatedTime,jdbcType=TIMESTAMP},
+      #{enabled,jdbcType=BIT}, #{createdTime,jdbcType=TIMESTAMP}, #{updatedTime,jdbcType=TIMESTAMP}, #{expiredTime,jdbcType=TIMESTAMP},
       #{createdBy,jdbcType=VARCHAR}, #{updatedBy,jdbcType=VARCHAR}, #{accountAmount, jdbcType=DECIMAL},
       #{inAmount, jdbcType=DECIMAL}, #{outAmount, jdbcType=DECIMAL})
   </insert>
@@ -62,6 +63,9 @@
       </if>
       <if test="updatedTime != null" >
         updated_time = #{updatedTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="expiredTime != null" >
+        expired_time = #{expiredTime,jdbcType=TIMESTAMP},
       </if>
       <if test="createdBy != null" >
         created_by = #{createdBy,jdbcType=VARCHAR},
