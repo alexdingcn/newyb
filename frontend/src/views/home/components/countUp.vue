@@ -101,7 +101,9 @@ export default {
             let res = transformValue(val);
             let endVal = res.val;
             this.unit = res.unit;
-            this.demo.update(endVal);
+            if (Object.keys(this.demo).length !== 0) {
+                this.demo.update(endVal);
+            }
         }
     }
 };

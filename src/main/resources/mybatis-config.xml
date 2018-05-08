@@ -50,6 +50,6 @@
         <mapper resource="mapping/FinancialPrePaidMapper.xml"/>
         <mapper resource="mapping/FinancialPreReceiveMapper.xml"/>
         <mapper resource="mapping/BizLockMapper.xml"/>
-
+        <mapper resource="mapping/OperationLogMapper.xml"/>
     </mappers>
 </configuration>

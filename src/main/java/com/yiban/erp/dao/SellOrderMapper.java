@@ -3,12 +3,12 @@ package com.yiban.erp.dao;
 import com.yiban.erp.dto.SellOrderAllAction;
 import com.yiban.erp.dto.SellReviewOrderQuery;
 import com.yiban.erp.entities.SellOrder;
+import com.yiban.erp.entities.StatusCount;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 @Mapper
 public interface SellOrderMapper {
@@ -45,4 +45,10 @@ public interface SellOrderMapper {
     SellOrder getReviewDetailById(Long id);
 
     List<SellOrder> getReviewOrderList(SellReviewOrderQuery query);
+
+    List<StatusCount> getOrderStatusStat(@Param("companyId") Integer companyId);
+
+    List<StatusCount> getOrderAmountStat(@Param("companyId")Integer companyId,
+                                         @Param("startDate")Date startDate,
+                                         @Param("endDate")Date endDate);
 }
