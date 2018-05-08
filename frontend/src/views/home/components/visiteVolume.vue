@@ -4,25 +4,33 @@
 
 <script>
 import echarts from 'echarts';
+import moment from 'moment';
+
 export default {
     name: 'visiteVolume',
     data () {
         return {
-            //
+            saleVolume: {}
         };
     },
+    props: {
+        content: {
+            type: Array,
+            required: true
+        }
+    },
     mounted () {
-        this.$nextTick(() => {
-            let visiteVolume = echarts.init(document.getElementById('visite_volume_con'));
-            let xAxisData = [];
-            let data1 = [];
-            let data2 = [];
-            for (let i = 0; i < 20; i++) {
-                xAxisData.push('类目' + i);
-                data1.push((Math.sin(i / 5) * (i / 5 - 10) + i / 6) * 5);
-                data2.push((Math.cos(i / 5) * (i / 5 - 10) + i / 6) * 5);
-            }
+        this.saleVolume = echarts.init(document.getElementById('visite_volume_con'));
+    },
+    methods: {
+        draw (content) {
 
+            let xAxisData = [];
+            let yAxisData = [];
+            for (let i = 0; i < content.length; i++) {
+                xAxisData.push(moment(content[i].tradeDate).format('MM-DD'));
+                yAxisData.push(content[i].amount);
+            }
             const option = {
                 tooltip: {
                     trigger: 'axis',
@@ -31,7 +39,7 @@ export default {
                     }
                 },
                 grid: {
-                    top: 0,
+                    top: '2%',
                     left: '2%',
                     right: '4%',
                     bottom: '3%',
@@ -43,34 +51,31 @@ export default {
                 },
                 xAxis: {
                     type: 'category',
-                    data: ['周一', '周二', '周三', '周四', '周五', '周六', '周日'],
+                    data: xAxisData,
                     nameTextStyle: {
                         color: '#c3c3c3'
                     }
                 },
                 series: [
                     {
-                        name: '访问量',
+                        name: '金额',
                         type: 'bar',
-                        data: [
-                            {value: 45682, name: '周一', itemStyle: {normal: {color: '#2d8cf0'}}},
-                            {value: 87545, name: '周二', itemStyle: {normal: {color: '#2d8cf0'}}},
-                            {value: 234678, name: '周三', itemStyle: {normal: {color: '#2d8cf0'}}},
-                            {value: 158403, name: '周四', itemStyle: {normal: {color: '#2d8cf0'}}},
-                            {value: 54350, name: '周五', itemStyle: {normal: {color: '#2d8cf0'}}},
-                            {value: 130923, name: '周六', itemStyle: {normal: {color: '#2d8cf0'}}},
-                            {value: 110456, name: '周日', itemStyle: {normal: {color: '#2d8cf0'}}}
-                        ]
+                        data: yAxisData
                     }
                 ]
             };
 
-            visiteVolume.setOption(option);
+            this.saleVolume.setOption(option);
 
             window.addEventListener('resize', function () {
-                visiteVolume.resize();
+                this.saleVolume.resize();
             });
-        });
+        }
+    },
+    watch: {
+        content (val) {
+            this.draw(val);
+        }
     }
 };
 </script>

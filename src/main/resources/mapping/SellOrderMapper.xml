@@ -349,4 +349,19 @@
         group by status
     </select>
 
+    <select id="getOrderAmountStat" resultType="com.yiban.erp.entities.StatusCount" >
+        select date(create_time) as tradeDate, sum(total_amount) as amount
+        from sell_order
+        where status = 'SALE_CHECKED'
+        <if test="companyId != null">
+            and company_id = #{companyId}
+        </if>
+        <if test="startDate != null">
+            and create_time >= #{startDate}
+        </if>
+        <if test="endDate != null">
+            and #{endDate} > create_time
+        </if>
+        group by tradeDate
+    </select>
 </mapper>

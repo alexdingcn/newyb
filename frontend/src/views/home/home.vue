@@ -38,7 +38,7 @@
                         <p class="notwrap">上次登录时间: {{ loggedUser.lastLoginTime | formatTime }} </p>
                     </Row>
                 </Col>
-                <Col span="5">
+                <Col span="5" v-show="loggedUser.companyExpiredTime > 0">
                     <p>当前版本:试用版</p>
                     <br/>
                     <p>到期日: {{ loggedUser.companyExpiredTime | formatTime }} </p>
@@ -118,7 +118,7 @@
                                 上周销量统计
                             </p>
                             <div class="data-source-row">
-                                <visite-volume></visite-volume>
+                                <visite-volume :content="amountStats"></visite-volume>
                             </div>
                         </Card>
                     </Col>
@@ -269,11 +269,13 @@ export default {
             },
             cityData: cityData,
             showAddNewTodo: false,
-            newToDoItemValue: ''
+            newToDoItemValue: '',
+            amountStats: []
         };
     },
     mounted() {
         this.loadOrderStats();
+        this.loadAmountStats();
     },
     computed: {
         avatorPath () {
@@ -284,16 +286,31 @@ export default {
         loadOrderStats() {
             var self = this;
             util.ajax.post('/home/orderstats')
-                    .then(function (response) {
-                        if (response.status === 200 && response.data) {
-                            for (var i=0; i<response.data.length; i++) {
-                                self.count[response.data[i].status.toLowerCase()] = response.data[i].count;
-                            }
+                .then(function (response) {
+                    if (response.status === 200 && response.data) {
+                        for (var i=0; i<response.data.length; i++) {
+                            self.count[response.data[i].status.toLowerCase()] = response.data[i].count;
                         }
-                    })
-                    .catch(function (error) {
-                        util.errorProcessor(self, error);
-                    });
+                    }
+                })
+                .catch(function (error) {
+                    util.errorProcessor(self, error);
+                });
+        },
+        loadAmountStats() {
+            var self = this;
+            util.ajax.post('/home/amountstats', {
+                    startDate: moment().add(-3, 'w').format('YYYY-MM-DD'),
+                    endDate: moment().add(1, 'd').format('YYYY-MM-DD')
+                })
+                .then(function (response) {
+                    if (response.status === 200 && response.data) {
+                        self.amountStats = response.data;
+                    }
+                })
+                .catch(function (error) {
+                    util.errorProcessor(self, error);
+                });
         },
         addNewToDoItem () {
             this.showAddNewTodo = true;
