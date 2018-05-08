@@ -674,6 +674,8 @@ public class RepertoryInService {
             item.setCreateTime(new Date());
             item.setUpdateBy(user.getNickname());
             item.setUpdateTime(new Date());
+            item.setRefType(RepertoryRefType.BUY_ORDER.name());
+            item.setRefOrderId(order.getId());
 
             infos.add(item);
         }

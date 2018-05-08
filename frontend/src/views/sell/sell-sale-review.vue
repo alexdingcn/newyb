@@ -6,14 +6,14 @@
     <div>
         <Card >
             <p slot="title">
-                {{showTitle}}
+                {{viewMethod === 'CHECK' ? '销售审核' : '销售单选择'}}
             </p>
             <div slot="extra">
                 <ButtonGroup size="small">
                     <Button type="primary" icon="ios-search" :loading="sellOrderLoading" @click="querySellOrderList">查询</Button>
-                    <Button v-if="showMethod === 'CHECK'" type="success" icon="checkmark-round" :loading="sellOrderLoading" @click="reviewOkBtnClick">审核通过</Button>
-                    <Button v-if="showMethod === 'CHECK'" type="error" icon="close-round" :loading="sellOrderLoading" @click="removeBtnClick">删除订单</Button>
-                    <Button v-if="showMethod === 'SELECT'" type="success" icon="checkmark" :loading="sellOrderLoading" @click="selectSellOrder">选择</Button>
+                    <Button v-if="viewMethod === 'CHECK'" type="success" icon="checkmark-round" :loading="sellOrderLoading" @click="reviewOkBtnClick">审核通过</Button>
+                    <Button v-if="viewMethod === 'CHECK'" type="error" icon="close-round" :loading="sellOrderLoading" @click="removeBtnClick">删除订单</Button>
+                    <Button v-if="viewMethod === 'SELECT'" type="success" icon="checkmark" :loading="sellOrderLoading" @click="selectSellOrder">选择</Button>
                 </ButtonGroup>
             </div>
             <Form ref="searchForm" :model="query" :label-width="100">
@@ -34,7 +34,7 @@
                         </FormItem>
                     </i-col>
                     <i-col span="6" >
-                        <FormItem label="状态" v-if="showMethod === 'CHECK'">
+                        <FormItem label="状态" v-if="viewMethod === 'CHECK'">
                             <Select v-model="query.status" placeholder="状态">
                                 <Option v-for="option in statusOptions" :value="option.key" :label="option.name" :key="option.key">{{option.name}}</Option>
                             </Select>
@@ -121,7 +121,6 @@ export default {
         };
 
         return {
-            showMethod: 'CHECK',
             statusOptions: [
                 {key: 'ALL', name:'所有'},
                 {key: 'INIT', name:'未质审完成'},
@@ -424,21 +423,6 @@ export default {
                     return totalAmount + parseFloat(amount);
                 }, 0);
             }
-        },
-        viewMethod(value) {
-            if(value && (value === 'CHECK' || value === 'SELECT')) {
-                this.showMethod = value;
-            }else {
-                this.showMethod = 'CHECK';
-            }
-            if (value === 'SELECT') {
-                this.query.status = 'SALE_CHECKED'; //选择的模式下只查询审核通过的数据
-            }
-        }
-    },
-    computed: {
-        showTitle: function() {
-            return this.showMethod === 'CHECK' ? '销售审核' : '销售单选择';
         }
     },
     mounted() {
@@ -455,6 +439,9 @@ export default {
                 statusList = ['INIT', 'QUALITY_CHECKED', 'SALE_CHECKED'];
             }else {
                 statusList = [this.query.status];
+            }
+            if(this.viewMethod === 'SELECT') {
+                statusList = ['SALE_CHECKED']; //销售单选择查询时，只查询已经审核通过的
             }
             reqData['statusList'] = statusList;
             reqData['startDate'] = this.dateRange[0];
@@ -631,6 +618,10 @@ export default {
             }
             //出发事件，事件返回订单和订单详情信息
             this.$emit('on-choose', this.chooseOrderItem, this.sellDetailList);
+            this.$nextTick(() => {
+                this.chooseOrderItem = {};
+                this.sellDetailList = [];
+            });
         }
     }
 }

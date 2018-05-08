@@ -106,6 +106,14 @@ public enum ErrorCode {
     SELL_BACK_ADD_DETAIL_EMPTY(2221, "销售退单产品详情不能为空"),
     SELL_BACK_ADD_DETAIL_QUANTITY_ERROR(2222, "销售退单详情的退货数量需要存在大于0的数量"),
     SELL_BACK_GET_OUT_RECORD_FAIL(2223, "销售退货单获取关联销售出库单失败"),
+    SELL_BACK_ORDER_GET_FAIL(2224, "销售退货单信息获取失败"),
+    SELL_BACK_CHECK_STATUS_ERROR(2225, "销售退货审核状态错误, 请联系运营方排查原因.", ErrorDisplay.MODAL),
+    SELL_BACK_INIT_SALE_CHECK_ERROR(2226, "销售退货单当前状态不可操作销售经理审核"),
+    SELL_BACK_INIT_QUALITY_CHECK_ERROR(2227, "销售退货单当前状态不可操作质量经理审核"),
+    SELL_BACK_QUALITY_CHECK_ERROR(2228, "销售退货单当前状态不可操作质量复核验收"),
+    SELL_BACK_QUALITY_CHECK_CANCEL_ERROR(2229, "销售退货单当前状态不可操作质量复核取消"),
+    SELL_BACK_REMOVE_STATUS_ERROR(2230, "销售退货单已经通过了终审，不能做删除操作"),
+    SELL_BACK_DETAIL_GET_FAIL(2231, "获取销售退货单详情信息失败."),
 
 
     // 23xx -承运公司

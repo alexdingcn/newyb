@@ -157,6 +157,27 @@
     where b.sell_detail_id = s.id and b.back_order_id = #{backOrderId}
   </update>
 
+  <update id="releaseAlreadyBackQuantity" parameterType="java.lang.Long">
+    update sell_order_back_detail b, sell_order_detail s
+      set s.back_quantity = s.back_quantity - b.back_quantity
+    where b.sell_detail_id = s.id and b.back_order_id = #{backOrderId}
+  </update>
 
+  <select id="getByBackOrderId" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select
+      <include refid="Base_Column_List" />
+    from sell_order_back_detail
+    where back_order_id = #{backOrderId,jdbcType=BIGINT}
+  </select>
+
+  <update id="updateCheckStatus" parameterType="com.yiban.erp.dto.SellBackCheck" >
+    update sell_order_back_detail
+      set check_status = #{checkStatus,jdbcType=BIT},
+          check_user = #{checkUser,jdbcType=VARCHAR},
+          check_result = #{checkResult,jdbcType=VARCHAR},
+          updated_by = #{updatedBy,jdbcType=VARCHAR},
+          updated_time = #{updatedTime,jdbcType=TIMESTAMP}
+    where back_order_id = #{backOrderId,jdbcType=BIGINT}
+  </update>
 
 </mapper>

@@ -61,6 +61,17 @@ public class RepertoryInfo {
 
     private Date updateTime;
 
+    //销售退货入库时登记一些客户的信息
+    private Long customerId;
+    private Long customerRepId;
+    private Long saleId;
+    private BigDecimal backPrice;
+
+    //加多两个字段用于关联流水和表明流水的类型
+    private String refType;
+    private Long refOrderId;
+
+
     private Goods goods;
 
     //展示字段
@@ -406,5 +417,53 @@ public class RepertoryInfo {
 
     public void setStorageConditionName(String storageConditionName) {
         this.storageConditionName = storageConditionName;
+    }
+
+    public Long getCustomerId() {
+        return customerId;
+    }
+
+    public void setCustomerId(Long customerId) {
+        this.customerId = customerId;
+    }
+
+    public Long getCustomerRepId() {
+        return customerRepId;
+    }
+
+    public void setCustomerRepId(Long customerRepId) {
+        this.customerRepId = customerRepId;
+    }
+
+    public Long getSaleId() {
+        return saleId;
+    }
+
+    public void setSaleId(Long saleId) {
+        this.saleId = saleId;
+    }
+
+    public BigDecimal getBackPrice() {
+        return backPrice;
+    }
+
+    public void setBackPrice(BigDecimal backPrice) {
+        this.backPrice = backPrice;
+    }
+
+    public String getRefType() {
+        return refType;
+    }
+
+    public void setRefType(String refType) {
+        this.refType = refType;
+    }
+
+    public Long getRefOrderId() {
+        return refOrderId;
+    }
+
+    public void setRefOrderId(Long refOrderId) {
+        this.refOrderId = refOrderId;
     }
 }

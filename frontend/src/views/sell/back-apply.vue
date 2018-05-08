@@ -11,8 +11,10 @@
             </p>
             <div slot="extra"> 
                 <ButtonGroup size="small">
-                    <Button type="primary" icon="plus" :loading="loading" >销售单提取</Button>
+                    <Button type="primary" icon="plus" :loading="loading" @click="getSaleOrderShow">销售单提取</Button>
+                    <Button v-if="applyForm.haveSellOrder" type="warning" icon="arrow-swap" @click="backAllQuantity">整单退货</Button>
                     <Button type="success" icon="checkmark" :loading="loading" @click="saveSubmit">确认保存</Button>
+                    <Button type="ghost" icon="reply"  @click="clearForm">清空表单</Button>
                 </ButtonGroup>
             </div>
 
@@ -93,6 +95,7 @@
             <Table ref="details" border highlight-row :loading="loading" 
                 no-data-text="选择商品添加或者从销售单导入" style="width: 100%;" size="small" 
                 :columns="detailsColumns" :data="details" 
+                @on-row-dblclick="removeDetail"
             >
             </Table>
             <h4 style="margin-top:5px; color: #80848f;">退货商品详情(注意: 退货数量为0的在提交时会自动去除,只保留存在退货数量大于0的产品!)</h4>
@@ -102,7 +105,8 @@
         <warehouse-location-modal :openModal="locationModal" :warehouseId="applyForm.warehouseId" @on-ok="chooseLocation" @on-close="locationModalClose"></warehouse-location-modal>
 
         <Modal v-model="selectSellOrderModal" width="75" :mask-closable="false" title="销售单提取" >
-
+            <sell-sale-revivew view-method="SELECT" @on-choose="saleOrderChoose"></sell-sale-revivew>
+            <div slot="footer"></div>
         </Modal>
 
     </div>
@@ -118,6 +122,7 @@ import goodSelect from '@/views/selector/good-select.vue';
 import warehouseLocationModal from "@/views/selector/warehouse-location-modal.vue";
 import optionSelect from '@/views/selector/option-select.vue';
 import inTempVue from '../repertory/in-temp.vue';
+import sellSaleRevivew from './sell-sale-review.vue';
 
 export default {
     name: 'sell-back-apply',
@@ -127,7 +132,8 @@ export default {
         warehouseSelect,
         goodSelect,
         warehouseLocationModal,
-        optionSelect
+        optionSelect,
+        sellSaleRevivew
     },
     data() {
         const addWarehouseLocation = (h, location, rowData, index) => {
@@ -352,6 +358,27 @@ export default {
                     }
                 },
                 {
+                    title: "税率",
+                    key: "taxRate",
+                    align: "center",
+                    width: 120,
+                    render: (h, params) => {
+                        let self = this;
+                        return h("Input", {
+                            props: {
+                                number: true,
+                                value: self.details[params.index][params.column.key]
+                            },
+                            on: {
+                                "on-blur"(event) {
+                                    let row = self.details[params.index];
+                                    row[params.column.key] = event.target.value;
+                                }
+                            }
+                        });
+                    }
+                },
+                {
                     title: '货位',
                     key: 'location',
                     width: 150,
@@ -403,7 +430,7 @@ export default {
         }
     },
     watch: {
-        applyForm: (data) => {
+        applyForm: function (data) {
             if (data.customerId) {
                 this.customerError = '';
             }
@@ -417,12 +444,12 @@ export default {
                 this.freeAmountError = '';
             }
         },
-        details: (data) => {
+        details: function (data) {
             if (data && data.length > 0) {
                 this.goodsError = '';
             }
         },
-        totalBackQuantity: (data) => {
+        totalBackQuantity: function (data) {
             if (data && data > 0) {
                 this.goodsError = '';
             }
@@ -459,8 +486,8 @@ export default {
                 .then(response => {
                     self.customerRepList = response.data;
                     if (customerRepId) {
-                        this.nextTick().then(() => {
-                            self.applyForm.customerRepId = customerId;
+                        self.$nextTick(() => {
+                            self.applyForm.customerRepId = customerRepId;
                         })
                     }
                 })
@@ -477,7 +504,6 @@ export default {
                 this.customerRepList = [];
                 this.refreshCustomerRepList(customer.id);
             }
-            this.details = []; //客户或者仓库的变动，都把详情清空
         },
         customerRepChange(customerRepId) {
             if(!customerRepId) {
@@ -497,9 +523,9 @@ export default {
         },
         warehouseChanage(id, warehouse) {
             this.applyForm.warehouseName = warehouse.name;
-            this.details = [];
         },
         saleChange(saleId, saleUser) {
+            console.log(saleUser);
             if (saleUser.id) {
                 this.applyForm.saleName = saleUser.nickname;
             }
@@ -533,6 +559,7 @@ export default {
                 amount: 0,
                 costAmount: 0,
                 location: '',
+                taxRate: goods.outRate,
                 storageConditionName: goods.storageConditionName,
                 baseMedName: goods.baseMedName,
                 permitNo: goods.permitNo
@@ -633,8 +660,85 @@ export default {
             this.warehouseError = '';
             this.goodsError = '';
             this.$refs.applyForm.resetFields();
-        }
+        },
 
+        getSaleOrderShow() {
+            this.selectSellOrderModal = true;
+        },
+
+        saleOrderChoose(saleOrder, orderDetails) {
+            this.selectSellOrderModal = false;
+            if (!saleOrder.id || !orderDetails || orderDetails.length <= 0) {
+                return;
+            }
+            this.applyForm = {
+                refOrderId: saleOrder.id,
+                refOrderNo: saleOrder.orderNumber,
+                customerId: saleOrder.customerId,
+                customerName: saleOrder.customerName,
+                customerRepId: saleOrder.customerRepId,
+                customerRepName: saleOrder.customerRepName,
+                saleId: saleOrder.saleId,
+                haveSellOrder: true,
+                warehouseId: saleOrder.warehouseId,
+                temperControlId: saleOrder.temperControlId,
+                freeAmount: 0
+            };
+            this.refreshCustomerRepList(saleOrder.customerId, saleOrder.customerRepId);
+            //详情
+            this.details = []; //清除原有的
+            for (let i=0; i<orderDetails.length; i++) {
+                let detail = orderDetails[i];
+                let goods = detail.goods;
+                let item = {
+                    sellDetailId: detail.id,
+                    goodsId: goods.id,
+                    goodsName: goods.name,
+                    factoryName: goods.factory,
+                    origin: goods.origin,
+                    spec: goods.spec,
+                    jx: goods.jxName,
+                    unitName: goods.unitName,
+                    batchCode: detail.batchCode,
+                    productDate: detail.productDate,
+                    expDate: detail.expDate,
+                    saleQuantity: detail.quantity,
+                    alreadyBackQuantity: detail.backQuantity,
+                    backQuantity: 0,
+                    backPrice: detail.realPrice,
+                    amount: 0,
+                    costAmount: 0,
+                    taxRate: detail.taxRate,
+                    location: detail.location,
+                    storageConditionName: goods.storageConditionName,
+                    baseMedName: goods.baseMedName,
+                    permitNo: goods.permitNo
+                };
+                this.details.push(item);
+            }
+        },
+
+        backAllQuantity() {
+            for(let i=0; i<this.details.length; i++) {
+                let row = this.details[i];
+                let saleQuantity = row.saleQuantity ? row.saleQuantity : 0;
+                let alreadyBackQuantity = row.alreadyBackQuantity ? row.alreadyBackQuantity : 0;
+                row.backQuantity = saleQuantity - alreadyBackQuantity
+                this.resetAmount(i);
+            }
+        },
+
+        removeDetail(row, index) {
+            let self = this;
+            this.$Modal.confirm({
+                title: '删除确认',
+                content: '是否确认去除批次号: ' + row.batchCode + ', 商品: ' + row.goodsName + '？',
+                onCancel: () => {},
+                onOk: () => {
+                    self.details.splice(index, 1);
+                }
+            });
+        }
     }
   
 }

@@ -63,7 +63,7 @@
     select 
     <include refid="Base_Column_List" />
     from sell_order_back
-    where id = #{id,jdbcType=BIGINT}
+    where id = #{id,jdbcType=BIGINT} and status != 'DELETE'
   </select>
 
   <insert id="insert" parameterType="com.yiban.erp.entities.SellOrderBack" keyProperty="id" useGeneratedKeys="true">
@@ -238,6 +238,32 @@
     where id = #{id,jdbcType=BIGINT}
   </update>
 
-
+  <select id="getOrderList" parameterType="com.yiban.erp.dto.SellBackQuery" resultMap="BaseResultMap">
+    select
+      <include refid="Base_Column_List" />
+    from sell_order_back
+    where company_id = #{companyId} and status != 'DELETE'
+    <if test="warehouseId != null" >
+      and warehouse_id = #{warehouseId}
+    </if>
+    <if test="customerId != null" >
+      and customer_id = #{customerId}
+    </if>
+    <if test="saleId != null" >
+      and sale_id = #{saleId}
+    </if>
+    <if test="createdStartTime != null" >
+      and created_time >= #{createdStartTime}
+    </if>
+    <if test="createdEndTime != null" >
+      and #{createdEndTime} > created_time
+    </if>
+    <if test="statusList != null" >
+      and status in
+        <foreach collection="statusList" item="item" open="(" close=")" separator=", ">
+          #{item}
+        </foreach>
+    </if>
+  </select>
 
 </mapper>

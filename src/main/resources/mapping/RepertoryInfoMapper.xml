@@ -29,12 +29,18 @@
       <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
       <result column="update_by" property="updateBy" jdbcType="VARCHAR" />
       <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+      <result column="customer_id" property="customerId" jdbcType="BIGINT" />
+      <result column="customer_rep_id" property="customerRepId" jdbcType="BIGINT" />
+      <result column="sale_id" property="saleId" jdbcType="BIGINT" />
+      <result column="back_price" property="backPrice" jdbcType="DECIMAL" />
+      <result column="ref_type" property="refType" jdbcType="VARCHAR" />
+      <result column="ref_order_id" property="refOrderId" jdbcType="BIGINT"/>
   </resultMap>
   <sql id="Base_Column_List" >
     id, company_id, warehouse_id, location, in_user_id, batch_code, goods_id, factory_id,
     in_quantity, quantity, on_way_quantity, buy_price, is_exp, sale_enable, product_date, exp_date, in_date,
     supplier_id, supplier_contact_id, buyer_id, order_id, order_detail_id, sale_sate, create_by, create_time,
-    update_by, update_time
+    update_by, update_time, customer_id, customer_rep_id, sale_id, back_price, ref_type, ref_order_id
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
     select
@@ -56,7 +62,7 @@
       in_date, supplier_id, supplier_contact_id,
       buyer_id, order_id, order_detail_id, sale_sate,
       create_by, create_time, update_by,
-      update_time)
+      update_time, customer_id, customer_rep_id, sale_id, back_price, ref_type, ref_order_id)
     values (#{companyId,jdbcType=INTEGER}, #{warehouseId,jdbcType=INTEGER},
       #{location,jdbcType=VARCHAR}, #{inUserId,jdbcType=BIGINT}, #{batchCode,jdbcType=VARCHAR},
       #{goodsId,jdbcType=BIGINT}, #{factoryId,jdbcType=BIGINT}, #{inQuantity,jdbcType=DECIMAL},
@@ -65,7 +71,8 @@
       #{inDate,jdbcType=TIMESTAMP}, #{supplierId,jdbcType=BIGINT}, #{supplierContactId,jdbcType=BIGINT},
       #{buyerId,jdbcType=BIGINT}, #{orderId,jdbcType=BIGINT}, #{orderDetailId,jdbcType=BIGINT}, #{saleSate,jdbcType=BIT},
       #{createBy,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, #{updateBy,jdbcType=VARCHAR},
-      #{updateTime,jdbcType=TIMESTAMP})
+      #{updateTime,jdbcType=TIMESTAMP}, #{customerId,jdbcType=BIGINT}, #{customerRepId,jdbcType=BIGINT},
+      #{saleId,jdbcType=BIGINT}, #{backPrice,jdbcType=DECIMAL}, #{refType,jdbcType=VARCHAR}, #{refOrderId,jdbcType=BIGINT})
   </insert>
   <insert id="insertBatch" parameterType="com.yiban.erp.entities.RepertoryInfo" keyProperty="id" useGeneratedKeys="true">
       insert into repertory_info (company_id, warehouse_id,
@@ -76,7 +83,7 @@
       in_date, supplier_id, supplier_contact_id,
       buyer_id, order_id, order_detail_id, sale_sate,
       create_by, create_time, update_by,
-      update_time)
+      update_time, customer_id, customer_rep_id, sale_id, back_price, ref_type, ref_order_id)
     values
     <foreach collection="list" item="item" separator="), (" open="(" close=")">
         #{item.companyId,jdbcType=INTEGER}, #{item.warehouseId,jdbcType=INTEGER},
@@ -87,7 +94,8 @@
         #{item.inDate,jdbcType=TIMESTAMP}, #{item.supplierId,jdbcType=BIGINT}, #{item.supplierContactId,jdbcType=BIGINT},
         #{item.buyerId,jdbcType=BIGINT}, #{item.orderId,jdbcType=BIGINT}, #{item.orderDetailId,jdbcType=BIGINT}, #{item.saleSate,jdbcType=BIT},
         #{item.createBy,jdbcType=VARCHAR}, #{item.createTime,jdbcType=TIMESTAMP}, #{item.updateBy,jdbcType=VARCHAR},
-        #{item.updateTime,jdbcType=TIMESTAMP}
+        #{item.updateTime,jdbcType=TIMESTAMP}, #{item.customerId,jdbcType=BIGINT}, #{item.customerRepId,jdbcType=BIGINT},
+        #{item.saleId,jdbcType=BIGINT}, #{item.backPrice,jdbcType=DECIMAL}, #{item.refType,jdbcType=VARCHAR}, #{item.refOrderId,jdbcType=BIGINT}
     </foreach>
   </insert>
 
@@ -171,6 +179,24 @@
           </if>
           <if test="updateTime != null" >
               update_time = #{updateTime,jdbcType=TIMESTAMP},
+          </if>
+          <if test="customerId != null" >
+              customer_id = #{customerId,jdbcType=BIGINT},
+          </if>
+          <if test="customerRepId != null" >
+              customer_rep_id = #{customerRepId,jdbcType=BIGINT},
+          </if>
+          <if test="saleId != null" >
+              sale_id = #{saleId,jdbcType=BIGINT},
+          </if>
+          <if test="backPrice != null" >
+              back_price = #{backPrice,jdbcType=DECIMAL},
+          </if>
+          <if test="refType != null" >
+              ref_type = #{refType,jdbcType=VARCHAR},
+          </if>
+          <if test="refOrderId != null" >
+              ref_order_id = #{refOrderId,jdbcType=BIGINT},
           </if>
     </set>
     where id = #{id,jdbcType=BIGINT}

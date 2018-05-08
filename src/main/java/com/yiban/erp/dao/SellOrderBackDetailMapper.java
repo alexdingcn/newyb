@@ -1,5 +1,6 @@
 package com.yiban.erp.dao;
 
+import com.yiban.erp.dto.SellBackCheck;
 import com.yiban.erp.entities.SellOrderBackDetail;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -19,4 +20,12 @@ public interface SellOrderBackDetailMapper {
     int updateByPrimaryKeySelective(SellOrderBackDetail record);
 
     int updateAlreadyBackQuantity(Long backOrderId);
+
+    int releaseAlreadyBackQuantity(Long backOrderId);
+
+    List<SellOrderBackDetail> getByBackOrderId(Long backOrderId);
+
+    int updateCheckStatus(SellBackCheck check);
+
+
 }
