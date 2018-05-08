@@ -17,6 +17,11 @@
                 <Button type="error" size="large" @click="showTrialWarning = false">知道了</Button>
             </div>
         </Modal>
+
+        <Alert type="error" v-show="loggedUser.companyExpiredTime > 0" show-icon closable>
+            <p>您的系统使用期限即将到期，请尽快续费购买，以免影响您的正常使用！</p>
+            <span slot="close">升级</span>
+        </Alert>
         <Card>
             <Row :gutter="10">
                 <Col span="3">
