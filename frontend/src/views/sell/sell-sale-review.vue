@@ -1,49 +1,48 @@
+<style lang="less">
+@import "../../styles/common.less";
+</style>
+
 <template>
     <div>
         <Card >
             <p slot="title">
-                销售审核
+                {{showTitle}}
             </p>
             <div slot="extra">
                 <ButtonGroup size="small">
-                    <Button type="success" icon="checkmark-round" :loading="sellOrderLoading" @click="reviewOkBtnClick">审核通过</Button>
-                    <Button type="error" icon="close-round" :loading="sellOrderLoading" @click="removeBtnClick">删除订单</Button>
+                    <Button type="primary" icon="ios-search" :loading="sellOrderLoading" @click="querySellOrderList">查询</Button>
+                    <Button v-if="showMethod === 'CHECK'" type="success" icon="checkmark-round" :loading="sellOrderLoading" @click="reviewOkBtnClick">审核通过</Button>
+                    <Button v-if="showMethod === 'CHECK'" type="error" icon="close-round" :loading="sellOrderLoading" @click="removeBtnClick">删除订单</Button>
+                    <Button v-if="showMethod === 'SELECT'" type="success" icon="checkmark" :loading="sellOrderLoading" @click="selectSellOrder">选择</Button>
                 </ButtonGroup>
             </div>
             <Form ref="searchForm" :model="query" :label-width="100">
-                <Row>
-                    <Col span="8">
+                <Row class="row-margin-bottom">
+                    <i-col span="6">
                         <FormItem label="制单日期">
                             <DatePicker v-model="dateRange" type="daterange" placement="bottom-start" placeholder="制单日期" style="width:180px"></DatePicker>
                         </FormItem>
-                    </Col>
-                    <Col span="8">
+                    </i-col>
+                    <i-col span="6">
                         <FormItem label="客户">
                             <customer-select v-model="query.customerId"></customer-select>
                         </FormItem>
-                    </Col>
-                    <Col span="8"></Col>
-                </Row>
-                <Row>
-                    <Col span="8">
+                    </i-col>
+                    <i-col span="6">
                         <FormItem label="销售员">
                             <sale-select v-model="query.saleId"></sale-select>
                         </FormItem>
-                    </Col>
-                    <Col span="8" >
-                        <FormItem label="状态">
+                    </i-col>
+                    <i-col span="6" >
+                        <FormItem label="状态" v-if="showMethod === 'CHECK'">
                             <Select v-model="query.status" placeholder="状态">
                                 <Option v-for="option in statusOptions" :value="option.key" :label="option.name" :key="option.key">{{option.name}}</Option>
                             </Select>
                         </FormItem>
-                    </Col>
-                    <Col span="7" offset="1">
-                        <Button type="primary" icon="ios-search" :loading="sellOrderLoading" @click="querySellOrderList"></Button>
-                    </Col>
+                    </i-col>
                 </Row>
             </Form>
-        </Card>
-        <div >
+
             <Table border highlight-row disabled-hover height="250" style="width: 100%" 
                    :columns="orderListColumns" :data="orderList"
 				   ref="sellOrderListTable" size="small"
@@ -51,20 +50,20 @@
                    @on-row-click="handleSelectSellOrder"
 				   no-data-text="使用右上方输入搜索条件">
 			</Table>
-        </div>
 
-        <div class="table-div">
-            <Row type="flex" justify="start" style="margin-bottom: 10px;">
+            <Row type="flex" justify="start" style="margin-bottom: 5px; margin-top: 20px;">
                 <h3 class="padding-left-20" >
-                    <b>合计数量:</b> ￥{{ totalCount }} <b class="margin-left-30">合计金额:</b> ￥{{ totalAmount }}
+                    <b>合计数量:</b> ￥{{ totalCount }} <b style="margin-left: 30px;">合计金额:</b> ￥{{ totalAmount }}
                 </h3>
             </Row>
             <Table border highlight-row height="300" :loading="detailLoading" 
-                   :columns="sellDetailColumns" :data="sellDetailList"
-                   ref="sellGoodTable" style="width: 100%;" size="small"
-                   no-data-text="点击上方订单后查看销售明细">
+                :columns="sellDetailColumns" :data="sellDetailList"
+                ref="sellGoodTable" style="width: 100%;" size="small"
+                no-data-text="点击上方订单后查看销售明细">
             </Table>
-        </div>
+
+        </Card>
+        
     </div>
 </template>
 
@@ -81,6 +80,15 @@ export default {
         customerSelect,
         saleSelect,
         goodExpand
+    },
+    props: {
+        viewMethod: {
+            type: String,
+            default: 'CHECK',
+            validator: function(value) {
+                return value === 'CHECK' || value === 'SELECT';
+            }
+        }
     },
     data() {
         const stautsShow = function(h, status) {
@@ -113,6 +121,7 @@ export default {
         };
 
         return {
+            showMethod: 'CHECK',
             statusOptions: [
                 {key: 'ALL', name:'所有'},
                 {key: 'INIT', name:'未质审完成'},
@@ -400,7 +409,7 @@ export default {
             ],
             totalCount: 0,
             totalAmount: 0,
-            chooseOrderItem: ''
+            chooseOrderItem: {}
         }
     },
     watch: {
@@ -415,6 +424,21 @@ export default {
                     return totalAmount + parseFloat(amount);
                 }, 0);
             }
+        },
+        viewMethod(value) {
+            if(value && (value === 'CHECK' || value === 'SELECT')) {
+                this.showMethod = value;
+            }else {
+                this.showMethod = 'CHECK';
+            }
+            if (value === 'SELECT') {
+                this.query.status = 'SALE_CHECKED'; //选择的模式下只查询审核通过的数据
+            }
+        }
+    },
+    computed: {
+        showTitle: function() {
+            return this.showMethod === 'CHECK' ? '销售审核' : '销售单选择';
         }
     },
     mounted() {
@@ -436,7 +460,7 @@ export default {
             reqData['startDate'] = this.dateRange[0];
             reqData['endDate'] = this.dateRange[1];
             this.sellOrderLoading = true;
-            this.chooseOrderItem = '';
+            this.chooseOrderItem = {};
             this.sellDetailList = [];
             util.ajax.post("/sell/order/review/list", reqData)
                 .then((response) => {
@@ -598,28 +622,21 @@ export default {
                     this.sellOrderLoading = false;
                     util.errorProcessor(this, error);
                 });
-        }
+        },
 
+        selectSellOrder() {
+            if (!this.chooseOrderItem.id || !this.sellDetailList || this.sellDetailList.length <= 0) {
+                this.$Message.info('请先选择存在详情的销售单.');
+                return;
+            }
+            //出发事件，事件返回订单和订单详情信息
+            this.$emit('on-choose', this.chooseOrderItem, this.sellDetailList);
+        }
     }
 }
 </script>
 
 <style>
-.margin-top-8 {
-    margin-top: 8px;
-}
-.margin-left-30 {
-    margin-left: 30px;
-}
-.ivu-form-item {
-    margin-bottom: 5px;
-}
-.search-div {
-    background-color: #fff;
-}
-.table-div {
-    background-color: #fff;
-    margin-top: 20px;
-}
+
 </style>
 

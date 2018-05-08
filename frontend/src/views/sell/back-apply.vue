@@ -101,6 +101,10 @@
 
         <warehouse-location-modal :openModal="locationModal" :warehouseId="applyForm.warehouseId" @on-ok="chooseLocation" @on-close="locationModalClose"></warehouse-location-modal>
 
+        <Modal v-model="selectSellOrderModal" width="75" :mask-closable="false" title="销售单提取" >
+
+        </Modal>
+
     </div>
 </template>
 
@@ -374,7 +378,8 @@ export default {
             locationModal: false,
             currEditLocationRow: '',
             currEditLocationIndex: '',
-            currCustomer: {}
+            currCustomer: {},
+            selectSellOrderModal: false
         }
     },
     computed: {
