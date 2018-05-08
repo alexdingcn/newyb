@@ -82,7 +82,7 @@
                 <Input v-model="checkResult" placeholder="审核结果描述" />
             </div>
             <div slot="footer">
-                <Button type="success" @click="setCheckedOk">提交</Button>
+                <Button type="success" @click="setCheckedOk" :loading="checkSubimitLoading">提交</Button>
             </div>
         </Modal>
 
@@ -105,6 +105,35 @@ export default {
         goodExpand
     },
     data() {
+        const stautsShow = function(h, status) {
+            let label = '';
+            let color = '';
+            switch (status) {
+                case 'INIT':
+                    label = '制单初始';
+                    color = '#2d8cf0'
+                    break;
+                case 'QUALITY_CHECKED':
+                    label = '质量审核完成';
+                    color = '#ff9900'
+                    break;
+                case 'SALE_CHECKED':
+                    label = '销售审核完成';
+                    color = '#19be6b';
+                    break;
+                default:
+                    label = '';
+                    color = '';
+                    break;
+            }
+            return h('Tag', {
+                props: {
+                    type: 'dot',
+                    color: color
+                }
+            }, label);
+        };
+
         return {
             checkStatusOptionList: [
                 {key: 'OK', name: "通过", defaultResult: "出库质量审核通过"},
@@ -129,13 +158,13 @@ export default {
                     key: 'id',
                     title: '#',
                     align: 'center',
-                    width: 60
+                    width: 80
                 },
                 {
                     title: '制单日',
                     key: 'createOrderDate',
                     align: "center",
-                    width: 90,
+                    width: 120,
                     sortable: true,
                     render:(h, params) => {
                         return moment(params.row.createOrderDate).format('YYYY-MM-DD');
@@ -145,18 +174,18 @@ export default {
                     title: '仓库点',
                     key: 'warehouseName',
                     align: "center",
-                    width: 100
+                    width: 140
                 },
                 {
                     title: '客户',
                     key: 'customerName',
                     align: "center",
-                    width: 160
+                    width: 180
                 },
                 {
                     title: '销售员',
                     key: 'saleId',
-                    width: 100,
+                    width: 140,
                     align: "center",
                     render: (h, params) => {
                         let nickName = params.row.saleNickName;
@@ -171,32 +200,40 @@ export default {
                     }
                 },
                 {
+                    title: '当前状态',
+                    key: 'status',
+                    width: 150,
+                    render: (h, params) => {
+                        return stautsShow(h, params.row.status);
+                    }
+                },
+                {
                     title: '制单人',
                     key: 'createBy',
                     align: "center",
-                    width: 100
+                    width: 140
                 },
                 {
                     title: '提货员',
                     key: 'takeGoodsUser',
                     align: "center",
-                    width: 100
+                    width: 140
                 },
                 {
                     title: '销售单号',
                     key: 'orderNumber',
                     align: 'center',
-                    width: 120
+                    width: 180
                 },
                 {
                     title: '总计数量',
                     key: 'totalQuantity',
-                    width: 100
+                    width: 120
                 },
                 {
                     title: '总计金额',
                     key: 'totalAmount',
-                    width: 100
+                    width: 120
                 },
                 {
                     title: '温控方式',
@@ -208,13 +245,13 @@ export default {
                     title: '收货人',
                     key: 'customerRepName',
                     align: "center",
-                    width: 120
+                    width: 150
                 },
                 {
                     title: '收货电话',
                     key: 'customerRepContactPhone',
                     align: "center",
-                    width: 100
+                    width: 150
                 },
                 {
                     title: '收货地址',
@@ -226,13 +263,13 @@ export default {
                     title: '运输方式',
                     key: 'shipMethodName',
                     align: "center",
-                    width: 110
+                    width: 120
                 },
                 {
                     title: '运输工具',
                     key: 'shipToolName',
                     align: "center",
-                    width: 110
+                    width: 120
                 }
             ],
             detailLoading: false,
@@ -241,90 +278,69 @@ export default {
             sellDetailColumns: [
                 {
                     type: "expand",
+                    fixed: 'left',
                     width: 50,
                     render: (h, params) => {
-                        let repertoryInfo = params.row.repertoryInfo;
-                        let goods = {};
-                        if (repertoryInfo) {
-                        goods = repertoryInfo.goods;
-                        }
-                        let productDate = '';
-                        if (repertoryInfo.productDate) {
-                            productDate = moment(repertoryInfo.productDate).format('YYYY-MM-DD');
-                        }
-                        let expDate = '';
-                        if (repertoryInfo.expDate) {
-                            expDate = moment(repertoryInfo.expDate).format('YYYY-MM-DD');
-                        }
+                        let goods = params.row.goods;
+                        let productDate = params.row.productDate ? moment(params.row.productDate).format('YYYY-MM-DD') : '';
+                        let expDate = params.row.expDate ? moment(params.row.expDate).format('YYYY-MM-DD') : '';
                         return h(goodExpand, {
-                            props: {
-                                good: goods,
-                                repertoryInfo: repertoryInfo,
-                                productDate: productDate,
-                                expDate: expDate
-                            }
-                        });
+                        props: {
+                            good: goods,
+                            productDate: productDate,
+                            expDate: expDate
+                        }
+                        })
                     }
                 },
                 {
                     type: 'selection',
+                    fixed: 'left',
                     width: 60,
                     align: 'center'
                 },
                 {
-                    title: '商品名称',
-                    key: 'goodsName',
-                    width: 150
+                    title: "商品名称",
+                    key: "goodsName",
+                    sortable: true,
+                    width: 180
                 },
                 {
-                    title: '生产企业',
-                    key: 'factoryName',
-                    width: 150
+                    title: "生产企业",
+                    key: "factoryName",
+                    width: 180
+                },
+                {
+                    title: "产地",
+                    key: "origin",
+                    width: 120
                 },
                 {
                     title: '批次号',
-                    key: 'batch',
-                    align: 'center',
-                    width: 160,
-                    render: (h, params) => {
-                        return params.row.repertoryInfo.batchCode;
-                    }
+                    key: 'batchCode',
+                    width: 160
                 },
                 {
-                    title: '剂型',
-                    key: 'jx',
-                    width: 100,
-                    render: (h, params) => {
-                        let goods = params.row.repertoryInfo.goods;
-                        if(goods) {
-                            return goods.jxName;
-                        }else {
-                            return '';
-                        }
-                    }
+                    title: "规格",
+                    key: "spec",
+                    width: 120
                 },
                 {
-                    title: '规格',
-                    key: 'spec',
-                    width: 100,
-                    render: (h, params) => {
-                        let goods = params.row.repertoryInfo.goods;
-                        if(goods) {
-                            return goods.spec;
-                        }else {
-                            return '';
-                        }
-                    }
+                    title: "剂型",
+                    key: "jx",
+                    width: 120
+                },
+                {
+                    title: '单位',
+                    key: 'unitName',
+                    width: 120
                 },
                 {
                     title: '生产日期',
                     width: 120,
                     key: 'productData',
                     render: (h, params) => {
-                        let repertoryInfo = params.row.repertoryInfo;
-                        if (repertoryInfo && repertoryInfo.productDate) {
-                            return moment(repertoryInfo.productDate).format('YYYY-MM-DD');
-                        }
+                        return params.row.productDate ? moment(params.row.productDate).format('YYYY-MM-DD') : '';
                     }
                 },
                 {
@@ -332,62 +348,42 @@ export default {
                     key: 'expDate',
                     width: 120,
                     render: (h, params) => {
-                        let repertoryInfo = params.row.repertoryInfo;
-                        if (repertoryInfo && repertoryInfo.expDate) {
-                            return moment(repertoryInfo.expDate).format('YYYY-MM-DD');
-                        }
-                    }
-                },
-                {
-                    title: '单位',
-                    key: 'unitName',
-                    width: 90,
-                    render: (h, params) => {
-                        let goods = params.row.repertoryInfo.goods;
-                        if(goods) {
-                            return goods.unitName;
-                        }else {
-                            return '';
-                        }
+                        return params.row.expDate ? moment(params.row.expDate).format('YYYY-MM-DD') : '';
                     }
                 },
                 {
                     title: "库存量",
                     key: "repertoryQuantity",
-                    width: 100,
-                    align: "center"
+                    width: 120,
                 },
                 {
                     title: '销售数量',
-                    width: 90,
+                    width: 120,
                     key: 'quantity'
                 },
                 {
                     title: '价格',
-                    width: 90,
+                    width: 100,
                     key: 'realPrice'
                 },
                 {
                     title: "折扣",
                     key: "disPrice",
-                    align: "center",
                     width: 100
                 },
                 {
                     title: "赠送",
                     key: "free",
-                    align: "center",
                     width: 100
                 },
                 {
                     title: '金额',
-                    width: 100,
+                    width: 120,
                     key: 'amount'
                 },
                 {
                     title: "税率",
                     key: "taxRate",
-                    align: "center",
                     width: 100
                 },
                 {
@@ -438,7 +434,8 @@ export default {
             totalAmount: 0,
             reviewOkModal: false,
             checkStatus: '',
-            checkResult: ''
+            checkResult: '',
+            checkSubimitLoading: false
         }
     },
     watch: {
@@ -454,6 +451,9 @@ export default {
                 }, 0);
             }
         }
+    },
+    mounted() {
+        this.querySellOrderList();
     },
     methods: {
         querySellOrderList() {
@@ -473,8 +473,9 @@ export default {
             this.sellOrderLoading = true;
             util.ajax.post("/sell/order/review/list", reqData)
                 .then((response) => {
-                    this.orderList = response.data;
                     this.sellOrderLoading = false;
+                    this.orderList = response.data;
+                    this.sellDetailList = [];
                 })
                 .catch((error) => {
                     this.sellOrderLoading = false;
@@ -483,6 +484,7 @@ export default {
         },
         handleSelectSellOrder(data) {
             if (!data || !data.id) {
+                this.sellDetailList = [];
                 return;
             }
             let sellOrderId = data.id;
@@ -535,9 +537,11 @@ export default {
                 checkResult: this.checkResult
             }
             this.detailLoading = true;
+            this.checkSubimitLoading = true;
             util.ajax.post("/sell/order/review/quality/check", reqData)
                 .then((response) => {
                     this.detailLoading = false;
+                    this.checkSubimitLoading = false;
                     let order = response.data;
                     if (order && order.details) {
                         this.sellDetailList = order.details;
@@ -549,34 +553,39 @@ export default {
                 })
                 .catch((error) => {
                     this.detailLoading = false;
+                    this.checkSubimitLoading = false;
                     util.errorProcessor(this, error);
                 })
         },
 
         reviewCancelBtnClick() {
             if (!this.detailChooseItems || this.detailChooseItems.length <= 0) {
+                this.$Message.info('请先勾选需要取消审核的商品.');
                 return;
             }
             let reqData = {
                 reviewType: 'QUALITY_REVIEW',
                 detailList: this.detailChooseItems
             };
-            this.detailLoading = true;
-            util.ajax.post("/sell/order/review/quality/cancel", reqData)
-                .then((response) => {
-                    this.detailLoading = false;
-                    let order = response.data;
-                    if (order && order.details) {
-                        this.sellDetailList = order.details;
-                    }else {
-                        this.sellDetailList = [];
-                    }
-                    this.$Message.success("取消成功");
-                })
-                .catch((error) => {
-                    this.detailLoading = false;
-                    util.errorProcessor(this, error);
-                })
+            let self = this;
+            this.$Modal.confirm({
+                title: '取消确认',
+                content: '是否确认取消审核选中的商品?',
+                onCancel: () => {},
+                onOk: () => {
+                    self.detailLoading = true;
+                    util.ajax.post("/sell/order/review/quality/cancel", reqData)
+                        .then((response) => {
+                            self.detailLoading = false;
+                            self.$Message.success("取消成功");
+                            self.querySellOrderList();
+                        })
+                        .catch((error) => {
+                            self.detailLoading = false;
+                            util.errorProcessor(self, error);
+                        })
+                }
+            });
         }
     }
   

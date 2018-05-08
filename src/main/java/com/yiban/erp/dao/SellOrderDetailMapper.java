@@ -14,19 +14,15 @@ public interface SellOrderDetailMapper {
 
     int insert(SellOrderDetail record);
 
-    int insertSelective(SellOrderDetail record);
-
     SellOrderDetail selectByPrimaryKey(Long id);
 
     int updateByPrimaryKeySelective(SellOrderDetail record);
-
-    int updateByPrimaryKey(SellOrderDetail record);
 
     List<SellOrderDetail> getDetailList(Long sellOrderId);
 
     List<SellOrderDetail> getDetailHistory(@Param("companyId") Integer companyId,
                                            @Param("customerId") Long customerId,
-                                           @Param("goodIds") List<Long> goodIds,
+                                           @Param("goodsId") Long goodsId,
                                            @Param("offset") Integer offset,
                                            @Param("limit") Integer limit);
 

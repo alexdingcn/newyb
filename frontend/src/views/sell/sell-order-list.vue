@@ -291,9 +291,10 @@ export default {
             shipDetailTitle: ''
         };
     },
+    mounted() {
+        this.refreshTableData();
+    },
     methods: {
-
-        
         searchBtnClick () {
             this.currentPage = 1;
             this.refreshTableData();

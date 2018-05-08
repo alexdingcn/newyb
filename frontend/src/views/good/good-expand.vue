@@ -115,7 +115,6 @@ export default {
     name: 'good-expand',
     props: {
         good: Object,
-        repertoryInfo: Object,
         productDate: String,
         expDate: String
     }

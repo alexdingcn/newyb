@@ -1,15 +1,20 @@
 package com.yiban.erp.dto;
 
+import java.math.BigDecimal;
+
 public class RepertorySelectQuery {
 
     private Integer companyId;
-    private Long warehouseId;
+    private Integer warehouseId;
     private Long goodsId;
     private String batchCode; //模糊匹配
     private Long supplierId;
     private Integer page;
     private Integer size;
 
+    private BigDecimal minQuantity; //最低库存
+
+    private boolean byPage; // 是否分页，只有当true的时候才考虑分页，否则不考虑
     private int offset;
     private int limit;
 
@@ -21,6 +26,14 @@ public class RepertorySelectQuery {
         return (this.size == null || this.size <= 0) ? 50 : this.size;
     }
 
+    public boolean getByPage() {
+        return byPage;
+    }
+
+    public void setByPage(boolean byPage) {
+        this.byPage = byPage;
+    }
+
     public Integer getCompanyId() {
         return companyId;
     }
@@ -29,11 +42,11 @@ public class RepertorySelectQuery {
         this.companyId = companyId;
     }
 
-    public Long getWarehouseId() {
+    public Integer getWarehouseId() {
         return warehouseId;
     }
 
-    public void setWarehouseId(Long warehouseId) {
+    public void setWarehouseId(Integer warehouseId) {
         this.warehouseId = warehouseId;
     }
 
@@ -75,5 +88,13 @@ public class RepertorySelectQuery {
 
     public void setSize(Integer size) {
         this.size = size;
+    }
+
+    public BigDecimal getMinQuantity() {
+        return minQuantity;
+    }
+
+    public void setMinQuantity(BigDecimal minQuantity) {
+        this.minQuantity = minQuantity;
     }
 }
