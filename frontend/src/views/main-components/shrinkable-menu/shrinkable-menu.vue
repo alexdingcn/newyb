@@ -14,7 +14,7 @@
         ></sidebar-menu>
         <sidebar-menu-shrink 
             v-show="shrink"
-            :menu-theme="theme" 
+            :menu-theme="theme"
             :menu-list="menuList" 
             :icon-color="shrinkIconColor"
             @on-change="handleChange"

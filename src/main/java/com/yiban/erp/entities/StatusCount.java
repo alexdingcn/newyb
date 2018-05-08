@@ -7,6 +7,8 @@ public class StatusCount {
     private Integer count;
     private Double amount;
     private Date tradeDate;
+    private String goodsName;
+    private Long goodsId;
 
     public String getStatus() {
         return status;
@@ -38,5 +40,21 @@ public class StatusCount {
 
     public void setTradeDate(Date tradeDate) {
         this.tradeDate = tradeDate;
+    }
+
+    public String getGoodsName() {
+        return goodsName;
+    }
+
+    public void setGoodsName(String goodsName) {
+        this.goodsName = goodsName;
+    }
+
+    public Long getGoodsId() {
+        return goodsId;
+    }
+
+    public void setGoodsId(Long goodsId) {
+        this.goodsId = goodsId;
     }
 }

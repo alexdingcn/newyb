@@ -9,12 +9,31 @@ export default {
     name: 'dataSourcePie',
     data () {
         return {
-            //
+            dataSourcePie: {}
         };
     },
+    props: {
+        content: {
+            type: Array,
+            required: true
+        }
+    },
     mounted () {
-        this.$nextTick(() => {
-            var dataSourcePie = echarts.init(document.getElementById('data_source_con'));
+        this.dataSourcePie = echarts.init(document.getElementById('data_source_con'));
+    },
+    methods: {
+        draw(val) {
+            var data = [];
+            var legends = [];
+            for (let i = 0; i < val.length; i++) {
+                data.push({
+                    value: val[i].amount,
+                    name: val[i].goodsName
+                });
+
+                legends.push(val[i].goodsName);
+            }
+
             const option = {
                 tooltip: {
                     trigger: 'item',
@@ -22,37 +41,29 @@ export default {
                 },
                 legend: {
                     orient: 'vertical',
-                    left: 'right',
-                    data: ['德伦', '张章', '艾众', '刘意翔', '其他']
+                    x: 'right',
+                    data: legends
                 },
                 series: [
                     {
-                        name: '访问来源',
+                        name: '销量',
                         type: 'pie',
-                        radius: '66%',
-                        center: ['50%', '60%'],
-                        data: [
-                            {value: 2103456, name: '德伦', itemStyle: {normal: {color: '#9bd598'}}},
-                            {value: 1305923, name: '张章', itemStyle: {normal: {color: '#ffd58f'}}},
-                            {value: 543250, name: '艾众', itemStyle: {normal: {color: '#abd5f2'}}},
-                            {value: 798403, name: '刘意翔', itemStyle: {normal: {color: '#ab8df2'}}},
-                            {value: 302340, name: '其他', itemStyle: {normal: {color: '#e14f60'}}}
-                        ],
-                        itemStyle: {
-                            emphasis: {
-                                shadowBlur: 10,
-                                shadowOffsetX: 0,
-                                shadowColor: 'rgba(0, 0, 0, 0.5)'
-                            }
-                        }
+                        radius: ['40%', '70%'],
+                        avoidLabelOverlap: false,
+                        data: data
                     }
                 ]
             };
-            dataSourcePie.setOption(option);
+            this.dataSourcePie.setOption(option);
             window.addEventListener('resize', function () {
-                dataSourcePie.resize();
+                this.dataSourcePie.resize();
             });
-        });
+        }
+    },
+    watch: {
+        content (val) {
+            this.draw(val);
+        }
     }
 };
 </script>

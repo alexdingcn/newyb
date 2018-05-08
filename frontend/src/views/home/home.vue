@@ -38,7 +38,7 @@
                         <p class="notwrap">上次登录时间: {{ loggedUser.lastLoginTime | formatTime }} </p>
                     </Row>
                 </Col>
-                <Col span="5">
+                <Col span="5" v-show="loggedUser.companyExpiredTime > 0">
                     <p>当前版本:试用版</p>
                     <br/>
                     <p>到期日: {{ loggedUser.companyExpiredTime | formatTime }} </p>
@@ -115,10 +115,10 @@
                         <Card>
                             <p slot="title" class="card-title">
                                 <Icon type="android-map"></Icon>
-                                上周销量统计
+                                近4周销量统计
                             </p>
                             <div class="data-source-row">
-                                <visite-volume></visite-volume>
+                                <sale-volume :content="amountStats"></sale-volume>
                             </div>
                         </Card>
                     </Col>
@@ -126,10 +126,10 @@
                         <Card>
                             <p slot="title" class="card-title">
                                 <Icon type="ios-pulse-strong"></Icon>
-                                商品销售来源统计
+                                近4周商品销售统计
                             </p>
                             <div class="data-source-row">
-                                <data-source-pie></data-source-pie>
+                                <data-source-pie :content="goodsStats"></data-source-pie>
                             </div>
                         </Card>
                     </Col>
@@ -220,7 +220,7 @@ import Vue from 'vue';
 import cityData from './map-data/get-city-value.js';
 import homeMap from './components/map.vue';
 import dataSourcePie from './components/dataSourcePie.vue';
-import visiteVolume from './components/visiteVolume.vue';
+import saleVolume from './components/saleVolume.vue';
 import serviceRequests from './components/serviceRequests.vue';
 import userFlow from './components/userFlow.vue';
 import countUp from './components/countUp.vue';
@@ -246,7 +246,7 @@ export default {
     components: {
         homeMap,
         dataSourcePie,
-        visiteVolume,
+        saleVolume,
         serviceRequests,
         userFlow,
         countUp,
@@ -269,11 +269,15 @@ export default {
             },
             cityData: cityData,
             showAddNewTodo: false,
-            newToDoItemValue: ''
+            newToDoItemValue: '',
+            amountStats: [],
+            goodsStats: []
         };
     },
     mounted() {
         this.loadOrderStats();
+        this.loadAmountStats();
+        this.loadGoodsStats();
     },
     computed: {
         avatorPath () {
@@ -284,11 +288,41 @@ export default {
         loadOrderStats() {
             var self = this;
             util.ajax.post('/home/orderstats')
+                .then(function (response) {
+                    if (response.status === 200 && response.data) {
+                        for (var i=0; i<response.data.length; i++) {
+                            self.count[response.data[i].status.toLowerCase()] = response.data[i].count;
+                        }
+                    }
+                })
+                .catch(function (error) {
+                    util.errorProcessor(self, error);
+                });
+        },
+        loadAmountStats() {
+            var self = this;
+            util.ajax.post('/home/amountstats', {
+                    startDate: moment().add(-4, 'w').format('YYYY-MM-DD'),
+                    endDate: moment().add(1, 'd').format('YYYY-MM-DD')
+                })
+                .then(function (response) {
+                    if (response.status === 200 && response.data) {
+                        self.amountStats = response.data;
+                    }
+                })
+                .catch(function (error) {
+                    util.errorProcessor(self, error);
+                });
+        },
+        loadGoodsStats() {
+            var self = this;
+            util.ajax.post('/home/goodsstats', {
+                        startDate: moment().add(-4, 'w').format('YYYY-MM-DD'),
+                        endDate: moment().add(1, 'd').format('YYYY-MM-DD')
+                    })
                     .then(function (response) {
                         if (response.status === 200 && response.data) {
-                            for (var i=0; i<response.data.length; i++) {
-                                self.count[response.data[i].status.toLowerCase()] = response.data[i].count;
-                            }
+                            self.goodsStats = response.data;
                         }
                     })
                     .catch(function (error) {
