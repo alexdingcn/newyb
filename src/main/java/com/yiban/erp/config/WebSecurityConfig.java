@@ -37,6 +37,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     private CompanyMapper companyMapper;
     @Autowired
     private TokenManager tokenManager;
+    @Autowired
+    private OperationLogMapper operationLogMapper;
 
 
     @Override
@@ -87,7 +89,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
     public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
-        auth.authenticationProvider(new CustomAuthenticationProvider(userMapper, userRouteMapper, companyMapper));
+        auth.authenticationProvider(new CustomAuthenticationProvider(userMapper, userRouteMapper, companyMapper, operationLogMapper));
     }
 
 }

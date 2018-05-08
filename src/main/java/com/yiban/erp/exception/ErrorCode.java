@@ -24,8 +24,9 @@ public enum ErrorCode {
     USER_REGISTER_COMPANY_EXIST(1110, "公司营业执照已注册，请联系公司管理员确认"),
     USER_REGISTER_NICKNAME_EXIST(1111, "用户名已经存在"),
     USER_REGISTER_EXCEPTION(1112, "管理员用户注册异常, 请联系运营方"),
+    COMPANY_EXPIRED(1113, "试用账号已过期"),
     USER_LOGIN_UN_ACTIVATE(1114, "账号为未激活"),
-    COMPANY_UN_ENABLED(1115, "公司处于未激活状态，请联系运营方"),
+    COMPANY_DISABLED(1115, "公司处于未激活状态，请联系运营方"),
     USER_MOBILE_EXIST(1116, "手机号已经存在, 不可再次注册"),
     USER_MOBILE_MISSING(1117, "手机号缺失"),
 
