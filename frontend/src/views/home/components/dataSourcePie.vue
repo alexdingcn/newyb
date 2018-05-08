@@ -25,7 +25,6 @@ export default {
         draw(val) {
             var data = [];
             var legends = [];
-            var colors = ['#9bd598', '#ffd58f', '#abd5f2', '#ab8df2', '#e14f60'];
             for (let i = 0; i < val.length; i++) {
                 data.push({
                     value: val[i].amount,
@@ -42,8 +41,8 @@ export default {
                 },
                 legend: {
                     orient: 'vertical',
-                    left: 'left',
-                    legends: legends
+                    x: 'right',
+                    data: legends
                 },
                 series: [
                     {
