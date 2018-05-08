@@ -42,4 +42,14 @@ public class HomeController {
 
         return ResponseEntity.ok().body(JSON.toJSONString(counts));
     }
+
+    @RequestMapping(value = "/goodsstats", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    private ResponseEntity<String> getGoodsStats(@AuthenticationPrincipal User user, @RequestBody Map requestMap) {
+        Date startDate = DateUtils.parseDate((String) requestMap.getOrDefault("startDate", ""), new String[]{"yyyy-MM-dd"});
+        Date endDate = DateUtils.parseDate((String) requestMap.getOrDefault("endDate", ""), new String[]{"yyyy-MM-dd"});
+
+        List<StatusCount> counts = sellOrderMapper.getGoodsAmountStat(user.getCompanyId(), startDate, endDate);
+
+        return ResponseEntity.ok().body(JSON.toJSONString(counts));
+    }
 }

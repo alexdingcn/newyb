@@ -40,4 +40,8 @@ public interface SellOrderMapper {
     List<StatusCount> getOrderAmountStat(@Param("companyId")Integer companyId,
                                          @Param("startDate")Date startDate,
                                          @Param("endDate")Date endDate);
+
+    List<StatusCount> getGoodsAmountStat(@Param("companyId")Integer companyId,
+                                         @Param("startDate")Date startDate,
+                                         @Param("endDate")Date endDate);
 }

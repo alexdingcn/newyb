@@ -1,5 +1,5 @@
 <template>
-    <div style="width:100%;height:100%;" id="visite_volume_con"></div>
+    <div style="width:100%;height:100%;" id="sale_volume_con"></div>
 </template>
 
 <script>
@@ -7,7 +7,7 @@ import echarts from 'echarts';
 import moment from 'moment';
 
 export default {
-    name: 'visiteVolume',
+    name: 'saleVolume',
     data () {
         return {
             saleVolume: {}
@@ -20,7 +20,7 @@ export default {
         }
     },
     mounted () {
-        this.saleVolume = echarts.init(document.getElementById('visite_volume_con'));
+        this.saleVolume = echarts.init(document.getElementById('sale_volume_con'));
     },
     methods: {
         draw (content) {

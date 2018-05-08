@@ -363,5 +363,24 @@
             and #{endDate} > create_time
         </if>
         group by tradeDate
+        order by tradeDate
     </select>
+
+    <select id="getGoodsAmountStat" resultType="com.yiban.erp.entities.StatusCount" >
+        select g.name as goodsName, sod.goods_id as goodsId, sum(sod.amount) as amount
+        from sell_order so, sell_order_detail sod, goods g
+        where sod.sell_order_id = so.id and sod.goods_id=g.id and so.status='SALE_CHECKED'
+        <if test="companyId != null">
+            and so.company_id = #{companyId}
+        </if>
+        <if test="startDate != null">
+            and so.create_time >= #{startDate}
+        </if>
+        <if test="endDate != null">
+            and #{endDate} > so.create_time
+        </if>
+        group by sod.goods_id
+        order by amount desc
+    </select>
+
 </mapper>
