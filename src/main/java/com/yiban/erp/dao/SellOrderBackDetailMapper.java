@@ -27,5 +27,5 @@ public interface SellOrderBackDetailMapper {
 
     int updateCheckStatus(SellBackCheck check);
 
-
+    int updateCheckStatusByBackOrderId(SellBackCheck check);
 }

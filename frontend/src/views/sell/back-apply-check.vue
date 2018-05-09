@@ -104,8 +104,8 @@ export default {
                     color = '#ff9900';
                     break;
                 case 'BACK_RECEIVE': 
-                    label = '退货收货';
-                    color = '#495060';
+                    label = '退货已收货';
+                    color = 'rgb(107, 175, 158)';
                     break;
                 case 'QUALITY_CHECKED': 
                     label = '质量复核完成';
@@ -389,6 +389,7 @@ export default {
                     self.details = response.data;
                 })
                 .catch((error) => {
+                    self.detailLoading = false;
                     util.errorProcessor(self, error);
                 })
         },

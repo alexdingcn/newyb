@@ -61,11 +61,11 @@ public class SellOrderBackController {
         return ResponseEntity.ok().build();
     }
 
-    @RequestMapping(value = "/{backOrderId}/check/cancel", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> cancelQualityCheck(@PathVariable Long backOrderId,
+    @RequestMapping(value = "/quality/check/cancel", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> cancelQualityCheck(@RequestBody SellBackCheck check,
                                                      @AuthenticationPrincipal User user) throws Exception {
-        logger.info("user:{} cancel quality check request backOrderId:{}", user.getId(), backOrderId);
-        sellOrderBackService.cancelQualityCheck(backOrderId, user);
+        logger.info("user:{} cancel quality check request check:{}", user.getId(), JSON.toJSONString(check));
+        sellOrderBackService.cancelQualityCheck(check, user);
         return ResponseEntity.ok().build();
     }
 
@@ -76,5 +76,15 @@ public class SellOrderBackController {
         sellOrderBackService.removeBackOrder(backOrderId, user);
         return ResponseEntity.ok().build();
     }
+
+    @RequestMapping(value = "/receive", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> backReceive(@RequestBody SellOrderBack back,
+                                              @AuthenticationPrincipal User user) throws Exception {
+        logger.info("user:{} request record receive info by:{}", user.getId(), JSON.toJSONString(back));
+        sellOrderBackService.receive(back, user);
+        return ResponseEntity.ok().build();
+    }
+
+
 
 }

@@ -17,7 +17,11 @@
     <result column="exp_date" property="expDate" jdbcType="DATE" />
     <result column="product_date" property="productDate" jdbcType="DATE" />
     <result column="tax_rate" property="taxRate" jdbcType="DECIMAL" />
+    <result column="bad_plan" property="badPlan" jdbcType="VARCHAR" />
+    <result column="bad_reason" property="badReason" jdbcType="VARCHAR"/>
     <result column="check_status" property="checkStatus" jdbcType="BIT" />
+    <result column="check_temp_method" property="checkTempMethod" jdbcType="BIGINT"/>
+    <result column="check_time" property="checkTime" jdbcType="TIMESTAMP" />
     <result column="check_user" property="checkUser" jdbcType="VARCHAR" />
     <result column="check_result" property="checkResult" jdbcType="VARCHAR" />
     <result column="created_by" property="createdBy" jdbcType="VARCHAR" />
@@ -27,8 +31,9 @@
   </resultMap>
   <sql id="Base_Column_List" >
     id, back_order_id, sell_detail_id, goods_id, back_quantity, right_quantity, bad_quantity,
-    back_price, amount, cost_amount, batch_code, location, exp_date, product_date, tax_rate, 
-    check_status, check_user, check_result, created_by, updated_by, created_time, updated_time
+    back_price, amount, cost_amount, batch_code, location, exp_date, product_date, tax_rate,
+    bad_plan, bad_reason, check_status, check_temp_method, check_time, check_user, check_result,
+    created_by, updated_by, created_time, updated_time
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
     select 
@@ -45,16 +50,19 @@
       goods_id, back_quantity, right_quantity, 
       bad_quantity, back_price, amount, 
       cost_amount, batch_code, location, 
-      exp_date, product_date, tax_rate, 
-      check_status, check_user, check_result, 
+      exp_date, product_date, tax_rate,
+      bad_plan, bad_reason,
+      check_status, check_temp_method, check_time, check_user, check_result,
       created_by, updated_by, created_time, 
       updated_time)
     values (#{backOrderId,jdbcType=BIGINT}, #{sellDetailId,jdbcType=BIGINT},
       #{goodsId,jdbcType=BIGINT}, #{backQuantity,jdbcType=DECIMAL}, #{rightQuantity,jdbcType=DECIMAL}, 
       #{badQuantity,jdbcType=DECIMAL}, #{backPrice,jdbcType=DECIMAL}, #{amount,jdbcType=DECIMAL}, 
       #{costAmount,jdbcType=DECIMAL}, #{batchCode,jdbcType=VARCHAR}, #{location,jdbcType=VARCHAR}, 
-      #{expDate,jdbcType=DATE}, #{productDate,jdbcType=DATE}, #{taxRate,jdbcType=DECIMAL}, 
-      #{checkStatus,jdbcType=BIT}, #{checkUser,jdbcType=VARCHAR}, #{checkResult,jdbcType=VARCHAR}, 
+      #{expDate,jdbcType=DATE}, #{productDate,jdbcType=DATE}, #{taxRate,jdbcType=DECIMAL},
+      #{badPlan,jdbcType=VARCHAR}, #{badReason,jdbcType=VARCHAR},
+      #{checkStatus,jdbcType=BIT}, #{checkTempMethod,jdbcType=BIGINT}, #{checkTime,jdbcType=TIMESTAMP},
+      #{checkUser,jdbcType=VARCHAR}, #{checkResult,jdbcType=VARCHAR},
       #{createdBy,jdbcType=VARCHAR}, #{updatedBy,jdbcType=VARCHAR}, #{createdTime,jdbcType=TIMESTAMP}, 
       #{updatedTime,jdbcType=TIMESTAMP})
   </insert>
@@ -65,7 +73,8 @@
       bad_quantity, back_price, amount,
       cost_amount, batch_code, location,
       exp_date, product_date, tax_rate,
-      check_status, check_user, check_result,
+      bad_plan, bad_reason,
+      check_status, check_temp_method, check_time, check_user, check_result,
       created_by, updated_by, created_time,
       updated_time)
     values
@@ -75,7 +84,9 @@
       #{item.badQuantity,jdbcType=DECIMAL}, #{item.backPrice,jdbcType=DECIMAL}, #{item.amount,jdbcType=DECIMAL},
       #{item.costAmount,jdbcType=DECIMAL}, #{item.batchCode,jdbcType=VARCHAR}, #{item.location,jdbcType=VARCHAR},
       #{item.expDate,jdbcType=DATE}, #{item.productDate,jdbcType=DATE}, #{item.taxRate,jdbcType=DECIMAL},
-      #{item.checkStatus,jdbcType=BIT}, #{item.checkUser,jdbcType=VARCHAR}, #{item.checkResult,jdbcType=VARCHAR},
+      #{item.badPlan,jdbcType=VARCHAR}, #{item.badReason,jdbcType=VARCHAR},
+      #{item.checkStatus,jdbcType=BIT}, #{item.checkTempMethod,jdbcType=BIGINT}, #{item.checkTime,jdbcType=TIMESTAMP},
+      #{item.checkUser,jdbcType=VARCHAR}, #{item.checkResult,jdbcType=VARCHAR},
       #{item.createdBy,jdbcType=VARCHAR}, #{item.updatedBy,jdbcType=VARCHAR}, #{item.createdTime,jdbcType=TIMESTAMP},
       #{item.updatedTime,jdbcType=TIMESTAMP}
     </foreach>
@@ -126,8 +137,20 @@
       <if test="taxRate != null" >
         tax_rate = #{taxRate,jdbcType=DECIMAL},
       </if>
+      <if test="badPlan != null" >
+        bad_plan = #{badPlan,jdbcType=VARCHAR},
+      </if>
+      <if test="badReason != null" >
+        bad_reason = #{badReason,jdbcType=VARCHAR},
+      </if>
       <if test="checkStatus != null" >
         check_status = #{checkStatus,jdbcType=BIT},
+      </if>
+      <if test="checkTempMethod != null">
+        check_temp_method = #{checkTempMethod,jdbcType=BIGINT},
+      </if>
+      <if test="checkTime != null">
+        check_time = #{checkTime, jdbcType=TIMESTAMP},
       </if>
       <if test="checkUser != null" >
         check_user = #{checkUser,jdbcType=VARCHAR},
@@ -165,14 +188,44 @@
 
   <select id="getByBackOrderId" parameterType="java.lang.Long" resultMap="BaseResultMap">
     select
-      <include refid="Base_Column_List" />
-    from sell_order_back_detail
+      s.*, o.value as checkTempMethodName
+    from sell_order_back_detail s
+    left join options o on s.check_temp_method = o.id
     where back_order_id = #{backOrderId,jdbcType=BIGINT}
   </select>
 
   <update id="updateCheckStatus" parameterType="com.yiban.erp.dto.SellBackCheck" >
     update sell_order_back_detail
-      set check_status = #{checkStatus,jdbcType=BIT},
+      set
+          right_quantity = #{rightQuantity,jdbcType=DECIMAL},
+          bad_quantity = #{badQuantity,jdbcType=DECIMAL},
+          bad_plan = #{badPlan,jdbcType=VARCHAR},
+          bad_reason = #{badReason,jdbcType=VARCHAR},
+          check_status = #{checkStatus,jdbcType=BIT},
+          check_temp_method = #{checkTempMethod,jdbcType=BIGINT},
+          check_time = #{checkTime,jdbcType=TIMESTAMP},
+          check_user = #{checkUser,jdbcType=VARCHAR},
+          check_result = #{checkResult,jdbcType=VARCHAR},
+          updated_by = #{updatedBy,jdbcType=VARCHAR},
+          updated_time = #{updatedTime,jdbcType=TIMESTAMP}
+    where 1=1
+      <if test="detailId != null">
+        and id = #{detailId,jdbcType=BIGINT}
+      </if>
+      <if test="backOrderId != null">
+        and back_order_id = #{backOrderId,jdbcType=BIGINT}
+      </if>
+      <if test="detailId == null and backOrderId == null">
+        and 1 = 2
+      </if>
+  </update>
+
+  <update id="updateCheckStatusByBackOrderId" parameterType="com.yiban.erp.dto.SellBackCheck" >
+    update sell_order_back_detail
+      set
+          check_status = #{checkStatus,jdbcType=BIT},
+          check_temp_method = #{checkTempMethod,jdbcType=BIGINT},
+          check_time = #{checkTime,jdbcType=TIMESTAMP},
           check_user = #{checkUser,jdbcType=VARCHAR},
           check_result = #{checkResult,jdbcType=VARCHAR},
           updated_by = #{updatedBy,jdbcType=VARCHAR},

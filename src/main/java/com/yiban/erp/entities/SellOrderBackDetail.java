@@ -34,7 +34,17 @@ public class SellOrderBackDetail {
 
     private BigDecimal taxRate;
 
+    private String badPlan;
+
+    private String badReason;
+
     private Boolean checkStatus;
+
+    private Long checkTempMethod;
+
+    private String checkTempMethodName;
+
+    private Date checkTime;
 
     private String checkUser;
 
@@ -347,5 +357,45 @@ public class SellOrderBackDetail {
 
     public void setStorageConditionName(String storageConditionName) {
         this.storageConditionName = storageConditionName;
+    }
+
+    public String getBadPlan() {
+        return badPlan;
+    }
+
+    public void setBadPlan(String badPlan) {
+        this.badPlan = badPlan;
+    }
+
+    public String getBadReason() {
+        return badReason;
+    }
+
+    public void setBadReason(String badReason) {
+        this.badReason = badReason;
+    }
+
+    public Long getCheckTempMethod() {
+        return checkTempMethod;
+    }
+
+    public void setCheckTempMethod(Long checkTempMethod) {
+        this.checkTempMethod = checkTempMethod;
+    }
+
+    public Date getCheckTime() {
+        return checkTime;
+    }
+
+    public void setCheckTime(Date checkTime) {
+        this.checkTime = checkTime;
+    }
+
+    public String getCheckTempMethodName() {
+        return checkTempMethodName;
+    }
+
+    public void setCheckTempMethodName(String checkTempMethodName) {
+        this.checkTempMethodName = checkTempMethodName;
     }
 }

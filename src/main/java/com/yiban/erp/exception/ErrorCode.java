@@ -114,6 +114,8 @@ public enum ErrorCode {
     SELL_BACK_QUALITY_CHECK_CANCEL_ERROR(2229, "销售退货单当前状态不可操作质量复核取消"),
     SELL_BACK_REMOVE_STATUS_ERROR(2230, "销售退货单已经通过了终审，不能做删除操作"),
     SELL_BACK_DETAIL_GET_FAIL(2231, "获取销售退货单详情信息失败."),
+    SELL_BACK_RECEIVE_STATUS_ERROR(2232, "销售退货单当前状态不可操作收货确认."),
+    SELL_BACK_RIGHT_QUANTITY_ERROR(2233, "合格数据错误."),
 
 
     // 23xx -承运公司
