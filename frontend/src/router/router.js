@@ -144,7 +144,11 @@ export const appRouter = [
             { path: 'quality-review', title: '销售出库质量审核', name: 'sell-quality-review', component: () => import('@/views/sell/sell-quality-review.vue') },
             { path: 'sale-review', title: '销售审核', name: 'sell-sale-review', component: () => import('@/views/sell/sell-sale-review.vue') },
             { path: 'list', title: '销售订单列表', name: 'sell_list', component: () => import('@/views/sell/sell-order-list.vue') },
-
+            { path: 'back-apply', title: '销售退单申请', name: 'sell-back-apply', component: () => import('@/views/sell/back-apply.vue') },
+            { path: 'back-apply-check', title: '销售退单申请审核', name: 'sell-back-apply-check', component: () => import('@/views/sell/back-apply-check.vue') },
+            { path: 'back-receive', title: '销售退单申请审核', name: 'sell-back-receive', component: () => import('@/views/sell/back-receive.vue')},
+            { path: 'back-receive', title: '销售退单质量复核', name: 'sell-back-quality-check', component: () => import('@/views/sell/back-quality-check.vue') },
+            { path: 'back-final-check', title: '销售退单终审', name: 'sell-back-final-check', component: () => import('@/views/sell/back-final-check.vue') },
         ]
     },
     {

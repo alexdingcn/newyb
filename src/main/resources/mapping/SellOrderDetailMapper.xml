@@ -26,11 +26,12 @@
     <result column="product_date" property="productDate" jdbcType="DATE" />
     <result column="exp_date" property="expDate" jdbcType="DATE" />
     <result column="location" property="location" jdbcType="VARCHAR" />
+    <result column="back_quantity" property="backQuantity" jdbcType="DECIMAL" />
   </resultMap>
   <sql id="Base_Column_List" >
     id, sell_order_id, repertory_id, quantity, fix_price, dis_price, free, real_price, single_price,
     amount, tax_rate, create_by, create_time, update_by, update_time, check_status, check_result, check_date,
-    check_user, batch_code, goods_id, product_date, exp_date, location
+    check_user, batch_code, goods_id, product_date, exp_date, location, back_quantity
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
     select 
@@ -49,7 +50,7 @@
       amount, tax_rate, create_by, 
       create_time, update_by, update_time,
       check_status, check_result, check_date,
-      check_user, batch_code, goods_id, product_date, exp_date, location
+      check_user, batch_code, goods_id, product_date, exp_date, location, back_quantity
       )
     values (#{sellOrderId,jdbcType=BIGINT}, #{repertoryId,jdbcType=BIGINT},
       #{quantity,jdbcType=DECIMAL}, #{fixPrice,jdbcType=DECIMAL}, #{disPrice,jdbcType=DECIMAL},
@@ -58,7 +59,8 @@
       #{createTime,jdbcType=TIMESTAMP}, #{updateBy,jdbcType=VARCHAR}, #{updateTime,jdbcType=TIMESTAMP},
       #{checkStatus,jdbcType=VARCHAR}, #{checkResult,jdbcType=VARCHAR}, #{checkDate,jdbcType=TIMESTAMP},
       #{checkUser,jdbcType=VARCHAR}, #{batchCode,jdbcType=VARCHAR}, #{goodsId,jdbcType=BIGINT},
-      #{productDate,jdbcType=DATE}, #{expDate, jdbcType=DATE}, #{location,jdbcType=VARCHAR}
+      #{productDate,jdbcType=DATE}, #{expDate, jdbcType=DATE}, #{location,jdbcType=VARCHAR},
+      #{backQuantity,jdbcType=DECIMAL}
       )
   </insert>
 
@@ -69,7 +71,7 @@
       amount, tax_rate, create_by,
       create_time, update_by, update_time,
       check_status, check_result, check_date,
-      check_user, batch_code, goods_id, product_date, exp_date, location
+      check_user, batch_code, goods_id, product_date, exp_date, location, back_quantity
       )
     values
     <foreach collection="detailList" item="item" open="(" close=")" separator="), (">
@@ -80,7 +82,8 @@
       #{item.createTime,jdbcType=TIMESTAMP}, #{item.updateBy,jdbcType=VARCHAR}, #{item.updateTime,jdbcType=TIMESTAMP},
       #{item.checkStatus,jdbcType=VARCHAR}, #{item.checkResult,jdbcType=VARCHAR}, #{item.checkDate,jdbcType=TIMESTAMP},
       #{item.checkUser,jdbcType=VARCHAR}, #{item.batchCode,jdbcType=VARCHAR}, #{item.goodsId,jdbcType=BIGINT},
-      #{item.productDate,jdbcType=DATE}, #{item.expDate, jdbcType=DATE}, #{item.location, jdbcType=VARCHAR}
+      #{item.productDate,jdbcType=DATE}, #{item.expDate, jdbcType=DATE}, #{item.location, jdbcType=VARCHAR},
+      #{item.backQuantity,jdbcType=DECIMAL}
     </foreach>
   </insert>
 
@@ -155,6 +158,9 @@
        </if>
       <if test="location != null">
         location = #{location,jdbcType=VARCHAR},
+      </if>
+      <if test="backQuantity != null">
+        back_quantity = #{backQuantity,jdbcType=DECIMAL},
       </if>
     </set>
     where id = #{id,jdbcType=BIGINT}

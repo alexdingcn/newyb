@@ -3,6 +3,7 @@ package com.yiban.erp.service.warehouse;
 import com.alibaba.fastjson.JSONObject;
 import com.yiban.erp.constant.CheckPlanConstant;
 import com.yiban.erp.constant.OrderNumberType;
+import com.yiban.erp.constant.RepertoryRefType;
 import com.yiban.erp.dao.*;
 import com.yiban.erp.dto.RepertorySelectQuery;
 import com.yiban.erp.entities.*;
@@ -552,6 +553,8 @@ public class RepertoryCheckPlanService {
                 repertoryInfo.setInDate(new Date());
                 repertoryInfo.setCreateBy(user.getNickname());
                 repertoryInfo.setCreateTime(new Date());
+                repertoryInfo.setRefType(RepertoryRefType.CHECK_SURPLUS.name());
+                repertoryInfo.setRefOrderId(cp.getId());
                 repertoryInfoMapper.insert(repertoryInfo);
             //盘亏记录
             }else if(CheckPlanConstant.PLAN_DETAIL_CHECK_STATUS_LOSE.equals(cpdTemp.getCheckStatus())){

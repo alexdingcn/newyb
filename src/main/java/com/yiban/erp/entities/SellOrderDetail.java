@@ -40,6 +40,7 @@ public class SellOrderDetail {
     private Date productDate;
     private Date expDate;
     private String location;
+    private BigDecimal backQuantity; //已退货数
 
     private String checkStatus;
     private String checkResult;
@@ -329,6 +330,14 @@ public class SellOrderDetail {
 
     public void setLocation(String location) {
         this.location = location;
+    }
+
+    public BigDecimal getBackQuantity() {
+        return backQuantity;
+    }
+
+    public void setBackQuantity(BigDecimal backQuantity) {
+        this.backQuantity = backQuantity;
     }
 
     public Goods getGoods() {
