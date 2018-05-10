@@ -124,6 +124,11 @@ public enum ErrorCode {
 
     //26
     REPERTORY_CHANGE_PARAMS_ERROR(2601, "必输参数校验失败"),
+    OUT_ORDER_QUANTITY_ERROR(2602, "当前库存商品数量不足，不能做出库操作", ErrorDisplay.NOTICE),
+    OUT_REVIEW_STATE_ERROR(2603, "出库复核失败,当前状态无法复核，", ErrorDisplay.NOTICE),
+    OUT_UNREVIEW_STATE_ERROR(2604, "撤销复核失败，当前状态无法撤销", ErrorDisplay.NOTICE),
+    OUT_ORDER_WAREHOUSE_FROZEN(2613, "当前仓库正在盘库冻结，不能做出库操作", ErrorDisplay.NOTICE),
+
     // 31xx财务账
     FINANCIAL_SELL_ORDER_ERROR(3101, "当前销售单不能生成往来账信息"),
     FINANCIAL_SELL_ORDER_EXIST(3102, "当前销售单已经存在对应的往来账流水，不能再次建立"),

@@ -33,6 +33,16 @@ public class RepertoryOutDetail {
 
     private BigDecimal taxRate;
 
+    private Boolean checkStatus;
+
+    private Long reviewUserId;
+
+    private Long reviewNextUserId;
+
+    private String reviewResult;
+
+    private String status;
+
     private String checkUser;
 
     private Date checkDate;
@@ -48,6 +58,29 @@ public class RepertoryOutDetail {
     private Date updatedTime;
 
     private List<RepertoryOutDetail> details;
+
+    private Goods goods;
+
+    private String goodsName;
+    private String origin;
+    private String jx;
+    private String spec;
+    private String factory;
+    private String unitName;
+    private String packUnitName;
+    private BigDecimal bigPack;
+    private String permit;
+    private String brandNo; //商标编号
+    private String storageCondition;
+    private Boolean specialManaged;
+
+    public Goods getGoods() {
+        return goods;
+    }
+
+    public void setGoods(Goods goods) {
+        this.goods = goods;
+    }
 
     public Long getId() {
         return id;
@@ -224,4 +257,72 @@ public class RepertoryOutDetail {
     public void setDetails(List<RepertoryOutDetail> details) {
         this.details = details;
     }
+
+    public String getBrandNo() {
+        return this.goods == null ? null : this.goods.getBrandNo();
+    }
+
+    public Boolean getSpecialManaged() {
+        return this.goods == null ? null : this.goods.getSpecialManaged();
+    }
+
+    public String getStorageCondition() {
+        return this.goods == null ? null : this.goods.getStorageConditionName();
+    }
+
+    public String getGoodsName() {
+        return this.goods == null ? null : this.goods.getName();
+    }
+
+    public String getOrigin() {
+        return this.goods == null ? null : this.goods.getOrigin();
+    }
+
+    public String getJx() {
+        return this.goods == null ? null : this.goods.getJxName();
+    }
+
+    public String getSpec() {
+        return this.goods == null ? null : this.goods.getSpec();
+    }
+
+    public String getFactory() {
+        return this.goods == null ? null : this.goods.getFactory();
+    }
+
+    public String getUnitName() {
+        return this.goods == null ? null : this.goods.getUnitName();
+    }
+
+    public String getPackUnitName() {
+        return this.goods == null ? null : this.goods.getPackUnitName();
+    }
+
+    public BigDecimal getBigPack() {
+        return this.goods == null ? null : this.goods.getBigPack();
+    }
+
+    public String getPermit() {
+        return this.goods == null ? null : this.goods.getPermitNo();
+    }
+
+    public Boolean getCheckStatus() { return checkStatus; }
+
+    public void setCheckStatus(Boolean checkStatus) {this.checkStatus = checkStatus; }
+
+    public Long getReviewUserId() { return reviewUserId; }
+
+    public void setReviewUserId(Long reviewUserId) { this.reviewUserId = reviewUserId; }
+
+    public Long getReviewNextUserId() { return reviewNextUserId; }
+
+    public void setReviewNextUserId(Long reviewNextUserId) { this.reviewNextUserId = reviewNextUserId; }
+
+    public String getReviewResult() { return reviewResult; }
+
+    public void setReviewResult(String reviewResult) { this.reviewResult = reviewResult; }
+
+    public String getStatus() { return status; }
+
+    public void setStatus(String status) { this.status = status; }
 }

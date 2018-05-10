@@ -3,262 +3,553 @@
 </style>
 
 <template>
-    <Row>
-        <Card>
-            <p slot="title" >
-                <Icon type="document"></Icon> 库存盘点
-            </p>
+    <div>
+        <Row>
+            <Card>
+                <p slot="title" >
+                    <Icon type="document"></Icon>损耗出库
+                </p>
+                <div slot="extra">
+                    <ButtonGroup >
+                        <Button type="primary" icon="android-add-circle" @click="saveOut" >保存</Button>
+                    </ButtonGroup>
+                    <ButtonGroup >
+                        <Button type="primary" icon="android-add-circle" @click="" >单据修改</Button>
+                    </ButtonGroup>
+                    <ButtonGroup >
+                        <Button type="primary" icon="android-add-circle" @click="" >数据引入</Button>
+                    </ButtonGroup>
 
-            <div slot="extra">
-                <ButtonGroup >
-                    <Button type="primary" icon="android-add-circle" @click="showPlanDetail" >盘点单明细</Button>
-                </ButtonGroup>
-                <!--<ButtonGroup >-->
-                    <!--<Button type="primary" icon="android-add-circle" @click="doCheckOrder" >执行盘点</Button>-->
-                <!--</ButtonGroup>-->
-                <!--<ButtonGroup >-->
-                    <!--<Button type="primary" icon="android-add-circle" @click="" >盘点表审核</Button>-->
-                <!--</ButtonGroup>-->
-                <!--<ButtonGroup >-->
-                    <!--<Button type="primary" icon="android-add-circle" @click="checkOrderInfo" >盘点审核</Button>-->
-                <!--</ButtonGroup>-->
+                    <ButtonGroup >
+                        <Button type="primary" icon="android-add-circle" @click="" >草稿导入</Button>
+                    </ButtonGroup>
+                    <ButtonGroup >
+                        <Button type="primary" icon="android-add-circle" @click="" >打印</Button>
+                    </ButtonGroup>
+                </div>
+                <Form :label-width="85" :model="changeStore" ref="changeStoreForm">
+                    <Row>
 
-            </div>
-            <Form :label-width="85" :model="storeCheck" ref="storeCheckForm">
-                <Row>
-                    <Col span="5">
-                        <FormItem label="盘点类型" prop="checkType">
-                            <Select ref="checkTypeSelect"
-                                    v-model="storeCheck.checkType"
-                                    size="small"
-                                    @on-change="onSelectCheckType"
-                                    prop="checkType">
-                                <Option v-for="option in checkTypeOptions" :value="option.id" :label="option.name" :key="option.id">
-                                    {{option.name}}
-                                </Option>
-                            </Select>
+                        <Col span="5">
+                        <FormItem label="自定义单号" prop="refOrderNumber">
+                            <Input v-model="changeStore.refOrderNumber" />
                         </FormItem>
-                    </Col>
-                    <Col span="5">
-                        <FormItem label="仓库点" prop="warehouseId">
-                            <warehouse-select v-model="storeCheck.warehouseId" size="small"></warehouse-select>
-                        </FormItem>
-                    </Col>
+                        </Col>
 
-                    <!--<Col span="4">-->
-                        <!--<FormItem label="库区" >-->
-                            <!--<Select v-model="storeCheck.counterState" size="small"  prop="counter_state">-->
-                                <!--<Option v-for="option in counterOptions" :value="option.id" :label="option.name" :key="option.id">-->
-                                    <!--{{option.name}}-->
-                                <!--</Option>-->
-                            <!--</Select>-->
+                        <Col span="5">
+                        <FormItem label="出库日期" prop="outDate">
+                            <DatePicker type="datetime" v-model="changeStore.outDate" format="yyyy-MM-dd HH:mm" size="small"/>
+                        </FormItem>
+                        </Col>
+
+
+                        <Col span="10">
+                        <FormItem label="单据摘要" prop="comment">
+                            <Input v-model="changeStore.comment" />
+                        </FormItem>
+                        </Col>
+                        <!--<Col span="5">-->
+                        <!--<FormItem label="单据张数" prop="account">-->
+                        <!--<Input v-model="changeStore.account" />-->
                         <!--</FormItem>-->
-                    <!--</Col>-->
-                    <Col span="6">
-                        <FormItem label="盘点日期" >
-                            <DatePicker v-model="dateRange" type="daterange" placement="bottom-end" placeholder="盘点日期" style="width:180px"></DatePicker>
+                        <!--</Col>-->
+                    </Row>
+                    <Table border highlight-row
+                           class="margin-top-8"
+                           :columns="changeStoreColumns" :data="changeStoreItems"
+                           ref="changeStoreTable" style="width: 100%;" size="small"
+                           @on-row-dblclick="handleOutRowDbClick"
+                           no-data-text="当前条件下查询，无库存数据！">
+                    </Table>
+
+                </Form>
+            </Card>
+
+
+
+        </Row>
+        <br/>
+        <Row>
+            <Card>
+
+                <p slot="title" >
+                    <Icon type="document"></Icon>库存明细(选择需要报损的物品，加入移库单)
+                </p>
+                <div slot="extra">
+                    <ButtonGroup >
+                        <Button type="primary" icon="android-add-circle" @click="" >查询</Button>
+                    </ButtonGroup>
+
+                </div>
+                <Form :label-width="85" :model="queryStore" ref="queryStoreForm">
+                    <Row>
+                        <Col span="5">
+                        仓库：{{queryStore.warehouseName}}
+                        </Col>
+                        <Col span="10">
+                        <FormItem label="商品速查" prop="goodsId">
+                            <good-select v-model="queryStore.goodsId" size="small"></good-select>
                         </FormItem>
-                    </Col>
-                    <Col span="3">
-                        <Button type="primary" icon="android-search" @click="queryCheckListList()" :loading="saving">查询</Button>
-                    </Col>
+                        </Col>
+                    </Row>
+                    <Table border highlight-row
+                           class="margin-top-8"
+                           :columns="queryStoreColumns" :data="queryStoreItems"
+                           ref="queryStoreTable" style="width: 100%;" size="small"
+                           @on-row-dblclick="handleStoreRowDbClick"
+                           no-data-text="当前条件下查询，无库存数据！">
+                    </Table>
 
+                    <Row class="margin-top-8">
+                        <div style="float: right;">
+                            <Page :total="totalAmount" :current="currentPage" @on-change="changePage" size="small" show-total></Page>
+                        </div>
+                    </Row>
+                </Form>
+            </Card>
+
+        </Row>
+
+
+        <Modal  v-model="selectStoreModalShow" width="500" :mask-closable="false">
+            <p slot="header">
+                <Icon type="ios-plus-outline"></Icon>
+                <span>选择仓库</span>
+            </p>
+            <div >
+                <Row>
+                    <warehouse-select v-model="selectStore.warehouseId"  @on-change="onStoreChange" size="small"></warehouse-select>
                 </Row>
-
-                <Table border highlight-row
-                       class="margin-top-8"
-                       :columns="repertoryColumns" :data="repertoryCheckItems"
-                       ref="storeCheckTable" style="width: 100%;" size="small"
-                       no-data-text="当前条件下查询，无库存数据！">
-
-                </Table>
-
-            </Form>
-        </Card>
-    </Row>
-
+            </div>
+            <div slot="footer">
+                <Button type="primary" @click="choseOutStore">确定</Button>
+            </div>
+        </Modal>
+        <Modal v-model="closeConfirm"
+               title="是否继续下单"
+               @on-ok="clearData"
+               @on-cancel="closeTab">
+            <p>是否继续添加下一笔订单?</p>
+        </Modal>
+    </div>
 </template>
 <script>
-    import axios from 'axios';
     import moment from 'moment';
     import util from '@/libs/util.js';
-    import warehouseSelect from "@/views/selector/warehouse-select.vue";
     import goodSelect from "@/views/selector/good-select.vue";
+    import warehouseSelect from "@/views/selector/warehouse-select.vue";
     export default {
-        name: 'store_check_index',
+        name: 'cahneg-repertory-index',
         components: {
             warehouseSelect,
+            goodSelect,
         },
         data () {
             return {
                 saving: false,
-
-                repertoryCheckItems: [],
-                checkTypeOptions:[{ id: 0, name:'库存盘点'},{ id: 1, name:'直接盘库'},{ id: 2, name:'单品盘点'}],
-                counterOptions:[{ id: 'ALL', name:'全部'}],
-                storeCheck: {
-                    warehouseId: null
+                totalAmount: 0,
+                currentPage: 1,
+                changeStoreItems: [],
+                queryStoreItems:[],
+                selectStoreModalShow:false,
+                closeConfirm: false,
+                changeStore: {
                 },
-                repertoryColumns: [
-                    {
-                        type: 'selection',
-                        title: '',
-                        align: 'center',
-                        width: 60
-                    },
-                    {
-                        title: '状态',
-                        align: 'center',
-                        key: 'state',
-                        width: 120,
-                        render: (h, params) => {
-                            let state  = params.row.state;
-                            if (0==state) {
-                                return h('Tag', {props: {color: 'yellow'}}, '待审核');
-                            }else if (1==state) {
-                                return h('Tag', {props: {color: 'green'}}, '已审核');
-                            }
+                queryStore: {
+                    warehouseName:'',
+                },
+                selectStore:{
+                    storeId:null
+                },
+                RepertoryOut:{
+                    id:'',
+                    warehouseId:'',
+                    outDate:'',
+                    refOrderNumber:'',
+                    customerName:'',
+                    comment:'',
+                    detail:[]
+                },
+                RepertoryOutDetail:{
+                    repertoryId:'',
+                    amount:''
+                },
+                changeStoreColumns: [
 
-                        }
-                    },
                     {
-                        title: '盘点单号',
+                        title: '货号',
                         align: 'center',
-                        key: 'checkCode',
-                        width: 160
+                        key: 'code',
+                        width:100
                     },
                     {
-                        title: '盘点类型',
-                        key: 'checkType',
+                        title: '商品名称',
+                        key: 'goodsName',
                         align: 'center',
-                        width: 120,
-                        render: (h, params) => {
-                            let checkType  = params.row.checkType;
-                            if (0==checkType) {
-                                return h('Tag', {props: {color: 'green'}}, '库存盘点');
-                            }else if (1==checkType) {
-                                return h('Tag', {props: {color: 'green'}}, '直接盘库');
-                            }else if (2==checkType){
-                                return h('Tag', {props: {color: 'green'}}, '单品盘点');
-                            }
-                        }
+                        width: 150
+
                     },
                     {
-                        title: '仓库',
-                        key: 'warehouseName',
+                        title: '产地',
+                        key: 'origin',
                         align: 'center',
                         width: 100
                     },
 
                     {
-                        title: '盘点时间',
-                        key: 'checkDate',
+                        title: '规格',
+                        key: 'spec',
+                        align: 'center',
+                        width: 100
+                    },
+                    {
+                        title: '单位',
+                        key: 'unitName',
+                        align: 'center',
+                        width: 80
+                    },
+
+                    {
+                        title: '数量',
+                        key: 'quantity',
+                        align: 'center',
+                        width: 120
+
+                    },
+                    {
+                        title: '损耗数量',
+                        key: 'outAmount',
                         align: 'center',
                         width: 120,
                         render: (h, params) => {
-                            return moment(params.row.checkDate).format('YYYY-MM-DD');
+                            var self = this;
+                            return h('Input', {
+                                props: {
+                                    value: self.changeStoreItems[params.index][params.column.key]
+                                },
+                                on: {'on-blur' (event) {
+                                        let row = self.changeStoreItems[params.index];
+                                        row[params.column.key] = event.target.value;
+                                        let checkLimit=event.target.value;
+                                        if(checkLimit>row.quantity){
+                                            self.$Message.error('报损数量不能超出库存数量');
+                                        } else if(checkLimit <= 0){
+                                            self.$Message.error('报损数量不能小于等于0');
+                                        }
+                                    }
+                                }
+                            });
                         }
-                    },
+                    } ,
+
                     {
-                        title: '制单人',
-                        key: 'createBy',
+                        title: '单价',
+                        key: 'buyPrice',
+                        align: 'center',
+                        width: 80
+
+                    },
+
+                    {
+                        title: '批次号',
+                        key: 'batchCode',
                         align: 'center',
                         width: 80
                     },
                     {
-                        title: '备注',
-                        key: 'comment',
+                        title: '生产日期',
+                        key: 'productDate',
                         align: 'center',
-                        width: 150
+                        width: 120,
+                        render: (h, params) => {
+                            return moment(params.row.eta).format('YYYY-MM-DD');
+                        }
                     },
                     {
-                        title: '总经理',
-                        key: 'manager',
+                        title: '有效日期',
+                        key: 'expDate',
                         align: 'center',
-                        width: 120
-                    },
-                    {
-                        title: '总经理意见',
-                        key: 'managerNote',
-                        align: 'center',
-                        width: 150
-                    },
-                    {
-                        title: '财务经理',
-                        key: 'finance',
-                        align: 'center',
-                        width: 120
-                    },
-                    {
-                        title: '财务经理意见',
-                        key: 'financeNote',
-                        align: 'center',
-                        width: 150
+                        width: 120,
+                        render: (h, params) => {
+                            return moment(params.row.eta).format('YYYY-MM-DD');
+                        }
                     }
-                ]
+                ] ,
+                queryStoreColumns: [
+                    {
+                        title: '货号',
+                        align: 'center',
+                        key: 'code',
+                        width:100
+                    },
+                    {
+                        title: '商品名称',
+                        key: 'goodsName',
+                        align: 'center',
+                        width: 150
+
+                    },
+                    {
+                        title: '产地',
+                        key: 'origin',
+                        align: 'center',
+                        width: 100
+                    },
+
+                    {
+                        title: '规格',
+                        key: 'spec',
+                        align: 'center',
+                        width: 100
+                    },
+                    {
+                        title: '生产企业',
+                        key: 'factoryName',
+                        align: 'center',
+                        width: 120
+                    },
+                    {
+                        title: '存储条件',
+                        key: 'storageCondition',
+                        align: 'center',
+                        width: 120
+                    },
+                    {
+                        title: '基药',
+                        key: 'base_med_id',
+                        align: 'center',
+                        width:80
+                    },
+                    {
+                        title: '单位',
+                        key: 'unitName',
+                        align: 'center',
+                        width: 80
+                    },
+
+                    {
+                        title: '数量',
+                        key: 'quantity',
+                        align: 'center',
+                        width: 80
+
+                    },
+                    {
+                        title: '单价',
+                        key: 'buyPrice',
+                        align: 'center',
+                        width: 80
+
+                    },
+
+                    {
+                        title: '金额',
+                        key: '',
+                        align: 'center',
+                        width: 80
+                    },
+                    {
+                        title: '税率',
+                        key: 'out_tax',
+                        align: 'center',
+                        width: 80
+                    },
+                    {
+                        title: '批次号',
+                        key: 'batchCode',
+                        align: 'center',
+                        width: 80
+                    },
+                    {
+                        title: '生产日期',
+                        key: 'productDate',
+                        align: 'center',
+                        width: 80,
+                        render: (h, params) => {
+                            return moment(params.row.eta).format('YYYY-MM-DD');
+                        }
+                    },
+                    {
+                        title: '有效日期',
+                        key: 'expDate',
+                        align: 'center',
+                        width: 80,
+                        render: (h, params) => {
+                            return moment(params.row.eta).format('YYYY-MM-DD');
+                        }
+                    },
+
+                    {
+                        title: '仓库点',
+                        key: 'warehouseName',
+                        align: 'center',
+                        width: 100,
+                    }, {
+                        title: '货位号',
+                        key: 'location',
+                        align: 'center',
+                        width: 100,
+                    }
+                ],
+                ruleValidate: {
+                    supplierId: [
+                        { required: true, type: 'number', message: '请选择供应商', trigger: 'blur' }
+                    ],
+                    supplierContactId: [
+                        { required: true, type: 'number', message: '请选择供应商代表', trigger: 'blur' }
+                    ],
+                    buyerId: [
+                        { required: true, type: 'number', message: '请选择采购员', trigger: 'blur' }
+                    ],
+                    warehouseId: [
+                        { required: true, type: 'number', message: '请选择仓库点', trigger: 'blur' }
+                    ],
+                    orderItems: [
+                        { required: true, type: 'array', array: {min: 1}, message: '请添加商品', trigger: 'blur' }
+                    ]
+                },
 
             };
         },
         mounted () {
-            this.queryCheckListList();
+            this. selectStoreModalShow=true;
         },
         activated () {
-            this.queryCheckListList();
+            this.clearData();
         },
         watch: {
-            repertoryCheckItems: function () {
-            }
+            // repertoryCheckItems: function () {
+            // }
         },
         methods: {
             moment: function () {
                 return moment();
-            },
-            dateRange: [
-                moment().add(-1, 'w').format('YYYY-MM-DD'),
-                moment().format('YYYY-MM-DD')
-            ],
-            showPlanDetail(){
+            },choseOutStore(){
                 var self = this;
-                var rows = this.$refs.storeCheckTable.getSelection();
-                if (!rows || rows.length === 0) {
-                    this.$Message.warning('请选择盘点单');
-                } else if (rows.length > 1) {
-                    this.$Message.warning('请一次选择一条盘点单');
-                } else if (rows.length == 1) {
-                    this.$router.push({
-                        name: 'store_check_index_detail',
-                        params:{checkPlanId:rows[0].id,warehouseName:rows[0].warehouseName}
-                    });
-                }
-            },
-            queryCheckListList () {
-                var self = this;
-                let startDate = this.dateRange[0];
-                let endDate = this.dateRange[1];
-                this.storeCheck.startDate=startDate;
-                this.storeCheck.endDate=endDate;
-                this.repertoryCheckItems = [];
-                util.ajax.get('/repertory/check/list',{ params: {
-                        checkType:  this.storeCheck.checkType,
-                        warehouseId: this.storeCheck.warehouseId,
-                        startDate: this.storeCheck.startDate,
-                        endDate: this.storeCheck.endDate
-                    }})
+                this.queryStoreItems = [];
+                this.queryStore.warehouseId= this.selectStore.warehouseId;
+                this.queryStore.page=this.currentPage;
+                util.ajax.post('/repertory/list', this.queryStore)
                     .then(function (response) {
                         if (response.status === 200 && response.data) {
-                            self.repertoryCheckItems = response.data.data;
+                            self.selectStoreModalShow=false;
+                            self.queryStoreItems = response.data.data;
+                            self.totalAmount = response.data.total;
                         }
                     })
                     .catch(function (error) {
                         console.log(error);
                     });
-            },onSelectCheckType(item){
-                this.$refs.checkTypeSelect.clearSingleSelect();
-                this.storeCheck.checkType = item;
+            },
+            queryRepertoryList () {
+                var self = this;
+                this.repertoryItems = [];
+                this.queryStore.page=this.currentPage;
+                util.ajax.post('/repertory/list', this.queryStore)
+                    .then(function (response) {
+                        if (response.status === 200 && response.data) {
+                            self.queryStoreItems = response.data.data;
+                            self.totalAmount = response.data.total;
+                        }
+                    })
+                    .catch(function (error) {
+                        console.log(error);
+                        self.$Message.error(error);
+                    });
+            },
+            changePage (pageNumber) {
+                this.currentPage = pageNumber;
+                this.queryRepertoryList();
+            },onStoreChange(data,item){
+                this.queryStore.warehouseName=item.name;
+            },onReceiveStoreChange(data,item){
+                if(item.name===this.queryStore.warehouseName) {
+                    this.changeStore.warehouseId='';
+                    this.$Message.info('转入仓库不能与转出仓库相同');
+                }
+            },handleStoreRowDbClick(row){
+                //库存记录点击
+
+                for (var i = 0; i < this.changeStoreItems.length; i++) {
+                    if (row.id === this.changeStoreItems[i].id) {
+                        this.$Message.info('报损报损单已经存在此记录');
+                        return true;
+                    }
+                }
+                this.$Modal.confirm({
+                    title: '确认报损此商品？',
+                    content: '<p>确认报损商品 ' + row.goodsName + '?</p>',
+                    onOk: () => {
+                        this.changeStoreItems.splice(0,0,row);
+                    },
+                    onCancel: () => {
+                    }
+                });
+            },
+            handleOutRowDbClick(row){
+                //移库出库记录表，双击删除
+                this.$Modal.confirm({
+                    title: '确认删除商品？',
+                    content: '<p>确认删除商品 ' + row.name + '?</p>',
+                    onOk: () => {
+                        for (let i = 0; i < this.changeStoreItems.length; i++) {
+                            if (row.id === this.changeStoreItems[i].id) {
+                                this.changeStoreItems.splice(i, 1);
+                            }
+                        }
+                    },
+                    onCancel: () => {
+
+                    }
+                });
+            },
+            clearData () {
+                this.RepertoryOut = {};
+                this.RepertoryOut.outDetailList=[];
+                this.changeStoreItems = [];
+            },
+            closeTab () {
+                this.clearData();
+                let pageName = util.closeCurrentTab(this);
+                this.$router.push({
+                    name: pageName
+                });
+            },
+            saveOut(){
+                //前台验证出库信息
+                let self=this;
+                this.RepertoryOut={};
+                this.RepertoryOut.outDetailList=[];
+                this.RepertoryOut.warehouseId=this.selectStore.warehouseId;
+                this.RepertoryOut.refOrderNumber=this.changeStore.refOrderNumber;
+                this.RepertoryOut.outDate=this.changeStore.outDate;
+                this.RepertoryOut.comment=this.changeStore.comment;
+                for (let i = 0; i < this.changeStoreItems.length; i++) {
+                    if(this.changeStoreItems[i].quantity < this.changeStoreItems[i].outAmount){
+                        this.$Message.error(this.changeStoreItems[i].goodsName+'报损数量超过库存数量，无法进行报损，请修改后重新提交！');
+                        return;
+                    }else{
+                        let RepertoryOutDetail={};
+                        RepertoryOutDetail['repertoryInfoId']=this.changeStoreItems[i].id;
+                        RepertoryOutDetail['quantity']=this.changeStoreItems[i].outAmount;
+                        this.RepertoryOut.outDetailList.push(RepertoryOutDetail)
+                    }
+                    util.ajax.post('/repertory/out/loseRepertoryOut', this.RepertoryOut)
+                        .then(function (response) {
+                            if (response.status === 200 ) {
+                                self.$Message.info('报损出库单创建成功');
+                                self.closeConfirm = true;
+                            }
+                            self.saving = false;
+                        })
+                        .catch(function (error) {
+                            console.log(error);
+                            self.saving = false;
+                            self.$Message.error('报损出库单错误');
+                        });
+                }
+
             }
         }
     };
 </script>
-<style>
-
-</style>

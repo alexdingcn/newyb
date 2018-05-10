@@ -488,8 +488,6 @@
             this.clearData();
         },
         watch: {
-            // repertoryCheckItems: function () {
-            // }
         },
         methods: {
             moment: function () {
@@ -604,6 +602,7 @@
                         RepertoryOutDetail['repertoryInfoId']=this.changeStoreItems[i].id;
                         RepertoryOutDetail['quantity']=this.changeStoreItems[i].outAmount;
                         RepertoryOutDetail['location']=this.changeStoreItems[i].outLocation;
+                        RepertoryOutDetail['price']=this.changeStoreItems[i].buyPrice;
                         this.RepertoryOut.outDetailList.push(RepertoryOutDetail)
                     }
                     util.ajax.post('/repertory/out/changeRepertoryOut', this.RepertoryOut)

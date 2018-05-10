@@ -168,8 +168,13 @@ export const appRouter = [
         title: '出库管理',
         component: Main,
         children: [
+
             { path: 'change-repertory-index', title: '转库出库', name: 'change-repertory-index', component: () => import('@/views/out-store/change-repertory-index.vue') },
-            { path: 'broken-out-index', title: '损耗出库', name: 'broken-out-index', component: () => import('@/views/out-store/broken-out-index.vue') }
+            { path: 'broken-out-index', title: '损耗出库', name: 'broken-out-index', component: () => import('@/views/out-store/broken-out-index.vue') },
+            { path: 'out-review', title: '出库复核', name: 'out-review', component: () => import('@/views/out-store/out-review.vue') },
+            { path: 'out-review-next', title: '双人复核', name: 'out-review-next', component: () => import('@/views/out-store/out-review-next.vue') },
+            { path: 'out-check', title: '出库审核', name: 'out-check', component: () => import('@/views/out-store/out-check.vue') },
+
         ]
     },
     {
