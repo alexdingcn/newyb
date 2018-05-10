@@ -17,4 +17,6 @@ public interface RepertoryOutDetailMapper {
     int updateByPrimaryKeySelective(RepertoryOutDetail record);
 
     int insertBatch(@Param("details") List<RepertoryOutDetail> outDetails);
+
+    List<RepertoryOutDetail> getByOrderId(Long orderId);
 }

@@ -5,7 +5,8 @@
     <id column="id" property="id" jdbcType="BIGINT" />
     <result column="company_id" property="companyId" jdbcType="INTEGER" />
     <result column="warehouse_id" property="warehouseId" jdbcType="INTEGER" />
-    <result column="go_to_warehouse_id" property="go_to_warehouse_id" jdbcType="INTEGER" />
+    <result column="status" property="status" jdbcType="VARCHAR" />
+    <result column="go_to_warehouse_id" property="goToWarehouseId" jdbcType="INTEGER" />
     <result column="ref_type" property="refType" jdbcType="VARCHAR" />
     <result column="out_date" property="outDate" jdbcType="DATE" />
     <result column="ref_order_id" property="refOrderId" jdbcType="BIGINT" />
@@ -28,10 +29,21 @@
     <result column="updated_time" property="updatedTime" jdbcType="TIMESTAMP" />
   </resultMap>
   <sql id="Base_Column_List" >
-    id, company_id, warehouse_id,go_to_warehouse_id, ref_type, out_date, ref_order_id, ref_order_number,
+    id, company_id, warehouse_id,go_to_warehouse_id, ref_type,status, out_date, ref_order_id, ref_order_number,
     customer_id, customer_name, customer_rep_id, customer_rep_name, go_to, total_quantity, 
     total_amount, make_order_user, check_order_user, check_date, file_no, comment, created_by, 
     updated_by, created_time, updated_time
+  </sql>
+
+  <sql id="listSql" >
+      o.id as id, o.company_id as companyId,o.warehouse_id as warehouseId, o.status as status,
+      o.go_to_warehouse_id as goToWarehouseId,o.ref_type as refType,o.ref_order_id as refOrderId,
+      o.ref_order_number as refOrderNumber,o.out_date as outDate,  o.customer_id as customerId,
+      o.customer_name as customerName,o.customer_rep_id as customerRepId,o.customer_rep_name as customerRepName,
+      o.go_to as `goTo`, o.total_quantity as totalQuantity,o.total_amount as totalAmount,
+      o.make_order_user as makeOrderUser ,o.check_order_user as checkOrderUser,o.check_date as checkDate,
+      o.file_no as fileNo, o.comment as comment,o.created_by as createdBy,o.updated_by as updatedBy,
+      o.created_time as createdTime,o.updated_time as updatedTime, w.name as warehouseName
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
     select 
@@ -45,7 +57,7 @@
   </delete>
   <insert id="insert" parameterType="com.yiban.erp.entities.RepertoryOut" keyProperty="id" useGeneratedKeys="true">
     insert into repertory_out (company_id, warehouse_id,go_to_warehouse_id,
-      ref_type, out_date, ref_order_id, 
+      ref_type,status, out_date, ref_order_id,
       ref_order_number, customer_id, customer_name, 
       customer_rep_id, customer_rep_name, go_to, 
       total_quantity, total_amount, make_order_user, 
@@ -53,7 +65,7 @@
       comment, created_by, updated_by, 
       created_time, updated_time)
     values (#{companyId,jdbcType=INTEGER}, #{warehouseId,jdbcType=INTEGER}, #{goToWarehouseId,jdbcType=INTEGER},
-      #{refType,jdbcType=VARCHAR}, #{outDate,jdbcType=DATE}, #{refOrderId,jdbcType=BIGINT}, 
+      #{refType,jdbcType=VARCHAR},#{status,jdbcType=VARCHAR},  #{outDate,jdbcType=DATE}, #{refOrderId,jdbcType=BIGINT},
       #{refOrderNumber,jdbcType=VARCHAR}, #{customerId,jdbcType=BIGINT}, #{customerName,jdbcType=VARCHAR},
       #{customerRepId,jdbcType=INTEGER}, #{customerRepName,jdbcType=VARCHAR}, #{goTo,jdbcType=VARCHAR}, 
       #{totalQuantity,jdbcType=DECIMAL}, #{totalAmount,jdbcType=DECIMAL}, #{makeOrderUser,jdbcType=VARCHAR},
@@ -76,6 +88,9 @@
       </if>
       <if test="refType != null" >
         ref_type = #{refType,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null" >
+        status = #{status,jdbcType=VARCHAR},
       </if>
       <if test="outDate != null" >
         out_date = #{outDate,jdbcType=DATE},
@@ -137,5 +152,30 @@
     </set>
     where id = #{id,jdbcType=BIGINT}
   </update>
+
+
+  <select id="getList" parameterType="com.yiban.erp.dto.ReceiveListReq" resultType="com.yiban.erp.entities.RepertoryOut">
+    select
+    <include refid="listSql"/>
+    from repertory_out o, warehouse w
+    where  o.warehouse_id = w.id
+    and o.company_id = #{companyId}
+    and o.status != 'DELETE'
+    <if test="warehouseId != null">
+    and o.warehouse_id = #{warehouseId}
+    </if>
+    <if test="startReceiveDate != null">
+      and o.created_time >= #{startReceiveDate}
+    </if>
+    <if test="endReceiveDate != null">
+      and o.created_time &lt;= #{endReceiveDate}
+    </if>
+    <if test="statusList != null" >
+      and o.status in
+      <foreach collection="statusList" item="item" open="(" close=")" separator=", ">
+        #{item}
+      </foreach>
+    </if>
+  </select>
 
 </mapper>

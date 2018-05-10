@@ -1,8 +1,9 @@
 package com.yiban.erp.entities;
 
+import com.yiban.erp.constant.RepertoryRefType;
+
 import java.math.BigDecimal;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 public class RepertoryOut {
     private Long id;
@@ -12,6 +13,8 @@ public class RepertoryOut {
     private Integer warehouseId;
 
     private String refType;
+
+    private String status;
 
     private Date outDate;
 
@@ -52,6 +55,10 @@ public class RepertoryOut {
     private Date createdTime;
 
     private Date updatedTime;
+
+    private String  warehouseName;
+
+    private String refTypeName;
 
     private List<RepertoryOutDetail> outDetailList;
     public Long getId() {
@@ -238,13 +245,9 @@ public class RepertoryOut {
         this.updatedTime = updatedTime;
     }
 
-    public Long getGoToWarehouseId() {
-        return goToWarehouseId;
-    }
+    public Long getGoToWarehouseId() { return goToWarehouseId; }
 
-    public void setGoToWarehouseId(Long goToWarehouseId) {
-        this.goToWarehouseId = goToWarehouseId;
-    }
+    public void setGoToWarehouseId(Long goToWarehouseId) { this.goToWarehouseId = goToWarehouseId; }
 
     public List<RepertoryOutDetail> getOutDetailList() {
         return outDetailList;
@@ -254,5 +257,26 @@ public class RepertoryOut {
         this.outDetailList = outDetailList;
     }
 
+    public String getStatus() { return status; }
 
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public String getRefTypeName() {
+        RepertoryRefType type = RepertoryRefType.getByName(this.getRefType());
+        return type == null ? null : type.getDesc();
+    }
+
+    public String getWarehouseName() {
+        return warehouseName;
+    }
+
+    public void setWarehouseName(String warehouseName) {
+        this.warehouseName = warehouseName;
+    }
+
+    public void setRefTypeName(String refTypeName) {
+        this.refTypeName = refTypeName;
+    }
 }
