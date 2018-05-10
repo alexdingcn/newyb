@@ -20,7 +20,8 @@ public interface FinancialFlowMapper {
 
     int updateByPrimaryKeySelective(FinancialFlow record);
 
-    List<FinancialFlow> getByRefId(@Param("bizRefId") Long bizRefId);
+    List<FinancialFlow> getByRefId(@Param("bizRefId") Long bizRefId,
+                                   @Param("bizType") String bizType);
 
     List<FinancialFlow> getFlowList(FinancialQuery query);
 

@@ -5,8 +5,8 @@
 <template>
     <div>
         <Card>
-            <p>
-                <Icon type="login-in"></Icon>
+            <p slot="title">
+                <Icon type="log-in"></Icon>
                 销售退货制单
             </p>
             <div slot="extra"> 

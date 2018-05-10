@@ -1,6 +1,7 @@
 package com.yiban.erp.service.financial;
 
 import com.alibaba.fastjson.JSON;
+import com.sun.org.apache.regexp.internal.RE;
 import com.yiban.erp.constant.*;
 import com.yiban.erp.dao.*;
 import com.yiban.erp.dto.FinancialOffsetReq;
@@ -58,7 +59,7 @@ public class FinancialService {
             throw new BizException(ErrorCode.FINANCIAL_SELL_ORDER_ERROR);
         }
         //验证下当前销售单是否已经记录过往来账，如果记录过，给出错误提示
-        List<FinancialFlow> flows = financialFlowMapper.getByRefId(order.getId());
+        List<FinancialFlow> flows = financialFlowMapper.getByRefId(order.getId(), FinancialBizType.SELL_BATCH.name());
         if (flows != null && !flows.isEmpty()) {
             logger.warn("sell order:{} financial flow is already exist, can not add on this sell order. ", order.getId());
             throw new BizException(ErrorCode.FINANCIAL_SELL_ORDER_EXIST);
@@ -86,7 +87,49 @@ public class FinancialService {
      * @throws BizException
      */
     public void createFlowBySellBackOrder(SellOrderBack orderBack) throws BizException {
-        // TODO 分三种流水，一种是退货总金额，一种是成本总金额，一种是免零金额
+        // 分两种流水，一种是退货总金额，一种是免零金额
+        if (orderBack == null || !SellBackStatus.FINAL_CHECKED.name().equalsIgnoreCase(orderBack.getStatus())) {
+            logger.warn("sell back order is null or status is not in FINAL_CHECKED. ");
+            throw new BizException(ErrorCode.FINANCIAL_SELL_BACK_ORDER_ERROR);
+        }
+        List<FinancialFlow> flows = financialFlowMapper.getByRefId(orderBack.getId(), FinancialBizType.SELL_BACK.name());
+        if (flows != null && !flows.isEmpty()) {
+            logger.warn("sell back order:{} financial flow is already exist, can not add on this sell order. ", orderBack.getId());
+            throw new BizException(ErrorCode.FINANCIAL_SELL_BACK_ORDER_EXIST);
+        }
+        FinancialReq req = new FinancialReq();
+        req.setCompanyId(orderBack.getCompanyId());
+        req.setLogUserName(orderBack.getFinalCheckUser());
+        req.setCustType(FinancialReq.CUST_CUSTOMER);
+        req.setCustId(orderBack.getCustomerId());
+        req.setBizType(FinancialBizType.SELL_BACK.name());
+        req.setBizRefId(orderBack.getId()); //关联单ID取采购订单的ID
+        req.setBizRefNo(orderBack.getOrderNumber());
+        req.setLogAmount(orderBack.getTotalAmount());
+        req.setLogDate(new Date());
+        req.setLogAccount(orderBack.getCustomerName());
+        req.setKeyWord("销售退货"); //入库方式的描述信息
+
+        doFinancialRecord(req);
+
+        //如果存在有免零金额，对免零金额生产一笔流水账
+        if (orderBack.getFreeAmount() != null && BigDecimal.ZERO.compareTo(orderBack.getFreeAmount()) > 0) {
+            // 有免零金额，生产一笔免零金额的往来账流水
+            FinancialReq freeReq = new FinancialReq();
+            freeReq.setCompanyId(orderBack.getCompanyId());
+            freeReq.setLogUserName(orderBack.getFinalCheckUser());
+            freeReq.setCustType(FinancialReq.CUST_CUSTOMER);
+            freeReq.setCustId(orderBack.getCustomerId());
+            freeReq.setBizType(FinancialBizType.SELL_BACK_FREE.name());
+            freeReq.setBizRefId(orderBack.getId()); //关联单ID取采购订单的ID
+            freeReq.setBizRefNo(orderBack.getOrderNumber());
+            freeReq.setLogAmount(orderBack.getFreeAmount().negate()); //发生金额先取反
+            freeReq.setLogDate(new Date());
+            freeReq.setLogAccount(orderBack.getCustomerName());
+            freeReq.setKeyWord("销售退货免零"); //入库方式的描述信息
+            doFinancialRecord(freeReq);
+        }
+
     }
 
     /**
@@ -100,7 +143,7 @@ public class FinancialService {
             return;
         }
         //验证下当前销售单是否已经记录过往来账，如果记录过，给出错误提示
-        List<FinancialFlow> flows = financialFlowMapper.getByRefId(inBack.getId());
+        List<FinancialFlow> flows = financialFlowMapper.getByRefId(inBack.getId(), FinancialBizType.BUY_BACK.name());
         if (flows != null && !flows.isEmpty()) {
             logger.warn("sell back order:{} financial flow is already exist, can not add on this sell back order. ", inBack.getId());
             throw new BizException(ErrorCode.FINANCIAL_SELL_ORDER_EXIST);
@@ -139,7 +182,7 @@ public class FinancialService {
             throw new BizException(ErrorCode.FINANCIAL_IN_ORDER_ERROR);
         }
         //验证下当前销售单是否已经记录过往来账，如果记录过，给出错误提示
-        List<FinancialFlow> flows = financialFlowMapper.getByRefId(repertoryIn.getId());
+        List<FinancialFlow> flows = financialFlowMapper.getByRefId(repertoryIn.getId(), FinancialBizType.BUY_IN.name());
         if (flows != null && !flows.isEmpty()) {
             logger.warn("repertory in order:{} financial flow is already exist, can not add on this order.", repertoryIn.getId());
             throw new BizException(ErrorCode.FINANCIAL_SELL_ORDER_EXIST);
@@ -190,7 +233,7 @@ public class FinancialService {
             logger.warn("get cancel bizType fail by refBizType:{}", refBizType.name());
             throw new BizException(ErrorCode.FINANCIAL_CANNOT_CANCEL);
         }
-        List<FinancialFlow> flows = financialFlowMapper.getByRefId(refFlow.getId());
+        List<FinancialFlow> flows = financialFlowMapper.getByRefId(refFlow.getId(), currCancelBizType.name());
         for (FinancialFlow item : flows) {
             if (item.getBizType().equalsIgnoreCase(currCancelBizType.name())) {
                 logger.warn("当前流水已经做过取消操作，不能再次做取消操作。flowId:{}, itemId:{}", flow.getId(), item.getId());
@@ -471,6 +514,10 @@ public class FinancialService {
             case SELL_BACK:
                 //销售退货：需要付给客户多收的钱, 所以应付增加，应收不变
                 outAmount = logAmount;
+                break;
+            case SELL_BACK_FREE:
+                //销售退货免零: 需要付给客户的钱取负数，应付取负数，应收不变
+                outAmount = logAmount.negate();
                 break;
             case SELL_BATCH:
                 //销售出库：需要收客户的钱, 所以应收增加，应付不变

@@ -381,6 +381,7 @@ export default {
                 {bizType: 'BUY_BACK', label: '采购退货', cancel: false},
                 {bizType: 'SELL_BACK', label: '销售退货', cancel: false},
                 {bizType: 'SELL_BATCH', label: '批发销售', cancel: false},
+                {bizType: 'SELL_BACK_FREE', label: '销售退货免零', cancel: false},
                 {bizType: 'RECEIVE', label: '收款', cancel: true},
                 {bizType: 'PAY', label: '付款', cancel: true},
                 {bizType: 'PRE_PAID', label: '预付款', cancel: true},

@@ -10,6 +10,7 @@ public enum FinancialBizType {
     BUY_IN("采购入库", false),
     BUY_BACK("采购退货", false),
     SELL_BACK("销售退货", false),
+    SELL_BACK_FREE("销售退货免零", false),
     SELL_BATCH("批发销售", false),
 
     RECEIVE("收款", true),

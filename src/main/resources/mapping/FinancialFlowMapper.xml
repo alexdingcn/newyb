@@ -160,6 +160,7 @@
       <include refid="Base_Column_List" />
     from financial_flow
     where biz_ref_id = #{bizRefId}
+    and biz_type = #{bizType}
   </select>
 
   <select id="getFlowListCount" parameterType="com.yiban.erp.dto.FinancialQuery" resultType="java.lang.Integer">
