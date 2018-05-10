@@ -94,7 +94,9 @@
             <Form :label-width="85" :model="queryStore" ref="queryStoreForm">
                 <Row>
                     <Col span="5">
-                        仓库：{{queryStore.warehouseName}}
+                    <FormItem label="仓库：" prop="warehouseId">
+                      <warehouse-select v-model="selectStore.warehouseId"  @on-change="onStoreChange" size="small"></warehouse-select>
+                    </FormItem>
                     </Col>
                     <Col span="10">
                     <FormItem label="商品速查" prop="goodsId">
@@ -121,20 +123,20 @@
     </Row>
 
 
-    <Modal  v-model="selectStoreModalShow" width="500" :mask-closable="false">
-        <p slot="header">
-            <Icon type="ios-plus-outline"></Icon>
-            <span>选择移库仓库</span>
-        </p>
-        <div >
-            <Row>
-                <warehouse-select v-model="selectStore.warehouseId"  @on-change="onStoreChange" size="small"></warehouse-select>
-            </Row>
-        </div>
-        <div slot="footer">
-            <Button type="primary" @click="choseOutStore">确定</Button>
-        </div>
-    </Modal>
+    <!--<Modal  v-model="selectStoreModalShow" width="500" :mask-closable="false">-->
+        <!--<p slot="header">-->
+            <!--<Icon type="ios-plus-outline"></Icon>-->
+            <!--<span>选择移库仓库</span>-->
+        <!--</p>-->
+        <!--<div >-->
+            <!--<Row>-->
+                <!--<warehouse-select v-model="selectStore.warehouseId"  @on-change="onStoreChange" size="small"></warehouse-select>-->
+            <!--</Row>-->
+        <!--</div>-->
+        <!--<div slot="footer">-->
+            <!--<Button type="primary" @click="choseOutStore">确定</Button>-->
+        <!--</div>-->
+    <!--</Modal>-->
     <Modal v-model="closeConfirm"
            title="是否继续下单"
            @on-ok="clearData"
@@ -161,7 +163,7 @@
                 currentPage: 1,
                 changeStoreItems: [],
                 queryStoreItems:[],
-                selectStoreModalShow:false,
+                //selectStoreModalShow:false,
                 closeConfirm: false,
                 changeStore: {
                 },
@@ -482,7 +484,7 @@
             };
         },
         mounted () {
-            this. selectStoreModalShow=true;
+            //this. selectStoreModalShow=true;
         },
         activated () {
             this.clearData();
@@ -492,22 +494,6 @@
         methods: {
             moment: function () {
                 return moment();
-            },choseOutStore(){
-                var self = this;
-                this.queryStoreItems = [];
-                this.queryStore.warehouseId= this.selectStore.warehouseId;
-                this.queryStore.page=this.currentPage;
-                util.ajax.post('/repertory/list', this.queryStore)
-                    .then(function (response) {
-                        if (response.status === 200 && response.data) {
-                            self.selectStoreModalShow=false;
-                            self.queryStoreItems = response.data.data;
-                            self.totalAmount = response.data.total;
-                        }
-                    })
-                    .catch(function (error) {
-                        console.log(error);
-                    });
             },
             queryRepertoryList () {
                 var self = this;
@@ -528,16 +514,32 @@
             changePage (pageNumber) {
                 this.currentPage = pageNumber;
                 this.queryRepertoryList();
-            },onStoreChange(data,item){
-                this.queryStore.warehouseName=item.name;
-            },onReceiveStoreChange(data,item){
-               if(item.name===this.queryStore.warehouseName) {
-                   this.changeStore.warehouseId='';
-                   this.$Message.info('转入仓库不能与转出仓库相同');
+            },
+            onStoreChange(data,item){
+                var self = this;
+                this.queryStoreItems = [];
+                this.changeStoreItems=[];
+                this.queryStore.warehouseId= item.id;
+                this.queryStore.page=this.currentPage;
+                util.ajax.post('/repertory/list', this.queryStore)
+                    .then(function (response) {
+                        if (response.status === 200 && response.data) {
+                            //清空
+                            self.queryStoreItems = response.data.data;
+                            self.totalAmount = response.data.total;
+                        }
+                    })
+                    .catch(function (error) {
+                        console.log(error);
+                    });
+            },
+            onReceiveStoreChange(data,item){
+               if(this.item.id===this.selectStore.warehouseId) {
+                   this.$Message.error('转入仓库不能与转出仓库相同');
                }
-            },handleStoreRowDbClick(row){
+            },
+            handleStoreRowDbClick(row){
                 //库存记录点击
-
                 for (var i = 0; i < this.changeStoreItems.length; i++) {
                     if (row.id === this.changeStoreItems[i].id) {
                         this.$Message.info('转移单已经存在此记录');
@@ -567,7 +569,6 @@
                         }
                     },
                     onCancel: () => {
-
                     }
                 });
             },
@@ -593,7 +594,25 @@
                 this.RepertoryOut.refOrderNumber=this.changeStore.refOrderNumber;
                 this.RepertoryOut.outDate=this.changeStore.outDate;
                 this.RepertoryOut.comment=this.changeStore.comment;
+
+                if(this.changeStore.goToWarehouseId==this.selectStore.warehouseId){
+                    this.$Message.error('转入仓库不能与转出仓库相同');
+                    return;
+                }
+                if(this.changeStore.goToWarehouseId==''||this.changeStore.goToWarehouseId==undefined){
+                    this.$Message.error('转入仓库不能为空');
+                    return;
+                }
+                if(this.changeStoreItems.length==undefined||this.changeStoreItems.length<=0){
+                    this.$Message.error('移库单明细不能为空');
+                    return;
+                }
                 for (let i = 0; i < this.changeStoreItems.length; i++) {
+
+                    if( this.RepertoryOut.warehouseId!=this.changeStoreItems[i].warehouseId){
+                        this.$Message.error('移库单明细中物品不在出库仓库中');
+                        return;
+                    }
                     if(this.changeStoreItems[i].quantity < this.changeStoreItems[i].outAmount){
                         this.$Message.error(this.changeStoreItems[i].goodsName+'转移数量超过库存数量，无法进行转移，请修改后重新提交！');
                         return;
