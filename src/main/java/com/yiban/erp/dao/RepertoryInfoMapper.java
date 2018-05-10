@@ -24,10 +24,6 @@ public interface RepertoryInfoMapper {
 
     int updateByPrimaryKeySelective(RepertoryInfo record);
 
-    Integer getDetailListCount(Map<String, Object> paramMap);
-
-    List<RepertoryInfo> getDetailList(Map<String, Object> paramMap);
-
     List<RepertoryInfo> getListByIdList(@Param("idList") List<Long> repertoryIdList);
 
     List<String> getGoodNameWithLessQuantity(Long sellOrderId);
@@ -46,8 +42,6 @@ public interface RepertoryInfoMapper {
     //获取某一商品最近一次的采购价
     List<CurrentBalanceResp> getLastBuyPrice(@Param("warehouseId") Integer warehouseId, @Param("goodsIdList") List<Long> goodsIdList);
 
-    List<RepertoryInfo> selectByIdList(@Param("idList") List<Long> idList);
-
     Integer querySelectCount(RepertorySelectQuery query); //选择存库商品列表的查询项
 
     List<RepertoryInfo> querySelectList(RepertorySelectQuery query);
@@ -59,4 +53,6 @@ public interface RepertoryInfoMapper {
                                @Param("updateTime") Date updateTime);
 
     int buyBackReleaseOnWayQuantity(@Param("inBackId") Long inBackId); //释放锁定的在单数量
+
+    int sellOrderReleaseOnWayQuantity(@Param("sellOrderId") Long sellOrderId); //释放锁定的销售在单数量
 }

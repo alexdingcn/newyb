@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.yiban.erp.dao.SellOrderMapper;
 import com.yiban.erp.dto.SellOrderAllAction;
+import com.yiban.erp.dto.SellOrderQuery;
 import com.yiban.erp.dto.SellReviewAction;
 import com.yiban.erp.dto.SellReviewOrderQuery;
 import com.yiban.erp.entities.SellOrder;
@@ -37,29 +38,15 @@ public class SellOrderController {
     @Autowired
     private SellOrderMapper sellOrderMapper;
 
-    @RequestMapping(value = "/order/list", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> getOrderList(HttpServletRequest request,
+    @RequestMapping(value = "/order/list", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> getOrderList(@RequestBody SellOrderQuery query,
                                                @AuthenticationPrincipal User user) throws Exception {
-
-        String reqCustomerId = request.getParameter("customerId");
-        String reqSaleId = request.getParameter("saleId");
-        String refNo = request.getParameter("refNo");
-        String status = request.getParameter("status");
-        String reqDate = request.getParameter("createOrderDate");
-        String reqPage = request.getParameter("page");
-        String reqSize = request.getParameter("size");
-        Long customerId = StringUtils.isBlank(reqCustomerId) ? null : Long.parseLong(reqCustomerId);
-        Long saleId = StringUtils.isBlank(reqSaleId) ? null : Long.parseLong(reqSaleId);
-        Integer page = StringUtils.isBlank(reqPage) ? 1 : Integer.parseInt(reqPage);
-        Integer size = StringUtils.isBlank(reqSize) ? 10 : Integer.parseInt(reqSize);
-        String reqRefNo = StringUtils.isBlank(refNo) ? null : refNo.trim();
-        String reqStatus = StringUtils.isBlank(status) ? null : status;
-        Date createOrderDate = StringUtils.isBlank(reqDate) ? null : new Date(Long.valueOf(reqDate));
-        List<SellOrder> sellOrders = sellOrderService.getList(user.getCompanyId(), customerId, saleId, reqRefNo, reqStatus, createOrderDate, page, size);
+        query.setCompanyId(user.getCompanyId());
+        Integer count = sellOrderMapper.getListCount(query);
         JSONObject result = new JSONObject();
-        if (!sellOrders.isEmpty()) {
-            Integer count = sellOrderMapper.getListCount(user.getCompanyId(), customerId, saleId, reqRefNo, reqStatus, createOrderDate);
-            result.put("count", count == null ? 0 : count);
+        if (count != null && count > 0) {
+            List<SellOrder> sellOrders = sellOrderMapper.getList(query);
+            result.put("count", count);
             result.put("data", sellOrders);
         }else {
             result.put("count", 0);
@@ -92,20 +79,11 @@ public class SellOrderController {
     }
 
     @RequestMapping(value = "/detail/history", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<JSON> getDetailHistory(HttpServletRequest request,
+    public ResponseEntity<String> getDetailHistory(@RequestParam("customerId") Long customerId,
+                                                   @RequestParam("goodsId") Long goodsId,
                                                    @AuthenticationPrincipal User user) throws Exception {
-        String customerIdStr = request.getParameter("customerId");
-        String goodIdStr = request.getParameter("goodIds");
-        Long customerId = null;
-        List<Long> goodIds = new ArrayList<>();
-        if (StringUtils.isNotBlank(customerIdStr)) {
-            customerId = Long.parseLong(customerIdStr);
-        }
-        if (StringUtils.isNotBlank(goodIdStr)) {
-            goodIds = JSON.parseArray(goodIdStr, Long.class);
-        }
-        Map<Long, List<SellOrderDetail>> details = sellOrderService.getDetailHistory(user.getCompanyId(), customerId, goodIds);
-        return ResponseEntity.ok().body((JSON) JSON.toJSON(details));
+        List<SellOrderDetail> details = sellOrderService.getDetailHistory(user.getCompanyId(), customerId, goodsId);
+        return ResponseEntity.ok().body(JSON.toJSONString(details, SerializerFeature.DisableCircularReferenceDetect));
     }
 
     @RequestMapping(value = "/detail/remove/{detailId}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -150,9 +128,7 @@ public class SellOrderController {
             throw new BizException(ErrorCode.SELL_ORDER_DETAIL_GET_FAIL);
         }
         sellOrderService.qualityCheckCancel(user, reviewAction);
-        //如果没有报错，则重新根据sellOrderId 获取详情列表
-        SellOrder order = sellOrderService.reviewDetail(sellOrderId);
-        return ResponseEntity.ok().body(JSON.toJSONString(order, SerializerFeature.DisableCircularReferenceDetect));
+        return ResponseEntity.ok().build();
     }
 
     @RequestMapping(value = "/order/review/sale/ok", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)

@@ -106,11 +106,12 @@ export const appRouter = [
         title: '基本资料',
         component: Main,
         children: [
-            { path: 'goods', title: '商品档案', name: 'basic_data_good', component: () => import('@/views/basic-data/good.vue') },
+            { path: 'goods', title: '商品列表', name: 'basic_data_good', component: () => import('@/views/basic-data/good.vue') },
+            { path: 'goods-category', title: '商品分类', name: 'basic_data_good_category', component: () => import('@/views/basic-data/good-category.vue') },
             { path: 'factory', title: '生产企业', name: 'basic_data_factory', component: () => import('@/views/basic-data/factory.vue') },
             { path: 'supplier', title: '供应商', name: 'basic_data_supplier', component: () => import('@/views/basic-data/supplier.vue') },
             { path: 'customer', title: '客户档案', name: 'basic_data_customer', component: () => import('@/views/basic-data/customer.vue') },
-            { path: 'buyer', title: '采购员', name: 'basic_data_buyer', component: () => import('@/views/basic-data/buyer.vue') },
+            { path: 'buyer', title: '采购员', name: 'basic_data_buyer', divided: true, component: () => import('@/views/basic-data/buyer.vue') },
             { path: 'sale', title: '销售员', name: 'basic_data_sale', component: () => import('@/views/basic-data/sale.vue') },
             { path: 'file', title: '档案管理', name: 'basic_data_file', component: () => import('@/views/basic-data/file.vue') },
             { path: 'ship', title: '运输公司档案', name: 'basic_data_ship', component: () => import('@/views/basic-data/ship.vue') }
@@ -126,7 +127,7 @@ export const appRouter = [
             { path: 'order', title: '采购制单', name: 'buy_order', component: () => import('@/views/buy/buy-order.vue') },
             { path: 'review', title: '采购单审核', name: 'buy_order_review', component: () => import('@/views/buy/buy-order-list.vue') },
             { path: 'receive', title: '采购收货', name: 'buy_receive', component: () => import('@/views/repertory/in-make.vue') },
-            { path: 'back-apply', title: '采购退出申请', name: 'back-apply', component: () => import('@/views/buy/back-apply.vue') },
+            { path: 'back-apply', title: '采购退出申请', name: 'back-apply', divided: true, component: () => import('@/views/buy/back-apply.vue') },
             { path: 'back-apply-check', title: '采购退出申请审核', name: 'back-apply-check', component: () => import('@/views/buy/back-apply-check.vue') },
             { path: 'back-quality-check', title: '采购退出质量审核', name: 'back-quality-check', component: () => import('@/views/buy/back-quality-check.vue') },
             { path: 'back-final-check', title: '采购退出终审', name: 'back-final-check', component: () => import('@/views/buy/back-final-check.vue') }
@@ -143,7 +144,11 @@ export const appRouter = [
             { path: 'quality-review', title: '销售出库质量审核', name: 'sell-quality-review', component: () => import('@/views/sell/sell-quality-review.vue') },
             { path: 'sale-review', title: '销售审核', name: 'sell-sale-review', component: () => import('@/views/sell/sell-sale-review.vue') },
             { path: 'list', title: '销售订单列表', name: 'sell_list', component: () => import('@/views/sell/sell-order-list.vue') },
-
+            { path: 'back-apply', title: '销售退单申请', name: 'sell-back-apply', component: () => import('@/views/sell/back-apply.vue') },
+            { path: 'back-apply-check', title: '销售退单申请审核', name: 'sell-back-apply-check', component: () => import('@/views/sell/back-apply-check.vue') },
+            { path: 'back-receive', title: '销售退单收货', name: 'sell-back-receive', component: () => import('@/views/sell/back-receive.vue')},
+            { path: 'back-quality-check', title: '销售退单质量复核', name: 'sell-back-quality-check', component: () => import('@/views/sell/back-quality-check.vue') },
+            { path: 'back-final-check', title: '销售退单终审', name: 'sell-back-final-check', component: () => import('@/views/sell/back-final-check.vue') },
         ]
     },
     {

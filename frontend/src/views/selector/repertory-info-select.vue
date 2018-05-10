@@ -209,6 +209,7 @@ export default {
               goodsId: this.formItem.goodsId,
               batchCode: this.formItem.batchCode,
               supplierId: this.formItem.supplierId,
+              minQuantity: 0,
               page: this.currentPage,
               size: this.tableCurrPageSize
           };

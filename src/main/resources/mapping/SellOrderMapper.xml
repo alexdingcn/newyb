@@ -38,7 +38,9 @@
     <include refid="Base_Column_List" />
     from sell_order
     where id = #{id,jdbcType=BIGINT}
+    and status != 'DELETE'
   </select>
+
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
     delete from sell_order
     where id = #{id,jdbcType=BIGINT}
@@ -132,7 +134,7 @@
     where id = #{id,jdbcType=BIGINT}
   </update>
 
-  <select id="getListCount" parameterType="map" resultType="java.lang.Integer">
+  <select id="getListCount" parameterType="com.yiban.erp.dto.SellOrderQuery" resultType="java.lang.Integer">
     select count(1)
     from sell_order
     where company_id = #{companyId} and status != 'DELETE'
@@ -149,8 +151,11 @@
         <bind name="refNoVal" value="refNo + '%'"/>
         and ref_no like #{refNoVal}
       </if>
-      <if test="createOrderDate != null">
-        and create_order_date = #{createOrderDate}
+      <if test="formCreateOrderDate != null">
+        and create_order_date >= #{formCreateOrderDate}
+      </if>
+      <if test="toCreateOrderDate != null">
+        and #{toCreateOrderDate} > create_order_date
       </if>
   </select>
 
@@ -208,7 +213,9 @@
   <select id="getList" parameterType="map" resultMap="ListMap">
     select
       <include refid="ListColumn" />
-    from sell_order s left join users u on s.sale_id=u.id, customer c, customer_rep r, warehouse w
+    from sell_order s
+    left join users u on s.sale_id=u.id,
+    customer c, customer_rep r, warehouse w
     where s.customer_id = c.id and s.customer_rep_id = r.id and s.warehouse_id = w.id
       and s.company_id = #{companyId} and s.status != 'DELETE'
     <if test="customerId != null" >
@@ -224,8 +231,11 @@
       <bind name="refNoVal" value="refNo + '%'"/>
       and s.ref_no like #{refNoVal}
     </if>
-    <if test="createOrderDate != null">
-      and s.create_order_date = #{createOrderDate}
+    <if test="formCreateOrderDate != null">
+      and create_order_date >= #{formCreateOrderDate}
+    </if>
+    <if test="toCreateOrderDate != null">
+      and #{toCreateOrderDate} > create_order_date
     </if>
     order by id desc
     limit #{offset}, #{limit};
@@ -327,5 +337,50 @@
     where s.customer_id = c.id and s.customer_rep_id = r.id and s.warehouse_id = w.id
     and s.id = #{id} and s.status != 'DELETE'
   </select>
+
+
+    <select id="getOrderStatusStat" resultType="com.yiban.erp.entities.StatusCount" parameterType="java.lang.Long" >
+        select status, count(1) as count
+        from sell_order
+        where status != 'DELETE'
+        <if test="companyId != null">
+            and company_id = #{companyId}
+        </if>
+        group by status
+    </select>
+
+    <select id="getOrderAmountStat" resultType="com.yiban.erp.entities.StatusCount" >
+        select date(create_time) as tradeDate, sum(total_amount) as amount
+        from sell_order
+        where status = 'SALE_CHECKED'
+        <if test="companyId != null">
+            and company_id = #{companyId}
+        </if>
+        <if test="startDate != null">
+            and create_time >= #{startDate}
+        </if>
+        <if test="endDate != null">
+            and #{endDate} > create_time
+        </if>
+        group by tradeDate
+        order by tradeDate
+    </select>
+
+    <select id="getGoodsAmountStat" resultType="com.yiban.erp.entities.StatusCount" >
+        select g.name as goodsName, sod.goods_id as goodsId, sum(sod.amount) as amount
+        from sell_order so, sell_order_detail sod, goods g
+        where sod.sell_order_id = so.id and sod.goods_id=g.id and so.status='SALE_CHECKED'
+        <if test="companyId != null">
+            and so.company_id = #{companyId}
+        </if>
+        <if test="startDate != null">
+            and so.create_time >= #{startDate}
+        </if>
+        <if test="endDate != null">
+            and #{endDate} > so.create_time
+        </if>
+        group by sod.goods_id
+        order by amount desc
+    </select>
 
 </mapper>

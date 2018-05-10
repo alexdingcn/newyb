@@ -37,13 +37,13 @@ export default {
                 });
         },
         onChange (data) {
-            let items = this.optionList.filter(item => item.id === data);
-            let item = '';
+            let items = this.optionList.filter(item => item.userId === data);
+            let saleUser = {};
             if(items && items[0]) {
-                item = items[0];
+                saleUser = items[0];
             }
             this.$emit('input', data);
-            this.$emit('on-change', data, item);
+            this.$emit('on-change', data, saleUser);
         }
     }
 }

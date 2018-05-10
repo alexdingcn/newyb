@@ -1,49 +1,48 @@
+<style lang="less">
+@import "../../styles/common.less";
+</style>
+
 <template>
     <div>
         <Card >
             <p slot="title">
-                销售审核
+                {{viewMethod === 'CHECK' ? '销售审核' : '销售单选择'}}
             </p>
             <div slot="extra">
                 <ButtonGroup size="small">
-                    <Button type="success" icon="checkmark-round" :loading="sellOrderLoading" @click="reviewOkBtnClick">审核通过</Button>
-                    <Button type="error" icon="close-round" :loading="sellOrderLoading" @click="removeBtnClick">删除订单</Button>
+                    <Button type="primary" icon="ios-search" :loading="sellOrderLoading" @click="querySellOrderList">查询</Button>
+                    <Button v-if="viewMethod === 'CHECK'" type="success" icon="checkmark-round" :loading="sellOrderLoading" @click="reviewOkBtnClick">审核通过</Button>
+                    <Button v-if="viewMethod === 'CHECK'" type="error" icon="close-round" :loading="sellOrderLoading" @click="removeBtnClick">删除订单</Button>
+                    <Button v-if="viewMethod === 'SELECT'" type="success" icon="checkmark" :loading="sellOrderLoading" @click="selectSellOrder">选择</Button>
                 </ButtonGroup>
             </div>
             <Form ref="searchForm" :model="query" :label-width="100">
-                <Row>
-                    <Col span="8">
+                <Row class="row-margin-bottom">
+                    <i-col span="6">
                         <FormItem label="制单日期">
                             <DatePicker v-model="dateRange" type="daterange" placement="bottom-start" placeholder="制单日期" style="width:180px"></DatePicker>
                         </FormItem>
-                    </Col>
-                    <Col span="8">
+                    </i-col>
+                    <i-col span="6">
                         <FormItem label="客户">
                             <customer-select v-model="query.customerId"></customer-select>
                         </FormItem>
-                    </Col>
-                    <Col span="8"></Col>
-                </Row>
-                <Row>
-                    <Col span="8">
+                    </i-col>
+                    <i-col span="6">
                         <FormItem label="销售员">
                             <sale-select v-model="query.saleId"></sale-select>
                         </FormItem>
-                    </Col>
-                    <Col span="8" >
-                        <FormItem label="状态">
+                    </i-col>
+                    <i-col span="6" >
+                        <FormItem label="状态" v-if="viewMethod === 'CHECK'">
                             <Select v-model="query.status" placeholder="状态">
                                 <Option v-for="option in statusOptions" :value="option.key" :label="option.name" :key="option.key">{{option.name}}</Option>
                             </Select>
                         </FormItem>
-                    </Col>
-                    <Col span="7" offset="1">
-                        <Button type="primary" icon="ios-search" :loading="sellOrderLoading" @click="querySellOrderList"></Button>
-                    </Col>
+                    </i-col>
                 </Row>
             </Form>
-        </Card>
-        <div >
+
             <Table border highlight-row disabled-hover height="250" style="width: 100%" 
                    :columns="orderListColumns" :data="orderList"
 				   ref="sellOrderListTable" size="small"
@@ -51,20 +50,20 @@
                    @on-row-click="handleSelectSellOrder"
 				   no-data-text="使用右上方输入搜索条件">
 			</Table>
-        </div>
 
-        <div class="table-div">
+            <Row type="flex" justify="start" style="margin-bottom: 5px; margin-top: 20px;">
+                <h3 class="padding-left-20" >
+                    <b>合计数量:</b> ￥{{ totalCount }} <b style="margin-left: 30px;">合计金额:</b> ￥{{ totalAmount }}
+                </h3>
+            </Row>
             <Table border highlight-row height="300" :loading="detailLoading" 
-                   :columns="sellDetailColumns" :data="sellDetailList"
-                   ref="sellGoodTable" style="width: 100%;" size="small"
-                   no-data-text="点击上方订单后查看销售明细">
-                <div slot="header">
-                    <h3 class="padding-left-20" >
-                        <b>合计数量:</b> ￥{{ totalCount }} <b class="margin-left-30">合计金额:</b> ￥{{ totalAmount }}
-                    </h3>
-                </div>
+                :columns="sellDetailColumns" :data="sellDetailList"
+                ref="sellGoodTable" style="width: 100%;" size="small"
+                no-data-text="点击上方订单后查看销售明细">
             </Table>
-        </div>
+
+        </Card>
+        
     </div>
 </template>
 
@@ -82,7 +81,45 @@ export default {
         saleSelect,
         goodExpand
     },
+    props: {
+        viewMethod: {
+            type: String,
+            default: 'CHECK',
+            validator: function(value) {
+                return value === 'CHECK' || value === 'SELECT';
+            }
+        }
+    },
     data() {
+        const stautsShow = function(h, status) {
+            let label = '';
+            let color = '';
+            switch (status) {
+                case 'INIT':
+                    label = '制单初始';
+                    color = '#2d8cf0'
+                    break;
+                case 'QUALITY_CHECKED':
+                    label = '质量审核完成';
+                    color = '#ff9900'
+                    break;
+                case 'SALE_CHECKED':
+                    label = '销售审核完成';
+                    color = '#19be6b';
+                    break;
+                default:
+                    label = '';
+                    color = '';
+                    break;
+            }
+            return h('Tag', {
+                props: {
+                    type: 'dot',
+                    color: color
+                }
+            }, label);
+        };
+
         return {
             statusOptions: [
                 {key: 'ALL', name:'所有'},
@@ -104,13 +141,13 @@ export default {
                     key: 'id',
                     title: '#',
                     align: 'center',
-                    width: 60
+                    width: 80
                 },
                 {
                     title: '制单日',
                     key: 'createOrderDate',
                     align: "center",
-                    width: 100,
+                    width: 120,
                     sortable: true,
                     render:(h, params) => {
                         return moment(params.row.createOrderDate).format('YYYY-MM-DD');
@@ -120,18 +157,18 @@ export default {
                     title: '仓库点',
                     key: 'warehouseName',
                     align: "center",
-                    width: 100
+                    width: 140
                 },
                 {
                     title: '客户',
                     key: 'customerName',
                     align: "center",
-                    width: 160
+                    width: 180
                 },
                 {
                     title: '销售员',
                     key: 'saleId',
-                    width: 90,
+                    width: 140,
                     align: "center",
                     render: (h, params) => {
                         let nickName = params.row.saleNickName;
@@ -146,32 +183,40 @@ export default {
                     }
                 },
                 {
+                    title: '当前状态',
+                    key: 'status',
+                    width: 150,
+                    render: (h, params) => {
+                        return stautsShow(h, params.row.status);
+                    }
+                },
+                {
                     title: '制单人',
                     key: 'createBy',
                     align: "center",
-                    width: 100
+                    width: 140
                 },
                 {
                     title: '提货员',
                     key: 'takeGoodsUser',
                     align: "center",
-                    width: 100
+                    width: 140
                 },
                 {
                     title: '销售单号',
                     key: 'orderNumber',
                     align: 'center',
-                    width: 120
+                    width: 180
                 },
                 {
                     title: '总计数量',
                     key: 'totalQuantity',
-                    width: 100
+                    width: 120
                 },
                 {
                     title: '总计金额',
                     key: 'totalAmount',
-                    width: 100
+                    width: 120
                 },
                 {
                     title: '温控方式',
@@ -183,31 +228,31 @@ export default {
                     title: '收货人',
                     key: 'customerRepName',
                     align: "center",
-                    width: 120
+                    width: 150
                 },
                 {
                     title: '收货电话',
                     key: 'customerRepContactPhone',
                     align: "center",
-                    width: 100
+                    width: 150
                 },
                 {
                     title: '收货地址',
                     key: 'customerRepRepertoryAddress',
                     align: "center",
                     width: 200
-                },
+                }, 
                 {
                     title: '运输方式',
                     key: 'shipMethodName',
                     align: "center",
-                    width: 110
+                    width: 120
                 },
                 {
                     title: '运输工具',
                     key: 'shipToolName',
                     align: "center",
-                    width: 110
+                    width: 120
                 }
             ],
             detailLoading: false,
@@ -218,83 +263,60 @@ export default {
                     type: "expand",
                     width: 50,
                     render: (h, params) => {
-                        let repertoryInfo = params.row.repertoryInfo;
-                        let goods = {};
-                        if (repertoryInfo) {
-                        goods = repertoryInfo.goods;
-                        }
-                        let productDate = '';
-                        if (repertoryInfo.productDate) {
-                            productDate = moment(repertoryInfo.productDate).format('YYYY-MM-DD');
-                        }
-                        let expDate = '';
-                        if (repertoryInfo.expDate) {
-                            expDate = moment(repertoryInfo.expDate).format('YYYY-MM-DD');
-                        }
+                        let goods = params.row.goods;
+                        let productDate = params.row.productDate ? moment(params.row.productDate).format('YYYY-MM-DD') : '';
+                        let expDate = params.row.expDate ? moment(params.row.expDate).format('YYYY-MM-DD') : '';
                         return h(goodExpand, {
-                            props: {
-                                good: goods,
-                                repertoryInfo: repertoryInfo,
-                                productDate: productDate,
-                                expDate: expDate
-                            }
-                        });
+                        props: {
+                            good: goods,
+                            productDate: productDate,
+                            expDate: expDate
+                        }
+                        })
                     }
                 },
                 {
-                    title: '商品名称',
-                    key: 'goodsName',
-                    width: 150
+                    title: "商品名称",
+                    key: "goodsName",
+                    sortable: true,
+                    width: 180
                 },
                 {
-                    title: '生产企业',
-                    key: 'factoryName',
-                    width: 150
+                    title: "生产企业",
+                    key: "factoryName",
+                    width: 180
+                },
+                {
+                    title: "产地",
+                    key: "origin",
+                    width: 120
                 },
                 {
                     title: '批次号',
-                    key: 'batch',
-                    align: 'center',
-                    width: 160,
-                    render: (h, params) => {
-                        return params.row.repertoryInfo.batchCode;
-                    }
+                    key: 'batchCode',
+                    width: 160
                 },
                 {
-                    title: '剂型',
-                    key: 'jx',
-                    width: 100,
-                    render: (h, params) => {
-                        let goods = params.row.repertoryInfo.goods;
-                        if(goods) {
-                            return goods.jxName;
-                        }else {
-                            return '';
-                        }
-                    }
+                    title: "规格",
+                    key: "spec",
+                    width: 120
                 },
                 {
-                    title: '规格',
-                    key: 'spec',
-                    width: 100,
-                    render: (h, params) => {
-                        let goods = params.row.repertoryInfo.goods;
-                        if(goods) {
-                            return goods.spec;
-                        }else {
-                            return '';
-                        }
-                    }
+                    title: "剂型",
+                    key: "jx",
+                    width: 120
+                },
+                {
+                    title: '单位',
+                    key: 'unitName',
+                    width: 120
                 },
                 {
                     title: '生产日期',
                     width: 120,
                     key: 'productData',
                     render: (h, params) => {
-                        let repertoryInfo = params.row.repertoryInfo;
-                        if (repertoryInfo && repertoryInfo.productDate) {
-                            return moment(repertoryInfo.productDate).format('YYYY-MM-DD');
-                        }
+                        return params.row.productDate ? moment(params.row.productDate).format('YYYY-MM-DD') : '';
                     }
                 },
                 {
@@ -302,62 +324,42 @@ export default {
                     key: 'expDate',
                     width: 120,
                     render: (h, params) => {
-                        let repertoryInfo = params.row.repertoryInfo;
-                        if (repertoryInfo && repertoryInfo.expDate) {
-                            return moment(repertoryInfo.expDate).format('YYYY-MM-DD');
-                        }
-                    }
-                },
-                {
-                    title: '单位',
-                    key: 'unitName',
-                    width: 90,
-                    render: (h, params) => {
-                        let goods = params.row.repertoryInfo.goods;
-                        if(goods) {
-                            return goods.unitName;
-                        }else {
-                            return '';
-                        }
+                        return params.row.expDate ? moment(params.row.expDate).format('YYYY-MM-DD') : '';
                     }
                 },
                 {
                     title: "库存量",
                     key: "repertoryQuantity",
-                    width: 100,
-                    align: "center"
+                    width: 120,
                 },
                 {
-                    title: '数量',
-                    width: 90,
+                    title: '销售数量',
+                    width: 120,
                     key: 'quantity'
                 },
                 {
                     title: '价格',
-                    width: 90,
+                    width: 100,
                     key: 'realPrice'
                 },
                 {
                     title: "折扣",
                     key: "disPrice",
-                    align: "center",
                     width: 100
                 },
                 {
                     title: "赠送",
                     key: "free",
-                    align: "center",
                     width: 100
                 },
                 {
                     title: '金额',
-                    width: 100,
+                    width: 120,
                     key: 'amount'
                 },
                 {
                     title: "税率",
                     key: "taxRate",
-                    align: "center",
                     width: 100
                 },
                 {
@@ -366,8 +368,8 @@ export default {
                     key: 'checkStatus',
                     render: (h, params) => {
                         const checkStatus = params.row.checkStatus;
-                        const color = !checkStatus ? 'blue' : checkStatus === 'OK' ? 'green' : 'red';
-                        const text = !checkStatus ? '待审' : checkStatus === 'OK' ? '通过' : '拒绝';
+                        const color = !checkStatus ? 'blue' : (checkStatus === 'OK' ? 'green' : 'red');
+                        const text = !checkStatus ? '待审' : (checkStatus === 'OK' ? '通过' : '拒绝');
                         return h('Tag', {
                             props: {
                                 type: 'dot',
@@ -406,7 +408,7 @@ export default {
             ],
             totalCount: 0,
             totalAmount: 0,
-            chooseOrderItem: ''
+            chooseOrderItem: {}
         }
     },
     watch: {
@@ -423,6 +425,9 @@ export default {
             }
         }
     },
+    mounted() {
+        this.querySellOrderList();
+    },
     methods: {
         querySellOrderList() {
             let reqData = {
@@ -435,16 +440,20 @@ export default {
             }else {
                 statusList = [this.query.status];
             }
+            if(this.viewMethod === 'SELECT') {
+                statusList = ['SALE_CHECKED']; //销售单选择查询时，只查询已经审核通过的
+            }
             reqData['statusList'] = statusList;
             reqData['startDate'] = this.dateRange[0];
             reqData['endDate'] = this.dateRange[1];
             this.sellOrderLoading = true;
-            this.chooseOrderItem = '';
+            this.chooseOrderItem = {};
             this.sellDetailList = [];
             util.ajax.post("/sell/order/review/list", reqData)
                 .then((response) => {
                     this.orderList = response.data;
                     this.sellOrderLoading = false;
+                    this.sellDetailList = [];
                 })
                 .catch((error) => {
                     this.sellOrderLoading = false;
@@ -538,83 +547,87 @@ export default {
             let reqData = {
                 orderId: this.chooseOrderItem.id
             };
-            this.sellOrderLoading = true;
-            util.ajax.post("/sell/order/review/sale/ok", reqData)
-                .then((response) => {
-                    this.sellOrderLoading = false;
-                    this.querySellOrderList();
-                    this.$Message.success('审核成功');
-                })
-                .catch((error) => {
-                    this.sellOrderLoading = false;
-                    if (error.response && error.response.data && error.response.data.code === 2214) {
-                        //库存不足问题
-                        let goodNames = error.response.data.data;
-                        let nameLabel = '';
-                        if (goodNames && Array.isArray(goodNames)) {
-                            for(let i=0; i<goodNames.length; i++) {
-                                nameLabel = nameLabel + goodNames[i] + ' ';
+            let self = this;
+            this.$Modal.confirm({
+                title: '审核确认',
+                content: '是否确认当前选则的订单数据已经正确？审核提交后不再能修改，并且生成财务往来账',
+                onCancel: () => {},
+                onOk:() => {
+                    self.sellOrderLoading = true;
+                    util.ajax.post("/sell/order/review/sale/ok", reqData)
+                        .then((response) => {
+                            self.sellOrderLoading = false;
+                            self.querySellOrderList();
+                            self.$Message.success('审核成功');
+                        })
+                        .catch((error) => {
+                            self.sellOrderLoading = false;
+                            if (error.response && error.response.data && error.response.data.code === 2214) {
+                                //库存不足问题
+                                let goodNames = error.response.data.data;
+                                let nameLabel = '';
+                                if (goodNames && Array.isArray(goodNames)) {
+                                    for(let i=0; i<goodNames.length; i++) {
+                                        nameLabel = nameLabel + goodNames[i] + '; ';
+                                    }
+                                }
+                                self.$Modal.error({
+                                    title: '库存不足提示',
+                                    content: '订单下的商品存在库存不足的情况, 请确认, 对应商品:' + nameLabel
+                                });
+                            }else {
+                                util.errorProcessor(self, error);
                             }
-                        }
-                        this.$Modal.error({
-                            title: '库存不足提示',
-                            content: '订单下的商品存在库存不足的情况, 请确认, 对应商品:' + nameLabel
                         });
-                    }else {
-                        util.errorProcessor(this, error);
-                    }
-                });
+                }
+            });
         },
         removeBtnClick() {
             let validate = this.validateAction('DELETE');
             if (!validate) {
                 return;
             }
+            let self = this;
             this.$Modal.confirm({
                 title: '删除提示',
                 content: '订单删除后不可恢复，是否确认删除?',
                 onOk: () => {
-                    this.removeOrder();
+                    self.removeOrder();
                 },
-                onCancel: () => {
-
-                }
+                onCancel: () => {}
             })
         },
         removeOrder() {
-        this.sellOrderLoading = true;
-        util.ajax.delete("/sell/order/remove/" + this.chooseOrderItem.id)
-            .then((response) => {
-                this.sellOrderLoading = false;
-                this.querySellOrderList();
-                this.$Message.success('删除成功');
-            })
-            .catch((error) => {
-                this.sellOrderLoading = false;
-                util.errorProcessor(this, error);
+            this.sellOrderLoading = true;
+            util.ajax.delete("/sell/order/remove/" + this.chooseOrderItem.id)
+                .then((response) => {
+                    this.sellOrderLoading = false;
+                    this.querySellOrderList();
+                    this.$Message.success('删除成功');
+                })
+                .catch((error) => {
+                    this.sellOrderLoading = false;
+                    util.errorProcessor(this, error);
+                });
+        },
+
+        selectSellOrder() {
+            if (!this.chooseOrderItem.id || !this.sellDetailList || this.sellDetailList.length <= 0) {
+                this.$Message.info('请先选择存在详情的销售单.');
+                return;
+            }
+            //出发事件，事件返回订单和订单详情信息
+            this.$emit('on-choose', this.chooseOrderItem, this.sellDetailList);
+            this.$nextTick(() => {
+                this.chooseOrderItem = {};
+                this.sellDetailList = [];
             });
         }
-
     }
 }
 </script>
 
 <style>
-.margin-top-8 {
-    margin-top: 8px;
-}
-.margin-left-30 {
-    margin-left: 30px;
-}
-.ivu-form-item {
-    margin-bottom: 5px;
-}
-.search-div {
-    background-color: #fff;
-}
-.table-div {
-    background-color: #fff;
-    margin-top: 10px;
-}
+
 </style>
 

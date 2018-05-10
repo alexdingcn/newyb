@@ -24,8 +24,9 @@ public enum ErrorCode {
     USER_REGISTER_COMPANY_EXIST(1110, "公司营业执照已注册，请联系公司管理员确认"),
     USER_REGISTER_NICKNAME_EXIST(1111, "用户名已经存在"),
     USER_REGISTER_EXCEPTION(1112, "管理员用户注册异常, 请联系运营方"),
+    COMPANY_EXPIRED(1113, "试用账号已过期"),
     USER_LOGIN_UN_ACTIVATE(1114, "账号为未激活"),
-    COMPANY_UN_ENABLED(1115, "公司处于未激活状态，请联系运营方"),
+    COMPANY_DISABLED(1115, "公司处于未激活状态，请联系运营方"),
     USER_MOBILE_EXIST(1116, "手机号已经存在, 不可再次注册"),
     USER_MOBILE_MISSING(1117, "手机号缺失"),
 
@@ -100,6 +101,22 @@ public enum ErrorCode {
     SELL_ORDER_QUANTITY_NOT_ENOUGH(2214, "存在库存不足的商品:", ErrorDisplay.MODAL),
     SELL_ORDER_SALE_CHECK_STATUS_ERROR(2215, "订单状态不是质检通过状态，不能进行审核通过", ErrorDisplay.NOTICE),
     SELL_ORDER_WAREHOUSE_FROZEN(2215, "当前仓库正在盘库冻结，不能做出库操作"),
+    SELL_ORDER_REMOVE_STATUS_ERROR(2216, "当前销售订单已经审核通过, 不能删除"),
+    SELL_BACK_COST_AMOUNT_ERROR(2220, "销售退单的免零金额必须小于等于0"),
+    SELL_BACK_ADD_DETAIL_EMPTY(2221, "销售退单产品详情不能为空"),
+    SELL_BACK_ADD_DETAIL_QUANTITY_ERROR(2222, "销售退单详情的退货数量需要存在大于0的数量"),
+    SELL_BACK_GET_OUT_RECORD_FAIL(2223, "销售退货单获取关联销售出库单失败"),
+    SELL_BACK_ORDER_GET_FAIL(2224, "销售退货单信息获取失败"),
+    SELL_BACK_CHECK_STATUS_ERROR(2225, "销售退货审核状态错误, 请联系运营方排查原因.", ErrorDisplay.MODAL),
+    SELL_BACK_INIT_SALE_CHECK_ERROR(2226, "销售退货单当前状态不可操作销售经理审核"),
+    SELL_BACK_INIT_QUALITY_CHECK_ERROR(2227, "销售退货单当前状态不可操作质量经理审核"),
+    SELL_BACK_QUALITY_CHECK_ERROR(2228, "销售退货单当前状态不可操作质量复核验收"),
+    SELL_BACK_QUALITY_CHECK_CANCEL_ERROR(2229, "销售退货单当前状态不可操作质量复核取消"),
+    SELL_BACK_REMOVE_STATUS_ERROR(2230, "销售退货单已经通过了终审，不能做删除操作"),
+    SELL_BACK_DETAIL_GET_FAIL(2231, "获取销售退货单详情信息失败."),
+    SELL_BACK_RECEIVE_STATUS_ERROR(2232, "销售退货单当前状态不可操作收货确认."),
+    SELL_BACK_RIGHT_QUANTITY_ERROR(2233, "合格数据错误."),
+
 
     // 23xx -承运公司
     SHIP_SAVE_PARAMS_ERROR(2301, "必输参数校验失败"),

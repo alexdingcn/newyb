@@ -21,11 +21,17 @@
     <result column="check_result" property="checkResult" jdbcType="VARCHAR" />
     <result column="check_date" property="checkDate" jdbcType="TIMESTAMP" />
     <result column="check_user" property="checkUser" jdbcType="VARCHAR" />
+    <result column="batch_code" property="batchCode" jdbcType="VARCHAR" />
+    <result column="goods_id" property="goodsId" jdbcType="BIGINT" />
+    <result column="product_date" property="productDate" jdbcType="DATE" />
+    <result column="exp_date" property="expDate" jdbcType="DATE" />
+    <result column="location" property="location" jdbcType="VARCHAR" />
+    <result column="back_quantity" property="backQuantity" jdbcType="DECIMAL" />
   </resultMap>
   <sql id="Base_Column_List" >
     id, sell_order_id, repertory_id, quantity, fix_price, dis_price, free, real_price, single_price,
     amount, tax_rate, create_by, create_time, update_by, update_time, check_status, check_result, check_date,
-    check_user
+    check_user, batch_code, goods_id, product_date, exp_date, location, back_quantity
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
     select 
@@ -44,7 +50,7 @@
       amount, tax_rate, create_by, 
       create_time, update_by, update_time,
       check_status, check_result, check_date,
-      check_user
+      check_user, batch_code, goods_id, product_date, exp_date, location, back_quantity
       )
     values (#{sellOrderId,jdbcType=BIGINT}, #{repertoryId,jdbcType=BIGINT},
       #{quantity,jdbcType=DECIMAL}, #{fixPrice,jdbcType=DECIMAL}, #{disPrice,jdbcType=DECIMAL},
@@ -52,7 +58,9 @@
       #{amount,jdbcType=DECIMAL}, #{taxRate,jdbcType=DECIMAL}, #{createBy,jdbcType=VARCHAR}, 
       #{createTime,jdbcType=TIMESTAMP}, #{updateBy,jdbcType=VARCHAR}, #{updateTime,jdbcType=TIMESTAMP},
       #{checkStatus,jdbcType=VARCHAR}, #{checkResult,jdbcType=VARCHAR}, #{checkDate,jdbcType=TIMESTAMP},
-      #{checkUser,jdbcType=VARCHAR}
+      #{checkUser,jdbcType=VARCHAR}, #{batchCode,jdbcType=VARCHAR}, #{goodsId,jdbcType=BIGINT},
+      #{productDate,jdbcType=DATE}, #{expDate, jdbcType=DATE}, #{location,jdbcType=VARCHAR},
+      #{backQuantity,jdbcType=DECIMAL}
       )
   </insert>
 
@@ -63,7 +71,7 @@
       amount, tax_rate, create_by,
       create_time, update_by, update_time,
       check_status, check_result, check_date,
-      check_user
+      check_user, batch_code, goods_id, product_date, exp_date, location, back_quantity
       )
     values
     <foreach collection="detailList" item="item" open="(" close=")" separator="), (">
@@ -73,125 +81,12 @@
       #{item.amount,jdbcType=DECIMAL}, #{item.taxRate,jdbcType=DECIMAL}, #{item.createBy,jdbcType=VARCHAR},
       #{item.createTime,jdbcType=TIMESTAMP}, #{item.updateBy,jdbcType=VARCHAR}, #{item.updateTime,jdbcType=TIMESTAMP},
       #{item.checkStatus,jdbcType=VARCHAR}, #{item.checkResult,jdbcType=VARCHAR}, #{item.checkDate,jdbcType=TIMESTAMP},
-      #{item.checkUser,jdbcType=VARCHAR}
+      #{item.checkUser,jdbcType=VARCHAR}, #{item.batchCode,jdbcType=VARCHAR}, #{item.goodsId,jdbcType=BIGINT},
+      #{item.productDate,jdbcType=DATE}, #{item.expDate, jdbcType=DATE}, #{item.location, jdbcType=VARCHAR},
+      #{item.backQuantity,jdbcType=DECIMAL}
     </foreach>
   </insert>
 
-  <insert id="insertSelective" parameterType="com.yiban.erp.entities.SellOrderDetail" keyProperty="id" useGeneratedKeys="true" >
-    insert into sell_order_detail
-    <trim prefix="(" suffix=")" suffixOverrides="," >
-      <if test="sellOrderId != null" >
-        sell_order_id,
-      </if>
-      <if test="repertoryId != null" >
-        repertory_id,
-      </if>
-      <if test="quantity != null" >
-        quantity,
-      </if>
-      <if test="fixPrice != null" >
-        fix_price,
-      </if>
-      <if test="disPrice != null" >
-        dis_price,
-      </if>
-      <if test="free != null" >
-        free,
-      </if>
-      <if test="realPrice != null" >
-        real_price,
-      </if>
-      <if test="singlePrice != null" >
-        single_price,
-      </if>
-      <if test="amount != null" >
-        amount,
-      </if>
-      <if test="taxRate != null" >
-        tax_rate,
-      </if>
-      <if test="createBy != null" >
-        create_by,
-      </if>
-      <if test="createTime != null" >
-        create_time,
-      </if>
-      <if test="updateBy != null" >
-        update_by,
-      </if>
-      <if test="updateTime != null" >
-        update_time,
-      </if>
-      <if test="checkStatus != null" >
-        check_status,
-      </if>
-      <if test="checkResult != null" >
-        check_result,
-      </if>
-      <if test="checkDate != null" >
-        check_date,
-      </if>
-      <if test="checkUser != null" >
-        check_user,
-      </if>
-    </trim>
-    <trim prefix="values (" suffix=")" suffixOverrides="," >
-      <if test="sellOrderId != null" >
-        #{sellOrderId,jdbcType=BIGINT},
-      </if>
-      <if test="repertoryId != null" >
-        #{repertoryId,jdbcType=BIGINT},
-      </if>
-      <if test="quantity != null" >
-        #{quantity,jdbcType=DECIMAL},
-      </if>
-      <if test="fixPrice != null" >
-        #{fixPrice,jdbcType=DECIMAL},
-      </if>
-      <if test="disPrice != null" >
-        #{disPrice,jdbcType=DECIMAL},
-      </if>
-      <if test="free != null" >
-        #{free,jdbcType=DECIMAL},
-      </if>
-      <if test="realPrice != null" >
-        #{realPrice,jdbcType=DECIMAL},
-      </if>
-      <if test="singlePrice != null" >
-        #{singlePrice,jdbcType=DECIMAL},
-      </if>
-      <if test="amount != null" >
-        #{amount,jdbcType=DECIMAL},
-      </if>
-      <if test="taxRate != null" >
-        #{taxRate,jdbcType=DECIMAL},
-      </if>
-      <if test="createBy != null" >
-        #{createBy,jdbcType=VARCHAR},
-      </if>
-      <if test="createTime != null" >
-        #{createTime,jdbcType=TIMESTAMP},
-      </if>
-      <if test="updateBy != null" >
-        #{updateBy,jdbcType=VARCHAR},
-      </if>
-      <if test="updateTime != null" >
-        #{updateTime,jdbcType=TIMESTAMP},
-      </if>
-      <if test="checkStatus != null" >
-        #{checkStatus,jdbcType=VARCHAR},
-      </if>
-      <if test="checkResult != null" >
-        #{checkResult,jdbcType=VARCHAR},
-      </if>
-      <if test="checkDate != null" >
-        #{checkDate,jdbcType=TIMESTAMP},
-      </if>
-      <if test="checkUser != null" >
-        #{checkUser,jdbcType=VARCHAR},
-      </if>
-    </trim>
-  </insert>
   <update id="updateByPrimaryKeySelective" parameterType="com.yiban.erp.entities.SellOrderDetail" >
     update sell_order_detail
     <set >
@@ -249,59 +144,52 @@
       <if test="checkUser != null" >
         check_user = #{checkUser,jdbcType=VARCHAR},
       </if>
+      <if test="batchCode != null" >
+        batch_code = #{batchCode,jdbcType=VARCHAR},
+      </if>
+      <if test="goodsId != null" >
+        goods_id = #{goodsId,jdbcType=BIGINT},
+      </if>
+      <if test="productDate != null">
+        product_date = #{productDate,jdbcType=DATE},
+      </if>
+       <if test="expDate != null" >
+         exp_date = #{expDate, jdbcType=DATE},
+       </if>
+      <if test="location != null">
+        location = #{location,jdbcType=VARCHAR},
+      </if>
+      <if test="backQuantity != null">
+        back_quantity = #{backQuantity,jdbcType=DECIMAL},
+      </if>
     </set>
-    where id = #{id,jdbcType=BIGINT}
-  </update>
-  <update id="updateByPrimaryKey" parameterType="com.yiban.erp.entities.SellOrderDetail" >
-    update sell_order_detail
-    set sell_order_id = #{sellOrderId,jdbcType=BIGINT},
-      repertory_id = #{repertoryId,jdbcType=BIGINT},
-      quantity = #{quantity,jdbcType=DECIMAL},
-      fix_price = #{fixPrice,jdbcType=DECIMAL},
-      dis_price = #{disPrice,jdbcType=DECIMAL},
-      free = #{free,jdbcType=DECIMAL},
-      real_price = #{realPrice,jdbcType=DECIMAL},
-      single_price = #{singlePrice,jdbcType=DECIMAL},
-      amount = #{amount,jdbcType=DECIMAL},
-      tax_rate = #{taxRate,jdbcType=DECIMAL},
-      create_by = #{createBy,jdbcType=VARCHAR},
-      create_time = #{createTime,jdbcType=TIMESTAMP},
-      update_by = #{updateBy,jdbcType=VARCHAR},
-      update_time = #{updateTime,jdbcType=TIMESTAMP},
-      check_status = #{checkStatus,jdbcType=VARCHAR},
-      check_result = #{checkResult,jdbcType=VARCHAR},
-      check_date = #{checkDate,jdbcType=TIMESTAMP},
-      check_user = #{checkUser,jdbcType=VARCHAR}
     where id = #{id,jdbcType=BIGINT}
   </update>
 
   <select id="getDetailList" parameterType="java.lang.Long" resultMap="BaseResultMap">
     select
-      <include refid="Base_Column_List"/>
-    from sell_order_detail
-    where sell_order_id = #{sellOrderId,jdbcType=BIGINT}
+      s.*, r.quantity as repertoryQuantity, r.on_way_quantity as onWayQuantity
+    from sell_order_detail s, repertory_info r
+    where s.repertory_id = r.id
+      and sell_order_id = #{sellOrderId,jdbcType=BIGINT}
   </select>
 
-  <select id="getDetailHistory" parameterType="map" resultType="com.yiban.erp.entities.SellOrderDetail">
+  <select id="getDetailHistory" parameterType="map" resultMap="BaseResultMap">
     select
-      t.id as id, t.sell_order_id as sellOrderId, t.repertory_id as repertoryId, t.quantity as quantity,
-      t.fix_price as fixPrice, t.dis_price as disPrice, t.free as free, t.real_price as realPrice,
-      t.single_price as singlePrice, t.amount as amount, t.tax_rate as taxRate,
-      t.create_by as createBy, t.create_time as createTime, t.update_by as updateBy, t.update_time as updateTime,
-      t.check_status as checkStatus, t.check_result as checkResult, t.check_date as checkDate, t.check_user as checkUser,
+      t.*,
       c.name as customerName,
       s.create_order_date as createOrderDate,
-      u.nickname as salerNickName,
-      u.realname as salerRealName
+      u.nickname as saleNickName,
+      u.realname as saleRealName,
+      r.quantity as repertoryQuantity,
+      r.on_way_quantity as onWayQuantity
     from sell_order_detail t, sell_order s, users u, customer c, repertory_info r
     where t.sell_order_id = s.id and s.customer_id = c.id
-    and s.saler_id = u.id and t.repertory_id = r.id
+    and s.sale_id = u.id
+    and t.repertory_id = r.id
     and s.company_id = #{companyId}
     and s.customer_id = #{customerId}
-    and r.good_id in
-    <foreach collection="goodIds" separator="," item="item" close=")" open="(">
-      #{item}
-    </foreach>
+    and t.goods_id = #{goodsId}
     order by s.create_order_date desc
     <if test="offset != null and limit != null">
       limit #{offset}, #{limit}

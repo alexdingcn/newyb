@@ -30,11 +30,6 @@ public class RepertoryService {
     @Autowired
     private GoodsService goodsService;
 
-    public List<RepertoryInfo> getSearchList(Map<String, Object> requestMap) {
-        List<RepertoryInfo> list = repertoryInfoMapper.getDetailList(requestMap);
-        return setGoodsToList(list);
-    }
-
     public List<RepertoryInfo> querySelectList(RepertorySelectQuery query) {
         List<RepertoryInfo> list = repertoryInfoMapper.querySelectList(query);
         return setGoodsToList(list);
@@ -89,11 +84,6 @@ public class RepertoryService {
             item.setGoods(goodItem);
         });
         return list;
-    }
-
-    public int getSearchCount(Map<String, Object> requestMap) {
-        Integer count = repertoryInfoMapper.getDetailListCount(requestMap);
-        return count == null ? 0 : count;
     }
 
     public Map<Long, RepertoryInfo> getMapByIdList(List<Long> repertoryIdList) {

@@ -56,6 +56,9 @@ public class TokenService {
                 .signWith(SignatureAlgorithm.HS512, SECRET)
                 .compact();
 
+        // 生成登录日志
+
+
         // 将 结果 写入 body
         try {
             result.put("jwt", JWT);
@@ -76,8 +79,6 @@ public class TokenService {
         logger.info("token={}", token);
         if (token != null) {
             try {
-
-
                 // 解析 Token
                 Claims claims = Jwts.parser()
                         // 验签

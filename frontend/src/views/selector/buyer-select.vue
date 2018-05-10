@@ -41,7 +41,7 @@ export default {
                 });
         },
         onChange (data) {
-            let items = this.optionList.filter(item => item.id === data);
+            let items = this.optionList.filter(item => item.userId === data);
             let item = '';
             if(items && items[0]) {
                 item = items[0];

@@ -3,7 +3,9 @@ package com.yiban.erp.service.warehouse;
 import com.alibaba.fastjson.JSONObject;
 import com.yiban.erp.constant.CheckPlanConstant;
 import com.yiban.erp.constant.OrderNumberType;
+import com.yiban.erp.constant.RepertoryRefType;
 import com.yiban.erp.dao.*;
+import com.yiban.erp.dto.RepertorySelectQuery;
 import com.yiban.erp.entities.*;
 import com.yiban.erp.exception.BizException;
 import com.yiban.erp.exception.ErrorCode;
@@ -57,13 +59,14 @@ public class RepertoryCheckPlanService {
         //库存盘点--0
         if(checkType==0){
             //1.根据仓库ID,库区,获取所有库存商品进行盘点
-            Map<String, Object> requestMap = new HashMap<>();
-            requestMap.put("companyId", user.getCompanyId());
-            requestMap.put("warehouseId", repertoryCheckPlan.getWarehouseId());
+            RepertorySelectQuery query = new RepertorySelectQuery();
+            query.setCompanyId(user.getCompanyId());
+            query.setWarehouseId(repertoryCheckPlan.getWarehouseId());
+            query.setMinQuantity(BigDecimal.ZERO);
+            query.setByPage(false);
             //1.1.当前库存数量大于0
-            requestMap.put("limitCheck", 0);
             //1.2.查询符合盘点条件的商品
-            List<RepertoryInfo> checklist = repertoryService.getSearchList(requestMap);
+            List<RepertoryInfo> checklist = repertoryService.querySelectList(query);
             if(checklist==null || checklist.size()<=0){
                 throw new BizException(ErrorCode.CHECK_PLAN_NO_GOODS);
             }
@@ -550,6 +553,8 @@ public class RepertoryCheckPlanService {
                 repertoryInfo.setInDate(new Date());
                 repertoryInfo.setCreateBy(user.getNickname());
                 repertoryInfo.setCreateTime(new Date());
+                repertoryInfo.setRefType(RepertoryRefType.CHECK_SURPLUS.name());
+                repertoryInfo.setRefOrderId(cp.getId());
                 repertoryInfoMapper.insert(repertoryInfo);
             //盘亏记录
             }else if(CheckPlanConstant.PLAN_DETAIL_CHECK_STATUS_LOSE.equals(cpdTemp.getCheckStatus())){

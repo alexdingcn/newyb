@@ -3,6 +3,8 @@ package com.yiban.erp.service.mqconsumer;
 import com.alibaba.fastjson.JSON;
 import com.rabbitmq.client.*;
 import com.yiban.erp.config.RabbitmqQueueConfig;
+import com.yiban.erp.dao.SellOrderBackMapper;
+import com.yiban.erp.entities.SellOrderBack;
 import com.yiban.erp.service.financial.FinancialService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,6 +23,8 @@ public class FinancialSellBackConsumer {
     private RabbitmqQueueConfig rabbitmqQueueConfig;
     @Autowired
     private FinancialService financialService;
+    @Autowired
+    private SellOrderBackMapper sellOrderBackMapper;
 
     @PostConstruct
     public void initConsumer() {
@@ -52,8 +56,13 @@ public class FinancialSellBackConsumer {
         public void handleDelivery(String consumerTag, Envelope envelope, AMQP.BasicProperties properties, byte[] body) {
             try {
                 logger.info("[FinancialSellBackConsumerProcessor] get an message:{}", JSON.toJSONString(body));
-                // TODO 关联处理销售退货的财务记录逻辑
-
+                SellOrderBack back = JSON.parseObject(body, SellOrderBack.class);
+                if(back == null) {
+                    logger.warn("SellOrderBack back order parse fail.");
+                    return;
+                }
+                SellOrderBack orderBack = sellOrderBackMapper.selectByPrimaryKey(back.getId());
+                financialService.createFlowBySellBackOrder(orderBack);
             }catch (Exception e) {
                 logger.error("financial sell back order mq message process have exception.", e);
             }finally {

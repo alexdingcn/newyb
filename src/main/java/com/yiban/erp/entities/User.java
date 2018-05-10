@@ -52,6 +52,10 @@ public class User {
 
     private String credential;
 
+    private Date lastLoginTime;
+    // 公司过期时间
+    private Date companyExpiredTime;
+
     public Long getId() {
         return id;
     }
@@ -252,6 +256,24 @@ public class User {
         user.setId(this.getId());
         user.setIdcard(this.getIdcard());
         user.setStatus(this.getStatus());
+        user.setLastLoginTime(this.getLastLoginTime());
+        user.setCompanyExpiredTime(this.getCompanyExpiredTime());
         return user;
+    }
+
+    public Date getLastLoginTime() {
+        return lastLoginTime;
+    }
+
+    public void setLastLoginTime(Date lastLoginTime) {
+        this.lastLoginTime = lastLoginTime;
+    }
+
+    public Date getCompanyExpiredTime() {
+        return companyExpiredTime;
+    }
+
+    public void setCompanyExpiredTime(Date companyExpiredTime) {
+        this.companyExpiredTime = companyExpiredTime;
     }
 }

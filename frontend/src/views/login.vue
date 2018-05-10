@@ -106,9 +106,11 @@ export default {
                     var data = Qs.stringify(this.form);
                     this.loading = true;
                     util.ajax.post('/login', data, {
-                        headers: {'Content-Type': 'application/x-www-form-urlencoded'}
-                    })
+                            headers: {'Content-Type': 'application/x-www-form-urlencoded'}
+                        })
                         .then(function (response) {
+                            console.log(response);
+
                             self.loading = false;
                             let result = response.data;
                             let userDetail = result ? result.userDetail : '';

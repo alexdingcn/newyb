@@ -25,7 +25,7 @@
                         </Col>
                         <Col span="6">
                             <FormItem label="制单日期">
-                                <DatePicker size="small" v-model="formItem.createOrderDate" type="date" placeholder="请选择制单日期" ></DatePicker>
+                                <DatePicker v-model="dateRange" type="daterange" placement="bottom-end" placeholder="制单日期" style="width:180px"></DatePicker>
                             </FormItem>
                         </Col>
                     </Row>
@@ -92,31 +92,37 @@ export default {
                 customerId: '',
                 saleId: '',
                 refNo: '',
-                createOrderDate: ''
             },
+            dateRange: [
+                moment().add(-1, 'w').format('YYYY-MM-DD'),
+                moment().format('YYYY-MM-DD')
+            ],
             currentPage: 1,
             totalCount: 0,
             tableCurrPageSize: 10,
             tabData: [],
             tableLoading: false,
             currChooseShow: '',
-            currChooseItem: null,
+            currChooseItem: {},
             tabColumns: [
                 {
                     title: '订单编号',
                     key: "orderNumber",
-                    align: "center"
+                    align: "center",
+                    width: 200
                 },
                 {
                     title: '客户名称',
                     key: "customerName",
                     align: "center",
+                    width: 200,
                     sortable: true
                 },
                 {
                     title: '销售人员',
                     key: "saleId",
                     align: "center",
+                    width: 180,
                     render: (h, params) => {
                         let saleNickName = params.row.saleNickName ? params.row.saleNickName : '';
                         let saleRealName = params.row.saleRealName ? params.row.saleRealName : '';
@@ -126,13 +132,15 @@ export default {
                 {
                     title: '自定单号',
                     key: "refNo",
-                    align: "center"
+                    align: "center",
+                    width: 200
                 },
                 {
                     title: '制单日期',
                     key: "createOrderDate",
                     align: "center",
                     sortable: true,
+                    width: 180,
                     render: (h, params) => {
                         let date = params.row.createOrderDate;
                         return date ? moment(date).format('YYYY-MM-DD') : '';
@@ -143,11 +151,18 @@ export default {
                     key: "payOrderDate",
                     align: "center",
                     sortable: true,
+                    width: 180,
                     render: (h, params) => {
                         let date = params.row.payOrderDate;
                         return date ? moment(date).format('YYYY-MM-DD') : '';
                     }
+                },
+                {
+                    title: '仓库点',
+                    key: 'warehouseName',
+                    width: 170
                 }
+
             ]
         }
     },
@@ -155,10 +170,11 @@ export default {
         showModal(data) {
             if(data) {
                 this.isShowModal = data;
+                this.searchBtnClicked();
             }
         },
         currChooseItem(data) {
-            if (!data || data === null) {
+            if (!data || !data.id) {
                 this.currChooseShow = '';
             }else {
                 this.currChooseShow = '订单编号=' + data.orderNumber;
@@ -170,24 +186,21 @@ export default {
             let reqData = {
                 customerId: this.formItem.customerId,
                 saleId: this.formItem.saleId,
-                refNo: this.formItem.refNo
+                refNo: this.formItem.refNo,
+                page: this.currentPage,
+                pageSize: this.tableCurrPageSize,
+                status: this.status,
+                formCreateOrderDate: this.dateRange[0],
+                toCreateOrderDate: this.dateRange[1]
             };
-            reqData.page = this.currentPage;
-            reqData.size = this.tableCurrPageSize;
-            reqData.status = this.status;
             this.tableLoading = true;
-            let searchDate = this.formItem.createOrderDate;
-            if ( searchDate === "" || !(searchDate instanceof Date)) {
-                reqData.createOrderDate = null;
-            }else {
-                reqData.createOrderDate = searchDate.getTime();
-            }
-            util.ajax.get('/sell/order/list', {params: reqData})
+            util.ajax.post('/sell/order/list', reqData)
                 .then((response) => {
                     this.tableLoading = false;
                     this.tabData = response.data.data;
                     this.totalCount = response.data.count;
-                    this.currChooseItem = null;
+                    this.currChooseItem = {};
+                    this.$refs.customersTable.clearCurrentRow();
                 })
                 .catch((error) => {
                     this.tableLoading = false;

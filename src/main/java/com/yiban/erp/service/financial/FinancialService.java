@@ -81,6 +81,15 @@ public class FinancialService {
     }
 
     /**
+     * 销售退货单创建的往来账流水记录
+     * @param orderBack
+     * @throws BizException
+     */
+    public void createFlowBySellBackOrder(SellOrderBack orderBack) throws BizException {
+        // TODO 分三种流水，一种是退货总金额，一种是成本总金额，一种是免零金额
+    }
+
+    /**
      * 采购退货生成财务流水
      * @param inBack
      * @throws BizException

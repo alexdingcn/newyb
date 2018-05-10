@@ -116,180 +116,141 @@ export default {
           orderDetail: '',
           detailsData: [],
           tabColumns: [
-              {
-                  title: '货号',
-                  key: 'goodsId',
-                  width: 100
-              },
-              {
-                  title: '商品名称',
-                  key: 'goodsName',
-                  width: 160,
-              },
-              {
-                  title: '生产企业',
-                  key: 'factoryName',
-                  width: 160,
-              },
-              {
-                  title: '生产企业',
-                  key: 'factoryName',
-                  width: 160,
-              },
-              {
-                    title: '批次号',
-                    key: 'batch',
-                    align: 'center',
-                    width: 160,
-                    render: (h, params) => {
-                        return params.row.repertoryInfo.batchCode;
-                    }
-                },
-                {
-                    title: '剂型',
-                    key: 'jx',
-                    width: 100,
-                    render: (h, params) => {
-                        let goods = params.row.repertoryInfo.goods;
-                        if(goods) {
-                            return goods.jxName;
-                        }else {
-                            return '';
-                        }
-                    }
-                },
-                {
-                    title: '规格',
-                    key: 'spec',
-                    width: 100,
-                    render: (h, params) => {
-                        let goods = params.row.repertoryInfo.goods;
-                        if(goods) {
-                            return goods.spec;
-                        }else {
-                            return '';
-                        }
-                    }
-                },
-                {
-                    title: '生产日期',
-                    width: 120,
-                    key: 'productData',
-                    render: (h, params) => {
-                        let repertoryInfo = params.row.repertoryInfo;
-                        if (repertoryInfo && repertoryInfo.productDate) {
-                            return moment(repertoryInfo.productDate).format('YYYY-MM-DD');
-                        }
-                    }
-                },
-                {
-                    title: '有效期至',
-                    key: 'expDate',
-                    width: 120,
-                    render: (h, params) => {
-                        let repertoryInfo = params.row.repertoryInfo;
-                        if (repertoryInfo && repertoryInfo.expDate) {
-                            return moment(repertoryInfo.expDate).format('YYYY-MM-DD');
-                        }
-                    }
-                },
-                {
-                    title: '单位',
-                    key: 'unitName',
-                    width: 90,
-                    render: (h, params) => {
-                        let goods = params.row.repertoryInfo.goods;
-                        if(goods) {
-                            return goods.unitName;
-                        }else {
-                            return '';
-                        }
-                    }
-                },
-                {
-                    title: '数量',
-                    width: 90,
-                    key: 'quantity'
-                },
-                {
-                    title: '价格',
-                    width: 90,
-                    key: 'realPrice'
-                },
-                {
-                    title: "折扣",
-                    key: "disPrice",
-                    align: "center",
-                    width: 100
-                },
-                {
-                    title: "赠送",
-                    key: "free",
-                    align: "center",
-                    width: 100
-                },
-                {
-                    title: '金额',
-                    width: 100,
-                    key: 'amount'
-                },
-                {
-                    title: "税率",
-                    key: "taxRate",
-                    align: "center",
-                    width: 100
-                },
-                {
-                    title: '库位',
-                    key: 'location',
-                    width: 100,
-                    render: (h, params) => {
-                        return params.row.repertoryInfo.location;
-                    }
-                },
-                {
-                    title: '质量审核状态',
-                    width: 120,
-                    key: 'checkStatus',
-                    render: (h, params) => {
-                        const checkStatus = params.row.checkStatus;
-                        const color = !checkStatus ? 'blue' : checkStatus === 'OK' ? 'green' : 'red';
-                        const text = !checkStatus ? '待审' : checkStatus === 'OK' ? '通过' : '拒绝';
-                        return h('Tag', {
-                            props: {
-                                type: 'dot',
-                                color: color
-                            }
-                        }, text);
-                    }
-                },
-                {
-                    title: '质量审核人',
-                    width: 100,
-                    key: 'checkUser',
-                    render: (h, params) => {
-                        const checkUser = params.row.checkUser ? params.row.checkUser : '';
-                        return h('span', checkUser);
-                    }
-                },
-                {
-                    title: '质量审核日期',
-                    width: 120,
-                    key: 'checkDate',
-                    render: (h, params) => {
-                        let checkDate = params.row.checkDate;
-                        return h('span', checkDate ? moment(checkDate).format('YYYY-MM-DD HH:mm') : '');
-                    }
-                },
-                {
-                    title: '质量审核结论',
-                    width: 180,
-                    key: 'checkResult',
-                    render: (h, params) => {
-                        const checkResult = params.row.checkResult ? params.row.checkResult : '';
-                        return h('span', checkResult);
-                    }
+            {
+                title: '货号',
+                key: 'goodsId',
+                width: 100
+            },
+            {
+                title: "商品名称",
+                key: "goodsName",
+                sortable: true,
+                width: 180
+            },
+            {
+                title: "生产企业",
+                key: "factoryName",
+                width: 180
+            },
+            {
+                title: "产地",
+                key: "origin",
+                width: 120
+            },
+            {
+                title: '批次号',
+                key: 'batchCode',
+                width: 160
+            },
+            {
+                title: "规格",
+                key: "spec",
+                width: 120
+            },
+            {
+                title: "剂型",
+                key: "jx",
+                width: 120
+            },
+            {
+                title: '单位',
+                key: 'unitName',
+                width: 120
+            },
+            {
+                title: '生产日期',
+                width: 120,
+                key: 'productData',
+                render: (h, params) => {
+                    return params.row.productDate ? moment(params.row.productDate).format('YYYY-MM-DD') : '';
                 }
+            },
+            {
+                title: '有效期至',
+                key: 'expDate',
+                width: 120,
+                render: (h, params) => {
+                    return params.row.expDate ? moment(params.row.expDate).format('YYYY-MM-DD') : '';
+                }
+            },
+            {
+                title: "库存量",
+                key: "repertoryQuantity",
+                width: 120,
+            },
+            {
+                title: '销售数量',
+                width: 120,
+                key: 'quantity'
+            },
+            {
+                title: '价格',
+                width: 100,
+                key: 'realPrice'
+            },
+            {
+                title: "折扣",
+                key: "disPrice",
+                width: 100
+            },
+            {
+                title: "赠送",
+                key: "free",
+                width: 100
+            },
+            {
+                title: '金额',
+                width: 120,
+                key: 'amount'
+            },
+            {
+                title: "税率",
+                key: "taxRate",
+                width: 100
+            },
+            {
+                title: '质量审核状态',
+                width: 120,
+                key: 'checkStatus',
+                render: (h, params) => {
+                    const checkStatus = params.row.checkStatus;
+                    const color = !checkStatus ? 'blue' : (checkStatus === 'OK' ? 'green' : 'red');
+                    const text = !checkStatus ? '待审' : (checkStatus === 'OK' ? '通过' : '拒绝');
+                    return h('Tag', {
+                        props: {
+                            type: 'dot',
+                            color: color
+                        }
+                    }, text);
+                }
+            },
+            {
+                title: '质量审核人',
+                width: 100,
+                key: 'checkUser',
+                render: (h, params) => {
+                    const checkUser = params.row.checkUser ? params.row.checkUser : '';
+                    return h('span', checkUser);
+                }
+            },
+            {
+                title: '质量审核日期',
+                width: 120,
+                key: 'checkDate',
+                render: (h, params) => {
+                    let checkDate = params.row.checkDate;
+                    return h('span', checkDate ? moment(checkDate).format('YYYY-MM-DD HH:mm') : '');
+                }
+            },
+            {
+                title: '质量审核结论',
+                width: 180,
+                key: 'checkResult',
+                render: (h, params) => {
+                    const checkResult = params.row.checkResult ? params.row.checkResult : '';
+                    return h('span', checkResult);
+                }
+            }
           ]
       }
   },
@@ -318,32 +279,6 @@ export default {
             .catch(error => {
                 util.errorProcessor(this, error);
             });
-      },
-
-      getGoodDetail(sellDetail) {
-          if (!sellDetail) {
-              return {};
-          }
-          let repertoryInfo = sellDetail.repertoryInfo;
-          if (repertoryInfo) {
-              return repertoryInfo.goods;
-          }else {
-              return {};
-          }
-      },
-      getGoodProductDate(repertoryInfo) {
-          if(!repertoryInfo) {
-              return '';
-          }
-          let productDate = repertoryInfo.productDate;
-          return productDate ? moment(productDate).format('YYYY-MM-DD') : '';
-      },
-      getGoodExpDate(repertoryInfo) {
-          if(!repertoryInfo) {
-              return '';
-          }
-          let expDate = repertoryInfo.expDate;
-          return expDate ? moment(expDate).format('YYYY-MM-DD') : '';
       }
   }
 }

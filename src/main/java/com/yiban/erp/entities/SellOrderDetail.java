@@ -35,21 +35,54 @@ public class SellOrderDetail {
 
     private Date updateTime;
 
+    private String batchCode;
+    private Long goodsId;
+    private Date productDate;
+    private Date expDate;
+    private String location;
+    private BigDecimal backQuantity; //已退货数
+
     private String checkStatus;
     private String checkResult;
     private String checkUser;
     private Date checkDate;
 
-    private RepertoryInfo repertoryInfo;
-    private Long goodsId;  //在设置repertoryInfo时设置, 辅助前端展示
-    private String goodsName; //在设置repertoryInfo时设置, 辅助前端展示
-    private BigDecimal repertoryQuantity; //在设置repertoryInfo时设置, 辅助前端展示
-    private String factoryName; //在设置repertoryInfo时设置, 辅助前端展示
-
     private Date createOrderDate;
     private String saleNickName;
     private String saleRealName;
     private String customerName;
+
+    private Goods goods;
+
+    private BigDecimal repertoryQuantity; // 当前库存量
+    private BigDecimal onWayQuantity; // 当前在单数量
+
+    //展示字段
+    private String goodsName;
+    private String factoryName;
+    private String origin;
+    private String jx;
+    private String spec;
+    private String unitName;
+    private String permitNo;
+    private String baseMedName;
+    private String storageConditionName;
+
+    public void setGoods(Goods goods) {
+        this.goods = goods;
+        if (goods != null) {
+            this.goodsName = goods.getName();
+            this.factoryName = goods.getFactory();
+            this.origin = goods.getOrigin();
+            this.jx = goods.getJxName();
+            this.spec = goods.getSpec();
+            this.unitName = goods.getUnitName();
+            this.permitNo = goods.getPermitNo();
+            this.baseMedName = goods.getBaseMedName();
+            this.storageConditionName = goods.getStorageConditionName();
+            this.taxRate = goods.getOutTax();
+        }
+    }
 
     public Long getId() {
         return id;
@@ -235,21 +268,6 @@ public class SellOrderDetail {
         this.customerName = customerName;
     }
 
-    public RepertoryInfo getRepertoryInfo() {
-        return repertoryInfo;
-    }
-
-    public void setRepertoryInfo(RepertoryInfo repertoryInfo) {
-        this.repertoryInfo = repertoryInfo;
-        if (repertoryInfo != null && repertoryInfo.getGoods() != null) {
-            Goods goods = repertoryInfo.getGoods();
-            this.goodsId = goods.getId();
-            this.goodsName = goods.getName();
-            this.repertoryQuantity = repertoryInfo.getQuantity();
-            this.factoryName = goods.getFactory();
-        }
-    }
-
     public Long getGoodsId() {
         return goodsId;
     }
@@ -282,4 +300,111 @@ public class SellOrderDetail {
         this.factoryName = factoryName;
     }
 
+    public String getBatchCode() {
+        return batchCode;
+    }
+
+    public void setBatchCode(String batchCode) {
+        this.batchCode = batchCode;
+    }
+
+    public Date getProductDate() {
+        return productDate;
+    }
+
+    public void setProductDate(Date productDate) {
+        this.productDate = productDate;
+    }
+
+    public Date getExpDate() {
+        return expDate;
+    }
+
+    public void setExpDate(Date expDate) {
+        this.expDate = expDate;
+    }
+
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
+    }
+
+    public BigDecimal getBackQuantity() {
+        return backQuantity;
+    }
+
+    public void setBackQuantity(BigDecimal backQuantity) {
+        this.backQuantity = backQuantity;
+    }
+
+    public Goods getGoods() {
+        return goods;
+    }
+
+    public BigDecimal getOnWayQuantity() {
+        return onWayQuantity;
+    }
+
+    public void setOnWayQuantity(BigDecimal onWayQuantity) {
+        this.onWayQuantity = onWayQuantity;
+    }
+
+    public String getOrigin() {
+        return origin;
+    }
+
+    public void setOrigin(String origin) {
+        this.origin = origin;
+    }
+
+    public String getJx() {
+        return jx;
+    }
+
+    public void setJx(String jx) {
+        this.jx = jx;
+    }
+
+    public String getSpec() {
+        return spec;
+    }
+
+    public void setSpec(String spec) {
+        this.spec = spec;
+    }
+
+    public String getUnitName() {
+        return unitName;
+    }
+
+    public void setUnitName(String unitName) {
+        this.unitName = unitName;
+    }
+
+    public String getPermitNo() {
+        return permitNo;
+    }
+
+    public void setPermitNo(String permitNo) {
+        this.permitNo = permitNo;
+    }
+
+    public String getBaseMedName() {
+        return baseMedName;
+    }
+
+    public void setBaseMedName(String baseMedName) {
+        this.baseMedName = baseMedName;
+    }
+
+    public String getStorageConditionName() {
+        return storageConditionName;
+    }
+
+    public void setStorageConditionName(String storageConditionName) {
+        this.storageConditionName = storageConditionName;
+    }
 }
