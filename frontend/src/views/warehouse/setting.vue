@@ -11,7 +11,7 @@
                         <Icon type="social-buffer"></Icon> 仓库点
                     </p>
                     <div slot="extra">
-                        <ButtonGroup class="padding-left-20">
+                        <ButtonGroup class="padding-left-20" size="small">
                             <Button type="primary" icon="android-add-circle" @click="warehouseModalShow = true">添加</Button>
                             <Button type="error" icon="android-remove-circle"  @click="delWarehouse">删除</Button>
                         </ButtonGroup>
@@ -32,7 +32,7 @@
                         <Icon type="ios-albums"></Icon> 库位 {{warehouseNameTitle ||  ''}}
                     </p>
                     <div slot="extra">
-                        <ButtonGroup class="padding-left-20">
+                        <ButtonGroup class="padding-left-20"  size="small">
                             <Button type="primary" icon="android-add-circle" @click="locationModalShow = true">添加库位</Button>
                             <Button type="error" icon="android-remove-circle"  @click="delWarehouseLocation">删除库位</Button>
                         </ButtonGroup>

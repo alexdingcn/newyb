@@ -12,7 +12,7 @@
                         {{showTitle || '用户信息'}}
                     </p>
                     <div slot="extra">
-                        <ButtonGroup >
+                        <ButtonGroup size="small" >
                             <Button type="primary" icon="plus" @click="createUserBtnClick">新建用户</Button>
                             <Button type="success" icon="checkmark" @click="save" :loading="saveLoading">保存</Button>
                         </ButtonGroup>

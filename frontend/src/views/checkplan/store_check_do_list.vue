@@ -22,20 +22,14 @@
         <Row>
             <Card>
                 <p slot="title" >
-                    <Icon type="document"></Icon>盘点制单
+                    <Icon type="document"></Icon>
+                    盘点制单
                 </p>
                 <div slot="extra">
-
-                    <ButtonGroup >
-                        <Button type="primary" icon="android-add-circle" @click="saveCheckPart" >更新盘点表</Button>
-                    </ButtonGroup>
-
-                    <ButtonGroup >
+                    <ButtonGroup size="small" >
                         <Button type="primary" icon="android-add-circle" @click="getCheckPlan" >载入盘点表</Button>
-                    </ButtonGroup>
-
-                    <ButtonGroup >
-                        <Button type="primary" icon="android-add-circle" @click="backPartIndex" >返回</Button>
+                        <Button type="success" icon="checkmark" @click="saveCheckPart" >更新盘点表</Button>
+                        <Button type="ghost" icon="reply" @click="backPartIndex" >返回</Button>
                     </ButtonGroup>
                 </div>
 

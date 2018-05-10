@@ -5,8 +5,10 @@
 <template>
 	<Row>
 		<Card>
-			<p slot="title" >
-			</p>
+			<p slot="title">
+              <Icon type="funnel"></Icon>
+              采购审核
+          </p>
 			<div slot="extra" style="width:600px">
 				<Row type="flex" justify="end">
 					<Col span="8">
