@@ -431,6 +431,11 @@ export default {
                     }
                 },
                 {
+                    title: '验收温控方式',
+                    key: 'checkTempMethodName',
+                    width: 100
+                },
+                {
                     title: '验收员',
                     key: 'checkUser',
                     width: 120

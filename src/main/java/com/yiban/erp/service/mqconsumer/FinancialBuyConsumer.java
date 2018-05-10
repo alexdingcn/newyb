@@ -32,6 +32,7 @@ public class FinancialBuyConsumer {
             Connection connection = rabbitmqQueueConfig.getConnectionFactory();
             Channel channel = connection.createChannel();
             channel.exchangeDeclare(RabbitmqQueueConfig.EXCHANGE, RabbitmqQueueConfig.TOPIC_TYPE, true, false, null);
+            channel.queueDeclare(RabbitmqQueueConfig.FINANCIAL_BUY, true, false, false, null);
             /**
              * 参数1：队列名称
              * 参数2：交换器名称

@@ -36,6 +36,14 @@ public class FinancialBuyBackConsumer {
             channel.exchangeDeclare(RabbitmqQueueConfig.EXCHANGE, RabbitmqQueueConfig.TOPIC_TYPE, true, false, null);
             /**
              * 参数1：队列名称
+             * 参数2：true：在RabbitMQ服务器重启时，能够存活,
+             * 参数3：exclusive ：是否为当前连接的专用队列，在连接断开后，会自动删除该队列
+             * 参数4：autodelete：当没有任何消费者使用时，自动删除该队列
+             * 参数5: 参数
+             */
+            channel.queueDeclare(RabbitmqQueueConfig.FINANCIAL_BUY_BACK, true, false, false, null);
+            /**
+             * 参数1：队列名称
              * 参数2：交换器名称
              * 参数3：监听的路由 route key
              */
