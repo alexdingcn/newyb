@@ -23,6 +23,7 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 档案管理
@@ -140,6 +141,28 @@ public class FileController {
         JSONObject result = new JSONObject();
         result.put("url", url);
         return ResponseEntity.ok().body(result.toJSONString());
+    }
+
+    @RequestMapping(value = "/upload/avatar", method = RequestMethod.POST)
+    public ResponseEntity<String> uploadAvatar(HttpServletRequest request,
+                                             @AuthenticationPrincipal User user) throws Exception {
+        MultipartHttpServletRequest mtRequest = (MultipartHttpServletRequest) request;
+        MultipartFile file = mtRequest.getFile("file");
+        if (file == null || file.isEmpty()) {
+            logger.warn("user:{} request upload file but file is empty.", user.getId());
+            throw new BizException(ErrorCode.FILE_UPLOAD_PARAMS_ERROR);
+        }
+        Map<String, Object> results = fileService.persistenceFile(user.getId(), user.getCompanyId(), null, file);
+        String url = (String) results.get("url");
+        if (StringUtils.isNotEmpty(url)) {
+            logger.info("user:{} upload file success, file url:{}", user.getId(), url);
+            JSONObject result = new JSONObject();
+            url = url.substring(0, url.indexOf("?"));
+            result.put("url", url);
+            return ResponseEntity.ok().body(result.toJSONString());
+        } else {
+            throw new BizException(ErrorCode.FILE_UPLOAD_FAIL);
+        }
     }
 
     @RequestMapping(value = "/upload/remove/{uploadId}", method = RequestMethod.DELETE)

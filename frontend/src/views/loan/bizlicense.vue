@@ -6,7 +6,7 @@
     .bizApply .ivu-form-item {
         margin-bottom: 10px;
     }
-    .blue-header { background-color: #296ecc; color: white; }
+    .blue-header { background-color: #3670C5; color: white; height: 50px; line-height: 50px; }
     .back-btn { color: white; }
 </style>
 
@@ -22,7 +22,7 @@
                         </Button>
                     </Col>
                     <Col span="18" class="center">
-                        <h1>融资申请</h1>
+                        <h2>融资申请</h2>
                     </Col>
                 </Row>
             </Header>

@@ -327,7 +327,7 @@ public class FileService {
      *  如果成功，必须两个值都返回，失败直接抛出异常
      * @throws BizException
      */
-    private Map<String, Object>  persistenceFile(Long userId, Integer companyId, Integer fileId, MultipartFile file) throws BizException {
+    public Map<String, Object>  persistenceFile(Long userId, Integer companyId, Integer fileId, MultipartFile file) throws BizException {
         if ("oss".equalsIgnoreCase(saveLocation)) {
             logger.info("upload file save to aliyuncs oss. userId{}", userId);
             return saveToOss(userId, companyId, fileId, file);
@@ -433,8 +433,10 @@ public class FileService {
     private String getFileName(Integer fileId, String originalName) {
         String dateStr = UtilTool.dateFormat(new Date(), "yyyyMMdd");
         StringBuilder fileName = new StringBuilder();
-        fileName.append(String.valueOf(fileId));
-        fileName.append("_");
+        if (fileId != null) {
+            fileName.append(String.valueOf(fileId));
+            fileName.append("_");
+        }
         fileName.append(dateStr);
         fileName.append("_");
         fileName.append(RandomStringUtils.randomAlphanumeric(20));
