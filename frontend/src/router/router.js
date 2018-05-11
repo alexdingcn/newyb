@@ -118,6 +118,20 @@ export const appRouter = [
         ]
     },
     {
+        path: '/goods',
+        icon: 'briefcase',
+        name: 'goods',
+        title: '商品',
+        component: Main,
+        children: [
+            { path: 'goods-list', title: '商品列表', name: 'goods-list', component: () => import('@/views/goods/goods-list.vue') },
+            { path: 'goods-category', title: '商品分类', name: 'goods-category', component: () => import('@/views/goods/goods-category.vue') },
+            { path: 'goods-brand', title: '商品品牌', name: 'goods-brand', component: () => import('@/views/goods/goods-brand.vue') },
+            { path: 'goods-attribute', title: '商品自定义属性', name: 'goods-attribute', component: () => import('@/views/goods/goods-attribute.vue')},
+            { path: 'goods-spee', title: '商品多规格', name: 'goods-spec', component: () => import('@/views/goods/goods-spec.vue')},
+        ]
+    },
+    {
         path: '/buy',
         icon: 'bag',
         name: 'buy',

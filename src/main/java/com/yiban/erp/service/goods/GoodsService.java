@@ -1,4 +1,4 @@
-package com.yiban.erp.service;
+package com.yiban.erp.service.goods;
 
 import com.yiban.erp.dao.GoodsMapper;
 import com.yiban.erp.dao.OptionsMapper;

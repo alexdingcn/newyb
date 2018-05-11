@@ -349,7 +349,12 @@ function showErrorMessage (vm, data) {
     let message = data.message ? data.message : '交易出现异常';
     switch (display) {
         case 1:
-            vm.$Message.error(message);
+            // vm.$Message.error(message);
+            // break;
+            vm.$Notice.error({
+                title: '错误码: ' + code,
+                desc: message
+            });
             break;
         case 2:
             vm.$Notice.error({

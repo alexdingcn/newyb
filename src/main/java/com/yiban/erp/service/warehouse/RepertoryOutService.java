@@ -1,7 +1,5 @@
 package com.yiban.erp.service.warehouse;
 
-import com.alibaba.fastjson.JSON;
-import com.yiban.erp.config.RabbitmqQueueConfig;
 import com.yiban.erp.constant.*;
 import com.yiban.erp.dao.*;
 import com.yiban.erp.dto.ReceiveListReq;
@@ -11,7 +9,7 @@ import com.yiban.erp.exception.BizException;
 import com.yiban.erp.exception.BizRuntimeException;
 import com.yiban.erp.exception.ErrorCode;
 
-import com.yiban.erp.service.GoodsService;
+import com.yiban.erp.service.goods.GoodsService;
 import com.yiban.erp.util.UtilTool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

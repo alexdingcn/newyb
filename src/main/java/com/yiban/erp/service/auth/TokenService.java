@@ -76,7 +76,6 @@ public class TokenService {
     static Authentication getAuthentication(HttpServletRequest request) {
         // 从Header中拿到token
         String token = request.getHeader(HEADER_STRING);
-        logger.info("token={}", token);
         if (token != null) {
             try {
                 // 解析 Token

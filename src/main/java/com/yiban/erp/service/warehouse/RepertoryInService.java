@@ -11,7 +11,7 @@ import com.yiban.erp.entities.*;
 import com.yiban.erp.exception.BizException;
 import com.yiban.erp.exception.BizRuntimeException;
 import com.yiban.erp.exception.ErrorCode;
-import com.yiban.erp.service.GoodsService;
+import com.yiban.erp.service.goods.GoodsService;
 import com.yiban.erp.util.UtilTool;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;

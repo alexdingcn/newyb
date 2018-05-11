@@ -14,6 +14,9 @@
         <mapper resource="mapping/UserRouteMapper.xml"/>
         <mapper resource="mapping/GoodCategoryMapper.xml"/>
         <mapper resource="mapping/GoodsMapper.xml"/>
+        <mapper resource="mapping/GoodsInfoMapper.xml"/>
+        <mapper resource="mapping/GoodsAttributeMapper.xml"/>
+        <mapper resource="mapping/GoodsSpecMapper.xml"/>
         <mapper resource="mapping/FactoryMapper.xml"/>
         <mapper resource="mapping/ShipCompanyMapper.xml"/>
         <mapper resource="mapping/SupplierMapper.xml"/>

@@ -3,14 +3,13 @@ package com.yiban.erp.service.warehouse;
 import com.alibaba.fastjson.JSONObject;
 import com.yiban.erp.constant.RepertorySaleStatus;
 import com.yiban.erp.constant.RepertoryStoreStatus;
-import com.yiban.erp.dao.GoodsMapper;
 import com.yiban.erp.dao.RepertoryInfoMapper;
 import com.yiban.erp.dto.RepertoryQuery;
 import com.yiban.erp.dto.RepertorySelectQuery;
 import com.yiban.erp.entities.Goods;
 import com.yiban.erp.entities.RepertoryInfo;
 import com.yiban.erp.entities.User;
-import com.yiban.erp.service.GoodsService;
+import com.yiban.erp.service.goods.GoodsService;
 import com.yiban.erp.util.DateUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,7 +17,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 public class RepertoryService {

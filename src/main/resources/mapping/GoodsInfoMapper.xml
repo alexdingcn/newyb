@@ -1,0 +1,371 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.yiban.erp.dao.GoodsInfoMapper" >
+  <resultMap id="BaseResultMap" type="com.yiban.erp.entities.GoodsInfo" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="company_id" property="companyId" jdbcType="INTEGER" />
+    <result column="category_id" property="categoryId" jdbcType="INTEGER" />
+    <result column="goods_no" property="goodsNo" jdbcType="VARCHAR" />
+    <result column="status" property="status" jdbcType="VARCHAR" />
+    <result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="full_name" property="fullName" jdbcType="VARCHAR" />
+    <result column="origin" property="origin" jdbcType="VARCHAR" />
+    <result column="spec" property="spec" jdbcType="VARCHAR" />
+    <result column="serial" property="serial" jdbcType="VARCHAR" />
+    <result column="enable" property="enable" jdbcType="BIT" />
+    <result column="is_proxy" property="isProxy" jdbcType="BIT" />
+    <result column="factory_id" property="factoryId" jdbcType="BIGINT" />
+    <result column="unit" property="unit" jdbcType="BIGINT" />
+    <result column="pack_unit" property="packUnit" jdbcType="BIGINT" />
+    <result column="medium_unit" property="mediumUnit" jdbcType="BIGINT" />
+    <result column="medium_pack" property="mediumPack" jdbcType="DECIMAL" />
+    <result column="big_pack" property="bigPack" jdbcType="DECIMAL" />
+    <result column="pinyin" property="pinyin" jdbcType="VARCHAR" />
+    <result column="storage_condition" property="storageCondition" jdbcType="BIGINT" />
+    <result column="comment" property="comment" jdbcType="VARCHAR" />
+    <result column="cert_no" property="certNo" jdbcType="VARCHAR" />
+    <result column="cert_exp_date" property="certExpDate" jdbcType="DATE" />
+    <result column="cert_file_no" property="certFileNo" jdbcType="VARCHAR" />
+    <result column="brand_no" property="brandNo" jdbcType="VARCHAR" />
+    <result column="brand_exp_date" property="brandExpDate" jdbcType="DATE" />
+    <result column="brand_file_no" property="brandFileNo" jdbcType="VARCHAR" />
+    <result column="permit_no" property="permitNo" jdbcType="VARCHAR" />
+    <result column="permit_exp_date" property="permitExpDate" jdbcType="DATE" />
+    <result column="permit_file_no" property="permitFileNo" jdbcType="VARCHAR" />
+    <result column="archive_no" property="archiveNo" jdbcType="VARCHAR" />
+    <result column="in_check" property="inCheck" jdbcType="BIT" />
+    <result column="first_check" property="firstCheck" jdbcType="BIT" />
+    <result column="special_managed" property="specialManaged" jdbcType="BIT" />
+    <result column="need_care" property="needCare" jdbcType="BIT" />
+    <result column="in_tax" property="inTax" jdbcType="DECIMAL" />
+    <result column="out_tax" property="outTax" jdbcType="DECIMAL" />
+    <result column="valid_months" property="validMonths" jdbcType="INTEGER" />
+    <result column="warning_days" property="warningDays" jdbcType="INTEGER" />
+    <result column="contact" property="contact" jdbcType="VARCHAR" />
+    <result column="cure_range" property="cureRange" jdbcType="VARCHAR" />
+    <result column="sale_policy" property="salePolicy" jdbcType="VARCHAR" />
+    <result column="is_foreign" property="isForeign" jdbcType="BIT" />
+    <result column="prescription_id" property="prescriptionId" jdbcType="BIGINT" />
+    <result column="med_type_id" property="medTypeId" jdbcType="BIGINT" />
+    <result column="is_shebao" property="isShebao" jdbcType="TINYINT" />
+    <result column="specific_med_id" property="specificMedId" jdbcType="BIGINT" />
+    <result column="jx_id" property="jxId" jdbcType="BIGINT" />
+    <result column="base_med_id" property="baseMedId" jdbcType="BIGINT" />
+    <result column="func_cat_id" property="funcCatId" jdbcType="BIGINT" />
+    <result column="medication_id" property="medicationId" jdbcType="BIGINT" />
+    <result column="care_time_id" property="careTimeId" jdbcType="BIGINT" />
+    <result column="gmp_type_id" property="gmpTypeId" jdbcType="BIGINT" />
+    <result column="abc_type_id" property="abcTypeId" jdbcType="BIGINT" />
+    <result column="scope_id" property="scopeId" jdbcType="BIGINT" />
+    <result column="new_type_id" property="newTypeId" jdbcType="BIGINT" />
+    <result column="created_by" property="createdBy" jdbcType="VARCHAR" />
+    <result column="updated_by" property="updatedBy" jdbcType="VARCHAR" />
+    <result column="created_time" property="createdTime" jdbcType="TIMESTAMP" />
+    <result column="updated_time" property="updatedTime" jdbcType="TIMESTAMP" />
+    <result column="att1_id" property="att1Id" jdbcType="BIGINT" />
+    <result column="att1_value" property="att1Value" jdbcType="VARCHAR" />
+    <result column="att2_id" property="att2Id" jdbcType="BIGINT" />
+    <result column="att2_value" property="att2Value" jdbcType="VARCHAR" />
+    <result column="att3_id" property="att3Id" jdbcType="BIGINT" />
+    <result column="att3_value" property="att3Value" jdbcType="VARCHAR" />
+    <result column="att4_id" property="att4Id" jdbcType="BIGINT" />
+    <result column="att4_value" property="att4Value" jdbcType="VARCHAR" />
+    <result column="att5_id" property="att5Id" jdbcType="BIGINT" />
+    <result column="att5_value" property="att5Value" jdbcType="VARCHAR" />
+    <result column="att6_id" property="att6Id" jdbcType="BIGINT" />
+    <result column="att6_value" property="att6Value" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, company_id, category_id, goods_no, status, name, full_name, origin, spec, serial, 
+    enable, is_proxy, factory_id, unit, pack_unit, medium_unit, medium_pack, big_pack, 
+    pinyin, storage_condition, comment, cert_no, cert_exp_date, cert_file_no, brand_no, 
+    brand_exp_date, brand_file_no, permit_no, permit_exp_date, permit_file_no, archive_no, 
+    in_check, first_check, special_managed, need_care, in_tax, out_tax, valid_months, 
+    warning_days, contact, cure_range, sale_policy, is_foreign, prescription_id, med_type_id, 
+    is_shebao, specific_med_id, jx_id, base_med_id, func_cat_id, medication_id, care_time_id, 
+    gmp_type_id, abc_type_id, scope_id, new_type_id, created_by, updated_by, created_time, 
+    updated_time, att1_id, att1_value, att2_id, att2_value, att3_id, att3_value, att4_id, 
+    att4_value, att5_id, att5_value, att6_id, att6_value
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select 
+    <include refid="Base_Column_List" />
+    from goods_info
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
+    delete from goods_info
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="com.yiban.erp.entities.GoodsInfo" keyProperty="id" useGeneratedKeys="true" >
+    insert into goods_info (company_id, category_id,
+      goods_no, status, name, 
+      full_name, origin, spec, 
+      serial, enable, is_proxy, factory_id, 
+      unit, pack_unit, medium_unit, 
+      medium_pack, big_pack, pinyin, 
+      storage_condition, comment, cert_no, 
+      cert_exp_date, cert_file_no, brand_no, 
+      brand_exp_date, brand_file_no, permit_no, 
+      permit_exp_date, permit_file_no, archive_no, 
+      in_check, first_check, special_managed, 
+      need_care, in_tax, out_tax, 
+      valid_months, warning_days, contact, 
+      cure_range, sale_policy, is_foreign, 
+      prescription_id, med_type_id, is_shebao, 
+      specific_med_id, jx_id, base_med_id, 
+      func_cat_id, medication_id, care_time_id, 
+      gmp_type_id, abc_type_id, scope_id, 
+      new_type_id, created_by, updated_by, 
+      created_time, updated_time, att1_id, 
+      att1_value, att2_id, att2_value, 
+      att3_id, att3_value, att4_id, 
+      att4_value, att5_id, att5_value, 
+      att6_id, att6_value)
+    values (#{companyId,jdbcType=INTEGER}, #{categoryId,jdbcType=INTEGER},
+      #{goodsNo,jdbcType=VARCHAR}, #{status,jdbcType=VARCHAR}, #{name,jdbcType=VARCHAR}, 
+      #{fullName,jdbcType=VARCHAR}, #{origin,jdbcType=VARCHAR}, #{spec,jdbcType=VARCHAR}, 
+      #{serial,jdbcType=VARCHAR}, #{enable,jdbcType=BIT}, #{isProxy,jdbcType=BIT}, #{factoryId,jdbcType=BIGINT}, 
+      #{unit,jdbcType=BIGINT}, #{packUnit,jdbcType=BIGINT}, #{mediumUnit,jdbcType=BIGINT}, 
+      #{mediumPack,jdbcType=DECIMAL}, #{bigPack,jdbcType=DECIMAL}, #{pinyin,jdbcType=VARCHAR}, 
+      #{storageCondition,jdbcType=BIGINT}, #{comment,jdbcType=VARCHAR}, #{certNo,jdbcType=VARCHAR}, 
+      #{certExpDate,jdbcType=DATE}, #{certFileNo,jdbcType=VARCHAR}, #{brandNo,jdbcType=VARCHAR}, 
+      #{brandExpDate,jdbcType=DATE}, #{brandFileNo,jdbcType=VARCHAR}, #{permitNo,jdbcType=VARCHAR}, 
+      #{permitExpDate,jdbcType=DATE}, #{permitFileNo,jdbcType=VARCHAR}, #{archiveNo,jdbcType=VARCHAR}, 
+      #{inCheck,jdbcType=BIT}, #{firstCheck,jdbcType=BIT}, #{specialManaged,jdbcType=BIT}, 
+      #{needCare,jdbcType=BIT}, #{inTax,jdbcType=DECIMAL}, #{outTax,jdbcType=DECIMAL}, 
+      #{validMonths,jdbcType=INTEGER}, #{warningDays,jdbcType=INTEGER}, #{contact,jdbcType=VARCHAR}, 
+      #{cureRange,jdbcType=VARCHAR}, #{salePolicy,jdbcType=VARCHAR}, #{isForeign,jdbcType=BIT}, 
+      #{prescriptionId,jdbcType=BIGINT}, #{medTypeId,jdbcType=BIGINT}, #{isShebao,jdbcType=TINYINT}, 
+      #{specificMedId,jdbcType=BIGINT}, #{jxId,jdbcType=BIGINT}, #{baseMedId,jdbcType=BIGINT}, 
+      #{funcCatId,jdbcType=BIGINT}, #{medicationId,jdbcType=BIGINT}, #{careTimeId,jdbcType=BIGINT}, 
+      #{gmpTypeId,jdbcType=BIGINT}, #{abcTypeId,jdbcType=BIGINT}, #{scopeId,jdbcType=BIGINT}, 
+      #{newTypeId,jdbcType=BIGINT}, #{createdBy,jdbcType=VARCHAR}, #{updatedBy,jdbcType=VARCHAR}, 
+      #{createdTime,jdbcType=TIMESTAMP}, #{updatedTime,jdbcType=TIMESTAMP}, #{att1Id,jdbcType=BIGINT}, 
+      #{att1Value,jdbcType=VARCHAR}, #{att2Id,jdbcType=BIGINT}, #{att2Value,jdbcType=VARCHAR}, 
+      #{att3Id,jdbcType=BIGINT}, #{att3Value,jdbcType=VARCHAR}, #{att4Id,jdbcType=BIGINT}, 
+      #{att4Value,jdbcType=VARCHAR}, #{att5Id,jdbcType=BIGINT}, #{att5Value,jdbcType=VARCHAR}, 
+      #{att6Id,jdbcType=BIGINT}, #{att6Value,jdbcType=VARCHAR})
+  </insert>
+
+  <update id="updateByPrimaryKeySelective" parameterType="com.yiban.erp.entities.GoodsInfo" >
+    update goods_info
+    <set >
+      <if test="companyId != null" >
+        company_id = #{companyId,jdbcType=INTEGER},
+      </if>
+      <if test="categoryId != null" >
+        category_id = #{categoryId,jdbcType=INTEGER},
+      </if>
+      <if test="goodsNo != null" >
+        goods_no = #{goodsNo,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null" >
+        status = #{status,jdbcType=VARCHAR},
+      </if>
+      <if test="name != null" >
+        name = #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="fullName != null" >
+        full_name = #{fullName,jdbcType=VARCHAR},
+      </if>
+      <if test="origin != null" >
+        origin = #{origin,jdbcType=VARCHAR},
+      </if>
+      <if test="spec != null" >
+        spec = #{spec,jdbcType=VARCHAR},
+      </if>
+      <if test="serial != null" >
+        serial = #{serial,jdbcType=VARCHAR},
+      </if>
+      <if test="enable != null" >
+        enable = #{enable,jdbcType=BIT},
+      </if>
+      <if test="isProxy != null" >
+        is_proxy = #{isProxy,jdbcType=BIT},
+      </if>
+      <if test="factoryId != null" >
+        factory_id = #{factoryId,jdbcType=BIGINT},
+      </if>
+      <if test="unit != null" >
+        unit = #{unit,jdbcType=BIGINT},
+      </if>
+      <if test="packUnit != null" >
+        pack_unit = #{packUnit,jdbcType=BIGINT},
+      </if>
+      <if test="mediumUnit != null" >
+        medium_unit = #{mediumUnit,jdbcType=BIGINT},
+      </if>
+      <if test="mediumPack != null" >
+        medium_pack = #{mediumPack,jdbcType=DECIMAL},
+      </if>
+      <if test="bigPack != null" >
+        big_pack = #{bigPack,jdbcType=DECIMAL},
+      </if>
+      <if test="pinyin != null" >
+        pinyin = #{pinyin,jdbcType=VARCHAR},
+      </if>
+      <if test="storageCondition != null" >
+        storage_condition = #{storageCondition,jdbcType=BIGINT},
+      </if>
+      <if test="comment != null" >
+        comment = #{comment,jdbcType=VARCHAR},
+      </if>
+      <if test="certNo != null" >
+        cert_no = #{certNo,jdbcType=VARCHAR},
+      </if>
+      <if test="certExpDate != null" >
+        cert_exp_date = #{certExpDate,jdbcType=DATE},
+      </if>
+      <if test="certFileNo != null" >
+        cert_file_no = #{certFileNo,jdbcType=VARCHAR},
+      </if>
+      <if test="brandNo != null" >
+        brand_no = #{brandNo,jdbcType=VARCHAR},
+      </if>
+      <if test="brandExpDate != null" >
+        brand_exp_date = #{brandExpDate,jdbcType=DATE},
+      </if>
+      <if test="brandFileNo != null" >
+        brand_file_no = #{brandFileNo,jdbcType=VARCHAR},
+      </if>
+      <if test="permitNo != null" >
+        permit_no = #{permitNo,jdbcType=VARCHAR},
+      </if>
+      <if test="permitExpDate != null" >
+        permit_exp_date = #{permitExpDate,jdbcType=DATE},
+      </if>
+      <if test="permitFileNo != null" >
+        permit_file_no = #{permitFileNo,jdbcType=VARCHAR},
+      </if>
+      <if test="archiveNo != null" >
+        archive_no = #{archiveNo,jdbcType=VARCHAR},
+      </if>
+      <if test="inCheck != null" >
+        in_check = #{inCheck,jdbcType=BIT},
+      </if>
+      <if test="firstCheck != null" >
+        first_check = #{firstCheck,jdbcType=BIT},
+      </if>
+      <if test="specialManaged != null" >
+        special_managed = #{specialManaged,jdbcType=BIT},
+      </if>
+      <if test="needCare != null" >
+        need_care = #{needCare,jdbcType=BIT},
+      </if>
+      <if test="inTax != null" >
+        in_tax = #{inTax,jdbcType=DECIMAL},
+      </if>
+      <if test="outTax != null" >
+        out_tax = #{outTax,jdbcType=DECIMAL},
+      </if>
+      <if test="validMonths != null" >
+        valid_months = #{validMonths,jdbcType=INTEGER},
+      </if>
+      <if test="warningDays != null" >
+        warning_days = #{warningDays,jdbcType=INTEGER},
+      </if>
+      <if test="contact != null" >
+        contact = #{contact,jdbcType=VARCHAR},
+      </if>
+      <if test="cureRange != null" >
+        cure_range = #{cureRange,jdbcType=VARCHAR},
+      </if>
+      <if test="salePolicy != null" >
+        sale_policy = #{salePolicy,jdbcType=VARCHAR},
+      </if>
+      <if test="isForeign != null" >
+        is_foreign = #{isForeign,jdbcType=BIT},
+      </if>
+      <if test="prescriptionId != null" >
+        prescription_id = #{prescriptionId,jdbcType=BIGINT},
+      </if>
+      <if test="medTypeId != null" >
+        med_type_id = #{medTypeId,jdbcType=BIGINT},
+      </if>
+      <if test="isShebao != null" >
+        is_shebao = #{isShebao,jdbcType=TINYINT},
+      </if>
+      <if test="specificMedId != null" >
+        specific_med_id = #{specificMedId,jdbcType=BIGINT},
+      </if>
+      <if test="jxId != null" >
+        jx_id = #{jxId,jdbcType=BIGINT},
+      </if>
+      <if test="baseMedId != null" >
+        base_med_id = #{baseMedId,jdbcType=BIGINT},
+      </if>
+      <if test="funcCatId != null" >
+        func_cat_id = #{funcCatId,jdbcType=BIGINT},
+      </if>
+      <if test="medicationId != null" >
+        medication_id = #{medicationId,jdbcType=BIGINT},
+      </if>
+      <if test="careTimeId != null" >
+        care_time_id = #{careTimeId,jdbcType=BIGINT},
+      </if>
+      <if test="gmpTypeId != null" >
+        gmp_type_id = #{gmpTypeId,jdbcType=BIGINT},
+      </if>
+      <if test="abcTypeId != null" >
+        abc_type_id = #{abcTypeId,jdbcType=BIGINT},
+      </if>
+      <if test="scopeId != null" >
+        scope_id = #{scopeId,jdbcType=BIGINT},
+      </if>
+      <if test="newTypeId != null" >
+        new_type_id = #{newTypeId,jdbcType=BIGINT},
+      </if>
+      <if test="createdBy != null" >
+        created_by = #{createdBy,jdbcType=VARCHAR},
+      </if>
+      <if test="updatedBy != null" >
+        updated_by = #{updatedBy,jdbcType=VARCHAR},
+      </if>
+      <if test="createdTime != null" >
+        created_time = #{createdTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updatedTime != null" >
+        updated_time = #{updatedTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="att1Id != null" >
+        att1_id = #{att1Id,jdbcType=BIGINT},
+      </if>
+      <if test="att1Value != null" >
+        att1_value = #{att1Value,jdbcType=VARCHAR},
+      </if>
+      <if test="att2Id != null" >
+        att2_id = #{att2Id,jdbcType=BIGINT},
+      </if>
+      <if test="att2Value != null" >
+        att2_value = #{att2Value,jdbcType=VARCHAR},
+      </if>
+      <if test="att3Id != null" >
+        att3_id = #{att3Id,jdbcType=BIGINT},
+      </if>
+      <if test="att3Value != null" >
+        att3_value = #{att3Value,jdbcType=VARCHAR},
+      </if>
+      <if test="att4Id != null" >
+        att4_id = #{att4Id,jdbcType=BIGINT},
+      </if>
+      <if test="att4Value != null" >
+        att4_value = #{att4Value,jdbcType=VARCHAR},
+      </if>
+      <if test="att5Id != null" >
+        att5_id = #{att5Id,jdbcType=BIGINT},
+      </if>
+      <if test="att5Value != null" >
+        att5_value = #{att5Value,jdbcType=VARCHAR},
+      </if>
+      <if test="att6Id != null" >
+        att6_id = #{att6Id,jdbcType=BIGINT},
+      </if>
+      <if test="att6Value != null" >
+        att6_value = #{att6Value,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+
+</mapper>

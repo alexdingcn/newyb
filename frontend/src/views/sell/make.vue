@@ -163,7 +163,7 @@ import moment from 'moment';
 import dataConver from "@/libs/data-conver.js";
 import customerSelect from "@/views/selector/customer-select.vue";
 import sellOrderSearch from "@/views/sell/sell-order-search.vue";
-import goodExpand from "@/views/good/good-expand.vue";
+import goodsExpand from "@/views/goods/goods-expand.vue";
 import sellGoodHistory from "./sell-good-history.vue";
 import warehouseSelect from "@/views/selector/warehouse-select.vue";
 import saleSelect from "@/views/selector/sale-select.vue";
@@ -177,7 +177,7 @@ export default {
     customerSelect,
     sellOrderSearch,
     repertoryInfoSelect,
-    goodExpand,
+    goodsExpand,
     sellGoodHistory,
     warehouseSelect,
     saleSelect,
@@ -250,7 +250,7 @@ export default {
             let goods = params.row.goods;
             let productDate = params.row.productDate ? moment(params.row.productDate).format('YYYY-MM-DD') : '';
             let expDate = params.row.expDate ? moment(params.row.expDate).format('YYYY-MM-DD') : '';
-            return h(goodExpand, {
+            return h(goodsExpand, {
               props: {
                 good: goods,
                 productDate: productDate,

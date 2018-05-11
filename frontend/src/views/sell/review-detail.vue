@@ -101,7 +101,7 @@
 <script>
 import util from "@/libs/util.js";
 import moment from 'moment';
-import goodExpand from "@/views/good/good-expand.vue";
+import goodsExpand from "@/views/goods/goods-expand.vue";
 
 export default {
   name: 'review-detail',
@@ -109,7 +109,7 @@ export default {
       sellOrderId: Number
   },
   components: {
-      goodExpand
+      goodsExpand
   },
   data() {
       return {

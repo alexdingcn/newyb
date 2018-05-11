@@ -1,7 +1,5 @@
 package com.yiban.erp.service.sell;
 
-import com.sun.org.apache.bcel.internal.generic.IF_ACMPEQ;
-import com.sun.org.apache.regexp.internal.RE;
 import com.yiban.erp.config.RabbitmqQueueConfig;
 import com.yiban.erp.constant.OrderNumberType;
 import com.yiban.erp.constant.RepertoryRefType;
@@ -17,15 +15,13 @@ import com.yiban.erp.entities.*;
 import com.yiban.erp.exception.BizException;
 import com.yiban.erp.exception.BizRuntimeException;
 import com.yiban.erp.exception.ErrorCode;
-import com.yiban.erp.service.GoodsService;
+import com.yiban.erp.service.goods.GoodsService;
 import com.yiban.erp.util.UtilTool;
-import org.omg.CORBA.ORB;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import sun.rmi.runtime.Log;
 
 import java.math.BigDecimal;
 import java.util.*;

@@ -72,14 +72,14 @@ import util from "@/libs/util.js";
 import moment from 'moment';
 import customerSelect from "@/views/selector/customer-select.vue";
 import saleSelect from "@/views/selector/sale-select.vue";
-import goodExpand from "@/views/good/good-expand.vue";
+import goodsExpand from "@/views/goods/goods-expand.vue";
 
 export default {
     name: 'sell-sale-review',
     components: {
         customerSelect,
         saleSelect,
-        goodExpand
+        goodsExpand
     },
     props: {
         viewMethod: {
@@ -266,7 +266,7 @@ export default {
                         let goods = params.row.goods;
                         let productDate = params.row.productDate ? moment(params.row.productDate).format('YYYY-MM-DD') : '';
                         let expDate = params.row.expDate ? moment(params.row.expDate).format('YYYY-MM-DD') : '';
-                        return h(goodExpand, {
+                        return h(goodsExpand, {
                         props: {
                             good: goods,
                             productDate: productDate,

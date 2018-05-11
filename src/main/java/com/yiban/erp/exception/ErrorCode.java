@@ -34,6 +34,7 @@ public enum ErrorCode {
     GOODS_CATEGORY_ID_MISSING(1201, "缺失商品分类ID"),
     GOODS_REMAINED_IN_CATEGORY(1200, "该分类下还有商品,请先移除商品后操作"),
     GOODS_CATEGORY_NAME_MISS(1202, "商品类别名称不能为空"),
+    GOODS_ATTRIBUTE_SIZE_ERROR(1203, "商品自定义字段的个数不能多于6个"),
 
     // 13xx - 采购
     BUY_ORDER_NOT_EXISTED(1300, "采购订单不存在"),
