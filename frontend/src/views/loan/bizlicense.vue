@@ -6,76 +6,73 @@
     .bizApply .ivu-form-item {
         margin-bottom: 10px;
     }
+    .blue-header { background-color: #296ecc; color: white; }
+    .back-btn { color: white; }
 </style>
 
 
 <template>
-    <div class="bizApply">
-        <div class="logo-con margin-top-10 center">
-            <img src="../../images/logo.png" key="min-logo"/>
-        </div>
+    <div class="bizApply layout">
+        <Layout>
+            <Header class="blue-header padding-side-10">
+                <Row>
+                    <Col span="3">
+                        <Button type="text" class="back-btn" @click="historyGoBack">
+                            <Icon type="chevron-left" size="24" ></Icon>
+                        </Button>
+                    </Col>
+                    <Col span="18" class="center">
+                        <h1>融资申请</h1>
+                    </Col>
+                </Row>
+            </Header>
+            <Content>
+                <Form ref="formInline" :model="bizLicenseForm" :label-width="80" :rule="ruleValidate" class="padding-10" v-show="formShow">
+                    <h2>公司信息</h2>
+                    <FormItem label="公司名称">
+                        <Input type="text" v-model="bizLicenseForm.name" placeholder="公司名称" size="large"/>
+                    </FormItem>
 
-        <Form ref="formInline" :model="bizLicenseForm" :label-width="80" :rule="ruleValidate"
-              style="padding: 10px;" v-show="formShow">
+                    <FormItem label="法人" v-show="bizLicenseForm.legalPerson != ''">
+                        <Input type="text" v-model="bizLicenseForm.legalPerson" placeholder="法人" size="large"/>
+                    </FormItem>
 
+                    <h2>申请金额</h2>
+                    <FormItem label="融资金额">
+                        <Input type="tel" v-model="bizLicenseForm.applyAmount" placeholder="申请金额(万)" size="large"/>
+                    </FormItem>
+                    <FormItem label="期限">
+                        <Select v-model="bizLicenseForm.applyMonths" size="large">
+                            <Option value='3'>3个月</Option>
+                            <Option value='6'>6个月</Option>
+                            <Option value='12'>12个月</Option>
+                        </Select>
+                    </FormItem>
 
-            <h2>公司信息</h2>
-            <FormItem label="营业执照号">
-                <Input type="text" v-model="bizLicenseForm.license" placeholder="营业执照号" size="large"/>
-            </FormItem>
-
-            <FormItem label="公司名称">
-                <Input type="text" v-model="bizLicenseForm.name" placeholder="公司名称" size="large"/>
-            </FormItem>
-
-            <FormItem label="法人" v-show="bizLicenseForm.legalPerson != ''">
-                <Input type="text" v-model="bizLicenseForm.legalPerson" placeholder="法人" size="large"/>
-            </FormItem>
-
-            <FormItem>
-                <p>图片格式jpg/jpeg/png</p>
-                <div class="file-wrapper">
-                    <Button type="ghost" icon="ios-cloud-upload-outline">
-                        <label for="fileControl">选择营业执照</label>
-                        <input id="fileControl" type="file" accept="image/*" class="file-control" style="display:none;" />
-                    </Button>
+                    <h2>申请人</h2>
+                    <FormItem label="联系人姓名">
+                        <Input v-model="bizLicenseForm.contact" placeholder="联系人姓名" size="large"/>
+                    </FormItem>
+                    <FormItem label="联系人手机">
+                        <Input type="tel" v-model="bizLicenseForm.contactMobile" placeholder="联系人手机" size="large" maxlength=11 />
+                        <Button type="info" @click="handleVerifyCode" class="margin-top-8" :disabled="bizLicenseForm.contactMobile === '' || countDown > 0">{{verifyText}}</Button>
+                    </FormItem>
+                    <FormItem label="验证码">
+                        <Input type="tel" v-model="bizLicenseForm.verifyCode"  placeholder="验证码" size="large" maxlength=6 />
+                    </FormItem>
+                    <Button type="success" @click="handleSubmit" long :disabled="!submitEnabled" size="large">提交</Button>
+                </Form>
+                <div v-show="!formShow" >
+                    <Alert type="success" show-icon class="margin-20">
+                        你的申请我们已经收到
+                        <template slot="desc">客户经理会尽快与您联系, 感谢您的关注!</template>
+                    </Alert>
                 </div>
-            </FormItem>
 
-            <h2>申请金额</h2>
-            <FormItem label="融资金额">
-                <Input type="tel" v-model="bizLicenseForm.applyAmount" placeholder="申请金额(万)" size="large"/>
-            </FormItem>
-            <FormItem label="期限">
-                <Select v-model="bizLicenseForm.applyMonths" size="large">
-                    <Option value='3'>3个月</Option>
-                    <Option value='6'>6个月</Option>
-                    <Option value='12'>12个月</Option>
-                </Select>
-            </FormItem>
+            </Content>
+        </Layout>
 
-            <h2>申请人</h2>
-            <FormItem label="身份证">
-                <Input type="text" v-model="bizLicenseForm.contactIdcard" placeholder="身份证" size="large"/>
-            </FormItem>
-            <FormItem label="联系人姓名">
-                <Input v-model="bizLicenseForm.contact" placeholder="联系人姓名" size="large"/>
-            </FormItem>
-            <FormItem label="联系人手机">
-                <Input type="tel" v-model="bizLicenseForm.contactMobile" placeholder="联系人手机" size="large" maxlength=11 />
-                <Button type="info" @click="handleVerifyCode" class="margin-top-8" :disabled="bizLicenseForm.contactMobile === '' || countDown > 0">{{verifyText}}</Button>
-            </FormItem>
-            <FormItem label="验证码">
-                <Input type="tel" v-model="bizLicenseForm.verifyCode"  placeholder="验证码" size="large" maxlength=6 />
-            </FormItem>
-            <Button type="success" @click="handleSubmit" long :disabled="!submitEnabled" size="large">提交</Button>
-        </Form>
-        <div v-show="!formShow" >
-            <Alert type="success" show-icon class="margin-20">
-                你的申请我们已经收到
-                <template slot="desc">客户经理会尽快与您联系, 感谢您的关注!</template>
-            </Alert>
-        </div>
+
     </div>
 
 </template>
@@ -115,6 +112,9 @@
             this.getFaceResult();
         },
         methods: {
+            historyGoBack() {
+                history.go(-1);
+            },
             getFaceResult () {
                 var self = this;
                 let bizNo = Cookies.get('face_token');

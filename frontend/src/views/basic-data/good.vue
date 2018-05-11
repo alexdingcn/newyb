@@ -55,7 +55,7 @@
             </Layout>
         </Layout>
 
-        <Modal v-model="checkModalShow" title="商品基础信息维护" :mask-closable="false" width="80">
+        <Modal v-model="checkModalShow" :mask-closable="false" width="80">
             <goods-info :goodsId="currentGoodsId" @save-ok="saveGoodsOk" ></goods-info>
             <div slot="footer"></div>
         </Modal>
