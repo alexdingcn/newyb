@@ -1,4 +1,6 @@
 import 'es6-promise/auto';
+import '@/styles/icon-font/iconfont.css';
+import '@/styles/icon-font/iconfont.js';
 
 import Vue from 'vue';
 import iView from 'iview';
@@ -10,9 +12,11 @@ import '@/locale';
 import 'iview/dist/styles/iview.css';
 import VueI18n from 'vue-i18n';
 import util from './libs/util';
+import FontIcon from '@/views/my-components/icon-font/font-icon.vue';
 
 Vue.use(VueI18n);
 Vue.use(iView);
+Vue.component('FontIcon', FontIcon);
 
 new Vue({
     el: '#app',

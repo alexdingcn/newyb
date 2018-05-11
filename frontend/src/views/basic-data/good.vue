@@ -26,12 +26,12 @@
             <Layout>
                 <Card class="margin-left-10">
                     <p slot="title">
-                        <Icon type="ios-information"></Icon>
+                        <font-icon type="icon-shangpin" ></font-icon> 
                         商品 {{ selectedCategory.title }}
                     </p>
                     <div slot="extra">
-                        <Input v-model="searchGoodsVal" icon="search" placeholder="商品名称/拼音简称" style="width: 300px"></Input>
-                        <ButtonGroup>
+                        <Input v-model="searchGoodsVal" icon="search" placeholder="商品名称/拼音简称" style="width: 300px" @on-click="loadGoodsData"></Input>
+                        <ButtonGroup >
                             <Button type="success" icon="android-add-circle" @click="addGoods">添加</Button>
                             <Button type="primary" icon="edit" @click="editGoods">修改</Button>
                             <Button type="error" icon="android-remove-circle" @click="delGoods">删除</Button>
@@ -39,13 +39,12 @@
                         </ButtonGroup>
                     </div>
 
-                    <Row type="flex" align="middle" class="advanced-router margin-top-8">
-                        <Table border stripe highlight-row :loading="goodsTableLoading" 
+                    <Table border stripe highlight-row :loading="goodsTableLoading" 
                             :columns="orderColumns" :data="goodsData" ref="goodsTable" 
                             @on-row-click="goodsTabRowClick"
                             @on-row-dblclick="goodsTabRowDblClick" 
-                            style="width: 100%;" size="small"></Table>
-                    </Row>
+                            style="width: 100%;" size="small">
+                    </Table>
                     <Row class="margin-top-8">
                         <div style="float: right;">
                             <Page :total="totalGoodsCount" :current="currentPage" @on-change="changePage" size="small" show-total></Page>
