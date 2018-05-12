@@ -34,7 +34,8 @@
                     <lock-screen></lock-screen>
                     <message-tip v-model="mesCount"></message-tip>
                     <theme-switch></theme-switch>
-                    
+                    <help-menu :openHelp="openHelp" @open-change="openHelpHandle"></help-menu>
+
                     <div class="user-dropdown-menu-con">
                         <Row type="flex" justify="end" align="middle" class="user-dropdown-innercon">
                             <Dropdown transfer trigger="click" @on-click="handleClickUserDropdown">
@@ -56,11 +57,14 @@
                 <tags-page-opened :pageTagsList="pageTagsList"></tags-page-opened>
             </div>
         </div>
-        <div class="single-page-con" :style="{left: shrink?'100px':'200px'}">
-            <div class="single-page">
+        <div class="single-page-con" :style="{left: shrink?'100px':'200px', right: this.openHelp ? '200px' : '0px'}">
+            <div class="single-page" >
                 <keep-alive :include="cachePage">
                     <router-view></router-view>
                 </keep-alive>
+            </div>
+            <div class="help-con" :style="{width: this.openHelp ? '200px': '0px', overflow: this.openHelp ? 'auto' : 'visible'}">
+                <main-help></main-help>
             </div>
         </div>
     </div>
@@ -72,7 +76,9 @@
     import fullScreen from './main-components/fullscreen.vue';
     import lockScreen from './main-components/lockscreen/lockscreen.vue';
     import messageTip from './main-components/message-tip.vue';
-   import themeSwitch from './main-components/theme-switch/theme-switch.vue';
+    import themeSwitch from './main-components/theme-switch/theme-switch.vue';
+    import helpMenu from './main-components/help-center/help-menu.vue';
+    import mainHelp from './main-components/help-center/main-help.vue';
     import Cookies from 'js-cookie';
     import util from '@/libs/util.js';
     
@@ -84,12 +90,15 @@
             fullScreen,
             lockScreen,
             messageTip,
-            themeSwitch
+            themeSwitch,
+            helpMenu,
+            mainHelp
         },
         data () {
             return {
                 shrink: true,
                 isFullScreen: false,
+                openHelp: true,
                 openedSubmenuArr: this.$store.state.app.openedSubmenuArr
             };
         },
@@ -190,6 +199,10 @@
             },
             fullscreenChange (isFullScreen) {
                 // console.log(isFullScreen);
+            },
+            openHelpHandle (data) {
+                console.log('main-help:' + data);
+                this.openHelp = data;
             }
         },
         watch: {
