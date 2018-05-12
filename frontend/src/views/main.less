@@ -29,6 +29,7 @@
         transition: width .3s;
         box-shadow: 2px 0 2px 1px #8c8c8c;
     }
+    
     .layout-text{
         display: inline-block;
         white-space:nowrap;
@@ -114,7 +115,7 @@
             right: 0;
             top: 0;
             height: 100%;
-            width: 300px;
+            width: 340px;
             .switch-theme-con{
                 display: inline-block;
                 width: 40px;
@@ -137,6 +138,17 @@
             }
             .switch-theme{
                 height: 100%;
+            }
+            .help-con{
+                display: inline-block;
+                width: 30px;
+                padding: 10px 0;
+                text-align: center;
+                margin-right: 20px; 
+                cursor: pointer;
+                i{
+                    vertical-align: middle;
+                }
             }
             .user-dropdown{
                 &-menu-con{
@@ -194,6 +206,15 @@
         transition: left .3s;
         .single-page{
             margin: 10px;
+        }
+        .help-con{
+            height: 100%;
+            position: fixed;
+            width: 200px;
+            top: 80px;
+            right: 0;
+            transition: width .3s;
+            box-shadow: 2px 0 2px 1px #8c8c8c;
         }
     }
     &-copy{
