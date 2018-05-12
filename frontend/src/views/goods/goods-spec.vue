@@ -18,6 +18,15 @@
       </Card>
 
       <Modal v-model="specModal" title="商品基础信息维护" :mask-closable="false" width="40">
+          <Alert>
+              规格编号设置建议：在类型的规格编号中，建议使用两位字符(数字或字母),在多规格值中的每一个值的规格编号建议使用类型编号+1(2,3)的模式.
+              <h5>例如: 规格“颜色”的编号为“A1”, 则颜色规格值的规格编号设置如下模式</h5>
+              <ul>
+                  <li>“白色”：“A11”</li>
+                  <li>“红色”：“A12”</li>
+                  <li>“蓝色”：“A13”</li>
+              </ul>
+          </Alert>
           <Form ref="form" :model="specForm" :label-width="90">
               <h3>多规格类型</h3>
               <Row>
@@ -33,15 +42,15 @@
               <h3>多规格值</h3>
               <Table ref="modalTable" highlight-row :loading="tableLoading" 
                 :columns="modalColumns" :data="specForm.subGoodsSpecs" 
-                size="small" style="width:625px;"
+                size="small" style="width:100%;"
                ></Table>
                <Row type="flex" justify="start">
-                   <a href="javascript:void(0)" style="margin-top:10px;" @click="addSpecValue"><Icon type="plus"></Icon>继续添加</a>
+                   <a href="javascript:void(0)" style="margin-top:10px;" @click="addSpecName"><Icon type="plus"></Icon>继续添加</a>
                </Row>
           </Form>
           <Row type="flex" justify="end" slot="footer" >
               <ButtonGroup size="small">
-                  <Button type="success" icon="checkmark" >确定保存</Button>
+                  <Button type="success" icon="checkmark" :loading="saveLoading" @click="specModalSaveSubmit" >确定保存</Button>
                   <Button type="ghost" icon="reply" @click="specModalCancel" >取消</Button>
               </ButtonGroup>
           </Row>
@@ -55,10 +64,6 @@ import util from '@/libs/util.js';
 export default {
     name: 'goods-spec',
     data() {
-        const remove = function(h, rows) {
-            
-        }
-
         return {
             tableLoading: false,
             tableData: [],
@@ -80,12 +85,12 @@ export default {
                 },
                 {
                     title: '多规格值',
-                    key: 'specValusList',
+                    key: 'subValues',
                 },
                 {
                     title: '操作',
                     key: 'action',
-                    width: 130,
+                    width: 150,
                     render: (h, params) =>　{
                         return h('ButtonGroup', {
                             props: {
@@ -94,7 +99,7 @@ export default {
                         }, [
                             h('Button', {
                                 props: {
-                                    type: 'warning',
+                                    type: 'primary',
                                     icon: "edit"
                                 },
                                 on: {
@@ -135,8 +140,7 @@ export default {
                 },
                 {
                     title: '多规格值',
-                    key: 'specValue',
-                    width: 220,
+                    key: 'specName',
                     render: (h, params) => {
                         let self= this;
                         return h('Input', {
@@ -144,7 +148,7 @@ export default {
                                 value: self.specForm.subGoodsSpecs[params.index][params.column.key]
                             },
                             on: {
-                                "on-change"(event) {
+                                'on-blur' (event) {
                                     let row = self.specForm.subGoodsSpecs[params.index];
                                     row[params.column.key] = event.target.value;
                                 }
@@ -155,7 +159,6 @@ export default {
                 {
                     title: '多规格编号',
                     key: 'specNo',
-                    width: 220,
                     render: (h, params) => {
                         let self= this;
                         return h('Input', {
@@ -163,7 +166,7 @@ export default {
                                 value: self.specForm.subGoodsSpecs[params.index][params.column.key]
                             },
                             on: {
-                                "on-change"(event) {
+                                'on-blur' (event) {
                                     let row = self.specForm.subGoodsSpecs[params.index];
                                     row[params.column.key] = event.target.value;
                                 }
@@ -188,14 +191,15 @@ export default {
                                     },
                                     on: {
                                         click: () => {
-                                            this.removeValueItem(params.row.id, params.index);
+                                            this.removeSubItem(params.row.id, params.index);
                                         }
                                     }
                                 }, '删除')
                             ]);
                     }
                 }
-            ]
+            ],
+            saveLoading: false
         }
     },
     mounted() {
@@ -215,18 +219,18 @@ export default {
                 })
         },
 
-        removeItem(parentId) {
-            if (!parentId) {
+        removeItem(id) {
+            if (!id) {
                 return;
             }
             let self = this;
-            this.$Model.confirm({
+            this.$Modal.confirm({
                 title: '删除确认',
                 content: '是否确认删除商品多规格',
                 onCancel: () => {},
                 onOk: () => {
                     self.tableLoading = true;
-                    util.ajax.delete('/goods/spec/remove/' + parentId)
+                    util.ajax.delete('/goods/spec/remove/' + id)
                         .then((response) => {
                             self.tableLoading = false;
                             self.$Message.success('删除成功');
@@ -246,23 +250,34 @@ export default {
                 parentName: '',
                 parentNo: '',
                 subGoodsSpecs: [
-                    {id: '', specNo: '', specValue: ''},
-                    {id: '', specNo: '', specValue: ''}
+                    {id: '', specNo: '', specName: ''},
+                    {id: '', specNo: '', specName: ''}
                 ]
             };
             this.isAddModal = true;
             this.specModal = true;
         },
 
-        addSpecValue() {
-            let item = {id: '', specNo: '', specValue: ''};
+        addSpecName() {
+            let item = {id: '', specNo: '', specName: ''};
             this.specForm.subGoodsSpecs.push(item);
         },
 
-        removeValueItem(id, index) {
-            this.specForm.subGoodsSpecs.splice(index, 1);
+        removeSubItem(id, index) {
             if (id && id>0) {
-                // 删除后天数据
+                // 删除后台数据
+                let self = this;
+                util.ajax.delete('/goods/spec/remove/' + id)
+                    .then(response => {
+                        self.$Message.success('删除成功');
+                        self.specForm.subGoodsSpecs.splice(index, 1);
+                        self.refreshTableData();
+                    })
+                    .catch(error => {
+                        util.errorProcessor(self, error);
+                    })
+            }else {
+                this.specForm.subGoodsSpecs.splice(index, 1);
             }
         },
 
@@ -272,8 +287,8 @@ export default {
                 parentName: '',
                 parentNo: '',
                 subGoodsSpecs: [
-                    {id: '', specNo: '', specValue: ''},
-                    {id: '', specNo: '', specValue: ''}
+                    {id: '', specNo: '', specName: ''},
+                    {id: '', specNo: '', specName: ''}
                 ]
             };
             this.isAddModal = true;
@@ -284,6 +299,21 @@ export default {
             this.specForm = row;
             this.isAddModal = false;
             this.specModal = true;
+        },
+
+        specModalSaveSubmit() {
+            this.saveLoading = true;
+            util.ajax.post('/goods/spec/save', this.specForm)
+                .then((response) => {
+                    this.saveLoading = false;
+                    this.$Message.success('保存成功');
+                    this.specModalCancel();
+                    this.refreshTableData();
+                })
+                .catch((error) => {
+                    this.saveLoading = false;
+                    util.errorProcessor(this, error);
+                })
         }
 
     }

@@ -10,10 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -32,11 +29,19 @@ public class GoodsSpecController {
         return ResponseEntity.ok().body(JSON.toJSONString(form));
     }
 
-    @RequestMapping(value = "/save", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/save", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> save(@RequestBody GoodsSpecForm form,
                                        @AuthenticationPrincipal User user) throws Exception{
         logger.info("user:{} request save GoodsSpecForm :{}", user.getId(), JSON.toJSONString(form));
-        goodsSpecService.save(form);
+        goodsSpecService.save(form, user);
+        return ResponseEntity.ok().build();
+    }
+
+    @RequestMapping(value = "/remove/{specId}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> remove(@PathVariable Long specId,
+                                         @AuthenticationPrincipal User user) throws Exception {
+        logger.info("user:{} request remove goods spec id:{}", user.getId(), specId);
+        goodsSpecService.remove(specId);
         return ResponseEntity.ok().build();
     }
 

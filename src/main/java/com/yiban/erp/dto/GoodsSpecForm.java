@@ -41,7 +41,14 @@ public class GoodsSpecForm {
     }
 
     public String getSubValues() {
-        return subValues;
+        StringBuilder sb = new StringBuilder();
+        if (this.getSubGoodsSpecs() != null && !this.getSubGoodsSpecs().isEmpty()) {
+            for (GoodsSpec spec : this.getSubGoodsSpecs()) {
+                sb.append(spec.getSpecName());
+                sb.append(" ");
+            }
+        }
+        return sb.toString();
     }
 
     public void setSubValues(String subValues) {

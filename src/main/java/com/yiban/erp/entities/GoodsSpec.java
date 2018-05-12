@@ -11,8 +11,6 @@ public class GoodsSpec {
 
     private String specName;
 
-    private String specValue;
-
     private Long parentId;
 
     private String parentName;
@@ -57,14 +55,6 @@ public class GoodsSpec {
 
     public void setSpecName(String specName) {
         this.specName = specName == null ? null : specName.trim();
-    }
-
-    public String getSpecValue() {
-        return specValue;
-    }
-
-    public void setSpecValue(String specValue) {
-        this.specValue = specValue == null ? null : specValue.trim();
     }
 
     public Long getParentId() {

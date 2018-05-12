@@ -6,7 +6,6 @@
     <result column="company_id" property="companyId" jdbcType="INTEGER" />
     <result column="spec_no" property="specNo" jdbcType="VARCHAR" />
     <result column="spec_name" property="specName" jdbcType="VARCHAR" />
-    <result column="spec_value" property="specValue" jdbcType="VARCHAR" />
     <result column="parent_id" property="parentId" jdbcType="BIGINT" />
     <result column="parent_no" property="parentNo" jdbcType="VARCHAR" />
     <result column="parent_name" property="parentName" jdbcType="VARCHAR" />
@@ -16,7 +15,7 @@
     <result column="updated_time" property="updatedTime" jdbcType="TIMESTAMP" />
   </resultMap>
   <sql id="Base_Column_List" >
-    id, company_id, spec_no, spec_name, spec_value, parent_id, parent_no, parent_name, created_by,
+    id, company_id, spec_no, spec_name, parent_id, parent_no, parent_name, created_by,
     updated_by, created_time, updated_time
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
@@ -38,13 +37,27 @@
   </delete>
   <insert id="insert" parameterType="com.yiban.erp.entities.GoodsSpec" keyProperty="id" useGeneratedKeys="true" >
     insert into goods_spec (company_id, spec_no,
-      spec_name, spec_value, parent_id, parent_no,
+      spec_name, parent_id, parent_no,
       parent_name, created_by, updated_by, 
       created_time, updated_time)
     values (#{companyId,jdbcType=INTEGER}, #{specNo,jdbcType=VARCHAR},
-      #{specName,jdbcType=VARCHAR}, #{specValue,jdbcType=VARCHAR}, #{parentId,jdbcType=BIGINT}, #{parentNo,jdbcType=VARCHAR},
+      #{specName,jdbcType=VARCHAR}, #{parentId,jdbcType=BIGINT}, #{parentNo,jdbcType=VARCHAR},
       #{parentName,jdbcType=VARCHAR}, #{createdBy,jdbcType=VARCHAR}, #{updatedBy,jdbcType=VARCHAR}, 
       #{createdTime,jdbcType=TIMESTAMP}, #{updatedTime,jdbcType=TIMESTAMP})
+  </insert>
+
+  <insert id="insertBatch" parameterType="map" keyProperty="id" useGeneratedKeys="true">
+    insert into goods_spec (company_id, spec_no,
+      spec_name, parent_id, parent_no,
+      parent_name, created_by, updated_by,
+      created_time, updated_time)
+    values
+      <foreach collection="goodsSpecs" item="item" open="(" close=")" separator="), (">
+        #{item.companyId,jdbcType=INTEGER}, #{item.specNo,jdbcType=VARCHAR},
+        #{item.specName,jdbcType=VARCHAR}, #{item.parentId,jdbcType=BIGINT}, #{item.parentNo,jdbcType=VARCHAR},
+        #{item.parentName,jdbcType=VARCHAR}, #{item.createdBy,jdbcType=VARCHAR}, #{item.updatedBy,jdbcType=VARCHAR},
+        #{item.createdTime,jdbcType=TIMESTAMP}, #{item.updatedTime,jdbcType=TIMESTAMP}
+      </foreach>
   </insert>
 
   <update id="updateByPrimaryKeySelective" parameterType="com.yiban.erp.entities.GoodsSpec" >
@@ -55,9 +68,6 @@
       </if>
       <if test="specName != null" >
         spec_name = #{specName,jdbcType=VARCHAR},
-      </if>
-      <if test="specValue != null" >
-        spec_value = #{specValue,jdbcType=VARCHAR},
       </if>
       <if test="parentId != null" >
         parent_id = #{parentId,jdbcType=BIGINT},
@@ -83,5 +93,37 @@
     </set>
     where id = #{id,jdbcType=BIGINT}
   </update>
+
+  <select id="getSubSpecs" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select <include refid="Base_Column_List" />
+    from goods_spec
+    where parent_id = #{parentId}
+  </select>
+
+  <select id="isGoodsSpecUsed" parameterType="map" resultType="java.lang.Boolean">
+    select
+      count(1) > 0 as result
+    from goods
+    where spec_one_id in
+      <foreach collection="specIds" separator=", " open="(" close=")" item="item">
+        #{item}
+      </foreach>
+    or spec_two_id in
+      <foreach collection="specIds" separator=", " open="(" close=")" item="item">
+        #{item}
+      </foreach>
+    or spec_three_id in
+    <foreach collection="specIds" separator=", " open="(" close=")" item="item">
+      #{item}
+    </foreach>
+  </select>
+
+  <delete id="deleteByIds" parameterType="map">
+    delete from goods_spec
+    where id in
+    <foreach collection="specIds" separator=", " open="(" close=")" item="item">
+      #{item}
+    </foreach>
+  </delete>
 
 </mapper>

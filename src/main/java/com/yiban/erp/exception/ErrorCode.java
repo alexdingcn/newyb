@@ -35,6 +35,10 @@ public enum ErrorCode {
     GOODS_REMAINED_IN_CATEGORY(1200, "该分类下还有商品,请先移除商品后操作"),
     GOODS_CATEGORY_NAME_MISS(1202, "商品类别名称不能为空"),
     GOODS_ATTRIBUTE_SIZE_ERROR(1203, "商品自定义字段的个数不能多于6个"),
+    GOODS_SPEC_NAME_NO_NULL(1204, "多规格的名称和序号不能为空"),
+    GOODS_SPEC_SUB_SPEC_EMPTY(1205, "多规格的子规格不能为空列表"),
+    GOODS_SPEC_GET_FAIL(1206, "获取商品多规格失败"),
+    GOODS_SPEC_USED_CANNOT_REMOVE(1207, "多规格有商品在使用，不能删除"),
 
     // 13xx - 采购
     BUY_ORDER_NOT_EXISTED(1300, "采购订单不存在"),
