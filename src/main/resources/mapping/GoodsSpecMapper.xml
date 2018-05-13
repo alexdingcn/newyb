@@ -116,6 +116,7 @@
     <foreach collection="specIds" separator=", " open="(" close=")" item="item">
       #{item}
     </foreach>
+    and status != 'DELETE'
   </select>
 
   <delete id="deleteByIds" parameterType="map">

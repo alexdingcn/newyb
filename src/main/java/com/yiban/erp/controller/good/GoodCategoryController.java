@@ -17,47 +17,19 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
 import java.util.List;
 
 
 @RestController
-@RequestMapping("/good/category")
+@RequestMapping("/goods/category")
 public class GoodCategoryController {
     private static final Logger logger = LoggerFactory.getLogger(GoodCategoryController.class);
 
     @Autowired
     private GoodCategoryMapper goodCategoryMapper;
-
-    @Autowired
-    private GoodsMapper goodsMapper;
-    /**
-     * 获取产品类别的目录树
-     *
-     * @return
-     */
-    @RequestMapping(value = "/tree", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> tree(@AuthenticationPrincipal User user) {
-        List<GoodCategory> goodCategoryList = goodCategoryMapper.selectAll(user.getCompanyId());
-        JSONArray arr = new JSONArray();
-        int i = 0;
-        for (GoodCategory category : goodCategoryList) {
-            JSONObject obj = new JSONObject();
-            obj.put("title", category.getName());
-            obj.put("loading", false);
-            obj.put("id", category.getId());
-            obj.put("expand", false);
-            obj.put("children", new JSONArray());
-            arr.add(obj);
-            i++;
-        }
-        return ResponseEntity.ok().body(arr.toString());
-    }
 
     @RequestMapping(value = "/list", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> list(@AuthenticationPrincipal User user) throws Exception {
@@ -65,58 +37,49 @@ public class GoodCategoryController {
         return ResponseEntity.ok().body(JSON.toJSONString(goodCategoryList));
     }
 
-    @RequestMapping(value = "/add", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> add(@RequestBody String payload,
-                                      @AuthenticationPrincipal User user) throws Exception {
-        JSONObject requestBody = JSON.parseObject(payload);
-        String name = requestBody.getString("name");
-        logger.info("user:{} ADD new good category:{}", user.getId(), name);
-        if (StringUtils.isBlank(name)) {
-            throw new BizException(ErrorCode.GOODS_CATEGORY_NAME_MISS);
-        }
-        GoodCategory goodCategory = new GoodCategory();
-        goodCategory.setCompanyId(user.getCompanyId());
-        goodCategory.setName(requestBody.getString("name"));
-        goodCategory.setCreatedBy(user.getNickname());
-        goodCategory.setCreatedTime(new Date());
-        int result = goodCategoryMapper.insertSelective(goodCategory);
-        if (result > 0) {
-            return ResponseEntity.ok().build();
-        }
-        throw new BizRuntimeException(ErrorCode.FAILED_INSERT_FROM_DB);
-    }
-
-    @RequestMapping(value = "/edit", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> edit(@RequestBody GoodCategory goodCategory,
+    @RequestMapping(value = "/save", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> save(@RequestBody GoodCategory category,
                                        @AuthenticationPrincipal User user) throws Exception {
-        logger.info("user:{} update goods category:{} name:{}", user.getId(), goodCategory.getId(), goodCategory.getName());
-        if (StringUtils.isBlank(goodCategory.getName())) {
+        logger.info("user:{} request save goods category:{}", user.getId(), JSON.toJSONString(category));
+        if (StringUtils.isEmpty(category.getName())) {
             throw new BizException(ErrorCode.GOODS_CATEGORY_NAME_MISS);
         }
-        goodCategory.setUpdatedBy(user.getNickname());
-        goodCategory.setUpdatedTime(new Date());
-        int count = goodCategoryMapper.updateByPrimaryKeySelective(goodCategory);
-        if (count > 0) {
-            return ResponseEntity.ok().build();
+        if (category.getId() != null) {
+            //修改
+            category.setUpdatedBy(user.getNickname());
+            category.setUpdatedTime(new Date());
+            goodCategoryMapper.updateByPrimaryKeySelective(category);
+        }else {
+            //新建
+            category.setCompanyId(user.getCompanyId());
+            if (category.getParent() == null) {
+                category.setParent(-1);
+            }
+            category.setCreatedBy(user.getNickname());
+            category.setCreatedTime(new Date());
+            goodCategoryMapper.insert(category);
         }
-        throw new BizRuntimeException(ErrorCode.FAILED_UPDATE_FROM_DB);
+        return ResponseEntity.ok().build();
     }
 
-    @RequestMapping(value = "/remove", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> remove(@RequestBody String payload,
+    @RequestMapping(value = "/remove/{categoryId}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> remove(@PathVariable Integer categoryId,
                                          @AuthenticationPrincipal User user) throws Exception {
-        JSONObject requestBody = JSON.parseObject(payload);
-        Integer id = requestBody.getInteger("id");
-        logger.info("user:{} DELETE good category:{}", user.getId(), id);
-        if (id <= 0) {
+        logger.info("user:{} DELETE good category:{}", user.getId(), categoryId);
+        if (categoryId <= 0) {
             throw new BizException(ErrorCode.GOODS_CATEGORY_ID_MISSING);
         }
-        Long goodsCount = goodsMapper.selectCount(user.getCompanyId(), id, null, null);
+        //是否有子分类
+        Integer subCount = goodCategoryMapper.subCategoryCount(categoryId);
+        if (subCount > 0) {
+            throw new BizException(ErrorCode.GOODS_CHILD_IN_CATEGORY);
+        }
+        //是否有商品
+        Integer goodsCount = goodCategoryMapper.goodsInfoUseCategory(categoryId);
         if (goodsCount > 0) {
             throw new BizException(ErrorCode.GOODS_REMAINED_IN_CATEGORY);
         }
-
-        int result = goodCategoryMapper.deleteByPrimaryKey(id);
+        int result = goodCategoryMapper.deleteByPrimaryKey(categoryId);
         if (result > 0) {
             return ResponseEntity.ok().build();
         }

@@ -5,7 +5,10 @@
 <template>
   <div>
       <Card>
-          <p slot="title">商品多规格设置</p>
+          <p slot="title">
+              <Icon type="network"></Icon>
+              商品多规格设置
+            </p>
           <div slot="extra" >
               <ButtonGroup size="small">
                   <Button type="success" icon="plus" @click="add" >新增多规格</Button>
@@ -14,6 +17,7 @@
           <Table ref="table" highlight-row :loading="tableLoading" 
                 :columns="tableColumns" :data="tableData" 
                 style="width: 100%;" size="small" 
+                no-data-text="点击上方“新增多规格”按钮进行新建"
           ></Table>
       </Card>
 
@@ -76,16 +80,17 @@ export default {
                 {
                     title: '多规格编号',
                     key: 'parentNo',
-                    width: 100
+                    minWidth: 150
                 },
                 {
                     title: '多规格名称',
                     key: 'parentName',
-                    width: 150,
+                    minWidth: 150,
                 },
                 {
                     title: '多规格值',
                     key: 'subValues',
+                    minWidth: 200,
                 },
                 {
                     title: '操作',

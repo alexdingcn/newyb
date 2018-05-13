@@ -43,68 +43,7 @@
       #{comment,jdbcType=VARCHAR}, #{createdTime,jdbcType=TIMESTAMP}, #{updatedTime,jdbcType=TIMESTAMP}, 
       #{createdBy,jdbcType=VARCHAR}, #{updatedBy,jdbcType=VARCHAR}, #{companyId, jdbcType=INTEGER})
   </insert>
-  <insert id="insertSelective" parameterType="com.yiban.erp.entities.GoodCategory" keyProperty="id"
-          useGeneratedKeys="true">
-    insert into good_category
-    <trim prefix="(" suffix=")" suffixOverrides="," >
-      <if test="name != null" >
-        name,
-      </if>
-      <if test="parent != null" >
-        parent,
-      </if>
-      <if test="sequence != null">
-        sequence,
-      </if>
-      <if test="comment != null" >
-        comment,
-      </if>
-      <if test="createdTime != null" >
-        created_time,
-      </if>
-      <if test="updatedTime != null" >
-        updated_time,
-      </if>
-      <if test="createdBy != null" >
-        created_by,
-      </if>
-      <if test="updatedBy != null" >
-        updated_by,
-      </if>
-      <if test="companyId != null">
-        company_id,
-      </if>
-    </trim>
-    <trim prefix="values (" suffix=")" suffixOverrides="," >
-      <if test="name != null" >
-        #{name,jdbcType=VARCHAR},
-      </if>
-      <if test="parent != null" >
-        #{parent,jdbcType=INTEGER},
-      </if>
-      <if test="sequence != null">
-        #{sequence,jdbcType=INTEGER},
-      </if>
-      <if test="comment != null" >
-        #{comment,jdbcType=VARCHAR},
-      </if>
-      <if test="createdTime != null" >
-        #{createdTime,jdbcType=TIMESTAMP},
-      </if>
-      <if test="updatedTime != null" >
-        #{updatedTime,jdbcType=TIMESTAMP},
-      </if>
-      <if test="createdBy != null" >
-        #{createdBy,jdbcType=VARCHAR},
-      </if>
-      <if test="updatedBy != null" >
-        #{updatedBy,jdbcType=VARCHAR},
-      </if>
-      <if test="companyId != null">
-        #{companyId, jdbcType=INTEGER},
-      </if>
-    </trim>
-  </insert>
+
   <update id="updateByPrimaryKeySelective" parameterType="com.yiban.erp.entities.GoodCategory" >
     update good_category
     <set >
@@ -135,16 +74,13 @@
     </set>
     where id = #{id,jdbcType=INTEGER}
   </update>
-  <update id="updateByPrimaryKey" parameterType="com.yiban.erp.entities.GoodCategory" >
-    update good_category
-    set name = #{name,jdbcType=VARCHAR},
-      parent = #{parent,jdbcType=INTEGER},
-      sequence = #{sequence,jdbcType=INTEGER},
-      comment = #{comment,jdbcType=VARCHAR},
-      created_time = #{createdTime,jdbcType=TIMESTAMP},
-      updated_time = #{updatedTime,jdbcType=TIMESTAMP},
-      created_by = #{createdBy,jdbcType=VARCHAR},
-      updated_by = #{updatedBy,jdbcType=VARCHAR}
-    where id = #{id,jdbcType=INTEGER}
-  </update>
+
+  <select id="subCategoryCount" parameterType="java.lang.Integer" resultType="java.lang.Integer">
+    select count(1) from good_category where parent = #{id}
+  </select>
+
+  <select id="goodsInfoUseCategory" parameterType="java.lang.Integer" resultType="java.lang.Integer">
+    select count(1) from goods_info where category_id = #{id} and status != 'DELETE'
+  </select>
+
 </mapper>
