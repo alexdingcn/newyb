@@ -9,6 +9,10 @@
                 <Icon type="person"></Icon>
                 个人信息
             </p>
+            <div slot="extra">
+                <Button type="text" @click="cancelEditUserInfor">取消</Button>
+                <Button type="primary" :loading="save_loading" @click="saveEdit">保存</Button>
+            </div>
             <div>
                 <Form 
                     ref="userForm"
@@ -16,8 +20,40 @@
                     :label-width="100" 
                     label-position="right"
                 >
+
+                    <FormItem label="头像：" >
+                        <div class="own-space-avatar" v-if="avatarUrl != ''">
+                            <img :src="avatarUrl" >
+                            <div class="own-space-avatar-cover">
+                                <Icon type="ios-eye-outline" @click.native="avatarVisible = true"></Icon>
+                            </div>
+                        </div>
+                        <Upload ref="upload"
+                                :show-upload-list="false"
+                                :default-file-list="defaultList"
+                                :on-success="handleSuccess"
+                                :format="['jpg','jpeg','png']"
+                                :max-size="2048"
+                                :on-format-error="handleFormatError"
+                                :on-exceeded-size="handleMaxSize"
+
+                                type="drag"
+                                action=""
+                                :before-upload="handleUpload"
+                                style="display: inline-block;width:58px;">
+                            <div style="width: 58px;height:58px;line-height: 58px;">
+                                <Icon type="camera" size="20"></Icon>
+                            </div>
+                        </Upload>
+                        <Modal title="查看头像" v-model="avatarVisible">
+                            <img :src="avatarUrl" style="width: 100%">
+                        </Modal>
+                    </FormItem>
+
                     <FormItem label="用户名：" prop="nickname">
                         <strong> {{ userDetail.nickname }} </strong>
+
+                        <Button type="text" size="small" @click="showEditPassword" style="color:#2d8cf0; margin-left:10px;">修改密码</Button>
                     </FormItem>
                     <FormItem label="公司：">
                         <strong>{{ userDetail.companyName }}</strong>
@@ -51,14 +87,7 @@
                             <Input v-model="userDetail.address" ></Input>
                         </div>
                     </FormItem>
-                    
-                    <FormItem label="登录密码：">
-                        <Button type="text" size="small" @click="showEditPassword">修改密码</Button>
-                    </FormItem>
-                    <div>
-                        <Button type="text" style="width: 100px;" @click="cancelEditUserInfor">取消</Button>
-                        <Button type="primary" style="width: 100px;" :loading="save_loading" @click="saveEdit">保存</Button>
-                    </div>
+
                 </Form>
             </div>
         </Card>
@@ -93,7 +122,7 @@
                     <Input v-model="editMobileForm.verifyCode" placeholder="请输入短信验证码" ></Input>
                 </FormItem>
             </Form>
-            <Alert type="error" v-show="valdMessage" show-icon>{{ valdMessage }}</Alert>
+            <Alert type="error" v-show="validMessage" show-icon>{{ validMessage }}</Alert>
             <div slot="footer">
                 <Button type="text" @click="cancelEditMobile">取消</Button>
                 <Button type="primary" :loading="saveMobileLoading" @click="saveEditMobile" >保存</Button>
@@ -129,7 +158,14 @@ export default {
             }
         }
         return {
-            userDetail: {},
+            defaultList: [
+
+            ],
+            avatarVisible: false,
+            imgName: '',
+            avatarUrl: '',
+            userDetail: {
+            },
             save_loading: false,
             editPasswordModal: false, // 修改密码模态框显示
             savePassLoading: false,
@@ -160,7 +196,7 @@ export default {
                 mobile: '',
                 verifyCode: ''
             },
-            valdMessage: '',
+            validMessage: '',
             mobileValidate: {
                mobile: [
                    { required: true, message: '请输入新手机号', trigger: 'blur' },
@@ -179,13 +215,44 @@ export default {
         sendVerifyCodeDisabled() {
               let result = true;
               var re = /^1[0-9]{10}$/;
-              if (this.editMobileForm.mobile && re.test(this.editMobileForm.mobile) && this.countDown <= 0 && !this.valdMessage) {
+              if (this.editMobileForm.mobile && re.test(this.editMobileForm.mobile) && this.countDown <= 0 && !this.validMessage) {
                   result = false;
               }
               return result;
         }
     },
     methods: {
+        handleUpload (file) {
+            let reqData = new FormData();
+            var self = this;
+            reqData.append('fileId', this.fileId);
+            reqData.append('comment', this.comment);
+            reqData.append('file', file);
+            util.ajax.post('/file/upload/avatar', reqData, {headers: {'Content-Type': 'multipart/form-data'}})
+                    .then((response) => {
+                        if (response.status === 200) {
+                            self.avatarUrl = response.data.url;
+                        }
+                    })
+                    .catch((error) => {
+                        util.errorProcessor(this, error);
+                    });
+            return false;
+        },
+        handleSuccess (res, file) {
+        },
+        handleFormatError (file) {
+            this.$Notice.warning({
+                title: 'The file format is incorrect',
+                desc: '文件格式必须是jpg或者png'
+            });
+        },
+        handleMaxSize (file) {
+            this.$Notice.warning({
+                title: 'Exceeding file size limit',
+                desc: '文件 ' + file.name + ' 太大,请勿超过2M.'
+            });
+        },
         showEditPassword () {
             this.editPasswordModal = true;
         },
@@ -239,11 +306,13 @@ export default {
                 return;
             }
             this.save_loading = true;
+            this.userDetail.avatarUrl = this.avatarUrl;
             util.ajax.put('user/save', this.userDetail)
                 .then((response) => {
                     this.save_loading = false;
                     this.$Message.success('保存成功');
                     this.userDetail = response.data;
+                    this.$store.commit('setAvator', this.userDetail.avatarUrl + '?x-oss-process=style/resize200');
                 })
                 .catch((error) => {
                     util.errorProcessor(this, error);
@@ -258,7 +327,7 @@ export default {
         },
 
         validMobileExist() {
-            this.valdMessage = undefined;
+            this.validMessage = undefined;
             let mobile = this.editMobileForm.mobile;
             if(!mobile) {
                 return;
@@ -269,10 +338,10 @@ export default {
             }
             util.ajax.get('/user/valid/mobile', {params: {mobile: mobile}})
                 .then((response) => {
-                    this.valdMessage = undefined;
+                    this.validMessage = undefined;
                 })
                 .catch((error) => {
-                    this.valdMessage = error.response.data.message;
+                    this.validMessage = error.response.data.message;
                 })
         },
 
@@ -342,6 +411,9 @@ export default {
             util.ajax.get('/user/detail', {params: {userId: storeUser.id}})
                 .then((response) => {
                     this.userDetail = response.data;
+                    if (this.userDetail && this.userDetail.avatarUrl) {
+                        this.avatarUrl = this.userDetail.avatarUrl;
+                    }
                 })
                 .catch((error) => {
                     util.errorProcessor(this, error);

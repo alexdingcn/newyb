@@ -349,31 +349,38 @@
       and customer_no like #{customerNoVal}
     </if>
     <if test="search != null" >
-      <bind name="pattern" value="search"/>
-      and (name like #{pattern} or customer_no like #{pattern} or lower(pinyin) like lower(#{pattern}))
+      <bind name="pattern" value="'%' + search + '%'"/>
+      and (name like #{pattern} or
+          customer_no like #{pattern} or
+          lower(pinyin) like lower(#{pattern}) OR
+          employee like #{pattern} )
     </if>
   </select>
 
   <select id="selectAll" parameterType="map" resultMap="BaseResultMap">
     select
-      <include refid="Base_Column_List"/>
-    from customer
-    where status != 'delete'
-      and company_id = #{companyId}
+      c.*, cc.name as categoryName
+    from customer c, customer_category cc
+    where c.status != 'delete'
+      and c.company_id = #{companyId}
+      and c.category_id = cc.id
     <if test="categoryId != null">
-      and category_id = #{categoryId}
+      and c.category_id = #{categoryId}
     </if>
     <if test="customerName != null" >
       <bind name="customerNameVal" value="'%' + customerName + '%'" />
-      and name like #{customerNameVal}
+      and c.name like #{customerNameVal}
     </if>
     <if test="customerNo != null" >
       <bind name="customerNoVal" value="customerNo + '%'" />
-      and customer_no like #{customerNoVal}
+      and c.customer_no like #{customerNoVal}
     </if>
     <if test="search != null" >
       <bind name="pattern" value="'%' + search + '%'"/>
-      and (name like #{pattern} or customer_no like #{pattern} or lower(pinyin) like lower(#{pattern}))
+      and (c.name like #{pattern} or
+          c.customer_no like #{pattern} or
+          lower(c.pinyin) like lower(#{pattern}) OR
+          c.employee like #{pattern} )
     </if>
     <if test="offset != null and limit != null">
       limit #{offset}, #{limit}

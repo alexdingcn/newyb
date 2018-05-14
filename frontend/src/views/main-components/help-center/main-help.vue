@@ -4,7 +4,7 @@
 
 <template>
     <Card class="help-main">
-        <p slot="title"><Icon type="happy-outline" color="#2d8cf0" size="22"></Icon> 帮助中心</p>
+        <p slot="title"><Icon type="ios-help-outline"></Icon> 帮助中心</p>
     </Card>
 </template>
 

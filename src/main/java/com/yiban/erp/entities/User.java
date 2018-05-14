@@ -38,6 +38,8 @@ public class User {
 
     private String comment;
 
+    private String avatarUrl;
+
     private String createdBy;
 
     private String updatedBy;
@@ -258,6 +260,7 @@ public class User {
         user.setStatus(this.getStatus());
         user.setLastLoginTime(this.getLastLoginTime());
         user.setCompanyExpiredTime(this.getCompanyExpiredTime());
+        user.setAvatarUrl(this.getAvatarUrl());
         return user;
     }
 
@@ -275,5 +278,13 @@ public class User {
 
     public void setCompanyExpiredTime(Date companyExpiredTime) {
         this.companyExpiredTime = companyExpiredTime;
+    }
+
+    public String getAvatarUrl() {
+        return avatarUrl;
+    }
+
+    public void setAvatarUrl(String avatarUrl) {
+        this.avatarUrl = avatarUrl;
     }
 }

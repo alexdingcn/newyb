@@ -17,6 +17,7 @@
     <result column="status" property="status" jdbcType="INTEGER" />
     <result column="super_user" property="superUser" jdbcType="BIT" />
     <result column="comment" property="comment" jdbcType="VARCHAR" />
+    <result column="avatar_url" property="avatarUrl" jdbcType="VARCHAR" />
     <result column="created_by" property="createdBy" jdbcType="VARCHAR" />
     <result column="updated_by" property="updatedBy" jdbcType="VARCHAR" />
     <result column="created_time" property="createdTime" jdbcType="TIMESTAMP" />
@@ -24,7 +25,7 @@
   </resultMap>
   <sql id="Base_Column_List" >
     id, company_id, nickname, mobile, realname, email, phone, idcard, forget_token, address, 
-    birthday, sex, status, super_user, comment, created_by, updated_by, created_time, updated_time
+    birthday, sex, status, super_user, comment, avatar_url, created_by, updated_by, created_time, updated_time
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
     select 
@@ -43,7 +44,7 @@
   <select id="findUserByNickName" parameterType="java.lang.String" resultMap="BaseResultMap">
     select
       u.id, u.company_id, u.nickname, mobile, u.realname, u.email, u.phone, u.idcard, u.forget_token, u.address,
-      u.birthday, u.sex, u.status, u.super_user, u.comment, u.created_by, u.updated_by, u.created_time, u.updated_time,
+      u.birthday, u.sex, u.status, u.super_user, u.comment, u.avatar_url, u.created_by, u.updated_by, u.created_time, u.updated_time,
       c.name as companyName
     from users u, company c
     where u.company_id = c.id and u.nickname = #{nickname} and u.status >= 0
@@ -52,7 +53,7 @@
   <select id="findUserByMobile" parameterType="java.lang.String" resultMap="BaseResultMap">
     select
       u.id, u.company_id, u.nickname, mobile, u.realname, u.email, u.phone, u.idcard, u.forget_token, u.address,
-      u.birthday, u.sex, u.status, u.super_user, u.comment, u.created_by, u.updated_by, u.created_time, u.updated_time,
+      u.birthday, u.sex, u.status, u.super_user, u.comment, u.avatar_url, u.created_by, u.updated_by, u.created_time, u.updated_time,
       c.name as companyName
     from users u, company c
     where u.company_id = c.id and u.mobile = #{mobile} and u.status >= 0
@@ -61,7 +62,7 @@
   <select id="getDetailById" parameterType="java.lang.Long" resultMap="BaseResultMap">
     select
       u.id, u.company_id, u.nickname, mobile, u.realname, u.email, u.phone, u.idcard, u.forget_token, u.address,
-      u.birthday, u.sex, u.status, u.super_user, u.comment, u.created_by, u.updated_by, u.created_time, u.updated_time,
+      u.birthday, u.sex, u.status, u.super_user, u.comment, u.avatar_url, u.created_by, u.updated_by, u.created_time, u.updated_time,
       c.name as companyName
     from users u, company c
     where u.company_id = c.id and u.id = #{userId} and u.status >= 0
@@ -70,7 +71,7 @@
   <select id="findUserByNameOrMobile" resultMap="BaseResultMap" parameterType="java.lang.String" >
     select
     u.id, u.company_id, u.nickname, mobile, u.realname, u.email, u.phone, u.idcard, u.forget_token, u.address,
-    u.birthday, u.sex, u.status, u.super_user, u.comment, u.created_by, u.updated_by, u.created_time, u.updated_time,
+    u.birthday, u.sex, u.status, u.super_user, u.comment, u.avatar_url, u.created_by, u.updated_by, u.created_time, u.updated_time,
     ua.identifier as identifier, ua.identifier_type as identifier_type, ua.credential as credential
     from users u, user_auths ua
     where u.id = ua.user_id
@@ -87,14 +88,15 @@
     insert into users (company_id, nickname,
       mobile, realname, email, 
       phone, idcard, forget_token, 
-      address, birthday, sex, status, super_user,
+      address, birthday, sex, status, super_user, avatar_url,
       comment, created_by, updated_by, 
       created_time, updated_time)
     values (#{companyId,jdbcType=INTEGER}, #{nickname,jdbcType=VARCHAR},
       #{mobile,jdbcType=VARCHAR}, #{realname,jdbcType=VARCHAR}, #{email,jdbcType=VARCHAR}, 
       #{phone,jdbcType=VARCHAR}, #{idcard,jdbcType=VARCHAR}, #{forgetToken,jdbcType=VARCHAR}, 
       #{address,jdbcType=VARCHAR}, #{birthday,jdbcType=DATE}, #{sex,jdbcType=INTEGER}, #{status,jdbcType=INTEGER},
-      #{superUser, jdbcType=BIT}, #{comment,jdbcType=VARCHAR}, #{createdBy,jdbcType=VARCHAR}, #{updatedBy,jdbcType=VARCHAR},
+      #{superUser, jdbcType=BIT}, #{avatarUrl,jdbcType=VARCHAR},
+      #{comment,jdbcType=VARCHAR}, #{createdBy,jdbcType=VARCHAR}, #{updatedBy,jdbcType=VARCHAR},
       #{createdTime,jdbcType=TIMESTAMP}, #{updatedTime,jdbcType=TIMESTAMP})
   </insert>
   <insert id="insertSelective" parameterType="com.yiban.erp.entities.User" useGeneratedKeys="true" keyProperty="id">
@@ -142,6 +144,9 @@
       <if test="comment != null" >
         comment,
       </if>
+        <if test="avatarUrl != null" >
+            avatar_url,
+        </if>
       <if test="createdBy != null" >
         created_by,
       </if>
@@ -198,6 +203,9 @@
       <if test="comment != null" >
         #{comment,jdbcType=VARCHAR},
       </if>
+        <if test="avatarUrl != null" >
+            #{avatarUrl,jdbcType=VARCHAR},
+        </if>
       <if test="createdBy != null" >
         #{createdBy,jdbcType=VARCHAR},
       </if>
@@ -248,6 +256,9 @@
       <if test="comment != null" >
         comment = #{comment,jdbcType=VARCHAR},
       </if>
+        <if test="avatarUrl != null" >
+            avatar_url = #{avatarUrl,jdbcType=VARCHAR},
+        </if>
       <if test="createdBy != null" >
         created_by = #{createdBy,jdbcType=VARCHAR},
       </if>
@@ -277,6 +288,7 @@
       status = #{status,jdbcType=INTEGER},
       super_user = #{superUser, jdbcType=BIT},
       comment = #{comment,jdbcType=VARCHAR},
+      avatar_url = #{avatarUrl,jdbcType=VARCHAR},
       created_by = #{createdBy,jdbcType=VARCHAR},
       updated_by = #{updatedBy,jdbcType=VARCHAR},
       created_time = #{createdTime,jdbcType=TIMESTAMP},

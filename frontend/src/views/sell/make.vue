@@ -9,7 +9,7 @@
                 <Icon type="ios-cart"></Icon>
                 销售订单制单
             </p> 
-            <ButtonGroup slot="extra" size="small">
+            <ButtonGroup slot="extra">
                 <Button type="success" icon="ios-checkmark" :loading="sellOrderSaveLoading" @click="sellOrderSaveBtnClick"> 保存 </Button>
                 <Button icon="bookmark" :loading="sellOrderSaveLoading" @click="tempStorageOrderBtnClick"> 暂挂 </Button>
                 <Button type="info" icon="filing" @click="getOldSellOrderBtnClick"> 暂挂提取 </Button>

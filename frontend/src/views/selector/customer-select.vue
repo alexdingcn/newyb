@@ -3,22 +3,43 @@
 </style>
 
 <template>
-    <Select ref="custSelect" v-model="customerIdValue" :disabled="selectDisable" :placeholder="placeholderShow"
-            filterable clearable remote :remote-method="searchByName" 
-            :loading="searchLoading" 
-            @on-change="onChange" :size="selectSize">
-        <Option v-for="item in customerList" :value="item.id" :key="item.id" :disabled="!item.enabled"> {{item.name}} </Option>
-    </Select>
+    <div :class="wrapClasses">
+        <div class="ivu-input-group-prepend">
+            <Button type="primary" size="small" icon="ios-people" @click="showCustomerSelectModal"></Button>
+        </div>
+        <Select ref="custSelect" v-model="customerIdValue"
+                :disabled="selectDisable" :placeholder="placeholderShow"
+                filterable clearable remote :remote-method="searchByName"
+                :loading="searchLoading"
+                @on-change="onChange" :size="selectSize">
+            <Option v-for="item in customerList"
+                    :value="item.id" :key="item.id" :disabled="!item.enabled"> {{item.name}} </Option>
+        </Select>
+
+        <Modal v-model="selectCustModal" width="60" :mask-closable="false" title="选择客户" class="cust-modal">
+            <customerListSelect ref="custSelectModal" @on-choosed="customerSelected" ></customerListSelect>
+            <div slot="footer">
+                <Button type="text" @click="selectCustModal = false">取消</Button>
+            </div>
+        </Modal>
+    </div>
 </template>
 
 <script>
 import util from '@/libs/util.js';
+import customerListSelect from './customer-list-select.vue';
+
+const prefixCls = 'ivu-input';
 
 export default {
     name: 'customer-select',
+    components: {
+        customerListSelect
+    },
     props: ['value', 'size', 'disabled'],
     data () {
         return {
+            selectCustModal: false,
             selectSize: this.size,
             customerIdValue: '',
             selectDisable: false,
@@ -39,8 +60,30 @@ export default {
             this.customerIdValue = newValue;
         }
     },
+    computed: {
+        wrapClasses () {
+            return [
+                `${prefixCls}-wrapper`,
+                {
+                    [`${prefixCls}-group`]: true,
+                    [`${prefixCls}-group-with-prepend`]: true
+                }
+            ];
+        },
+    },
     methods: {
+        showCustomerSelectModal() {
+            this.selectCustModal = true;
+            this.$refs.custSelectModal.reload();
+        },
+        customerSelected(item) {
+            this.customerList = new Array();
+            this.customerList.push(item);
+            this.$nextTick(() => { this.customerIdValue = item.id; });
+            this.selectCustModal = false;
+        },
         searchByName (name) {
+
             if (!name || name === '' || name.trim() === '') {
                 this.customerList = [];
                 return;
@@ -49,12 +92,13 @@ export default {
             let reqData = {name: name};
             util.ajax.get('/customer/search/name', {params: reqData})
                 .then((response) => {
+                    this.searchLoading = false;
                     this.customerList = response.data;
                 })
                 .catch((error) => {
+                    this.searchLoading = false;
                     util.errorProcessor(this, error);
                 });
-            this.searchLoading = false;
         },
 
         onChange (data) {
@@ -71,3 +115,15 @@ export default {
 };
 </script>
 
+<style lang="less">
+    .cust-modal {
+        .ivu-modal-header {
+            background-color: #07889B;
+            border-top-left-radius: 6px;
+            border-top-right-radius: 6px;
+        }
+        .ivu-modal-header-inner,
+        .ivu-modal-close,
+        .ivu-icon-ios-close-empty { color: white; }
+    }
+</style>
