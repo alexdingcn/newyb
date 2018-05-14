@@ -21,7 +21,7 @@
           ></Table>
       </Card>
 
-      <Modal v-model="specModal" title="商品基础信息维护" :mask-closable="false" width="40">
+      <Modal v-model="specModal" title="商品多规格维护" :mask-closable="false" width="40">
           <Alert>
               规格编号设置建议：在类型的规格编号中，建议使用两位字符(数字或字母),在多规格值中的每一个值的规格编号建议使用类型编号+1(2,3)的模式.
               <h5>例如: 规格“颜色”的编号为“A1”, 则颜色规格值的规格编号设置如下模式</h5>

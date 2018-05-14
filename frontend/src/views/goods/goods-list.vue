@@ -37,6 +37,10 @@
                     </Row>
                 </Card>
           </div>
+
+          <Modal v-model="goodsModal" title="商品信息维护" :footerHide="true" :mask-closable="false" width="60">
+              <goods-info ></goods-info>
+          </Modal>
           
   </div>
 </template>
@@ -46,6 +50,7 @@ import util from '@/libs/util.js';
 import goodsCategory from './goods-category.vue';
 import goodsBrandSelect from '@/views/selector/goods-brand-select.vue';
 import supplierSelect from '@/views/selector/supplier-select.vue';
+import goodsInfo from './goods-info.vue';
 
 export default {
     name: 'goods-list',
@@ -53,16 +58,18 @@ export default {
         goodsCategory,
         goodsBrandSelect,
         supplierSelect,
+        goodsInfo,
     },
     data() {
         return {
             statusList: [{value:'ALL', label:'全部'}, {value:'ON_SALE', label: '上架'}, {value:'OFF_SALE', label: '下架'}],
-            showSider: true,
+            showSider: false,
             searchCategoryId: '',
             searchValue: '',
             searchGoodsBrandId: '',
             searchSupplierId: '',
             searchStatus: 'ALL',
+            goodsModal: false,
         }
     },
     mounted() {
@@ -77,7 +84,9 @@ export default {
         },
         refreshGoodsList() {},
 
-        createGoods() {}
+        createGoods() {
+            this.goodsModal = true;
+        }
     }
 
   

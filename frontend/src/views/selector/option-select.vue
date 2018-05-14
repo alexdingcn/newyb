@@ -2,7 +2,7 @@
     <div>
         <Row>
             <Col span="20">
-                <Select style="width:100%;" v-model="optionId" clearable filterable :size="size" :placeholder="selectPlaceHolder" @on-change="onChange">
+                <Select style="width:100%;" :placement="placement" v-model="optionId" clearable filterable :size="size" :placeholder="selectPlaceHolder" @on-change="onChange">
                     <Option v-for="item in optionList" :value="item.id" :key="item.id">{{ item.value }}</Option>
                 </Select>
             </Col>
@@ -80,6 +80,10 @@ export default {
             type: String,
             default: 'default'
         },
+        placement: {
+            type: String,
+            default: 'bottom'
+        }
     },
     watch: {
         value(data) {
