@@ -10,7 +10,7 @@
                 <p slot="title">
                     <Icon type="android-options"></Icon> 商品分类
                     <Tooltip placement="right-start">
-                        <Icon type="help-circled"></Icon>
+                        <Icon type="ios-help-outline"></Icon>
                         <div slot="content">
                             <span>1、设置商品分类的类目内容，最多支持5级的商品分类</span><br/>
                             <span>2、客户通过商品分类快速查找商品</span><br/>

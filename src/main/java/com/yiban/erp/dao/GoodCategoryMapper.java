@@ -12,13 +12,13 @@ public interface GoodCategoryMapper {
 
     int insert(GoodCategory record);
 
-    int insertSelective(GoodCategory record);
-
     GoodCategory selectByPrimaryKey(Integer id);
 
     int updateByPrimaryKeySelective(GoodCategory record);
 
-    int updateByPrimaryKey(GoodCategory record);
-
     List<GoodCategory> selectAll(Integer companyId);
+
+    int goodsInfoUseCategory(Integer id);
+
+    Integer subCategoryCount(Integer id);
 }

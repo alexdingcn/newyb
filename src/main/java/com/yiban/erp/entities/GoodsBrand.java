@@ -2,20 +2,20 @@ package com.yiban.erp.entities;
 
 import java.util.Date;
 
-public class GoodsSpec {
+public class GoodsBrand {
     private Long id;
 
     private Integer companyId;
 
-    private String specNo;
+    private String brandName;
 
-    private String specName;
+    private String brandNo;
 
-    private Long parentId;
+    private String pinyin;
 
-    private String parentName;
+    private Integer sortNo;
 
-    private String parentNo;
+    private Boolean enabled;
 
     private String createdBy;
 
@@ -41,44 +41,44 @@ public class GoodsSpec {
         this.companyId = companyId;
     }
 
-    public String getSpecNo() {
-        return specNo;
+    public String getBrandName() {
+        return brandName;
     }
 
-    public void setSpecNo(String specNo) {
-        this.specNo = specNo == null ? null : specNo.trim();
+    public void setBrandName(String brandName) {
+        this.brandName = brandName == null ? null : brandName.trim();
     }
 
-    public String getSpecName() {
-        return specName;
+    public String getBrandNo() {
+        return brandNo;
     }
 
-    public void setSpecName(String specName) {
-        this.specName = specName == null ? null : specName.trim();
+    public void setBrandNo(String brandNo) {
+        this.brandNo = brandNo == null ? null : brandNo.trim();
     }
 
-    public Long getParentId() {
-        return parentId;
+    public String getPinyin() {
+        return pinyin;
     }
 
-    public void setParentId(Long parentId) {
-        this.parentId = parentId;
+    public void setPinyin(String pinyin) {
+        this.pinyin = pinyin == null ? null : pinyin.trim();
     }
 
-    public String getParentName() {
-        return parentName;
+    public Integer getSortNo() {
+        return sortNo;
     }
 
-    public void setParentName(String parentName) {
-        this.parentName = parentName == null ? null : parentName.trim();
+    public void setSortNo(Integer sortNo) {
+        this.sortNo = sortNo;
     }
 
-    public String getParentNo() {
-        return parentNo;
+    public Boolean getEnabled() {
+        return enabled;
     }
 
-    public void setParentNo(String parentNo) {
-        this.parentNo = parentNo;
+    public void setEnabled(Boolean enabled) {
+        this.enabled = enabled;
     }
 
     public String getCreatedBy() {

@@ -201,7 +201,6 @@
                 // console.log(isFullScreen);
             },
             openHelpHandle (data) {
-                console.log('main-help:' + data);
                 this.openHelp = data;
             }
         },
