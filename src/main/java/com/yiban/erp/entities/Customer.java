@@ -17,6 +17,8 @@ public class Customer {
 
     private Integer categoryId;
 
+    private String categoryName;
+
     private String name;
 
     private String pinyin;
@@ -488,5 +490,13 @@ public class Customer {
 
     public void setAccountAmount(BigDecimal accountAmount) {
         this.accountAmount = accountAmount;
+    }
+
+    public String getCategoryName() {
+        return categoryName;
+    }
+
+    public void setCategoryName(String categoryName) {
+        this.categoryName = categoryName;
     }
 }

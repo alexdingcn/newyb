@@ -52,6 +52,8 @@
 
                     <FormItem label="用户名：" prop="nickname">
                         <strong> {{ userDetail.nickname }} </strong>
+
+                        <Button type="text" size="small" @click="showEditPassword" style="color:#2d8cf0; margin-left:10px;">修改密码</Button>
                     </FormItem>
                     <FormItem label="公司：">
                         <strong>{{ userDetail.companyName }}</strong>
@@ -84,10 +86,6 @@
                         <div style="display:inline-block;width:400px;">
                             <Input v-model="userDetail.address" ></Input>
                         </div>
-                    </FormItem>
-                    
-                    <FormItem label="登录密码：">
-                        <Button type="text" size="small" @click="showEditPassword">修改密码</Button>
                     </FormItem>
 
                 </Form>
