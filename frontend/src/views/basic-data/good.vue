@@ -26,8 +26,8 @@
             <Layout>
                 <Card class="margin-left-10">
                     <p slot="title">
-                        <font-icon type="icon-shangpin" ></font-icon> 
-                        商品 {{ selectedCategory.title }}
+                       <font-icon type="icon-shangpin" ></font-icon>
+                       商品 {{ selectedCategory.title }}
                     </p>
                     <div slot="extra">
                         <Input v-model="searchGoodsVal" icon="search" placeholder="商品名称/拼音简称" style="width: 300px" @on-click="loadGoodsData"></Input>
@@ -55,9 +55,8 @@
             </Layout>
         </Layout>
 
-        <Modal v-model="checkModalShow" :mask-closable="false" width="80">
+        <Modal v-model="checkModalShow" :mask-closable="false" width="80" :footerHide="true" title="商品信息">
             <goods-info :goodsId="currentGoodsId" @save-ok="saveGoodsOk" ></goods-info>
-            <div slot="footer"></div>
         </Modal>
 
     </div>
