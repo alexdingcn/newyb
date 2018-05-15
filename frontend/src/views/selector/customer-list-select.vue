@@ -17,7 +17,7 @@
                 </Select>
             </Col>
         </Row>
-        <Table ref="customerSelect" size="small" border highlight-row
+        <Table ref="customerSelect" size="small" border
                :columns="customerColumns" :data="customerList"
                @on-row-click="chooseCustomer"
                 class="margin-top-10 customer-select-table">

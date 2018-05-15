@@ -118,13 +118,37 @@
 }
 
 .ivu-input-group-with-prepend {
+  .ivu-input-group-prepend {
+    .ivu-icon {
+      font-size: 16px;
+    }
+  }
   .ivu-select-selection {
     border-top-left-radius: 0;
     border-bottom-left-radius: 0;
   }
 }
+
 .ivu-input-group-with-append {
   .ivu-input-icon {
     right: 24px;
+  }
+  .ivu-select-selection {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+  }
+}
+
+.ivu-input-group {
+  &:hover {
+    .ivu-tooltip {
+      visibility: visible;
+    }
+  }
+  .ivu-tooltip {
+    display: table-cell;
+    padding-left: 4px;
+    font-size: 14px;
+    visibility: hidden;
   }
 }

@@ -20,10 +20,33 @@
                 <Row type="flex" justify="start" class="row-margin-bottom">
                     <i-col span="6">
                         <FormItem label="客户" prop="customerId">
-                            <customer-select v-if="!editeOnlyDisable" :disabled="editeOnlyDisable" v-model="sellOrderFormData.customerId" @on-change="customerChange"></customer-select>
-                            <Input v-else type="text" :disabled="editeOnlyDisable" v-model="sellOrderFormData.customerName"></Input>
+                            <customer-select v-if="!editMode" :disabled="editMode" v-model="sellOrderFormData.customerId" @on-change="customerChange">
+                                <div slot="helpContent">
+                                    <span>同一个商品可能对于不同的客户既定的报价不同，所以请先选择客户，再选择商品，自动匹配既定的报价。</span>
+                                </div>
+                            </customer-select>
+                            <Input v-else type="text" :disabled="editMode" v-model="sellOrderFormData.customerName"></Input>
                         </FormItem>
                     </i-col>
+
+                    <i-col span="6">
+                        <FormItem label="销售人员" prop="saleId">
+                          <sale-select v-model="sellOrderFormData.saleId" ></sale-select>
+                        </FormItem>
+                    </i-col>
+                    <i-col span="6">
+                        <FormItem label="自定单号" >
+                            <Input type="text" v-model="sellOrderFormData.refNo" ></Input>
+                        </FormItem>
+                    </i-col>
+                    <!--<i-col span="6">-->
+                        <!--<FormItem label="加价率" >-->
+                            <!--<Input v-model="sellOrderFormData.markUpRate" number ></Input>-->
+                        <!--</FormItem>-->
+                    <!--</i-col>-->
+                </Row>
+
+                <Row type="flex" justify="start" class="row-margin-bottom">
                     <i-col span="6">
                         <FormItem label="客户代表" prop="customerRepId">
                             <Select v-model="sellOrderFormData.customerRepId" filterable clearable placeholder="请选择客户代表" @on-change="customerRepSelChange">
@@ -31,25 +54,12 @@
                             </Select>
                         </FormItem>
                     </i-col>
-                    <i-col span="6">
-                        <FormItem label="销售人员" prop="saleId">
-                          <sale-select v-model="sellOrderFormData.saleId" ></sale-select>
-                        </FormItem>
-                    </i-col>
-                    <i-col span="6">
-                        <FormItem label="加价率" >
-                            <Input v-model="sellOrderFormData.markUpRate" number ></Input>
-                        </FormItem>
-                    </i-col>
-                </Row>
-
-                <Row type="flex" justify="start" class="row-margin-bottom">
                     <i-col span="8">
                         <FormItem label="收货电话" prop="contactPhone">
                             <Input type="text" readonly v-model="sellOrderFormData.contactPhone" ></Input>
                         </FormItem>
                     </i-col>
-                    <i-col span="16">
+                    <i-col span="10">
                         <FormItem label="收货地址" prop="repertoryAddress">
                             <Input type="text" readonly v-model="sellOrderFormData.repertoryAddress" ></Input>
                         </FormItem>
@@ -57,11 +67,7 @@
                 </Row>
 
                 <Row type="flex" justify="start" class="row-margin-bottom">
-                    <i-col span="6">
-                        <FormItem label="自定单号" >
-                            <Input type="text" v-model="sellOrderFormData.refNo" ></Input>
-                        </FormItem>
-                    </i-col>
+
                     <i-col span="6">
                         <FormItem label="制单日期" >
                             <DatePicker v-model="sellOrderFormData.createOrderDate" type="date" placeholder="请选择制单日期" ></DatePicker>
@@ -186,7 +192,7 @@ export default {
   },
   data() {
     return {
-      editeOnlyDisable: false,
+      editMode: false,
       sellOrderFormData: {
         customerId: '',
         customerRepId: '',
@@ -674,13 +680,13 @@ export default {
         });
       }
       this.sellOrderFormData.customerName = this.currChooseCustomer.name;
-      this.editeOnlyDisable = true; //编辑模式下的客户信息不能修改
+      this.editMode = true; //编辑模式下的客户信息不能修改
       this.warehouseDisable = true;
       this.refreshCustomerRepList(data.customerId, data.customerRepId);
       this.refreshDetailsData(data.id);
     },
     orderFormChangeToAddModel() {
-      this.editeOnlyDisable = false;
+      this.editMode = false;
       this.warehouseDisable = false;
       this.sellOrderFormData = {
         customerId: '',
