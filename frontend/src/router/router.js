@@ -199,7 +199,7 @@ export const appRouter = [
         path: '/financial',
         icon: 'social-yen',
         name: 'financial',
-        title: '财务管理',
+        title: '财务',
         component: Main,
         children: [
             { path: 'pre-receive', title: '预收款', name: 'financial-pre-receive', component: () => import('@/views/financial/financial-pre-receive.vue') },
@@ -218,6 +218,7 @@ export const appRouter = [
             { path: 'add/user', title: '新建用户', name: 'add_user', component: () => import('@/views/access/add-user.vue')}
         ]
     },
+    /*
     {
         path: '/international',
         icon: 'earth',
@@ -341,6 +342,7 @@ export const appRouter = [
             { path: 'index', title: '错误页面', name: 'errorpage_index', component: () => import('@/views/error-page/error-page.vue') }
         ]
     }
+    */
 ];
 
 // 所有上面定义的路由都要写在下面的routers里
