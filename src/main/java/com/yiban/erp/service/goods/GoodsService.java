@@ -6,6 +6,7 @@ import com.yiban.erp.dao.GoodsDetailMapper;
 import com.yiban.erp.dao.GoodsInfoMapper;
 import com.yiban.erp.dao.GoodsMapper;
 import com.yiban.erp.dao.OptionsMapper;
+import com.yiban.erp.dto.GoodsQuery;
 import com.yiban.erp.entities.*;
 import com.yiban.erp.exception.BizException;
 import com.yiban.erp.exception.BizRuntimeException;
@@ -82,6 +83,32 @@ public class GoodsService {
         return goods;
     }
 
+    public void setGoodsInfoOptionName(List<GoodsInfo> goodsInfoList) {
+        if (goodsInfoList == null || goodsInfoList.isEmpty()) {
+            return;
+        }
+        //设置对应的Option的Name值
+        Set<Long> optionIdSet = new HashSet<>();
+        goodsInfoList.stream().forEach(item -> {
+            optionIdSet.addAll(item.getOptionIds());
+        });
+        Long[] ids = new Long[optionIdSet.size()];
+        optionIdSet.toArray(ids);
+        List<Options> options = optionsMapper.getByIds(ids);
+        goodsInfoList.stream().forEach(item -> item.setOptions(options));
+    }
+
+
+    public Long searchListCount(GoodsQuery query) {
+        return goodsInfoMapper.searchListCount(query);
+    }
+
+    public List<GoodsInfo> searchList(GoodsQuery query) {
+        List<GoodsInfo> infos = goodsInfoMapper.searchList(query);
+        setGoodsInfoOptionName(infos);
+        return infos;
+    }
+
 
     public void saveGoodsInfo(GoodsInfo goodsInfo, User user) throws BizException {
         if (StringUtils.isEmpty(goodsInfo.getName()) || goodsInfo.getUnit() == null || goodsInfo.getUseSpec() == null) {
@@ -119,6 +146,7 @@ public class GoodsService {
         if (!useSpec) {
             GoodsDetail detail = new GoodsDetail();
             detail.setCompanyId(user.getCompanyId());
+            detail.setGoodsInfoId(goodsInfo.getId());
             detail.setStatus(GoodsStatus.NORMAL.name());
             detail.setSkuKey(getSkuKey(null, goodsInfo.getId()));
             detail.setBarCode(goodsInfo.getBarCode());
@@ -134,6 +162,7 @@ public class GoodsService {
         }else {
             for (GoodsDetail detail : details) {
                 detail.setCompanyId(user.getCompanyId());
+                detail.setGoodsInfoId(goodsInfo.getId());
                 detail.setStatus(GoodsStatus.NORMAL.name());
                 if (detail.getBarCode() == null && goodsInfo.getBarCode() != null) {
                     detail.setBarCode(goodsInfo.getBarCode());

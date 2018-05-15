@@ -395,6 +395,60 @@
     where id = #{id,jdbcType=BIGINT}
   </update>
 
+  <select id="searchListCount" parameterType="com.yiban.erp.dto.GoodsQuery" resultType="java.lang.Long">
+      select count(1)
+      from goods_info
+      where company_id = #{companyId} and status != 'DELETE'
+      <if test="categoryId != null" >
+        and category_id = #{categoryId}
+      </if>
+      <if test="brandId != null" >
+        and brand_id = #{brandId}
+      </if>
+      <if test="supplierId != null" >
+        and supplier_id = #{supplierId}
+      </if>
+      <if test="status != null">
+        and status = #{status}
+      </if>
+      <if test="search != null">
+        <bind name="patten" value="'%' + search + '%'"/>
+        and (name LIKE #{patten} or pinyin LIKE #{patten} or goods_no LIKE #{patten})
+      </if>
+  </select>
+
+  <select id="searchList" parameterType="com.yiban.erp.dto.GoodsQuery" resultMap="BaseResultMap">
+    select g.*, ca.name as categoryName, br.brand_name as brandName, su.name as supplierName,
+      (select count(de.id)
+        from goods_detail de
+        where de.goods_info_id = g.id and de.status != 'DELETE'
+      ) as detailsSize
+    from goods_info g
+      left join good_category ca on g.category_id = ca.id
+      left join goods_brand br on g.brand_id = br.id
+      left join supplier su on g.supplier_id = su.id
+    where g.company_id = #{companyId} and g.status != 'DELETE'
+    <if test="categoryId != null" >
+      and g.category_id = #{categoryId}
+    </if>
+    <if test="brandId != null" >
+      and g.brand_id = #{brandId}
+    </if>
+    <if test="supplierId != null" >
+      and g.supplier_id = #{supplierId}
+    </if>
+    <if test="status != null">
+      and g.status = #{status}
+    </if>
+    <if test="search != null">
+      <bind name="patten" value="'%' + search + '%'"/>
+      and (g.name LIKE #{patten} or g.pinyin LIKE #{patten} or g.goods_no LIKE #{patten})
+    </if>
+    order by g.id desc
+    <if test="offset != null and limit != null">
+      limit #{offset}, #{limit}
+    </if>
+  </select>
 
 
 </mapper>

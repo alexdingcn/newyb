@@ -82,8 +82,8 @@
                         </Row>
                         <Row class="row-margin-bottom">
                             <i-col span="12">
-                                <FormItem label="商品标签" prop="tags">
-                                    <CheckboxGroup v-model="formData.tags">
+                                <FormItem label="商品标签" prop="tagList">
+                                    <CheckboxGroup v-model="formData.tagList">
                                         <Checkbox label="NEW_GOODS">
                                             <span>新品</span>
                                         </Checkbox>
@@ -109,7 +109,7 @@
                                 </FormItem>
                             </i-col>
                             <i-col span="8">
-                                <FormItem label="条形码" prop="unit">
+                                <FormItem label="条形码" prop="barCode">
                                     <Input type="text" v-model="formData.barCode" placeholder="最小单位的条形码"/>
                                 </FormItem>
                             </i-col>
@@ -241,7 +241,6 @@ export default {
         optionSelect
     },
     data() {
-
         return {
             saveLoading: false,
             formData: {

@@ -21,12 +21,12 @@
                     <Row class="row-margin-bottom">
                         <i-col span="19">
                             <Row type="flex" justify="start">
-                                <Input type="text" v-model="searchValue" placeholder="商品名称/拼音/编号" icon="search" @on-clik="refreshGoodsList" style="width: 250px"/>
-                                <goods-brand-select v-model="searchGoodsBrandId" style="width: 150px; margin-left:10px; margin-right:10px;"></goods-brand-select>
-                                <Select v-model="searchStatus" style="width: 90px; margin-right:10px;">
+                                <Input type="text" v-model="searchValue" placeholder="商品名称/拼音/编号" icon="search" @on-click="refreshGoodsList" style="width: 250px"/>
+                                <goods-brand-select v-model="searchGoodsBrandId" @on-change="refreshGoodsList" style="width: 150px; margin-left:10px; margin-right:10px;"></goods-brand-select>
+                                <Select v-model="searchStatus" placeholder="状态"  @on-change="refreshGoodsList" style="width: 90px; margin-right:10px;">
                                     <Option v-for="item in statusList" :value="item.value" :key="item.value">{{ item.label }}</Option>
                                 </Select>
-                                <supplier-select v-model="searchSupplierId" style="width: 230px"></supplier-select>
+                                <supplier-select v-model="searchSupplierId"  @on-change="refreshGoodsList" style="width: 230px"></supplier-select>
                             </Row>
                         </i-col>
                         <i-col span="5">
@@ -40,7 +40,7 @@
                             :columns="tableCulumns" :data="tableData" ref="goodsTable" 
                             style="width: 100%;" size="small">
                     </Table>
-                    <Row >
+                    <Row type="flex" justify="end">
                         <Page :total="totalCount" :current="currentPage" @on-change="changePage" size="small" show-total></Page>
                     </Row>
 
@@ -48,7 +48,7 @@
           </div>
 
           <Modal v-model="goodsModal" title="商品信息维护" :footerHide="true" :mask-closable="false" width="60">
-              <goods-info ></goods-info>
+              <goods-info @save-ok="goodsSaveOk" ></goods-info>
           </Modal>
           
   </div>
@@ -56,6 +56,7 @@
 
 <script>
 import util from '@/libs/util.js';
+import lodash from 'lodash';
 import goodsCategory from './goods-category.vue';
 import goodsBrandSelect from '@/views/selector/goods-brand-select.vue';
 import supplierSelect from '@/views/selector/supplier-select.vue';
@@ -77,8 +78,9 @@ export default {
             searchValue: '',
             searchGoodsBrandId: '',
             searchSupplierId: '',
-            searchStatus: 'ALL',
+            searchStatus: '',
             goodsModal: false,
+            tableLoading: false,
             tableData:[],
             tableCulumns: [
                 {
@@ -92,7 +94,12 @@ export default {
                     minWidth: 200,
                     render: (h, params) => {
                         return h('div',[
-                            h('h5', params.row.goodsNo),
+                            h('h5', {
+                                style: {
+                                    color: '#9ea7b4',
+                                    fontSize: '12px'
+                                }
+                            }, params.row.goodsNo),
                             h('h4', params.row.name)
                         ]);
                     }
@@ -106,7 +113,7 @@ export default {
                         if (!useSpec) {
                             return '';
                         }else {
-                            return params.row.detailsSize;
+                            return params.row.detailsSize + '种';
                         }
                     }
                 },
@@ -149,10 +156,23 @@ export default {
                     }
                 }
             ],
+            totalCount: 0,
+            currentPage: 1,
+            pageSize: 30,
         }
     },
     mounted() {
-      this.refreshGoodsList();  
+      this.refreshGoodsList();
+    },
+    watch: {
+        searchCategoryId: function(data) {
+            this.refreshGoodsList();
+        },
+        searchValue: function(data) {
+            lodash.debounce(function() {
+                this.refreshGoodsList();
+            }, 700);
+        }
     },
     methods: {
         changeSiderShow() {
@@ -162,11 +182,37 @@ export default {
             this.searchCategoryId = categoryId;
         },
         refreshGoodsList() {
-            let 
+            let reqData = {
+                categoryId: this.searchCategoryId,
+                brandId: this.searchGoodsBrandId,
+                supplierId: this.searchSupplierId,
+                status: this.searchStatus === 'ALL' ? '' : this.searchStatus,
+                search: this.searchValue,
+                page: this.currentPage,
+                pageSize: this.pageSize
+            };
+            this.tableLoading = true;
+            util.ajax.post('/goods/list', reqData)
+                .then((response) => {
+                    this.tableLoading = false;
+                    this.tableData = response.data.data;
+                    this.totalCount = response.data.count;
+                })
+                .catch((error) => {
+                    this.tableLoading = false;
+                    util.errorProcessor(this, error);
+                });
         },
-
+        changePage(data) {
+            this.currentPage = data;
+            this.refreshGoodsList();
+        },
         createGoods() {
             this.goodsModal = true;
+        },
+        goodsSaveOk() {
+            this.refreshGoodsList();
+            this.goodsModal = false;
         }
     }
 

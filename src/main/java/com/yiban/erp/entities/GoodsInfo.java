@@ -4,9 +4,7 @@ import com.alibaba.fastjson.JSON;
 import org.apache.commons.lang3.StringUtils;
 
 import java.math.BigDecimal;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 public class GoodsInfo {
     private Long id;
@@ -172,6 +170,31 @@ public class GoodsInfo {
     private String categoryName;
     private String brandName;
     private String supplierName;
+
+    private String unitName;
+    private String mediumUnitName;
+    private String packUnitName;
+
+    public void setOptions(List<Options> options) {
+        if (options == null || options.isEmpty()) {
+            return;
+        }
+        Map<Long, Options> optionMap = new HashMap<>();
+        options.stream().forEach(item -> {
+            optionMap.put(item.getId(), item);
+        });
+        this.setUnitName(optionMap.get(this.getUnit()) != null ? optionMap.get(this.getUnit()).getValue() : null);
+        this.setPackUnitName(optionMap.get(this.getPackUnit()) != null ? optionMap.get(this.getPackUnit()).getValue() : null);
+        this.setMediumUnitName(optionMap.get(this.getMediumUnit()) != null ? optionMap.get(this.getMediumUnit()).getValue() : null);
+    }
+
+    public Set<Long> getOptionIds() {
+        Set<Long> optionIds = new HashSet<>();
+        optionIds.add(this.getUnit() != null ? this.getUnit() : 0);
+        optionIds.add(this.getMediumUnit() != null ? this.getMediumUnit() : 0);
+        optionIds.add(this.getPackUnit() != null ? this.getPackUnit() : 0);
+        return optionIds;
+    }
 
     public Integer getDetailsSize() {
         return detailsSize;
@@ -852,5 +875,29 @@ public class GoodsInfo {
 
     public void setGoodsDetails(List<GoodsDetail> goodsDetails) {
         this.goodsDetails = goodsDetails;
+    }
+
+    public String getUnitName() {
+        return unitName;
+    }
+
+    public void setUnitName(String unitName) {
+        this.unitName = unitName;
+    }
+
+    public String getMediumUnitName() {
+        return mediumUnitName;
+    }
+
+    public void setMediumUnitName(String mediumUnitName) {
+        this.mediumUnitName = mediumUnitName;
+    }
+
+    public String getPackUnitName() {
+        return packUnitName;
+    }
+
+    public void setPackUnitName(String packUnitName) {
+        this.packUnitName = packUnitName;
     }
 }

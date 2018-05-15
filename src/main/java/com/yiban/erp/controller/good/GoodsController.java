@@ -3,6 +3,7 @@ package com.yiban.erp.controller.good;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.yiban.erp.dao.GoodsMapper;
+import com.yiban.erp.dto.GoodsQuery;
 import com.yiban.erp.entities.Goods;
 import com.yiban.erp.entities.GoodsInfo;
 import com.yiban.erp.entities.User;
@@ -51,6 +52,23 @@ public class GoodsController {
         result.put("total", count);
         result.put("data", JSON.toJSON(goodsList));
         return ResponseEntity.ok().body(result.toJSONString());
+    }
+
+    @RequestMapping(value = "/list", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> searchList(@RequestBody GoodsQuery query,
+                                             @AuthenticationPrincipal User user) {
+        query.setCompanyId(user.getCompanyId());
+        Long count = goodsService.searchListCount(query);
+        List<GoodsInfo> result = new ArrayList<>();
+        if (count > 0) {
+            result = goodsService.searchList(query);
+        }else if (count == null){
+            count = 0L;
+        }
+        JSONObject response = new JSONObject();
+        response.put("count", count);
+        response.put("data", result);
+        return ResponseEntity.ok(response.toJSONString());
     }
 
     @RequestMapping(value = "/{goodsId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
