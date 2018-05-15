@@ -103,7 +103,7 @@
   <select id="isGoodsSpecUsed" parameterType="map" resultType="java.lang.Boolean">
     select
       count(1) > 0 as result
-    from goods
+    from goods_detail
     where spec_one_id in
       <foreach collection="specIds" separator=", " open="(" close=")" item="item">
         #{item}

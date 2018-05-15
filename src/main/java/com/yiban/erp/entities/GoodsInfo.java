@@ -1,7 +1,12 @@
 package com.yiban.erp.entities;
 
+import com.alibaba.fastjson.JSON;
+import org.apache.commons.lang3.StringUtils;
+
 import java.math.BigDecimal;
+import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 
 public class GoodsInfo {
     private Long id;
@@ -12,6 +17,10 @@ public class GoodsInfo {
 
     private String goodsNo;
 
+    private Long brandId;
+
+    private Long supplierId;
+
     private String status;
 
     private String name;
@@ -19,10 +28,6 @@ public class GoodsInfo {
     private String fullName;
 
     private String origin;
-
-    private String spec;
-
-    private String serial;
 
     private Boolean enable;
 
@@ -148,6 +153,82 @@ public class GoodsInfo {
 
     private String att6Value;
 
+    private String tags; //转换为List
+
+    private List<String> tagList;
+
+    private Boolean useSpec;
+
+    private String barCode;
+
+    private List<GoodsDetail> goodsDetails;
+
+    private BigDecimal batchPrice;
+    private BigDecimal retailPrice;
+    private BigDecimal inPrice;
+
+    //列表辅助显示
+    private Integer detailsSize;
+    private String categoryName;
+    private String brandName;
+    private String supplierName;
+
+    public Integer getDetailsSize() {
+        return detailsSize;
+    }
+
+    public void setDetailsSize(Integer detailsSize) {
+        this.detailsSize = detailsSize;
+    }
+
+    public String getCategoryName() {
+        return categoryName;
+    }
+
+    public void setCategoryName(String categoryName) {
+        this.categoryName = categoryName;
+    }
+
+    public String getBrandName() {
+        return brandName;
+    }
+
+    public void setBrandName(String brandName) {
+        this.brandName = brandName;
+    }
+
+    public String getSupplierName() {
+        return supplierName;
+    }
+
+    public void setSupplierName(String supplierName) {
+        this.supplierName = supplierName;
+    }
+
+    public BigDecimal getBatchPrice() {
+        return batchPrice;
+    }
+
+    public void setBatchPrice(BigDecimal batchPrice) {
+        this.batchPrice = batchPrice;
+    }
+
+    public BigDecimal getRetailPrice() {
+        return retailPrice;
+    }
+
+    public void setRetailPrice(BigDecimal retailPrice) {
+        this.retailPrice = retailPrice;
+    }
+
+    public BigDecimal getInPrice() {
+        return inPrice;
+    }
+
+    public void setInPrice(BigDecimal inPrice) {
+        this.inPrice = inPrice;
+    }
+
     public Long getId() {
         return id;
     }
@@ -180,6 +261,22 @@ public class GoodsInfo {
         this.goodsNo = goodsNo == null ? null : goodsNo.trim();
     }
 
+    public Long getBrandId() {
+        return brandId;
+    }
+
+    public void setBrandId(Long brandId) {
+        this.brandId = brandId;
+    }
+
+    public Long getSupplierId() {
+        return supplierId;
+    }
+
+    public void setSupplierId(Long supplierId) {
+        this.supplierId = supplierId;
+    }
+
     public String getStatus() {
         return status;
     }
@@ -210,22 +307,6 @@ public class GoodsInfo {
 
     public void setOrigin(String origin) {
         this.origin = origin == null ? null : origin.trim();
-    }
-
-    public String getSpec() {
-        return spec;
-    }
-
-    public void setSpec(String spec) {
-        this.spec = spec == null ? null : spec.trim();
-    }
-
-    public String getSerial() {
-        return serial;
-    }
-
-    public void setSerial(String serial) {
-        this.serial = serial == null ? null : serial.trim();
     }
 
     public Boolean getEnable() {
@@ -722,5 +803,54 @@ public class GoodsInfo {
 
     public void setAtt6Value(String att6Value) {
         this.att6Value = att6Value == null ? null : att6Value.trim();
+    }
+
+    public String getTags() {
+        return tags;
+    }
+
+    public void setTags(String tags) {
+        this.tags = tags == null ? null : tags.trim();
+    }
+
+    public List<String> getTagList() {
+        if (StringUtils.isEmpty(this.getTags())) {
+            return Collections.emptyList();
+        }else {
+            return JSON.parseArray(this.getTags(), String.class);
+        }
+    }
+
+    public void setTagList(List<String> tagList) {
+        if (tagList != null || tagList.isEmpty()) {
+            this.setTags(null);
+        }else {
+            this.setTags(JSON.toJSONString(tagList));
+        }
+        this.tagList = tagList;
+    }
+
+    public Boolean getUseSpec() {
+        return useSpec;
+    }
+
+    public void setUseSpec(Boolean useSpec) {
+        this.useSpec = useSpec;
+    }
+
+    public String getBarCode() {
+        return barCode;
+    }
+
+    public void setBarCode(String barCode) {
+        this.barCode = barCode;
+    }
+
+    public List<GoodsDetail> getGoodsDetails() {
+        return goodsDetails;
+    }
+
+    public void setGoodsDetails(List<GoodsDetail> goodsDetails) {
+        this.goodsDetails = goodsDetails;
     }
 }

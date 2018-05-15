@@ -1,0 +1,176 @@
+package com.yiban.erp.entities;
+
+import java.math.BigDecimal;
+import java.util.Date;
+
+public class GoodsDetail {
+    private Long id;
+
+    private Integer companyId;
+
+    private Long goodsInfoId;
+
+    private String status;
+
+    private String skuKey;
+
+    private Long specOneId;
+
+    private Long specTwoId;
+
+    private Long specThreeId;
+
+    private String specDesc;
+
+    private String barCode;
+
+    private BigDecimal retailPrice;
+
+    private BigDecimal batchPrice;
+
+    private BigDecimal inPrice;
+
+    private String createdBy;
+
+    private String updatedBy;
+
+    private Date createdTime;
+
+    private Date updatedTime;
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public Integer getCompanyId() {
+        return companyId;
+    }
+
+    public void setCompanyId(Integer companyId) {
+        this.companyId = companyId;
+    }
+
+    public Long getGoodsInfoId() {
+        return goodsInfoId;
+    }
+
+    public void setGoodsInfoId(Long goodsInfoId) {
+        this.goodsInfoId = goodsInfoId;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status == null ? null : status.trim();
+    }
+
+    public String getSkuKey() {
+        return skuKey;
+    }
+
+    public void setSkuKey(String skuKey) {
+        this.skuKey = skuKey == null ? null : skuKey.trim();
+    }
+
+    public Long getSpecOneId() {
+        return specOneId;
+    }
+
+    public void setSpecOneId(Long specOneId) {
+        this.specOneId = specOneId;
+    }
+
+    public Long getSpecTwoId() {
+        return specTwoId;
+    }
+
+    public void setSpecTwoId(Long specTwoId) {
+        this.specTwoId = specTwoId;
+    }
+
+    public Long getSpecThreeId() {
+        return specThreeId;
+    }
+
+    public void setSpecThreeId(Long specThreeId) {
+        this.specThreeId = specThreeId;
+    }
+
+    public String getSpecDesc() {
+        return specDesc;
+    }
+
+    public void setSpecDesc(String specDesc) {
+        this.specDesc = specDesc == null ? null : specDesc.trim();
+    }
+
+    public String getBarCode() {
+        return barCode;
+    }
+
+    public void setBarCode(String barCode) {
+        this.barCode = barCode == null ? null : barCode.trim();
+    }
+
+    public BigDecimal getRetailPrice() {
+        return retailPrice;
+    }
+
+    public void setRetailPrice(BigDecimal retailPrice) {
+        this.retailPrice = retailPrice;
+    }
+
+    public BigDecimal getBatchPrice() {
+        return batchPrice;
+    }
+
+    public void setBatchPrice(BigDecimal batchPrice) {
+        this.batchPrice = batchPrice;
+    }
+
+    public BigDecimal getInPrice() {
+        return inPrice;
+    }
+
+    public void setInPrice(BigDecimal inPrice) {
+        this.inPrice = inPrice;
+    }
+
+    public String getCreatedBy() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(String createdBy) {
+        this.createdBy = createdBy == null ? null : createdBy.trim();
+    }
+
+    public String getUpdatedBy() {
+        return updatedBy;
+    }
+
+    public void setUpdatedBy(String updatedBy) {
+        this.updatedBy = updatedBy == null ? null : updatedBy.trim();
+    }
+
+    public Date getCreatedTime() {
+        return createdTime;
+    }
+
+    public void setCreatedTime(Date createdTime) {
+        this.createdTime = createdTime;
+    }
+
+    public Date getUpdatedTime() {
+        return updatedTime;
+    }
+
+    public void setUpdatedTime(Date updatedTime) {
+        this.updatedTime = updatedTime;
+    }
+}

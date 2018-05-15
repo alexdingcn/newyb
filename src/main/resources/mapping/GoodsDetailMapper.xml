@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.yiban.erp.dao.GoodsDetailMapper" >
+  <resultMap id="BaseResultMap" type="com.yiban.erp.entities.GoodsDetail" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="company_id" property="companyId" jdbcType="INTEGER" />
+    <result column="goods_info_id" property="goodsInfoId" jdbcType="BIGINT" />
+    <result column="status" property="status" jdbcType="VARCHAR" />
+    <result column="sku_key" property="skuKey" jdbcType="VARCHAR" />
+    <result column="spec_one_id" property="specOneId" jdbcType="BIGINT" />
+    <result column="spec_two_id" property="specTwoId" jdbcType="BIGINT" />
+    <result column="spec_three_id" property="specThreeId" jdbcType="BIGINT" />
+    <result column="spec_desc" property="specDesc" jdbcType="VARCHAR" />
+    <result column="bar_code" property="barCode" jdbcType="VARCHAR" />
+    <result column="retail_price" property="retailPrice" jdbcType="DECIMAL" />
+    <result column="batch_price" property="batchPrice" jdbcType="DECIMAL" />
+    <result column="in_price" property="inPrice" jdbcType="DECIMAL" />
+    <result column="created_by" property="createdBy" jdbcType="VARCHAR" />
+    <result column="updated_by" property="updatedBy" jdbcType="VARCHAR" />
+    <result column="created_time" property="createdTime" jdbcType="TIMESTAMP" />
+    <result column="updated_time" property="updatedTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, company_id, goods_info_id, status, sku_key, spec_one_id, spec_two_id, spec_three_id, 
+    spec_desc, bar_code, retail_price, batch_price, in_price, created_by, updated_by, 
+    created_time, updated_time
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select 
+    <include refid="Base_Column_List" />
+    from goods_detail
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
+    delete from goods_detail
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="com.yiban.erp.entities.GoodsDetail" keyProperty="id" useGeneratedKeys="true" >
+    insert into goods_detail (company_id, goods_info_id,
+      status, sku_key, spec_one_id, 
+      spec_two_id, spec_three_id, spec_desc, 
+      bar_code, retail_price, batch_price, 
+      in_price, created_by, updated_by, 
+      created_time, updated_time)
+    values (#{companyId,jdbcType=INTEGER}, #{goodsInfoId,jdbcType=BIGINT},
+      #{status,jdbcType=VARCHAR}, #{skuKey,jdbcType=VARCHAR}, #{specOneId,jdbcType=BIGINT}, 
+      #{specTwoId,jdbcType=BIGINT}, #{specThreeId,jdbcType=BIGINT}, #{specDesc,jdbcType=VARCHAR}, 
+      #{barCode,jdbcType=VARCHAR}, #{retailPrice,jdbcType=DECIMAL}, #{batchPrice,jdbcType=DECIMAL}, 
+      #{inPrice,jdbcType=DECIMAL}, #{createdBy,jdbcType=VARCHAR}, #{updatedBy,jdbcType=VARCHAR}, 
+      #{createdTime,jdbcType=TIMESTAMP}, #{updatedTime,jdbcType=TIMESTAMP})
+  </insert>
+
+  <insert id="insertBatch" parameterType="map" keyProperty="id" useGeneratedKeys="true" >
+    insert into goods_detail (company_id, goods_info_id,
+      status, sku_key, spec_one_id,
+      spec_two_id, spec_three_id, spec_desc,
+      bar_code, retail_price, batch_price,
+      in_price, created_by, updated_by,
+      created_time, updated_time)
+    values
+     <foreach collection="details" item="item" open="(" close=")" separator="), (" >
+       #{item.companyId,jdbcType=INTEGER}, #{item.goodsInfoId,jdbcType=BIGINT},
+       #{item.status,jdbcType=VARCHAR}, #{item.skuKey,jdbcType=VARCHAR}, #{item.specOneId,jdbcType=BIGINT},
+       #{item.item.specTwoId,jdbcType=BIGINT}, #{item.specThreeId,jdbcType=BIGINT}, #{item.specDesc,jdbcType=VARCHAR},
+       #{item.barCode,jdbcType=VARCHAR}, #{item.retailPrice,jdbcType=DECIMAL}, #{item.batchPrice,jdbcType=DECIMAL},
+       #{item.inPrice,jdbcType=DECIMAL}, #{item.createdBy,jdbcType=VARCHAR}, #{item.updatedBy,jdbcType=VARCHAR},
+       #{item.createdTime,jdbcType=TIMESTAMP}, #{item.updatedTime,jdbcType=TIMESTAMP}
+     </foreach>
+  </insert>
+
+  <update id="updateByPrimaryKeySelective" parameterType="com.yiban.erp.entities.GoodsDetail" >
+    update goods_detail
+    <set >
+      <if test="companyId != null" >
+        company_id = #{companyId,jdbcType=INTEGER},
+      </if>
+      <if test="goodsInfoId != null" >
+        goods_info_id = #{goodsInfoId,jdbcType=BIGINT},
+      </if>
+      <if test="status != null" >
+        status = #{status,jdbcType=VARCHAR},
+      </if>
+      <if test="skuKey != null" >
+        sku_key = #{skuKey,jdbcType=VARCHAR},
+      </if>
+      <if test="specOneId != null" >
+        spec_one_id = #{specOneId,jdbcType=BIGINT},
+      </if>
+      <if test="specTwoId != null" >
+        spec_two_id = #{specTwoId,jdbcType=BIGINT},
+      </if>
+      <if test="specThreeId != null" >
+        spec_three_id = #{specThreeId,jdbcType=BIGINT},
+      </if>
+      <if test="specDesc != null" >
+        spec_desc = #{specDesc,jdbcType=VARCHAR},
+      </if>
+      <if test="barCode != null" >
+        bar_code = #{barCode,jdbcType=VARCHAR},
+      </if>
+      <if test="retailPrice != null" >
+        retail_price = #{retailPrice,jdbcType=DECIMAL},
+      </if>
+      <if test="batchPrice != null" >
+        batch_price = #{batchPrice,jdbcType=DECIMAL},
+      </if>
+      <if test="inPrice != null" >
+        in_price = #{inPrice,jdbcType=DECIMAL},
+      </if>
+      <if test="createdBy != null" >
+        created_by = #{createdBy,jdbcType=VARCHAR},
+      </if>
+      <if test="updatedBy != null" >
+        updated_by = #{updatedBy,jdbcType=VARCHAR},
+      </if>
+      <if test="createdTime != null" >
+        created_time = #{createdTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updatedTime != null" >
+        updated_time = #{updatedTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+
+
+
+</mapper>

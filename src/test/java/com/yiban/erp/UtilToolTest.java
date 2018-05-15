@@ -1,11 +1,14 @@
 package com.yiban.erp;
 
+import com.alibaba.fastjson.JSON;
 import com.yiban.erp.constant.OrderNumberType;
 import com.yiban.erp.entities.Customer;
 import com.yiban.erp.util.IDCardUtil;
 import com.yiban.erp.util.UtilTool;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.Test;
+
+import java.util.Arrays;
 
 public class UtilToolTest {
 
@@ -59,5 +62,17 @@ public class UtilToolTest {
         String token = "XXXX.12.123.xxxxxxxxxxxxxxx";
         String cacheKey = token.substring(0, token.lastIndexOf("."));
         System.out.println(cacheKey);
+    }
+
+    @Test
+    public void testArraysSort() {
+
+        long a = 10L;
+        long b = -1L;
+        long c = 5L;
+        long[] arr = {a, b, c};
+        Arrays.sort(arr);
+        System.out.println(JSON.toJSONString(arr));
+
     }
 }

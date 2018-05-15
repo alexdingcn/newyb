@@ -1,7 +1,7 @@
 package com.yiban.erp.controller.loan;
 
 import com.alibaba.fastjson.JSONObject;
-import com.yiban.erp.controller.good.GoodController;
+import com.yiban.erp.controller.good.GoodsController;
 import com.yiban.erp.dao.BizWxApplyMapper;
 import com.yiban.erp.entities.BizWxApply;
 import com.yiban.erp.exception.BizException;
@@ -34,7 +34,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/loan")
 public class LoanController {
-    private static final Logger logger = LoggerFactory.getLogger(GoodController.class);
+    private static final Logger logger = LoggerFactory.getLogger(GoodsController.class);
 
     @Autowired
     private RestTemplate restTemplate;

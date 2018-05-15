@@ -18,7 +18,7 @@
                         <Icon type="bag"></Icon>
                         商品列表
                     </p>
-                    <Row>
+                    <Row class="row-margin-bottom">
                         <i-col span="19">
                             <Row type="flex" justify="start">
                                 <Input type="text" v-model="searchValue" placeholder="商品名称/拼音/编号" icon="search" @on-clik="refreshGoodsList" style="width: 250px"/>
@@ -35,6 +35,15 @@
                             </Row>
                         </i-col>
                     </Row>
+
+                    <Table stripe highlight-row :loading="tableLoading" 
+                            :columns="tableCulumns" :data="tableData" ref="goodsTable" 
+                            style="width: 100%;" size="small">
+                    </Table>
+                    <Row >
+                        <Page :total="totalCount" :current="currentPage" @on-change="changePage" size="small" show-total></Page>
+                    </Row>
+
                 </Card>
           </div>
 
@@ -70,6 +79,76 @@ export default {
             searchSupplierId: '',
             searchStatus: 'ALL',
             goodsModal: false,
+            tableData:[],
+            tableCulumns: [
+                {
+                    title: '',
+                    type: 'selection',
+                    width: 60
+                },
+                {
+                    title: '商品名称',
+                    type: 'name',
+                    minWidth: 200,
+                    render: (h, params) => {
+                        return h('div',[
+                            h('h5', params.row.goodsNo),
+                            h('h4', params.row.name)
+                        ]);
+                    }
+                },
+                {
+                    title: '多规格',
+                    key: 'specCount',
+                    width: 90,
+                    render: (h, params) => {
+                        let useSpec = params.row.useSpec;
+                        if (!useSpec) {
+                            return '';
+                        }else {
+                            return params.row.detailsSize;
+                        }
+                    }
+                },
+                {
+                    title: '单位',
+                    key: 'unitName',
+                    width: 100
+                },
+                {
+                    title: '批发价',
+                    key: 'batchPrice',
+                    width: 120
+                },
+                {
+                    title: '市场价',
+                    key: 'retailPrice',
+                    width: 120
+                },
+                {
+                    title: '参考进货价',
+                    key: 'inPrice',
+                    width: 120
+                },
+                {
+                    title: '供应商',
+                    key: 'supplierName',
+                    minWidth: 180
+                },
+                {
+                    title: '分类/品牌',
+                    key: 'brandName',
+                    minWidth: 150,
+                    render: (h, params) => {
+                        let categoryName = params.row.categoryName;
+                        let brandName = params.row.brandName;
+                        return h('div',[
+                            h('h5', categoryName),
+                            h('h5', brandName)
+                        ]);
+                    }
+                }
+            ],
         }
     },
     mounted() {
@@ -82,7 +161,9 @@ export default {
         categoryChoose(categoryId) {
             this.searchCategoryId = categoryId;
         },
-        refreshGoodsList() {},
+        refreshGoodsList() {
+            let 
+        },
 
         createGoods() {
             this.goodsModal = true;

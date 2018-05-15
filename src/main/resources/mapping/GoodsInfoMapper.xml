@@ -6,12 +6,12 @@
     <result column="company_id" property="companyId" jdbcType="INTEGER" />
     <result column="category_id" property="categoryId" jdbcType="INTEGER" />
     <result column="goods_no" property="goodsNo" jdbcType="VARCHAR" />
+    <result column="brand_id" property="brandId" jdbcType="BIGINT" />
+    <result column="supplier_id" property="supplierId" jdbcType="BIGINT" />
     <result column="status" property="status" jdbcType="VARCHAR" />
     <result column="name" property="name" jdbcType="VARCHAR" />
     <result column="full_name" property="fullName" jdbcType="VARCHAR" />
     <result column="origin" property="origin" jdbcType="VARCHAR" />
-    <result column="spec" property="spec" jdbcType="VARCHAR" />
-    <result column="serial" property="serial" jdbcType="VARCHAR" />
     <result column="enable" property="enable" jdbcType="BIT" />
     <result column="is_proxy" property="isProxy" jdbcType="BIT" />
     <result column="factory_id" property="factoryId" jdbcType="BIGINT" />
@@ -74,18 +74,24 @@
     <result column="att5_value" property="att5Value" jdbcType="VARCHAR" />
     <result column="att6_id" property="att6Id" jdbcType="BIGINT" />
     <result column="att6_value" property="att6Value" jdbcType="VARCHAR" />
+    <result column="tags" property="tags" jdbcType="VARCHAR" />
+    <result column="use_spec" property="useSpec" jdbcType="BIT" />
+    <result column="bar_code" property="barCode" jdbcType="VARCHAR" />
+    <result column="retail_price" property="retailPrice" jdbcType="DECIMAL" />
+    <result column="batch_price" property="batchPrice" jdbcType="DECIMAL" />
+    <result column="in_price" property="inPrice" jdbcType="DECIMAL" />
   </resultMap>
   <sql id="Base_Column_List" >
-    id, company_id, category_id, goods_no, status, name, full_name, origin, spec, serial, 
-    enable, is_proxy, factory_id, unit, pack_unit, medium_unit, medium_pack, big_pack, 
-    pinyin, storage_condition, comment, cert_no, cert_exp_date, cert_file_no, brand_no, 
-    brand_exp_date, brand_file_no, permit_no, permit_exp_date, permit_file_no, archive_no, 
-    in_check, first_check, special_managed, need_care, in_tax, out_tax, valid_months, 
+    id, company_id, category_id, goods_no, brand_id, supplier_id, status, name, full_name, 
+    origin, enable, is_proxy, factory_id, unit, pack_unit, medium_unit, medium_pack, 
+    big_pack, pinyin, storage_condition, comment, cert_no, cert_exp_date, cert_file_no, 
+    brand_no, brand_exp_date, brand_file_no, permit_no, permit_exp_date, permit_file_no, 
+    archive_no, in_check, first_check, special_managed, need_care, in_tax, out_tax, valid_months, 
     warning_days, contact, cure_range, sale_policy, is_foreign, prescription_id, med_type_id, 
     is_shebao, specific_med_id, jx_id, base_med_id, func_cat_id, medication_id, care_time_id, 
     gmp_type_id, abc_type_id, scope_id, new_type_id, created_by, updated_by, created_time, 
     updated_time, att1_id, att1_value, att2_id, att2_value, att3_id, att3_value, att4_id, 
-    att4_value, att5_id, att5_value, att6_id, att6_value
+    att4_value, att5_id, att5_value, att6_id, att6_value, tags, use_spec, bar_code, retail_price, batch_price, in_price
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
     select 
@@ -99,9 +105,9 @@
   </delete>
   <insert id="insert" parameterType="com.yiban.erp.entities.GoodsInfo" keyProperty="id" useGeneratedKeys="true" >
     insert into goods_info (company_id, category_id,
-      goods_no, status, name, 
-      full_name, origin, spec, 
-      serial, enable, is_proxy, factory_id, 
+      goods_no, brand_id, supplier_id, 
+      status, name, full_name, 
+      origin, enable, is_proxy, factory_id, 
       unit, pack_unit, medium_unit, 
       medium_pack, big_pack, pinyin, 
       storage_condition, comment, cert_no, 
@@ -121,11 +127,12 @@
       att1_value, att2_id, att2_value, 
       att3_id, att3_value, att4_id, 
       att4_value, att5_id, att5_value, 
-      att6_id, att6_value)
+      att6_id, att6_value, tags, 
+      use_spec, bar_code, retail_price, batch_price, in_price)
     values (#{companyId,jdbcType=INTEGER}, #{categoryId,jdbcType=INTEGER},
-      #{goodsNo,jdbcType=VARCHAR}, #{status,jdbcType=VARCHAR}, #{name,jdbcType=VARCHAR}, 
-      #{fullName,jdbcType=VARCHAR}, #{origin,jdbcType=VARCHAR}, #{spec,jdbcType=VARCHAR}, 
-      #{serial,jdbcType=VARCHAR}, #{enable,jdbcType=BIT}, #{isProxy,jdbcType=BIT}, #{factoryId,jdbcType=BIGINT}, 
+      #{goodsNo,jdbcType=VARCHAR}, #{brandId,jdbcType=BIGINT}, #{supplierId,jdbcType=BIGINT}, 
+      #{status,jdbcType=VARCHAR}, #{name,jdbcType=VARCHAR}, #{fullName,jdbcType=VARCHAR}, 
+      #{origin,jdbcType=VARCHAR}, #{enable,jdbcType=BIT}, #{isProxy,jdbcType=BIT}, #{factoryId,jdbcType=BIGINT}, 
       #{unit,jdbcType=BIGINT}, #{packUnit,jdbcType=BIGINT}, #{mediumUnit,jdbcType=BIGINT}, 
       #{mediumPack,jdbcType=DECIMAL}, #{bigPack,jdbcType=DECIMAL}, #{pinyin,jdbcType=VARCHAR}, 
       #{storageCondition,jdbcType=BIGINT}, #{comment,jdbcType=VARCHAR}, #{certNo,jdbcType=VARCHAR}, 
@@ -145,7 +152,9 @@
       #{att1Value,jdbcType=VARCHAR}, #{att2Id,jdbcType=BIGINT}, #{att2Value,jdbcType=VARCHAR}, 
       #{att3Id,jdbcType=BIGINT}, #{att3Value,jdbcType=VARCHAR}, #{att4Id,jdbcType=BIGINT}, 
       #{att4Value,jdbcType=VARCHAR}, #{att5Id,jdbcType=BIGINT}, #{att5Value,jdbcType=VARCHAR}, 
-      #{att6Id,jdbcType=BIGINT}, #{att6Value,jdbcType=VARCHAR})
+      #{att6Id,jdbcType=BIGINT}, #{att6Value,jdbcType=VARCHAR}, #{tags,jdbcType=VARCHAR}, 
+      #{useSpec,jdbcType=BIT}, #{barCode,jdbcType=VARCHAR}, #{retailPrice,jdbcType=DECIMAL}, #{batchPrice,jdbcType=DECIMAL},
+      #{inPrice,jdbcType=DECIMAL})
   </insert>
 
   <update id="updateByPrimaryKeySelective" parameterType="com.yiban.erp.entities.GoodsInfo" >
@@ -160,6 +169,12 @@
       <if test="goodsNo != null" >
         goods_no = #{goodsNo,jdbcType=VARCHAR},
       </if>
+      <if test="brandId != null" >
+        brand_id = #{brandId,jdbcType=BIGINT},
+      </if>
+      <if test="supplierId != null" >
+        supplier_id = #{supplierId,jdbcType=BIGINT},
+      </if>
       <if test="status != null" >
         status = #{status,jdbcType=VARCHAR},
       </if>
@@ -171,12 +186,6 @@
       </if>
       <if test="origin != null" >
         origin = #{origin,jdbcType=VARCHAR},
-      </if>
-      <if test="spec != null" >
-        spec = #{spec,jdbcType=VARCHAR},
-      </if>
-      <if test="serial != null" >
-        serial = #{serial,jdbcType=VARCHAR},
       </if>
       <if test="enable != null" >
         enable = #{enable,jdbcType=BIT},
@@ -364,8 +373,28 @@
       <if test="att6Value != null" >
         att6_value = #{att6Value,jdbcType=VARCHAR},
       </if>
+      <if test="tags != null" >
+        tags = #{tags,jdbcType=VARCHAR},
+      </if>
+      <if test="useSpec != null" >
+        use_spec = #{useSpec,jdbcType=BIT},
+      </if>
+      <if test="barCode != null" >
+        bar_code = #{barCode,jdbcType=VARCHAR},
+      </if>
+      <if test="retailPrice != null" >
+        retail_price = #{retailPrice,jdbcType=DECIMAL},
+      </if>
+      <if test="batchPrice != null" >
+        batch_price = #{batchPrice,jdbcType=DECIMAL},
+      </if>
+      <if test="inPrice != null" >
+        in_price = #{inPrice,jdbcType=DECIMAL},
+      </if>
     </set>
     where id = #{id,jdbcType=BIGINT}
   </update>
+
+
 
 </mapper>

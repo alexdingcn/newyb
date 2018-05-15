@@ -3,6 +3,7 @@ package com.yiban.erp.constant;
 public enum OrderNumberType {
 
     CUST("CU", "客户编号"),
+    GOODS("SP", "商品编号"),
     SELL("SO", "销售"),
     BUY("BO", "采购"),
     BUY_BACK("BB", "采购退货"),

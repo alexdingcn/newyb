@@ -7,7 +7,7 @@
         <Card :bordered="false" dis-hover>
             <p slot="title">
                 <Icon type="android-options"></Icon> 商品分类
-                <Tooltip placement="right-start">
+                <Tooltip transfer placement="right-start">
                     <Icon type="ios-help-outline"></Icon>
                     <div slot="content" >
                         <span>1、设置商品分类的类目内容，最多支持5级的商品分类</span><br/>

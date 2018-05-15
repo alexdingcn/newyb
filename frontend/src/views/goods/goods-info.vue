@@ -8,7 +8,7 @@
             <Tabs value="general" :animated="false">
                 <div slot="extra">
                     <ButtonGroup size="small">
-                        <Button type="success" icon="checkmark" >确认保存</Button>
+                        <Button type="success" icon="checkmark" :loading="saveLoading" @click="saveGoodsInfo" >确认保存</Button>
                     </ButtonGroup>
                 </div>
                     <TabPane icon="cube" name="general" label="基础信息">
@@ -65,10 +65,10 @@
                             <i-col span="8">
                                 <FormItem label="上架下架" prop="status">
                                     <RadioGroup v-model="formData.status">
-                                         <Radio label="ON-SALE">
+                                         <Radio label="ON_SALE">
                                             <span>上架</span>
                                         </Radio>
-                                        <Radio label="OFF-SALE">
+                                        <Radio label="OFF_SALE">
                                             <span>下架</span>
                                         </Radio>
                                     </RadioGroup>
@@ -106,6 +106,11 @@
                             <i-col span="8">
                                 <FormItem label="小单位" prop="unit">
                                     <option-select placement="top" v-model="formData.unit" optionType='GOODS_UNIT' ></option-select>
+                                </FormItem>
+                            </i-col>
+                            <i-col span="8">
+                                <FormItem label="条形码" prop="unit">
+                                    <Input type="text" v-model="formData.barCode" placeholder="最小单位的条形码"/>
                                 </FormItem>
                             </i-col>
                         </Row>
@@ -151,7 +156,7 @@
                                 </FormItem>
                             </i-col>
                         </Row>
-                        <Row v-if="!formData.useSpec" class="row-margin-bottom">
+                        <Row class="row-margin-bottom">
                             <i-col span="6">
                                 <FormItem label="批发价" :label-width="100" prop="useSpec">
                                      <InputNumber :min="0" v-model="formData.batchPrice" style="width: 100%;" />
@@ -173,26 +178,32 @@
                             <Alert type="succuess" v-if="goodsSpesList.length<=0">
                                 <strong>温馨提示: </strong>还没有维护商品多规格配置，请先维护商品多规格配置信息!
                             </Alert>
-                            <Row  class="row-margin-bottom">
-                                <i-col spap=20>
-                                    <FormItem label="选择规格" :label-width="100">
-                                        <Select placement="top" v-model="useParentSpecIdList" multiple style="width: 50%;" @on-change="addGoodsSpec">
-                                            <Option v-for="item in goodsSpesList" :value="item.parentId" :key="item.parentId">{{ item.parentName }}</Option>
-                                        </Select>
+                            <Row class="row-margin-bottom" >
+                                <FormItem label="添加商品规格">
+                                    <Select v-model="chooseParentValue" placement="top" style="width: 250px" @on-change="chooseParentSpecChange">
+                                        <Option size="" v-for="item in goodsSpesList" :value="item.parentId" :key="item.parentId">{{ item.parentName }}</Option>
+                                    </Select>
+                                </FormItem>
+                            </Row>
+                            <Row class="row-margin-bottom">
+                                <Tag v-for="item in currParentSpecs" closable color="green" :key="item.parentId" :name="item.parentId" @on-close="specTagChose">{{item.parentName}}</Tag>
+                            </Row>
+                            <Row class="row-margin-bottom" v-for="(item, index) in currParentSpecs" :key="item.parentId"  >
+                                <i-col span="24" >
+                                    <FormItem :label="item.parentName" :label-width="100">
+                                        <CheckboxGroup v-model="currSpecIds[index]" @on-change="chooseSpecChange" >
+                                            <Checkbox v-for="subItem in item.subGoodsSpecs" :key="subItem.id" :label="subItem.id">
+                                                <span>{{subItem.specName}}</span>
+                                            </Checkbox>
+                                        </CheckboxGroup>
                                     </FormItem>
                                 </i-col>
                             </Row>
-                            <Row v-for="(item, index) in useParentSpecList" :key="item.parentId" class="row-margin-bottom">
-                                <FormItem :label="item.parentName" :label-width="100">
-                                    <CheckboxGroup v-model="chooseSpecList[index]" >
-                                        <Checkbox v-for="subItem in item.subGoodsSpecs" :key="subItem.id" :label="subItem">
-                                            <span>{{subItem.specName}}</span>
-                                        </Checkbox>
-                                    </CheckboxGroup>
-                                </FormItem>
-                            </Row>
-
-
+                            
+                            <Table v-if="goodsDetails.length > 0" ref="goodsDetailTable" highlight-row 
+                                :columns="goodsDetailColumn" :data="goodsDetails" 
+                                size="small" height="350">
+                            </Table>
                         </div>
                     </TabPane>
                     <TabPane icon="ios-pricetags" name="attribute" label="自定义属性">
@@ -201,10 +212,9 @@
                     <TabPane icon="document-text" name="file" label="档案管理">
                         <p>档案管理</p>
                     </TabPane>
-                    <TabPane icon="medkit" name="medication" label="药品扩展">
+                    <!-- <TabPane icon="medkit" name="medication" label="药品扩展">
                         <p>药品扩展</p>
-                    </TabPane>
-                
+                    </TabPane> -->
             </Tabs>
         </Form>
     </div>
@@ -231,34 +241,40 @@ export default {
         optionSelect
     },
     data() {
+
         return {
+            saveLoading: false,
             formData: {
                 name: '',
                 goodsNo: '',
                 pinyin: '',
-                status: 'ON_SALE',
+                status: 'OFF_SALE',
                 useSpec: false,
-                specList: []
+                batchPrice: 0,
+                retailPrice: 0,
+                inPrice: 0,
+                goodsDetails: [],
             },
-            formRules: {},
+            formRules: {
+                name: [
+                    {required: true, message: '商品名称不能为空', trigger: 'blur'}
+                ],
+                unit: [
+                    {required: true, type: 'number', message: '商品最小单位不能为空', trigger: 'blur'}
+                ]
+            },
             goodsSpesList: [],
-            useParentSpecIdList: [],
-            useParentSpecList: [],
-            chooseSpecList: [[], [], []]
+            chooseParentValue:'',
+            currParentSpecs: [],
+            currSpecIds: [[], [], []],
+            goodsDetails: [],
+            goodsDetailColumn: [],
         }
     },
     mounted() {
         this.loadGoodsSpecs();
     },
     watch: {
-        chooseSpecList: function (values) {
-            console.log(values);
-            let specForms = [];
-            if(values.length <= 0) {
-                return;
-            }
-            
-        }
     },
     methods: {
         loadGoodsSpecs() {
@@ -271,7 +287,6 @@ export default {
                 })
         },
         gotoGoodsSpecPage() {
-            
             this.$router.push({
                 name: 'goods-spec'
             });
@@ -288,24 +303,282 @@ export default {
                     });
             }
         },
-        addGoodsSpec(valuse) {
-            if(this.useParentSpecIdList.length <= 3) {
-                let tempList = [];
-                for(let i=0;i<this.goodsSpesList.length; i++) {
-                    let item = this.goodsSpesList[i];
-                    if (valuse.indexOf(item.parentId) >= 0) {
-                         tempList.push(item);
-                    }
+
+        getSpecFormItemByParentId(parentId) {
+            if (!parentId) {
+                return {};
+            }
+            for (let i=0; i<this.goodsSpesList.length; i++) {
+                let temp = this.goodsSpesList[i];
+                if (parentId === temp.parentId) {
+                    return temp;
                 }
-                this.useParentSpecList = tempList;
-            }else {
-                //最多三层
-                this.useParentSpecIdList.splice(this.useParentSpecIdList.length-1, 1); //去除最后一个
-                this.$Message.info('产品多规格最多三层');
+            }
+            return {};
+        },
+
+        chooseParentSpecChange(parentId) {
+            let specForm = this.getSpecFormItemByParentId(parentId);
+            if(!specForm || !specForm.parentId) {
+                this.chooseParentValue = '';
+                return;
+            }
+            //判断是否已经存在已选择的规格中
+            for (let i=0; i<this.currParentSpecs.length; i++) {
+                let item = this.currParentSpecs[i];
+                if (parentId === item.parentId) {
+                    this.chooseParentValue = '';
+                    return; //已经选择过了，不需要不能再次选择
+                }
+            }
+            if (this.currParentSpecs.length >= 3) {
+                this.chooseParentValue = '';
+                this.$Message.info('规格配置最多能加三层');
+                return;
+            }
+            this.currParentSpecs.push(specForm);
+            this.goodsDetailColumn = this.makeSpecTableColumns();
+        },
+        specTagChose(event, parentId) {
+            if(!parentId) {
+                return;
+            }
+            for (let i=0; i<this.currParentSpecs.length; i++) {
+                let item = this.currParentSpecs[i];
+                if(parentId === item.parentId) {
+                    //删除这个节点
+                    this.currParentSpecs.splice(i, 1);
+                    this.currSpecIds.splice(i, 1);
+                    this.goodsDetailColumn = this.makeSpecTableColumns();
+                    this.chooseSpecChange();
+                    break;
+                }
             }
         },
-        
-        
+
+        chooseSpecChange(data) {
+            this.goodsDetails = this.makeSpecTableData();
+        },
+
+        makeSpecTableColumns() {
+            let culumns = [];
+            let self = this;
+            if (this.currParentSpecs.length <=0) {
+                culumns = [];
+                return;
+            }
+            let indexItem = {
+                title: '序号',
+                type: 'index',
+                widht: 60
+            };
+            culumns.push(indexItem);
+            for (let i=0; i<this.currParentSpecs.length; i++) {
+                let item = this.currParentSpecs[i];
+                if (i === 0) {
+                    let temp = {
+                        title: item.parentName,
+                        key: 'specOneId',
+                        width: 100,
+                        render: (h, params) => {
+                            return self.tableSpecRender(h, params.row.specOneId);
+                        }
+                    };
+                    culumns.push(temp);
+                }else if(i===1) {
+                    let temp = {
+                        title: item.parentName,
+                        key: 'specTwoId',
+                        width: 100,
+                        render: (h, params) => {
+                            return self.tableSpecRender(h, params.row.specTwoId);
+                        }
+                    };
+                    culumns.push(temp);
+                }else if(i===2) {
+                    let temp = {
+                        title: item.parentName,
+                        key: 'specThreeId',
+                        width: 100,
+                        render: (h, params) => {
+                            return self.tableSpecRender(h, params.row.specThreeId);
+                        }
+                    };
+                    culumns.push(temp);
+                }
+            }
+            culumns.push({
+                title: '条码',
+                key: 'barCode',
+                widht: 150,
+                render: (h, params) => {
+                    return h('Input', {
+                        props: {
+                            value: self.goodsDetails[params.index][params.column.key]
+                        },
+                        on: {
+                            'on-blur' (event) {
+                                let row = self.goodsDetails[params.index];
+                                row[params.column.key] = event.target.value;
+                            }
+                        }
+                    });
+                }
+            });
+            culumns.push({
+                title: '批发价',
+                key: 'batchPrice',
+                widht: 120,
+                render: (h, params) => {
+                    return self.inputRender(h, params);
+                }
+            });
+            culumns.push({
+                title: '市场价',
+                key: 'retailPrice',
+                widht: 120,
+                render: (h, params) => {
+                    return self.inputRender(h, params);
+                }
+            });
+            culumns.push({
+                title: '参考进货价',
+                key: 'inPrice',
+                widht: 120,
+                render: (h, params) => {
+                    return self.inputRender(h, params);
+                }
+            });
+            return culumns;
+        },
+
+        tableSpecRender(h, id) {
+            let item = {};
+            let label = '';
+            for (let i=0; i<this.currParentSpecs.length; i++) {
+                let subItems = this.currParentSpecs[i].subGoodsSpecs;
+                if (subItems.length <= 0) {
+                    continue;
+                }
+                let matchItem = subItems.find(function(subItem) {
+                    if (id === subItem.id) {
+                        return subItem;
+                    }
+                });
+                if (matchItem && matchItem.id) {
+                    label = matchItem.specName;
+                    break;
+                }
+            }
+            return h('span', label);
+        },
+
+        inputRender (h, params) {
+            let self = this;
+            return h('InputNumber', {
+                props: {
+                    min: 0,
+                    value: self.goodsDetails[params.index][params.column.key]
+                },
+                on: {
+                    'on-blur' (event) {
+                        let row = self.goodsDetails[params.index];
+                        row[params.column.key] = event.target.value;
+                    }
+                }
+            });
+        },
+
+        //展开选择的规格明细展开成一个表格数据
+        makeSpecTableData() {
+            let specTableData = [];
+            if(this.currParentSpecs.length <= 0) {
+                specTableData = [];
+                return;
+            }
+            for (let i=0; i<this.currParentSpecs.length; i++) {
+                let idList = this.currSpecIds[i];
+                
+                if (!idList || idList.length<=0) {
+                    continue;
+                }
+                specTableData = this.makeSpecTableDataItem(i, idList, specTableData);
+            }
+            return specTableData;
+        },
+
+        makeSpecTableDataItem(index, idList, resultList) {
+            let self = this;
+            if (index === 0) {
+                let datailList = idList.map(id => {
+                    let item = {
+                        specOneId: id,
+                        specTwoId: '',
+                        specThreeId: '',
+                        barCode: '',
+                        batchPrice: self.formData.batchPrice ? self.formData.batchPrice : 0 ,
+                        retailPrice: self.formData.retailPrice ? self.formData.retailPrice : 0 ,
+                        inPrice: self.formData.inPrice ? self.formData.inPrice : 0 ,
+                    };
+                    return item;
+                });
+                resultList = [...datailList];
+                return resultList;
+            }else {
+                let tempList = [];
+                for (let i=0; i<resultList.length; i++ ) {
+                    let result = resultList[i];
+                    for (let j=0; j<idList.length; j++) {
+                        let temp = {
+                            specOneId: result.specOneId,
+                            specTwoId: result.specTwoId,
+                            specThreeId: result.specThreeId,
+                            barCode: result.barCode,
+                            batchPrice: result.batchPrice,
+                            retailPrice: result.retailPrice,
+                            inPrice: result.inPrice
+                        };
+                        let id = idList[j];
+                        if (index === 1) {
+                            temp.specTwoId = id;
+                        }else if (index === 2){
+                            temp.specThreeId = id;
+                        }
+                        tempList.push(temp);
+                    }
+                }
+                return tempList;
+            }
+        },
+
+        saveGoodsInfo() {
+            let self = this;
+            this.$refs.form.validate(valite => {
+                if(!valite) {
+                    return;
+                }else {
+                    self.$Modal.confirm({
+                        title: '提交保存确认',
+                        content: '是否确认商品信息已经维护正确？',
+                        onOk: () => {
+                            self.saveLoading = true;
+                            self.formData.goodsDetails = self.goodsDetails;
+                            util.ajax.post('/goods/save', self.formData)
+                                .then((response) => {
+                                    self.saveLoading = false;
+                                    self.$Message.success('商品信息保存成功');
+                                    self.$emit('save-ok');
+                                })
+                                .catch((error) => {
+                                    self.saveLoading = false;
+                                    util.errorProcessor(self, error);
+                                });
+                        }
+                    });
+                }
+            });
+        }
+
     }
   
 }
