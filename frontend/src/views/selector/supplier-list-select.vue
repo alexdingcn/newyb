@@ -100,17 +100,14 @@
                 if (this.supplierQuery !== '') {
                     queryObj['search'] = this.supplierQuery;
                 }
-                if (this.supplierTypeQuery > 0) {
-                    queryObj['categoryId'] = this.supplierTypeQuery;
-                }
 
                 this.supplierLoading = true;
                 util.ajax.get('/supplier/list',
                         {params: queryObj})
                         .then(function (response) {
                             self.supplierLoading = false;
-                            self.supplierList = response.data;
-                            //self.totalsupplierCount = response.data.count;
+                            self.supplierList = response.data.data;
+                            self.totalsupplierCount = response.data.count;
                         })
                         .catch(function (error) {
                             self.supplierLoading = false;
