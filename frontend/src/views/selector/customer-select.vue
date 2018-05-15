@@ -1,11 +1,12 @@
 <style lang="less">
 @import "../../styles/common.less";
+@import "customer-select.less";
 </style>
 
 <template>
     <div :class="wrapClasses">
         <div class="ivu-input-group-prepend">
-            <Button type="primary" size="small" icon="ios-people" @click="showCustomerSelectModal"></Button>
+            <Button type="primary" size="small" icon="ios-people-outline" @click="showCustomerSelectModal"></Button>
         </div>
         <Select ref="custSelect" v-model="customerIdValue"
                 :disabled="selectDisable" :placeholder="placeholderShow"
@@ -15,6 +16,12 @@
             <Option v-for="item in customerList"
                     :value="item.id" :key="item.id" :disabled="!item.enabled"> {{item.name}} </Option>
         </Select>
+
+        <Tooltip transfer v-if="hasHelpSlot">
+            <Icon type="ios-information-outline"></Icon>
+            <slot name="helpContent" slot="content">
+            </slot>
+        </Tooltip>
 
         <Modal v-model="selectCustModal" width="60" :mask-closable="false" title="选择客户" class="cust-modal">
             <customerListSelect ref="custSelectModal" @on-choosed="customerSelected" ></customerListSelect>
@@ -61,6 +68,9 @@ export default {
         }
     },
     computed: {
+        hasHelpSlot () {
+            return !!this.$slots.helpContent
+        },
         wrapClasses () {
             return [
                 `${prefixCls}-wrapper`,

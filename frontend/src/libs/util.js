@@ -26,6 +26,7 @@ util.ajax = axios.create({
     baseURL: ajaxUrl,
     timeout: 30000
 });
+
 util.ajax.defaults.headers['Content-Type'] = 'application/json';
 
 // http request 拦截器

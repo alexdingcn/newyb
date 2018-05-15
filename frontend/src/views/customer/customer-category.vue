@@ -100,13 +100,7 @@ export default {
         modalTitle () {
             let updName = '';
             if (this.action === 'edit' && this.editeData) {
-                updName =
-          '修改 ' +
-          this.editeData.name +
-          '(' +
-          this.editeData.id +
-          ')' +
-          '信息';
+                updName = '修改 ' + this.editeData.name + '(' + this.editeData.id + ')' + '信息';
             }
             return this.action === 'add' ? '新建客户分组' : updName;
         }

@@ -24,4 +24,12 @@ public interface SupplierMapper {
 
     int updateAccountAmount(@Param("id") Long id,
                             @Param("accountAmount")BigDecimal accountAmount);
+
+    int selectAllCount(@Param("companyId") Integer companyId,
+                       @Param("search") String search);
+
+    List<Supplier> selectAllPaged(@Param("companyId") Integer companyId,
+                             @Param("search") String search,
+                             @Param("limit") Integer limit,
+                             @Param("offset") Integer offset);
 }

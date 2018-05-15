@@ -111,6 +111,10 @@ public class CustomerService {
         }
     }
 
+    public int setDefaultCustomerRep(Integer customerRepId) {
+        return customerRepMapper.setDefault(customerRepId, new Date());
+    }
+
     private void setRepDefaultFlag(List<CustomerRep> reps) {
         if (reps == null || reps.isEmpty()) {
             return;
@@ -135,11 +139,11 @@ public class CustomerService {
         }
     }
 
-    public List<CustomerRep> getRepList(Long customerId) throws BizException {
+    public List<CustomerRep> getRepList(Long customerId, Boolean enableOnly) throws BizException {
         if (customerId == null) {
             return Collections.emptyList();
         }
-        List<CustomerRep> reps = customerRepMapper.getByCustomerId(customerId);
+        List<CustomerRep> reps = customerRepMapper.getByCustomerId(customerId, enableOnly);
         //设置默认标识
         setRepDefaultFlag(reps);
         return reps;

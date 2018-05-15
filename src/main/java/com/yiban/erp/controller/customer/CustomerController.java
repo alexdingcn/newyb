@@ -103,9 +103,10 @@ public class CustomerController {
     }
 
     @RequestMapping(value = "/rep/list", method = RequestMethod.GET)
-    public ResponseEntity<JSON> getRepList(@RequestParam("customerId") Long customerId) throws Exception {
+    public ResponseEntity<JSON> getRepList(@RequestParam("customerId") Long customerId,
+                                           @RequestParam(value = "enabled", required = false) Boolean enableOnly) throws Exception {
         logger.debug("get an request to get customer rep list by customerId:", customerId);
-        List<CustomerRep> reps = customerService.getRepList(customerId);
+        List<CustomerRep> reps = customerService.getRepList(customerId, enableOnly);
         return ResponseEntity.ok().body((JSON) JSON.toJSON(reps));
     }
 
@@ -135,6 +136,18 @@ public class CustomerController {
         JSONObject result = new JSONObject();
         result.put("count", count);
         return ResponseEntity.ok().body(result.toJSONString());
+    }
+
+    @RequestMapping(value = "/rep/default/{repId}", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> setDefaultRep(@PathVariable Integer repId,
+                                            @AuthenticationPrincipal User user) throws Exception {
+        logger.info("user:{} request to set default customer rep, id:", user.getId(), repId);
+        // TODO: check company security
+        int count = customerService.setDefaultCustomerRep(repId);
+        if (count > 0) {
+            return ResponseEntity.ok().build();
+        }
+        return ResponseEntity.badRequest().body(ErrorCode.FAILED_INSERT_OR_UPDATE_FROM_DB.toString());
     }
 
     @RequestMapping(value = "/search/name", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)

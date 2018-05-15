@@ -1,15 +1,16 @@
 <template>
     <div>
-        <Row>
-            <Col span="20">
-                <Select style="width:100%;" :placement="placement" v-model="optionId" clearable filterable :size="size" :placeholder="selectPlaceHolder" @on-change="onChange">
-                    <Option v-for="item in optionList" :value="item.id" :key="item.id">{{ item.value }}</Option>
-                </Select>
-            </Col>
-            <Col span="4">
-                <Button type="ghost" :size="size" icon="ios-settings-strong" @click="optionModalShow = true;"></Button>
-            </Col>
-        </Row>
+        <div :class="wrapClasses">
+            <Select v-model="optionId" clearable filterable :size="size"
+                    :placeholder="selectPlaceHolder" @on-change="onChange">
+                <Option v-for="item in optionList" :value="item.id" :key="item.id">{{ item.value }}</Option>
+            </Select>
+            <div class="ivu-input-group-append">
+                <Button type="ghost" size="small"
+                        icon="ios-settings-strong"
+                        @click="optionModalShow = true;"></Button>
+            </div>
+        </div>
 
         <Modal v-model="optionModalShow" class="option-modal-position-show">
             <p slot="header">
@@ -65,7 +66,7 @@ export default {
     },
     props: {
         value: {
-            tpye: Number|String,
+            type: Number|String,
             default: ''
         },
         disabled: {
@@ -140,6 +141,15 @@ export default {
         this.loadOptionList();
     },
     computed: {
+        wrapClasses () {
+            return [
+                `${prefixCls}-wrapper`,
+                {
+                    [`${prefixCls}-group`]: true,
+                    [`${prefixCls}-group-with-append`]: true
+                }
+            ];
+        },
         showTitle () {
             if (this.optionType && this.allTypes && this.allTypes.length > 0) {
                 for (let i=0; i<this.allTypes.length; i++) {

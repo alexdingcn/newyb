@@ -237,7 +237,7 @@
                       </Col>
                     </Row>
                   </TabPane>
-                  <TabPane label="代表人信息" name="repInfo" :disabled="!formItem.id">
+                  <TabPane label="地址信息" name="repInfo" :disabled="!formItem.id">
                     <Row type="flex" justify="start">
                         <ButtonGroup v-if="!isReadOnly" size="small" >
                           <Button type="primary" @click="addRepModal" icon="plus-round">
@@ -257,41 +257,9 @@
           </Card>
       </Row>
 
-      <Modal v-model="repModalShow" :mask-closable="false" title="客户代表人信息" >
-          <Card >
-                <p slot="title">
-                    <span>{{repFormItem.name || '客户代表'}}</span>
-                </p>
-                <div slot="extra">
-                    <Button type="success" :loading="repSubmitBtnLoading" v-if="repFormItem.id" @click="doEditCustomerRep">保存</Button>
-                    <Button type="primary" :loading="repSubmitBtnLoading" v-if="!repFormItem.id" @click="doAddCustomerRep">提交</Button>
-                </div>
-                <Form ref="repForm" :model="repFormItem" :label-width="100" :rules="repFormValidate">
-                    <FormItem label="姓名" prop="name">
-                        <Input type="text" v-model="repFormItem.name" />
-                    </FormItem>
-                    <FormItem label="联系电话" prop="contactPhone">
-                        <Input type="text" v-model="repFormItem.contactPhone" />
-                    </FormItem>
-                    <FormItem label="收货地址" prop="repertoryAddress">
-                        <Input type="text" v-model="repFormItem.repertoryAddress" />
-                    </FormItem>
-                    <FormItem label="邮编" >
-                        <Input type="text" v-model="repFormItem.postcode" />
-                    </FormItem>
-                    <FormItem label="是否启用" >
-                        <Checkbox v-model="repFormItem.enabled"></Checkbox>
-                    </FormItem>
-                    <FormItem label="是否默认使用" >
-                        <Checkbox v-model="repFormItem.isDefault"></Checkbox>
-                    </FormItem>
-                    <FormItem label="备注" >
-                        <Input type="text" v-model="repFormItem.comment" />
-                    </FormItem>
-                </Form>
-          </Card>
-         <div slot="footer"></div>          
-      </Modal>
+      <customer-rep :value="repFormItem" :showModal="repModalShow" :customer="formItem.id"
+        @on-closed="onRepUpdated">
+      </customer-rep>
 
       <Modal v-model="fileUploadModal" title="客户档案上传" :mask-closable="false" width="50" >
             <file-detail :fileNo="formItem.fileNo" @add-file-success="addFileSuccess" ></file-detail>
@@ -308,6 +276,7 @@ import Vue from 'vue';
 import iviewArea from 'iview-area';
 import optionSelect from '@/views/selector/option-select.vue';
 import fileDetail from "@/views/basic-data/file-detail.vue";
+import customerRep from './customer-rep.vue';
 
 Vue.use(iviewArea);
 
@@ -332,6 +301,7 @@ export default {
     },
     components: {
         optionSelect,
+        customerRep,
         fileDetail
     },
     data () {
@@ -348,7 +318,7 @@ export default {
             repTabData: [],
             repTabColumns: [
                 {
-                    title: '代表人姓名',
+                    title: '联系人',
                     key: 'name',
                     align: 'center',
                 },
@@ -380,7 +350,7 @@ export default {
                     }
                 },
                 {
-                    title: '是否默认使用',
+                    title: '默认地址',
                     key: 'isDefault',
                     align: 'center',
                     sortable: true,
@@ -424,24 +394,12 @@ export default {
             repDelBtnLoading: false,
             repModalShow: false,
             repFormItem: {},
-            repSubmitBtnLoading: false,
             ruleValidate: {
                 categoryId: [
                     {required: true, type: 'number', message: '客户分组必输', trigger: 'change'}
                 ],
                 name: [
                     {required: true, message: '客户名称必输', trigger: 'blur'}
-                ]
-            },
-            repFormValidate: {
-                name: [
-                    {required: true, message: '代表人姓名必输', trigger: 'blur'}
-                ],
-                contactPhone: [
-                    {required: true, message: '联系方式必输', trigger: 'blur'}
-                ],
-                repertoryAddress: [
-                    {required: true, message: '收货地址必输', trigger: 'blur'}
                 ]
             }
         };
@@ -456,12 +414,12 @@ export default {
             this.formItem.businessScopeIdList = data;
         },
         customerId() {
-            this.refeashCustomer();
+            this.reload();
         }
     },
     mounted () {
         this.getBusinessScopeList();
-        this.refeashCustomer();
+        this.reload();
     },
     methods: {
         onChangeName () {
@@ -492,7 +450,7 @@ export default {
                 })
         },
 
-        refeashCustomer() {
+        reload() {
             if (this.customerId) {
                 util.ajax.get("/customer/" + this.customerId)
                     .then((response) => {
@@ -516,6 +474,13 @@ export default {
                     pinyin: ''
                 };
                 this.businessScopeChooseList = [];
+            }
+        },
+
+        onRepUpdated(data) {
+            this.repModalShow = false;
+            if (data) {
+                this.refreshRepData();
             }
         },
 
@@ -612,60 +577,10 @@ export default {
         },
 
         editRepModal (row) {
-            this.repFormItem = row;
+            // clone this row
+            this.repFormItem = JSON.parse(JSON.stringify(row));
             this.repModalShow = true;
         },
-
-        doAddCustomerRep () {
-            let customerId = this.formItem.id;
-            this.repSubmitBtnLoading = true;
-            let self = this;
-            this.$refs.repForm.validate(valid => {
-                if (!valid) {
-                    self.$Message.warning('请检查表单必输项信息');
-                    self.repSubmitBtnLoading = false;
-                } else {
-                    self.repFormItem.customerId = customerId;
-                    util.ajax.post('/customer/rep/add', this.repFormItem)
-                        .then((response) => {
-                            self.repSubmitBtnLoading = false;
-                            self.$Message.success('新建客户代表人信息成功');
-                            self.refreshRepData();
-                            self.repModalShow = false;
-                        })
-                        .catch((error) => {
-                            self.repSubmitBtnLoading = false;
-                            util.errorProcessor(self, error);
-                        });
-                }
-            });
-        },
-
-        doEditCustomerRep () {
-            let customerId = this.formItem.id;
-            this.repSubmitBtnLoading = true;
-            if (!customerId) {
-                this.$Notice.info({title: '操作提醒', desc: '请先提交客户基本信息建立客户'});
-                this.repSubmitBtnLoading = false;
-                return;
-            }
-            if (!this.repFormItem.id || this.repFormItem.id === '') {
-                this.$$Notice.warn({title: '系统异常', desc: '获取需要修改的代表人编号失败，请重新选择'});
-                this.repSubmitBtnLoading = false;
-                return;
-            }
-            util.ajax.post('/customer/rep/update', this.repFormItem)
-                .then((response) => {
-                    this.repSubmitBtnLoading = false;
-                    this.$Message.success('保存代表人信息成功');
-                    this.refreshRepData();
-                    this.repModalShow = false;
-                })
-                .catch((error) => {
-                    this.repSubmitBtnLoading = false;
-                    util.errorProcessor(this, error);
-                });
-        }
     }
 };
 </script>
