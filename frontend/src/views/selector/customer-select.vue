@@ -1,5 +1,6 @@
 <style lang="less">
 @import "../../styles/common.less";
+@import "customer-select.less";
 </style>
 
 <template>

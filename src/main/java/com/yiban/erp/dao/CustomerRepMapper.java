@@ -22,6 +22,7 @@ public interface CustomerRepMapper {
     int setDefault(@Param("id") Integer id,
                    @Param("defaultTime")Date defaultTime);
 
-    List<CustomerRep> getByCustomerId(Long customerId);
+    List<CustomerRep> getByCustomerId(@Param("customerId") Long customerId,
+                                      @Param("enabled") Boolean enabled);
 
 }

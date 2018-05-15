@@ -100,11 +100,14 @@
     where id = #{id}
   </update>
 
-  <select id="getByCustomerId" parameterType="java.lang.Long" resultMap="BaseResultMap">
+  <select id="getByCustomerId" resultMap="BaseResultMap">
     select
       <include refid="Base_Column_List"/>
     from customer_rep
-    where customer_id = #{customerId};
+    where customer_id = #{customerId}
+      <if test="enabled != null" >
+          and enabled = #{enabled,jdbcType=BIT}
+      </if>
   </select>
 
 </mapper>
