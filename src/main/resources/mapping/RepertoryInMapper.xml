@@ -232,7 +232,7 @@
     <include refid="listSql"/>
     from repertory_in o, supplier s, supplier_contact sc, warehouse w, users u
     where o.supplier_id = s.id and o.supplier_contact_id = sc.id
-    and o.warehouse_id = w.id and o.buyer_id = u.id
+    and o.warehouse_id = w.id
     and o.buyer_id = u.id
     and o.company_id = #{companyId}
     and o.status != 'DELETE'
@@ -243,10 +243,10 @@
       and o.supplier_id = #{supplierId}
     </if>
     <if test="startReceiveDate != null">
-      and o.receive_date >= #{startReceiveDate}
+      and o.create_time >= #{startReceiveDate}
     </if>
     <if test="endReceiveDate != null">
-      and o.receive_date &lt;= #{endReceiveDate}
+      and o.create_time &lt;= #{endReceiveDate}
     </if>
     <if test="statusList != null" >
       and o.status in
@@ -261,7 +261,7 @@
     <include refid="listSql"/>
     from repertory_in o, supplier s, supplier_contact sc, warehouse w, users u
     where o.supplier_id = s.id and o.supplier_contact_id = sc.id
-    and o.warehouse_id = w.id and o.buyer_id = u.id
+    and o.warehouse_id = w.id
     and o.buyer_id = u.id
     and o.company_id = #{companyId}
     and o.status != 'DELETE'

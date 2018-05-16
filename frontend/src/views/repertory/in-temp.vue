@@ -119,7 +119,7 @@ export default {
                 },
                 {
                     title: '生产企业',
-                    key: 'factory'
+                    key: 'factoryName'
                 },
                 {
                     title: '单位',

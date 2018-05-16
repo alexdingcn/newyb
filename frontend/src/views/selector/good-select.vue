@@ -92,6 +92,7 @@ export default {
             this.goodsList.push(item);
             this.$nextTick(() => { this.goodsId = item.id; });
             this.selectGoodsModal = false;
+            this.$emit('on-change', item.id, item);
         },
         queryGoods (query) {
             var self = this;

@@ -32,10 +32,13 @@
 
 <script>
     import util from '@/libs/util.js';
+    import goodsSepcTags from '../goods/goods-spec-tabs.vue';
 
     export default {
         name: 'goodsListSelect',
-
+        components: {
+            goodsSepcTags
+        },
         props: ['disabled', 'size'],
         data () {
             return {
@@ -67,11 +70,24 @@
                         title: '产地'
                     },
                     {
-                        key: 'spec',
-                        title: '规格'
+                        key: 'goodsSpecs',
+                        title: '规格',
+                        minWidth: 200,
+                        render: (h, params) =>　{
+                            return h(goodsSepcTags, {
+                                props: {
+                                    tags: params.row.goodsSpecs,
+                                    color: 'blue'
+                                }
+                            });
+                        }
                     },
                     {
-                        key: 'factory',
+                        key: 'supplierName',
+                        title: '供应商'
+                    },
+                    {
+                        key: 'factoryName',
                         title: '生产企业'
                     },
                     {
@@ -132,9 +148,11 @@
                         {params: queryObj})
                         .then(function (response) {
                             console.log(response.data);
-                            self.goodsLoading = false;
-                            self.totalGoodsCount = response.data.total;
-                            self.goodsList = response.data.data;
+                            if (response.status === 200) {
+                                self.goodsLoading = false;
+                                self.totalGoodsCount = response.data.total;
+                                self.goodsList = response.data.data;
+                            }
                         })
                         .catch(function (error) {
                             self.goodsLoading = false;

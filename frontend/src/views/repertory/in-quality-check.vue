@@ -1,3 +1,6 @@
+<style lang="less">
+    @import '../../styles/common.less';
+</style>
 <template>
   <div>
       <Card>
@@ -13,20 +16,28 @@
           
         <Form ref="searchForm" :model="query" :label-width="100">
                 <Row type="flex" justify="start">
-                <FormItem label="收货日期">
-                    <DatePicker size="small" v-model="dateRange" type="daterange" placement="bottom-start" placeholder="收货日期" style="width:180px"></DatePicker>
-                </FormItem>
-                <FormItem label="仓库">
-                   <warehouse-select v-model="query.warehouseId" size="small"></warehouse-select>
-                </FormItem>
-                <FormItem label="供应商">
-                    <supplier-select v-model="query.supplierId" size="small"></supplier-select>
-                </FormItem>
-                <FormItem label="状态">
-                    <Select size="small" v-model="query.status" placeholder="状态">
-                            <Option v-for="option in statusOptions" :value="option.key" :label="option.name" :key="option.key">{{option.name}}</Option>
-                    </Select>
-                </FormItem>
+                <Col span="5">
+                    <FormItem label="订单日期">
+                        <DatePicker v-model="dateRange" type="daterange" placement="bottom-start" placeholder="收货日期" style="width:180px"></DatePicker>
+                    </FormItem>
+                </Col>
+                <Col span="5">
+                    <FormItem label="仓库">
+                    <warehouse-select v-model="query.warehouseId"></warehouse-select>
+                    </FormItem>
+                </Col>
+                <Col span="6">
+                    <FormItem label="供应商">
+                        <supplier-select v-model="query.supplierId"></supplier-select>
+                    </FormItem>
+                </Col>
+                <Col span="6">
+                    <FormItem label="状态">
+                        <Select v-model="query.status" placeholder="状态">
+                                <Option v-for="option in statusOptions" :value="option.key" :label="option.name" :key="option.key">{{option.name}}</Option>
+                        </Select>
+                    </FormItem>
+                </Col>
                 </Row>
         </Form>
           <div>
@@ -41,16 +52,17 @@
           <div class="detail-div">
                 <Row type="flex" justify="end">
                     <ButtonGroup>
-                        <Button type="info" size="small" icon="android-bulb" @click="samplingSurveyBtnClick">抽样检查</Button>
-                        <Button type="success" size="small" icon="checkmark" @click="checkOneDetailBtn">验收一条</Button>
-                        <Button type="warning" size="small" icon="close" @click="unCheckOneDetailBtn">取消验收一条</Button>
-                        <Button type="success" size="small" icon="android-checkbox-outline" @click="saveOroderDetail">保存详情</Button>
-                        <Button type="error" size="small" icon="close" @click="removeDetail">删除一条</Button>
+                        <Button type="info" icon="android-bulb" @click="samplingSurveyBtnClick">抽样检查</Button>
+                        <Button type="success" icon="checkmark" @click="checkOneDetailBtn">验收一条</Button>
+                        <Button type="warning" icon="close" @click="unCheckOneDetailBtn">取消验收一条</Button>
+                        <Button type="success" icon="android-checkbox-outline" @click="saveOroderDetail">保存详情</Button>
+                        <Button type="error" icon="close" @click="removeDetail">删除一条</Button>
                     </ButtonGroup>
                 </Row>
+
               <Table border highlight-row height="300" :loading="detailLoading" 
                    :columns="detailColumns" :data="detailList" size="small" 
-                   ref="detailTable" style="width: 100%;" 
+                   ref="detailTable" class="margin-top-10"
                    @on-row-click="handleSelectDetail" 
                    no-data-text="点击上方订单后查看明细">
                 <div slot="footer">
@@ -101,8 +113,7 @@
                     </FormItem>
                   </Col>
               </Row>
-              <h4 style="margin-top:20px;">验收结果</h4>
-              <hr size="1" style="width: 80%; margin-bottom: 10px;"/>
+
               <Row v-if="checkDetail">
                   <Col span="12">
                     <FormItem label="合格数量">
@@ -235,7 +246,6 @@ export default {
             orderList: [],
             orderListColumns: [
                 {
-                    title: '序号',
                     type: 'index',
                     width: 60
                 },
@@ -337,9 +347,21 @@ export default {
             detailList: [],
             detailColumns: [
                 {
-                    title: "序号",
                     type: 'index',
                     width: 60
+                },
+                {
+                    title: "验收状态",
+                    key: 'checkStatus',
+                    width: 140,
+                    render (h, params) {
+                        let checkStatus = params.row.checkStatus;
+                        if (checkStatus) {
+                            return h('Tag', {props:{type:'dot', color:'green'}}, '已验收');
+                        }else{
+                            return h('Tag', {props:{type:'dot', color:'red'}}, '未验收');
+                        }
+                    }
                 },
                 {
                     title: "商品名称",
@@ -363,7 +385,7 @@ export default {
                 },
                 {
                     title: "生产企业",
-                    key: 'factory',
+                    key: 'factoryName',
                     width: 120
                 },
                 {
@@ -589,19 +611,7 @@ export default {
                         }
                     }
                 },
-                {
-                    title: "验收状态",
-                    key: 'checkStatus',
-                    width: 140,
-                    render (h, params) {
-                        let checkStatus = params.row.checkStatus;
-                        if (checkStatus) {
-                            return h('Tag', {props:{type:'dot', color:'green'}}, '已验收');
-                        }else{
-                            return h('Tag', {props:{type:'dot', color:'red'}}, '未验收');
-                        }
-                    }
-                },
+                
                 {
                     title: "温控方式验收",
                     key: 'checkTempMethod',

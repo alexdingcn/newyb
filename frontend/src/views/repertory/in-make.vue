@@ -308,7 +308,7 @@
                     },
                     {
                         title: '生产企业',
-                        key: 'factory',
+                        key: 'factoryName',
                         align: 'center',
                         width: 120
                     },

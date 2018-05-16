@@ -11,6 +11,7 @@ import com.yiban.erp.entities.User;
 import com.yiban.erp.exception.BizException;
 import com.yiban.erp.exception.ErrorCode;
 import com.yiban.erp.service.warehouse.RepertoryInService;
+import org.apache.commons.lang.time.DateUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,6 +21,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
 
@@ -65,6 +67,9 @@ public class RepertoryInController {
                                        @AuthenticationPrincipal User user) throws Exception {
         if (listReq == null || listReq.getStatusList() == null || listReq.getStatusList().isEmpty()) {
             throw new BizException(ErrorCode.RECEIVE_QUERY_PARAM_ERROR);
+        }
+        if (listReq.getEndReceiveDate() != null) {
+            listReq.setEndReceiveDate(DateUtils.truncate(DateUtils.addDays(listReq.getEndReceiveDate(), 1), Calendar.DATE));
         }
         listReq.setCompanyId(user.getCompanyId());
         List<RepertoryIn> result = repertoryInService.getList(listReq);

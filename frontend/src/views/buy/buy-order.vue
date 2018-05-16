@@ -66,13 +66,11 @@
 					</Col>
 				</Row>
 				<Row>
-					<Col span="6">
+					<Col span="8">
 						<FormItem label="选择商品">
-                            <good-select :disabled="!buyOrder.warehouseId" ref="goodsSelect" @on-change="onSelectGoods" ></good-select>
+                            <good-select :disabled="!buyOrder.warehouseId" ref="goodsSelect" 
+                            @on-change="onSelectGoods"></good-select>
 						</FormItem>
-					</Col>
-					<Col span="12">
-
 					</Col>
 				</Row>
 
@@ -115,6 +113,7 @@
     import optionSelect from '@/views/selector/option-select.vue';
     import warehouseSelect from "@/views/selector/warehouse-select.vue";
     import goodSelect from '@/views/selector/good-select.vue';
+    import goodsSepcTags from '../goods/goods-spec-tabs.vue';
 
     export default {
         name: 'buy_order',
@@ -124,7 +123,8 @@
             buyerSelect,
             optionSelect,
             goodSelect,
-            warehouseSelect
+            warehouseSelect,
+            goodsSepcTags
         },
         data () {
             return {
@@ -166,13 +166,21 @@
                         width: 120
                     },
                     {
+                        key: 'goodsSpecs',
                         title: '规格',
-                        key: 'spec',
-                        width: 120
+                        width: 120,
+                        render: (h, params) =>　{
+                            return h(goodsSepcTags, {
+                                props: {
+                                    tags: params.row.goodsSpecs,
+                                    color: 'blue'
+                                }
+                            });
+                        }
                     },
                     {
                         title: '生产企业',
-                        key: 'factory',
+                        key: 'factoryName',
                         width: 150
                     },
                     {
@@ -192,7 +200,7 @@
                             return h('Input', {
                                 props: {
 								  	value: self.orderItems[params.index][params.column.key],
-                                      number: true
+                                    number: true
                                 },
                                 on: {
                                     'on-change' (event) {
@@ -330,13 +338,13 @@
                         { required: true, type: 'number', message: '请选择供应商' }
                     ],
                     buyerId: [
-                        { required: true, type: 'number', message: '请选择采购员', trigger: 'blur' }
+                        { required: true, type: 'number', message: '请选择采购员' }
                     ],
                     warehouseId: [
-                        { required: true, type: 'number', message: '请选择仓库点', trigger: 'blur' }
+                        { required: true, type: 'number', message: '请选择仓库点' }
                     ],
                     orderItems: [
-                        { required: true, type: 'array', array: {min: 1}, message: '请添加商品', trigger: 'blur' }
+                        { required: true, type: 'array', array: {min: 1}, message: '请添加商品' }
                     ]
                 }
             };
@@ -373,13 +381,15 @@
                 });
             },
             onSelectGoods (goodsId, goods) {
-                var index = this.buyOrder.orderItemIds.indexOf(goods.id);
-                if (index < 0) {
-                    this.setGoodsBalance(goods);
-                } else {
-                    this.$Message.warning('该商品已经添加');
+                if (goodsId && goods) {
+                    var index = this.buyOrder.orderItemIds.indexOf(goods.id);
+                    if (index < 0) {
+                        this.setGoodsBalance(goods);
+                    } else {
+                        this.$Message.warning('该商品已经添加');
+                    }
+                    this.$refs.goodsSelect.clearSingleSelect();
                 }
-                this.$refs.goodsSelect.clearSingleSelect();
             },
 
             setGoodsBalance(goods) {
@@ -403,6 +413,7 @@
                         goods['balance'] = record ? record.balance : '';
                         goods['ongoingCount'] = record ? record.ongoingCount : '';
                         goods['amount'] = 0;
+                        console.log(goods);
                         this.orderItems.push(goods);
                         this.buyOrder.orderItemIds.push(goods.id);
                         var self = this;
