@@ -288,10 +288,10 @@
                     },
                     {
                         title: '生产企业',
-                        key: 'factory',
+                        key: 'factoryName',
                         align: 'center',
                         render: (h, params) => {
-                            return params.row.goods.factory;
+                            return params.row.goods.factoryName;
                         }
                     },
                     {

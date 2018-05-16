@@ -498,13 +498,20 @@
     gi.updated_time as updatedTime, gi.att1_id as att1Id, gi.att1_value as att1Value,
     gi.att2_id as att2Id, gi.att2_value as att2Value, gi.att3_id as att3Id, gi.att3_value as att3Value, gi.att4_id as att4Id,
     gi.att4_value as att4Value, gi.att5_id as att5Id, gi.att5_value as att5Value, gi.att6_id as att6Id, gi.att6_value as att6Value,
-    gi.tags as tags, gi.use_spec as useSpec
+    gi.tags as tags, gi.use_spec as useSpec,
+    gc.name as categoryName,
+    f.name as factoryName,
+    s.name as supplierName
   </sql>
 
   <select id="getChooseListDetail" parameterType="com.yiban.erp.dto.GoodsQuery" resultType="com.yiban.erp.entities.Goods">
     select
       <include refid="Goods_Column_List"/>
-    from goods_info gi, goods_detail gd
+    from goods_info gi
+      left join good_category gc on gc.id = gi.category_id
+      left join factory f on f.id = gi.factory_id
+      left join supplier s on s.id = gi.supplier_id
+      , goods_detail gd
       left join goods_spec gs1 on gd.spec_one_id = gs1.id
       left join goods_spec gs2 on gd.spec_one_id = gs2.id
       left join goods_spec gs3 on gd.spec_one_id = gs3.id

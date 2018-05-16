@@ -23,7 +23,7 @@
             </slot>
         </Tooltip>
 
-        <Modal v-model="selectCustModal" width="60" :mask-closable="false" title="选择客户" class="cust-modal">
+        <Modal v-model="selectCustModal" width="60" :mask-closable="false" title="选择客户" class="cust-modal" transfer>
             <customerListSelect ref="custSelectModal" @on-choosed="customerSelected" ></customerListSelect>
             <div slot="footer">
                 <Button type="text" @click="selectCustModal = false">取消</Button>

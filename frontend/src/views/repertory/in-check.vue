@@ -213,7 +213,7 @@ export default {
                 },
                 {
                     title: "生产企业",
-                    key: 'factory',
+                    key: 'factoryName',
                     width: 120
                 },
                 {

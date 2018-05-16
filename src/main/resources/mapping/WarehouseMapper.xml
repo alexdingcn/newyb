@@ -5,6 +5,7 @@
     <id column="id" property="id" jdbcType="INTEGER" />
     <result column="company_id" property="companyId" jdbcType="INTEGER" />
     <result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="address" property="address" jdbcType="VARCHAR" />
     <result column="status" property="status" jdbcType="VARCHAR" />
     <result column="description" property="description" jdbcType="VARCHAR" />
     <result column="created_by" property="createdBy" jdbcType="VARCHAR" />
@@ -13,7 +14,7 @@
     <result column="updated_time" property="updatedTime" jdbcType="TIMESTAMP" />
   </resultMap>
   <sql id="Base_Column_List" >
-    id, company_id, name, status, description, created_by, updated_by, created_time, updated_time
+    id, company_id, name, status, address, description, created_by, updated_by, created_time, updated_time
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
     select 
@@ -55,6 +56,9 @@
       <if test="name != null" >
         name,
       </if>
+    <if test="address != null">
+      address,
+    </if>
       <if test="status != null">
         status,
       </if>
@@ -82,6 +86,9 @@
       <if test="name != null" >
         #{name,jdbcType=VARCHAR},
       </if>
+        <if test="address != null">
+            #{address,jdbcType=VARCHAR},
+        </if>
       <if test="status != null" >
         #{status,jdbcType=VARCHAR},
       </if>
@@ -111,6 +118,9 @@
       <if test="name != null" >
         name = #{name,jdbcType=VARCHAR},
       </if>
+        <if test="address != null" >
+            address = #{address,jdbcType=VARCHAR},
+        </if>
       <if test="status != null" >
         status = #{status,jdbcType=VARCHAR},
       </if>
@@ -137,6 +147,7 @@
     set company_id = #{companyId,jdbcType=INTEGER},
       name = #{name,jdbcType=VARCHAR},
       status = #{status,jdbcType=VARCHAR},
+      address = #{address,jdbcType=VARCHAR},
       description = #{description,jdbcType=VARCHAR},
       created_by = #{createdBy,jdbcType=VARCHAR},
       updated_by = #{updatedBy,jdbcType=VARCHAR},

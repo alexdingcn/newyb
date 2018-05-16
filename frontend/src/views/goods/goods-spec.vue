@@ -10,7 +10,7 @@
               商品多规格设置
             </p>
           <div slot="extra" >
-              <ButtonGroup size="small">
+              <ButtonGroup>
                   <Button type="success" icon="plus" @click="add" >新增多规格</Button>
               </ButtonGroup>
           </div>
@@ -64,33 +64,45 @@
 
 <script>
 import util from '@/libs/util.js';
+import goodsSepcTags from './goods-spec-tabs.vue';
 
 export default {
     name: 'goods-spec',
+    components: {
+        goodsSepcTags
+    },
     data() {
         return {
             tableLoading: false,
             tableData: [],
             tableColumns: [
                 {
-                    title: '序号',
+                    title: '#',
                     type: 'index',
                     width: 60
                 },
                 {
-                    title: '多规格编号',
+                    title: '规格编号',
                     key: 'parentNo',
                     minWidth: 150
                 },
                 {
-                    title: '多规格名称',
+                    title: '规格名称',
                     key: 'parentName',
                     minWidth: 150,
                 },
                 {
-                    title: '多规格值',
-                    key: 'subValues',
+                    title: '规格可选值',
+                    key: 'subGoodsSpecs',
                     minWidth: 200,
+                    render: (h, params) =>　{
+                        return h(goodsSepcTags, {
+                                props: {
+                                    tags: params.row.subGoodsSpecs,
+                                    color: 'blue'
+                                }
+                            });
+                    }
                 },
                 {
                     title: '操作',
@@ -144,7 +156,7 @@ export default {
                     width: 60
                 },
                 {
-                    title: '多规格值',
+                    title: '规格值',
                     key: 'specName',
                     render: (h, params) => {
                         let self= this;
@@ -162,7 +174,7 @@ export default {
                     }
                 },
                 {
-                    title: '多规格编号',
+                    title: '规格编号',
                     key: 'specNo',
                     render: (h, params) => {
                         let self= this;
@@ -215,6 +227,7 @@ export default {
             this.tableLoading = true;
             util.ajax.get('/goods/spec/list')
                 .then((response) => {
+                    console.log(response);
                     this.tableLoading = false;
                     this.tableData = response.data;
                 })

@@ -17,15 +17,14 @@
                     </div>
                 </Tooltip>
             </p>
-            
-            <div class="good-category-con">
-                <ButtonGroup slot="extra" size="small">
-                    <Button type="primary" icon="android-add-circle" @click="addCategory">新建</Button>
-                    <Button type="success" icon="edit"  @click="editCategory" :disabled="disableDelCategory">修改</Button>
-                    <Button type="error" icon="android-remove-circle" @click="delCategory" :loading="dataLoading" :disabled="disableDelCategory">删除</Button>
-                    <Button type="ghost" icon="refresh" :loading="dataLoading" @click="loadTree" >刷新</Button>
-                </ButtonGroup>
+            <ButtonGroup slot="extra" >
+                <Button type="primary" icon="android-add-circle" @click="addCategory">新建</Button>
+                <Button type="success" icon="edit"  @click="editCategory" :disabled="disableDelCategory">修改</Button>
+                <Button type="error" icon="android-remove-circle" @click="delCategory" :loading="dataLoading" :disabled="disableDelCategory">删除</Button>
+                <Button type="ghost" icon="refresh" :loading="dataLoading" @click="loadTree" >刷新</Button>
+            </ButtonGroup>
 
+            <div class="good-category-con">
                 <Tree :data="goodCatTreeData" @on-select-change="onTreeNodeSelected" ref="goodCatTree"></Tree>
             </div>
         </Card>
@@ -46,7 +45,7 @@
                 </Row>
             </Form>
             <Row type="flex" justify="end" slot="footer" >
-              <ButtonGroup size="small">
+              <ButtonGroup>
                   <Button type="success" icon="checkmark" :loading="saveLoading" @click="saveSubmit" >确定保存</Button>
                   <Button type="ghost" icon="reply" @click="modalCancel" >取消</Button>
               </ButtonGroup>

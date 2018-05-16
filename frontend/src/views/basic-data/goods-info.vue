@@ -476,7 +476,7 @@ export default {
     methods: {
         init () {
             var self = this;
-            util.ajax.get('/good/category/list')
+            util.ajax.get('/goods/category/list')
                 .then(function (response) {
                     self.categoryList = response.data;
                 })

@@ -82,14 +82,17 @@ export default {
     },
     methods: {
         showGoodsSelectModal() {
-            this.selectGoodsModal = true;
-            this.$refs.goodsSelectModal.reload();
+            if (!this.disabled) {
+                this.selectGoodsModal = true;
+                this.$refs.goodsSelectModal.reload();
+            }
         },
         goodsSelected(item) {
             this.goodsList = new Array();
             this.goodsList.push(item);
             this.$nextTick(() => { this.goodsId = item.id; });
             this.selectGoodsModal = false;
+            this.$emit('on-change', item.id, item);
         },
         queryGoods (query) {
             var self = this;

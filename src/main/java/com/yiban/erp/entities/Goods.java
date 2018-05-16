@@ -188,6 +188,7 @@ public class Goods {
     private String categoryName;
     private String brandName;
     private String supplierName;
+    private String factoryName;
 
     // Option value
     private String unitName;
@@ -1127,5 +1128,37 @@ public class Goods {
 
     public void setMedTypeName(String medTypeName) {
         this.medTypeName = medTypeName;
+    }
+
+    public String getFactoryName() {
+        return factoryName;
+    }
+
+    public void setFactoryName(String factoryName) {
+        this.factoryName = factoryName;
+    }
+
+    public List<GoodsSpec> getGoodsSpecs() {
+        List<GoodsSpec> result = new ArrayList<>();
+        GoodsSpec spec;
+        if (this.specOneId != null) {
+            spec = new GoodsSpec();
+            spec.setId(this.specOneId);
+            spec.setSpecName(this.specOneName);
+            result.add(spec);
+        }
+        if (this.specTwoId != null) {
+            spec = new GoodsSpec();
+            spec.setId(this.specTwoId);
+            spec.setSpecName(this.specTwoName);
+            result.add(spec);
+        }
+        if (this.specThreeId != null) {
+            spec = new GoodsSpec();
+            spec.setId(this.specThreeId);
+            spec.setSpecName(this.specThreeName);
+            result.add(spec);
+        }
+        return result;
     }
 }

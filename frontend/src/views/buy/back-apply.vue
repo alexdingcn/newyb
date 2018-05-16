@@ -62,7 +62,7 @@
       </Card>
 
       <Modal v-model="selectRepertoryModal" width="60" :mask-closable="false" title="选择库存商品" >
-          <repertory-info-select :warehouse="currWarehouse" @on-choosed="repertoryInfoChoonsed" ></repertory-info-select>
+          <repertory-info-select :warehouse="currWarehouse" @on-choosed="repertoryInfoChoosed" ></repertory-info-select>
           <span slot="footer"></span>
       </Modal>
 
@@ -307,7 +307,7 @@ export default {
             }
             this.selectRepertoryModal = true;
         },
-        repertoryInfoChoonsed(data) {
+        repertoryInfoChoosed(data) {
             this.selectRepertoryModal = false;
             if (!data || data.length <= 0) {
                 return;

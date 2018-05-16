@@ -9,6 +9,8 @@ public class Warehouse {
 
     private String name;
 
+    private String address;
+
     private String status;
 
     private String description;
@@ -91,5 +93,13 @@ public class Warehouse {
 
     public void setUpdatedTime(Date updatedTime) {
         this.updatedTime = updatedTime;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
     }
 }

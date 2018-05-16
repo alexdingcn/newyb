@@ -4,8 +4,8 @@
 
 <template>
     <div class="access">
-        <Row>
-            <Col span="12">
+        <Row :gutter="16">
+            <Col span="14">
                 <Card>
                     <p slot="title">
                         <Icon type="social-buffer"></Icon> 仓库点
@@ -13,6 +13,7 @@
                     <div slot="extra">
                         <ButtonGroup class="padding-left-20" size="small">
                             <Button type="primary" icon="android-add-circle" @click="warehouseModalShow = true">添加</Button>
+                            <Button type="success" icon="edit" @click="doEdit">修改</Button>
                             <Button type="error" icon="android-remove-circle"  @click="delWarehouse">删除</Button>
                         </ButtonGroup>
                     </div>
@@ -26,7 +27,7 @@
                     </Row>
                 </Card>
             </Col>
-            <Col span="11" style="margin-left:10px;">
+            <Col span="10">
                 <Card>
                     <p slot="title">
                         <Icon type="ios-albums"></Icon> 库位 {{warehouseNameTitle ||  ''}}
@@ -53,14 +54,13 @@
                 <span>新增仓库</span>
             </p>
             <div style="text-align:center">
-                <Row>
-                    <Input v-model="newWarehouse.name" placeholder="仓库名" />
-                    <br>
-                    <Input v-model="newWarehouse.description" placeholder="描述" />
-                </Row>
+                <Input v-model="newWarehouse.name" placeholder="仓库名" />
+                <Input v-model="newWarehouse.description" placeholder="描述" class="margin-top-10"/>
+                <Input v-model="newWarehouse.address" placeholder="地址" class="margin-top-10"/>
             </div>
             <div slot="footer">
-                <Button type="primary" @click="handleAddWarehouse">增加</Button>
+                <Button type="primary" @click="handleAddWarehouse" v-if="!newWarehouse.id">增加</Button>
+                <Button type="success" @click="handleAddWarehouse" v-if="newWarehouse.id">保存</Button>
             </div>
         </Modal>
 
@@ -70,14 +70,12 @@
                 <span>新增仓库库位</span>
             </p>
             <div style="text-align:center">
-                <Row>
-                    <Input v-model="newLocation.location" placeholder="库位名称" />
-                    <br>
-                    <Input v-model="newLocation.comment" placeholder="描述" />
-                </Row>
+                <Input v-model="newLocation.location" placeholder="库位名称" />
+                <Input v-model="newLocation.comment" placeholder="描述" class="margin-top-10"/>
             </div>
             <div slot="footer">
-                <Button type="primary" @click="handleAddLocation">增加</Button>
+                <Button type="primary" @click="handleAddLocation(true)">增加</Button>
+                <Button type="primary" @click="handleAddLocation(false)">增加并关闭</Button>
             </div>
         </Modal>
 
@@ -97,7 +95,8 @@
                 warehouseData: [],
                 newWarehouse: {
                     name: '',
-                    description: ''
+                    description: '',
+                    address: ''
                 },
                 warehouseColumns: [
                     {
@@ -109,13 +108,13 @@
                         title: '名称',
                         key: 'name',
                         align: 'center',
-                        width: 150
+                        width: 120
                     },
                     {
                         title: '状态',
                         key: 'status',
                         align: 'center',
-                        width: 130,
+                        width: 120,
                         render: (h, params) => {
                             let status = params.row.status;
                             switch (status) {
@@ -132,6 +131,11 @@
                         title: '描述',
                         key: 'description',
                         align: 'center',
+                        width: 200
+                    },
+                    {
+                        title: '地址',
+                        key: 'address',
                         width: 250
                     },
                     {
@@ -171,7 +175,7 @@
                         align: 'center',
                     }, 
                     {
-                        tilte: '创建操作员',
+                        title: '创建者',
                         key: 'createBy',
                         align: 'center'
                     },
@@ -229,6 +233,15 @@
                     },
                     onCancel: () => {}
                 });
+            },
+
+            doEdit() {
+                var rows = this.$refs.warehouseTable.getSelection();
+                if (rows && rows.length > 0) {
+                    var self = this;
+                    self.newWarehouse = rows[0];
+                    self.warehouseModalShow = true;
+                }
             },
 
             doDelete() {
@@ -317,7 +330,7 @@
                 this.locationSelectList = data;
             },
 
-            handleAddLocation() {
+            handleAddLocation(closeModal) {
                 var self = this;
                 if (!this.currWarehouseId) {
                     this.$Message.warning('请先点击对应仓库选择需要添加库位的仓库');
@@ -332,7 +345,7 @@
                     .then(function (response) {
                         self.$Message.success('添加成功');
                         self.loadWarehouseLocationList(self.currWarehouseId);
-                        self.locationModalShow = false;
+                        self.locationModalShow = closeModal;
                         self.newLocation = {};
                     })
                     .catch(function (error) {
