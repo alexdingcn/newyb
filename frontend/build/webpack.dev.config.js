@@ -20,6 +20,11 @@ module.exports = merge(webpackBaseConfig, {
         filename: '[name].js',
         chunkFilename: '[name].chunk.js'
     },
+    devServer: {
+        headers: {
+          'Access-Control-Allow-Origin': '*',
+        },
+    },
     plugins: [
         new ExtractTextPlugin({
             filename: '[name].css',

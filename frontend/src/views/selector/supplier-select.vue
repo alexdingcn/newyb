@@ -7,11 +7,13 @@
             <Button type="primary" size="small" icon="android-contacts" @click="showSupplierSelectModal"></Button>
         </div>
         <Select v-model="supplierId"
+                ref="supplierSelectCtrl"
                 filterable
                 clearable
                 remote
                 :size="selectSize"
                 @on-change="onSelectSupplier"
+                @on-query-change="onSelectQueryChange"
                 placeholder="供应商名称/拼音"
                 :remote-method="querySupplier"
                 :loading="supplierLoading">
@@ -73,21 +75,26 @@ export default {
             this.selectSupplierModal = true;
             this.$refs.supplierSelectModal.reload();
         },
+        onSelectQueryChange(query) {
+            if (query === '') {
+                this.$refs.supplierSelectCtrl.setQuery(this.$refs.supplierSelectCtrl.selectedSingle);
+            }
+        },
         querySupplier (query) {
             var self = this;
             if (query !== '') {
                 this.supplierLoading = true;
                 util.ajax.post('/supplier/search', {search: query})
                     .then(function (response) {
-                        self.supplierLoading = false;
-                        self.supplierOptions = response.data;
+                        if (response.status === 200) {
+                            self.supplierLoading = false;
+                            self.supplierOptions = response.data;
+                        }
                     })
                     .catch(function (error) {
                         self.supplierLoading = false;
                         util.errorProcessor(self, error);
                     });
-            } else {
-                this.supplierOptions = [];
             }
         },
         onSelectSupplier (data) {
@@ -103,7 +110,9 @@ export default {
         supplierSelected(item) {
             this.supplierOptions = new Array();
             this.supplierOptions.push(item);
-            this.$nextTick(() => { this.supplierId = item.id; });
+            this.$nextTick(() => { 
+                this.onSelectSupplier(item.id); 
+            });
             this.selectSupplierModal = false;
         }
     }

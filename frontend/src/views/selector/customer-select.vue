@@ -124,16 +124,3 @@ export default {
 
 };
 </script>
-
-<style lang="less">
-    .cust-modal {
-        .ivu-modal-header {
-            background-color: #07889B;
-            border-top-left-radius: 6px;
-            border-top-right-radius: 6px;
-        }
-        .ivu-modal-header-inner,
-        .ivu-modal-close,
-        .ivu-icon-ios-close-empty { color: white; }
-    }
-</style>

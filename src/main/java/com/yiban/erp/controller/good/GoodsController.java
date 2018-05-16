@@ -7,8 +7,6 @@ import com.yiban.erp.dto.GoodsQuery;
 import com.yiban.erp.entities.Goods;
 import com.yiban.erp.entities.GoodsInfo;
 import com.yiban.erp.entities.User;
-import com.yiban.erp.exception.BizRuntimeException;
-import com.yiban.erp.exception.ErrorCode;
 import com.yiban.erp.service.goods.GoodsService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,7 +16,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 
 @RestController
@@ -33,7 +32,7 @@ public class GoodsController {
 
     @RequestMapping(value = "/list", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> list(@AuthenticationPrincipal User user,
-                                        @RequestParam(required = false) Integer catId,
+                                       @RequestParam(required = false) Integer catId,
                                        @RequestParam(required = false) String search,
                                        @RequestParam(required = false) Integer factoryId,
                                        @RequestParam(required = false) Integer page,

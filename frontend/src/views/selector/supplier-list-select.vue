@@ -18,7 +18,6 @@
                 class="margin-top-10 supplier-select-table">
         </Table>
         <Row class="margin-top-8">
-            TODO：添加分页
             <div style="float: right;">
                 <Page :total="totalsupplierCount" :current="currentPage" :page-size="pageSize" @on-change="changePage" size="small" show-total></Page>
             </div>
