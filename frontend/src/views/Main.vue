@@ -98,7 +98,7 @@
             return {
                 shrink: true,
                 isFullScreen: false,
-                openHelp: true,
+                openHelp: false,
                 openedSubmenuArr: this.$store.state.app.openedSubmenuArr
             };
         },

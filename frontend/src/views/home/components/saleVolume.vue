@@ -24,7 +24,7 @@ export default {
     },
     methods: {
         draw (content) {
-
+            var self = this;
             let xAxisData = [];
             let yAxisData = [];
             for (let i = 0; i < content.length; i++) {
@@ -68,7 +68,7 @@ export default {
             this.saleVolume.setOption(option);
 
             window.addEventListener('resize', function () {
-                this.saleVolume.resize();
+                self.saleVolume.resize();
             });
         }
     },

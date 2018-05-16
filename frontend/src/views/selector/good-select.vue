@@ -82,8 +82,10 @@ export default {
     },
     methods: {
         showGoodsSelectModal() {
-            this.selectGoodsModal = true;
-            this.$refs.goodsSelectModal.reload();
+            if (!this.disabled) {
+                this.selectGoodsModal = true;
+                this.$refs.goodsSelectModal.reload();
+            }
         },
         goodsSelected(item) {
             this.goodsList = new Array();

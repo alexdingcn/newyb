@@ -287,11 +287,13 @@ export default {
         loadGoodsInfo(id) {
             util.ajax.get('/goods/' + id)
                 .then((response) => {
-                    let data = response.data;
-                    data.enable = data.enable ? 1 : 0;
-                    this.formData = data;
-                    if(this.formData.useSpec) {
-                        this.editShowSpecForm(this.formData.goodsDetails);
+                    if (response.status === 200) {
+                        let data = response.data;
+                        data.enable = data.enable ? 1 : 0;
+                        this.formData = data;
+                        if(this.formData.useSpec) {
+                            this.editShowSpecForm(this.formData.goodsDetails);
+                        }
                     }
                 })
                 .catch((error) => {

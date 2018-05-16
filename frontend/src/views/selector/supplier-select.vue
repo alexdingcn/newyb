@@ -68,6 +68,9 @@ export default {
     watch: {
         value(data) {
             this.supplierId = data;
+            if (this.supplierOptions === undefined || this.supplierOptions.length == 0) {
+                this.querySupplier();
+            }
         }
     },
     methods: {
@@ -82,13 +85,28 @@ export default {
         },
         querySupplier (query) {
             var self = this;
-            if (query !== '') {
+            if (query && query !== '') {
                 this.supplierLoading = true;
                 util.ajax.post('/supplier/search', {search: query})
                     .then(function (response) {
                         if (response.status === 200) {
                             self.supplierLoading = false;
                             self.supplierOptions = response.data;
+                        }
+                    })
+                    .catch(function (error) {
+                        self.supplierLoading = false;
+                        util.errorProcessor(self, error);
+                    });
+            } else if (this.supplierId !== '') {
+                util.ajax.get('/supplier/' + this.supplierId)
+                    .then(function (response) {
+                        if (response.status === 200) {
+                            self.supplierLoading = false;
+                            if (response.data) {
+                                self.supplierOptions = [ response.data ];
+                                self.$refs.supplierSelectCtrl.setQuery(response.data.name);
+                            }
                         }
                     })
                     .catch(function (error) {
