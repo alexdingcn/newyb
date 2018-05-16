@@ -22,53 +22,53 @@
                             <supplier-select v-model="buyOrder.supplierId" ></supplier-select>
                         </FormItem>
 					</Col>
-					<Col span="5">
+					<!-- <Col span="5">
                         <FormItem label="供应商代表" prop="supplierContactId" >
                             <supplier-contact-select v-model="buyOrder.supplierContactId" :disabled="!buyOrder.supplierId" :supplierId="buyOrder.supplierId"></supplier-contact-select>
                         </FormItem>
-					</Col>
+					</Col> -->
 					<Col span="6">
-					<FormItem label="采购员" prop="buyerId">
-                        <buyer-select v-model="buyOrder.buyerId" ></buyer-select>
-					</FormItem>
+                        <FormItem label="采购员" prop="buyerId">
+                            <buyer-select v-model="buyOrder.buyerId" ></buyer-select>
+                        </FormItem>
 					</Col>
-					<Col span="6">
-					<FormItem label="自定单号" prop="refNo">
-						<Input v-model="buyOrder.refNo" />
-					</FormItem>
+					<!-- <Col span="6">
+                        <FormItem label="自定单号" prop="refNo">
+                            <Input v-model="buyOrder.refNo" />
+                        </FormItem>
+					</Col> -->
+                    <Col span="6">
+                        <FormItem label="仓库点" prop="warehouseId">
+                            <warehouse-select v-model="buyOrder.warehouseId" ></warehouse-select>
+                        </FormItem>
 					</Col>
 				</Row>
 				<Row>
+                    <Col span="5">
+						<FormItem label="预到货日期" prop="eta">
+							<DatePicker type="date" v-model="buyOrder.eta" />
+						</FormItem>
+					</Col>
 					<Col span="6">
-					<FormItem label="运输方式" prop="shipMethodId">
-                        <option-select v-model="buyOrder.shipMethodId" optionType="SHIP_METHOD"></option-select>
-					</FormItem>
+                        <FormItem label="运输方式" prop="shipMethodId">
+                            <option-select v-model="buyOrder.shipMethodId" optionType="SHIP_METHOD"></option-select>
+                        </FormItem>
 					</Col>
 					<Col span="5">
-					<FormItem label="运输工具" prop="shipToolId">
-                        <option-select v-model="buyOrder.shipToolId" optionType="SHIP_TOOL"></option-select>
-					</FormItem>
+                        <FormItem label="运输工具" prop="shipToolId">
+                            <option-select v-model="buyOrder.shipToolId" optionType="SHIP_TOOL"></option-select>
+                        </FormItem>
 					</Col>
 					<Col span="6">
-					<FormItem label="温控方式" prop="temperControlId">
-                        <option-select v-model="buyOrder.temperControlId" optionType="TEMPER_CONTROL"></option-select>
-					</FormItem>
-					</Col>
-					<Col span="6">
-					<FormItem label="仓库点" prop="warehouseId">
-                        <warehouse-select v-model="buyOrder.warehouseId" ></warehouse-select>
-					</FormItem>
+                        <FormItem label="温控方式" prop="temperControlId">
+                            <option-select v-model="buyOrder.temperControlId" optionType="TEMPER_CONTROL"></option-select>
+                        </FormItem>
 					</Col>
 				</Row>
 				<Row>
 					<Col span="6">
 						<FormItem label="选择商品">
                             <good-select :disabled="!buyOrder.warehouseId" ref="goodsSelect" @on-change="onSelectGoods" ></good-select>
-						</FormItem>
-					</Col>
-					<Col span="5">
-						<FormItem label="预到货日期" prop="eta">
-							<DatePicker type="date" v-model="buyOrder.eta" />
 						</FormItem>
 					</Col>
 					<Col span="12">
@@ -325,10 +325,7 @@
         	],
                 ruleValidate: {
                     supplierId: [
-                        { required: true, type: 'number', message: '请选择供应商', trigger: 'blur' }
-                    ],
-                    supplierContactId: [
-                        { required: true, type: 'number', message: '请选择供应商代表', trigger: 'blur' }
+                        { required: true, type: 'number', message: '请选择供应商' }
                     ],
                     buyerId: [
                         { required: true, type: 'number', message: '请选择采购员', trigger: 'blur' }

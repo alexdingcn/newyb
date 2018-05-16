@@ -1,34 +1,61 @@
-<template>
-  
-  <Select
-        ref="goodsSelect"
-        v-model="id" 
-        filterable
-        :clearable="true"
-        remote
-        placeholder="商品名称/拼音"
-        :disabled="disabled" 
-        :size="selectSize"
-        @on-change="onChange"
-        :remote-method="queryGoods"
-        :loading="goodsLoading">
-        <Option v-for="option in goodsOptions" :value="option.id" :label="option.name" :key="option.id" :disabled="!option.enable">
-            <span class="option-goods-name">{{ option.name }}</span>
-            <span class="option-goods-spec">{{option.jx}} | {{ option.spec }} | {{option.factory}}</span>
-        </Option>
-    </Select>
+<style lang="less">
+@import "customer-select.less";
+</style>
 
+<template>
+      <div :class="wrapClasses">
+        <div class="ivu-input-group-prepend">
+            <Button type="primary" size="small" icon="ios-book" @click="showGoodsSelectModal"></Button>
+        </div>
+        <Select
+            ref="goodsSelect"
+            v-model="goodsId" 
+            filterable
+            :clearable="true"
+            remote
+            placeholder="商品名称/拼音"
+            :disabled="disabled" 
+            :size="selectSize"
+            @on-change="onChange"
+            :remote-method="queryGoods"
+            :loading="goodsLoading">
+            <Option v-for="option in goodsOptions" :value="option.id" :label="option.name" :key="option.id" :disabled="!option.enable">
+                <span class="option-goods-name">{{ option.name }}</span>
+                <span class="option-goods-spec">{{option.jx}} | {{ option.spec }} | {{option.factory}}</span>
+            </Option>
+        </Select>
+
+        <Tooltip transfer v-if="hasHelpSlot">
+            <Icon type="ios-information-outline"></Icon>
+            <slot name="helpContent" slot="content">
+            </slot>
+        </Tooltip>
+
+        <Modal v-model="selectGoodsModal" width="60" :mask-closable="false" title="选择客户" class="cust-modal">
+            <goodsListSelect ref="goodsSelectModal" @on-choosed="goodsSelected" ></goodsListSelect>
+            <div slot="footer">
+                <Button type="text" @click="selectGoodsModal = false">取消</Button>
+            </div>
+        </Modal>
+    </div>
 </template>
 
 <script>
 import util from '@/libs/util.js';
+import goodsListSelect from './good-list-select.vue';
+
+const prefixCls = 'ivu-input';
 
 export default {
     name: 'good-select',
     props: ['value', 'disabled', 'size'],
+    components: {
+        goodsListSelect
+    },
     data () {
         return {
-            id: '',
+            goodsId: '',
+            selectGoodsModal: false,
             selectSize: this.size,
             goodsLoading: false,
             goodsOptions: []
@@ -36,10 +63,34 @@ export default {
     },
     watch: {
         value(newValue) {
-            this.id = newValue;
+            this.goodsId = newValue;
         }
     },
+    computed: {
+        hasHelpSlot () {
+            return !!this.$slots.helpContent
+        },
+        wrapClasses () {
+            return [
+                `${prefixCls}-wrapper`,
+                {
+                    [`${prefixCls}-group`]: true,
+                    [`${prefixCls}-group-with-prepend`]: true
+                }
+            ];
+        },
+    },
     methods: {
+        showGoodsSelectModal() {
+            this.selectGoodsModal = true;
+            this.$refs.goodsSelectModal.reload();
+        },
+        goodsSelected(item) {
+            this.goodsList = new Array();
+            this.goodsList.push(item);
+            this.$nextTick(() => { this.goodsId = item.id; });
+            this.selectGoodsModal = false;
+        },
         queryGoods (query) {
             var self = this;
             if (query !== '') {
@@ -61,7 +112,7 @@ export default {
             }
         },
         clearSingleSelect() {
-            this.id = '';
+            this.goodsId = '';
             this.$refs.goodsSelect.clearSingleSelect();
         },
         onChange (data) {
