@@ -71,27 +71,34 @@ public class GoodsController {
         return ResponseEntity.ok(response.toJSONString());
     }
 
-    @RequestMapping(value = "/{goodsId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> get(@PathVariable Long goodsId) {
-        Goods goods = goodsMapper.selectByPrimaryKey(goodsId);
-        goodsService.setGoodsOptionName(goods);
-        return ResponseEntity.ok().body(JSON.toJSONString(goods));
+    @RequestMapping(value = "/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> get(@PathVariable Long id) throws Exception {
+        GoodsInfo goodsInfo = goodsService.getGoodsInfoById(id);
+        return ResponseEntity.ok().body(JSON.toJSONString(goodsInfo));
     }
 
-    @RequestMapping(value = "/remove/{goodsId}", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> remove(@PathVariable Long goodsId) {
-        int result = goodsMapper.deleteByPrimaryKey(goodsId);
-        if (result > 0) {
-            return ResponseEntity.ok().build();
-        }
-        throw new BizRuntimeException(ErrorCode.FAILED_DELETE_FROM_DB);
+    @RequestMapping(value = "/remove/{infoId}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> remove(@PathVariable Long infoId,
+                                         @AuthenticationPrincipal User user) throws Exception {
+        logger.info("user:{} request to remove goods info by id:{}", user.getId(), infoId);
+        goodsService.remove(infoId, user);
+        return ResponseEntity.ok().build();
     }
 
     @RequestMapping(value = "/save", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> add(@RequestBody GoodsInfo goodsInfo,
+    public ResponseEntity<String> save(@RequestBody GoodsInfo goodsInfo,
                                       @AuthenticationPrincipal User user) throws Exception {
         logger.info("save add or update goods info :{}", JSON.toJSONString(goodsInfo));
         goodsService.saveGoodsInfo(goodsInfo, user);
         return ResponseEntity.ok().build();
     }
+
+    @RequestMapping(value = "/copy/{id}", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> copy(@PathVariable Long id,
+                                       @AuthenticationPrincipal User user) throws Exception {
+        logger.info("user:{} request copy goods info by modal id:{}", user.getId(), id);
+        goodsService.copyGoodsInfo(id, user);
+        return ResponseEntity.ok().build();
+    }
+
 }

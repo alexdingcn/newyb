@@ -98,6 +98,17 @@ public class GoodsService {
         goodsInfoList.stream().forEach(item -> item.setOptions(options));
     }
 
+    public void setGoodsInfoOptionName(GoodsInfo goodsInfo) {
+        if (goodsInfo == null || goodsInfo.getOptionIds() == null || goodsInfo.getOptionIds().isEmpty()) {
+            return;
+        }
+        Set<Long> optionIdSet = goodsInfo.getOptionIds();
+        Long[] ids = new Long[optionIdSet.size()];
+        optionIdSet.toArray(ids);
+        List<Options> options = optionsMapper.getByIds(ids);
+        goodsInfo.setOptions(options);
+    }
+
 
     public Long searchListCount(GoodsQuery query) {
         return goodsInfoMapper.searchListCount(query);
@@ -107,6 +118,17 @@ public class GoodsService {
         List<GoodsInfo> infos = goodsInfoMapper.searchList(query);
         setGoodsInfoOptionName(infos);
         return infos;
+    }
+
+    public GoodsInfo getGoodsInfoById(Long id) throws BizException {
+        GoodsInfo goodsInfo = goodsInfoMapper.selectByPrimaryKey(id);
+        if (goodsInfo == null) {
+            throw new BizException(ErrorCode.GOODS_GET_RESULT_NULL);
+        }
+        List<GoodsDetail> details = goodsDetailMapper.getByGoodsInfoId(goodsInfo.getId());
+        goodsInfo.setGoodsDetails(details);
+        setGoodsInfoOptionName(goodsInfo);
+        return goodsInfo;
     }
 
 
@@ -131,10 +153,12 @@ public class GoodsService {
         goodsInfo.setCompanyId(user.getCompanyId());
         goodsInfo.setUseSpec(useSpec);
         if (goodsInfo.getStatus() == null) {
-            goodsInfo.setStatus(GoodsStatus.OFF_SALE.name());
+            goodsInfo.setStatus(GoodsStatus.ON_SALE.name());
         }
         goodsInfo.setGoodsNo(UtilTool.makeOrderNumber(user.getCompanyId(), OrderNumberType.GOODS));
-        goodsInfo.setEnable(true);
+        if (goodsInfo.getEnable() == null) {
+            goodsInfo.setEnable(false);
+        }
         goodsInfo.setCreatedBy(user.getNickname());
         goodsInfo.setCreatedTime(new Date());
         int count = goodsInfoMapper.insert(goodsInfo);
@@ -203,5 +227,74 @@ public class GoodsService {
     public void updateGoodsInfo(GoodsInfo goodsInfo, User user) throws BizException {
 
     }
+
+    @Transactional
+    public void remove(Long infoId, User user) throws BizException {
+        GoodsInfo goodsInfo = goodsInfoMapper.selectByPrimaryKey(infoId);
+        if (goodsInfo == null || !goodsInfo.getCompanyId().equals(user.getCompanyId())) {
+            logger.warn("get goods info fail by id:{}", infoId);
+            throw new BizException(ErrorCode.GOODS_GET_RESULT_NULL);
+        }
+        //验证当前商品下的所有详情是否有存在使用的情况，如果存在，不能删除
+        boolean isGoodsUse = goodsInfoMapper.isGoodsUsed(infoId);
+        if (isGoodsUse) {
+            logger.warn("goods info is used, can not delete.");
+            throw new BizException(ErrorCode.GOODS_USED_CANNOT_DELETE);
+        }
+        //如果没有关联的，直接修改到删除状态
+        goodsInfo.setEnable(false);
+        goodsInfo.setStatus(GoodsStatus.DELETE.name());
+        goodsInfo.setUpdatedBy(user.getNickname());
+        goodsInfo.setUpdatedTime(new Date());
+        int count = goodsInfoMapper.updateByPrimaryKeySelective(goodsInfo);
+        if (count <= 0) {
+            throw new BizRuntimeException(ErrorCode.FAILED_DELETE_FROM_DB);
+        }
+        logger.info("goods info is update to DELETE status, then update details status to DELETE");
+        goodsDetailMapper.deleteByGoodsInfoId(goodsInfo.getId(), user.getNickname(), new Date());
+    }
+
+    @Transactional
+    public void copyGoodsInfo(Long id, User user) throws BizException {
+        GoodsInfo goodsInfo = goodsInfoMapper.selectByPrimaryKey(id);
+        if (goodsInfo == null || !goodsInfo.getCompanyId().equals(user.getCompanyId())) {
+            logger.warn("get goods info fail by id:{}", id);
+            throw new BizException(ErrorCode.GOODS_GET_RESULT_NULL);
+        }
+        List<GoodsDetail> details = goodsDetailMapper.getByGoodsInfoId(goodsInfo.getId());
+        if (details == null || details.isEmpty()) {
+            logger.warn("get goods info detail by goods info id result is empty");
+            throw new BizException(ErrorCode.GOODS_GET_RESULT_NULL);
+        }
+        //先直接对goodsInfo 做入库操作
+        goodsInfo.setId(null);
+        goodsInfo.setName(goodsInfo.getName() + "copy"); //名称在原来的商品名称上加一个copy
+        goodsInfo.setGoodsNo(UtilTool.makeOrderNumber(user.getCompanyId(), OrderNumberType.GOODS));
+        goodsInfo.setCreatedBy(user.getNickname());
+        goodsInfo.setCreatedTime(new Date());
+        goodsInfo.setUpdatedBy(user.getNickname());
+        goodsInfo.setUpdatedTime(new Date());
+        int count = goodsInfoMapper.insert(goodsInfo);
+        if (count <=0 || goodsInfo.getId() == null) {
+            logger.warn("copy goods info insert db fail.");
+            throw new BizRuntimeException(ErrorCode.FAILED_INSERT_FROM_DB);
+        }
+        logger.info("copy goods info insert info success, id:{}", goodsInfo.getId());
+        //需要对每一个detail的goods_info_id 和 sku_key 重置
+        for (GoodsDetail detail : details) {
+            detail.setId(null);
+            detail.setGoodsInfoId(goodsInfo.getId());
+            detail.setSkuKey(getSkuKey(detail, goodsInfo.getId()));
+            detail.setCreatedBy(user.getNickname());
+            detail.setCreatedTime(new Date());
+            detail.setUpdatedBy(user.getNickname());
+            detail.setUpdatedTime(new Date());
+        }
+        int detailCount = goodsDetailMapper.insertBatch(details);
+        if (detailCount <= 0) {
+            throw new BizRuntimeException(ErrorCode.FAILED_INSERT_FROM_DB);
+        }
+    }
+
 
 }

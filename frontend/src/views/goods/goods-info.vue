@@ -63,13 +63,13 @@
                         </Row>
                         <Row class="row-margin-bottom">
                             <i-col span="8">
-                                <FormItem label="上架下架" prop="status">
-                                    <RadioGroup v-model="formData.status">
-                                         <Radio label="ON_SALE">
-                                            <span>上架</span>
+                                <FormItem label="是否启用" prop="enable">
+                                    <RadioGroup v-model="formData.enable">
+                                         <Radio :label="1">
+                                            <span>启用</span>
                                         </Radio>
-                                        <Radio label="OFF_SALE">
-                                            <span>下架</span>
+                                        <Radio :label="0">
+                                            <span>禁用</span>
                                         </Radio>
                                     </RadioGroup>
                                 </FormItem>
@@ -231,7 +231,10 @@ import optionSelect from '@/views/selector/option-select.vue';
 export default {
     name: 'goods-info',
     props: {
-        
+        goodsInfoId: {
+            type: String|Number,
+            default: ''
+        }
     },
     components: {
         goodsCategorySelect,
@@ -247,7 +250,7 @@ export default {
                 name: '',
                 goodsNo: '',
                 pinyin: '',
-                status: 'OFF_SALE',
+                enable: 1,
                 useSpec: false,
                 batchPrice: 0,
                 retailPrice: 0,
@@ -274,8 +277,28 @@ export default {
         this.loadGoodsSpecs();
     },
     watch: {
+        goodsInfoId: function(id) {
+            if(id && id > 0) {
+                this.loadGoodsInfo(id);
+            }
+        }
     },
     methods: {
+        loadGoodsInfo(id) {
+            util.ajax.get('/goods/' + id)
+                .then((response) => {
+                    let data = response.data;
+                    data.enable = data.enable ? 1 : 0;
+                    this.formData = data;
+                    if(this.formData.useSpec) {
+                        this.editShowSpecForm(this.formData.goodsDetails);
+                    }
+                })
+                .catch((error) => {
+                    util.errorProcessor(this, error);
+                })
+            
+        },
         loadGoodsSpecs() {
             util.ajax.get('/goods/spec/list')
                 .then((response) => {
@@ -303,6 +326,29 @@ export default {
             }
         },
 
+        editShowSpecForm(details) {
+            //根据规格详情，制造出规格表和选择标签
+            this.currParentSpecs = [];
+
+            // TODO 
+
+        },
+        getSpecFormItemBySubId(id) {
+            if (!id || id<=0) {
+                return {};
+            }
+            for (let i=0; i< this.goodsSpesList.length; i++) {
+                let temp = this.goodsSpesList[i];
+                if (temp.subGoodsSpecs.length > 0) {
+                    for (let j=0; j<temp.subGoodsSpecs.length; j++) {
+                        if (id === temp.subGoodsSpecs[j].id) {
+                            return temp;
+                        }
+                    }
+                }
+            }
+            return {};
+        },
         getSpecFormItemByParentId(parentId) {
             if (!parentId) {
                 return {};
@@ -315,7 +361,6 @@ export default {
             }
             return {};
         },
-
         chooseParentSpecChange(parentId) {
             let specForm = this.getSpecFormItemByParentId(parentId);
             if(!specForm || !specForm.parentId) {

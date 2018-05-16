@@ -23,8 +23,8 @@
                             <Row type="flex" justify="start">
                                 <Input type="text" v-model="searchValue" placeholder="商品名称/拼音/编号" icon="search" @on-click="refreshGoodsList" style="width: 250px"/>
                                 <goods-brand-select v-model="searchGoodsBrandId" @on-change="refreshGoodsList" style="width: 150px; margin-left:10px; margin-right:10px;"></goods-brand-select>
-                                <Select v-model="searchStatus" placeholder="状态"  @on-change="refreshGoodsList" style="width: 90px; margin-right:10px;">
-                                    <Option v-for="item in statusList" :value="item.value" :key="item.value">{{ item.label }}</Option>
+                                <Select v-model="searchEnable" placeholder="状态"  @on-change="refreshGoodsList" style="width: 90px; margin-right:10px;">
+                                    <Option v-for="item in enableList" :value="item.value" :key="item.value">{{ item.label }}</Option>
                                 </Select>
                                 <supplier-select v-model="searchSupplierId"  @on-change="refreshGoodsList" style="width: 230px"></supplier-select>
                             </Row>
@@ -48,7 +48,7 @@
           </div>
 
           <Modal v-model="goodsModal" title="商品信息维护" :footerHide="true" :mask-closable="false" width="60">
-              <goods-info @save-ok="goodsSaveOk" ></goods-info>
+              <goods-info :goodsInfoId="editId" @save-ok="goodsSaveOk" ></goods-info>
           </Modal>
           
   </div>
@@ -61,6 +61,7 @@ import goodsCategory from './goods-category.vue';
 import goodsBrandSelect from '@/views/selector/goods-brand-select.vue';
 import supplierSelect from '@/views/selector/supplier-select.vue';
 import goodsInfo from './goods-info.vue';
+import factoryVue from '../basic-data/factory.vue';
 
 export default {
     name: 'goods-list',
@@ -71,14 +72,26 @@ export default {
         goodsInfo,
     },
     data() {
+        const actionButton = (h, icon, color, clickCall, data) => {
+            return h('Button', {
+                    props: {
+                        type: 'text',
+                        size: 'small',
+                        icon: icon
+                    },
+                    on: {
+                        click: (data) => {clickCall(data)}
+                    }
+                }, '');
+        }
         return {
-            statusList: [{value:'ALL', label:'全部'}, {value:'ON_SALE', label: '上架'}, {value:'OFF_SALE', label: '下架'}],
+            enableList: [{value:'ALL', label:'全部'}, {value: 1, label: '启用'}, {value: 0, label: '禁用'}],
             showSider: false,
             searchCategoryId: '',
             searchValue: '',
             searchGoodsBrandId: '',
             searchSupplierId: '',
-            searchStatus: '',
+            searchEnable: '',
             goodsModal: false,
             tableLoading: false,
             tableData:[],
@@ -113,7 +126,7 @@ export default {
                         if (!useSpec) {
                             return '';
                         }else {
-                            return params.row.detailsSize + '种';
+                            return h('span', params.row.detailsSize + '种');
                         }
                     }
                 },
@@ -121,6 +134,21 @@ export default {
                     title: '单位',
                     key: 'unitName',
                     width: 100
+                },
+                {
+                    title: '是否可用',
+                    key: 'enable',
+                    minWidth: 120,
+                    render: (h, params) => {
+                        let label = params.row.enable ? '启用' : '禁用';
+                        let color = params.row.enable ? 'green' : 'red';
+                        return h('Tag', {
+                            props:{
+                                type: 'dot',
+                                color: color
+                            }
+                        }, label);
+                    }
                 },
                 {
                     title: '批发价',
@@ -154,11 +182,52 @@ export default {
                             h('h5', brandName)
                         ]);
                     }
+                },
+                {
+                    title: '操作',
+                    key: 'action',
+                    width: 120,
+                    render: (h, params) => {
+                        let self = this;
+                        return h('div', [
+                            h('Button', {
+                                props: {
+                                    type: 'text',
+                                    size: 'small',
+                                    icon: 'edit'
+                                },
+                                on: {
+                                    click: (data) => {self.updateGoods(params.row.id)}
+                                }
+                            }, ''),
+                            h('Button', {
+                                props: {
+                                    type: 'text',
+                                    size: 'small',
+                                    icon: 'ios-copy'
+                                },
+                                on: {
+                                    click: (data) => {self.copyGoods(params.row)}
+                                }
+                            }, ''),
+                            h('Button', {
+                                props: {
+                                    type: 'text',
+                                    size: 'small',
+                                    icon: 'ios-trash'
+                                },
+                                on: {
+                                    click: (data) => {self.removeGoods(params.row)}
+                                }
+                            }, '')
+                        ]);
+                    }
                 }
             ],
             totalCount: 0,
             currentPage: 1,
             pageSize: 30,
+            editId: ''
         }
     },
     mounted() {
@@ -186,7 +255,7 @@ export default {
                 categoryId: this.searchCategoryId,
                 brandId: this.searchGoodsBrandId,
                 supplierId: this.searchSupplierId,
-                status: this.searchStatus === 'ALL' ? '' : this.searchStatus,
+                enable: this.searchEnable === 'ALL' ? '' : this.searchEnable,
                 search: this.searchValue,
                 page: this.currentPage,
                 pageSize: this.pageSize
@@ -213,7 +282,62 @@ export default {
         goodsSaveOk() {
             this.refreshGoodsList();
             this.goodsModal = false;
+        },
+
+        updateGoods(id) {
+            if(!id) {
+                return;
+            }
+            this.editId = id;
+            this.goodsModal = true;
+        },
+        copyGoods(row) {
+            if (!row.id) {
+                return;
+            }
+            let self  = this;
+            this.$Modal.confirm({
+                title: '商品复制确认',
+                content: '是否确认以商品：' + row.name + '为模板复制多一个产品？',
+                onOk: () => {
+                    self.tableLoading = true;
+                    util.ajax.put('/goods/copy/' + row.id)
+                        .then((response) => {
+                            self.tableLoading = false;
+                            self.$Message.success('商品复制成功');
+                            self.refreshGoodsList();
+                        })
+                        .catch((error) => {
+                            self.tableLoading = false;
+                            util.errorProcessor(self, error);
+                        });
+                }
+            })
+        },
+        removeGoods(row) {
+            if (!row.id) {
+                return;
+            }
+            let self = this;
+            this.$Modal.confirm({
+                title: '删除商品确认',
+                content: '是否确认删除商品：' + row.name,
+                onOk: () => {
+                    self.tableLoading = true;
+                    util.ajax.delete('/goods/remove/' + row.id)
+                        .then((response) => {
+                            self.tableLoading = false;
+                            self.$Message.success('商品删除成功');
+                            self.refreshGoodsList();
+                        })
+                        .catch((error) => {
+                            self.tableLoading = false;
+                            util.errorProcessor(self, error);
+                        });
+                }
+            })
         }
+
     }
 
   

@@ -19,4 +19,6 @@ public interface GoodsInfoMapper {
     Long searchListCount(GoodsQuery query);
 
     List<GoodsInfo> searchList(GoodsQuery query);
+
+    boolean isGoodsUsed(Long id); //检查一个商品下的所有详情是否存在使用的情况，如果存在，不能删除（验证的是采购进货表）
 }

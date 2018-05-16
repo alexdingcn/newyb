@@ -123,6 +123,21 @@
     where id = #{id,jdbcType=BIGINT}
   </update>
 
+  <update id="deleteByGoodsInfoId" parameterType="map" >
+    update goods_detail
+      set status = 'DELETE',
+        updated_by = #{updatedBy,jdbcType=VARCHAR},
+        updated_time = #{updatedTime,jdbcType=TIMESTAMP}
+      where goods_info_id = #{goodsInfoId}
+  </update>
+
+  <select id="getByGoodsInfoId" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select
+      <include refid="Base_Column_List"/>
+    from goods_detail
+    where goods_info_id = #{goodsInfoId} and status != 'DELETE'
+  </select>
+
 
 
 </mapper>

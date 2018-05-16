@@ -8,6 +8,7 @@ public class GoodsQuery {
     private Integer categoryId;
     private Long brandId;
     private Long supplierId;
+    private Boolean enable;
     private String status;
     private String search; //名称、拼音、编号模糊匹配
     private Integer page;
@@ -96,5 +97,13 @@ public class GoodsQuery {
 
     public void setPageSize(Integer pageSize) {
         this.pageSize = pageSize;
+    }
+
+    public Boolean getEnable() {
+        return enable;
+    }
+
+    public void setEnable(Boolean enable) {
+        this.enable = enable;
     }
 }

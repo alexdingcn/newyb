@@ -41,6 +41,8 @@ public enum ErrorCode {
     GOODS_SPEC_GET_FAIL(1206, "获取商品多规格失败"),
     GOODS_SPEC_USED_CANNOT_REMOVE(1207, "多规格有商品在使用，不能删除"),
     GOODS_BRAND_USED_CANNOT_REMOVE(1208, "商品品牌有商品正在使用，不能删除"),
+    GOODS_GET_RESULT_NULL(1209, "获取商品信息失败"),
+    GOODS_USED_CANNOT_DELETE(1210, "商品存在使用的数据，不能删除"),
 
     // 13xx - 采购
     BUY_ORDER_NOT_EXISTED(1300, "采购订单不存在"),
