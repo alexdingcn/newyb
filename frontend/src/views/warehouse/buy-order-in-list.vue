@@ -13,7 +13,7 @@
         padding-right: 5px;
     }
     th .ivu-table-cell {
-        width-space: nowrap;
+        white-space: nowrap;
     }
 
 </style>

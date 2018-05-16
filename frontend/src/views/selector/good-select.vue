@@ -31,7 +31,7 @@
             </slot>
         </Tooltip>
 
-        <Modal v-model="selectGoodsModal" width="60" :mask-closable="false" title="选择客户" class="cust-modal">
+        <Modal v-model="selectGoodsModal" width="60" :mask-closable="false" title="选择商品" class="goods-modal">
             <goodsListSelect ref="goodsSelectModal" @on-choosed="goodsSelected" ></goodsListSelect>
             <div slot="footer">
                 <Button type="text" @click="selectGoodsModal = false">取消</Button>

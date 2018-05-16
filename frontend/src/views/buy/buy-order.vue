@@ -72,9 +72,7 @@
 						</FormItem>
 					</Col>
 					<Col span="12">
-						<FormItem label="备注" prop="comment">
-							<Input v-model="buyOrder.comment" />
-						</FormItem>
+
 					</Col>
 				</Row>
 
@@ -91,6 +89,10 @@
 					</div>
 				</Table>
 
+				<div class="margin-top-10">
+				    <Input type="textarea" v-model="buyOrder.comment" :rows="2" placeholder="暂无备注信息"/>
+				</div>
+				
 			</Form>
 		</Card>
 		<Modal v-model="closeConfirm"
@@ -489,7 +491,10 @@
     padding-right: 5px;
 }
 th .ivu-table-cell {
-	width-space: nowrap;
+	white-space: nowrap;
 }
-
+.ivu-table-body, .ivu-table-tip { min-height: 300px; }
+@media (max-height: 800px) {
+    .ivu-table-body, .ivu-table-tip { min-height: 120px; }
+}
 </style>
