@@ -5,9 +5,11 @@ import com.alibaba.fastjson.JSONObject;
 import com.yiban.erp.dao.GoodsMapper;
 import com.yiban.erp.dto.GoodsQuery;
 import com.yiban.erp.entities.Goods;
+import com.yiban.erp.entities.GoodsDetail;
 import com.yiban.erp.entities.GoodsInfo;
 import com.yiban.erp.entities.User;
 import com.yiban.erp.service.goods.GoodsService;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Queue;
 
 
 @RestController
@@ -30,26 +33,40 @@ public class GoodsController {
     @Autowired
     private GoodsService goodsService;
 
+    /**
+     * 根据详情信息，全部展开商品详情信息
+     * @param user
+     * @param catId
+     * @param search
+     * @param page
+     * @param size
+     * @return
+     */
     @RequestMapping(value = "/list", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> list(@AuthenticationPrincipal User user,
                                        @RequestParam(required = false) Integer catId,
                                        @RequestParam(required = false) String search,
-                                       @RequestParam(required = false) Integer factoryId,
                                        @RequestParam(required = false) Integer page,
                                        @RequestParam(required = false) Integer size) {
         logger.info("Get goods list, search={}, catId={}, page={}, size={}", search, catId, page, size);
-        Integer pageSize = size == null ? 10 : size;
-        Integer offset = (page == null || page <= 0 ? 0 : page - 1) * pageSize;
-
-        Long count = goodsMapper.selectCount(user.getCompanyId(), catId, factoryId, search);
-        List<Goods> goodsList = new ArrayList<>();
+        if (StringUtils.isEmpty(search)) {
+            search = null;
+        }
+        GoodsQuery query = new GoodsQuery();
+        query.setCompanyId(user.getCompanyId());
+        query.setCategoryId(catId);
+        query.setSearch(search);
+        query.setPage(page);
+        query.setPageSize(size);
+        Long count = 0L;
+        count = goodsService.getChooseListDetailCount(query);
+        List<Goods> details = new ArrayList<>();
         if (count > 0) {
-            goodsList = goodsMapper.selectAll(user.getCompanyId(), catId, factoryId, search, offset, pageSize);
-            goodsService.setGoodsOptionName(goodsList);
+            details = goodsService.getChooseListDetail(query);
         }
         JSONObject result = new JSONObject();
         result.put("total", count);
-        result.put("data", JSON.toJSON(goodsList));
+        result.put("data", JSON.toJSON(details));
         return ResponseEntity.ok().body(result.toJSONString());
     }
 

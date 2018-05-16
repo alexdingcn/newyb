@@ -1,20 +1,45 @@
 package com.yiban.erp.entities;
 
-import com.yiban.erp.constant.OptionsType;
+
+import com.alibaba.fastjson.JSON;
+import org.apache.commons.lang3.StringUtils;
 
 import java.math.BigDecimal;
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class Goods {
 
     private Long id;
 
+    private Long goodsInfoId;
+
+    private String skuKey;
+
+    private Long specOneId;
+
+    private String specOneName;
+
+    private Long specTwoId;
+
+    private String specTwoName;
+
+    private Long specThreeId;
+
+    private String specThreeName;
+
+    private String barCode;
+
     private Integer companyId;
 
     private Integer categoryId;
 
-    private String categoryName;
+    private String goodsNo;
+
+    private Long brandId;
+
+    private Long supplierId;
+
+    private String status;
 
     private String name;
 
@@ -22,21 +47,17 @@ public class Goods {
 
     private String origin;
 
-    private String spec;
-
-    private String serial;
-
     private Boolean enable;
 
     private Boolean isProxy;
 
     private Long factoryId;
 
-    private String factory;
-
     private Long unit;
 
     private Long packUnit;
+
+    private Long mediumUnit;
 
     private BigDecimal mediumPack;
 
@@ -96,7 +117,7 @@ public class Goods {
 
     private Long medTypeId;
 
-    private Boolean isShebao;
+    private Byte isShebao;
 
     private Long specificMedId;
 
@@ -118,20 +139,6 @@ public class Goods {
 
     private Long newTypeId;
 
-    private BigDecimal retailPrice;
-
-    private BigDecimal batchPrice;
-
-    private BigDecimal memberPrice;
-
-    private BigDecimal onlinePrice;
-
-    private BigDecimal splitPrice;
-
-    private BigDecimal lowPrice;
-
-    private BigDecimal hightPrice;
-
     private String createdBy;
 
     private String updatedBy;
@@ -140,10 +147,49 @@ public class Goods {
 
     private Date updatedTime;
 
+    private Long att1Id;
+
+    private String att1Value;
+
+    private Long att2Id;
+
+    private String att2Value;
+
+    private Long att3Id;
+
+    private String att3Value;
+
+    private Long att4Id;
+
+    private String att4Value;
+
+    private Long att5Id;
+
+    private String att5Value;
+
+    private Long att6Id;
+
+    private String att6Value;
+
+    private String tags; //转换为List
+
+    private List<String> tagList;
+
+    private Boolean useSpec;
+
+    private BigDecimal batchPrice;
+    private BigDecimal retailPrice;
+    private BigDecimal inPrice;
+
+    private String categoryName;
+    private String brandName;
+    private String supplierName;
+
     // Option value
-    private String storageConditionName;
     private String unitName;
+    private String mediumUnitName;
     private String packUnitName;
+    private String storageConditionName;
     private String specificMedName;
     private String jxName;
     private String baseMedName;
@@ -168,6 +214,7 @@ public class Goods {
         });
         this.setStorageConditionName(optionMap.get(this.getStorageCondition()) != null ? optionMap.get(this.getStorageCondition()).getValue() : null);
         this.setUnitName(optionMap.get(this.getUnit()) != null ? optionMap.get(this.getUnit()).getValue() : null);
+        this.setMediumUnitName(optionMap.get(this.getMediumUnit()) != null ? optionMap.get(this.getMediumUnit()).getValue() : null);
         this.setPackUnitName(optionMap.get(this.getPackUnit()) != null ? optionMap.get(this.getPackUnit()).getValue() : null);
         this.setSpecificMedName(optionMap.get(this.getSpecificMedId()) != null ? optionMap.get(this.getSpecificMedId()).getValue() : null);
         this.setJxName(optionMap.get(this.getJxId()) != null ? optionMap.get(this.getJxId()).getValue() : null);
@@ -187,6 +234,7 @@ public class Goods {
         Set<Long> optionIdSet = new HashSet<>();
         optionIdSet.add(this.getStorageCondition() != null ? this.getStorageCondition() : 0);
         optionIdSet.add(this.getUnit() != null ? this.getUnit() : 0);
+        optionIdSet.add(this.getMediumUnit() != null ? this.getMediumUnit() : 0);
         optionIdSet.add(this.getPackUnit() != null ? this.getPackUnit() : 0);
         optionIdSet.add(this.getSpecificMedId() != null ? this.getSpecificMedId() : 0);
         optionIdSet.add(this.getJxId() != null ? this.getJxId() : 0);
@@ -220,6 +268,70 @@ public class Goods {
         this.companyId = companyId;
     }
 
+    public Long getGoodsInfoId() {
+        return goodsInfoId;
+    }
+
+    public void setGoodsInfoId(Long goodsInfoId) {
+        this.goodsInfoId = goodsInfoId;
+    }
+
+    public String getSkuKey() {
+        return skuKey;
+    }
+
+    public void setSkuKey(String skuKey) {
+        this.skuKey = skuKey;
+    }
+
+    public Long getSpecOneId() {
+        return specOneId;
+    }
+
+    public void setSpecOneId(Long specOneId) {
+        this.specOneId = specOneId;
+    }
+
+    public Long getSpecTwoId() {
+        return specTwoId;
+    }
+
+    public void setSpecTwoId(Long specTwoId) {
+        this.specTwoId = specTwoId;
+    }
+
+    public Long getSpecThreeId() {
+        return specThreeId;
+    }
+
+    public void setSpecThreeId(Long specThreeId) {
+        this.specThreeId = specThreeId;
+    }
+
+    public String getSpecOneName() {
+        return specOneName;
+    }
+
+    public void setSpecOneName(String specOneName) {
+        this.specOneName = specOneName;
+    }
+
+    public String getSpecTwoName() {
+        return specTwoName;
+    }
+
+    public void setSpecTwoName(String specTwoName) {
+        this.specTwoName = specTwoName;
+    }
+
+    public String getSpecThreeName() {
+        return specThreeName;
+    }
+
+    public void setSpecThreeName(String specThreeName) {
+        this.specThreeName = specThreeName;
+    }
+
     public Integer getCategoryId() {
         return categoryId;
     }
@@ -228,12 +340,36 @@ public class Goods {
         this.categoryId = categoryId;
     }
 
-    public String getCategoryName() {
-        return categoryName;
+    public String getGoodsNo() {
+        return goodsNo;
     }
 
-    public void setCategoryName(String categoryName) {
-        this.categoryName = categoryName;
+    public void setGoodsNo(String goodsNo) {
+        this.goodsNo = goodsNo;
+    }
+
+    public Long getBrandId() {
+        return brandId;
+    }
+
+    public void setBrandId(Long brandId) {
+        this.brandId = brandId;
+    }
+
+    public Long getSupplierId() {
+        return supplierId;
+    }
+
+    public void setSupplierId(Long supplierId) {
+        this.supplierId = supplierId;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 
     public String getName() {
@@ -260,22 +396,6 @@ public class Goods {
         this.origin = origin;
     }
 
-    public String getSpec() {
-        return spec;
-    }
-
-    public void setSpec(String spec) {
-        this.spec = spec;
-    }
-
-    public String getSerial() {
-        return serial;
-    }
-
-    public void setSerial(String serial) {
-        this.serial = serial;
-    }
-
     public Boolean getEnable() {
         return enable;
     }
@@ -300,14 +420,6 @@ public class Goods {
         this.factoryId = factoryId;
     }
 
-    public String getFactory() {
-        return factory;
-    }
-
-    public void setFactory(String factory) {
-        this.factory = factory;
-    }
-
     public Long getUnit() {
         return unit;
     }
@@ -322,6 +434,14 @@ public class Goods {
 
     public void setPackUnit(Long packUnit) {
         this.packUnit = packUnit;
+    }
+
+    public Long getMediumUnit() {
+        return mediumUnit;
+    }
+
+    public void setMediumUnit(Long mediumUnit) {
+        this.mediumUnit = mediumUnit;
     }
 
     public BigDecimal getMediumPack() {
@@ -556,11 +676,11 @@ public class Goods {
         this.medTypeId = medTypeId;
     }
 
-    public Boolean getIsShebao() {
+    public Byte getIsShebao() {
         return isShebao;
     }
 
-    public void setIsShebao(Boolean isShebao) {
+    public void setIsShebao(Byte isShebao) {
         this.isShebao = isShebao;
     }
 
@@ -644,62 +764,6 @@ public class Goods {
         this.newTypeId = newTypeId;
     }
 
-    public BigDecimal getRetailPrice() {
-        return retailPrice;
-    }
-
-    public void setRetailPrice(BigDecimal retailPrice) {
-        this.retailPrice = retailPrice;
-    }
-
-    public BigDecimal getBatchPrice() {
-        return batchPrice;
-    }
-
-    public void setBatchPrice(BigDecimal batchPrice) {
-        this.batchPrice = batchPrice;
-    }
-
-    public BigDecimal getMemberPrice() {
-        return memberPrice;
-    }
-
-    public void setMemberPrice(BigDecimal memberPrice) {
-        this.memberPrice = memberPrice;
-    }
-
-    public BigDecimal getOnlinePrice() {
-        return onlinePrice;
-    }
-
-    public void setOnlinePrice(BigDecimal onlinePrice) {
-        this.onlinePrice = onlinePrice;
-    }
-
-    public BigDecimal getSplitPrice() {
-        return splitPrice;
-    }
-
-    public void setSplitPrice(BigDecimal splitPrice) {
-        this.splitPrice = splitPrice;
-    }
-
-    public BigDecimal getLowPrice() {
-        return lowPrice;
-    }
-
-    public void setLowPrice(BigDecimal lowPrice) {
-        this.lowPrice = lowPrice;
-    }
-
-    public BigDecimal getHightPrice() {
-        return hightPrice;
-    }
-
-    public void setHightPrice(BigDecimal hightPrice) {
-        this.hightPrice = hightPrice;
-    }
-
     public String getCreatedBy() {
         return createdBy;
     }
@@ -732,6 +796,191 @@ public class Goods {
         this.updatedTime = updatedTime;
     }
 
+    public Long getAtt1Id() {
+        return att1Id;
+    }
+
+    public void setAtt1Id(Long att1Id) {
+        this.att1Id = att1Id;
+    }
+
+    public String getAtt1Value() {
+        return att1Value;
+    }
+
+    public void setAtt1Value(String att1Value) {
+        this.att1Value = att1Value;
+    }
+
+    public Long getAtt2Id() {
+        return att2Id;
+    }
+
+    public void setAtt2Id(Long att2Id) {
+        this.att2Id = att2Id;
+    }
+
+    public String getAtt2Value() {
+        return att2Value;
+    }
+
+    public void setAtt2Value(String att2Value) {
+        this.att2Value = att2Value;
+    }
+
+    public Long getAtt3Id() {
+        return att3Id;
+    }
+
+    public void setAtt3Id(Long att3Id) {
+        this.att3Id = att3Id;
+    }
+
+    public String getAtt3Value() {
+        return att3Value;
+    }
+
+    public void setAtt3Value(String att3Value) {
+        this.att3Value = att3Value;
+    }
+
+    public Long getAtt4Id() {
+        return att4Id;
+    }
+
+    public void setAtt4Id(Long att4Id) {
+        this.att4Id = att4Id;
+    }
+
+    public String getAtt4Value() {
+        return att4Value;
+    }
+
+    public void setAtt4Value(String att4Value) {
+        this.att4Value = att4Value;
+    }
+
+    public Long getAtt5Id() {
+        return att5Id;
+    }
+
+    public void setAtt5Id(Long att5Id) {
+        this.att5Id = att5Id;
+    }
+
+    public String getAtt5Value() {
+        return att5Value;
+    }
+
+    public void setAtt5Value(String att5Value) {
+        this.att5Value = att5Value;
+    }
+
+    public Long getAtt6Id() {
+        return att6Id;
+    }
+
+    public void setAtt6Id(Long att6Id) {
+        this.att6Id = att6Id;
+    }
+
+    public String getAtt6Value() {
+        return att6Value;
+    }
+
+    public void setAtt6Value(String att6Value) {
+        this.att6Value = att6Value;
+    }
+
+    public String getTags() {
+        return tags;
+    }
+
+    public void setTags(String tags) {
+        this.tags = tags;
+    }
+
+    public List<String> getTagList() {
+        if (StringUtils.isEmpty(this.getTags())) {
+            return Collections.emptyList();
+        }else {
+            return JSON.parseArray(this.getTags(), String.class);
+        }
+    }
+
+    public void setTagList(List<String> tagList) {
+        if (tagList != null || tagList.isEmpty()) {
+            this.setTags(null);
+        }else {
+            this.setTags(JSON.toJSONString(tagList));
+        }
+        this.tagList = tagList;
+    }
+
+    public Boolean getUseSpec() {
+        return useSpec;
+    }
+
+    public void setUseSpec(Boolean useSpec) {
+        this.useSpec = useSpec;
+    }
+
+    public String getBarCode() {
+        return barCode;
+    }
+
+    public void setBarCode(String barCode) {
+        this.barCode = barCode;
+    }
+
+    public BigDecimal getBatchPrice() {
+        return batchPrice;
+    }
+
+    public void setBatchPrice(BigDecimal batchPrice) {
+        this.batchPrice = batchPrice;
+    }
+
+    public BigDecimal getRetailPrice() {
+        return retailPrice;
+    }
+
+    public void setRetailPrice(BigDecimal retailPrice) {
+        this.retailPrice = retailPrice;
+    }
+
+    public BigDecimal getInPrice() {
+        return inPrice;
+    }
+
+    public void setInPrice(BigDecimal inPrice) {
+        this.inPrice = inPrice;
+    }
+
+    public String getCategoryName() {
+        return categoryName;
+    }
+
+    public void setCategoryName(String categoryName) {
+        this.categoryName = categoryName;
+    }
+
+    public String getBrandName() {
+        return brandName;
+    }
+
+    public void setBrandName(String brandName) {
+        this.brandName = brandName;
+    }
+
+    public String getSupplierName() {
+        return supplierName;
+    }
+
+    public void setSupplierName(String supplierName) {
+        this.supplierName = supplierName;
+    }
+
     public String getStorageConditionName() {
         return storageConditionName;
     }
@@ -746,6 +995,14 @@ public class Goods {
 
     public void setUnitName(String unitName) {
         this.unitName = unitName;
+    }
+
+    public String getMediumUnitName() {
+        return mediumUnitName;
+    }
+
+    public void setMediumUnitName(String mediumUnitName) {
+        this.mediumUnitName = mediumUnitName;
     }
 
     public String getPackUnitName() {

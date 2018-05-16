@@ -282,14 +282,6 @@ public class RepertoryOutDetail {
         return this.goods == null ? null : this.goods.getJxName();
     }
 
-    public String getSpec() {
-        return this.goods == null ? null : this.goods.getSpec();
-    }
-
-    public String getFactory() {
-        return this.goods == null ? null : this.goods.getFactory();
-    }
-
     public String getUnitName() {
         return this.goods == null ? null : this.goods.getUnitName();
     }

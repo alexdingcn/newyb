@@ -305,9 +305,7 @@ public class RepertoryCheckPlanDetail {
             Goods goods = repertoryInfo.getGoods();
             this.goodsName = goods.getName();
             this.jx=goods.getJxName();
-            this.spec=goods.getSpec();
             this.origin=goods.getOrigin();
-            this.factoryName = goods.getFactory();
             this.unitName=goods.getUnitName();
         }
     }

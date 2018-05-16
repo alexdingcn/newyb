@@ -1,5 +1,6 @@
 package com.yiban.erp.dao;
 
+import com.yiban.erp.dto.GoodsQuery;
 import com.yiban.erp.entities.GoodsDetail;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -25,4 +26,6 @@ public interface GoodsDetailMapper {
                             @Param("updatedTime") Date updatedTime);
 
     List<GoodsDetail> getByGoodsInfoId(Long id);
+
+
 }

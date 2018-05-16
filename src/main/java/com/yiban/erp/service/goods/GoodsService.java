@@ -74,15 +74,6 @@ public class GoodsService {
         return goodsList;
     }
 
-    public Goods getGoodsById(Long id) {
-        if (id == null || id <= 0) {
-            return null;
-        }
-        Goods goods = goodsMapper.selectByPrimaryKey(id);
-        setGoodsOptionName(goods);
-        return goods;
-    }
-
     public void setGoodsInfoOptionName(List<GoodsInfo> goodsInfoList) {
         if (goodsInfoList == null || goodsInfoList.isEmpty()) {
             return;
@@ -119,6 +110,20 @@ public class GoodsService {
         setGoodsInfoOptionName(infos);
         return infos;
     }
+
+    public Long getChooseListDetailCount(GoodsQuery query) {
+        return goodsInfoMapper.getChooseListDetailCount(query);
+    }
+
+    public List<Goods> getChooseListDetail(GoodsQuery query){
+        List<Goods> goods = goodsInfoMapper.getChooseListDetail(query);
+        //设置option的值
+        setGoodsOptionName(goods);
+        //TODO 设置自定义字段的值
+
+        return goods;
+    }
+
 
     public GoodsInfo getGoodsInfoById(Long id) throws BizException {
         GoodsInfo goodsInfo = goodsInfoMapper.selectByPrimaryKey(id);

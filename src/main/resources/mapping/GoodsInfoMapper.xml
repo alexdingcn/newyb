@@ -457,4 +457,68 @@
   </select>
 
 
+  <select id="getChooseListDetailCount" parameterType="com.yiban.erp.dto.GoodsQuery" resultType="java.lang.Long">
+    select count(d.id)
+    from goods_info i, goods_detail d
+    where d.goods_info_id = i.id  and i.status != 'DELETE' and d.status != 'DELETE'
+    and i.company_id = #{companyId}
+    <if test="categoryId != null" >
+      and i.category_id = #{categoryId}
+    </if>
+    <if test="search != null">
+      <bind name="patten" value="'%' + search + '%'"/>
+      and (i.name LIKE #{patten} or i.pinyin LIKE #{patten} or i.goods_no LIKE #{patten})
+    </if>
+  </select>
+
+  <sql id="Goods_Column_List" >
+    gd.id as id, gd.sku_key as skuKey, gd.spec_one_id as specOneId, gd.spec_two_id as specTwoId,
+    gd.spec_three_id as specThreeId, gd.bar_code as barCode, gd.retail_price as retailPrice,
+    gd.batch_price as batchPrice, gd.in_price as inPrice,
+    gs1.spec_name as specOneName, gs1.parent_name as specOneParentName,
+    gs2.spec_name as specTwoName, gs2.parent_name as specTwoParentName,
+    gs3.spec_name as specThreeName, gs3.parent_name as specThreeParentName,
+    gi.id as goodsInfoId, gi.company_id as companyId, gi.category_id as categoryId,
+    gi.goods_no as goodsNo, gi.brand_id as brandId, gi.supplier_id as supplierId,
+    gi.status as status, gi.name as name, gi.full_name as fullName,
+    gi.origin as origin, gi.enable as enable, gi.is_proxy as isProxy, gi.factory_id as factoryId,
+    gi.unit as unit, gi.pack_unit as packUnit, gi.medium_unit as mediumUnit, gi.medium_pack as mediumPack,
+    gi.big_pack as bigPack, gi.pinyin as pinyin, gi.storage_condition as storageCondition, gi.comment as comment,
+    gi.cert_no as certNo, gi.cert_exp_date as certExpDate, gi.cert_file_no as certFileNo,
+    gi.brand_no as brandNo, gi.brand_exp_date as brandExpDate, gi.brand_file_no as brandFileNo,
+    gi.permit_no as permitNo, gi.permit_exp_date as permitExpDate, gi.permit_file_no as permitFileNo,
+    gi.archive_no as archiveNo, gi.in_check as inCheck, gi.first_check as firstCheck,
+    gi.special_managed as specialManaged, gi.need_care as needCare, gi.in_tax as inTax, gi.out_tax as outTax,
+    gi.valid_months as validMonths, gi.warning_days as warningDays, gi.contact as contact, gi.cure_range as cureRange,
+    gi.sale_policy as salePolicy, gi.is_foreign as isForeign, gi.prescription_id as prescriptionId, gi.med_type_id as medTypeId,
+    gi.is_shebao as isSheBao, gi.specific_med_id as specificMedId, gi.jx_id as jxId, gi.base_med_id baseMedId, gi.func_cat_id as funcCatId,
+    gi.medication_id as medicationId, gi.care_time_id as careTimeId,
+    gi.gmp_type_id as gmpTypeId, gi.abc_type_id as abcTypeId, gi.scope_id as scopeId,
+    gi.new_type_id as newTypeId, gi.created_by as createdBy, gi.updated_by as updatedBy, gi.created_time as createdTime,
+    gi.updated_time as updatedTime, gi.att1_id as att1Id, gi.att1_value as att1Value,
+    gi.att2_id as att2Id, gi.att2_value as att2Value, gi.att3_id as att3Id, gi.att3_value as att3Value, gi.att4_id as att4Id,
+    gi.att4_value as att4Value, gi.att5_id as att5Id, gi.att5_value as att5Value, gi.att6_id as att6Id, gi.att6_value as att6Value,
+    gi.tags as tags, gi.use_spec as useSpec
+  </sql>
+
+  <select id="getChooseListDetail" parameterType="com.yiban.erp.dto.GoodsQuery" resultType="com.yiban.erp.entities.Goods">
+    select
+      <include refid="Goods_Column_List"/>
+    from goods_info gi, goods_detail gd
+      left join goods_spec gs1 on gd.spec_one_id = gs1.id
+      left join goods_spec gs2 on gd.spec_one_id = gs2.id
+      left join goods_spec gs3 on gd.spec_one_id = gs3.id
+    where gd.goods_info_id = gi.id and gi.status != 'DELETE' AND gd.status != 'DELETE'
+    and gi.company_id = #{companyId}
+    <if test="search != null">
+      <bind name="patten" value="'%' + search + '%'"/>
+      and (gi.name LIKE #{patten} or gi.pinyin LIKE #{patten} or gi.goods_no LIKE #{patten})
+    </if>
+    order by gi.id desc
+    <if test="offset != null and limit != null">
+      limit #{offset}, #{limit}
+    </if>
+
+  </select>
+
 </mapper>
