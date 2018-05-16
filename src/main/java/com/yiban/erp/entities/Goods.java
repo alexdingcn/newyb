@@ -73,25 +73,25 @@ public class Goods {
 
     private String comment;
 
-    private String certNo;
+    private String cert1Name;
 
-    private Date certExpDate;
+    private Date cert1ExpDate;
 
-    private String certFileNo;
+    private String cert1No;
 
-    private String brandNo;
+    private String cert2Name;
 
-    private Date brandExpDate;
+    private Date cert2ExpDate;
 
-    private String brandFileNo;
+    private String cert2No;
 
-    private String permitNo;
+    private String cert3Name;
 
-    private Date permitExpDate;
+    private Date cert3ExpDate;
 
-    private String permitFileNo;
+    private String cert3No;
 
-    private String archiveNo;
+    private String fileNo;
 
     private Boolean inCheck;
 
@@ -184,6 +184,10 @@ public class Goods {
     private BigDecimal batchPrice;
     private BigDecimal retailPrice;
     private BigDecimal inPrice;
+
+    private BigDecimal normalLimit;
+    private BigDecimal lowLimit;
+    private BigDecimal highLimit;
 
     private String categoryName;
     private String brandName;
@@ -489,84 +493,84 @@ public class Goods {
         this.comment = comment;
     }
 
-    public String getCertNo() {
-        return certNo;
+    public String getCert1Name() {
+        return cert1Name;
     }
 
-    public void setCertNo(String certNo) {
-        this.certNo = certNo;
+    public void setCert1Name(String cert1Name) {
+        this.cert1Name = cert1Name;
     }
 
-    public Date getCertExpDate() {
-        return certExpDate;
+    public Date getCert1ExpDate() {
+        return cert1ExpDate;
     }
 
-    public void setCertExpDate(Date certExpDate) {
-        this.certExpDate = certExpDate;
+    public void setCert1ExpDate(Date cert1ExpDate) {
+        this.cert1ExpDate = cert1ExpDate;
     }
 
-    public String getCertFileNo() {
-        return certFileNo;
+    public String getCert1No() {
+        return cert1No;
     }
 
-    public void setCertFileNo(String certFileNo) {
-        this.certFileNo = certFileNo;
+    public void setCert1No(String cert1No) {
+        this.cert1No = cert1No;
     }
 
-    public String getBrandNo() {
-        return brandNo;
+    public String getCert2Name() {
+        return cert2Name;
     }
 
-    public void setBrandNo(String brandNo) {
-        this.brandNo = brandNo;
+    public void setCert2Name(String cert2Name) {
+        this.cert2Name = cert2Name;
     }
 
-    public Date getBrandExpDate() {
-        return brandExpDate;
+    public Date getCert2ExpDate() {
+        return cert2ExpDate;
     }
 
-    public void setBrandExpDate(Date brandExpDate) {
-        this.brandExpDate = brandExpDate;
+    public void setCert2ExpDate(Date cert2ExpDate) {
+        this.cert2ExpDate = cert2ExpDate;
     }
 
-    public String getBrandFileNo() {
-        return brandFileNo;
+    public String getCert2No() {
+        return cert2No;
     }
 
-    public void setBrandFileNo(String brandFileNo) {
-        this.brandFileNo = brandFileNo;
+    public void setCert2No(String cert2No) {
+        this.cert2No = cert2No;
     }
 
-    public String getPermitNo() {
-        return permitNo;
+    public String getCert3Name() {
+        return cert3Name;
     }
 
-    public void setPermitNo(String permitNo) {
-        this.permitNo = permitNo;
+    public void setCert3Name(String cert3Name) {
+        this.cert3Name = cert3Name;
     }
 
-    public Date getPermitExpDate() {
-        return permitExpDate;
+    public Date getCert3ExpDate() {
+        return cert3ExpDate;
     }
 
-    public void setPermitExpDate(Date permitExpDate) {
-        this.permitExpDate = permitExpDate;
+    public void setCert3ExpDate(Date cert3ExpDate) {
+        this.cert3ExpDate = cert3ExpDate;
     }
 
-    public String getPermitFileNo() {
-        return permitFileNo;
+    public String getCert3No() {
+        return cert3No;
     }
 
-    public void setPermitFileNo(String permitFileNo) {
-        this.permitFileNo = permitFileNo;
+    public void setCert3No(String cert3No) {
+        this.cert3No = cert3No;
     }
 
-    public String getArchiveNo() {
-        return archiveNo;
+    public String getFileNo() {
+        return fileNo;
     }
 
-    public void setArchiveNo(String archiveNo) {
-        this.archiveNo = archiveNo;
+    public void setFileNo(String fileNo) {
+        this.fileNo = fileNo;
     }
 
     public Boolean getInCheck() {
@@ -1136,6 +1140,30 @@ public class Goods {
 
     public void setFactoryName(String factoryName) {
         this.factoryName = factoryName;
+    }
+
+    public BigDecimal getNormalLimit() {
+        return normalLimit;
+    }
+
+    public void setNormalLimit(BigDecimal normalLimit) {
+        this.normalLimit = normalLimit;
+    }
+
+    public BigDecimal getLowLimit() {
+        return lowLimit;
+    }
+
+    public void setLowLimit(BigDecimal lowLimit) {
+        this.lowLimit = lowLimit;
+    }
+
+    public BigDecimal getHighLimit() {
+        return highLimit;
+    }
+
+    public void setHighLimit(BigDecimal highLimit) {
+        this.highLimit = highLimit;
     }
 
     public List<GoodsSpec> getGoodsSpecs() {

@@ -206,17 +206,145 @@
                             </Table>
                         </div>
                     </TabPane>
-                    <TabPane icon="ios-pricetags" name="attribute" label="自定义属性">
-                        <p>自定义属性</p>
+                    <TabPane icon="ios-pricetags" name="attribute" label="预警/扩展属性">
+                        <h2 style="margin-bottom: 10px;">库存预警信息</h2>
+                        <Row class="row-margin-bottom">
+                            <i-col span="10">
+                                <FormItem label="库存预警天数" :label-width="100">
+                                    <InputNumber :min="0" v-model="formData.warningDays" style="width: 100%;" />
+                                </FormItem>
+                            </i-col>
+                            <i-col span="10">
+                                <FormItem label="商品有效时长" :label-width="100">
+                                    <InputNumber :min="0" v-model="formData.validMonths" style="width: 100%;" />
+                                </FormItem>
+                            </i-col>
+                        </Row>
+                        <Row class="row-margin-bottom">
+                            <i-col span="8">
+                                <FormItem label="安全库存" >
+                                    <InputNumber :min="0" v-model="formData.normalLimit" style="width: 100%;" />
+                                </FormItem>
+                            </i-col>
+                            <i-col span="8">
+                                <FormItem label="库存下限" >
+                                    <InputNumber :min="0" v-model="formData.lowLimit" style="width: 100%;" />
+                                </FormItem>
+                            </i-col>
+                            <i-col span="8">
+                                <FormItem label="库存上限" >
+                                    <InputNumber :min="0" v-model="formData.highLimit" style="width: 100%;" />
+                                </FormItem>
+                            </i-col>
+                        </Row>
+                        <h2 style="margin-bottom: 10px;">自定义属性</h2>
+                        <Row class="row-margin-bottom" v-if="formData.att1Id > 0">
+                            <i-col span="10" v-if="formData.att1Id > 0">
+                                <FormItem :label="formData.att1Name" >
+                                    <Input type="text" v-model="formData.att1Value" />
+                                </FormItem>
+                            </i-col>
+                            <i-col span="10" v-if="formData.att2Id  > 0">
+                                <FormItem :label="formData.att2Name" >
+                                    <Input type="text" v-model="formData.att2Value" />
+                                </FormItem>
+                            </i-col>
+                        </Row>
+                        <Row class="row-margin-bottom" v-if="formData.att3Id  > 0">
+                            <i-col span="10" v-if="formData.att3Id > 0">
+                                <FormItem :label="formData.att3Name" >
+                                    <Input type="text" v-model="formData.att3Value" />
+                                </FormItem>
+                            </i-col>
+                            <i-col span="10" v-if="formData.att4Id > 0">
+                                <FormItem :label="formData.att4Name" >
+                                    <Input type="text" v-model="formData.att4Value" />
+                                </FormItem>
+                            </i-col>
+                        </Row>
+                        <Row class="row-margin-bottom" v-if="formData.att5Id > 0">
+                            <i-col span="10" v-if="formData.att5Id > 0">
+                                <FormItem :label="formData.att5Name" >
+                                    <Input type="text" v-model="formData.att5Value" />
+                                </FormItem>
+                            </i-col>
+                            <i-col span="10" v-if="formData.att6Id > 0">
+                                <FormItem :label="formData.att6Name" >
+                                    <Input type="text" v-model="formData.att6Value" />
+                                </FormItem>
+                            </i-col>
+                        </Row>
                     </TabPane>
                     <TabPane icon="document-text" name="file" label="档案管理">
-                        <p>档案管理</p>
+                        <h2 style="margin-bottom: 10px;">档案信息管理</h2>
+                        <Row class="row-margin-bottom">
+                            <i-col span="8">
+                                <FormItem label="证件1名称">
+                                    <Input type="text" v-model="formData.cert1Name"/>
+                                </FormItem>
+                            </i-col>
+                            <i-col span="8">
+                                <FormItem label="证件1编号">
+                                    <Input type="text" v-model="formData.cert1No"/>
+                                </FormItem>
+                            </i-col>
+                            <i-col span="8">
+                                <FormItem label="证件1有效期">
+                                    <DatePicker type="date"  v-model="formData.cert1ExpDate" placeholder="有效期至" style="width: 100%"></DatePicker>
+                                </FormItem>
+                            </i-col>
+                        </Row>
+                        <Row class="row-margin-bottom">
+                            <i-col span="8">
+                                <FormItem label="证件2名称">
+                                    <Input type="text" v-model="formData.cert2Name"/>
+                                </FormItem>
+                            </i-col>
+                            <i-col span="8">
+                                <FormItem label="证件2编号">
+                                    <Input type="text" v-model="formData.cert2No"/>
+                                </FormItem>
+                            </i-col>
+                            <i-col span="8">
+                                <FormItem label="证件2有效期">
+                                    <DatePicker type="date"  v-model="formData.cert2ExpDate" placeholder="有效期至" style="width: 100%"></DatePicker>
+                                </FormItem>
+                            </i-col>
+                        </Row>
+                        <Row class="row-margin-bottom">
+                            <i-col span="8">
+                                <FormItem label="证件3名称">
+                                    <Input type="text" v-model="formData.cert3Name"/>
+                                </FormItem>
+                            </i-col>
+                            <i-col span="8">
+                                <FormItem label="证件3编号">
+                                    <Input type="text" v-model="formData.cert3No"/>
+                                </FormItem>
+                            </i-col>
+                            <i-col span="8">
+                                <FormItem label="证件3有效期">
+                                    <DatePicker type="date"  v-model="formData.cert3ExpDate" placeholder="有效期至" style="width: 100%"></DatePicker>
+                                </FormItem>
+                            </i-col>
+                        </Row>
+                        <Row class="row-margin-bottom">
+                            <i-col span="10">
+                                <FormItem label="档案附件">
+                                    <Input v-model="formData.fileNo" readonly>
+                                        <Button slot="append" type="text" icon="edit" @click="openFileUpload(formData.fileNo)"></Button>
+                                    </Input>
+                                </FormItem>
+                            </i-col>
+                        </Row>
                     </TabPane>
-                    <!-- <TabPane icon="medkit" name="medication" label="药品扩展">
-                        <p>药品扩展</p>
-                    </TabPane> -->
             </Tabs>
         </Form>
+
+        <Modal v-model="fileUploadModal" title="商品档案管理" :footerHide="true" :mask-closable="false" width="50" class="file-upload-modal">
+            <file-detail :fileNo="uploadFileNo" @add-file-success="addFileSuccess" ></file-detail>
+        </Modal>
+
     </div>
 </template>
 
@@ -227,6 +355,7 @@ import goodsBrandSelect from '@/views/selector/goods-brand-select.vue';
 import factorySelect from '@/views/selector/factory-select.vue';
 import supplierSelect from '@/views/selector/supplier-select.vue';
 import optionSelect from '@/views/selector/option-select.vue';
+import fileDetail from '@/views/basic-data/file-detail.vue';
 
 export default {
     name: 'goods-info',
@@ -241,7 +370,8 @@ export default {
         goodsBrandSelect,
         factorySelect,
         supplierSelect,
-        optionSelect
+        optionSelect,
+        fileDetail
     },
     data() {
         return {
@@ -257,6 +387,25 @@ export default {
                 retailPrice: 0,
                 inPrice: 0,
                 goodsDetails: [],
+                fileNo: '',
+                att1Id: '',
+                att1Name: '',
+                att1Value: '',
+                att2Id: '',
+                att2Name: '',
+                att2Value: '',
+                att3Id: '',
+                att3Name: '',
+                att3Value: '',
+                att4Id: '',
+                att4Name: '',
+                att4Value: '',
+                att5Id: '',
+                att5Name: '',
+                att5Value: '',
+                att6Id: '',
+                att6Name: '',
+                att6Value: '',
             },
             formRules: {
                 name: [
@@ -272,10 +421,14 @@ export default {
             currSpecIds: [[], [], []],
             goodsDetails: [],
             goodsDetailColumn: [],
+            fileUploadModal: false,
+            uploadFileNo: '',
+            goodsAttributes: []
         }
     },
     mounted() {
         this.loadGoodsSpecs();
+        this.loadGoodsAttribute();
     },
     watch: {
         goodsInfoId: function(id) {
@@ -302,8 +455,7 @@ export default {
                 })
                 .catch((error) => {
                     util.errorProcessor(this, error);
-                })
-            
+                });
         },
         loadGoodsSpecs() {
             util.ajax.get('/goods/spec/list')
@@ -314,10 +466,49 @@ export default {
                     util.errorProcessor(this, error);
                 })
         },
-        gotoGoodsSpecPage() {
-            this.$router.push({
-                name: 'goods-spec'
-            });
+        loadGoodsAttribute() {
+            util.ajax.get('/goods/attribute/list')
+                .then((response) => {
+                    this.goodsAttributes = response.data;
+                    this.setFormDataAttribut();
+                })
+                .catch((error) => {
+                    util.errorProcessor(this, error);
+                })
+        },
+        setFormDataAttribut() {
+            console.log(this.goodsAttributes);
+            if (this.goodsAttributes[0] && this.goodsAttributes[0].id && this.goodsAttributes[0].attName) {
+                this.formData.att1Id = this.goodsAttributes[0].id;
+                this.formData.att1Name = this.goodsAttributes[0].attName;
+                this.formData.att1Value = '';
+            }
+            if (this.goodsAttributes[1] && this.goodsAttributes[1].id && this.goodsAttributes[1].attName) {
+                this.formData.att2Id = this.goodsAttributes[1].id;
+                this.formData.att2Name = this.goodsAttributes[1].attName;
+                this.formData.att2Value = '';
+            }
+            if (this.goodsAttributes[2] && this.goodsAttributes[2].id && this.goodsAttributes[2].attName) {
+                this.formData.att3Id = this.goodsAttributes[2].id;
+                this.formData.att3Name = this.goodsAttributes[2].attName;
+                this.formData.att3Value = '';
+            }
+            if (this.goodsAttributes[3] && this.goodsAttributes[3].id && this.goodsAttributes[3].attName) {
+                this.formData.att4Id = this.goodsAttributes[3].id;
+                this.formData.att4Name = this.goodsAttributes[3].attName;
+                this.formData.att4Value = '';
+            }
+            if (this.goodsAttributes[4] && this.goodsAttributes[4].id && this.goodsAttributes[4].attName) {
+                this.formData.att5Id = this.goodsAttributes[4].id;
+                this.formData.att5Name = this.goodsAttributes[4].attName;
+                this.formData.att5Value = '';
+            }
+            if (this.goodsAttributes[5] && this.goodsAttributes[5].id && this.goodsAttributes[5].attName) {
+                this.formData.att6Id = this.goodsAttributes[5].id;
+                this.formData.att6Name = this.goodsAttributes[5].attName;
+                this.formData.att6Value = '';
+            }
+            console.log(this.formData);
         },
         onChangeName() {
             if (this.formData.name && this.formData.name.length > 0) {
@@ -751,8 +942,15 @@ export default {
                     });
                 }
             });
-        }
+        },
 
+        openFileUpload(fileNo) {
+            this.uploadFileNo = fileNo;
+            this.fileUploadModal = true;
+        },
+        addFileSuccess(data) {
+            this.formData.fileNo = data.fileNo;
+        }
     }
   
 }

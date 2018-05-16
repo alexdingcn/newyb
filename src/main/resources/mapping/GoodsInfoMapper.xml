@@ -23,16 +23,16 @@
     <result column="pinyin" property="pinyin" jdbcType="VARCHAR" />
     <result column="storage_condition" property="storageCondition" jdbcType="BIGINT" />
     <result column="comment" property="comment" jdbcType="VARCHAR" />
-    <result column="cert_no" property="certNo" jdbcType="VARCHAR" />
-    <result column="cert_exp_date" property="certExpDate" jdbcType="DATE" />
-    <result column="cert_file_no" property="certFileNo" jdbcType="VARCHAR" />
-    <result column="brand_no" property="brandNo" jdbcType="VARCHAR" />
-    <result column="brand_exp_date" property="brandExpDate" jdbcType="DATE" />
-    <result column="brand_file_no" property="brandFileNo" jdbcType="VARCHAR" />
-    <result column="permit_no" property="permitNo" jdbcType="VARCHAR" />
-    <result column="permit_exp_date" property="permitExpDate" jdbcType="DATE" />
-    <result column="permit_file_no" property="permitFileNo" jdbcType="VARCHAR" />
-    <result column="archive_no" property="archiveNo" jdbcType="VARCHAR" />
+    <result column="cert1_name" property="cert1Name" jdbcType="VARCHAR" />
+    <result column="cert1_exp_date" property="cert1ExpDate" jdbcType="DATE" />
+    <result column="cert1_no" property="cert1No" jdbcType="VARCHAR" />
+    <result column="cert2_name" property="cert2Name" jdbcType="VARCHAR" />
+    <result column="cert2_exp_date" property="cert2ExpDate" jdbcType="DATE" />
+    <result column="cert2_no" property="cert2No" jdbcType="VARCHAR" />
+    <result column="cert3_name" property="cert3Name" jdbcType="VARCHAR" />
+    <result column="cert3_exp_date" property="cert3ExpDate" jdbcType="DATE" />
+    <result column="cert3_no" property="cert3No" jdbcType="VARCHAR" />
+    <result column="file_no" property="fileNo" jdbcType="VARCHAR" />
     <result column="in_check" property="inCheck" jdbcType="BIT" />
     <result column="first_check" property="firstCheck" jdbcType="BIT" />
     <result column="special_managed" property="specialManaged" jdbcType="BIT" />
@@ -80,18 +80,22 @@
     <result column="retail_price" property="retailPrice" jdbcType="DECIMAL" />
     <result column="batch_price" property="batchPrice" jdbcType="DECIMAL" />
     <result column="in_price" property="inPrice" jdbcType="DECIMAL" />
+    <result column="normal_limit" property="normalLimit" jdbcType="DECIMAL"/>
+    <result column="low_limit" property="lowLimit" jdbcType="DECIMAL"/>
+    <result column="high_limit" property="highLimit" jdbcType="DECIMAL"/>
   </resultMap>
   <sql id="Base_Column_List" >
     id, company_id, category_id, goods_no, brand_id, supplier_id, status, name, full_name, 
     origin, enable, is_proxy, factory_id, unit, pack_unit, medium_unit, medium_pack, 
-    big_pack, pinyin, storage_condition, comment, cert_no, cert_exp_date, cert_file_no, 
-    brand_no, brand_exp_date, brand_file_no, permit_no, permit_exp_date, permit_file_no, 
-    archive_no, in_check, first_check, special_managed, need_care, in_tax, out_tax, valid_months, 
+    big_pack, pinyin, storage_condition, comment, cert1_name, cert1_exp_date, cert1_no,
+    cert2_name,cert2_exp_date, cert2_no, cert3_name, cert3_exp_date, cert3_no,
+    file_no, in_check, first_check, special_managed, need_care, in_tax, out_tax, valid_months,
     warning_days, contact, cure_range, sale_policy, is_foreign, prescription_id, med_type_id, 
     is_shebao, specific_med_id, jx_id, base_med_id, func_cat_id, medication_id, care_time_id, 
     gmp_type_id, abc_type_id, scope_id, new_type_id, created_by, updated_by, created_time, 
     updated_time, att1_id, att1_value, att2_id, att2_value, att3_id, att3_value, att4_id, 
-    att4_value, att5_id, att5_value, att6_id, att6_value, tags, use_spec, bar_code, retail_price, batch_price, in_price
+    att4_value, att5_id, att5_value, att6_id, att6_value, tags, use_spec, bar_code, retail_price, batch_price, in_price,
+    normal_limit, low_limit, high_limit
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
     select 
@@ -110,11 +114,11 @@
       origin, enable, is_proxy, factory_id, 
       unit, pack_unit, medium_unit, 
       medium_pack, big_pack, pinyin, 
-      storage_condition, comment, cert_no, 
-      cert_exp_date, cert_file_no, brand_no, 
-      brand_exp_date, brand_file_no, permit_no, 
-      permit_exp_date, permit_file_no, archive_no, 
-      in_check, first_check, special_managed, 
+      storage_condition, comment,
+      cert1_name, cert1_exp_date, cert1_no,
+      cert2_name,cert2_exp_date, cert2_no,
+      cert3_name, cert3_exp_date, cert3_no,
+      file_no, in_check, first_check, special_managed,
       need_care, in_tax, out_tax, 
       valid_months, warning_days, contact, 
       cure_range, sale_policy, is_foreign, 
@@ -128,17 +132,18 @@
       att3_id, att3_value, att4_id, 
       att4_value, att5_id, att5_value, 
       att6_id, att6_value, tags, 
-      use_spec, bar_code, retail_price, batch_price, in_price)
+      use_spec, bar_code, retail_price, batch_price, in_price,
+      normal_limit, low_limit, high_limit)
     values (#{companyId,jdbcType=INTEGER}, #{categoryId,jdbcType=INTEGER},
       #{goodsNo,jdbcType=VARCHAR}, #{brandId,jdbcType=BIGINT}, #{supplierId,jdbcType=BIGINT}, 
       #{status,jdbcType=VARCHAR}, #{name,jdbcType=VARCHAR}, #{fullName,jdbcType=VARCHAR}, 
       #{origin,jdbcType=VARCHAR}, #{enable,jdbcType=BIT}, #{isProxy,jdbcType=BIT}, #{factoryId,jdbcType=BIGINT}, 
       #{unit,jdbcType=BIGINT}, #{packUnit,jdbcType=BIGINT}, #{mediumUnit,jdbcType=BIGINT}, 
       #{mediumPack,jdbcType=DECIMAL}, #{bigPack,jdbcType=DECIMAL}, #{pinyin,jdbcType=VARCHAR}, 
-      #{storageCondition,jdbcType=BIGINT}, #{comment,jdbcType=VARCHAR}, #{certNo,jdbcType=VARCHAR}, 
-      #{certExpDate,jdbcType=DATE}, #{certFileNo,jdbcType=VARCHAR}, #{brandNo,jdbcType=VARCHAR}, 
-      #{brandExpDate,jdbcType=DATE}, #{brandFileNo,jdbcType=VARCHAR}, #{permitNo,jdbcType=VARCHAR}, 
-      #{permitExpDate,jdbcType=DATE}, #{permitFileNo,jdbcType=VARCHAR}, #{archiveNo,jdbcType=VARCHAR}, 
+      #{storageCondition,jdbcType=BIGINT}, #{comment,jdbcType=VARCHAR}, #{cert1Name,jdbcType=VARCHAR},
+      #{cert1ExpDate,jdbcType=DATE}, #{cert1No,jdbcType=VARCHAR}, #{cert2Name,jdbcType=VARCHAR},
+      #{cert2ExpDate,jdbcType=DATE}, #{cert2No,jdbcType=VARCHAR}, #{cert3Name,jdbcType=VARCHAR},
+      #{cert3ExpDate,jdbcType=DATE}, #{cert3No,jdbcType=VARCHAR}, #{fileNo,jdbcType=VARCHAR},
       #{inCheck,jdbcType=BIT}, #{firstCheck,jdbcType=BIT}, #{specialManaged,jdbcType=BIT}, 
       #{needCare,jdbcType=BIT}, #{inTax,jdbcType=DECIMAL}, #{outTax,jdbcType=DECIMAL}, 
       #{validMonths,jdbcType=INTEGER}, #{warningDays,jdbcType=INTEGER}, #{contact,jdbcType=VARCHAR}, 
@@ -153,8 +158,9 @@
       #{att3Id,jdbcType=BIGINT}, #{att3Value,jdbcType=VARCHAR}, #{att4Id,jdbcType=BIGINT}, 
       #{att4Value,jdbcType=VARCHAR}, #{att5Id,jdbcType=BIGINT}, #{att5Value,jdbcType=VARCHAR}, 
       #{att6Id,jdbcType=BIGINT}, #{att6Value,jdbcType=VARCHAR}, #{tags,jdbcType=VARCHAR}, 
-      #{useSpec,jdbcType=BIT}, #{barCode,jdbcType=VARCHAR}, #{retailPrice,jdbcType=DECIMAL}, #{batchPrice,jdbcType=DECIMAL},
-      #{inPrice,jdbcType=DECIMAL})
+      #{useSpec,jdbcType=BIT}, #{barCode,jdbcType=VARCHAR}, #{retailPrice,jdbcType=DECIMAL},
+      #{batchPrice,jdbcType=DECIMAL}, #{inPrice,jdbcType=DECIMAL},
+      #{normalLimit,jdbcType=DECIMAL}, #{lowLimit,jdbcType=DECIMAL}, #{highLimit,jdbcType=DECIMAL})
   </insert>
 
   <update id="updateByPrimaryKeySelective" parameterType="com.yiban.erp.entities.GoodsInfo" >
@@ -220,35 +226,35 @@
       <if test="comment != null" >
         comment = #{comment,jdbcType=VARCHAR},
       </if>
-      <if test="certNo != null" >
-        cert_no = #{certNo,jdbcType=VARCHAR},
+      <if test="cert1Name != null" >
+        cert1_name = #{cert1Name,jdbcType=VARCHAR},
       </if>
-      <if test="certExpDate != null" >
-        cert_exp_date = #{certExpDate,jdbcType=DATE},
+      <if test="cert1ExpDate != null" >
+        cert1_exp_date = #{cert1ExpDate,jdbcType=DATE},
       </if>
-      <if test="certFileNo != null" >
-        cert_file_no = #{certFileNo,jdbcType=VARCHAR},
+      <if test="cert1No != null" >
+        cert1_no = #{cert1No,jdbcType=VARCHAR},
       </if>
-      <if test="brandNo != null" >
-        brand_no = #{brandNo,jdbcType=VARCHAR},
+      <if test="cert2Name != null" >
+        cert2_name = #{cert2Name,jdbcType=VARCHAR},
       </if>
-      <if test="brandExpDate != null" >
-        brand_exp_date = #{brandExpDate,jdbcType=DATE},
+      <if test="cert2ExpDate != null" >
+        cert2_exp_date = #{cert2ExpDate,jdbcType=DATE},
       </if>
-      <if test="brandFileNo != null" >
-        brand_file_no = #{brandFileNo,jdbcType=VARCHAR},
+      <if test="cert2No != null" >
+        cert2_no = #{cert2No,jdbcType=VARCHAR},
       </if>
-      <if test="permitNo != null" >
-        permit_no = #{permitNo,jdbcType=VARCHAR},
+      <if test="cert3Name != null" >
+        cert3_name = #{cert3Name,jdbcType=VARCHAR},
       </if>
-      <if test="permitExpDate != null" >
-        permit_exp_date = #{permitExpDate,jdbcType=DATE},
+      <if test="cert3ExpDate != null" >
+        cert3_exp_date = #{cert3ExpDate,jdbcType=DATE},
       </if>
-      <if test="permitFileNo != null" >
-        permit_file_no = #{permitFileNo,jdbcType=VARCHAR},
+      <if test="cert3No != null" >
+        cert3_no = #{cert3No,jdbcType=VARCHAR},
       </if>
-      <if test="archiveNo != null" >
-        archive_no = #{archiveNo,jdbcType=VARCHAR},
+      <if test="fileNo != null" >
+        file_no = #{fileNo,jdbcType=VARCHAR},
       </if>
       <if test="inCheck != null" >
         in_check = #{inCheck,jdbcType=BIT},
@@ -391,6 +397,15 @@
       <if test="inPrice != null" >
         in_price = #{inPrice,jdbcType=DECIMAL},
       </if>
+      <if test="normalLimit != null">
+        normal_limit = #{normalLimit,jdbcType=DECIMAL},
+      </if>
+      <if test="lowLimit != null">
+        low_limit = #{lowLimit,jdbcType=DECIMAL},
+      </if>
+      <if test="highLimit != null">
+        high_limit = #{highLimit,jdbcType=DECIMAL},
+      </if>
     </set>
     where id = #{id,jdbcType=BIGINT}
   </update>
@@ -484,10 +499,10 @@
     gi.origin as origin, gi.enable as enable, gi.is_proxy as isProxy, gi.factory_id as factoryId,
     gi.unit as unit, gi.pack_unit as packUnit, gi.medium_unit as mediumUnit, gi.medium_pack as mediumPack,
     gi.big_pack as bigPack, gi.pinyin as pinyin, gi.storage_condition as storageCondition, gi.comment as comment,
-    gi.cert_no as certNo, gi.cert_exp_date as certExpDate, gi.cert_file_no as certFileNo,
-    gi.brand_no as brandNo, gi.brand_exp_date as brandExpDate, gi.brand_file_no as brandFileNo,
-    gi.permit_no as permitNo, gi.permit_exp_date as permitExpDate, gi.permit_file_no as permitFileNo,
-    gi.archive_no as archiveNo, gi.in_check as inCheck, gi.first_check as firstCheck,
+    gi.cert1_name as cert1Name, gi.cert1_exp_date as cert1ExpDate, gi.cert1_no as cert1No,
+    gi.cert2_name as cert2Name, gi.cert2_exp_date as cert2ExpDate, gi.cert2_no as cert2No,
+    gi.cert3_name as cert3Name, gi.cert3_exp_date as cert3ExpDate, gi.cert3_no as cert3No,
+    gi.file_no as fileNo, gi.in_check as inCheck, gi.first_check as firstCheck,
     gi.special_managed as specialManaged, gi.need_care as needCare, gi.in_tax as inTax, gi.out_tax as outTax,
     gi.valid_months as validMonths, gi.warning_days as warningDays, gi.contact as contact, gi.cure_range as cureRange,
     gi.sale_policy as salePolicy, gi.is_foreign as isForeign, gi.prescription_id as prescriptionId, gi.med_type_id as medTypeId,
@@ -499,6 +514,7 @@
     gi.att2_id as att2Id, gi.att2_value as att2Value, gi.att3_id as att3Id, gi.att3_value as att3Value, gi.att4_id as att4Id,
     gi.att4_value as att4Value, gi.att5_id as att5Id, gi.att5_value as att5Value, gi.att6_id as att6Id, gi.att6_value as att6Value,
     gi.tags as tags, gi.use_spec as useSpec,
+    gi.normal_limit as normalLimit, gi.low_limit as lowLimit, gi.high_limit as highLimit,
     gc.name as categoryName,
     f.name as factoryName,
     s.name as supplierName

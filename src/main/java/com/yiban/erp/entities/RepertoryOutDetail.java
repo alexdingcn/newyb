@@ -258,9 +258,6 @@ public class RepertoryOutDetail {
         this.details = details;
     }
 
-    public String getBrandNo() {
-        return this.goods == null ? null : this.goods.getBrandNo();
-    }
 
     public Boolean getSpecialManaged() {
         return this.goods == null ? null : this.goods.getSpecialManaged();
@@ -292,10 +289,6 @@ public class RepertoryOutDetail {
 
     public BigDecimal getBigPack() {
         return this.goods == null ? null : this.goods.getBigPack();
-    }
-
-    public String getPermit() {
-        return this.goods == null ? null : this.goods.getPermitNo();
     }
 
     public Boolean getCheckStatus() { return checkStatus; }

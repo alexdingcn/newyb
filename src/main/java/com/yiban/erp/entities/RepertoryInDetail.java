@@ -91,14 +91,10 @@ public class RepertoryInDetail {
     private String unitName;
     private String packUnitName;
     private BigDecimal bigPack;
-    private String permit;
-    private String brandNo; //商标编号
     private String storageCondition;
     private Boolean specialManaged;
 
-    public String getBrandNo() {
-        return this.goods == null ? null : this.goods.getBrandNo();
-    }
+
 
     public Boolean getSpecialManaged() {
         return this.goods == null ? null : this.goods.getSpecialManaged();
@@ -130,10 +126,6 @@ public class RepertoryInDetail {
 
     public BigDecimal getBigPack() {
         return this.goods == null ? null : this.goods.getBigPack();
-    }
-
-    public String getPermit() {
-        return this.goods == null ? null : this.goods.getPermitNo();
     }
 
     public Goods getGoods() {

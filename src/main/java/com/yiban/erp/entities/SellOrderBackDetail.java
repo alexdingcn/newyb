@@ -82,7 +82,6 @@ public class SellOrderBackDetail {
             this.origin = goods.getOrigin();
             this.jx = goods.getJxName();
             this.unitName = goods.getUnitName();
-            this.permitNo = goods.getPermitNo();
             this.baseMedName = goods.getBaseMedName();
             this.storageConditionName = goods.getStorageConditionName();
             this.taxRate = goods.getOutTax();

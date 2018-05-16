@@ -82,7 +82,6 @@ public class RepertoryInfo {
     private String jx;
     private String spec;
     private String unitName;
-    private String permitNo;
     private String baseMedName;
     private String storageConditionName;
     private BigDecimal taxRate;
@@ -94,7 +93,6 @@ public class RepertoryInfo {
             this.origin = goods.getOrigin();
             this.jx = goods.getJxName();
             this.unitName = goods.getUnitName();
-            this.permitNo = goods.getPermitNo();
             this.baseMedName = goods.getBaseMedName();
             this.storageConditionName = goods.getStorageConditionName();
             this.taxRate = goods.getOutTax();
@@ -391,14 +389,6 @@ public class RepertoryInfo {
 
     public void setUnitName(String unitName) {
         this.unitName = unitName;
-    }
-
-    public String getPermitNo() {
-        return permitNo;
-    }
-
-    public void setPermitNo(String permitNo) {
-        this.permitNo = permitNo;
     }
 
     public String getBaseMedName() {
