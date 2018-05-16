@@ -19,11 +19,13 @@
     <result column="updated_by" property="updatedBy" jdbcType="VARCHAR" />
     <result column="created_time" property="createdTime" jdbcType="TIMESTAMP" />
     <result column="updated_time" property="updatedTime" jdbcType="TIMESTAMP" />
+    <result column="last_used_time" property="lastUsedTime" jdbcType="TIMESTAMP" />
+    <result column="used_count" property="usedCount" jdbcType="INTEGER"/>
   </resultMap>
   <sql id="Base_Column_List" >
     id, company_id, goods_info_id, status, sku_key, spec_one_id, spec_two_id, spec_three_id, 
     spec_desc, bar_code, retail_price, batch_price, in_price, created_by, updated_by, 
-    created_time, updated_time
+    created_time, updated_time, last_used_time, used_count
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
     select 
@@ -41,13 +43,14 @@
       spec_two_id, spec_three_id, spec_desc, 
       bar_code, retail_price, batch_price, 
       in_price, created_by, updated_by, 
-      created_time, updated_time)
+      created_time, updated_time, last_used_time, used_count)
     values (#{companyId,jdbcType=INTEGER}, #{goodsInfoId,jdbcType=BIGINT},
       #{status,jdbcType=VARCHAR}, #{skuKey,jdbcType=VARCHAR}, #{specOneId,jdbcType=BIGINT}, 
       #{specTwoId,jdbcType=BIGINT}, #{specThreeId,jdbcType=BIGINT}, #{specDesc,jdbcType=VARCHAR}, 
       #{barCode,jdbcType=VARCHAR}, #{retailPrice,jdbcType=DECIMAL}, #{batchPrice,jdbcType=DECIMAL}, 
       #{inPrice,jdbcType=DECIMAL}, #{createdBy,jdbcType=VARCHAR}, #{updatedBy,jdbcType=VARCHAR}, 
-      #{createdTime,jdbcType=TIMESTAMP}, #{updatedTime,jdbcType=TIMESTAMP})
+      #{createdTime,jdbcType=TIMESTAMP}, #{updatedTime,jdbcType=TIMESTAMP},
+      #{lastUsedTime,jdbcType=TIMESTAMP}, #{usedCount, jdbcType=INTEGER})
   </insert>
 
   <insert id="insertBatch" parameterType="map" keyProperty="id" useGeneratedKeys="true" >
@@ -56,7 +59,7 @@
       spec_two_id, spec_three_id, spec_desc,
       bar_code, retail_price, batch_price,
       in_price, created_by, updated_by,
-      created_time, updated_time)
+      created_time, updated_time, last_used_time, used_count)
     values
      <foreach collection="details" item="item" open="(" close=")" separator="), (" >
        #{item.companyId,jdbcType=INTEGER}, #{item.goodsInfoId,jdbcType=BIGINT},
@@ -64,7 +67,8 @@
        #{item.specTwoId,jdbcType=BIGINT}, #{item.specThreeId,jdbcType=BIGINT}, #{item.specDesc,jdbcType=VARCHAR},
        #{item.barCode,jdbcType=VARCHAR}, #{item.retailPrice,jdbcType=DECIMAL}, #{item.batchPrice,jdbcType=DECIMAL},
        #{item.inPrice,jdbcType=DECIMAL}, #{item.createdBy,jdbcType=VARCHAR}, #{item.updatedBy,jdbcType=VARCHAR},
-       #{item.createdTime,jdbcType=TIMESTAMP}, #{item.updatedTime,jdbcType=TIMESTAMP}
+       #{item.createdTime,jdbcType=TIMESTAMP}, #{item.updatedTime,jdbcType=TIMESTAMP},
+       #{item.lastUsedTime,jdbcType=TIMESTAMP}, #{item.usedCount, jdbcType=INTEGER}
      </foreach>
   </insert>
 
@@ -119,6 +123,12 @@
       <if test="updatedTime != null" >
         updated_time = #{updatedTime,jdbcType=TIMESTAMP},
       </if>
+      <if test="lastUsedTime != null">
+        last_used_time = #{lastUsedTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="usedCount != null">
+        used_count = #{usedCount, jdbcType=INTEGER},
+      </if>
     </set>
     where id = #{id,jdbcType=BIGINT}
   </update>
@@ -135,9 +145,22 @@
     select
       <include refid="Base_Column_List"/>
     from goods_detail
-    where goods_info_id = #{goodsInfoId} and status != 'DELETE'
+    where goods_info_id = #{goodsInfoId}
+    <if test="includeDelete == false" >
+      and status != 'DELETE'
+    </if>
   </select>
 
+
+  <update id="updateUsedCount" parameterType="map" >
+    update goods_detail
+      set last_used_time = CURRENT_TIMESTAMP,
+          used_count = used_count + 1
+    where id in
+    <foreach collection="ids" separator="," item="item" open="(" close=")">
+      #{item}
+    </foreach>
+  </update>
 
 
 

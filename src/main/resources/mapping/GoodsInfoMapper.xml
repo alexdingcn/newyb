@@ -451,11 +451,10 @@
   </select>
 
   <select id="isGoodsUsed" parameterType="java.lang.Long" resultType="java.lang.Boolean">
-    select count(s.id) > 0 from sell_order_detail s, goods_detail d, goods_info g
-    where s.goods_id = d.id and d.goods_info_id = g.id
-    and g.id = #{id}
+    select count(d.id) > 0 from goods_detail d, goods_info g
+    where d.goods_info_id = g.id
+    and g.id = #{id} and d.used_count > 0
   </select>
-
 
   <select id="getChooseListDetailCount" parameterType="com.yiban.erp.dto.GoodsQuery" resultType="java.lang.Long">
     select count(d.id)
@@ -475,6 +474,7 @@
     gd.id as id, gd.sku_key as skuKey, gd.spec_one_id as specOneId, gd.spec_two_id as specTwoId,
     gd.spec_three_id as specThreeId, gd.bar_code as barCode, gd.retail_price as retailPrice,
     gd.batch_price as batchPrice, gd.in_price as inPrice,
+    gd.last_used_time as lastUsedTime, gd.used_count as usedCount,
     gs1.spec_name as specOneName, gs1.parent_name as specOneParentName,
     gs2.spec_name as specTwoName, gs2.parent_name as specTwoParentName,
     gs3.spec_name as specThreeName, gs3.parent_name as specThreeParentName,

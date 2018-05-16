@@ -130,7 +130,7 @@ public class GoodsService {
         if (goodsInfo == null) {
             throw new BizException(ErrorCode.GOODS_GET_RESULT_NULL);
         }
-        List<GoodsDetail> details = goodsDetailMapper.getByGoodsInfoId(goodsInfo.getId());
+        List<GoodsDetail> details = goodsDetailMapper.getByGoodsInfoId(goodsInfo.getId(), false);
         goodsInfo.setGoodsDetails(details);
         setGoodsInfoOptionName(goodsInfo);
         return goodsInfo;
@@ -184,6 +184,8 @@ public class GoodsService {
             detail.setInPrice(goodsInfo.getInPrice());
             detail.setCreatedBy(user.getNickname());
             detail.setCreatedTime(new Date());
+            detail.setLastUsedTime(null); //初始为空值
+            detail.setUsedCount(0); //初始设置为0
             int detailCount = goodsDetailMapper.insert(detail);
             if (detailCount <= 0) {
                 throw new BizRuntimeException(ErrorCode.FAILED_INSERT_FROM_DB);
@@ -199,6 +201,8 @@ public class GoodsService {
                 detail.setSkuKey(getSkuKey(detail, goodsInfo.getId()));
                 detail.setCreatedBy(user.getNickname());
                 detail.setCreatedTime(new Date());
+                detail.setLastUsedTime(null); //初始为空值
+                detail.setUsedCount(0); //初始设置为0
             }
             int detailsCount = goodsDetailMapper.insertBatch(details);
             if (detailsCount <= 0) {
@@ -230,7 +234,155 @@ public class GoodsService {
 
     @Transactional
     public void updateGoodsInfo(GoodsInfo goodsInfo, User user) throws BizException {
+        GoodsInfo oldGoodsInfo = goodsInfoMapper.selectByPrimaryKey(goodsInfo.getId());
+        if (oldGoodsInfo == null || !oldGoodsInfo.getCompanyId().equals(user.getCompanyId())) {
+            throw new BizException(ErrorCode.GOODS_GET_RESULT_NULL);
+        }
+        //检查是否使用了多规格, 老的全部拉出来
+        List<GoodsDetail> oldDetails = goodsDetailMapper.getByGoodsInfoId(goodsInfo.getId(), true);
+        if (oldDetails == null || oldDetails.isEmpty()) {
+            throw new BizException(ErrorCode.GOODS_GET_RESULT_NULL); //至少会有一个
+        }
+        Map<String, GoodsDetail> oldMap = new HashMap<>();
+        oldDetails.stream().forEach(item -> oldMap.put(item.getSkuKey(), item));
+        boolean useSpec = goodsInfo.getUseSpec() == null ? false : goodsInfo.getUseSpec();
+        if (!useSpec) {
+            //未使用多规格
+            updateUnUseSpec(goodsInfo, oldGoodsInfo, oldDetails, oldMap, user);
+        }else {
+            //使用了多规格，
+            updateUseSpec(goodsInfo, oldDetails, oldMap, user);
+        }
+    }
 
+    @Transactional
+    public void updateUseSpec(GoodsInfo goodsInfo, List<GoodsDetail> oldDetails, Map<String, GoodsDetail> oldDetailMap, User user) throws BizException {
+        //生成所有新规格的skuKey
+        List<GoodsDetail> details = goodsInfo.getGoodsDetails();
+        for (GoodsDetail detail : details) {
+            detail.setCompanyId(user.getCompanyId());
+            detail.setGoodsInfoId(goodsInfo.getId());
+            detail.setStatus(GoodsStatus.NORMAL.name());
+            if (detail.getBarCode() == null && goodsInfo.getBarCode() != null) {
+                detail.setBarCode(goodsInfo.getBarCode());
+            }
+            detail.setSkuKey(getSkuKey(detail, goodsInfo.getId()));
+        }
+        Map<String, GoodsDetail> newSkuKeyMap = new HashMap<>();
+        details.stream().forEach(item -> newSkuKeyMap.put(item.getSkuKey(), item));
+
+        for (GoodsDetail oldItem : oldDetails) {
+            GoodsDetail newItem = newSkuKeyMap.get(oldItem.getSkuKey());
+            if (newItem != null) {
+                //新的中还包含老的，
+                continue;
+            }
+            //如果不包含老的了，说明需要删除老的，在删除前验证是否可以删除
+            if (!GoodsStatus.DELETE.name().equalsIgnoreCase(oldItem.getStatus())
+                    && oldItem.getUsedCount() != null && oldItem.getUsedCount() > 0) {
+                logger.warn("old detail not include in new detail, but old detail useCount > 0 can not delete. old detail skuKey:{}", oldItem.getSkuKey());
+                throw new BizException(ErrorCode.GOODS_OLD_SPEC_USED);
+            }
+        }
+        logger.info("validate old detail true"); //没有抛错退出，认为验证都通过
+        //把老的全部修改改到DELETE的状态
+        goodsDetailMapper.deleteByGoodsInfoId(goodsInfo.getId(), user.getNickname(), new Date());
+        //然后根据新的规格，如果在老的中，则修改，如果不在，则添加
+        for (GoodsDetail newItem : details) {
+            GoodsDetail oldDetail = oldDetailMap.get(newItem.getSkuKey());
+            if (oldDetail != null) {
+                oldDetail.setStatus(GoodsStatus.NORMAL.name());
+                oldDetail.setSkuKey(newItem.getSkuKey());
+                oldDetail.setBarCode(newItem.getBarCode());
+                oldDetail.setBatchPrice(newItem.getBatchPrice());
+                oldDetail.setRetailPrice(newItem.getRetailPrice());
+                oldDetail.setInPrice(newItem.getInPrice());
+                oldDetail.setUpdatedBy(user.getNickname());
+                oldDetail.setUpdatedTime(new Date());
+                goodsDetailMapper.updateByPrimaryKeySelective(oldDetail);
+                logger.info("update detail success. goodsInfoId:{}", goodsInfo.getId());
+            }else {
+                //如果获取不到，说明原来是多规格的，现在变更为了单规格，根据key创建一个新的
+                newItem.setCreatedTime(new Date());
+                newItem.setCreatedBy(user.getNickname());
+                goodsDetailMapper.insert(newItem);
+                logger.info("update goods info created detail success");
+            }
+        }
+
+        //然后直接修改产品信息
+        goodsInfo.setCompanyId(user.getCompanyId());
+        goodsInfo.setUpdatedBy(user.getNickname());
+        goodsInfo.setUpdatedTime(new Date());
+        goodsInfoMapper.updateByPrimaryKeySelective(goodsInfo);
+    }
+
+    @Transactional
+    public void updateUnUseSpec(GoodsInfo goodsInfo, GoodsInfo oldGoodsInfo, List<GoodsDetail> oldDetails, Map<String, GoodsDetail> oldDetailMap, User user) throws BizException {
+        //如果新的没有使用多规格，看看老的是否使用了多规格
+        if (oldGoodsInfo.getUseSpec() && isDetailsHaveUsed(oldDetails)) {
+            //老的使用了多规格，且多规格中的值是存在有使用过的，如果有，则不能进行修改，相当于存在有多规格限制
+            throw new BizException(ErrorCode.GOODS_OLD_SPEC_USED);
+        }
+        //如果验证通过，把原来的detail全部设置为DELETE状态. 然后建立新的
+        goodsDetailMapper.deleteByGoodsInfoId(oldGoodsInfo.getId(), user.getNickname(), new Date());
+        //新的skuKey
+        String newSkuKey = getSkuKey(null, goodsInfo.getId());
+        GoodsDetail oldDetail = oldDetailMap.get(newSkuKey);
+        //如果获取到了，直接根据新值赋值给老的值进行修改
+        if (oldDetail != null) {
+            oldDetail.setStatus(GoodsStatus.NORMAL.name());
+            oldDetail.setSkuKey(newSkuKey);
+            oldDetail.setBarCode(goodsInfo.getBarCode());
+            oldDetail.setBatchPrice(goodsInfo.getBatchPrice());
+            oldDetail.setRetailPrice(goodsInfo.getRetailPrice());
+            oldDetail.setInPrice(goodsInfo.getInPrice());
+            oldDetail.setUpdatedBy(user.getNickname());
+            oldDetail.setUpdatedTime(new Date());
+            goodsDetailMapper.updateByPrimaryKeySelective(oldDetail);
+            logger.info("update detail success. goodsInfoId:{}", goodsInfo.getId());
+        }else {
+            //如果获取不到，说明原来是多规格的，现在变更为了单规格，根据key创建一个新的
+            GoodsDetail detail = makeNewGoodsDeail(goodsInfo, user);
+            goodsDetailMapper.insert(detail);
+            logger.info("update goods info created detail success");
+        }
+
+        //然后直接修改产品信息
+        goodsInfo.setUpdatedBy(user.getNickname());
+        goodsInfo.setUpdatedTime(new Date());
+        goodsInfoMapper.updateByPrimaryKeySelective(goodsInfo);
+    }
+
+    private GoodsDetail makeNewGoodsDeail(GoodsInfo goodsInfo, User user) {
+        GoodsDetail detail = new GoodsDetail();
+        detail.setCompanyId(user.getCompanyId());
+        detail.setGoodsInfoId(goodsInfo.getId());
+        detail.setStatus(GoodsStatus.NORMAL.name());
+        detail.setSkuKey(getSkuKey(null, goodsInfo.getId()));
+        detail.setBarCode(goodsInfo.getBarCode());
+        detail.setBatchPrice(goodsInfo.getBatchPrice());
+        detail.setRetailPrice(goodsInfo.getRetailPrice());
+        detail.setInPrice(goodsInfo.getInPrice());
+        detail.setCreatedBy(user.getNickname());
+        detail.setCreatedTime(new Date());
+        detail.setLastUsedTime(null); //初始为空值
+        detail.setUsedCount(0); //初始设置为0
+
+        return detail;
+    }
+
+    private boolean isDetailsHaveUsed(List<GoodsDetail> details) {
+        if (details == null || details.isEmpty()) {
+            return false;
+        }
+        for (GoodsDetail item : details) {
+            if (!GoodsStatus.DELETE.name().equalsIgnoreCase(item.getStatus())
+                    && item.getUsedCount() != null && item.getUsedCount() > 0) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Transactional
@@ -266,7 +418,7 @@ public class GoodsService {
             logger.warn("get goods info fail by id:{}", id);
             throw new BizException(ErrorCode.GOODS_GET_RESULT_NULL);
         }
-        List<GoodsDetail> details = goodsDetailMapper.getByGoodsInfoId(goodsInfo.getId());
+        List<GoodsDetail> details = goodsDetailMapper.getByGoodsInfoId(goodsInfo.getId(), false);
         if (details == null || details.isEmpty()) {
             logger.warn("get goods info detail by goods info id result is empty");
             throw new BizException(ErrorCode.GOODS_GET_RESULT_NULL);
@@ -294,11 +446,31 @@ public class GoodsService {
             detail.setCreatedTime(new Date());
             detail.setUpdatedBy(user.getNickname());
             detail.setUpdatedTime(new Date());
+            detail.setLastUsedTime(null); //初始为空值
+            detail.setUsedCount(0); //初始设置为0
         }
         int detailCount = goodsDetailMapper.insertBatch(details);
         if (detailCount <= 0) {
             throw new BizRuntimeException(ErrorCode.FAILED_INSERT_FROM_DB);
         }
+    }
+
+    @Transactional
+    public void detailRemoveById(Long detailId, User user) throws BizException {
+        GoodsDetail detail = goodsDetailMapper.selectByPrimaryKey(detailId);
+        if (detail == null) {
+            throw new BizException(ErrorCode.GOODS_DETAIL_GET_FAIL);
+        }
+        //如果usedCount大于0,则不能修改到删除状态，如果小于等于0，可以修改
+        if (detail.getUsedCount() != null && detail.getUsedCount()>0) {
+            logger.warn("detail usedCount > 0 can not delete.");
+            throw new BizException(ErrorCode.GOODS_DETAIL_USED_CANNOT_DELETE);
+        }
+        logger.info("user:{} request delete detail:{}", user.getId(), detail.getId());
+        detail.setStatus(GoodsStatus.DELETE.name());
+        detail.setUpdatedTime(new Date());
+        detail.setUpdatedBy(user.getNickname());
+        goodsDetailMapper.updateByPrimaryKeySelective(detail);
     }
 
 

@@ -43,6 +43,9 @@ public enum ErrorCode {
     GOODS_BRAND_USED_CANNOT_REMOVE(1208, "商品品牌有商品正在使用，不能删除"),
     GOODS_GET_RESULT_NULL(1209, "获取商品信息失败"),
     GOODS_USED_CANNOT_DELETE(1210, "商品存在使用的数据，不能删除"),
+    GOODS_DETAIL_GET_FAIL(1211, "获取商品详情信息失败"),
+    GOODS_DETAIL_USED_CANNOT_DELETE(1212, "当前产品详情信息存在使用信息，不能删除"),
+    GOODS_OLD_SPEC_USED(1213, "商品需要删除的多规格信息存在使用情况，不能删除"),
 
     // 13xx - 采购
     BUY_ORDER_NOT_EXISTED(1300, "采购订单不存在"),

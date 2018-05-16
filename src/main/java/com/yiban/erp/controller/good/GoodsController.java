@@ -117,4 +117,14 @@ public class GoodsController {
         return ResponseEntity.ok().build();
     }
 
+    @RequestMapping(value = "/detail/remove/{detailId}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> detailRemove(@PathVariable Long detailId,
+                                               @AuthenticationPrincipal User user) throws Exception {
+        logger.info("user:{} request remove detail by id:{}", user.getId(), detailId);
+        goodsService.detailRemoveById(detailId, user);
+        return ResponseEntity.ok().build();
+    }
+
+
+
 }

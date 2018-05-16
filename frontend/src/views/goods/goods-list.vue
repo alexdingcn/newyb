@@ -282,9 +282,11 @@ export default {
         goodsSaveOk() {
             this.refreshGoodsList();
             this.goodsModal = false;
+            
         },
 
         updateGoods(id) {
+            this.editId = ''; //重置，可以导致再次点击时能刷新数据
             if(!id) {
                 return;
             }

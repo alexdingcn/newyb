@@ -38,6 +38,9 @@ public class GoodsDetail {
 
     private Date updatedTime;
 
+    private Date lastUsedTime; //最后一次使用时间
+    private Integer usedCount; //使用次数
+
     public Long getId() {
         return id;
     }
@@ -172,5 +175,21 @@ public class GoodsDetail {
 
     public void setUpdatedTime(Date updatedTime) {
         this.updatedTime = updatedTime;
+    }
+
+    public Date getLastUsedTime() {
+        return lastUsedTime;
+    }
+
+    public void setLastUsedTime(Date lastUsedTime) {
+        this.lastUsedTime = lastUsedTime;
+    }
+
+    public Integer getUsedCount() {
+        return usedCount;
+    }
+
+    public void setUsedCount(Integer usedCount) {
+        this.usedCount = usedCount;
     }
 }

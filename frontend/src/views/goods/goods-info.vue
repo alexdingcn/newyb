@@ -14,55 +14,55 @@
                     <TabPane icon="cube" name="general" label="基础信息">
                         <h2 style="margin-bottom: 10px;">商品基础信息</h2>
                         <Row class="row-margin-bottom">
-                            <i-col span="8">
+                            <i-col span="10">
                                 <FormItem label="商品名称" prop="name">
                                     <Input type="text" v-model="formData.name" @on-blur="onChangeName" />
                                 </FormItem>
                             </i-col>
-                            <i-col span="8">
+                            <i-col span="10">
                                 <FormItem label="商品编号" prop="goodsNo">
                                     <Input type="text" v-model="formData.goodsNo" placeholder="由系统自动生成" disabled/>
                                 </FormItem>
                             </i-col>
                         </Row>
                         <Row class="row-margin-bottom">
-                            <i-col span="8">
+                            <i-col span="10">
                                 <FormItem label="商品类别" prop="categoryId">
                                     <goods-category-select v-model="formData.categoryId"></goods-category-select>
                                 </FormItem>
                             </i-col>
-                            <i-col span="8">
+                            <i-col span="10">
                                 <FormItem label="商品品牌" prop="brandId">
                                     <goods-brand-select v-model="formData.brandId" ></goods-brand-select>
                                 </FormItem>
                             </i-col>
                         </Row>
                         <Row class="row-margin-bottom">
-                            <i-col span="8">
+                            <i-col span="10">
                                 <FormItem label="拼音" prop="pinyin">
                                     <Input type="text" v-model="formData.pinyin" />
                                 </FormItem>
                             </i-col>
-                            <i-col span="8">
+                            <i-col span="10">
                                 <FormItem label="生产企业" prop="factoryId">
                                     <factory-select v-model="formData.factoryId"></factory-select>
                                 </FormItem>
                             </i-col>
                         </Row>
                         <Row class="row-margin-bottom">
-                            <i-col span="8">
+                            <i-col span="10">
                                 <FormItem label="产地" prop="origin">
                                     <Input type="text" v-model="formData.origin" />
                                 </FormItem>
                             </i-col>
-                            <i-col span="8">
+                            <i-col span="10">
                                 <FormItem label="供应商" prop="supplierId">
                                     <supplier-select v-model="formData.supplierId"></supplier-select>
                                 </FormItem>
                             </i-col>
                         </Row>
                         <Row class="row-margin-bottom">
-                            <i-col span="8">
+                            <i-col span="10">
                                 <FormItem label="是否启用" prop="enable">
                                     <RadioGroup v-model="formData.enable">
                                          <Radio :label="1">
@@ -74,14 +74,14 @@
                                     </RadioGroup>
                                 </FormItem>
                             </i-col>
-                            <i-col span="8">
+                            <i-col span="10">
                                 <FormItem label="备注" prop="comment">
                                     <Input type="text" v-model="formData.comment" placeholder="备注信息"/>
                                 </FormItem>
                             </i-col>
                         </Row>
                         <Row class="row-margin-bottom">
-                            <i-col span="12">
+                            <i-col span="16">
                                 <FormItem label="商品标签" prop="tagList">
                                     <CheckboxGroup v-model="formData.tagList">
                                         <Checkbox label="NEW_GOODS">
@@ -103,36 +103,36 @@
 
                         <h2 style="margin-bottom: 10px;">商品单位</h2>
                         <Row class="row-margin-bottom">
-                            <i-col span="8">
+                            <i-col span="10">
                                 <FormItem label="小单位" prop="unit">
                                     <option-select placement="top" v-model="formData.unit" optionType='GOODS_UNIT' ></option-select>
                                 </FormItem>
                             </i-col>
-                            <i-col span="8">
+                            <i-col span="10">
                                 <FormItem label="条形码" prop="barCode">
                                     <Input type="text" v-model="formData.barCode" placeholder="最小单位的条形码"/>
                                 </FormItem>
                             </i-col>
                         </Row>
                         <Row class="row-margin-bottom">
-                            <i-col span="8">
+                            <i-col span="10">
                                 <FormItem label="中件单位" prop="mediumUnit">
                                     <option-select placement="top" v-model="formData.mediumUnit" optionType='GOODS_UNIT' ></option-select>
                                 </FormItem>
                             </i-col>
-                            <i-col span="8">
+                            <i-col span="10">
                                 <FormItem label="中件单位换算" prop="mediumPack">
                                     <InputNumber :min="0" v-model="formData.mediumPack"  style="width: 100%;" />
                                 </FormItem>
                             </i-col>
                         </Row>
                         <Row class="row-margin-bottom">
-                            <i-col span="8">
+                            <i-col span="10">
                                 <FormItem label="大件单位" prop="packUnit">
                                     <option-select placement="top" v-model="formData.packUnit" optionType='GOODS_UNIT' ></option-select>
                                 </FormItem>
                             </i-col>
-                            <i-col span="8">
+                            <i-col span="10">
                                 <FormItem label="大件单位换算" prop="bigPack">
                                     <InputNumber :min="0" v-model="formData.bigPack" style="width: 100%;" />
                                 </FormItem>
@@ -251,6 +251,7 @@ export default {
                 goodsNo: '',
                 pinyin: '',
                 enable: 1,
+                tagList: [],
                 useSpec: false,
                 batchPrice: 0,
                 retailPrice: 0,
@@ -290,6 +291,11 @@ export default {
                     let data = response.data;
                     data.enable = data.enable ? 1 : 0;
                     this.formData = data;
+                    //需要重新初始化多规格数据信息，如果使用了多规格的，再根据数据生成
+                    this.currParentSpecs = [];
+                    this.currSpecIds = [[], [], []],
+                    this.goodsDetails = [];
+                    this.goodsDetailColumn = [];
                     if(this.formData.useSpec) {
                         this.editShowSpecForm(this.formData.goodsDetails);
                     }
@@ -329,9 +335,43 @@ export default {
         editShowSpecForm(details) {
             //根据规格详情，制造出规格表和选择标签
             this.currParentSpecs = [];
+            let haveParentIds = [];
+            let specOneIds = [];
+            let specTwoIds = [];
+            let specThreeIds = [];
+            for (let i=0; i<details.length; i++) {
+                let detailItem = details[i];
+                let formItem1 = this.getSpecFormItemBySubId(detailItem.specOneId);
+                let formItem2 = this.getSpecFormItemBySubId(detailItem.specTwoId);
+                let formItem3 = this.getSpecFormItemBySubId(detailItem.specThreeId);
+                if (formItem1.parentId && haveParentIds.indexOf(formItem1.parentId) < 0) {
+                    this.currParentSpecs.push(formItem1);
+                    haveParentIds.push(formItem1.parentId);
+                }
+                if (specOneIds.indexOf(detailItem.specOneId) < 0) {
+                    specOneIds.push(detailItem.specOneId)
+                }
 
-            // TODO 
+                if (formItem2.parentId && haveParentIds.indexOf(formItem2.parentId) < 0) {
+                    this.currParentSpecs.push(formItem2);
+                    haveParentIds.push(formItem2.parentId);
+                }
+                if (specTwoIds.indexOf(detailItem.specTwoId) < 0) {
+                    specTwoIds.push(detailItem.specTwoId)
+                }
 
+                if (formItem3.parentId && haveParentIds.indexOf(formItem3.parentId) < 0) {
+                    this.currParentSpecs.push(formItem3);
+                    haveParentIds.push(formItem3.parentId);
+                }
+                if (specThreeIds.indexOf(detailItem.specThreeId) < 0) {
+                    specThreeIds.push(detailItem.specThreeId)
+                }
+            }
+            this.currSpecIds = [specOneIds, specTwoIds, specThreeIds];
+
+            this.goodsDetailColumn = this.makeSpecTableColumns();
+            this.goodsDetails = details;
         },
         getSpecFormItemBySubId(id) {
             if (!id || id<=0) {
@@ -401,7 +441,57 @@ export default {
         },
 
         chooseSpecChange(data) {
-            this.goodsDetails = this.makeSpecTableData();
+            let details = this.makeSpecTableData();
+            //如果当前的goodsInfoId存在，且大于0，证明是修改操作，如果是修改操作，把规格数据按后台返回的formData.details做数据赋值操作
+            if (this.goodsInfoId && this.formData.useSpec && this.formData.goodsDetails.length > 0) {
+                //做数值赋值操作，做赋值操作之前，需要先把details的每一个skuKey的值按规则生成出来
+                for (let i=0; i<details.length; i++) {
+                    let detail = details[i];
+                    let skuKey = this.makeSkuKey(detail, this.goodsInfoId);
+                    detail.skuKey = skuKey;
+                    //根据skuKey 的值从formData.goodsDetails中查询相同值进行赋值
+                    let oldDetail = this.getDataFormGoodsDetailsBySkuKey(skuKey);
+                    if(oldDetail.id) {
+                        detail.id = oldDetail.id;
+                        detail.barCode = oldDetail.barCode;
+                        detail.batchPrice = oldDetail.batchPrice;
+                        detail.retailPrice = oldDetail.retailPrice;
+                        detail.inPrice = oldDetail.inPrice;
+                        detail.lastUsedTime = oldDetail.lastUsedTime;
+                        detail.usedCount = oldDetail.usedCount;
+                    }
+                }
+                this.goodsDetails = details; //赋值
+            }else {
+                this.goodsDetails = details; //如果没存在的，直接赋值，认为是新的数据
+            }
+        },
+
+        getDataFormGoodsDetailsBySkuKey(skuKey) {
+            for(let i=0; i<this.formData.goodsDetails.length; i++) {
+                let item = this.formData.goodsDetails[i];
+                if (skuKey === item.skuKey) {
+                    return item;
+                }
+            }
+            return {};
+        },
+
+        //根据详情和infoId生成skuKey
+        makeSkuKey (detail, goodsInfoId) {
+            let oneId = detail.specOneId ? detail.specOneId : -1;
+            let twoId = detail.specTwoId ? detail.specTwoId : -1;
+            let threeId = detail.specThreeId ? detail.specThreeId : -1;
+            let result = goodsInfoId + '';
+            
+            let arr = [oneId, twoId, threeId]; //从小到大排序
+            arr.sort((a, b)=>{return a-b});
+            for (let i=0;i<arr.length;i++) {
+                if(arr[i] > 0) {
+                    result = result + '-' + arr[i];
+                }
+            }
+            return result;
         },
 
         makeSpecTableColumns() {
@@ -493,6 +583,29 @@ export default {
                     return self.inputRender(h, params);
                 }
             });
+            culumns.push({
+                title: '操作',
+                key: 'action',
+                widht: 100,
+                render: (h, params) => {
+                    let usedCount = params.row.usedCount;
+                    if (usedCount && usedCount > 0) {
+                        return h('span', '不可删除');
+                    }else {
+                        return h('Button', {
+                            props: {
+                                type: 'text',
+                                icon: 'close'
+                            },
+                            on: {
+                                click: () => {
+                                    self.removeDetailItem(params.row, params.index);
+                                }
+                            }
+                        }, '');
+                    }
+                }
+            });
             return culumns;
         },
 
@@ -531,6 +644,23 @@ export default {
                     }
                 }
             });
+        },
+
+        removeDetailItem(row, index) {
+            if(row.id) {
+                //关联有后端的数据,ajax做删除操作
+                util.ajax.delete('/goods/detail/remove/' + row.id)
+                    .then((response) => {
+                        //删除成功时把表中的数据去除
+                        this.goodsDetails.splice(index, 1);
+                    })
+                    .catch((error) => {
+                        util.errorProcessor(this, error);
+                    })
+            }else {
+                //没有关联到后天数据，直接考虑删除
+                this.goodsDetails.splice(index, 1);
+            }
         },
 
         //展开选择的规格明细展开成一个表格数据

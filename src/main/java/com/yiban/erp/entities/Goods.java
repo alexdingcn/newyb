@@ -29,6 +29,10 @@ public class Goods {
 
     private String barCode;
 
+    private Date lastUsedTime;
+
+    private Integer usedCount;
+
     private Integer companyId;
 
     private Integer categoryId;
@@ -931,6 +935,22 @@ public class Goods {
 
     public void setBarCode(String barCode) {
         this.barCode = barCode;
+    }
+
+    public Date getLastUsedTime() {
+        return lastUsedTime;
+    }
+
+    public void setLastUsedTime(Date lastUsedTime) {
+        this.lastUsedTime = lastUsedTime;
+    }
+
+    public Integer getUsedCount() {
+        return usedCount;
+    }
+
+    public void setUsedCount(Integer usedCount) {
+        this.usedCount = usedCount;
     }
 
     public BigDecimal getBatchPrice() {

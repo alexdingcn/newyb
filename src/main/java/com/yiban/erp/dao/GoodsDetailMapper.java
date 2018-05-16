@@ -1,6 +1,5 @@
 package com.yiban.erp.dao;
 
-import com.yiban.erp.dto.GoodsQuery;
 import com.yiban.erp.entities.GoodsDetail;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -25,7 +24,15 @@ public interface GoodsDetailMapper {
                             @Param("updatedBy") String updatedBy,
                             @Param("updatedTime") Date updatedTime);
 
-    List<GoodsDetail> getByGoodsInfoId(Long id);
+    List<GoodsDetail> getByGoodsInfoId(@Param("goodsInfoId") Long id,
+                                       @Param("includeDelete") boolean includeDelete);
+
+    /**
+     * 修改商品的最后使用时间和次数
+     * @param ids
+     * @return
+     */
+    int updateUsedCount(@Param("ids") List<Long> ids);
 
 
 }
