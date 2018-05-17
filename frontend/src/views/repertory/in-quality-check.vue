@@ -148,7 +148,7 @@
               <Row>
                   <Col span="8">
                     <FormItem label="温控方式验收">
-                        <temper-control-select v-model="checkFormItem.checkTempMethod"></temper-control-select>
+                        <option-select optionType="TEMPER_CONTROL" v-model="checkFormItem.checkTempMethod"></option-select>
                     </FormItem>
                   </Col>
                   <Col span="8">
@@ -187,7 +187,7 @@ import moment,{ isMoment } from 'moment';
 import supplierSelect from "@/views/selector/supplier-select.vue";
 import warehouseSelect from "@/views/selector/warehouse-select.vue";
 import inSurveyCheck from "./in-survey-check.vue";
-import temperControlSelect from "@/views/selector/temper-control-select.vue";
+import optionSelect from "@/views/selector/option-select.vue";
 import goodSelect from "@/views/selector/good-select.vue";
 import fileDetail from "@/views/basic-data/file-detail.vue";
 import warehouseLocationModal from "@/views/selector/warehouse-location-modal.vue";
@@ -198,7 +198,7 @@ export default {
         supplierSelect,
         warehouseSelect,
         inSurveyCheck,
-        temperControlSelect,
+        optionSelect,
         goodSelect,
         fileDetail,
         warehouseLocationModal

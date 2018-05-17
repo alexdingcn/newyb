@@ -6,7 +6,7 @@
 <template>
   <div class="goods-list">
           <div class="list-sider" :style="{width: showSider ? '200px' : '0px'}">
-            <goods-category v-show="showSider" @on-choose="categoryChoose" ></goods-category>
+            <goods-category :is-sider="true" v-show="showSider" @on-choose="categoryChoose" ></goods-category>
           </div>
           <div class="list-body" :style="{left: showSider ? '200px': '0px'}">
               <Card>
@@ -72,18 +72,6 @@ export default {
         goodsInfo,
     },
     data() {
-        const actionButton = (h, icon, color, clickCall, data) => {
-            return h('Button', {
-                    props: {
-                        type: 'text',
-                        size: 'small',
-                        icon: icon
-                    },
-                    on: {
-                        click: (data) => {clickCall(data)}
-                    }
-                }, '');
-        }
         return {
             enableList: [{value:'ALL', label:'全部'}, {value: 1, label: '启用'}, {value: 0, label: '禁用'}],
             showSider: false,
@@ -100,6 +88,46 @@ export default {
                     title: '',
                     type: 'selection',
                     width: 60
+                },
+                {
+                    title: '操作',
+                    key: 'action',
+                    width: 120,
+                    render: (h, params) => {
+                        let self = this;
+                        return h('div', [
+                            h('Button', {
+                                props: {
+                                    type: 'text',
+                                    size: 'small',
+                                    icon: 'edit'
+                                },
+                                on: {
+                                    click: (data) => {self.updateGoods(params.row.id)}
+                                }
+                            }, ''),
+                            h('Button', {
+                                props: {
+                                    type: 'text',
+                                    size: 'small',
+                                    icon: 'ios-copy'
+                                },
+                                on: {
+                                    click: (data) => {self.copyGoods(params.row)}
+                                }
+                            }, ''),
+                            h('Button', {
+                                props: {
+                                    type: 'text',
+                                    size: 'small',
+                                    icon: 'ios-trash'
+                                },
+                                on: {
+                                    click: (data) => {self.removeGoods(params.row)}
+                                }
+                            }, '')
+                        ]);
+                    }
                 },
                 {
                     title: '商品名称',
@@ -182,46 +210,6 @@ export default {
                             h('h5', brandName)
                         ]);
                     }
-                },
-                {
-                    title: '操作',
-                    key: 'action',
-                    width: 120,
-                    render: (h, params) => {
-                        let self = this;
-                        return h('div', [
-                            h('Button', {
-                                props: {
-                                    type: 'text',
-                                    size: 'small',
-                                    icon: 'edit'
-                                },
-                                on: {
-                                    click: (data) => {self.updateGoods(params.row.id)}
-                                }
-                            }, ''),
-                            h('Button', {
-                                props: {
-                                    type: 'text',
-                                    size: 'small',
-                                    icon: 'ios-copy'
-                                },
-                                on: {
-                                    click: (data) => {self.copyGoods(params.row)}
-                                }
-                            }, ''),
-                            h('Button', {
-                                props: {
-                                    type: 'text',
-                                    size: 'small',
-                                    icon: 'ios-trash'
-                                },
-                                on: {
-                                    click: (data) => {self.removeGoods(params.row)}
-                                }
-                            }, '')
-                        ]);
-                    }
                 }
             ],
             totalCount: 0,
@@ -237,11 +225,9 @@ export default {
         searchCategoryId: function(data) {
             this.refreshGoodsList();
         },
-        searchValue: function(data) {
-            lodash.debounce(function() {
-                this.refreshGoodsList();
-            }, 700);
-        }
+        searchValue: lodash.debounce(function() {
+            this.refreshGoodsList();
+            }, 800)
     },
     methods: {
         changeSiderShow() {

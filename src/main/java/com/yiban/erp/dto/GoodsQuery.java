@@ -14,6 +14,8 @@ public class GoodsQuery {
     private Integer page;
     private Integer pageSize;
 
+    private Boolean includeDetail;
+
     private Integer offset;
     private Integer limit;
 
@@ -105,5 +107,13 @@ public class GoodsQuery {
 
     public void setEnable(Boolean enable) {
         this.enable = enable;
+    }
+
+    public Boolean getIncludeDetail() {
+        return includeDetail;
+    }
+
+    public void setIncludeDetail(Boolean includeDetail) {
+        this.includeDetail = includeDetail;
     }
 }

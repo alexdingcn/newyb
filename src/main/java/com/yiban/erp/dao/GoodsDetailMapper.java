@@ -27,12 +27,15 @@ public interface GoodsDetailMapper {
     List<GoodsDetail> getByGoodsInfoId(@Param("goodsInfoId") Long id,
                                        @Param("includeDelete") boolean includeDelete);
 
+    List<GoodsDetail> getByGoodsInfoIds(@Param("infoIds") List<Long> infoIds);
+
     /**
      * 修改商品的最后使用时间和次数
      * @param ids
      * @return
      */
     int updateUsedCount(@Param("ids") List<Long> ids);
+
 
 
 }

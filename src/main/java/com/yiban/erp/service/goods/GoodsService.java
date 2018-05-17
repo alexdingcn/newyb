@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class GoodsService {
@@ -106,7 +107,23 @@ public class GoodsService {
     public List<GoodsInfo> searchList(GoodsQuery query) {
         List<GoodsInfo> infos = goodsInfoMapper.searchList(query);
         setGoodsInfoOptionName(infos);
+
+        //如果query中的includeDetail 为true，查询对应的详情信息
+        if (query.getIncludeDetail() != null && query.getIncludeDetail()) {
+            setGoodsInfoDetails(infos);
+        }
         return infos;
+    }
+
+    private void setGoodsInfoDetails(List<GoodsInfo> infos) {
+        if (infos == null || infos.isEmpty()) {
+            return;
+        }
+        List<Long> infoIds = new ArrayList<>();
+        infos.stream().forEach(item -> infoIds.add(item.getId()));
+        List<GoodsDetail> details = goodsDetailMapper.getByGoodsInfoIds(infoIds);
+        Map<Long, List<GoodsDetail>> map = details.stream().collect(Collectors.groupingBy(GoodsDetail::getGoodsInfoId));
+        infos.stream().forEach(item -> item.setGoodsDetails(map.get(item.getId())));
     }
 
     public Long getChooseListDetailCount(GoodsQuery query) {

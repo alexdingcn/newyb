@@ -1,7 +1,9 @@
 package com.yiban.erp.entities;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 public class GoodsDetail {
     private Long id;
@@ -15,10 +17,13 @@ public class GoodsDetail {
     private String skuKey;
 
     private Long specOneId;
+    private String specOneName;
 
     private Long specTwoId;
+    private String specTwoName;
 
     private Long specThreeId;
+    private String specThreeName;
 
     private String specDesc;
 
@@ -192,4 +197,29 @@ public class GoodsDetail {
     public void setUsedCount(Integer usedCount) {
         this.usedCount = usedCount;
     }
+
+    public List<GoodsSpec> getGoodsSpecs() {
+        List<GoodsSpec> result = new ArrayList<>();
+        GoodsSpec spec;
+        if (this.specOneId != null) {
+            spec = new GoodsSpec();
+            spec.setId(this.specOneId);
+            spec.setSpecName(this.specOneName);
+            result.add(spec);
+        }
+        if (this.specTwoId != null) {
+            spec = new GoodsSpec();
+            spec.setId(this.specTwoId);
+            spec.setSpecName(this.specTwoName);
+            result.add(spec);
+        }
+        if (this.specThreeId != null) {
+            spec = new GoodsSpec();
+            spec.setId(this.specThreeId);
+            spec.setSpecName(this.specThreeName);
+            result.add(spec);
+        }
+        return result;
+    }
+
 }

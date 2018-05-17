@@ -151,6 +151,22 @@
     </if>
   </select>
 
+  <select id="getByGoodsInfoIds" parameterType="map" resultMap="BaseResultMap">
+    select
+      g.*,
+      s1.spec_name as specOneName,
+      s2.spec_name as specTwoName,
+      s3.spec_name as specThreeName
+    from goods_detail g
+      left join goods_spec s1 on g.spec_one_id = s1.id
+      left join goods_spec s2 on g.spec_two_id = s2.id
+      left join goods_spec s3 on g.spec_three_id = s3.id
+    where g.status != 'DELETE' and goods_info_id in
+    <foreach collection="infoIds" item="item" separator=", " open="(" close=")">
+      #{item}
+    </foreach>
+  </select>
+
 
   <update id="updateUsedCount" parameterType="map" >
     update goods_detail

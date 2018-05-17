@@ -17,12 +17,16 @@
                     </div>
                 </Tooltip>
             </p>
-            <ButtonGroup slot="extra" >
-                <Button type="primary" icon="android-add-circle" @click="addCategory">新建</Button>
-                <Button type="success" icon="edit"  @click="editCategory" :disabled="disableDelCategory">修改</Button>
-                <Button type="error" icon="android-remove-circle" @click="delCategory" :loading="dataLoading" :disabled="disableDelCategory">删除</Button>
-                <Button type="ghost" icon="refresh" :loading="dataLoading" @click="loadTree" >刷新</Button>
-            </ButtonGroup>
+            <div slot="extra">
+                <ButtonGroup v-if="!isSider" >
+                    <Button type="primary" icon="android-add-circle" @click="addCategory">新建</Button>
+                    <Button type="success" icon="edit"  @click="editCategory" :disabled="disableDelCategory">修改</Button>
+                    <Button type="error" icon="android-remove-circle" @click="delCategory" :loading="dataLoading" :disabled="disableDelCategory">删除</Button>
+                    <Button type="ghost" icon="refresh" :loading="dataLoading" @click="loadTree" >刷新</Button>
+                </ButtonGroup>
+                <a v-else href="javascript:void(0)" @click="gotoGoodsCategory">去维护</a>
+            </div>
+            
 
             <div class="good-category-con">
                 <Tree :data="goodCatTreeData" @on-select-change="onTreeNodeSelected" ref="goodCatTree"></Tree>
@@ -205,6 +209,12 @@ export default {
                 }
             });
         },
+
+        gotoGoodsCategory() {
+            this.$router.push({
+                name: 'goods-category'
+            });
+        }
     }
 };
 </script>
