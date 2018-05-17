@@ -5,7 +5,7 @@
 <template>
     <div>
         <Form ref="form" :model="formData" :rules="formRules" :label-width="90">
-            <Tabs value="general" :animated="false">
+            <Tabs value="general" :animated="false" @on-click="switchTabPane">
                 <div slot="extra">
                     <ButtonGroup size="small">
                         <Button type="success" icon="checkmark" :loading="saveLoading" @click="saveGoodsInfo" >确认保存</Button>
@@ -313,6 +313,9 @@
                             </i-col>
                         </Row>
                     </TabPane>
+                    <TabPane icon="eye-disabled" name="black-list" label="经营范围屏蔽" >
+                        <goods-black-list v-model="goodsBlackListValue"></goods-black-list>
+                    </TabPane>
             </Tabs>
         </Form>
 
@@ -332,6 +335,7 @@ import factorySelect from '@/views/selector/factory-select.vue';
 import supplierSelect from '@/views/selector/supplier-select.vue';
 import optionSelect from '@/views/selector/option-select.vue';
 import fileDetail from '@/views/basic-data/file-detail.vue';
+import goodsBlackList from './goods-black-list.vue';
 
 export default {
     name: 'goods-info',
@@ -342,6 +346,7 @@ export default {
         }
     },
     components: {
+        goodsBlackList,
         goodsCategorySelect,
         goodsBrandSelect,
         factorySelect,
@@ -385,6 +390,12 @@ export default {
             goodsAttributes: [],
             chooseAttValue: '',
             currAttributes: [],
+            customerCategoryList: [],
+            goodsBlackListValue: {
+                customerCategories: [],
+                regions: [],
+                customers: []
+            }
         }
     },
     mounted() {
@@ -399,6 +410,25 @@ export default {
         }
     },
     methods: {
+        switchTabPane(tabName) {
+            if (tabName === 'black-list') {
+                // TODO: load black list first
+                this.loadGoodsBlackList();
+            }
+        },
+        loadGoodsBlackList() {
+            if (this.goodsInfoId) {
+                util.ajax.get('/goods/blacklist/' + this.goodsInfoId)
+                    .then((response) => {
+                        if (response.data) {
+                            this.goodsBlackListValue = response.data;
+                        }
+                    })
+                    .catch((error) => {
+                        util.errorProcessor(this, error);
+                    });
+            }
+        },
         loadGoodsInfo(id) {
             util.ajax.get('/goods/' + id)
                 .then((response) => {
@@ -850,17 +880,22 @@ export default {
 
         saveGoodsInfo() {
             let self = this;
-            this.$refs.form.validate(valite => {
-                if(!valite) {
+            if (this.goodsBlackListValue) {
+                this.formData.blackList = JSON.stringify(this.goodsBlackListValue);
+            }
+            this.$refs.form.validate(valid => {
+                if (!valid) {
                     return;
-                }else {
+                } else {
                     self.$Modal.confirm({
                         title: '提交保存确认',
                         content: '是否确认商品信息已经维护正确？',
                         onOk: () => {
+              
                             self.saveLoading = true;
                             self.formData.goodsDetails = self.goodsDetails;
                             self.formData.attributeRefs = self.currAttributes;
+                            
                             util.ajax.post('/goods/save', self.formData)
                                 .then((response) => {
                                     self.saveLoading = false;
