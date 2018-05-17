@@ -8,32 +8,31 @@
                         {{ item.title }}
                     </Button>
 
+                    <div v-if="item.menuGroup" slot="list">
+                        <template v-for="(group, k) in item.menuGroup">
+                            <DropdownMenu :key="k" style="width:150px;display:table-cell">
+                                <Row v-if="group.title" class="menu-sub-title">
+                                    <FontIcon :type="group.icon" size="20"></FontIcon>
+                                    <span>{{ group.title }}</span>
+                                </Row>
+                                <template v-for="(child, i) in item.children" v-if="i >= group.start && i <= group.end" @click="handleClick">
+                                    <DropdownItem :name="child.name" :key="i" :divided="child.divided" >
+                                        <Icon :type="child.icon"></Icon>
+                                        <span style="padding-left:10px;">{{ itemTitle(child) }}</span>
+                                    </DropdownItem>
+                                </template>
+                            </DropdownMenu>
+                        </template>
+                    </div>
+                    <DropdownMenu v-else style="width:150px;display:inline-block;" slot="list">
+                        <template v-for="(child, i) in item.children">
+                            <DropdownItem :name="child.name" :key="i" :divided="child.divided">
+                                <Icon :type="child.icon"></Icon>
+                                <span style="padding-left:10px;">{{ itemTitle(child) }}</span>
+                            </DropdownItem>
+                        </template>
+                    </DropdownMenu>
 
-                    <template v-if="item.menuGroup"  v-for="(group, k) in item.menuGroup" slot="list" >
-                        <DropdownMenu :key="k" style="width:150px;display:table-cell">
-                            <Row v-if="group.title" class="menu-sub-title">
-                                <FontIcon :type="group.icon" size="20"></FontIcon>
-                                <span>{{ group.title }}</span>
-                            </Row>
-                            <template v-for="(child, i) in item.children" v-if="i >= group.start && i <= group.end" @click="handleClick">
-                                <DropdownItem :name="child.name" :key="i" :divided="child.divided" >
-                                    <Icon :type="child.icon"></Icon>
-                                    <span style="padding-left:10px;">{{ itemTitle(child) }}</span>
-                                </DropdownItem>
-                            </template>
-                        </DropdownMenu>
-                    </template>
-
-                    <template v-else>
-                        <DropdownMenu style="width:150px;" slot="list">
-                            <template v-for="(child, i) in item.children">
-                                <DropdownItem :name="child.name" :key="i" :divided="child.divided">
-                                    <Icon :type="child.icon"></Icon>
-                                    <span style="padding-left:10px;">{{ itemTitle(child) }}</span>
-                                </DropdownItem>
-                            </template>
-                        </DropdownMenu>
-                    </template>
                     
                 </Dropdown>
                 <Dropdown transfer v-else placement="right-start" :key="index" @on-click="changeMenu">
