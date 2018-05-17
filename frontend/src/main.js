@@ -1,6 +1,4 @@
 import 'es6-promise/auto';
-import '@/styles/icon-font/iconfont.css';
-import '@/styles/icon-font/iconfont.js';
 
 import Vue from 'vue';
 import iView from 'iview';
