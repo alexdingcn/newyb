@@ -37,5 +37,5 @@ public interface GoodsDetailMapper {
     int updateUsedCount(@Param("ids") List<Long> ids);
 
 
-
+    int updatePrice(GoodsDetail detail);
 }

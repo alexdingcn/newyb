@@ -89,13 +89,24 @@ export default {
                     type: 'expand',
                     width: 50,
                     render: (h, params) => {
+                        let self = this;
                         let details = params.row.goodsDetails && params.row.goodsDetails.length > 0 ? params.row.goodsDetails : [];
                         return h(goodsSpecPrice, {
                             props: {
+                                infoId: params.row.id,
                                 details: details,
                                 infoBatchPrice: params.row.batchPrice,
                                 infoRetailPrice: params.row.retailPrice,
                                 infoInPrice: params.row.inPrice
+                            },
+                            on: {
+                                change: (newDetails, newBatchPrice, newRetailPrice, newInPrice) => {
+                                    let row = params.row;
+                                    row.goodsDetails = newDetails;
+                                    row.batchPrice = newBatchPrice;
+                                    row.retailPrice = newRetailPrice;
+                                    row.inPrice = newInPrice;
+                                }
                             }
                         });
                     }
@@ -164,9 +175,10 @@ export default {
                         if (useSpec) {
                             return h('span', params.row.batchPrice);
                         }else {
-                            return h('InputNumber', {
+                            return h('Input', {
                                 props: {
-                                    min: 0,
+                                    // type: 'number',
+                                    number: true,
                                     value: self.tableData[params.index][params.column.key]
                                 },
                                 style: {
@@ -175,7 +187,15 @@ export default {
                                 on: {
                                     'on-blur' (event) {
                                         let row = self.tableData[params.index];
+                                        let oldValue = parseFloat(row.batchPrice);
+                                        let newValue = parseFloat(event.target.value);
                                         row[params.column.key] = event.target.value;
+                                        if (newValue < 0 || isNaN(newValue)) {
+                                            row[params.column.key] = 0;
+                                        }
+                                        if (oldValue !== newValue && !isNaN(newValue)) {
+                                             self.updateBasePrice('batchPrice', row.id, newValue);
+                                        }
                                     }
                                 }
                             });
@@ -192,9 +212,10 @@ export default {
                         if (useSpec) {
                             return h('span', params.row.retailPrice);
                         }else {
-                            return h('InputNumber', {
+                            return h('Input', {
                                 props: {
-                                    min: 0,
+                                    // type: 'number',
+                                    number: true,
                                     value: self.tableData[params.index][params.column.key]
                                 },
                                 style: {
@@ -203,7 +224,15 @@ export default {
                                 on: {
                                     'on-blur' (event) {
                                         let row = self.tableData[params.index];
+                                        let oldValue = parseFloat(row.retailPrice);
+                                        let newValue = parseFloat(event.target.value);
                                         row[params.column.key] = event.target.value;
+                                        if (newValue < 0 || isNaN(newValue)) {
+                                            row[params.column.key] = 0;
+                                        }
+                                        if (oldValue !== newValue && !isNaN(newValue)) {
+                                             self.updateBasePrice('retailPrice', row.id, newValue);
+                                        }
                                     }
                                 }
                             });
@@ -220,9 +249,10 @@ export default {
                         if (useSpec) {
                             return h('span', params.row.inPrice);
                         }else {
-                            return h('InputNumber', {
+                            return h('Input', {
                                 props: {
-                                    min: 0,
+                                    // type: 'text',
+                                    number: true,
                                     value: self.tableData[params.index][params.column.key]
                                 },
                                 style: {
@@ -231,7 +261,15 @@ export default {
                                 on: {
                                     'on-blur' (event) {
                                         let row = self.tableData[params.index];
+                                        let oldValue = parseFloat(row.inPrice);
+                                        let newValue = parseFloat(event.target.value);
                                         row[params.column.key] = event.target.value;
+                                        if (newValue < 0 || isNaN(newValue)) {
+                                            row[params.column.key] = 0;
+                                        }
+                                        if (oldValue !== newValue && !isNaN(newValue)) {
+                                             self.updateBasePrice('inPrice', row.id, newValue);
+                                        }
                                     }
                                 }
                             });
@@ -346,6 +384,34 @@ export default {
                 })
                 .catch((error) => {
                     this.tableLoading = false;
+                    util.errorProcessor(this, error);
+                });
+        },
+
+        updateBasePrice(type, infoId, newValue) {
+            console.log('base price change, type:' + type + ', id:' + infoId + ', newValue:' + newValue);
+            if (!infoId || isNaN(newValue) || newValue < 0) {
+                return;
+            }
+            let reqData = {
+                infoId: infoId
+            };
+            if (type === 'batchPrice') {
+                reqData.batchPrice = newValue;
+            }else if (type === 'retailPrice') {
+                reqData.retailPrice = newValue;
+            }else if (type === 'inPrice') {
+                reqData.inPrice = newValue;
+            }else {
+                this.$Message.info('参数错误');
+                return;
+            }
+            console.log(reqData)
+            util.ajax.put('/goods/price/update', reqData)
+                .then((response) => {
+                    this.$Message.success('价格修改成功');
+                })
+                .catch((error) => {
                     util.errorProcessor(this, error);
                 });
         },

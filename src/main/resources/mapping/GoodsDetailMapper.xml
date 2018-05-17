@@ -178,6 +178,13 @@
     </foreach>
   </update>
 
+  <update id="updatePrice" parameterType="com.yiban.erp.entities.GoodsDetail">
+    update goods_detail
+    set batch_price = #{batchPrice,jdbcType=DECIMAL},
+        retail_price = #{retailPrice,jdbcType=DECIMAL},
+        in_price = #{inPrice,jdbcType=DECIMAL}
+    where id = #{id}
+  </update>
 
 
 

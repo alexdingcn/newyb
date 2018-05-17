@@ -43,4 +43,6 @@ public interface GoodsInfoMapper {
      * @return
      */
     List<Goods> getChooseListDetailById(@Param("ids") List<Long> ids);
+
+    int updatePrice(GoodsInfo goodsInfo);
 }
