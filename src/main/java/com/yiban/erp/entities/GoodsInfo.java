@@ -157,6 +157,8 @@ public class GoodsInfo {
     private String mediumUnitName;
     private String packUnitName;
 
+    private String blackList;
+
     public void setOptions(List<Options> options) {
         if (options == null || options.isEmpty()) {
             return;
@@ -817,5 +819,13 @@ public class GoodsInfo {
 
     public void setHighLimit(BigDecimal highLimit) {
         this.highLimit = highLimit;
+    }
+
+    public String getBlackList() {
+        return blackList;
+    }
+
+    public void setBlackList(String blackList) {
+        this.blackList = blackList;
     }
 }

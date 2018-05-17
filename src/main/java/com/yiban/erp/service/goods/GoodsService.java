@@ -1,5 +1,7 @@
 package com.yiban.erp.service.goods;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.yiban.erp.constant.GoodsStatus;
 import com.yiban.erp.constant.OrderNumberType;
 import com.yiban.erp.dao.*;
@@ -33,6 +35,8 @@ public class GoodsService {
     private GoodsAttributeRefMapper goodsAttributeRefMapper;
     @Autowired
     private GoodsAttrService goodsAttrService;
+    @Autowired
+    private GoodsBlackListMapper goodsBlackListMapper;
 
 
     public void setGoodsOptionName(List<Goods> goodsList) {
@@ -227,6 +231,20 @@ public class GoodsService {
             setAttributeGoodsInfoId(attributeRefs, goodsInfo.getId());
             goodsAttributeRefMapper.insertBatch(attributeRefs);
         }
+
+        // 黑名单
+        if (StringUtils.isNotBlank(goodsInfo.getBlackList())) {
+            JSONObject obj = JSON.parseObject(goodsInfo.getBlackList());
+            GoodsBlackListWithBLOBs blackList = new GoodsBlackListWithBLOBs();
+            blackList.setCustomerCategoryIds(obj.getString("customerCategories"));
+            blackList.setRegions(obj.getString("regions"));
+            blackList.setCustomerIds(obj.getString("customers"));
+
+            blackList.setGoodsId(goodsInfo.getId());
+            blackList.setCreatedBy(user.getId().toString());
+            blackList.setCreatedTime(new Date());
+            goodsBlackListMapper.insert(blackList);
+        }
     }
 
     private String getSkuKey(GoodsDetail detail, Long goodsInfoId) {
@@ -267,7 +285,7 @@ public class GoodsService {
         if (!useSpec) {
             //未使用多规格
             updateUnUseSpec(goodsInfo, oldGoodsInfo, oldDetails, oldMap, user);
-        }else {
+        } else {
             //使用了多规格，
             updateUseSpec(goodsInfo, oldDetails, oldMap, user);
         }
@@ -279,6 +297,30 @@ public class GoodsService {
             logger.info("insert goods attribute info.");
             setAttributeGoodsInfoId(attributeRefs, goodsInfo.getId());
             goodsAttributeRefMapper.insertBatch(attributeRefs);
+        }
+
+        // 黑名单
+        if (StringUtils.isNotBlank(goodsInfo.getBlackList())) {
+            GoodsBlackListWithBLOBs blackList = goodsBlackListMapper.selectByGoodsId(goodsInfo.getId());
+            if (blackList == null) {
+                blackList = new GoodsBlackListWithBLOBs();
+                blackList.setCreatedBy(user.getId().toString());
+                blackList.setCreatedTime(new Date());
+            }
+
+            JSONObject obj = JSON.parseObject(goodsInfo.getBlackList());
+            blackList.setCustomerCategoryIds(obj.getString("customerCategories"));
+            blackList.setRegions(obj.getString("regions"));
+            blackList.setCustomerIds(obj.getString("customers"));
+
+            blackList.setGoodsId(goodsInfo.getId());
+            blackList.setUpdatedBy(user.getId().toString());
+            blackList.setUpdatedTime(new Date());
+            if (blackList.getId() == null) {
+                goodsBlackListMapper.insert(blackList);
+            } else {
+                goodsBlackListMapper.updateByPrimaryKeyWithBLOBs(blackList);
+            }
         }
     }
 
