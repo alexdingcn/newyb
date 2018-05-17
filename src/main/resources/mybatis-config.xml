@@ -13,7 +13,6 @@
         <mapper resource="mapping/UserAuthMapper.xml"/>
         <mapper resource="mapping/UserRouteMapper.xml"/>
         <mapper resource="mapping/GoodCategoryMapper.xml"/>
-        <mapper resource="mapping/GoodsMapper.xml"/>
         <mapper resource="mapping/GoodsInfoMapper.xml"/>
         <mapper resource="mapping/GoodsDetailMapper.xml"/>
         <mapper resource="mapping/GoodsAttributeMapper.xml"/>

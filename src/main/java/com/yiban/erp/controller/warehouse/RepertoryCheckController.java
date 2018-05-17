@@ -131,7 +131,6 @@ public class RepertoryCheckController {
         JSONObject result = new JSONObject();
         Map<String, Object> requestMap = new HashMap<>();
         requestMap.put("checkPlanId", checkPlanId);
-        requestMap.put("goodSearch", goodSearch);
         result = repertoryCheckPlanService.getCheckPlanDetail4SearchJSON(requestMap);
         return ResponseEntity.ok().body(result.toJSONString());
     }

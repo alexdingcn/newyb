@@ -34,10 +34,6 @@ public class SellOrderService {
     @Autowired
     private SellOrderShipMapper sellOrderShipMapper;
     @Autowired
-    private CustomerMapper customerMapper;
-    @Autowired
-    private GoodsMapper goodsMapper;
-    @Autowired
     private GoodsService goodsService;
     @Autowired
     private RepertoryInfoMapper repertoryInfoMapper;
@@ -234,20 +230,7 @@ public class SellOrderService {
 
 
     public boolean isCustomerCanSellGoods(Long customerId, List<Long> goodIds) throws BizException {
-        Customer customer = customerMapper.selectByPrimaryKey(customerId);
-        if (customer == null) {
-            throw new BizException(ErrorCode.CUSTOMER_GET_FAIL);
-        }
-        if (customer.getCanSaleSpecial() != null && customer.getCanSaleSpecial()) {
-            return true;
-        }
-        //验证产品列表中是否存在特殊管理药品
-        List<Goods> goods = goodsMapper.selectByIdList(goodIds);
-        for (Goods good : goods) {
-            if (good.getSpecialManaged() != null && good.getSpecialManaged()) {
-                return false;
-            }
-        }
+        //TODO 检验客户是否能否购买这些产品信息
         return true;
     }
 

@@ -1,10 +1,7 @@
 package com.yiban.erp.controller.good;
 
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
 import com.yiban.erp.dao.GoodCategoryMapper;
-import com.yiban.erp.dao.GoodsMapper;
 import com.yiban.erp.entities.GoodCategory;
 import com.yiban.erp.entities.User;
 import com.yiban.erp.exception.BizException;

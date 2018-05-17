@@ -9,6 +9,7 @@ import com.yiban.erp.dto.RepertorySelectQuery;
 import com.yiban.erp.entities.*;
 import com.yiban.erp.exception.BizException;
 import com.yiban.erp.exception.ErrorCode;
+import com.yiban.erp.service.goods.GoodsService;
 import com.yiban.erp.util.UtilTool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,7 +35,7 @@ public class RepertoryCheckPlanService {
     @Autowired
     private RepertoryInfoMapper repertoryInfoMapper;
     @Autowired
-    private GoodsMapper goodsMapper;
+    private GoodsService goodsService;
     @Autowired
     private RepertoryCheckFormMapper repertoryCheckFormMapper;
     /**
@@ -376,7 +377,7 @@ public class RepertoryCheckPlanService {
         //获取对应的商品基础信息
         List<Long> goodIdList = new ArrayList<>();
         list.stream().forEach(item -> goodIdList.add(item.getGoodsId()));
-        List<Goods> goodsList = goodsMapper.selectByIdList(goodIdList);
+        List<Goods> goodsList = goodsService.getGoodsById(goodIdList);
         final Map<Long, Goods> goodMap = new HashMap<>();
         goodsList.stream().forEach(item -> goodMap.put(item.getId(), item));
         list.stream().forEach(item -> {
@@ -429,9 +430,6 @@ public class RepertoryCheckPlanService {
         if(repertoryCheckPlanDetail.getAccLimit().compareTo(repertoryCheckPlanDetail.getCheckLimit())>=0){
             throw new BizException(ErrorCode.CHECK_PLAN_DETAIL_MORE_ERROR);
         }
-
-        //根据商品id获取商品信息
-        Goods goodsInfo=goodsMapper.selectByPrimaryKey(repertoryCheckPlanDetail.getGoodsId());
 
         //保存盘盈记录--库存数大于0，正常+盘盈
         if(repertoryCheckPlanDetail.getAccLimit().doubleValue()>=0){

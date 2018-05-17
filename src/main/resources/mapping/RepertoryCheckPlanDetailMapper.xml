@@ -282,7 +282,6 @@
   <select id="getCheckPlanDetailList"  parameterType="map" resultMap="BaseResultMap" >
     SELECT  a.*
     FROM `repertory_check_plan_detail`  a
-    left JOIN goods g ON  a.goods_id = g.id
     WHERE 1=1
     <if test="checkPlanId  != null" >
       and a.check_plan_id = #{checkPlanId ,jdbcType=BIGINT}
@@ -292,10 +291,6 @@
     </if>
     <if test="formId  != null" >
       and a.form_id = #{formId ,jdbcType=BIGINT}
-    </if>
-    <if test="goodSearch != null">
-      <bind name="pattern" value="'%' + goodSearch + '%'" />
-      and ( g.name like #{pattern} or lower(g.pinyin) like lower(#{pattern}) or  a.batch_code like #{pattern} )
     </if>
     order by a.id desc
   </select>
