@@ -4,6 +4,7 @@ import com.yiban.erp.dto.GoodsQuery;
 import com.yiban.erp.entities.Goods;
 import com.yiban.erp.entities.GoodsInfo;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -36,5 +37,10 @@ public interface GoodsInfoMapper {
      * @return
      */
     List<Goods> getChooseListDetail(GoodsQuery query);
-
+    /**
+     * 详情全部展开的模式进行查询
+     * @param ids 列表查询
+     * @return
+     */
+    List<Goods> getChooseListDetailById(@Param("ids") List<Long> ids);
 }

@@ -127,29 +127,7 @@ public class GoodsInfo {
 
     private Date updatedTime;
 
-    private Long att1Id;
-
-    private String att1Value;
-
-    private Long att2Id;
-
-    private String att2Value;
-
-    private Long att3Id;
-
-    private String att3Value;
-
-    private Long att4Id;
-
-    private String att4Value;
-
-    private Long att5Id;
-
-    private String att5Value;
-
-    private Long att6Id;
-
-    private String att6Value;
+    private List<GoodsAttributeRef> attributeRefs;
 
     private String tags; //转换为List
 
@@ -736,100 +714,12 @@ public class GoodsInfo {
         this.updatedTime = updatedTime;
     }
 
-    public Long getAtt1Id() {
-        return att1Id;
+    public List<GoodsAttributeRef> getAttributeRefs() {
+        return attributeRefs;
     }
 
-    public void setAtt1Id(Long att1Id) {
-        this.att1Id = att1Id;
-    }
-
-    public String getAtt1Value() {
-        return att1Value;
-    }
-
-    public void setAtt1Value(String att1Value) {
-        this.att1Value = att1Value == null ? null : att1Value.trim();
-    }
-
-    public Long getAtt2Id() {
-        return att2Id;
-    }
-
-    public void setAtt2Id(Long att2Id) {
-        this.att2Id = att2Id;
-    }
-
-    public String getAtt2Value() {
-        return att2Value;
-    }
-
-    public void setAtt2Value(String att2Value) {
-        this.att2Value = att2Value == null ? null : att2Value.trim();
-    }
-
-    public Long getAtt3Id() {
-        return att3Id;
-    }
-
-    public void setAtt3Id(Long att3Id) {
-        this.att3Id = att3Id;
-    }
-
-    public String getAtt3Value() {
-        return att3Value;
-    }
-
-    public void setAtt3Value(String att3Value) {
-        this.att3Value = att3Value == null ? null : att3Value.trim();
-    }
-
-    public Long getAtt4Id() {
-        return att4Id;
-    }
-
-    public void setAtt4Id(Long att4Id) {
-        this.att4Id = att4Id;
-    }
-
-    public String getAtt4Value() {
-        return att4Value;
-    }
-
-    public void setAtt4Value(String att4Value) {
-        this.att4Value = att4Value == null ? null : att4Value.trim();
-    }
-
-    public Long getAtt5Id() {
-        return att5Id;
-    }
-
-    public void setAtt5Id(Long att5Id) {
-        this.att5Id = att5Id;
-    }
-
-    public String getAtt5Value() {
-        return att5Value;
-    }
-
-    public void setAtt5Value(String att5Value) {
-        this.att5Value = att5Value == null ? null : att5Value.trim();
-    }
-
-    public Long getAtt6Id() {
-        return att6Id;
-    }
-
-    public void setAtt6Id(Long att6Id) {
-        this.att6Id = att6Id;
-    }
-
-    public String getAtt6Value() {
-        return att6Value;
-    }
-
-    public void setAtt6Value(String att6Value) {
-        this.att6Value = att6Value == null ? null : att6Value.trim();
+    public void setAttributeRefs(List<GoodsAttributeRef> attributeRefs) {
+        this.attributeRefs = attributeRefs;
     }
 
     public String getTags() {

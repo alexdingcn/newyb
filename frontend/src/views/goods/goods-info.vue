@@ -180,7 +180,7 @@
                             </Alert>
                             <Row class="row-margin-bottom" >
                                 <FormItem label="添加商品规格">
-                                    <Select v-model="chooseParentValue" placement="top" style="width: 250px" @on-change="chooseParentSpecChange">
+                                    <Select transfer v-model="chooseParentValue" style="width: 250px" @on-change="chooseParentSpecChange">
                                         <Option size="" v-for="item in goodsSpesList" :value="item.parentId" :key="item.parentId">{{ item.parentName }}</Option>
                                     </Select>
                                 </FormItem>
@@ -209,14 +209,9 @@
                     <TabPane icon="ios-pricetags" name="attribute" label="预警/扩展属性">
                         <h2 style="margin-bottom: 10px;">库存预警信息</h2>
                         <Row class="row-margin-bottom">
-                            <i-col span="10">
-                                <FormItem label="库存预警天数" :label-width="100">
+                            <i-col span="8">
+                                <FormItem label="到期预警天数" >
                                     <InputNumber :min="0" v-model="formData.warningDays" style="width: 100%;" />
-                                </FormItem>
-                            </i-col>
-                            <i-col span="10">
-                                <FormItem label="商品有效时长" :label-width="100">
-                                    <InputNumber :min="0" v-model="formData.validMonths" style="width: 100%;" />
                                 </FormItem>
                             </i-col>
                         </Row>
@@ -237,43 +232,23 @@
                                 </FormItem>
                             </i-col>
                         </Row>
-                        <h2 style="margin-bottom: 10px;">自定义属性</h2>
-                        <Row class="row-margin-bottom" v-if="formData.att1Id > 0">
-                            <i-col span="10" v-if="formData.att1Id > 0">
-                                <FormItem :label="formData.att1Name" >
-                                    <Input type="text" v-model="formData.att1Value" />
+                        <h2 style="margin-bottom: 10px;">
+                            自定义属性
+                            <Select ref="attSelect" clearable transfer v-model="chooseAttValue" placement="top" style="width: 250px" @on-change="chooseAttChange">
+                                <Option size="" v-for="item in goodsAttributes" :value="item.id" :key="item.id">{{ item.attName }}</Option>
+                            </Select>
+                        </h2>
+                        <Row class="row-margin-bottom" v-for="(item, index) in currAttributes" :key="item.attId" :gutter="20">
+                            <i-col span="12" >
+                                <FormItem :label="item.attName" :label-width="100" >
+                                    <Input type="text" v-model="item.attValue" />
                                 </FormItem>
                             </i-col>
-                            <i-col span="10" v-if="formData.att2Id  > 0">
-                                <FormItem :label="formData.att2Name" >
-                                    <Input type="text" v-model="formData.att2Value" />
-                                </FormItem>
-                            </i-col>
-                        </Row>
-                        <Row class="row-margin-bottom" v-if="formData.att3Id  > 0">
-                            <i-col span="10" v-if="formData.att3Id > 0">
-                                <FormItem :label="formData.att3Name" >
-                                    <Input type="text" v-model="formData.att3Value" />
-                                </FormItem>
-                            </i-col>
-                            <i-col span="10" v-if="formData.att4Id > 0">
-                                <FormItem :label="formData.att4Name" >
-                                    <Input type="text" v-model="formData.att4Value" />
-                                </FormItem>
+                            <i-col span="1">
+                                <Button type="text" icon="close" @click="removeOneAttribute(index)"></Button>
                             </i-col>
                         </Row>
-                        <Row class="row-margin-bottom" v-if="formData.att5Id > 0">
-                            <i-col span="10" v-if="formData.att5Id > 0">
-                                <FormItem :label="formData.att5Name" >
-                                    <Input type="text" v-model="formData.att5Value" />
-                                </FormItem>
-                            </i-col>
-                            <i-col span="10" v-if="formData.att6Id > 0">
-                                <FormItem :label="formData.att6Name" >
-                                    <Input type="text" v-model="formData.att6Value" />
-                                </FormItem>
-                            </i-col>
-                        </Row>
+                        
                     </TabPane>
                     <TabPane icon="document-text" name="file" label="档案管理">
                         <h2 style="margin-bottom: 10px;">档案信息管理</h2>
@@ -290,7 +265,7 @@
                             </i-col>
                             <i-col span="8">
                                 <FormItem label="证件1有效期">
-                                    <DatePicker type="date"  v-model="formData.cert1ExpDate" placeholder="有效期至" style="width: 100%"></DatePicker>
+                                    <DatePicker type="date" transfer v-model="formData.cert1ExpDate" format="yyyy-MM-dd" placeholder="有效期至" style="width: 100%"></DatePicker>
                                 </FormItem>
                             </i-col>
                         </Row>
@@ -307,7 +282,7 @@
                             </i-col>
                             <i-col span="8">
                                 <FormItem label="证件2有效期">
-                                    <DatePicker type="date"  v-model="formData.cert2ExpDate" placeholder="有效期至" style="width: 100%"></DatePicker>
+                                    <DatePicker type="date" transfer v-model="formData.cert2ExpDate" format="yyyy-MM-dd" placeholder="有效期至" style="width: 100%"></DatePicker>
                                 </FormItem>
                             </i-col>
                         </Row>
@@ -324,7 +299,7 @@
                             </i-col>
                             <i-col span="8">
                                 <FormItem label="证件3有效期">
-                                    <DatePicker type="date"  v-model="formData.cert3ExpDate" placeholder="有效期至" style="width: 100%"></DatePicker>
+                                    <DatePicker type="date" transfer v-model="formData.cert3ExpDate" format="yyyy-MM-dd" placeholder="有效期至" style="width: 100%"></DatePicker>
                                 </FormItem>
                             </i-col>
                         </Row>
@@ -350,6 +325,7 @@
 
 <script>
 import util from '@/libs/util.js';
+import moment from 'moment';
 import goodsCategorySelect from '@/views/selector/goods-category-select.vue';
 import goodsBrandSelect from '@/views/selector/goods-brand-select.vue';
 import factorySelect from '@/views/selector/factory-select.vue';
@@ -388,24 +364,7 @@ export default {
                 inPrice: 0,
                 goodsDetails: [],
                 fileNo: '',
-                att1Id: '',
-                att1Name: '',
-                att1Value: '',
-                att2Id: '',
-                att2Name: '',
-                att2Value: '',
-                att3Id: '',
-                att3Name: '',
-                att3Value: '',
-                att4Id: '',
-                att4Name: '',
-                att4Value: '',
-                att5Id: '',
-                att5Name: '',
-                att5Value: '',
-                att6Id: '',
-                att6Name: '',
-                att6Value: '',
+                attributeRefs: [],
             },
             formRules: {
                 name: [
@@ -423,7 +382,9 @@ export default {
             goodsDetailColumn: [],
             fileUploadModal: false,
             uploadFileNo: '',
-            goodsAttributes: []
+            goodsAttributes: [],
+            chooseAttValue: '',
+            currAttributes: [],
         }
     },
     mounted() {
@@ -443,6 +404,9 @@ export default {
                 .then((response) => {
                     let data = response.data;
                     data.enable = data.enable ? 1 : 0;
+                    data.cert1ExpDate = data.cert1ExpDate ? moment(data.cert1ExpDate).format('YYYY-MM-DD') : '';
+                    data.cert2ExpDate = data.cert2ExpDate ? moment(data.cert2ExpDate).format('YYYY-MM-DD') : '';
+                    data.cert3ExpDate = data.cert3ExpDate ? moment(data.cert3ExpDate).format('YYYY-MM-DD') : '';
                     this.formData = data;
                     //需要重新初始化多规格数据信息，如果使用了多规格的，再根据数据生成
                     this.currParentSpecs = [];
@@ -452,6 +416,9 @@ export default {
                     if(this.formData.useSpec) {
                         this.editShowSpecForm(this.formData.goodsDetails);
                     }
+                    //重新赋值自定义属性信息
+                    this.currAttributes = this.formData.attributeRefs;
+                    
                 })
                 .catch((error) => {
                     util.errorProcessor(this, error);
@@ -470,45 +437,10 @@ export default {
             util.ajax.get('/goods/attribute/list')
                 .then((response) => {
                     this.goodsAttributes = response.data;
-                    this.setFormDataAttribut();
                 })
                 .catch((error) => {
                     util.errorProcessor(this, error);
                 })
-        },
-        setFormDataAttribut() {
-            console.log(this.goodsAttributes);
-            if (this.goodsAttributes[0] && this.goodsAttributes[0].id && this.goodsAttributes[0].attName) {
-                this.formData.att1Id = this.goodsAttributes[0].id;
-                this.formData.att1Name = this.goodsAttributes[0].attName;
-                this.formData.att1Value = '';
-            }
-            if (this.goodsAttributes[1] && this.goodsAttributes[1].id && this.goodsAttributes[1].attName) {
-                this.formData.att2Id = this.goodsAttributes[1].id;
-                this.formData.att2Name = this.goodsAttributes[1].attName;
-                this.formData.att2Value = '';
-            }
-            if (this.goodsAttributes[2] && this.goodsAttributes[2].id && this.goodsAttributes[2].attName) {
-                this.formData.att3Id = this.goodsAttributes[2].id;
-                this.formData.att3Name = this.goodsAttributes[2].attName;
-                this.formData.att3Value = '';
-            }
-            if (this.goodsAttributes[3] && this.goodsAttributes[3].id && this.goodsAttributes[3].attName) {
-                this.formData.att4Id = this.goodsAttributes[3].id;
-                this.formData.att4Name = this.goodsAttributes[3].attName;
-                this.formData.att4Value = '';
-            }
-            if (this.goodsAttributes[4] && this.goodsAttributes[4].id && this.goodsAttributes[4].attName) {
-                this.formData.att5Id = this.goodsAttributes[4].id;
-                this.formData.att5Name = this.goodsAttributes[4].attName;
-                this.formData.att5Value = '';
-            }
-            if (this.goodsAttributes[5] && this.goodsAttributes[5].id && this.goodsAttributes[5].attName) {
-                this.formData.att6Id = this.goodsAttributes[5].id;
-                this.formData.att6Name = this.goodsAttributes[5].attName;
-                this.formData.att6Value = '';
-            }
-            console.log(this.formData);
         },
         onChangeName() {
             if (this.formData.name && this.formData.name.length > 0) {
@@ -928,6 +860,7 @@ export default {
                         onOk: () => {
                             self.saveLoading = true;
                             self.formData.goodsDetails = self.goodsDetails;
+                            self.formData.attributeRefs = self.currAttributes;
                             util.ajax.post('/goods/save', self.formData)
                                 .then((response) => {
                                     self.saveLoading = false;
@@ -942,6 +875,54 @@ export default {
                     });
                 }
             });
+        },
+
+        chooseAttChange(data) {
+            if (!data) {
+                this.chooseAttValue = '';
+                this.$refs.attSelect.clearSingleSelect();
+                return;
+            }
+            let attItem = this.getGoodsAttributeItem(data);
+            if (!attItem.id) {
+                this.chooseAttValue = '';
+                this.$refs.attSelect.clearSingleSelect();
+                return;
+            }
+            //判断是否已经存在，如果已经存在，不进行添加
+            if(!this.isAttributeHaveExist(data)) {
+                let item = {
+                    attId: attItem.id,
+                    attName: attItem.attName,
+                    attValue: '',
+                };
+                this.currAttributes.push(item);
+            }
+            this.chooseAttValue = ''; //清除，让其再次可选
+            this.$refs.attSelect.clearSingleSelect();
+        },
+
+        isAttributeHaveExist(attId) {
+            for(let i=0; i<this.currAttributes.length; i++) {
+                if (attId === this.currAttributes[i].attId) {
+                    return true;
+                }
+            }
+            return false;
+        },
+
+        getGoodsAttributeItem(attId) {
+            for(let i=0; i<this.goodsAttributes.length; i++) {
+                let item = this.goodsAttributes[i];
+                if(attId === item.id) {
+                    return item;
+                }
+            }
+            return {};
+        },
+
+        removeOneAttribute(index) {
+            this.currAttributes.splice(index, 1);
         },
 
         openFileUpload(fileNo) {

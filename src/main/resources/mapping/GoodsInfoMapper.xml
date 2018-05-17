@@ -62,18 +62,6 @@
     <result column="updated_by" property="updatedBy" jdbcType="VARCHAR" />
     <result column="created_time" property="createdTime" jdbcType="TIMESTAMP" />
     <result column="updated_time" property="updatedTime" jdbcType="TIMESTAMP" />
-    <result column="att1_id" property="att1Id" jdbcType="BIGINT" />
-    <result column="att1_value" property="att1Value" jdbcType="VARCHAR" />
-    <result column="att2_id" property="att2Id" jdbcType="BIGINT" />
-    <result column="att2_value" property="att2Value" jdbcType="VARCHAR" />
-    <result column="att3_id" property="att3Id" jdbcType="BIGINT" />
-    <result column="att3_value" property="att3Value" jdbcType="VARCHAR" />
-    <result column="att4_id" property="att4Id" jdbcType="BIGINT" />
-    <result column="att4_value" property="att4Value" jdbcType="VARCHAR" />
-    <result column="att5_id" property="att5Id" jdbcType="BIGINT" />
-    <result column="att5_value" property="att5Value" jdbcType="VARCHAR" />
-    <result column="att6_id" property="att6Id" jdbcType="BIGINT" />
-    <result column="att6_value" property="att6Value" jdbcType="VARCHAR" />
     <result column="tags" property="tags" jdbcType="VARCHAR" />
     <result column="use_spec" property="useSpec" jdbcType="BIT" />
     <result column="bar_code" property="barCode" jdbcType="VARCHAR" />
@@ -93,8 +81,7 @@
     warning_days, contact, cure_range, sale_policy, is_foreign, prescription_id, med_type_id, 
     is_shebao, specific_med_id, jx_id, base_med_id, func_cat_id, medication_id, care_time_id, 
     gmp_type_id, abc_type_id, scope_id, new_type_id, created_by, updated_by, created_time, 
-    updated_time, att1_id, att1_value, att2_id, att2_value, att3_id, att3_value, att4_id, 
-    att4_value, att5_id, att5_value, att6_id, att6_value, tags, use_spec, bar_code, retail_price, batch_price, in_price,
+    updated_time, tags, use_spec, bar_code, retail_price, batch_price, in_price,
     normal_limit, low_limit, high_limit
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
@@ -127,11 +114,7 @@
       func_cat_id, medication_id, care_time_id, 
       gmp_type_id, abc_type_id, scope_id, 
       new_type_id, created_by, updated_by, 
-      created_time, updated_time, att1_id, 
-      att1_value, att2_id, att2_value, 
-      att3_id, att3_value, att4_id, 
-      att4_value, att5_id, att5_value, 
-      att6_id, att6_value, tags, 
+      created_time, updated_time, tags,
       use_spec, bar_code, retail_price, batch_price, in_price,
       normal_limit, low_limit, high_limit)
     values (#{companyId,jdbcType=INTEGER}, #{categoryId,jdbcType=INTEGER},
@@ -153,11 +136,7 @@
       #{funcCatId,jdbcType=BIGINT}, #{medicationId,jdbcType=BIGINT}, #{careTimeId,jdbcType=BIGINT}, 
       #{gmpTypeId,jdbcType=BIGINT}, #{abcTypeId,jdbcType=BIGINT}, #{scopeId,jdbcType=BIGINT}, 
       #{newTypeId,jdbcType=BIGINT}, #{createdBy,jdbcType=VARCHAR}, #{updatedBy,jdbcType=VARCHAR}, 
-      #{createdTime,jdbcType=TIMESTAMP}, #{updatedTime,jdbcType=TIMESTAMP}, #{att1Id,jdbcType=BIGINT}, 
-      #{att1Value,jdbcType=VARCHAR}, #{att2Id,jdbcType=BIGINT}, #{att2Value,jdbcType=VARCHAR}, 
-      #{att3Id,jdbcType=BIGINT}, #{att3Value,jdbcType=VARCHAR}, #{att4Id,jdbcType=BIGINT}, 
-      #{att4Value,jdbcType=VARCHAR}, #{att5Id,jdbcType=BIGINT}, #{att5Value,jdbcType=VARCHAR}, 
-      #{att6Id,jdbcType=BIGINT}, #{att6Value,jdbcType=VARCHAR}, #{tags,jdbcType=VARCHAR}, 
+      #{createdTime,jdbcType=TIMESTAMP}, #{updatedTime,jdbcType=TIMESTAMP}, #{tags,jdbcType=VARCHAR},
       #{useSpec,jdbcType=BIT}, #{barCode,jdbcType=VARCHAR}, #{retailPrice,jdbcType=DECIMAL},
       #{batchPrice,jdbcType=DECIMAL}, #{inPrice,jdbcType=DECIMAL},
       #{normalLimit,jdbcType=DECIMAL}, #{lowLimit,jdbcType=DECIMAL}, #{highLimit,jdbcType=DECIMAL})
@@ -343,42 +322,6 @@
       <if test="updatedTime != null" >
         updated_time = #{updatedTime,jdbcType=TIMESTAMP},
       </if>
-      <if test="att1Id != null" >
-        att1_id = #{att1Id,jdbcType=BIGINT},
-      </if>
-      <if test="att1Value != null" >
-        att1_value = #{att1Value,jdbcType=VARCHAR},
-      </if>
-      <if test="att2Id != null" >
-        att2_id = #{att2Id,jdbcType=BIGINT},
-      </if>
-      <if test="att2Value != null" >
-        att2_value = #{att2Value,jdbcType=VARCHAR},
-      </if>
-      <if test="att3Id != null" >
-        att3_id = #{att3Id,jdbcType=BIGINT},
-      </if>
-      <if test="att3Value != null" >
-        att3_value = #{att3Value,jdbcType=VARCHAR},
-      </if>
-      <if test="att4Id != null" >
-        att4_id = #{att4Id,jdbcType=BIGINT},
-      </if>
-      <if test="att4Value != null" >
-        att4_value = #{att4Value,jdbcType=VARCHAR},
-      </if>
-      <if test="att5Id != null" >
-        att5_id = #{att5Id,jdbcType=BIGINT},
-      </if>
-      <if test="att5Value != null" >
-        att5_value = #{att5Value,jdbcType=VARCHAR},
-      </if>
-      <if test="att6Id != null" >
-        att6_id = #{att6Id,jdbcType=BIGINT},
-      </if>
-      <if test="att6Value != null" >
-        att6_value = #{att6Value,jdbcType=VARCHAR},
-      </if>
       <if test="tags != null" >
         tags = #{tags,jdbcType=VARCHAR},
       </if>
@@ -510,10 +453,7 @@
     gi.medication_id as medicationId, gi.care_time_id as careTimeId,
     gi.gmp_type_id as gmpTypeId, gi.abc_type_id as abcTypeId, gi.scope_id as scopeId,
     gi.new_type_id as newTypeId, gi.created_by as createdBy, gi.updated_by as updatedBy, gi.created_time as createdTime,
-    gi.updated_time as updatedTime, gi.att1_id as att1Id, gi.att1_value as att1Value,
-    gi.att2_id as att2Id, gi.att2_value as att2Value, gi.att3_id as att3Id, gi.att3_value as att3Value, gi.att4_id as att4Id,
-    gi.att4_value as att4Value, gi.att5_id as att5Id, gi.att5_value as att5Value, gi.att6_id as att6Id, gi.att6_value as att6Value,
-    gi.tags as tags, gi.use_spec as useSpec,
+    gi.updated_time as updatedTime, gi.tags as tags, gi.use_spec as useSpec,
     gi.normal_limit as normalLimit, gi.low_limit as lowLimit, gi.high_limit as highLimit,
     gc.name as categoryName,
     f.name as factoryName,
@@ -541,7 +481,24 @@
     <if test="offset != null and limit != null">
       limit #{offset}, #{limit}
     </if>
+  </select>
 
+  <select id="getChooseListDetailById" parameterType="map" resultType="com.yiban.erp.entities.Goods">
+    select
+    <include refid="Goods_Column_List"/>
+    from goods_info gi
+    left join good_category gc on gc.id = gi.category_id
+    left join factory f on f.id = gi.factory_id
+    left join supplier s on s.id = gi.supplier_id
+    , goods_detail gd
+    left join goods_spec gs1 on gd.spec_one_id = gs1.id
+    left join goods_spec gs2 on gd.spec_one_id = gs2.id
+    left join goods_spec gs3 on gd.spec_one_id = gs3.id
+    where gd.goods_info_id = gi.id and gi.status != 'DELETE' AND gd.status != 'DELETE'
+    and gi.id in
+    <foreach collection="ids" item="item" open="(" close=")" separator=", ">
+      #{item}
+    </foreach>
   </select>
 
 </mapper>

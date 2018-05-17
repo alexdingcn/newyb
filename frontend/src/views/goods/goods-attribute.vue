@@ -4,59 +4,43 @@
 
 <template>
   <div>
-      <Card>
+      <Card style="width: 60%;">
           <p slot="title">
               <Icon type="ios-pricetags"></Icon>
               商品自定义属性
           </p>
           <div slot="extra">
               <ButtonGroup size="small">
-                  <Button type="success" icon="checkmark" :loading="loading" @click="save" >保存</Button>
+                  <Button type="primary" icon="plus" @click="add" >新增自定义属性</Button>
               </ButtonGroup>
           </div>
 
-           <Alert>
+           <Alert type="success" class="row-margin-bottom" >
                 自定义字段设置说明：用于补充默认商品字段中不足的地方，设置后，可在“商品详情页”增加一个自定义文本字段进行描述，
-                如：医药类产品的“主治功能”，设置后，可在每个“商品详情页”的自定义字段增加一个自定义的“主治功能”的字段。最多支持6个自定义字段
+                <p>如：医药类产品的“主治功能”，设置后，可在每个“商品详情页”的自定义字段增加一个自定义的“主治功能”的字段。</p>
             </Alert>
+            <Table ref="table" highlight-row :loading="tableLoading" 
+                :columns="tableColumns" :data="tableData" 
+                style="width: 100%;" size="small" 
+                no-data-text="点击上方“新增自定义属性”按钮进行新建"
+            ></Table>
+      </Card>
 
-          <Form ref="form" :model="formData" :label-width="90">
-              <Row class="row-margin-bottom">
-                  <i-col span="6">
-                      <FormItem label="自定义属性1">
-                          <Input type="text" v-model="formData.attName1"/>
-                      </FormItem>
-                  </i-col>
-                  <i-col span="6">
-                      <FormItem label="自定义属性2">
-                          <Input type="text" v-model="formData.attName2"/>
-                      </FormItem>
-                  </i-col>
-                  <i-col span="6">
-                      <FormItem label="自定义属性3">
-                          <Input type="text" v-model="formData.attName3"/>
-                      </FormItem>
-                  </i-col>
-              </Row>
-              <Row class="row-margin-bottom">
-                  <i-col span="6">
-                      <FormItem label="自定义属性4">
-                          <Input type="text" v-model="formData.attName4"/>
-                      </FormItem>
-                  </i-col>
-                  <i-col span="6">
-                      <FormItem label="自定义属性5">
-                          <Input type="text" v-model="formData.attName5"/>
-                      </FormItem>
-                  </i-col>
-                  <i-col span="6">
-                      <FormItem label="自定义属性6">
-                          <Input type="text" v-model="formData.attName6"/>
-                      </FormItem>
-                  </i-col>
+      <Modal v-model="modal" title="商品自定义属性维护" :mask-closable="false" width="30">
+          <Form ref="form" :model="attForm" :label-width="90">
+              <Row>
+                  <FormItem label="属性名称" error="attNameError">
+                      <Input type="text" style="width: 250px" v-model="attForm.attName" />
+                  </FormItem>
               </Row>
           </Form>
-      </Card>
+          <Row type="flex" justify="end" slot="footer" >
+              <ButtonGroup size="small">
+                  <Button type="success" icon="checkmark" :loading="saveLoading" @click="saveSubmit" >确定保存</Button>
+                  <Button type="ghost" icon="reply" @click="modalCancel" >取消</Button>
+              </ButtonGroup>
+          </Row>
+      </Modal>
 
   </div>
 </template>
@@ -68,23 +52,66 @@ export default {
   name: 'goods-attribute',
   data() {
       return {
-          loading: false,
-          formData: {
-              attName1: '',
-              attName2: '',
-              attName3: '',
-              attName4: '',
-              attName5: '',
-              attName6: '',
+          tableLoading: false,
+          tableData: [],
+          tableColumns: [
+              {
+                  title: '#',
+                  type: 'index',
+                  width: 60
+              },
+              {
+                  title: '系统编号',
+                  key: 'id',
+                  width: 150,
+              },
+              {
+                  title: '自定义属性名称',
+                  key: 'attName'
+              }, 
+              {
+                  title: '操作',
+                  key: 'action',
+                  width: 150,
+                  render: (h, params) =>　{
+                        return h('ButtonGroup', {
+                            props: {
+                                size: 'small'
+                            }
+                        }, [
+                            h('Button', {
+                                props: {
+                                    type: 'primary',
+                                    icon: "edit"
+                                },
+                                on: {
+                                    click: () => {
+                                        this.edit(params.row);
+                                    }
+                                }
+                            }, '修改'),
+                            h('Button', {
+                                props: {
+                                    type: 'error',
+                                    icon: 'close'
+                                },
+                                on: {
+                                    click: () => {
+                                        this.removeItem(params.row.id);
+                                    }
+                                }
+                            }, '删除')
+                        ]);
+                    }
+              }
+          ],
+          modal: false,
+          attForm: {
+              id: '',
+              attName: ''
           },
-          attributes: [
-                {id: '', attName: ''},
-                {id: '', attName: ''},
-                {id: '', attName: ''},
-                {id: '', attName: ''},
-                {id: '', attName: ''},
-                {id: '', attName: ''}
-           ]
+          attNameError: '',
+          saveLoading: false
       }
   },
   mounted() {
@@ -92,48 +119,64 @@ export default {
   },
   methods: {
       refreshGoodsAttribute() {
+          this.tableLoading = true;
           util.ajax.get('/goods/attribute/list')
             .then((response) => {
-                let data = response.data;
-                if(data && data.length>0) {
-                    for (let i=0;i<6;i++) {
-                        let item = data[i];
-                        if (item && item.id) {
-                            this.attributes[i] = item;
-                        }
-                    }
-                    this.formData = {
-                        attName1: this.attributes[0] ? this.attributes[0].attName : '',
-                        attName2: this.attributes[1] ? this.attributes[1].attName : '',
-                        attName3: this.attributes[2] ? this.attributes[2].attName : '',
-                        attName4: this.attributes[3] ? this.attributes[3].attName : '',
-                        attName5: this.attributes[4] ? this.attributes[4].attName : '',
-                        attName6: this.attributes[5] ? this.attributes[5].attName : '',
-                    }
-                }
+                this.tableLoading = false;
+                this.tableData = response.data;
             })
             .catch((error) => {
+                this.tableLoading = false;
                 util.errorProcessor(this, error);
             })
       },
-      save() {
-          this.loading = true;
-          this.attributes[0].attName = this.formData.attName1;
-          this.attributes[1].attName = this.formData.attName2;
-          this.attributes[2].attName = this.formData.attName3;
-          this.attributes[3].attName = this.formData.attName4;
-          this.attributes[4].attName = this.formData.attName5;
-          this.attributes[5].attName = this.formData.attName6;
-          let reqData = {
-              attributes: this.attributes
+      modalCancel() {
+          this.attForm = {
+              id: '',
+              attName: ''
+          };
+          this.attNameError = '';
+          this.modal = false;
+      },
+
+      add() {
+          this.modal = true;
+      },
+      edit(row) {
+          this.attForm = row;
+          this.modal = true;
+      },
+
+      saveSubmit() {
+          this.attNameError = '';
+          if (!this.attForm.attName) {
+              this.attNameError = '属性名称必需';
+              return;
           }
-          util.ajax.post('/goods/attribute/save', reqData)
+          this.saveLoading = true;
+          util.ajax.post('/goods/attribute/save', this.attForm)
             .then((response) => {
-                this.loading = false;
+                this.saveLoading = false;
                 this.$Message.success('保存成功.');
+                this.refreshGoodsAttribute();
+                this.modalCancel();
             })
             .catch((error) => {
-                this.loading = false;
+                this.saveLoading = false;
+                util.errorProcessor(this, error);
+            })
+      },
+
+      removeItem(id) {
+          this.tableLoading = true;
+          util.ajax.delete('/goods/attribute/remove/' + id)
+            .then((response) => {
+                this.tableLoading = false;
+                this.$Message.success('删除成功');
+                this.refreshGoodsAttribute();
+            })
+            .catch((error) => {
+                this.tableLoading = false;
                 util.errorProcessor(this, error);
             })
       }

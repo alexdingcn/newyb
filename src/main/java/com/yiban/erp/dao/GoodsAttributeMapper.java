@@ -16,4 +16,6 @@ public interface GoodsAttributeMapper {
     int updateByPrimaryKeySelective(GoodsAttribute record);
 
     List<GoodsAttribute> getByCompanyId(Integer companyId);
+
+    boolean isUsedAttribute(Long id);
 }

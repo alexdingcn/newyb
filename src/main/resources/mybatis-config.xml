@@ -17,6 +17,7 @@
         <mapper resource="mapping/GoodsInfoMapper.xml"/>
         <mapper resource="mapping/GoodsDetailMapper.xml"/>
         <mapper resource="mapping/GoodsAttributeMapper.xml"/>
+        <mapper resource="mapping/GoodsAttributeRefMapper.xml"/>
         <mapper resource="mapping/GoodsSpecMapper.xml"/>
         <mapper resource="mapping/GoodsBrandMapper.xml"/>
         <mapper resource="mapping/FactoryMapper.xml"/>

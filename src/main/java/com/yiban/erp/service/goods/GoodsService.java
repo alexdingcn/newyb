@@ -2,10 +2,7 @@ package com.yiban.erp.service.goods;
 
 import com.yiban.erp.constant.GoodsStatus;
 import com.yiban.erp.constant.OrderNumberType;
-import com.yiban.erp.dao.GoodsDetailMapper;
-import com.yiban.erp.dao.GoodsInfoMapper;
-import com.yiban.erp.dao.GoodsMapper;
-import com.yiban.erp.dao.OptionsMapper;
+import com.yiban.erp.dao.*;
 import com.yiban.erp.dto.GoodsQuery;
 import com.yiban.erp.entities.*;
 import com.yiban.erp.exception.BizException;
@@ -29,11 +26,13 @@ public class GoodsService {
     @Autowired
     private OptionsMapper optionsMapper;
     @Autowired
-    private GoodsMapper goodsMapper;
-    @Autowired
     private GoodsInfoMapper goodsInfoMapper;
     @Autowired
     private GoodsDetailMapper goodsDetailMapper;
+    @Autowired
+    private GoodsAttributeRefMapper goodsAttributeRefMapper;
+    @Autowired
+    private GoodsAttrService goodsAttrService;
 
 
     public void setGoodsOptionName(List<Goods> goodsList) {
@@ -65,15 +64,6 @@ public class GoodsService {
         goods.setOptionName(options);
     }
 
-    public List<Goods> getGoodsById(List<Long> ids) {
-        if (ids == null || ids.isEmpty()) {
-            return Collections.emptyList();
-        }
-        List<Goods> goodsList = goodsMapper.selectByIdList(ids);
-        setGoodsOptionName(goodsList);
-        return goodsList;
-    }
-
     public void setGoodsInfoOptionName(List<GoodsInfo> goodsInfoList) {
         if (goodsInfoList == null || goodsInfoList.isEmpty()) {
             return;
@@ -100,6 +90,14 @@ public class GoodsService {
         goodsInfo.setOptions(options);
     }
 
+    public List<Goods> getGoodsById(List<Long> ids) {
+        if (ids == null || ids.isEmpty()) {
+            return Collections.emptyList();
+        }
+        List<Goods> goodsList = goodsInfoMapper.getChooseListDetailById(ids);
+        setGoodsOptionName(goodsList);
+        return goodsList;
+    }
 
     public Long searchListCount(GoodsQuery query) {
         return goodsInfoMapper.searchListCount(query);
@@ -119,8 +117,7 @@ public class GoodsService {
         List<Goods> goods = goodsInfoMapper.getChooseListDetail(query);
         //设置option的值
         setGoodsOptionName(goods);
-        //TODO 设置自定义字段的值
-
+        //列表中忽略自定义属性的展示
         return goods;
     }
 
@@ -131,8 +128,22 @@ public class GoodsService {
             throw new BizException(ErrorCode.GOODS_GET_RESULT_NULL);
         }
         List<GoodsDetail> details = goodsDetailMapper.getByGoodsInfoId(goodsInfo.getId(), false);
-        goodsInfo.setGoodsDetails(details);
-        setGoodsInfoOptionName(goodsInfo);
+        goodsInfo.setGoodsDetails(details); //详情
+        setGoodsInfoOptionName(goodsInfo); //option的值
+
+        //自定义属性
+        List<GoodsAttributeRef> attributeRefs = goodsAttributeRefMapper.getByGoodsInfoId(id);
+        if (attributeRefs != null && !attributeRefs.isEmpty()) {
+            Map<Long, GoodsAttribute> attributeMap = goodsAttrService.getGoodsAttMap(goodsInfo.getCompanyId());
+            for (GoodsAttributeRef ref : attributeRefs) {
+                GoodsAttribute attribute = attributeMap.get(ref.getAttId());
+                if (attribute != null) {
+                    ref.setAttName(attribute.getAttName());
+                }
+            }
+        }
+        goodsInfo.setAttributeRefs(attributeRefs);
+
         return goodsInfo;
     }
 
@@ -209,6 +220,13 @@ public class GoodsService {
                 throw new BizRuntimeException(ErrorCode.FAILED_INSERT_FROM_DB);
             }
         }
+
+        //自定义属性如果存在，直接操作入库
+        List<GoodsAttributeRef> attributeRefs = goodsInfo.getAttributeRefs();
+        if (attributeRefs != null && !attributeRefs.isEmpty()) {
+            setAttributeGoodsInfoId(attributeRefs, goodsInfo.getId());
+            goodsAttributeRefMapper.insertBatch(attributeRefs);
+        }
     }
 
     private String getSkuKey(GoodsDetail detail, Long goodsInfoId) {
@@ -252,6 +270,21 @@ public class GoodsService {
         }else {
             //使用了多规格，
             updateUseSpec(goodsInfo, oldDetails, oldMap, user);
+        }
+
+        //自定义属性，先直接一次删除全部的在全部插入进去
+        goodsAttributeRefMapper.deleteByGoodsInfoId(goodsInfo.getId());
+        List<GoodsAttributeRef> attributeRefs = goodsInfo.getAttributeRefs();
+        if (attributeRefs != null && !attributeRefs.isEmpty()) {
+            logger.info("insert goods attribute info.");
+            setAttributeGoodsInfoId(attributeRefs, goodsInfo.getId());
+            goodsAttributeRefMapper.insertBatch(attributeRefs);
+        }
+    }
+
+    private void setAttributeGoodsInfoId(List<GoodsAttributeRef> attributeRefs, Long goodsInfoId) {
+        for (GoodsAttributeRef ref : attributeRefs) {
+            ref.setGoodsInfoId(goodsInfoId);
         }
     }
 

@@ -1,7 +1,7 @@
 <template>
     <div>
         <div :class="wrapClasses">
-            <Select v-model="optionId" clearable filterable :size="size"
+            <Select v-model="optionId" clearable filterable :size="size" transfer 
                     :placeholder="selectPlaceHolder" @on-change="onChange">
                 <Option v-for="item in optionList" :value="item.id" :key="item.id">{{ item.value }}</Option>
             </Select>
@@ -12,7 +12,7 @@
             </div>
         </div>
 
-        <Modal v-model="optionModalShow" class="option-modal-position-show">
+        <Modal v-model="optionModalShow" :footerHide="true" class="option-modal-position-show">
             <p slot="header">
                 <Icon type="ios-settings-strong"></Icon>
                 <span>{{showTitle || '属性配置'}}</span>
@@ -26,8 +26,6 @@
                         :columns="unitColumns" :data="optionList">
                     </Table>
                 </Row>
-            </div>
-            <div slot="footer">
             </div>
         </Modal>
 

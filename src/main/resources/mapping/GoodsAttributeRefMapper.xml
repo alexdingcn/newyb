@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.yiban.erp.dao.GoodsAttributeRefMapper" >
+  <resultMap id="BaseResultMap" type="com.yiban.erp.entities.GoodsAttributeRef" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="goods_info_id" property="goodsInfoId" jdbcType="BIGINT" />
+    <result column="att_id" property="attId" jdbcType="BIGINT" />
+    <result column="att_value" property="attValue" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, goods_info_id, att_id, att_value
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select 
+    <include refid="Base_Column_List" />
+    from goods_attribute_ref
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
+    delete from goods_attribute_ref
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+  <delete id="deleteByGoodsInfoId" parameterType="java.lang.Long">
+    delete from goods_attribute_ref
+    where goods_info_id = #{id,jdbcType=BIGINT}
+  </delete>
+
+  <insert id="insert" parameterType="com.yiban.erp.entities.GoodsAttributeRef" keyProperty="id" useGeneratedKeys="true" >
+    insert into goods_attribute_ref (goods_info_id, att_id,
+      att_value)
+    values (#{goodsInfoId,jdbcType=BIGINT}, #{attId,jdbcType=BIGINT},
+      #{attValue,jdbcType=VARCHAR})
+  </insert>
+
+  <insert id="insertBatch" parameterType="map" keyProperty="id" useGeneratedKeys="true" >
+    insert into goods_attribute_ref (goods_info_id, att_id,
+      att_value)
+    values
+    <foreach collection="attributeRefs" separator="), (" item="item" open="(" close=")">
+      #{item.goodsInfoId,jdbcType=BIGINT}, #{item.attId,jdbcType=BIGINT},
+      #{item.attValue,jdbcType=VARCHAR}
+    </foreach>
+  </insert>
+
+  <update id="updateByPrimaryKey" parameterType="com.yiban.erp.entities.GoodsAttributeRef" >
+    update goods_attribute_ref
+    set goods_info_id = #{goodsInfoId,jdbcType=BIGINT},
+      att_id = #{attId,jdbcType=BIGINT},
+      att_value = #{attValue,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+
+  <select id="getByGoodsInfoId" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select <include refid="Base_Column_List" />
+    from goods_attribute_ref
+    where goods_info_id = #{goodsInfoId}
+  </select>
+
+</mapper>

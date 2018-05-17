@@ -35,7 +35,7 @@ public enum ErrorCode {
     GOODS_REMAINED_IN_CATEGORY(1200, "该分类下还有商品,请先移除商品后操作"),
     GOODS_CHILD_IN_CATEGORY(1200, "该分类下还有子分类, 请先移除对应的子分类后操作"),
     GOODS_CATEGORY_NAME_MISS(1202, "商品类别名称不能为空"),
-    GOODS_ATTRIBUTE_SIZE_ERROR(1203, "商品自定义字段的个数不能多于6个"),
+    GOODS_ATTRIBUTE_NAME_ERROR(1203, "商品自定义字段名称不能为空"),
     GOODS_SPEC_NAME_NO_NULL(1204, "多规格的名称和序号不能为空"),
     GOODS_SPEC_SUB_SPEC_EMPTY(1205, "多规格的子规格不能为空列表"),
     GOODS_SPEC_GET_FAIL(1206, "获取商品多规格失败"),
@@ -46,6 +46,8 @@ public enum ErrorCode {
     GOODS_DETAIL_GET_FAIL(1211, "获取商品详情信息失败"),
     GOODS_DETAIL_USED_CANNOT_DELETE(1212, "当前产品详情信息存在使用信息，不能删除"),
     GOODS_OLD_SPEC_USED(1213, "商品需要删除的多规格信息存在使用情况，不能删除"),
+    GOODS_ATTRIBUTE_GET_FAIL(1214, "商品自定义属性信息获取失败"),
+    GOODS_ATTRIBUTE_USED(1215, "商品自定义属性正在使用，不能删除"),
 
     // 13xx - 采购
     BUY_ORDER_NOT_EXISTED(1300, "采购订单不存在"),
