@@ -137,11 +137,16 @@ export const appRouter = [
         name: 'buy',
         title: '采购',
         component: Main,
+        menuGroup: [
+            { title: "采购", icon: 'icon-caigou-xianxing', start: 0, end: 2 },
+            { title: "采购退单", icon: 'icon-huankuan-xianxing', start: 3, end: 6 }
+        ],
         children: [
             { path: 'order', title: '采购制单', name: 'buy_order', component: () => import('@/views/buy/buy-order.vue') },
             { path: 'review', title: '采购单审核', name: 'buy_order_review', component: () => import('@/views/buy/buy-order-list.vue') },
             { path: 'receive', title: '采购收货', name: 'buy_receive', component: () => import('@/views/repertory/in-make.vue') },
-            { path: 'back-apply', title: '采购退出申请', name: 'back-apply', divided: true, component: () => import('@/views/buy/back-apply.vue') },
+
+            { path: 'back-apply', title: '采购退出申请', name: 'back-apply', component: () => import('@/views/buy/back-apply.vue') },
             { path: 'back-apply-check', title: '采购退出申请审核', name: 'back-apply-check', component: () => import('@/views/buy/back-apply-check.vue') },
             { path: 'back-quality-check', title: '采购退出质量审核', name: 'back-quality-check', component: () => import('@/views/buy/back-quality-check.vue') },
             { path: 'back-final-check', title: '采购退出终审', name: 'back-final-check', component: () => import('@/views/buy/back-final-check.vue') }
@@ -153,11 +158,16 @@ export const appRouter = [
         name: 'sell',
         title: '销售',
         component: Main,
+        menuGroup: [
+            { title: "销售", icon: 'icon-chuangjiandanju-xianxing', start: 0, end: 3 },
+            { title: "销售退单", icon: 'icon-qianshoushenpitongguo-xianxing', start: 4, end: 8 }
+        ],
         children: [
             { path: 'order', title: '销售制单', name: 'sell_order', component: () => import('@/views/sell/make.vue') },
             { path: 'quality-review', title: '销售出库质量审核', name: 'sell-quality-review', component: () => import('@/views/sell/sell-quality-review.vue') },
             { path: 'sale-review', title: '销售审核', name: 'sell-sale-review', component: () => import('@/views/sell/sell-sale-review.vue') },
             { path: 'list', title: '销售订单列表', name: 'sell_list', component: () => import('@/views/sell/sell-order-list.vue') },
+
             { path: 'back-apply', title: '销售退单申请', name: 'sell-back-apply', component: () => import('@/views/sell/back-apply.vue') },
             { path: 'back-apply-check', title: '销售退单申请审核', name: 'sell-back-apply-check', component: () => import('@/views/sell/back-apply-check.vue') },
             { path: 'back-receive', title: '销售退单收货', name: 'sell-back-receive', component: () => import('@/views/sell/back-receive.vue')},
@@ -171,6 +181,11 @@ export const appRouter = [
         name: 'warehouse',
         title: '库存',
         component: Main,
+        menuGroup: [
+            { title: "入库", icon: 'icon-peizaizhuangche-xianxing', start: 0, end: 5 },
+            { title: "出库", icon: 'icon-baoguofahuo-xianxing', start: 6, end: 10 },
+            { title: "盘点", icon: 'icon-zhongzhuanzhan-xianxing', start: 11, end: 14 }
+        ],
         children: [
             { path: 'store_now', title: '实时库存', name: 'store_now', component: () => import('@/views/warehouse/store_now.vue') },
             { path: 'setting', title: '仓库点设置', name: 'wh_setting', component: () => import('@/views/warehouse/setting.vue') },
@@ -178,37 +193,20 @@ export const appRouter = [
             { path: 'in-make', title: '录制入库单', name: 'in-make', component: () => import('@/views/repertory/in-make.vue') },
             { path: "in-quality-check", title: '入库质量验收', name: 'in-quality-check', component: () => import('@/views/repertory/in-quality-check.vue')},
             { path: "in-check", title: '入库审核', name: 'in-check', component: () => import('@/views/repertory/in-check.vue')},
-        ]
-    },
-    {
-        path: '/out-store',
-        icon: 'social-buffer',
-        name: 'out-store',
-        title: '出库管理',
-        component: Main,
-        children: [
-
-            { path: 'change-repertory-index', title: '转库出库', name: 'change-repertory-index', component: () => import('@/views/out-store/change-repertory-index.vue') },
+            
+            { path: 'change-repertory-index', title: '转库出库', name: 'change-repertory-index',  component: () => import('@/views/out-store/change-repertory-index.vue') },
             { path: 'broken-out-index', title: '损耗出库', name: 'broken-out-index', component: () => import('@/views/out-store/broken-out-index.vue') },
             { path: 'out-review', title: '出库复核', name: 'out-review', component: () => import('@/views/out-store/out-review.vue') },
             { path: 'out-review-next', title: '双人复核', name: 'out-review-next', component: () => import('@/views/out-store/out-review-next.vue') },
             { path: 'out-check', title: '出库审核', name: 'out-check', component: () => import('@/views/out-store/out-check.vue') },
 
-        ]
-    },
-    {
-        path: '/checkplan',
-        icon: 'social-buffer',
-        name: 'checkplan',
-        title: '库存盘点',
-        component: Main,
-        children: [
             { path: 'store_check_index', title: '盘点单列表', name: 'store_check_index', component: () => import('@/views/checkplan/store_check_index.vue') },{ path: 'store_check_add', title: '盘点制单', name: 'store_check_add', component: () => import('@/views/checkplan/store_check_add.vue') },
             { path: 'store_check_do_list', title: '执行盘点', name: 'store_check_do_list', component: () => import('@/views/checkplan/store_check_do_list.vue') },
             { path: 'store_check_table_list', title: '盘点表确认', name: 'store_check_table_list', component: () => import('@/views/checkplan/store_check_table_list.vue') },
             { path: "store_check_pass_list", title: '盘点审核', name: 'store_check_pass_list', component: () => import('@/views/checkplan/store_check_pass_list.vue')},
         ]
     },
+
     {
         path: '/financial',
         icon: 'social-yen',

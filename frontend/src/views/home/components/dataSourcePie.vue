@@ -25,6 +25,7 @@ export default {
         draw(val) {
             var data = [];
             var legends = [];
+            var self = this;
             for (let i = 0; i < val.length; i++) {
                 data.push({
                     value: val[i].amount,
@@ -56,7 +57,7 @@ export default {
             };
             this.dataSourcePie.setOption(option);
             window.addEventListener('resize', function () {
-                this.dataSourcePie.resize();
+                self.dataSourcePie.resize();
             });
         }
     },
