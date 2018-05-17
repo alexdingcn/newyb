@@ -101,13 +101,11 @@ export const otherRouter = {
 export const appRouter = [
     {
         path: '/basic-data',
-        icon: 'cube',
+        icon: 'android-settings',
         name: 'basic-data',
-        title: '基本资料',
+        title: '系统',
         component: Main,
         children: [
-            { path: 'goods', title: '商品列表', name: 'basic_data_good', component: () => import('@/views/basic-data/good.vue') },
-            { path: 'goods-category', title: '商品分类', name: 'basic_data_good_category', component: () => import('@/views/basic-data/good-category.vue') },
             { path: 'factory', title: '生产企业', name: 'basic_data_factory', component: () => import('@/views/basic-data/factory.vue') },
             { path: 'supplier', title: '供应商', name: 'basic_data_supplier', component: () => import('@/views/basic-data/supplier.vue') },
             { path: 'customer', title: '客户档案', name: 'basic_data_customer', component: () => import('@/views/basic-data/customer.vue') },
@@ -223,7 +221,7 @@ export const appRouter = [
         path: '/access',
         icon: 'key',
         name: 'access',
-        title: '权限管理',
+        title: '权限',
         component: Main,
         children: [
             { path: 'index', title: '权限管理', name: 'access_index', component: () => import('@/views/access/access.vue') },
