@@ -15,7 +15,7 @@
             </div>
           </Row>
           <Row>
-            <Col span="10">
+            <i-col span="10">
                 <Card>
                     <p slot="title">
                         <Icon type="ios-paper"></Icon> 档案信息 
@@ -45,10 +45,10 @@
                     <Page :total="fileInfoTotalCount" size="small" show-total :current="fileInfoTabCurrPage" 
                         :page-size="fileInfoTabPageSize" @on-change="fileInfoTabPageChange"></Page>
                 </Card>
-            </Col>
-            <Col span="14">
+            </i-col>
+            <i-col span="14">
                 <file-detail :fileNo="editFileNo" @add-file-success="loadFileInfoList"></file-detail>
-            </Col>
+            </i-col>
           </Row>
       </Row>
 
@@ -62,15 +62,15 @@
           </Row>
           <div slot="footer">
             <Row >
-                <Col span="6" offset="6">
+                <i-col span="6" offset="6">
                     <Button type="primary" :loading="fileTypeSubmitLoading" @click="fileTypeSubmit" long>
                         <span v-if="!fileTypeSubmitLoading">提交</span>
                         <span v-else>正在提交...</span>
                     </Button>
-                </Col>
-                <Col span=6 class="padding-left-10">
+                </i-col>
+                <i-col span=6 class="padding-left-10">
                     <Button @click="closedfileTypeModal" long>取消</Button>
-                </Col>
+                </i-col>
             </Row>
           </div>
       </Modal>

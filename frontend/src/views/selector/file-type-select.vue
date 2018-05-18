@@ -1,10 +1,25 @@
 
 <template>
-  <Select v-model="id" filterable clearable filterable :disabled="disabled" placeholder="请选择档案类型" 
-        :size="size" 
-        @on-change="onChange">
-        <Option v-for="item in optionList" :value="item.typeName" :key="item.typeName">{{item.typeName}}</Option>
-    </Select>
+    <div>
+        <Select transfer v-model="id" filterable clearable :disabled="disabled" placeholder="请选择档案类型" 
+            :size="size" 
+            @on-change="onChange">
+            <Option v-for="item in optionList" :value="item.typeName" :key="item.typeName">{{item.typeName}}</Option>
+        </Select>
+
+        <Modal v-model="brandModal" title="新增档案类型" :mask-closable="false" width="40" class="file-upload-modal">
+            <Form ref="addForm" :model="addForm" :label-width="100">
+
+            </Form>
+
+            <Row type="flex" justify="end" slot="footer" >
+                <ButtonGroup size="small">
+                    <Button type="success" icon="checkmark" :loading="saveLoading" @click="saveSubmit" >确定保存</Button>
+                    <Button type="ghost" icon="reply" @click="modalCancel" >取消</Button>
+                </ButtonGroup>
+            </Row>
+        </Modal>
+    </div>
 </template>
 
 <script>

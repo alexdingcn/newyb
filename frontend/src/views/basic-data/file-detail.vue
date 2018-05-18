@@ -2,52 +2,52 @@
 <template>
   <div class="file-info-div">
         <Row class="file-info-title">
-            <Col span="12">
-            <Row type="flex" justify="start">
-                <h3><Icon type="document"></Icon> {{titleName || ''}}</h3>
-            </Row>
-            </Col>
-            <Col span="12">
-            <Row type="flex" justify="end">
-                <Button size="small" type="primary" :disabled="isEditView" :loading="submitLoading"
-                        icon="checkmark" @click="submitFileInfoBtnClick">提交</Button>
-            </Row>
-            </Col>
+            <i-col span="12">
+                <Row type="flex" justify="start">
+                    <h3><Icon type="document"></Icon> {{titleName || ''}}</h3>
+                </Row>
+            </i-col>
+            <i-col span="12">
+                <Row type="flex" justify="end">
+                    <Button size="small" type="primary" :disabled="isEditView" :loading="submitLoading"
+                            icon="checkmark" @click="submitFileInfoBtnClick">提交</Button>
+                </Row>
+            </i-col>
         </Row>
         <hr class="file-info-hr"/>
         <Row type="flex" justify="center">
             <Form ref="fileInfoForm" :model="formData" :rules="formValidate" label-position="right" :label-width="90">
                 <Row>
-                    <Col span="12">
+                    <i-col span="12">
                         <FormItem label="档案类型" prop="fileType">
                             <file-type-select size="small" v-model="formData.fileType" v-if="!isEditView"></file-type-select>
                             <Input v-if="isEditView" v-model="formData.fileType" />
                         </FormItem>
-                    </Col>
-                    <Col span="12">
+                    </i-col>
+                    <i-col span="12">
                         <FormItem label="档案编号">
                             <Input size="small" type="text" v-model="formData.fileNo" placeholder="由系统自动生成" disabled />
                         </FormItem>
-                    </Col>
+                    </i-col>
                 </Row>
                 <Row>
-                    <Col span="12">
+                    <i-col span="12">
                         <FormItem label="档案名称" prop="fileName">
                             <Input size="small" type="text" v-model="formData.fileName" :readonly="isEditView" />
                         </FormItem>
-                    </Col>
-                    <Col span="12">
+                    </i-col>
+                    <i-col span="12">
                         <FormItem label="操作时间">
                             <DatePicker size="small" type="datetime" v-model="formData.updateTime" format="yyyy-MM-dd HH:mm" disabled></DatePicker>
                         </FormItem>
-                    </Col>
+                    </i-col>
                 </Row>
                 <Row>
-                    <Col span="24">
+                    <i-col span="24">
                         <FormItem label="备注">
                             <Input size="small" type="text" v-model="formData.comment" :readonly="isEditView" />
                         </FormItem>
-                    </Col>
+                    </i-col>
                 </Row>
             </Form>
         </Row>
