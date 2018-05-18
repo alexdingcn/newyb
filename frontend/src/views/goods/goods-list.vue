@@ -4,11 +4,11 @@
 </style>
 
 <template>
-  <div class="goods-list">
-          <div class="list-sider" :style="{width: showSider ? '200px' : '0px'}">
+  <Row class="goods-list" :gutter="10">
+          <Col :span="showSider ? '4' : '0'">
             <goods-category :is-sider="true" v-show="showSider" @on-choose="categoryChoose" ></goods-category>
-          </div>
-          <div class="list-body" :style="{left: showSider ? '200px': '0px'}">
+          </Col>
+          <Col :span="showSider ? '20' : '24'">
               <Card>
                     <p slot="title">
                         <a href="javascript:void(0)" @click="changeSiderShow" style="margin-right: 5px;" >
@@ -40,18 +40,18 @@
                             :columns="tableCulumns" :data="tableData" ref="goodsTable" 
                             style="width: 100%;" size="small">
                     </Table>
-                    <Row type="flex" justify="end">
+                    <Row type="flex" justify="end" class="margin-top-10">
                         <Page :total="totalCount" :current="currentPage" @on-change="changePage" size="small" show-total></Page>
                     </Row>
 
                 </Card>
-          </div>
+          </Col>
 
           <Modal v-model="goodsModal" title="商品信息维护" :footerHide="true" :mask-closable="false" width="75">
               <goods-info :goodsInfoId="editId" @save-ok="goodsSaveOk" ></goods-info>
           </Modal>
           
-  </div>
+  </Row>
 </template>
 
 <script>
