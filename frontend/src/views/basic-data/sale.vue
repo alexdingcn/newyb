@@ -7,6 +7,14 @@
                 </p>
                 <div slot="extra">
                 </div>
+                <Alert type="success">
+                    <p><strong>如何添加销售员: </strong></p>
+                    <ul style="padding-left:30px;">
+                        <li>左侧列出的是所有用户，如果是新客户，请点击<Button type="text" @click="addUser">添加用户</Button>
+                        </li>
+                        <li>然后选择左侧用户移动到右侧后点击保存</li>
+                    </ul>
+                </Alert>
                 <Transfer
                         :data="allUsers"
                         :target-keys="salerKeys"
@@ -114,6 +122,11 @@
             },
             reloadData () {
                 this.getUserList();
+            },
+            addUser () {
+                this.$router.push({
+                    name: 'add_user'
+                });
             },
             saveBuyer () {
                 var params = new Array();

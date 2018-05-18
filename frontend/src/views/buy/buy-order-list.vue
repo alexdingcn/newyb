@@ -6,10 +6,12 @@
 	<Row>
 		<Card>
 			<p slot="title">
-              <Icon type="funnel"></Icon>
-              采购审核
-          </p>
-			<div slot="extra" style="width:600px">
+                <div v-if="!chooseModal">
+                    <Icon type="funnel"></Icon>
+                    采购审核
+                </div>
+            </p>
+			<div slot="extra" style="width:700px">
 				<Row type="flex" justify="end">
 					<Col span="8">
 						<DatePicker v-model="dateRange" type="daterange" placement="bottom-end" placeholder="订单日期" style="width:180px"></DatePicker>
@@ -23,9 +25,9 @@
 						</Select>
                     </Col>
                     <Col span="5" >
-                            <Button type="primary" icon="ios-search" @click="queryOrderList"></Button>
-                            <Button v-if="!chooseModal" icon="checkmark-round" @click="showCheckModal">审核</Button>
-                            <Button v-if="chooseModal" icon="checkmark-round" @click="choosedItem" >选择</Button>
+                        <Button type="primary" icon="ios-search" @click="queryOrderList"></Button>
+                        <Button v-if="!chooseModal" type="success" icon="checkmark-round" @click="showCheckModal">审核</Button>
+                        <Button v-if="chooseModal" icon="checkmark-round" @click="choosedItem" >选择</Button>
 					</Col>
 				</Row>
 			</div>
@@ -74,6 +76,7 @@
     import moment from 'moment';
     import util from '@/libs/util.js';
     import supplierSelect from "@/views/selector/supplier-select.vue";
+    import goodsSepcTags from '../goods/goods-spec-tabs.vue';
 
     export default {
         name: 'buy_order',
@@ -84,7 +87,8 @@
             }
         },
         components: {
-            supplierSelect
+            supplierSelect,
+            goodsSepcTags
         },
         data () {
             return {
@@ -106,10 +110,15 @@
                 checkModalShow: false,
                 orderListColumns: [
                     {
-                        key: 'id',
-                        title: '#',
+                        type: 'index',
                         align: 'center',
-                        width: 100
+                        width: 50
+                    },
+                    {
+                        title: '订单号',
+                        align: 'center',
+                        key: 'orderNumber',
+                        width: 180
                     },
                     {
                         title: '订单日期',
@@ -131,12 +140,6 @@
                         align: 'center',
                         key: 'supplier',
                         width: 170
-                    },
-                    {
-                        title: '供应商代表',
-                        align: 'center',
-                        key: 'supplierContact',
-                        width: 150
                     },
                     {
                         title: '制单人',
@@ -204,12 +207,7 @@
                             return params.row.checkTime ? moment(params.row.checkTime).format('YYYY-MM-DD') : '';
                         }
                     },
-                    {
-                        title: '订单号',
-                        align: 'center',
-                        key: 'orderNumber',
-                        width: 150
-                    },
+
                     {
                         title: '预计到货日',
                         align: 'center',
@@ -247,9 +245,7 @@
                 orderColumns: [
                     {
                         type: 'index',
-                        title: '',
-                        align: 'center',
-                        width: 60
+                        align: 'center'
                     },
                     {
                         title: '货号',
@@ -259,6 +255,7 @@
                     {
                         title: '商品名称',
                         key: 'goodsName',
+                        width: 200,
                         align: 'center',
                         sortable: true
                     },
@@ -271,19 +268,16 @@
                         }
                     },
                     {
-                        title: '剂型',
-                        key: 'jxName',
-                        align: 'center',
-                        render: (h, params) => {
-                            return params.row.goods.jxName;
-                        }
-                    },
-                    {
                         title: '规格',
-                        key: 'spec',
-                        align: 'center',
-                        render: (h, params) => {
-                            return params.row.goods.spec;
+                        key: 'goodsSpecs',
+                        width: 120,
+                        render: (h, params) =>　{
+                            return h(goodsSepcTags, {
+                                props: {
+                                    tags: params.row.goods.goodsSpecs,
+                                    color: 'blue'
+                                }
+                            });
                         }
                     },
                     {
@@ -427,7 +421,7 @@
                 let self = this;
                 this.$Modal.confirm({
                     title: '审批确认',
-                    content: '是否确认采购订单信息正确，确认提交审核结果？',
+                    content: '请确认采购订单信息正确？',
                     onCancel: () => {},
                     onOk: () => {
                         util.ajax.post('/buy/status', {

@@ -134,7 +134,7 @@ public class GoodsService {
         return goodsInfoMapper.getChooseListDetailCount(query);
     }
 
-    public List<Goods> getChooseListDetail(GoodsQuery query){
+    public List<Goods> getChooseListDetail(GoodsQuery query) {
         List<Goods> goods = goodsInfoMapper.getChooseListDetail(query);
         //设置option的值
         setGoodsOptionName(goods);
@@ -176,7 +176,7 @@ public class GoodsService {
         //如果存在有ID，则认为是修改，如果不存在ID，认为是添加
         if (goodsInfo.getId() != null) {
             updateGoodsInfo(goodsInfo, user);
-        }else {
+        } else {
             createdGoodsInfo(goodsInfo, user);
         }
     }
@@ -222,7 +222,7 @@ public class GoodsService {
             if (detailCount <= 0) {
                 throw new BizRuntimeException(ErrorCode.FAILED_INSERT_FROM_DB);
             }
-        }else {
+        } else {
             for (GoodsDetail detail : details) {
                 detail.setCompanyId(user.getCompanyId());
                 detail.setGoodsInfoId(goodsInfo.getId());
@@ -253,14 +253,16 @@ public class GoodsService {
         if (StringUtils.isNotBlank(goodsInfo.getBlackList())) {
             JSONObject obj = JSON.parseObject(goodsInfo.getBlackList());
             GoodsBlackListWithBLOBs blackList = new GoodsBlackListWithBLOBs();
-            blackList.setCustomerCategoryIds(obj.getString("customerCategories"));
+            blackList.setCustomerCategoryIds(obj.getString("customerCategoryIds"));
             blackList.setRegions(obj.getString("regions"));
-            blackList.setCustomerIds(obj.getString("customers"));
+            blackList.setCustomerIds(obj.getString("customerIds"));
 
-            blackList.setGoodsId(goodsInfo.getId());
-            blackList.setCreatedBy(user.getId().toString());
-            blackList.setCreatedTime(new Date());
-            goodsBlackListMapper.insert(blackList);
+            if (!blackList.isEmpty()) {
+                blackList.setGoodsId(goodsInfo.getId());
+                blackList.setCreatedBy(user.getId().toString());
+                blackList.setCreatedTime(new Date());
+                goodsBlackListMapper.insert(blackList);
+            }
         }
     }
 
@@ -326,9 +328,9 @@ public class GoodsService {
             }
 
             JSONObject obj = JSON.parseObject(goodsInfo.getBlackList());
-            blackList.setCustomerCategoryIds(obj.getString("customerCategories"));
+            blackList.setCustomerCategoryIds(obj.getString("customerCategoryIds"));
             blackList.setRegions(obj.getString("regions"));
-            blackList.setCustomerIds(obj.getString("customers"));
+            blackList.setCustomerIds(obj.getString("customerIds"));
 
             blackList.setGoodsId(goodsInfo.getId());
             blackList.setUpdatedBy(user.getId().toString());
@@ -336,10 +338,16 @@ public class GoodsService {
             if (blackList.getId() == null) {
                 goodsBlackListMapper.insert(blackList);
             } else {
-                goodsBlackListMapper.updateByPrimaryKeyWithBLOBs(blackList);
+                if (blackList.isEmpty()) {
+                    goodsBlackListMapper.deleteByPrimaryKey(blackList.getId());
+                } else {
+                    goodsBlackListMapper.updateByPrimaryKeyWithBLOBs(blackList);
+                }
             }
         }
     }
+
+
 
     private void setAttributeGoodsInfoId(List<GoodsAttributeRef> attributeRefs, Long goodsInfoId) {
         for (GoodsAttributeRef ref : attributeRefs) {
@@ -348,7 +356,8 @@ public class GoodsService {
     }
 
     @Transactional
-    public void updateUseSpec(GoodsInfo goodsInfo, List<GoodsDetail> oldDetails, Map<String, GoodsDetail> oldDetailMap, User user) throws BizException {
+    public void updateUseSpec(GoodsInfo goodsInfo, List<GoodsDetail> oldDetails, Map<String, GoodsDetail> oldDetailMap,
+                              User user) throws BizException {
         //生成所有新规格的skuKey
         List<GoodsDetail> details = goodsInfo.getGoodsDetails();
         for (GoodsDetail detail : details) {
@@ -393,7 +402,7 @@ public class GoodsService {
                 oldDetail.setUpdatedTime(new Date());
                 goodsDetailMapper.updateByPrimaryKeySelective(oldDetail);
                 logger.info("update detail success. goodsInfoId:{}", goodsInfo.getId());
-            }else {
+            } else {
                 //如果获取不到，说明原来是多规格的，现在变更为了单规格，根据key创建一个新的
                 newItem.setCreatedTime(new Date());
                 newItem.setCreatedBy(user.getNickname());
@@ -410,7 +419,8 @@ public class GoodsService {
     }
 
     @Transactional
-    public void updateUnUseSpec(GoodsInfo goodsInfo, GoodsInfo oldGoodsInfo, List<GoodsDetail> oldDetails, Map<String, GoodsDetail> oldDetailMap, User user) throws BizException {
+    public void updateUnUseSpec(GoodsInfo goodsInfo, GoodsInfo oldGoodsInfo, List<GoodsDetail> oldDetails,
+                                Map<String, GoodsDetail> oldDetailMap, User user) throws BizException {
         //如果新的没有使用多规格，看看老的是否使用了多规格
         if (oldGoodsInfo.getUseSpec() && isDetailsHaveUsed(oldDetails)) {
             //老的使用了多规格，且多规格中的值是存在有使用过的，如果有，则不能进行修改，相当于存在有多规格限制
@@ -433,7 +443,7 @@ public class GoodsService {
             oldDetail.setUpdatedTime(new Date());
             goodsDetailMapper.updateByPrimaryKeySelective(oldDetail);
             logger.info("update detail success. goodsInfoId:{}", goodsInfo.getId());
-        }else {
+        } else {
             //如果获取不到，说明原来是多规格的，现在变更为了单规格，根据key创建一个新的
             GoodsDetail detail = makeNewGoodsDeail(goodsInfo, user);
             goodsDetailMapper.insert(detail);
@@ -524,7 +534,7 @@ public class GoodsService {
         goodsInfo.setUpdatedBy(user.getNickname());
         goodsInfo.setUpdatedTime(new Date());
         int count = goodsInfoMapper.insert(goodsInfo);
-        if (count <=0 || goodsInfo.getId() == null) {
+        if (count <= 0 || goodsInfo.getId() == null) {
             logger.warn("copy goods info insert db fail.");
             throw new BizRuntimeException(ErrorCode.FAILED_INSERT_FROM_DB);
         }
@@ -554,7 +564,7 @@ public class GoodsService {
             throw new BizException(ErrorCode.GOODS_DETAIL_GET_FAIL);
         }
         //如果usedCount大于0,则不能修改到删除状态，如果小于等于0，可以修改
-        if (detail.getUsedCount() != null && detail.getUsedCount()>0) {
+        if (detail.getUsedCount() != null && detail.getUsedCount() > 0) {
             logger.warn("detail usedCount > 0 can not delete.");
             throw new BizException(ErrorCode.GOODS_DETAIL_USED_CANNOT_DELETE);
         }

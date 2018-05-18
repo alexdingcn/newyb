@@ -4,11 +4,11 @@
 </style>
 
 <template>
-  <div class="goods-list">
-          <div class="list-sider" :style="{width: showSider ? '200px' : '0px'}">
+  <Row class="goods-list" :gutter="10">
+          <Col :span="showSider ? '4' : '0'">
             <goods-category :is-sider="true" v-show="showSider" @on-choose="categoryChoose" ></goods-category>
-          </div>
-          <div class="list-body" :style="{left: showSider ? '200px': '0px'}">
+          </Col>
+          <Col :span="showSider ? '20' : '24'">
               <Card>
                     <p slot="title">
                         <a href="javascript:void(0)" @click="changeSiderShow" style="margin-right: 5px;" >
@@ -40,18 +40,18 @@
                             :columns="tableCulumns" :data="tableData" ref="goodsTable" 
                             style="width: 100%;" size="small">
                     </Table>
-                    <Row type="flex" justify="end">
+                    <Row type="flex" justify="end" class="margin-top-10">
                         <Page :total="totalCount" :current="currentPage" @on-change="changePage" size="small" show-total></Page>
                     </Row>
 
                 </Card>
-          </div>
+          </Col>
 
-          <Modal v-model="goodsModal" title="商品信息维护" :footerHide="true" :mask-closable="false" width="60">
+          <Modal v-model="goodsModal" title="商品信息维护" :footerHide="true" :mask-closable="false" width="75">
               <goods-info :goodsInfoId="editId" @save-ok="goodsSaveOk" ></goods-info>
           </Modal>
           
-  </div>
+  </Row>
 </template>
 
 <script>
@@ -132,7 +132,7 @@ export default {
                 {
                     title: '商品名称',
                     type: 'name',
-                    minWidth: 200,
+                    minWidth: 250,
                     render: (h, params) => {
                         return h('div',[
                             h('h5', {
@@ -161,7 +161,7 @@ export default {
                 {
                     title: '单位',
                     key: 'unitName',
-                    width: 100
+                    width: 70
                 },
                 {
                     title: '是否可用',
@@ -181,17 +181,17 @@ export default {
                 {
                     title: '批发价',
                     key: 'batchPrice',
-                    width: 120
+                    width: 100
                 },
                 {
                     title: '市场价',
                     key: 'retailPrice',
-                    width: 120
+                    width: 100
                 },
                 {
                     title: '参考进货价',
                     key: 'inPrice',
-                    width: 120
+                    width: 100
                 },
                 {
                     title: '供应商',
@@ -199,17 +199,12 @@ export default {
                     minWidth: 180
                 },
                 {
-                    title: '分类/品牌',
-                    key: 'brandName',
-                    minWidth: 150,
-                    render: (h, params) => {
-                        let categoryName = params.row.categoryName;
-                        let brandName = params.row.brandName;
-                        return h('div',[
-                            h('h5', categoryName),
-                            h('h5', brandName)
-                        ]);
-                    }
+                    title: '分类',
+                    key: 'categoryName'
+                },
+                {
+                    title: '品牌',
+                    key: 'brandName'
                 }
             ],
             totalCount: 0,

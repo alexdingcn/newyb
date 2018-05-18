@@ -34,7 +34,7 @@
                             :value="checkAll"
                             @click.prevent.native="handleCheckAll">全选</Checkbox> -->
                     </div>
-                    <CheckboxGroup v-model="goodsBlackList.customerCategories" @on-change="onChangeCategory">
+                    <CheckboxGroup v-model="goodsBlackList.customerCategoryIds" @on-change="onChangeCategory">
                         <Checkbox v-for="category in customerCategoryList" :key="category.id" :label="category.id">{{ category.name }}</Checkbox>
                     </CheckboxGroup>
                 </Content>
@@ -74,7 +74,7 @@
                             <Button type="success" @click="addCustomerToBlackList">添加</Button>
                         </Col>
                     </Row>
-                    <Table :columns="customerColumns" :data="goodsBlackList.customers" class="margin-top-10" stripe></Table>
+                    <Table :columns="customerColumns" :data="goodsBlackList.customerIds" class="margin-top-10" stripe></Table>
                 </Content>
             </Layout>
         </Layout>
@@ -93,9 +93,9 @@ export default {
             addCustomerQuery: '',
             addRegionQuery: [],
             goodsBlackList: {
-                customerCategories: [],
+                customerCategoryIds: [],
                 regions: [],
-                customers: []
+                customerIds: []
             },
             customerCategoryList: [],
             selectedBlackListType: 'block-customer-category',
@@ -166,13 +166,12 @@ export default {
 
     watch: {
         value (val) {
-            console.log(val);
             if (val) {
                 if (val.customerCategoryIds) {
-                    this.goodsBlackList.customerCategories = val.customerCategoryIds;
+                    this.goodsBlackList.customerCategoryIds = val.customerCategoryIds;
                 }
                 if (val.customerIds) {
-                    this.goodsBlackList.customers = val.customerIds;
+                    this.goodsBlackList.customerIds = val.customerIds;
                 }
                 if (val.regions) {
                     this.goodsBlackList.regions = val.regions;
@@ -199,7 +198,8 @@ export default {
         },
         addCustomerToBlackList() {
             if (this.addCustomerId) {
-                this.goodsBlackList.customers.push({
+                // TODO: existed?
+                this.goodsBlackList.customerIds.push({
                     id: this.addCustomerId, 
                     name: this.addCustomerQuery
                 });
@@ -208,6 +208,7 @@ export default {
         },
         addRegionToBlackList() {
             if (this.addRegionQuery && this.addRegionQuery.length === 2) {
+                // TODO: existed?
                 this.goodsBlackList.regions.push({
                     code: JSON.stringify(this.addRegionQuery),
                     name: this.addRegionQuery[0].name + this.addRegionQuery[1].name
@@ -228,8 +229,8 @@ export default {
             }
         },
         removeCustomer (index) {
-            if (this.goodsBlackList && this.goodsBlackList.customers) {
-                this.goodsBlackList.customers.splice(index, 1);
+            if (this.goodsBlackList && this.goodsBlackList.customerIds) {
+                this.goodsBlackList.customerIds.splice(index, 1);
                 this.setValue();
             }
         },

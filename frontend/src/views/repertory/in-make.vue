@@ -5,11 +5,15 @@
 <template>
 	<Row>
 		<Card>
-			<p slot="title" >
-				<Icon type="document"></Icon> 创建入库单
-			</p>
+			<div slot="title" style="width:50%">
+                <Steps :current="0">
+                    <Step title="采购收货" content="检查外包装，确认数量"></Step>
+                    <Step title="入库质量验收" content="抽样检查商品质量"></Step>
+                    <Step title="入库单审核" content="审核后入库"></Step>
+                </Steps>
+			</div>
 			<div slot="extra">
-				<ButtonGroup class="padding-left-20" size="small">
+				<ButtonGroup class="padding-left-20">
                     <Button type="primary" icon="android-add-circle" @click="buyCheckOrderGetBtnClick" >载入采购单</Button>
 					<Button type="success" icon="checkmark-round" @click="saveOrderBtnClick" :loading="saving">保存</Button>
                     <Button icon="bookmark" :loading="saving" @click="tempSaveOrderBtnClick"> 暂挂 </Button>
@@ -191,14 +195,12 @@
 			<p>是否继续添加下一笔订单?</p>
 		</Modal>
 
-        <Modal v-model="receiveTemp" title="采购入库单暂挂提取" :mask-closable="false" width="70">
+        <Modal v-model="receiveTemp" title="采购入库单暂挂提取" :mask-closable="false" width="70" footerHide>
             <in-temp :open="receiveTemp" @on-choosed="receiveTempChoose"></in-temp>
-            <div slot="footer"></div>
         </Modal>
 
-        <Modal v-model="buyCheckOrder" title="采购单提取" :mask-closable="false" width="70">
+        <Modal v-model="buyCheckOrder" title="采购单提取" :mask-closable="false" width="70" footerHide className="extract-buy-order">
             <buy-order-list @on-choosed="buyOrderChoose" :chooseModal="true" ></buy-order-list>
-            <div slot="footer"></div>
         </Modal>
 
         <warehouse-location-modal :openModal="locationModal" :warehouseId="order.warehouseId" @on-ok="chooseLocation" @on-close="locationModalClose"></warehouse-location-modal>
@@ -220,6 +222,7 @@
     import buyOrderList from "@/views/buy/buy-order-list.vue";
     import warehouseLocationModal from "@/views/selector/warehouse-location-modal.vue";
     import optionSelect from "@/views/selector/option-select.vue";
+    import goodsSepcTags from '../goods/goods-spec-tabs.vue';
 
     export default {
         name: 'in-make',
@@ -233,7 +236,8 @@
             inTemp,
             buyOrderList,
             warehouseLocationModal,
-            optionSelect
+            optionSelect,
+            goodsSepcTags
         },
         data () {
             const addWarehouseLocation = (h, location, rowData, index) => {
@@ -295,22 +299,26 @@
                         width: 60
                     },
                     {
-                        title: '剂型',
-                        key: 'jx',
-                        align: 'center',
-                        width: 60
-                    },
-                    {
                         title: '规格',
-                        key: 'spec',
-                        align: 'center',
-                        width: 80
+                        key: 'goodsSpecs',
+                        width: 120,
+                        render: (h, params) =>　{
+                            return h(goodsSepcTags, {
+                                props: {
+                                    tags: params.row.goods.goodsSpecs,
+                                    color: 'blue'
+                                }
+                            });
+                        }
                     },
                     {
                         title: '生产企业',
                         key: 'factoryName',
                         align: 'center',
-                        width: 120
+                        width: 120,
+                        render: (h, params) => {
+                            return params.row.goods.factoryName;
+                        }
                     },
                     {
                         title: '单位',
@@ -648,7 +656,7 @@
             handleRowDbClick (row) {
             	this.$Modal.confirm({
                     title: '确认删除商品？',
-                    content: '<p>确认删除商品 ' + row.name + '?</p>',
+                    content: '<p>确认删除商品 ' + row.goodsName + '?</p>',
                     onOk: () => {
                         for (var i = 0; i < this.orderItems.length; i++) {
                             if (row.id === this.orderItems[i].id) {
@@ -887,6 +895,7 @@
                                 }
                             }
                             this.order['orderItemIds'] = itemIds;
+                            this.order['receiveDate'] = moment().format('YYYY-MM-DD');
                             this.receiveTemp = false;
                             //设置每一条明细的历史价格和订单数信息
                             this.setCurrentBalanceRecord(itemIds);

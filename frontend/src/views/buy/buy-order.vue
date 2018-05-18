@@ -11,7 +11,7 @@
 			<div slot="extra">
 
 				<ButtonGroup class="padding-left-20">
-					<Button type="primary" icon="android-add-circle" @click="saveBuyOrder" :loading="saving">保存</Button>
+					<Button type="primary" icon="android-list" @click="saveBuyOrder" :loading="saving">保存</Button>
 				</ButtonGroup>
 			</div>
 
@@ -159,11 +159,6 @@
                         title: '产地',
                         key: 'origin',
                         width: 100
-                    },
-                    {
-                        title: '剂型',
-                        key: 'jxName',
-                        width: 120
                     },
                     {
                         key: 'goodsSpecs',
@@ -413,6 +408,8 @@
                         goods['balance'] = record ? record.balance : '';
                         goods['ongoingCount'] = record ? record.ongoingCount : '';
                         goods['amount'] = 0;
+                        // 填入参考买入价
+                        goods['price'] = goods['inPrice'];
                         console.log(goods);
                         this.orderItems.push(goods);
                         this.buyOrder.orderItemIds.push(goods.id);
@@ -436,7 +433,7 @@
             doSave () {
                 this.$Modal.confirm({
                     title: '提交确认',
-                    content: '是否确认采购数据录入完全正确, 提交后不可修改.',
+                    content: '请确认采购数据录入完全正确, 提交后不可修改.',
                     onCancel:() => {},
                     onOk:() => {
                         var self = this;
