@@ -437,7 +437,7 @@ export default {
         //复核一条明细
         checkOneDetailBtn() {
             if (!this.currChooseDetail || !this.currChooseDetail.id) {
-                this.$Message.warning('请先选择一条需要复核的产品信息');
+                this.$Message.warning('请先选择需要复核的商品');
                 return;
             }
             this.checkFormItem = {

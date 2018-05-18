@@ -33,7 +33,7 @@ public class RepertoryService {
         return setGoodsToList(list);
     }
 
-    public JSONObject getStoreNowPage(User user, RepertoryQuery repertoryQuery) {
+    public JSONObject getCurrentRepertory(User user, RepertoryQuery repertoryQuery) {
         JSONObject result = new JSONObject();
         Integer pageSize = repertoryQuery.getSize() == null ? 10 : repertoryQuery.getSize();
         Integer offset = (repertoryQuery.getPage() == null || repertoryQuery.getPage() <= 0 ? 0 : repertoryQuery.getPage() - 1) * pageSize;
@@ -41,11 +41,11 @@ public class RepertoryService {
         repertoryQuery.setSize(pageSize);
         repertoryQuery.setCompanyId(user.getCompanyId());
         //库龄大于x天数 根据库龄设置最大一个入库时间，查询所有早于这个时间的数据
-        Integer keepdays=repertoryQuery.getKeedays();
-        if(keepdays!=null && keepdays>0){
-            keepdays=keepdays*-1;
-            Date max_in_date=new Date();
-            max_in_date=new DateUtil().getPreDate(max_in_date,"d",keepdays);
+        Integer keepDays = repertoryQuery.getKeedays();
+        if (keepDays != null && keepDays > 0) {
+            keepDays = keepDays * -1;
+            Date max_in_date = new Date();
+            max_in_date = new DateUtil().getPreDate(max_in_date, "d", keepDays);
             repertoryQuery.setMaxInDate(max_in_date);
         }
 
@@ -58,12 +58,12 @@ public class RepertoryService {
         List<RepertoryInfo> rlist = repertoryInfoMapper.queryRepertoryPage(repertoryQuery);
         int count = 0;
         if (!rlist.isEmpty()) {
-            count =repertoryInfoMapper.queryRepertoryCount(repertoryQuery);
+            count = repertoryInfoMapper.queryRepertoryCount(repertoryQuery);
         }
-        rlist= setGoodsToList(rlist);
+        rlist = setGoodsToList(rlist);
         result.put("data", rlist);
         result.put("total", count);
-        return  result;
+        return result;
 
     }
 

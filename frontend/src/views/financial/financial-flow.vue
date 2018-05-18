@@ -422,9 +422,8 @@ export default {
             flowsData: [],
             flowsColumns: [
                 {
-                    title: '#',
                     type: 'index',
-                    width: 100
+                    width: 30
                 },
                 {
                     title: '流水号',
@@ -435,9 +434,9 @@ export default {
                     title: '发生日期',
                     key: 'logDate',
                     sortable: true,
-                    width: 120,
+                    width: 140,
                     render: (h, params) => {
-                        return params.row.logDate ? moment(params.row.logDate).format('YYYY-MM-DD') : '';
+                        return params.row.logDate ? moment(params.row.logDate).format('YYYY-MM-DD HH:mm') : '';
                     }
                 },
                 {

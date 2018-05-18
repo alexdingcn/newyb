@@ -15,6 +15,8 @@ public class RepertoryInfo {
 
     private Long inUserId;
 
+    private String goodsNo;
+
     private Long goodsId;
 
     private String batchCode;
@@ -89,6 +91,7 @@ public class RepertoryInfo {
     public void setGoods(Goods goods) {
         this.goods = goods;
         if (goods != null) {
+            this.goodsNo = goods.getGoodsNo();
             this.goodsName = goods.getName();
             this.origin = goods.getOrigin();
             this.jx = goods.getJxName();
@@ -453,5 +456,13 @@ public class RepertoryInfo {
 
     public void setRefOrderId(Long refOrderId) {
         this.refOrderId = refOrderId;
+    }
+
+    public String getGoodsNo() {
+        return goodsNo;
+    }
+
+    public void setGoodsNo(String goodsNo) {
+        this.goodsNo = goodsNo;
     }
 }
