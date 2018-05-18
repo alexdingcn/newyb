@@ -12,7 +12,7 @@
 
         <div slot="extra">
             <ButtonGroup class="padding-left-20">
-                <Button type="primary" icon="android-search" @click="queryRepertoryInfo()" :loading="saving">查询</Button>
+                <Button type="primary" icon="android-search" @click="queryRepertoryList" :loading="saving">查询</Button>
             </ButtonGroup>
         </div>
         <Form :label-width="85" :model="storeNow" ref="storeNowForm">
@@ -34,7 +34,7 @@
              </Col>
              <Col span="4">
                 <FormItem label="库存状态" >
-                    <Select v-model="storeNow.counter_state" size="small"   prop="counter_state">
+                    <Select v-model="storeNow.counter_state" prop="counter_state">
                         <Option v-for="option in counterOptions" :value="option.id" :label="option.name" :key="option.id">
                             {{option.name}}
                         </Option>
@@ -127,9 +127,12 @@ import factorySelect from "@/views/selector/factory-select.vue";
 import supplierSelect from "@/views/selector/supplier-select.vue";
 import goodSelect from "@/views/selector/good-select.vue";
 import buyerSelect from "@/views/selector/buyer-select.vue";
+import goodsSepcTags from '../goods/goods-spec-tabs.vue';
+
 export default {
   name: "store_now",
   components: {
+    goodsSepcTags,
     warehouseSelect,
     factorySelect,
     supplierSelect,
@@ -156,10 +159,10 @@ export default {
           width: 30
         },
         {
-          title: "货号",
+          title: "商品编号",
           align: "center",
-          key: "code",
-          width: 50
+          key: "goodsNo",
+          width: 180
         },
         {
           title: "商品名称",
@@ -173,30 +176,27 @@ export default {
           align: "center",
           width: 60
         },
-
         {
-          title: "规格",
-          key: "spec",
-          align: "center",
-          width: 80
+            title: '规格',
+            key: 'goodsSpecs',
+            width: 120,
+            render: (h, params) =>　{
+                return h(goodsSepcTags, {
+                    props: {
+                        tags: params.row.goods ? params.row.goods.goodsSpecs : "",
+                        color: 'blue'
+                    }
+                });
+            }
         },
         {
-          title: "生产企业",
-          key: "factoryName",
-          align: "center",
-          width: 120
-        },
-        {
-          title: "基药",
-          key: "base_med_id",
-          align: "center",
-          width: 60
-        },
-        {
-          title: "批准文号",
-          key: "permit_id",
-          align: "center",
-          width: 120
+            title: '生产企业',
+            key: 'factoryName',
+            align: 'center',
+            width: 120,
+            render: (h, params) => {
+                return params.row.goods ? params.row.goods.factoryName : "";
+            }
         },
         {
           title: "批次号",
@@ -242,53 +242,53 @@ export default {
           width: 100
         },
         {
-          title: "单价",
+          title: "采购价",
           key: "buyPrice",
           align: "center",
           width: 80
         },
-        {
-          title: "金额",
-          key: "",
-          align: "center",
-          width: 80
-        },
-        {
-          title: "税率",
-          key: "out_tax",
-          align: "center",
-          width: 60
-        },
-        {
-          title: "无税单价",
-          key: "",
-          align: "center",
-          width: 60
-        },
-        {
-          title: "无税金额",
-          key: "",
-          align: "center",
-          width: 60
-        },
-        {
-          title: "税额",
-          key: "",
-          align: "center",
-          width: 60
-        },
-        {
-          title: "销价",
-          key: "",
-          align: "center",
-          width: 60
-        },
-        {
-          title: "销价金额",
-          key: "",
-          align: "center",
-          width: 60
-        },
+        // {
+        //   title: "金额",
+        //   key: "",
+        //   align: "center",
+        //   width: 80
+        // },
+        // {
+        //   title: "税率",
+        //   key: "out_tax",
+        //   align: "center",
+        //   width: 60
+        // },
+        // {
+        //   title: "无税单价",
+        //   key: "",
+        //   align: "center",
+        //   width: 60
+        // },
+        // {
+        //   title: "无税金额",
+        //   key: "",
+        //   align: "center",
+        //   width: 60
+        // },
+        // {
+        //   title: "税额",
+        //   key: "",
+        //   align: "center",
+        //   width: 60
+        // },
+        // {
+        //   title: "销价",
+        //   key: "",
+        //   align: "center",
+        //   width: 60
+        // },
+        // {
+        //   title: "销价金额",
+        //   key: "",
+        //   align: "center",
+        //   width: 60
+        // },
 
         {
           title: "最近采购价",
@@ -298,25 +298,19 @@ export default {
         },
         {
           title: "供应商",
-          key: "supplier",
+          key: "supplierName",
           align: "center",
           width: 120
         },
         {
           title: "储存条件",
-          key: "storage_condition",
+          key: "storageConditionName",
           align: "center",
           width: 100
         },
         {
           title: "仓库点",
           key: "warehouseName",
-          align: "center",
-          width: 100
-        },
-        {
-          title: "库区",
-          key: "",
           align: "center",
           width: 100
         },
@@ -362,9 +356,6 @@ export default {
       this.currentPage = pageNumber;
       this.queryRepertoryList();
     },
-    queryRepertoryInfo() {
-      this.queryRepertoryList();
-    }
   }
 };
 </script>

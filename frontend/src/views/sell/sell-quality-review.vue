@@ -95,13 +95,14 @@ import moment from 'moment';
 import customerSelect from "@/views/selector/customer-select.vue";
 import saleSelect from "@/views/selector/sale-select.vue";
 import goodsExpand from "@/views/goods/goods-expand.vue";
-
+import goodsSepcTags from '../goods/goods-spec-tabs.vue';
 
 export default {
     name: 'sell-quality-review',
     components: {
         customerSelect,
         saleSelect,
+        goodsSepcTags,
         goodsExpand
     },
     data() {
@@ -308,7 +309,10 @@ export default {
                 {
                     title: "生产企业",
                     key: "factoryName",
-                    width: 180
+                    width: 180,
+                    render: (h, params) => {
+                        return params.row.goods.factoryName;
+                    }
                 },
                 {
                     title: "产地",
@@ -323,12 +327,15 @@ export default {
                 {
                     title: "规格",
                     key: "spec",
-                    width: 120
-                },
-                {
-                    title: "剂型",
-                    key: "jx",
-                    width: 120
+                    width: 120,
+                    render: (h, params) =>　{
+                        return h(goodsSepcTags, {
+                            props: {
+                                tags: params.row.goods.goodsSpecs,
+                                color: 'blue'
+                            }
+                        });
+                    }
                 },
                 {
                     title: '单位',
@@ -520,7 +527,7 @@ export default {
 
         reviewOkBtnClick() {
             if (!this.detailChooseItems || this.detailChooseItems.length <= 0) {
-                this.$Message.warning("请先选择需要审核的产品信息");
+                this.$Message.warning("请先选择需要审核的商品");
                 return;
             }
             this.reviewOkModal = true;

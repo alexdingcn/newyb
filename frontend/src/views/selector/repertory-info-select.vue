@@ -59,11 +59,13 @@ import util from "@/libs/util.js";
 import moment from 'moment';
 import goodSelect from "@/views/selector/good-select.vue";
 import supplierSelect from '@/views/selector/supplier-select.vue';
+import goodsSepcTags from '../goods/goods-spec-tabs.vue';
 
 export default {
   name: 'repertory-info-select',
   components: {
       goodSelect,
+      goodsSepcTags,
       supplierSelect
   },
   props: {
@@ -110,21 +112,28 @@ export default {
                   key: 'origin',
                   width: 120
               },
-              {
-                  title: '剂型',
-                  key: 'jx',
-                  width: 100
-              },
-              {
-                  title: '规格',
-                  key: 'spec',
-                  width: 100
-              },
-              {
-                  title: '生产企业',
-                  key: 'factoryName',
-                  width: 200
-              },
+                {
+                    title: '规格',
+                    key: 'goodsSpecs',
+                    width: 120,
+                    render: (h, params) =>　{
+                        return h(goodsSepcTags, {
+                            props: {
+                                tags: params.row.goods.goodsSpecs,
+                                color: 'blue'
+                            }
+                        });
+                    }
+                },
+                {
+                    title: '生产企业',
+                    key: 'factoryName',
+                    align: 'center',
+                    width: 120,
+                    render: (h, params) => {
+                        return params.row.goods.factoryName;
+                    }
+                },
               {
                   title: '供应商',
                   key: 'supplierName',

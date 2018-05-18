@@ -797,7 +797,7 @@ export default {
         },
         checkOneDetailBtn() {
             if (!this.currChooseDetail || !this.currChooseDetail.id) {
-                this.$Message.warning('请先选择一条需要验收的产品信息');
+                this.$Message.warning('请先选择需要验收的商品');
                 return;
             }
             let receiveQuality = this.currChooseDetail.receiveQuality ? this.currChooseDetail.receiveQuality : 0;

@@ -165,7 +165,7 @@ export const appRouter = [
             { path: 'order', title: '销售制单', name: 'sell_order', component: () => import('@/views/sell/make.vue') },
             { path: 'quality-review', title: '销售出库质量审核', name: 'sell-quality-review', component: () => import('@/views/sell/sell-quality-review.vue') },
             { path: 'sale-review', title: '销售审核', name: 'sell-sale-review', component: () => import('@/views/sell/sell-sale-review.vue') },
-            { path: 'list', title: '销售订单列表', name: 'sell_list', component: () => import('@/views/sell/sell-order-list.vue') },
+            { path: 'list', title: '销售订单列表', name: 'sell_list', divided: true, component: () => import('@/views/sell/sell-order-list.vue') },
 
             { path: 'back-apply', title: '销售退单申请', name: 'sell-back-apply', component: () => import('@/views/sell/back-apply.vue') },
             { path: 'back-apply-check', title: '销售退单申请审核', name: 'sell-back-apply-check', component: () => import('@/views/sell/back-apply-check.vue') },
@@ -181,13 +181,12 @@ export const appRouter = [
         title: '库存',
         component: Main,
         menuGroup: [
-            { title: "入库", icon: 'icon-peizaizhuangche-xianxing', start: 0, end: 5 },
-            { title: "出库", icon: 'icon-baoguofahuo-xianxing', start: 6, end: 10 },
-            { title: "盘点", icon: 'icon-zhongzhuanzhan-xianxing', start: 11, end: 14 }
+            { title: "入库", icon: 'icon-peizaizhuangche-xianxing', start: 0, end: 4 },
+            { title: "出库", icon: 'icon-baoguofahuo-xianxing', start: 5, end: 9 },
+            { title: "盘点", icon: 'icon-zhongzhuanzhan-xianxing', start: 10, end: 13 }
         ],
         children: [
             { path: 'store_now', title: '实时库存', name: 'store_now', component: () => import('@/views/warehouse/store_now.vue') },
-            { path: 'overview', title: '库存报表', name: 'wh_overview', component: () => import('@/views/warehouse/overview.vue') },
             { path: 'in-make', title: '录制入库单', name: 'in-make', divided: true, component: () => import('@/views/repertory/in-make.vue') },
             { path: "in-quality-check", title: '入库质量验收', name: 'in-quality-check', component: () => import('@/views/repertory/in-quality-check.vue')},
             { path: "in-check", title: '入库审核', name: 'in-check', component: () => import('@/views/repertory/in-check.vue')},

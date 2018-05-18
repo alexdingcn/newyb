@@ -9,7 +9,7 @@
                 {{viewMethod === 'CHECK' ? '销售审核' : '销售单选择'}}
             </p>
             <div slot="extra">
-                <ButtonGroup size="small">
+                <ButtonGroup>
                     <Button type="primary" icon="ios-search" :loading="sellOrderLoading" @click="querySellOrderList">查询</Button>
                     <Button v-if="viewMethod === 'CHECK'" type="success" icon="checkmark-round" :loading="sellOrderLoading" @click="reviewOkBtnClick">审核通过</Button>
                     <Button v-if="viewMethod === 'CHECK'" type="error" icon="close-round" :loading="sellOrderLoading" @click="removeBtnClick">删除订单</Button>
@@ -73,12 +73,14 @@ import moment from 'moment';
 import customerSelect from "@/views/selector/customer-select.vue";
 import saleSelect from "@/views/selector/sale-select.vue";
 import goodsExpand from "@/views/goods/goods-expand.vue";
+import goodsSepcTags from '../goods/goods-spec-tabs.vue';
 
 export default {
     name: 'sell-sale-review',
     components: {
         customerSelect,
         saleSelect,
+        goodsSepcTags,
         goodsExpand
     },
     props: {
@@ -138,10 +140,8 @@ export default {
             orderList: [],
             orderListColumns: [
                 {
-                    key: 'id',
-                    title: '#',
-                    align: 'center',
-                    width: 80
+                    type: '#',
+                    width: 30
                 },
                 {
                     title: '制单日',
@@ -175,9 +175,9 @@ export default {
                         let realName = params.row.saleRealName;
                         if (nickName && nickName) {
                             return h('span', realName + '---' + nickName);
-                        }else if(nickName) {
+                        } else if(nickName) {
                             return h('span', nickName);
-                        }else {
+                        } else {
                             return h('span', params.row.saleId);
                         }
                     }
@@ -284,7 +284,10 @@ export default {
                 {
                     title: "生产企业",
                     key: "factoryName",
-                    width: 180
+                    width: 180,
+                    render: (h, params) => {
+                        return params.row.goods.factoryName;
+                    }
                 },
                 {
                     title: "产地",
@@ -299,12 +302,31 @@ export default {
                 {
                     title: "规格",
                     key: "spec",
-                    width: 120
+                    width: 120,
+                    render: (h, params) =>　{
+                        return h(goodsSepcTags, {
+                            props: {
+                                tags: params.row.goods.goodsSpecs,
+                                color: 'blue'
+                            }
+                        });
+                    }
                 },
                 {
-                    title: "剂型",
-                    key: "jx",
-                    width: 120
+                    title: '质量审核状态',
+                    width: 120,
+                    key: 'checkStatus',
+                    render: (h, params) => {
+                        const checkStatus = params.row.checkStatus;
+                        const color = !checkStatus ? 'blue' : (checkStatus === 'OK' ? 'green' : 'red');
+                        const text = !checkStatus ? '待审' : (checkStatus === 'OK' ? '通过' : '拒绝');
+                        return h('Tag', {
+                            props: {
+                                type: 'dot',
+                                color: color
+                            }
+                        }, text);
+                    }
                 },
                 {
                     title: '单位',
@@ -362,22 +384,7 @@ export default {
                     key: "taxRate",
                     width: 100
                 },
-                {
-                    title: '质量审核状态',
-                    width: 120,
-                    key: 'checkStatus',
-                    render: (h, params) => {
-                        const checkStatus = params.row.checkStatus;
-                        const color = !checkStatus ? 'blue' : (checkStatus === 'OK' ? 'green' : 'red');
-                        const text = !checkStatus ? '待审' : (checkStatus === 'OK' ? '通过' : '拒绝');
-                        return h('Tag', {
-                            props: {
-                                type: 'dot',
-                                color: color
-                            }
-                        }, text);
-                    }
-                },
+
                 {
                     title: '质量审核人',
                     width: 100,
@@ -550,7 +557,7 @@ export default {
             let self = this;
             this.$Modal.confirm({
                 title: '审核确认',
-                content: '是否确认当前选则的订单数据已经正确？审核提交后不再能修改，并且生成财务往来账',
+                content: '请确认当前订单数据是否正确？审核提交后不再能修改，并且生成财务往来账',
                 onCancel: () => {},
                 onOk:() => {
                     self.sellOrderLoading = true;

@@ -187,10 +187,12 @@ import optionSelect from "@/views/selector/option-select.vue";
 import shipCompanySelect from "@/views/selector/ship-company-select.vue";
 import repertoryInfoSelect from "@/views/selector/repertory-info-select.vue";
 import customerRep from "../customer/customer-rep.vue";
+import goodsSepcTags from '../goods/goods-spec-tabs.vue';
 
 export default {
   name: "sell_order_make",
   components: {
+    goodsSepcTags,
     customerSelect,
     customerRep,
     sellOrderSearch,
@@ -296,7 +298,10 @@ export default {
           title: "生产企业",
           key: "factoryName",
           align: "center",
-          width: 180
+          width: 180,
+          render: (h, params) => {
+              return params.row.goods.factoryName;
+          }
         },
         {
           title: "产地",
@@ -314,13 +319,15 @@ export default {
           title: "规格",
           key: "spec",
           align: "center",
-          width: 120
-        },
-        {
-          title: "剂型",
-          key: "jx",
-          align: "center",
-          width: 120
+          width: 120,
+          render: (h, params) =>　{
+              return h(goodsSepcTags, {
+                  props: {
+                      tags: params.row.goods.goodsSpecs,
+                      color: 'blue'
+                  }
+              });
+          }
         },
         {
           title: "库存量",
@@ -328,12 +335,12 @@ export default {
           width: 100,
           align: "center"
         },
-        {
-          title: "在单数",
-          key: "onWayQuantity",
-          width: 100,
-          align: "center"
-        },
+        // {
+        //   title: "在单数",
+        //   key: "onWayQuantity",
+        //   width: 100,
+        //   align: "center"
+        // },
         {
           title: "销售数量",
           key: "quantity",
@@ -363,7 +370,7 @@ export default {
           align: "center"
         },
         {
-          title: "折扣",
+          title: "折扣 %",
           key: "disPrice",
           align: "center",
           width: 120,
@@ -662,7 +669,7 @@ export default {
         let self = this;
         this.$Modal.confirm({
           title: "保存提交确认",
-          content: "确认数据是否完整正确，提交后不能修改.",
+          content: "请确认数据是否正确，提交后不能修改.",
           onOk: () => {
             self.saveSellOrder("INIT");
           },
