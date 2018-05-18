@@ -1,5 +1,6 @@
 package com.yiban.erp.entities;
 
+import java.math.BigDecimal;
 import java.util.Date;
 
 public class CustomerCategory {
@@ -22,6 +23,9 @@ public class CustomerCategory {
     private String createBy;
 
     private String updateBy;
+
+    private BigDecimal batchDiscount;
+    private BigDecimal retailDiscount;
 
     public Integer getId() {
         return id;
@@ -104,5 +108,21 @@ public class CustomerCategory {
 
     public void setUpdateBy(String updateBy) {
         this.updateBy = updateBy == null ? null : updateBy.trim();
+    }
+
+    public BigDecimal getBatchDiscount() {
+        return batchDiscount;
+    }
+
+    public void setBatchDiscount(BigDecimal batchDiscount) {
+        this.batchDiscount = batchDiscount;
+    }
+
+    public BigDecimal getRetailDiscount() {
+        return retailDiscount;
+    }
+
+    public void setRetailDiscount(BigDecimal retailDiscount) {
+        this.retailDiscount = retailDiscount;
     }
 }

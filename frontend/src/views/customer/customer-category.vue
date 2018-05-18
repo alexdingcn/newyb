@@ -13,8 +13,14 @@
                     <Option v-for="item in parentCateList" :value="item.id" :key="item.id">{{ item.name }} </Option>
                 </Select>
             </FormItem>
+            <FormItem label="批发价折扣(%)">
+                <InputNumber v-model="custCatFormData.batchDiscount" :min="0" style="width:50%;"></InputNumber>
+            </FormItem>
+            <FormItem label="市场价折扣(%)">
+                <InputNumber v-model="custCatFormData.retailDiscount" :min="0" style="width:50%;"></InputNumber>
+            </FormItem>
             <FormItem label="备注">
-                <Input v-model="custCatFormData.comment" ></Input>
+                <Input v-model="custCatFormData.comment" />
             </FormItem>
         </Form>
         <div slot="footer">
@@ -77,6 +83,8 @@ export default {
                 categoryNo: '',
                 name: '',
                 parentId: -1,
+                batchDiscount: 100,
+                retailDiscount: 100,
                 comment: ''
             },
             ruleValidate: {
@@ -124,6 +132,8 @@ export default {
                 this.custCatFormData.name = this.editeData.name;
                 this.custCatFormData.parentId = this.editeData.parentId;
                 this.custCatFormData.comment = this.editeData.comment;
+                this.custCatFormData.batchDiscount = this.editeData.batchDiscount;
+                this.custCatFormData.retailDiscount = this.editeData.retailDiscount;
             }
         },
 

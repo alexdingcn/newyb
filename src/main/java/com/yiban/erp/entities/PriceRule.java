@@ -12,7 +12,9 @@ public class PriceRule {
 
     private Integer customerCategoryId;
 
-    private BigDecimal price;
+    private BigDecimal batchPrice;
+
+    private BigDecimal retailPrice;
 
     private String createdBy;
 
@@ -54,12 +56,20 @@ public class PriceRule {
         this.customerCategoryId = customerCategoryId;
     }
 
-    public BigDecimal getPrice() {
-        return price;
+    public BigDecimal getBatchPrice() {
+        return batchPrice;
     }
 
-    public void setPrice(BigDecimal price) {
-        this.price = price;
+    public void setBatchPrice(BigDecimal batchPrice) {
+        this.batchPrice = batchPrice;
+    }
+
+    public BigDecimal getRetailPrice() {
+        return retailPrice;
+    }
+
+    public void setRetailPrice(BigDecimal retailPrice) {
+        this.retailPrice = retailPrice;
     }
 
     public String getCreatedBy() {

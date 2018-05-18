@@ -4,7 +4,16 @@
 
 <template>
     <div>
-        <h3>批量设置: </h3>
+        <h3>
+            批量设置: 
+            <Tooltip transfer placement="right-start">
+                <Icon type="ios-help-outline"></Icon>
+                <div slot="content" >
+                    <span>批量设置提示</span><br/>
+                    <span>批量设置基础价格或者等级/指定价时，请先勾选需要设置的表格数据项</span>
+                </div>
+            </Tooltip>
+        </h3>
         <Row class="row-margin-bottom" :gutter="25">
             <i-col span="5">
                 <span>批发价:</span>
@@ -26,11 +35,8 @@
             </i-col>
         </Row>
         <Row class="row-margin-bottom">
-            <a href="javascript:void(0)" style="margin-right: 25px" >
-                <Icon type="ios-people"></Icon>设置规格等级价
-            </a>
-            <a href="javascript:void(0)" style="margin-right: 25px" >
-                <Icon type="ios-person"></Icon>设置规格指定价
+            <a href="javascript:void(0)" style="margin-right: 25px" @click="setChooseLevelPrice">
+                <Icon type="ios-people"></Icon>设置规格等级价/指定价
             </a>
         </Row>
         <Table stripe highlight-row :loading="tableLoading" 
@@ -38,12 +44,18 @@
                 @on-selection-change="chooseDetails" 
                 style="width: 100%;" size="small">
         </Table>
+
+        <Modal v-model="levelModal" title="商品等级/指定价设置" :footerHide="true" :mask-closable="false" width="55">
+             <goods-price-rule ref="goodsPriceRule" :detailIds="setDetailIds" toPane="levelPrice" :baseBatchPrice="batchPrices" :baseRetailPrice="retailPrices"></goods-price-rule>            
+        </Modal>
+
     </div>
 </template>
 
 <script>
 import util from '@/libs/util.js';
 import goodsSpecTabs from './goods-spec-tabs.vue';
+import goodsPriceRule from './goods-price-rule.vue';
 
 export default {
     name: 'goods-spec-price',
@@ -70,7 +82,8 @@ export default {
         },
     },
     components:{
-        goodsSpecTabs
+        goodsSpecTabs,
+        goodsPriceRule
     },
     data() {
         return {
@@ -195,49 +208,21 @@ export default {
                     }
                 },
                 {
-                    title: '等级价',
+                    title: '等级/指定价',
                     key: 'levelPrice',
                     width: 100,
                     render: (h, params) => {
                         let self = this;
-                        let useSpec = params.row.useSpec;
-                        if (useSpec) {
-                            return '';
-                        }else {
-                            return h('a', {
-                                props: {
-                                    href: 'javascript:void(0)'
-                                },
-                                on: {
-                                    click: () => {
-                                        // self.openLevelModal();
-                                    }
+                        return h('a', {
+                            props: {
+                                href: 'javascript:void(0)'
+                            },
+                            on: {
+                                click: () => {
+                                    self.setOneDetailLevelPrice(params.row);
                                 }
-                            }, '去设置');
-                        }
-                    }
-                },
-                {
-                    title: '指定价',
-                    key: 'fixedPrice',
-                    width: 100,
-                    render: (h, params) => {
-                        let self = this;
-                        let useSpec = params.row.useSpec;
-                        if (useSpec) {
-                            return '';
-                        }else {
-                            return h('a', {
-                                props: {
-                                    href: 'javascript:void(0)'
-                                },
-                                on: {
-                                    click: () => {
-                                        // self.openfixedModal();
-                                    }
-                                }
-                            }, '去设置');
-                        }
+                            }
+                        }, '去设置');
                     }
                 }
             ],
@@ -245,6 +230,8 @@ export default {
             retailPrices: this.infoRetailPrice,
             inPrices: this.infoInPrice,
             currDetails: [],
+            levelModal: false,
+            setDetailIds: [],
         }
     },
     methods: {
@@ -298,7 +285,37 @@ export default {
                     util.errorProcessor(this, error);
                 });
         },
-        
+
+        setChooseLevelPrice() {
+            let ids = [];
+            //按选择项进行修改
+            if (this.currDetails.length <=0) {
+                this.$Message.info('请先选择需要设置等级价的详情信息');
+                return;
+            }
+            for(let i=0; i<this.currDetails.length; i++) {
+                let row = this.currDetails[i];
+                ids.push(row.id);
+            }
+            this.setDetailIds = ids;
+            this.$nextTick(() => {
+                //调用组件中的初始化数据
+                this.$refs.goodsPriceRule.initData();
+                this.levelModal = true;
+            });
+        },
+
+        setOneDetailLevelPrice(row) {
+            if (!row.id) {
+                return;
+            }
+            this.setDetailIds = [row.id]; 
+            this.$nextTick(() => {
+                //调用组件中的初始化数据
+                this.$refs.goodsPriceRule.initData();
+                this.levelModal = true;
+            });
+        }
     }
     
 }

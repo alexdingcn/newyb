@@ -30,25 +30,8 @@
             </Row>
         </Card>
 
-        <Modal v-model="levelModal" title="商品等级价格设置" :mask-closable="false" width="45">
-            <h3 style="margin-bottom: 10px;"><Icon type="ios-people"></Icon>按客户分类设置价格</h3>
-
-            <Row type="flex" justify="end" slot="footer" >
-              <ButtonGroup size="small">
-                  <Button type="success" icon="checkmark" >确定保存</Button>
-                  <Button type="ghost" icon="reply" @click="levelModalCancel" >取消</Button>
-              </ButtonGroup>
-          </Row>
-        </Modal>
-
-        <Modal v-model="fixedModal" title="商品指定价格设置" :mask-closable="false" width="45">
-            <h3 style="margin-bottom: 10px;"><Icon type="ios-person"></Icon>按客户指定价格</h3>
-            <Row type="flex" justify="end" slot="footer" >
-                <ButtonGroup size="small">
-                    <Button type="success" icon="checkmark" >确定保存</Button>
-                    <Button type="ghost" icon="reply" @click="fixedModalCancel" >取消</Button>
-                </ButtonGroup>
-            </Row>
+        <Modal v-model="levelModal" title="商品等级/指定价设置" :footerHide="true" :mask-closable="false" width="55">
+             <goods-price-rule ref="goodsPriceRule" :detailIds="setDetailIds" toPane="levelPrice" :baseBatchPrice="setBaseBatchPrice" :baseRetailPrice="setBaseRetailPrice"></goods-price-rule>            
         </Modal>
 
     </div>
@@ -61,6 +44,7 @@ import goodsCategorySelect from '@/views/selector/goods-category-select.vue';
 import goodsBrandSelect from '@/views/selector/goods-brand-select.vue';
 import supplierSelect from '@/views/selector/supplier-select.vue';
 import goodsSpecPrice from './goods-spec-price.vue';
+import goodsPriceRule from './goods-price-rule.vue';
 
 export default {
     name: 'goods-price',
@@ -68,7 +52,8 @@ export default {
         goodsCategorySelect,
         goodsBrandSelect,
         supplierSelect,
-        goodsSpecPrice
+        goodsSpecPrice,
+        goodsPriceRule
     },
     data() {
         return {
@@ -277,9 +262,9 @@ export default {
                     }
                 },
                 {
-                    title: '等级价',
-                    key: 'levelPrice',
-                    width: 100,
+                    title: '等级价/指定价',
+                    key: 'setFixedPrice',
+                    width: 120,
                     render: (h, params) => {
                         let self = this;
                         let useSpec = params.row.useSpec;
@@ -292,30 +277,7 @@ export default {
                                 },
                                 on: {
                                     click: () => {
-                                        self.openLevelModal();
-                                    }
-                                }
-                            }, '去设置');
-                        }
-                    }
-                },
-                {
-                    title: '指定价',
-                    key: 'fixedPrice',
-                    width: 100,
-                    render: (h, params) => {
-                        let self = this;
-                        let useSpec = params.row.useSpec;
-                        if (useSpec) {
-                            return '';
-                        }else {
-                            return h('a', {
-                                props: {
-                                    href: 'javascript:void(0)'
-                                },
-                                on: {
-                                    click: () => {
-                                        self.openfixedModal();
+                                        self.openLevelModal(params.row);
                                     }
                                 }
                             }, '去设置');
@@ -342,7 +304,9 @@ export default {
                 }
             ],
             levelModal: false,
-            fixedModal: false
+            setDetailIds: [],
+            setBaseBatchPrice: 0,
+            setBaseRetailPrice: 0
         }
     },
     mounted() {
@@ -416,19 +380,29 @@ export default {
                 });
         },
 
-        openLevelModal() {
-            this.levelModal = true;
+        openLevelModal(row) {
+            if(!row.id) {
+                return;
+            }
+            let detailIdList = [];
+            for (let i=0; i<row.goodsDetails.length; i++) {
+                let item = row.goodsDetails[i];
+                detailIdList.push(item.id);
+            }
+            this.setDetailIds = detailIdList;
+            this.setBaseBatchPrice = row.batchPrice;
+            this.setBaseRetailPrice = row.retailPrice;
+
+            this.$nextTick(() => {
+                //调用组件中的初始化数据
+                this.$refs.goodsPriceRule.initData();
+                this.levelModal = true;
+            });
         },
         levelModalCancel() {
             this.levelModal = false;
         },
-
-        openfixedModal() {
-            this.fixedModal = true;
-        },
-        fixedModalCancel() {
-            this.fixedModal = false;
-        },
+        
 
     }
 

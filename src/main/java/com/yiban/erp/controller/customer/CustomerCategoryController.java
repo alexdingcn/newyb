@@ -18,6 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
@@ -47,6 +48,12 @@ public class CustomerCategoryController {
         category.setCompanyId(user.getCompanyId());
         category.setCreateBy(user.getNickname());
         category.setCreateTime(new Date());
+        if (category.getBatchDiscount() == null) {
+            category.setBatchDiscount(BigDecimal.valueOf(100.00));
+        }
+        if (category.getRetailDiscount() == null) {
+            category.setRetailDiscount(BigDecimal.valueOf(100.00));
+        }
         int count = customerCategoryMapper.insertSelective(category);
         if (count > 0) {
             logger.info("user:{} success add a customer category id:", user.getId(), category.getId());

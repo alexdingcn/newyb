@@ -1,12 +1,13 @@
 package com.yiban.erp.service.goods;
 
+import com.yiban.erp.dao.CustomerCategoryMapper;
 import com.yiban.erp.dao.GoodsDetailMapper;
 import com.yiban.erp.dao.GoodsInfoMapper;
 import com.yiban.erp.dao.PriceRuleMapper;
+import com.yiban.erp.dto.CustomerCategoryPrice;
 import com.yiban.erp.dto.PriceUpdateReq;
-import com.yiban.erp.entities.GoodsDetail;
-import com.yiban.erp.entities.GoodsInfo;
-import com.yiban.erp.entities.User;
+import com.yiban.erp.dto.SavePriceReq;
+import com.yiban.erp.entities.*;
 import com.yiban.erp.exception.BizException;
 import com.yiban.erp.exception.ErrorCode;
 import org.slf4j.Logger;
@@ -32,6 +33,8 @@ public class GoodsPriceService {
     private GoodsDetailMapper goodsDetailMapper;
     @Autowired
     private PriceRuleMapper priceRuleMapper;
+    @Autowired
+    private CustomerCategoryMapper customerCategoryMapper;
 
     @Transactional
     public List<GoodsDetail> updateBasePrice(PriceUpdateReq updateReq, User user) throws BizException {
@@ -133,4 +136,139 @@ public class GoodsPriceService {
         return;
     }
 
+    public List<CustomerCategoryPrice> getCustomerCategoryPrice(List<Long> goodsDetailIds, User user) {
+        if (goodsDetailIds == null || goodsDetailIds.isEmpty()) {
+            logger.warn("goods detail ids is empty.");
+            return Collections.emptyList();
+        }
+        List<CustomerCategory> categories = customerCategoryMapper.getAllByCompanyId(user.getCompanyId());
+        List<CustomerCategoryPrice> categoryPrices = new ArrayList<>();
+        for (CustomerCategory category : categories) {
+            CustomerCategoryPrice price = new CustomerCategoryPrice();
+            price.setCustomerCategoryId(category.getId());
+            price.setCustomerCategoryName(category.getName());
+            price.setBatchDiscount(category.getBatchDiscount() == null ? BigDecimal.valueOf(100.00) : category.getRetailDiscount());
+            price.setRetailDiscount(category.getRetailDiscount() == null ? BigDecimal.valueOf(100.00) : category.getRetailDiscount());
+
+            categoryPrices.add(price);
+        }
+
+        //如果detailIds 的长度为1的时候，获取这个商品详情的所有客户类别的价格配置信息
+        if (goodsDetailIds.size() == 1) {
+            List<PriceRule> priceRules = priceRuleMapper.getByGoodsId(goodsDetailIds.get(0));
+            if (priceRules != null && !priceRules.isEmpty()) {
+                Map<Integer, PriceRule> priceRuleMap = new HashMap<>(); //按照customerCategoryID分
+                priceRules.stream().forEach(item -> {
+                    if (item.getCustomerCategoryId() != null) {
+                        priceRuleMap.put(item.getCustomerCategoryId(), item);
+                    }
+                });
+                for (CustomerCategoryPrice price : categoryPrices) {
+                    PriceRule rule  = priceRuleMap.get(price.getCustomerCategoryId());
+                    if (rule != null) {
+                        price.setBatchPrice(rule.getBatchPrice());
+                        price.setRetailPrice(rule.getRetailPrice());
+                    }
+                }
+            }
+        }
+        return categoryPrices;
+    }
+
+    public PriceRule getCustomerPrice(Long goodsId, Long customerId) {
+        return priceRuleMapper.getByCustomer(goodsId, customerId);
+    }
+
+    public void categorySave(SavePriceReq priceReq, User user) throws BizException {
+        if (priceReq.getGoodsDetailIds() == null || priceReq.getGoodsDetailIds().isEmpty()) {
+            logger.warn("get goods detail ids is empty.");
+            throw new BizException(ErrorCode.GOODS_DETAIL_GET_FAIL);
+        }
+        if (priceReq.getCustomerCategoryPrices() == null || priceReq.getCustomerCategoryPrices().isEmpty()) {
+            logger.warn("get customer category prices is empty.");
+            throw new BizException(ErrorCode.GOODS_PRICE_REQUEST_LIST_EMPTY);
+        }
+        List<Long> goodsIds = priceReq.getGoodsDetailIds();
+        //一个个产品ID处理
+        for (Long goodsId : goodsIds) {
+            if (goodsId != null) {
+                saveCategoryByGoodsId(goodsId, priceReq.getCustomerCategoryPrices(), user);
+            }
+        }
+    }
+
+    @Transactional
+    public void saveCategoryByGoodsId(Long goodsId, List<CustomerCategoryPrice> categoryPrices, User user) {
+        List<PriceRule> newRule = new ArrayList<>();
+        for (CustomerCategoryPrice categoryPrice : categoryPrices) {
+            PriceRule rule = new PriceRule();
+            if (categoryPrice.getCustomerCategoryId() == null) {
+                continue;
+            }
+            rule.setCustomerCategoryId(categoryPrice.getCustomerCategoryId());
+            if (categoryPrice.getBatchPrice() != null && BigDecimal.ZERO.compareTo(categoryPrice.getBatchPrice()) <= 0) {
+                rule.setBatchPrice(categoryPrice.getBatchPrice());
+            }
+            if (categoryPrice.getRetailPrice() != null && BigDecimal.ZERO.compareTo(categoryPrice.getRetailPrice()) <= 0) {
+                rule.setRetailPrice(categoryPrice.getRetailPrice());
+            }
+            rule.setGoodsId(goodsId);
+            rule.setCreatedBy(user.getNickname());
+            rule.setCreatedTime(new Date());
+            newRule.add(rule);
+        }
+
+        //把原来的这个产品的所有客户类别的数据进行删除，然后在新建
+        priceRuleMapper.removeCategorys(goodsId);
+
+        priceRuleMapper.insertBatch(newRule);
+    }
+
+    public void customerSave(SavePriceReq priceReq, User user) throws BizException {
+        if (priceReq.getGoodsDetailIds() == null || priceReq.getGoodsDetailIds().isEmpty()) {
+            logger.warn("get goods detail ids is empty.");
+            throw new BizException(ErrorCode.GOODS_DETAIL_GET_FAIL);
+        }
+        if (priceReq.getCustomerPrices() == null || priceReq.getCustomerPrices().isEmpty()) {
+            logger.warn("get customer category prices is empty.");
+            throw new BizException(ErrorCode.GOODS_PRICE_REQUEST_LIST_EMPTY);
+        }
+        List<Long> goodsIds = priceReq.getGoodsDetailIds();
+        //一个个产品ID处理
+        for (Long goodsId : goodsIds) {
+            if (goodsId != null) {
+                saveCustomerPrice(goodsId, priceReq.getCustomerPrices(), user);
+            }
+        }
+    }
+
+    @Transactional
+    public void saveCustomerPrice(Long goodsId, List<PriceRule> priceRules, User user) {
+        List<PriceRule> newPriceRules = new ArrayList<>();
+        List<Long> customerIds = new ArrayList<>();
+        for (PriceRule rule : priceRules) {
+            PriceRule newRule = new PriceRule();
+            newRule.setGoodsId(goodsId);
+            if (rule.getCustomerId() == null) {
+                continue;
+            }
+            newRule.setCustomerId(rule.getCustomerId());
+            customerIds.add(rule.getCustomerId());
+
+            if (rule.getBatchPrice() != null && rule.getBatchPrice().compareTo(BigDecimal.ZERO) >= 0) {
+                newRule.setBatchPrice(rule.getBatchPrice());
+            }
+            if (rule.getRetailPrice() != null && rule.getRetailPrice().compareTo(BigDecimal.ZERO) >= 0) {
+                newRule.setRetailPrice(rule.getRetailPrice());
+            }
+            newRule.setCreatedTime(new Date());
+            newRule.setCreatedBy(user.getNickname());
+
+            newPriceRules.add(newRule);
+        }
+        //先把原来改商品下的客户的价格删除后直接插入
+        priceRuleMapper.removeCustomer(goodsId, customerIds);
+
+        priceRuleMapper.insertBatch(newPriceRules);
+    }
 }

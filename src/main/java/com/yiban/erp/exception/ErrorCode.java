@@ -48,6 +48,7 @@ public enum ErrorCode {
     GOODS_OLD_SPEC_USED(1213, "商品需要删除的多规格信息存在使用情况，不能删除"),
     GOODS_ATTRIBUTE_GET_FAIL(1214, "商品自定义属性信息获取失败"),
     GOODS_ATTRIBUTE_USED(1215, "商品自定义属性正在使用，不能删除"),
+    GOODS_PRICE_REQUEST_LIST_EMPTY(1216, "获取修改数据失败."),
 
     // 13xx - 采购
     BUY_ORDER_NOT_EXISTED(1300, "采购订单不存在"),

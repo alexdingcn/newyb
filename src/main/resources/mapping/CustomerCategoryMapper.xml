@@ -12,10 +12,12 @@
     <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
     <result column="create_by" property="createBy" jdbcType="VARCHAR" />
     <result column="update_by" property="updateBy" jdbcType="VARCHAR" />
+    <result column="batch_discount" property="batchDiscount" jdbcType="DECIMAL" />
+    <result column="retail_discount" property="retailDiscount" jdbcType="DECIMAL"/>
   </resultMap>
   <sql id="Base_Column_List" >
     id, company_id, name, parent_id, sequence_no, comment, create_time,
-    update_time, create_by, update_by
+    update_time, create_by, update_by, batch_discount, retail_discount
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
     select 
@@ -58,6 +60,12 @@
       <if test="updateBy != null" >
         update_by,
       </if>
+      <if test="batchDiscount != null" >
+        batch_discount,
+      </if>
+      <if test="retailDiscount != null" >
+        retail_discount,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides="," >
       <if test="companyId != null" >
@@ -87,6 +95,12 @@
       <if test="updateBy != null" >
         #{updateBy,jdbcType=VARCHAR},
       </if>
+      <if test="batchDiscount != null" >
+        #{batchDiscount, jdbcType=DECIMAL},
+      </if>
+      <if test="retailDiscount != null" >
+        #{retailDiscount, jdbcType=DECIMAL},
+      </if>
     </trim>
   </insert>
   <update id="updateByPrimaryKeySelective" parameterType="com.yiban.erp.entities.CustomerCategory" >
@@ -115,6 +129,12 @@
       </if>
       <if test="updateBy != null" >
         update_by = #{updateBy,jdbcType=VARCHAR},
+      </if>
+      <if test="batchDiscount != null" >
+        batch_discount = #{batchDiscount, jdbcType=DECIMAL},
+      </if>
+      <if test="retailDiscount != null" >
+        retail_discount = #{retailDiscount, jdbcType=DECIMAL},
       </if>
     </set>
     where id = #{id,jdbcType=INTEGER}
