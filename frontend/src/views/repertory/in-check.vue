@@ -2,16 +2,18 @@
 <template>
   <div>
       <Card>
-          <p slot="title">入库审查</p>
+          <div slot="title" style="width:50%">
+              <Alert show-icon>入库审核，这是入库前的最后一步，审核通过后库存会发生相应变化</Alert>
+          </div>
           <div slot="extra">
               <ButtonGroup>
-                <Button size="small" type="primary" icon="ios-search" :loading="orderLoading" @click="refreshOrder">查询</Button>
-                <Button size="small" type="success" icon="ios-checkmark" @click="checkOk" >审查通过</Button>
-                <Button size="small" type="info"  icon="images" @click="showCheckFile">检验档案</Button>
+                <Button type="primary" icon="ios-search" :loading="orderLoading" @click="refreshOrder">查询</Button>
+                <Button type="success" icon="ios-checkmark" @click="checkOk" >入库审核通过</Button>
+                <Button type="info" icon="images" @click="showCheckFile">检验档案</Button>
               </ButtonGroup>
           </div>
           
-          <Form ref="searchForm" :model="query" :label-width="100">
+          <Form ref="searchForm" :model="query" :label-width="80">
                 <Row type="flex" justify="start">
                     <FormItem label="收货日期">
                         <DatePicker size="small" v-model="dateRange" type="daterange" placement="bottom-start" placeholder="收货日期" style="width:180px"></DatePicker>
@@ -30,7 +32,7 @@
                 </Row>
           </Form>
           <div>
-              <Table ref="orderTable" border highlight-row disabled-hover height="250" style="width: 100%" 
+              <Table ref="orderTable" border highlight-row disabled-hover height="250"
                     :columns="orderListColumns" :data="orderList" size="small" 
                     :loading="orderLoading" 
                     @on-row-click="handleSelectOrder" 
@@ -64,10 +66,12 @@ import moment from 'moment';
 import warehouseSelect from "@/views/selector/warehouse-select.vue";
 import supplierSelect from "@/views/selector/supplier-select.vue";
 import fileDetail from "@/views/basic-data/file-detail.vue";
+import goodsSepcTags from '../goods/goods-spec-tabs.vue';
 
 export default {
     name: 'in-check',
     components: {
+        goodsSepcTags,
         warehouseSelect,
         supplierSelect,
         fileDetail
@@ -91,13 +95,13 @@ export default {
             orderList: [],
             orderListColumns: [
                 {
-                    title: '序号',
                     type: 'index',
-                    width: 60
+                    width: 50
                 },
                 {
                     title: '收货时间',
                     key: 'receiveDate',
+                    width: 100,
                     render: (h, params) => {
                         let receiveDate = params.row.receiveDate;
                         return receiveDate ? moment(receiveDate).format("YYYY-MM-DD") : '';
@@ -133,6 +137,7 @@ export default {
                 {
                     title: '供应商代表',
                     key: 'supplierContactName',
+                    width: 120
                 },
                 {
                     title: '采购员',
@@ -187,9 +192,8 @@ export default {
             detailList: [],
             detailColumns: [
                 {
-                    title: "序号",
                     type: 'index',
-                    width: 60
+                    width: 50
                 },
                 {
                     title: "商品名称",
@@ -202,24 +206,26 @@ export default {
                     width: 160
                 },
                 {
-                    title: "剂型",
-                    key: 'jx',
-                    width: 120
+                    title: '规格',
+                    key: 'goodsSpecs',
+                    width: 120,
+                    render: (h, params) =>　{
+                        return h(goodsSepcTags, {
+                            props: {
+                                tags: params.row.goods.goodsSpecs,
+                                color: 'blue'
+                            }
+                        });
+                    }
                 },
                 {
-                    title: "规格",
-                    key: 'spec',
-                    width: 100
-                },
-                {
-                    title: "生产企业",
+                    title: '生产企业',
                     key: 'factoryName',
-                    width: 120
-                },
-                {
-                    title: "批准文号",
-                    key: 'permit',
-                    width: 120
+                    align: 'center',
+                    width: 120,
+                    render: (h, params) => {
+                        return params.row.goods.factoryName;
+                    }
                 },
                 {
                     title: "存储条件",
@@ -446,13 +452,13 @@ export default {
 
         checkOk() {
             if(!this.currentChooseOrder || !this.currentChooseOrder.id) {
-                this.$Message.warning('请先悬着需要审核的订单');
+                this.$Message.warning('请先选择需要审核的订单');
                 return;
             }
             //验证订单的详情是否意见全部通过，如果是，才能提交
             let details = this.currentChooseOrder.details;
             if (!details || details.length <= 0) {
-                this.$Message.warning('订单没有对应的产品详情信息,不能审核通过');
+                this.$Message.warning('订单没有对应的商品详情信息');
                 return;
             }
             for(let i=0; i<details.length; i++) {
@@ -460,7 +466,7 @@ export default {
                 if (!item || !item.checkStatus) {
                     this.$Modal.warning({
                         title: '信息提醒',
-                        content: '订单存在有未验收通过的产品，不能审核通过'
+                        content: '订单存在有质量验收未通过的商品'
                     });
                     return;
                 }
@@ -472,13 +478,13 @@ export default {
             };
             //验收审核通过完成后，提示是否确认信息，然后提交
             this.$Modal.confirm({
-                title: '审核信息确认',
-                content: '是否已确认订单详情数据正确，提交审核通过后不能修改',
+                title: '入库审核确认',
+                content: '请确认商品数据正确，提交审核后库存将会发生相应变动',
                 onOk: () => {
                     util.ajax.put('/repertory/in/set/incheck', reqData)
                         .then((response) => {
                             self.orderLoading = false;
-                            self.$Message.success('审查成功');
+                            self.$Message.success('审核成功');
                             self.refreshOrder();
                         })
                         .catch((error) => {

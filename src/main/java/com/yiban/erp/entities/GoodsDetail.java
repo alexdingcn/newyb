@@ -111,7 +111,18 @@ public class GoodsDetail {
     }
 
     public String getSpecDesc() {
-        return specDesc;
+        StringBuilder sb = new StringBuilder();
+        if (this.specOneId != null) {
+            sb.append(this.specOneName).append(";");
+        }
+        if (this.specTwoId != null) {
+            sb.append(this.specTwoName).append(";");
+        }
+        if (this.specThreeId != null) {
+            sb.append(this.specThreeName);
+        }
+
+        return sb.toString();
     }
 
     public void setSpecDesc(String specDesc) {

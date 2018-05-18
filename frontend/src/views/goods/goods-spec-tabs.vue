@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div v-if="tags.length > 0">
         <Tag v-for="item in tags" :color="color" :key="item.id" :name="item.id">{{ item.specName }}</Tag>
     </div>
 </template>

@@ -187,12 +187,12 @@ export const appRouter = [
         ],
         children: [
             { path: 'store_now', title: '实时库存', name: 'store_now', component: () => import('@/views/warehouse/store_now.vue') },
-            { path: 'setting', title: '仓库点设置', name: 'wh_setting', component: () => import('@/views/warehouse/setting.vue') },
             { path: 'overview', title: '库存报表', name: 'wh_overview', component: () => import('@/views/warehouse/overview.vue') },
-            { path: 'in-make', title: '录制入库单', name: 'in-make', component: () => import('@/views/repertory/in-make.vue') },
+            { path: 'in-make', title: '录制入库单', name: 'in-make', divided: true, component: () => import('@/views/repertory/in-make.vue') },
             { path: "in-quality-check", title: '入库质量验收', name: 'in-quality-check', component: () => import('@/views/repertory/in-quality-check.vue')},
             { path: "in-check", title: '入库审核', name: 'in-check', component: () => import('@/views/repertory/in-check.vue')},
-            
+            { path: 'setting', title: '仓库点设置', name: 'wh_setting', divided: true, component: () => import('@/views/warehouse/setting.vue') },
+
             { path: 'change-repertory-index', title: '转库出库', name: 'change-repertory-index',  component: () => import('@/views/out-store/change-repertory-index.vue') },
             { path: 'broken-out-index', title: '损耗出库', name: 'broken-out-index', component: () => import('@/views/out-store/broken-out-index.vue') },
             { path: 'out-review', title: '出库复核', name: 'out-review', component: () => import('@/views/out-store/out-review.vue') },

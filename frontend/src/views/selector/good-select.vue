@@ -21,7 +21,7 @@
             :loading="goodsLoading">
             <Option v-for="option in goodsOptions" :value="option.id" :label="option.name" :key="option.id" :disabled="!option.enable">
                 <span class="option-goods-name">{{ option.name }}</span>
-                <span class="option-goods-spec">{{option.jx}} | {{ option.spec }} | {{option.factory}}</span>
+                <span class="option-goods-spec">{{ option.specDesc }} | {{option.factoryName}}</span>
             </Option>
         </Select>
 
@@ -31,7 +31,7 @@
             </slot>
         </Tooltip>
 
-        <Modal v-model="selectGoodsModal" width="60" :mask-closable="false" title="选择商品" class="goods-modal">
+        <Modal v-model="selectGoodsModal" width="70" :mask-closable="false" title="选择商品" class="goods-modal">
             <goodsListSelect ref="goodsSelectModal" @on-choosed="goodsSelected" ></goodsListSelect>
             <div slot="footer">
                 <Button type="text" @click="selectGoodsModal = false">取消</Button>

@@ -495,7 +495,7 @@
     left join goods_spec gs2 on gd.spec_one_id = gs2.id
     left join goods_spec gs3 on gd.spec_one_id = gs3.id
     where gd.goods_info_id = gi.id and gi.status != 'DELETE' AND gd.status != 'DELETE'
-    and gi.id in
+    and gd.id in
     <foreach collection="ids" item="item" open="(" close=")" separator=", ">
       #{item}
     </foreach>

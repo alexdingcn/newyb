@@ -99,8 +99,15 @@
                         title: '整件单位'
                     },
                     {
-                        key: 'jxName',
-                        title: '剂型'
+                        key: 'packUnit',
+                        title: '大件装量'
+                    },
+                    {
+                        key: 'inPrice',
+                        title: '参考采购价',
+                        render: (h, params) => {
+                            return h('span', { }, '￥' + (params.row.inPrice ? params.row.inPrice.toFixed(2): '0.00'));
+                        }
                     },
                     {
                         title: '操作',

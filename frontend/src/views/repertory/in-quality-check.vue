@@ -4,15 +4,20 @@
 <template>
   <div>
       <Card>
-          <p slot="title">入库质量验收</p>
-          <div slot="extra">
-              <ButtonGroup>
-                <Button size="small" type="primary" icon="ios-search" :loading="orderLoading" @click="refreshOrder">查询</Button>
-                <Button size="small" type="success" icon="ios-checkmark" @click="checkOneOrderBtn">验收一单</Button>
-                <Button size="small" type="warning"  icon="close" @click="unCheckOneOrderBtn">取消验收一单</Button>
-                <Button size="small" type="info"  icon="images" @click="showCheckFile">检验档案</Button>
-              </ButtonGroup>
-          </div>
+            <div slot="title" style="width:40%">
+                <Steps :current="0">
+                    <Step title="入库质量验收" content="抽样检查商品质量"></Step>
+                    <Step title="入库单审核" content="审核后入库"></Step>
+                </Steps>
+		    </div>
+            <div slot="extra">
+                <ButtonGroup>
+                    <Button type="primary" icon="ios-search" :loading="orderLoading" @click="refreshOrder">查询</Button>
+                    <Button type="success" icon="ios-checkmark" @click="checkOneOrderBtn">验收一单</Button>
+                    <Button type="warning"  icon="close" @click="unCheckOneOrderBtn">取消验收一单</Button>
+                    <Button type="info"  icon="images" @click="showCheckFile">检验档案</Button>
+                </ButtonGroup>
+            </div>
           
         <Form ref="searchForm" :model="query" :label-width="100">
                 <Row type="flex" justify="start">
@@ -191,6 +196,7 @@ import optionSelect from "@/views/selector/option-select.vue";
 import goodSelect from "@/views/selector/good-select.vue";
 import fileDetail from "@/views/basic-data/file-detail.vue";
 import warehouseLocationModal from "@/views/selector/warehouse-location-modal.vue";
+import goodsSepcTags from '../goods/goods-spec-tabs.vue';
 
 export default {
     name: 'in-quality-check',
@@ -200,6 +206,7 @@ export default {
         inSurveyCheck,
         optionSelect,
         goodSelect,
+        goodsSepcTags,
         fileDetail,
         warehouseLocationModal
     },
@@ -374,19 +381,26 @@ export default {
                     width: 160
                 },
                 {
-                    title: "剂型",
-                    key: 'jx',
-                    width: 120
+                    title: '规格',
+                    key: 'goodsSpecs',
+                    width: 120,
+                    render: (h, params) =>　{
+                        return h(goodsSepcTags, {
+                            props: {
+                                tags: params.row.goods.goodsSpecs,
+                                color: 'blue'
+                            }
+                        });
+                    }
                 },
                 {
-                    title: "规格",
-                    key: 'spec',
-                    width: 100
-                },
-                {
-                    title: "生产企业",
+                    title: '生产企业',
                     key: 'factoryName',
-                    width: 120
+                    align: 'center',
+                    width: 120,
+                    render: (h, params) => {
+                        return params.row.goods.factoryName;
+                    }
                 },
                 {
                     title: "批准文号",
