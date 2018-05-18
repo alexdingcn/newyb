@@ -132,7 +132,7 @@ export default {
                 {
                     title: '商品名称',
                     type: 'name',
-                    minWidth: 200,
+                    minWidth: 250,
                     render: (h, params) => {
                         return h('div',[
                             h('h5', {
@@ -161,7 +161,7 @@ export default {
                 {
                     title: '单位',
                     key: 'unitName',
-                    width: 100
+                    width: 70
                 },
                 {
                     title: '是否可用',
@@ -181,17 +181,17 @@ export default {
                 {
                     title: '批发价',
                     key: 'batchPrice',
-                    width: 120
+                    width: 100
                 },
                 {
                     title: '市场价',
                     key: 'retailPrice',
-                    width: 120
+                    width: 100
                 },
                 {
                     title: '参考进货价',
                     key: 'inPrice',
-                    width: 120
+                    width: 100
                 },
                 {
                     title: '供应商',
@@ -199,17 +199,12 @@ export default {
                     minWidth: 180
                 },
                 {
-                    title: '分类/品牌',
-                    key: 'brandName',
-                    minWidth: 150,
-                    render: (h, params) => {
-                        let categoryName = params.row.categoryName;
-                        let brandName = params.row.brandName;
-                        return h('div',[
-                            h('h5', categoryName),
-                            h('h5', brandName)
-                        ]);
-                    }
+                    title: '分类',
+                    key: 'categoryName'
+                },
+                {
+                    title: '品牌',
+                    key: 'brandName'
                 }
             ],
             totalCount: 0,
