@@ -5,7 +5,7 @@
 <template>
     <div>
         <Form ref="form" :model="formData" :rules="formRules" :label-width="90">
-            <Tabs value="general" :animated="false" @on-click="switchTabPane">
+            <Tabs v-model="currTabs" :animated="false" @on-click="switchTabPane">
                 <div slot="extra">
                     <ButtonGroup size="small">
                         <Button type="success" icon="checkmark" :loading="saveLoading" @click="saveGoodsInfo" >确认保存</Button>
@@ -319,7 +319,7 @@
             </Tabs>
         </Form>
 
-        <Modal v-model="fileUploadModal" title="商品档案管理" :footerHide="true" :mask-closable="false" width="50" class="file-upload-modal">
+        <Modal v-model="fileUploadModal" title="商品档案管理" :footerHide="true" :mask-closable="false" width="50" class="file-upload-low">
             <file-detail :fileNo="uploadFileNo" @add-file-success="addFileSuccess" ></file-detail>
         </Modal>
 
@@ -356,6 +356,7 @@ export default {
     },
     data() {
         return {
+            currTabs: 'general',
             saveLoading: false,
             formData: {
                 name: '',
@@ -404,12 +405,36 @@ export default {
     },
     watch: {
         goodsInfoId: function(id) {
+            this.currTabs = 'general';
             if(id && id > 0) {
                 this.loadGoodsInfo(id);
             }
         }
     },
     methods: {
+        addViewOpen() {
+            //初始化一些新增产品的清空数据数据信息
+            this.currTabs = 'general';
+            this.formData = {
+                name: '',
+                goodsNo: '',
+                pinyin: '',
+                enable: 1,
+                tagList: [],
+                useSpec: false,
+                batchPrice: 0,
+                retailPrice: 0,
+                inPrice: 0,
+                goodsDetails: [],
+                fileNo: '',
+                attributeRefs: [],
+            };
+            this.currParentSpecs = [];
+            this.currSpecIds = [[], [], []],
+            this.goodsDetails = [];
+            this.goodsDetailColumn = [];
+        },
+
         switchTabPane(tabName) {
             if (tabName === 'black-list') {
                 // TODO: load black list first

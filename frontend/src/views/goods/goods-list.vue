@@ -48,7 +48,7 @@
           </Col>
 
           <Modal v-model="goodsModal" title="商品信息维护" :footerHide="true" :mask-closable="false" width="75">
-              <goods-info :goodsInfoId="editId" @save-ok="goodsSaveOk" ></goods-info>
+              <goods-info ref="goodsInfoModal" :goodsInfoId="editId" @save-ok="goodsSaveOk" ></goods-info>
           </Modal>
           
   </Row>
@@ -258,6 +258,7 @@ export default {
             this.refreshGoodsList();
         },
         createGoods() {
+            this.$refs.goodsInfoModal.addViewOpen();
             this.goodsModal = true;
         },
         goodsSaveOk() {
