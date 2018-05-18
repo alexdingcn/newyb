@@ -392,9 +392,9 @@ export default {
             currAttributes: [],
             customerCategoryList: [],
             goodsBlackListValue: {
-                customerCategories: [],
+                customerCategoryIds: [],
                 regions: [],
-                customers: []
+                customerIds: []
             }
         }
     },

@@ -47,7 +47,7 @@
                 </Card>
           </div>
 
-          <Modal v-model="goodsModal" title="商品信息维护" :footerHide="true" :mask-closable="false" width="60">
+          <Modal v-model="goodsModal" title="商品信息维护" :footerHide="true" :mask-closable="false" width="75">
               <goods-info :goodsInfoId="editId" @save-ok="goodsSaveOk" ></goods-info>
           </Modal>
           

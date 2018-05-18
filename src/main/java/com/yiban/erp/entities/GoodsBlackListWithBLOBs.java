@@ -35,6 +35,15 @@ public class GoodsBlackListWithBLOBs extends GoodsBlackList {
         this.customerCategoryIds = customerCategoryIds == null ? null : customerCategoryIds.trim();
     }
 
+    public boolean isEmpty() {
+        if ("[]".equals(this.getCustomerCategoryIds()) &&
+                "[]".equalsIgnoreCase(this.getCustomerIds()) &&
+                "[]".equalsIgnoreCase(this.getRegions())) {
+            return true;
+        }
+        return false;
+    }
+
     public JSONObject getJsonFormat() {
         JSONObject obj = new JSONObject();
         if (StringUtils.isNotBlank(this.getRegions())) {
