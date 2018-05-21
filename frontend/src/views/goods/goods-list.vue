@@ -38,7 +38,7 @@
 
                     <Table stripe highlight-row :loading="tableLoading" 
                             :columns="tableCulumns" :data="tableData" ref="goodsTable" 
-                            style="width: 100%;" size="small">
+                            size="small">
                     </Table>
                     <Row type="flex" justify="end" class="margin-top-10">
                         <Page :total="totalCount" :current="currentPage" @on-change="changePage" size="small" show-total></Page>
@@ -85,7 +85,6 @@ export default {
             tableData:[],
             tableCulumns: [
                 {
-                    title: '',
                     type: 'selection',
                     width: 60
                 },
@@ -130,9 +129,9 @@ export default {
                     }
                 },
                 {
-                    title: '商品名称',
+                    title: '商品编码/名称',
                     type: 'name',
-                    minWidth: 250,
+                    width: 250,
                     render: (h, params) => {
                         return h('div',[
                             h('h5', {
@@ -166,7 +165,7 @@ export default {
                 {
                     title: '是否可用',
                     key: 'enable',
-                    minWidth: 120,
+                    width: 120,
                     render: (h, params) => {
                         let label = params.row.enable ? '启用' : '禁用';
                         let color = params.row.enable ? 'green' : 'red';
@@ -194,17 +193,24 @@ export default {
                     width: 100
                 },
                 {
+                    title: '生产企业',
+                    key: 'factoryName',
+                    width: 180
+                },
+                {
                     title: '供应商',
                     key: 'supplierName',
-                    minWidth: 180
+                    width: 180
                 },
                 {
                     title: '分类',
-                    key: 'categoryName'
+                    key: 'categoryName',
+                    width: 100
                 },
                 {
                     title: '品牌',
-                    key: 'brandName'
+                    key: 'brandName',
+                    width: 100
                 }
             ],
             totalCount: 0,
@@ -244,6 +250,7 @@ export default {
             this.tableLoading = true;
             util.ajax.post('/goods/list', reqData)
                 .then((response) => {
+                    console.log(response.data);
                     this.tableLoading = false;
                     this.tableData = response.data.data;
                     this.totalCount = response.data.count;

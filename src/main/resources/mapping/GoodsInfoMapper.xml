@@ -376,7 +376,7 @@
   </select>
 
   <select id="searchList" parameterType="com.yiban.erp.dto.GoodsQuery" resultMap="BaseResultMap">
-    select g.*, ca.name as categoryName, br.brand_name as brandName, su.name as supplierName,
+    select g.*, f.name as factoryName, ca.name as categoryName, br.brand_name as brandName, su.name as supplierName,
       (select count(de.id)
         from goods_detail de
         where de.goods_info_id = g.id and de.status != 'DELETE'
@@ -385,6 +385,7 @@
       left join good_category ca on g.category_id = ca.id
       left join goods_brand br on g.brand_id = br.id
       left join supplier su on g.supplier_id = su.id
+      left join factory f on f.id=g.factory_id
     where g.company_id = #{companyId} and g.status != 'DELETE'
     <if test="categoryId != null" >
       and g.category_id = #{categoryId}
