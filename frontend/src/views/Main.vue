@@ -4,7 +4,7 @@
 
 <template>
     <div class="main" :class="{'main-hide-text': shrink}">
-        <div class="sidebar-menu-con" :style="{width: shrink?'100px':'200px', overflow: shrink ? 'visible' : 'auto'}">
+        <div class="sidebar-menu-con" :style="{width: shrink?'100px':'220px', overflow: shrink ? 'visible' : 'auto'}">
             <shrinkable-menu 
                 :shrink="shrink"
                 @on-change="handleSubmenuChange"
@@ -18,7 +18,7 @@
                 </div>
             </shrinkable-menu>
         </div>
-        <div class="main-header-con" :style="{paddingLeft: shrink?'100px':'200px'}">
+        <div class="main-header-con" :style="{paddingLeft: shrink?'100px':'220px'}">
             <div class="main-header">
                 <div class="navicon-con">
                     <Button :style="{transform: 'rotateZ(' + (this.shrink ? '-90' : '0') + 'deg)'}" type="text" size="small" @click="toggleClick">
@@ -58,7 +58,7 @@
                 <tags-page-opened :pageTagsList="pageTagsList"></tags-page-opened>
             </div>
         </div>
-        <div class="single-page-con" :style="{left: shrink?'100px':'200px', right: this.openHelp ? '200px' : '0px'}">
+        <div class="single-page-con" :style="{left: shrink?'100px':'220px', right: this.openHelp ? '200px' : '0px'}">
             <div class="single-page" >
                 <keep-alive :include="cachePage">
                     <router-view></router-view>
