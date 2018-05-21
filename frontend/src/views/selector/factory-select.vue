@@ -4,9 +4,8 @@
 
 <template>
     <Select v-model="id" placeholder="企业名称/联系人/拼音简称搜索"
-            filterable clearable remote :remote-method="searchMethod" 
-            :loading="searchLoading" 
-            @on-change="onChange" :size="selectSize">
+            filterable clearable 
+            @on-change="onChange">
         <Option v-for="item in resultList" :value="item.id" :key="item.id"> {{item.name}} </Option>
     </Select>
 </template>
@@ -30,21 +29,23 @@ export default {
             this.id = newValue;
         }
     },
+    mounted() {
+        this.searchMethod();
+    },
     methods: {
-        searchMethod (searchStr) {
-            if (!searchStr) {
-                this.resultList = [];
-                return;
-            }
-            this.searchLoading = true;
-            util.ajax.post('/factory/search', {search: searchStr})
+        searchMethod () {
+            // if (!searchStr) {
+            //     this.resultList = [];
+            //     return;
+            // }
+            // this.searchLoading = true;
+            util.ajax.get('/factory/list')
                 .then((response) => {
                     this.resultList = response.data;
                 })
                 .catch((error) => {
                     util.errorProcessor(this, error);
                 });
-            this.searchLoading = false;
         },
 
         onChange (data) {
