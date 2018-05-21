@@ -2,7 +2,13 @@ package com.yiban.erp.dto;
 
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.List;
+
 public class GoodsQuery {
+
+    public static final String OPTION_LW = "LW";
+    public static final String OPTION_LB = "LB";
+    public static final String OPTION_LS = "LS";
 
     private Integer companyId;
     private Integer categoryId;
@@ -15,6 +21,15 @@ public class GoodsQuery {
     private Integer pageSize;
 
     private Boolean includeDetail;
+
+    /**
+     * LW:当前库存，
+     * LB: last buy 最近采购价
+     * LS: last sale 最近一次销售价
+     */
+    private List<String> options; //辅助查询项，空值是否查询库存，最近一次销售价，最近一次采购价
+    private Integer warehouseId; //查库存和采购销售价，需要配合warehouseId查询
+    private Long customerId; //配合options查询最近一次某一个客户的销售价时使用
 
     private Integer offset;
     private Integer limit;
@@ -115,5 +130,29 @@ public class GoodsQuery {
 
     public void setIncludeDetail(Boolean includeDetail) {
         this.includeDetail = includeDetail;
+    }
+
+    public List<String> getOptions() {
+        return options;
+    }
+
+    public void setOptions(List<String> options) {
+        this.options = options;
+    }
+
+    public Integer getWarehouseId() {
+        return warehouseId;
+    }
+
+    public void setWarehouseId(Integer warehouseId) {
+        this.warehouseId = warehouseId;
+    }
+
+    public Long getCustomerId() {
+        return customerId;
+    }
+
+    public void setCustomerId(Long customerId) {
+        this.customerId = customerId;
     }
 }

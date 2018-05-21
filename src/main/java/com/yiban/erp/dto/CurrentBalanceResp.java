@@ -9,6 +9,9 @@ public class CurrentBalanceResp {
     private BigDecimal ongoingCount; //在推申购订单申购数量
     private BigDecimal balance; //当前库存量
 
+
+    private BigDecimal lastSalePrice; //最后一次销售价，用户goods列表中查询映射
+
     private Long goodsId;
 
     public Long getGoodsId() {
@@ -49,5 +52,13 @@ public class CurrentBalanceResp {
 
     public void setOngoingCount(BigDecimal ongoingCount) {
         this.ongoingCount = ongoingCount;
+    }
+
+    public BigDecimal getLastSalePrice() {
+        return lastSalePrice;
+    }
+
+    public void setLastSalePrice(BigDecimal lastSalePrice) {
+        this.lastSalePrice = lastSalePrice;
     }
 }

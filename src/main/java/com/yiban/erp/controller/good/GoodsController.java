@@ -16,8 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 
 @RestController
@@ -35,6 +34,7 @@ public class GoodsController {
      * @param search
      * @param page
      * @param size
+     * @param options 辅助查询项，空值是否查询库存，最近一次销售价，最近一次采购价，多项以 ';'分割
      * @return
      */
     @RequestMapping(value = "/list", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -42,10 +42,18 @@ public class GoodsController {
                                        @RequestParam(required = false) Integer catId,
                                        @RequestParam(required = false) String search,
                                        @RequestParam(required = false) Integer page,
-                                       @RequestParam(required = false) Integer size) {
-        logger.info("Get goods list, search={}, catId={}, page={}, size={}", search, catId, page, size);
+                                       @RequestParam(required = false) Integer size,
+                                       @RequestParam(required = false) String options,
+                                       @RequestParam(required = false) Integer warehouseId) {
+        logger.info("Get goods list, search={}, catId={}, page={}, size={}, options={}, warehouseId={}",
+                search, catId, page, size, options, warehouseId);
         if (StringUtils.isEmpty(search)) {
             search = null;
+        }
+        List<String> optionList = new ArrayList<>();
+        if (StringUtils.isNotEmpty(options)) {
+            String[] opList = options.split(";");
+            optionList = Arrays.asList(opList);
         }
         GoodsQuery query = new GoodsQuery();
         query.setCompanyId(user.getCompanyId());
@@ -53,6 +61,8 @@ public class GoodsController {
         query.setSearch(search);
         query.setPage(page);
         query.setPageSize(size);
+        query.setOptions(optionList);
+        query.setWarehouseId(warehouseId);
         Long count = 0L;
         count = goodsService.getChooseListDetailCount(query);
         List<Goods> details = new ArrayList<>();

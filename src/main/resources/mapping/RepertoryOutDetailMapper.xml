@@ -176,5 +176,21 @@
     where repertory_out_id = #{repertoryOutId}
   </select>
 
+  <select id="getLastBuyPrice" parameterType="map" resultType="com.yiban.erp.dto.CurrentBalanceResp">
+    select
+      t1.goods_id as goodsId,
+      t1.price as lastBuyPrice
+    from repertory_out_detail t1, (
+      select max(d.id) as detailId from repertory_out_detail d, repertory_out o
+      where d.repertory_out_id = o.id
+        and o.customer_id = #{customerId} and o.ref_type='SELL_BATCH' and d.goods_id in
+        <foreach collection="goodsIdList" open="(" close=")" item="item" separator=",">
+          #{item}
+        </foreach>
+      group by goods_id ) t2
+    where t1.id = t2.detailId
+  </select>
+
+
 
 </mapper>

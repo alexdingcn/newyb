@@ -1,5 +1,6 @@
 package com.yiban.erp.dao;
 
+import com.yiban.erp.dto.CurrentBalanceResp;
 import com.yiban.erp.entities.RepertoryOutDetail;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -19,4 +20,13 @@ public interface RepertoryOutDetailMapper {
     int insertBatch(@Param("details") List<RepertoryOutDetail> outDetails);
 
     List<RepertoryOutDetail> getByOrderId(Long orderId);
+
+    /**
+     * 获取某一客户商品列表中的最近一次销售价
+     * @param customerId
+     * @param goodsIdList
+     * @return
+     */
+    List<CurrentBalanceResp> getLastBuyPrice(@Param("customerId") Long customerId,
+                                             @Param("goodsIdList") List<Long> goodsIdList);
 }

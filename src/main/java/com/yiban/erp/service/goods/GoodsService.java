@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.yiban.erp.constant.GoodsStatus;
 import com.yiban.erp.constant.OrderNumberType;
 import com.yiban.erp.dao.*;
+import com.yiban.erp.dto.CurrentBalanceResp;
 import com.yiban.erp.dto.GoodsQuery;
 import com.yiban.erp.entities.*;
 import com.yiban.erp.exception.BizException;
@@ -18,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -38,6 +40,11 @@ public class GoodsService {
     private GoodsAttrService goodsAttrService;
     @Autowired
     private GoodsBlackListMapper goodsBlackListMapper;
+    @Autowired
+    private RepertoryInfoMapper repertoryInfoMapper;
+    @Autowired
+    private RepertoryOutDetailMapper repertoryOutDetailMapper;
+
 
 
     public void setGoodsOptionName(List<Goods> goodsList) {
@@ -130,6 +137,53 @@ public class GoodsService {
         infos.stream().forEach(item -> item.setGoodsDetails(map.get(item.getId())));
     }
 
+
+    /**
+     * LW:当前库存，
+     * LB: last buy 最近采购价
+     * LS: last sale 最近一次销售价
+     */
+    private List<Goods> setGoodsExtra(Long customerId, Integer warehouseId, List<String> options, List<Goods> goods) {
+        if (options == null || options.isEmpty() || goods.isEmpty()) {
+            return goods;
+        }
+        List<Long> goodsIds = new ArrayList<>();
+        goods.stream().forEach(item -> goodsIds.add(item.getId()));
+        for (String option : options) {
+            if (warehouseId != null && GoodsQuery.OPTION_LW.equalsIgnoreCase(option)) {
+                //查询商品列表中的当前存库数据
+                List<CurrentBalanceResp> balanceResp = repertoryInfoMapper.getBalance(warehouseId, goodsIds);
+                Map<Long, CurrentBalanceResp> tempMap = new HashMap<>();
+                balanceResp.stream().forEach(item -> tempMap.put(item.getGoodsId(), item));
+                goods.stream().forEach(item -> {
+                    CurrentBalanceResp resp = tempMap.get(item.getId());
+                    item.setCurrRepQuatity(resp != null && resp.getBalance() != null ? resp.getBalance() : null);
+                });
+            }
+            if (warehouseId != null && GoodsQuery.OPTION_LB.equalsIgnoreCase(option)) {
+                //最近一次的采购价
+                List<CurrentBalanceResp> lastPriceResp = repertoryInfoMapper.getLastBuyPrice(warehouseId, goodsIds);
+                Map<Long, CurrentBalanceResp> tempMap = new HashMap<>();
+                lastPriceResp.stream().forEach(item -> tempMap.put(item.getGoodsId(), item));
+                goods.stream().forEach(item -> {
+                    CurrentBalanceResp resp = tempMap.get(item.getId());
+                    item.setLastBuyPrice(resp != null && resp.getLastPrice() != null ? resp.getLastPrice() : null);
+                });
+            }
+            if (customerId != null && GoodsQuery.OPTION_LS.equalsIgnoreCase(option)) {
+                //最近一次的销售价
+                List<CurrentBalanceResp> lastBuyPrices = repertoryOutDetailMapper.getLastBuyPrice(customerId, goodsIds);
+                Map<Long, CurrentBalanceResp> tempMap = new HashMap<>();
+                lastBuyPrices.stream().forEach(item -> tempMap.put(item.getGoodsId(), item));
+                goods.stream().forEach(item -> {
+                    CurrentBalanceResp resp = tempMap.get(item.getId());
+                    item.setLastSalePrice(resp != null && resp.getLastSalePrice() != null ? resp.getLastSalePrice() : null);
+                });
+            }
+        }
+        return goods;
+    }
+
     public Long getChooseListDetailCount(GoodsQuery query) {
         return goodsInfoMapper.getChooseListDetailCount(query);
     }
@@ -139,6 +193,10 @@ public class GoodsService {
         //设置option的值
         setGoodsOptionName(goods);
         //列表中忽略自定义属性的展示
+
+        //如果请求参数中的options不为空时，查询对应的数据值
+        setGoodsExtra(query.getCustomerId(), query.getWarehouseId(), query.getOptions(), goods);
+
         return goods;
     }
 

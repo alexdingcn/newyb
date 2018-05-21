@@ -191,6 +191,11 @@ public class Goods {
     private String medTypeName; //中西药属性
 
 
+    private BigDecimal currRepQuatity; //当前库存量
+    private BigDecimal lastBuyPrice;   //最近一次采购价
+    private BigDecimal lastSalePrice; // 最近一次销售价
+
+
     public void setOptionName(List<Options> options) {
         if (options == null || options.isEmpty()) {
             return;
@@ -1078,5 +1083,29 @@ public class Goods {
             result.add(spec);
         }
         return result;
+    }
+
+    public BigDecimal getCurrRepQuatity() {
+        return currRepQuatity;
+    }
+
+    public void setCurrRepQuatity(BigDecimal currRepQuatity) {
+        this.currRepQuatity = currRepQuatity;
+    }
+
+    public BigDecimal getLastBuyPrice() {
+        return lastBuyPrice;
+    }
+
+    public void setLastBuyPrice(BigDecimal lastBuyPrice) {
+        this.lastBuyPrice = lastBuyPrice;
+    }
+
+    public BigDecimal getLastSalePrice() {
+        return lastSalePrice;
+    }
+
+    public void setLastSalePrice(BigDecimal lastSalePrice) {
+        this.lastSalePrice = lastSalePrice;
     }
 }
