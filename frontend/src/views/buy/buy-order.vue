@@ -68,7 +68,7 @@
 				<Row>
 					<Col span="8">
 						<FormItem label="选择商品">
-                            <good-select :disabled="!buyOrder.warehouseId" ref="goodsSelect" 
+                            <good-select :disabled="!buyOrder.warehouseId" ref="goodsSelect" :warehouseId="buyOrder.warehouseId"
                             @on-change="onSelectGoods"></good-select>
 						</FormItem>
 					</Col>

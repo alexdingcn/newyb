@@ -37,11 +37,16 @@ public interface SellOrderMapper {
 
     List<StatusCount> getOrderStatusStat(@Param("companyId") Integer companyId);
 
-    List<StatusCount> getOrderAmountStat(@Param("companyId")Integer companyId,
-                                         @Param("startDate")Date startDate,
-                                         @Param("endDate")Date endDate);
+    List<StatusCount> getOrderAmountStat(@Param("companyId") Integer companyId,
+                                         @Param("startDate") Date startDate,
+                                         @Param("endDate") Date endDate);
 
-    List<StatusCount> getGoodsAmountStat(@Param("companyId")Integer companyId,
-                                         @Param("startDate")Date startDate,
-                                         @Param("endDate")Date endDate);
+    List<StatusCount> getGoodsAmountStat(@Param("companyId") Integer companyId,
+                                         @Param("startDate") Date startDate,
+                                         @Param("endDate") Date endDate);
+
+    List<StatusCount> getCustomerStat(@Param("companyId") Integer companyId,
+                                      @Param("customerId") Long customerId,
+                                      @Param("startDate") Date startDate,
+                                      @Param("endDate") Date endDate);
 }

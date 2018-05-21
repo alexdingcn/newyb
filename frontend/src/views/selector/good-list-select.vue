@@ -39,12 +39,13 @@
         components: {
             goodsSepcTags
         },
-        props: ['disabled', 'size'],
+        props: ['warehouseId', 'disabled', 'size'],
         data () {
             return {
                 currentPage: 1,
                 pageSize: 10,
                 totalGoodsCount: 0,
+                warehouseId: '',
                 goodsQuery: '',
                 goodsTypeQuery: '',
                 selectSize: this.size,
@@ -110,6 +111,17 @@
                         }
                     },
                     {
+                        key: 'currRepQuatity',
+                        title: '当前库存'
+                    },
+                    {
+                        key: 'lastBuyPrice',
+                        title: '最近采购价',
+                        render: (h, params) => {
+                            return h('span', { },  params.row.lastBuyPrice ? '￥' + params.row.lastBuyPrice.toFixed(2): '');
+                        }
+                    },
+                    {
                         title: '操作',
                         key: 'action',
                         width: 120,
@@ -124,6 +136,11 @@
                     }
                 ]
             };
+        },
+        watch: {
+            warehouseId(val) {
+                this.warehouseId = val;
+            }
         },
         methods: {
             reload() {
@@ -149,12 +166,16 @@
                 if (this.goodsTypeQuery > 0) {
                     queryObj['catId'] = this.goodsTypeQuery;
                 }
+                // 最新库存, 最后采购价
+                if (this.warehouseId) {
+                    queryObj['options'] = 'LW;LB';
+                    queryObj['warehouseId'] = this.warehouseId;
+                }
 
                 this.goodsLoading = true;
                 util.ajax.get('/goods/list',
                         {params: queryObj})
                         .then(function (response) {
-                            console.log(response.data);
                             if (response.status === 200) {
                                 self.goodsLoading = false;
                                 self.totalGoodsCount = response.data.total;

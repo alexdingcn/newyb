@@ -383,4 +383,32 @@
         order by amount desc
     </select>
 
+
+    <select id="getCustomerStat" resultType="com.yiban.erp.entities.StatusCount" >
+        select so.customer_id as customerId,
+              c.name as customerName,
+              c.account_amount as customerReceivable,
+              count(distinct sod.sell_order_id) as orderCount,
+              count(distinct sod.goods_id) as goodsCount,
+              sum(sod.amount) as amount
+        from sell_order so, sell_order_detail sod, customer c
+        where sod.sell_order_id = so.id and so.status='SALE_CHECKED'
+        and so.customer_id = c.id
+        <if test="companyId != null">
+            and so.company_id = #{companyId}
+        </if>
+        <if test="customerId != null">
+            and so.customer_id = #{customerId}
+        </if>
+        <if test="startDate != null">
+            and so.create_time >= #{startDate}
+        </if>
+        <if test="endDate != null">
+            and #{endDate} > so.create_time
+        </if>
+        group by so.customer_id
+        order by so.customer_id
+    </select>
+
+
 </mapper>

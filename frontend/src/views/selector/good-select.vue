@@ -32,7 +32,7 @@
         </Tooltip>
 
         <Modal v-model="selectGoodsModal" width="70" :mask-closable="false" title="选择商品" class="goods-modal">
-            <goodsListSelect ref="goodsSelectModal" @on-choosed="goodsSelected" ></goodsListSelect>
+            <goodsListSelect ref="goodsSelectModal" :warehouseId="warehouseId" @on-choosed="goodsSelected" ></goodsListSelect>
             <div slot="footer">
                 <Button type="text" @click="selectGoodsModal = false">取消</Button>
             </div>
@@ -48,13 +48,14 @@ const prefixCls = 'ivu-input';
 
 export default {
     name: 'good-select',
-    props: ['value', 'disabled', 'size'],
+    props: ['value', 'warehouseId', 'disabled', 'size'],
     components: {
         goodsListSelect
     },
     data () {
         return {
             goodsId: '',
+            warehouseId: '',
             selectGoodsModal: false,
             selectSize: this.size,
             goodsLoading: false,
@@ -64,6 +65,9 @@ export default {
     watch: {
         value(newValue) {
             this.goodsId = newValue;
+        },
+        warehouseId(val) {
+            this.warehouseId = val;
         }
     },
     computed: {

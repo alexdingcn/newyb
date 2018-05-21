@@ -3,57 +3,55 @@
 </style>
 
 <template>
-  <div>
-        <div class="search-div">
-            <Row >
-                <Form ref="searchForm" :model="searchFormItem" :label-width="90">
-                    
-                    <Row type="flex" justify="center">
-                        <Col span="8" >
-                            <FormItem label="客户">
-                                <customer-select size="small" v-model="searchFormItem.customerId" ></customer-select>
-                            </FormItem>
-                        </Col>
-                        <Col span="12" >
-                            <FormItem label="制单日期">
-                                <DatePicker size="small" v-model="dateRange" type="daterange" placement="bottom-start" placeholder="制单日期" style="width:200px"></DatePicker>
-                            </FormItem>
-                        </Col>
-                        <Col span="4"></Col>
-                    </Row>
-                    <Row type="flex" justify="center">
-                        <Col span="8" >
-                            <FormItem label="销售单号">
-                                <Input  size="small" type="text" v-model="searchFormItem.orderNumber" ></Input>
-                            </FormItem>
-                        </Col>
-                        <Col span="8" >
-                            <FormItem label="销售员" >
-                                <sale-select size="small" v-model="searchFormItem.saleId"></sale-select>
-                            </FormItem>
-                        </Col>
-                        <Col span="3" offset="1" >
-                            <Button size="small" icon="ios-search" type="primary" :loading="searching" @click="searchBtnClick">查询</Button>
-                        </Col>
-                        <Col span="4"></Col>
-                    </Row>
-                </Form>
-            </Row>
-        </div>
-        <div class="table-div">
-            <Row type="flex" justify="center" align="middle" >
-                <Table border highlight-row :columns="tabColumns" :data="tabData" 
-                        :loading="searching"  
-                        no-data-text="点击上方查询按钮获取数据"
-                        ref="table" style="width: 100%;" size="small">
-                </Table>
-            </Row>
-            <Row type="flex" justify="end">
-                <Page size="small" :total="totalCount" :current="currentPage" :page-size="pageSize" show-total
-                    @on-change="pageChange">
-                </Page>
-            </Row>
-        </div>
+    <Card>
+        <p slot="title">
+            销售订单列表
+        </p>
+        <Row >
+            <Form ref="searchForm" :model="searchFormItem" :label-width="90">
+                <Row type="flex" justify="center">
+                    <Col span="8" >
+                        <FormItem label="客户">
+                            <customer-select v-model="searchFormItem.customerId" ></customer-select>
+                        </FormItem>
+                    </Col>
+                    <Col span="12" >
+                        <FormItem label="制单日期">
+                            <DatePicker v-model="dateRange" type="daterange" placement="bottom-start" placeholder="制单日期" style="width:200px"></DatePicker>
+                        </FormItem>
+                    </Col>
+                    <Col span="4"></Col>
+                </Row>
+                <Row type="flex" justify="center">
+                    <Col span="8" >
+                        <FormItem label="销售单号">
+                            <Input type="text" v-model="searchFormItem.orderNumber" ></Input>
+                        </FormItem>
+                    </Col>
+                    <Col span="8" >
+                        <FormItem label="销售员" >
+                            <sale-select v-model="searchFormItem.saleId"></sale-select>
+                        </FormItem>
+                    </Col>
+                    <Col span="3" offset="1" >
+                        <Button icon="ios-search" type="primary" :loading="searching" @click="searchBtnClick">查询</Button>
+                    </Col>
+                    <Col span="4"></Col>
+                </Row>
+            </Form>
+        </Row>
+
+        <Table border highlight-row :columns="tabColumns" :data="tabData" 
+                :loading="searching"  
+                no-data-text="点击上方查询按钮获取数据"
+                ref="table" class="margin-top-10" size="small">
+        </Table>
+
+        <Row type="flex" justify="end" class="margin-top-10">
+            <Page size="small" :total="totalCount" :current="currentPage" :page-size="pageSize" show-total
+                @on-change="pageChange">
+            </Page>
+        </Row>
 
         <Modal v-model="showOrderDetailView" :width="70" :mask-closable="false" title="销售订单详细信息">
             <review-detail :sellOrderId="showDetailViewId" @on-cancel="showOrderDetailViewClose"></review-detail>
@@ -65,7 +63,7 @@
             <div slot="footer"></div>
         </Modal>
 
-    </div>
+    </Card>
 </template>
 
 <script>
@@ -117,13 +115,13 @@ export default {
 
         return {
             searchFormItem: {
-                customerId: '',
+                customerId: this.$route.query.customer_id ? this.$route.query.customer_id.toString() : '',
                 orderNumber: '',
                 saleId: ''
             },
             dateRange: [
-                moment().add(-1,'w').format('YYYY-MM-DD'),
-                moment().format('YYYY-MM-DD'),
+                this.$route.query.start_date ? this.$route.query.start_date : moment().add(-1,'w').format('YYYY-MM-DD'),
+                this.$route.query.end_date ? this.$route.query.end_date : moment().format('YYYY-MM-DD'),
             ],
             searching: false,
             tabData: [],
@@ -311,6 +309,7 @@ export default {
             reqData['endDate'] = this.dateRange[1];
             this.searching = true;
             let self = this;
+            console.log(reqData);
             util.ajax.post("/sell/order/all/list", reqData)
                 .then((response) => {
                     self.tabData = response.data.data;
@@ -348,13 +347,6 @@ export default {
 <style>
 .ivu-form-item {
     margin-bottom: 5px;
-}
-.search-div {
-    background-color: #fff;
-}
-.table-div {
-    background-color: #fff;
-    margin-top: 10px;
 }
 </style>
 

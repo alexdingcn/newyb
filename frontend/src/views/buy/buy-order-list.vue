@@ -5,12 +5,12 @@
 <template>
 	<Row>
 		<Card>
-			<p slot="title">
-                <div v-if="!chooseModal">
+			<div slot="title">
+                <p v-if="!chooseModal">
                     <Icon type="funnel"></Icon>
                     采购审核
-                </div>
-            </p>
+                </p>
+            </div>
 			<div slot="extra" style="width:700px">
 				<Row type="flex" justify="end">
 					<Col span="8">

@@ -8,14 +8,10 @@ import com.yiban.erp.dto.SellOrderAllAction;
 import com.yiban.erp.dto.SellOrderQuery;
 import com.yiban.erp.dto.SellReviewAction;
 import com.yiban.erp.dto.SellReviewOrderQuery;
-import com.yiban.erp.entities.SellOrder;
-import com.yiban.erp.entities.SellOrderDetail;
-import com.yiban.erp.entities.SellOrderShip;
-import com.yiban.erp.entities.User;
+import com.yiban.erp.entities.*;
 import com.yiban.erp.exception.BizException;
 import com.yiban.erp.exception.ErrorCode;
 import com.yiban.erp.service.sell.SellOrderService;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,8 +20,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @RestController
 @RequestMapping("/sell")
@@ -194,4 +190,18 @@ public class SellOrderController {
         return ResponseEntity.ok().body(JSON.toJSONString(response, SerializerFeature.DisableCircularReferenceDetect));
     }
 
+    /**
+     * 客户销售情况汇总
+     * @param allAction
+     * @param user
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping(value = "/order/customer/list", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> customerList(@RequestBody SellOrderAllAction allAction,
+                                            @AuthenticationPrincipal User user) throws Exception {
+        allAction.setCompanyId(user.getCompanyId());
+        List<StatusCount> result = sellOrderService.getStatByCustomer(allAction);
+        return ResponseEntity.ok().body(JSON.toJSONString(result));
+    }
 }

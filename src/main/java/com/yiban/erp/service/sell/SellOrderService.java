@@ -64,7 +64,7 @@ public class SellOrderService {
             totalQuantity = totalQuantity.add(item.getQuantity() == null ? BigDecimal.ZERO : item.getQuantity());
             totalAmount = totalAmount.add(item.getAmount() == null ? BigDecimal.ZERO : item.getAmount());
         }
-        if(!isCustomerCanSellGoods(sellOrder.getCustomerId(), goodIdList)) {
+        if (!isCustomerCanSellGoods(sellOrder.getCustomerId(), goodIdList)) {
             logger.warn("user: {} save sell order detail good have special managed but customer:{} can not shell.", user.getId(), sellOrder.getCustomerId());
             throw new BizException(ErrorCode.SELL_ORDER_CUSTOMER_CANNOT_SELL_GOOD);
         }
@@ -91,7 +91,7 @@ public class SellOrderService {
                 });
                 sellOrderDetailMapper.replaceBatch(details);
             }
-        }else {
+        } else {
             sellOrder.setTotalQuantity(totalQuantity);
             sellOrder.setTotalAmount(totalAmount);
             sellOrder.setUpdateTime(new Date());
@@ -234,7 +234,7 @@ public class SellOrderService {
         return true;
     }
 
-    public int removeSellOrderDetail(User user, Long detailId) throws BizException{
+    public int removeSellOrderDetail(User user, Long detailId) throws BizException {
         if (detailId == null || detailId <= 0) {
             return 0;
         }
@@ -478,7 +478,7 @@ public class SellOrderService {
         return sellOrderShipMapper.getBySellOrderId(orderId);
     }
 
-    public SellOrderShip saveOrderShip(User user, SellOrderShip sellOrderShip) throws BizException  {
+    public SellOrderShip saveOrderShip(User user, SellOrderShip sellOrderShip) throws BizException {
         SellOrderShip reqShip = sellOrderShip;
         if (reqShip == null || reqShip.getSellOrderId() == null) {
             logger.warn("user:{} save ship info but sell order id or ship company id is null", user.getId());
@@ -494,7 +494,7 @@ public class SellOrderService {
             reqShip.setUpdateTime(new Date());
             sellOrderShipMapper.updateByPrimaryKeySelective(reqShip);
             return reqShip;
-        }else {
+        } else {
             reqShip.setCreateBy(user.getNickname());
             reqShip.setCreateTime(new Date());
             sellOrderShipMapper.insert(reqShip);
@@ -518,5 +518,12 @@ public class SellOrderService {
         List<SellOrder> sellOrders = sellOrderMapper.getAllList(allAction);
         setOptions(sellOrders);
         return sellOrders;
+    }
+
+    public List<StatusCount> getStatByCustomer(SellOrderAllAction query) {
+        List<StatusCount> statusCounts = sellOrderMapper.getCustomerStat(query.getCompanyId(), query.getCustomerId(),
+                query.getStartDate(), query.getEndDate());
+
+        return statusCounts;
     }
 }

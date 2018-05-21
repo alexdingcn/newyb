@@ -158,14 +158,15 @@ export const appRouter = [
         title: '销售',
         component: Main,
         menuGroup: [
-            { title: "销售", icon: 'icon-chuangjiandanju-xianxing', start: 0, end: 3 },
-            { title: "销售退单", icon: 'icon-qianshoushenpitongguo-xianxing', start: 4, end: 8 }
+            { title: "销售", icon: 'icon-chuangjiandanju-xianxing', start: 0, end: 4 },
+            { title: "销售退单", icon: 'icon-qianshoushenpitongguo-xianxing', start: 5, end: 9 }
         ],
         children: [
             { path: 'order', title: '销售制单', name: 'sell_order', component: () => import('@/views/sell/make.vue') },
             { path: 'quality-review', title: '销售出库质量审核', name: 'sell-quality-review', component: () => import('@/views/sell/sell-quality-review.vue') },
             { path: 'sale-review', title: '销售审核', name: 'sell-sale-review', component: () => import('@/views/sell/sell-sale-review.vue') },
             { path: 'list', title: '销售订单列表', name: 'sell_list', divided: true, component: () => import('@/views/sell/sell-order-list.vue') },
+            { path: 'customer-list', title: '客户销售情况汇总', name: 'sell_customer_list', component: () => import('@/views/sell/sell-by-customer.vue') },
 
             { path: 'back-apply', title: '销售退单申请', name: 'sell-back-apply', component: () => import('@/views/sell/back-apply.vue') },
             { path: 'back-apply-check', title: '销售退单申请审核', name: 'sell-back-apply-check', component: () => import('@/views/sell/back-apply-check.vue') },

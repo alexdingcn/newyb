@@ -9,6 +9,11 @@ public class StatusCount {
     private Date tradeDate;
     private String goodsName;
     private Long goodsId;
+    private Integer goodsCount;
+    private Integer orderCount;
+    private Long customerId;
+    private String customerName;
+    private Double customerReceivable;
 
     public String getStatus() {
         return status;
@@ -56,5 +61,45 @@ public class StatusCount {
 
     public void setGoodsId(Long goodsId) {
         this.goodsId = goodsId;
+    }
+
+    public Integer getGoodsCount() {
+        return goodsCount;
+    }
+
+    public void setGoodsCount(Integer goodsCount) {
+        this.goodsCount = goodsCount;
+    }
+
+    public Long getCustomerId() {
+        return customerId;
+    }
+
+    public void setCustomerId(Long customerId) {
+        this.customerId = customerId;
+    }
+
+    public String getCustomerName() {
+        return customerName;
+    }
+
+    public void setCustomerName(String customerName) {
+        this.customerName = customerName;
+    }
+
+    public Integer getOrderCount() {
+        return orderCount;
+    }
+
+    public void setOrderCount(Integer orderCount) {
+        this.orderCount = orderCount;
+    }
+
+    public Double getCustomerReceivable() {
+        return customerReceivable;
+    }
+
+    public void setCustomerReceivable(Double customerReceivable) {
+        this.customerReceivable = customerReceivable;
     }
 }
