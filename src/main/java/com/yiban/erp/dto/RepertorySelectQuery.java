@@ -1,5 +1,7 @@
 package com.yiban.erp.dto;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.math.BigDecimal;
 
 public class RepertorySelectQuery {
@@ -59,7 +61,7 @@ public class RepertorySelectQuery {
     }
 
     public String getBatchCode() {
-        return batchCode;
+        return StringUtils.isEmpty(batchCode) ? null : batchCode;
     }
 
     public void setBatchCode(String batchCode) {

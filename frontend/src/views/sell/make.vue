@@ -161,9 +161,8 @@
             @choosed="orderSearchChoosed">
         </sell-order-search>
 
-        <Modal v-model="selectRepertoryModal" width="60" :mask-closable="false" title="选择库存商品" >
-          <repertory-info-select :warehouse="chooseWarehouse" @on-choosed="repertoryInfoChoonsed" ></repertory-info-select>
-          <span slot="footer"></span>
+        <Modal v-model="selectRepertoryModal" width="60" :footerHide="true" :mask-closable="false" title="选择库存商品" >
+          <repertory-info-select ref="repertorySelect" :warehouse="chooseWarehouse" @on-choosed="repertoryInfoChoonsed" ></repertory-info-select>
         </Modal>
 
         <Modal v-model="goodHistoryModal" width="75" :mask-closable="false" title="客户商品销售历史价格">
@@ -780,6 +779,7 @@ export default {
         this.$Message.warning("请先选择对应仓库点");
         return;
       }
+      this.$refs.repertorySelect.searchBtnClicked();
       this.selectRepertoryModal = true;
     },
     repertoryInfoChoonsed(repertoryList) {
