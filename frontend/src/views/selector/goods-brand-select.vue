@@ -11,7 +11,7 @@
             </Option>
         </Select>
 
-        <Modal v-model="brandModal" title="商品品牌信息维护" :mask-closable="false" width="40" class="file-upload-modal">
+        <Modal v-model="brandModal" title="商品品牌信息维护" :mask-closable="false" width="40" class="file-upload-low">
           <Form ref="form" :model="formData" :label-width="90" :rules="formRules">
               <Row class="row-margin-bottom">
                   <FormItem label="品牌名称" prop="brandName">
