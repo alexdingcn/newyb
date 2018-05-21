@@ -44,10 +44,10 @@
                     <p>到期日: {{ loggedUser.companyExpiredTime | formatTime }} </p>
                 </Col>
                 <Col span="4">
-                    <ButtonGroup>
+                    <!-- <ButtonGroup>
                         <Button>升级</Button>
                         <Button type="primary">充值</Button>
-                    </ButtonGroup>
+                    </ButtonGroup> -->
                 </Col>
             </Row>
         </Card>
@@ -193,7 +193,7 @@
                 <Card>
                     <p slot="title" class="card-title">
                         <Icon type="android-wifi"></Icon>
-                        各类用户服务调用变化统计
+                        本月发生金额
                     </p>
                     <div class="data-source-row">
                         <user-flow></user-flow>

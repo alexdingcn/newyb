@@ -304,7 +304,7 @@ export default {
 }
 .file-upload-modal {
     position: fixed;
-    z-index: 3000;
+    z-index: 1000;
 }
 </style>
 
