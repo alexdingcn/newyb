@@ -72,6 +72,7 @@
 
 <script>
 import util from "@/libs/util.js";
+import moment from 'moment';
 import fileView from "@/views/basic-data/file-view.vue";
 import fileUpload from "@/views/basic-data/file-upload.vue";
 import fileTypeSelect from "@/views/selector/file-type-select.vue";
@@ -191,6 +192,7 @@ export default {
             util.ajax.get('/file/fileno', {params: reqData})
                 .then((response) => {
                     let result = response.data;
+                    result.updateTime = result.updateTime ? moment(result.updateTime).format('YYYY-MM-dd HH:mm') : '';
                     this.titleName = result.fileName;
                     this.formData = result;
                     this.fileViewChange = this.fileViewChange + 1;
