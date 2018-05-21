@@ -45,7 +45,6 @@
                 currentPage: 1,
                 pageSize: 10,
                 totalGoodsCount: 0,
-                warehouseId: '',
                 goodsQuery: '',
                 goodsTypeQuery: '',
                 selectSize: this.size,
@@ -136,11 +135,6 @@
                     }
                 ]
             };
-        },
-        watch: {
-            warehouseId(val) {
-                this.warehouseId = val;
-            }
         },
         methods: {
             reload() {

@@ -67,6 +67,14 @@ export default {
             this.customerIdValue = newValue;
         }
     },
+    mounted() {
+        if (this.value && this.value > 0) {
+            this.customerIdValue = this.value;
+            if (this.customerList === undefined || this.customerList.length == 0) {
+                this.searchByName();
+            }
+        }
+    },
     computed: {
         hasHelpSlot () {
             return !!this.$slots.helpContent
@@ -93,22 +101,36 @@ export default {
             this.selectCustModal = false;
         },
         searchByName (name) {
-
-            if (!name || name === '' || name.trim() === '') {
-                this.customerList = [];
-                return;
-            }
+            this.customerList = [];
             this.searchLoading = true;
-            let reqData = {name: name};
-            util.ajax.get('/customer/search/name', {params: reqData})
-                .then((response) => {
-                    this.searchLoading = false;
-                    this.customerList = response.data;
-                })
-                .catch((error) => {
-                    this.searchLoading = false;
-                    util.errorProcessor(this, error);
-                });
+            if (name && name.trim() !== '') {
+                let reqData = {name: name};
+                util.ajax.get('/customer/search/name', {params: reqData})
+                    .then((response) => {
+                        this.searchLoading = false;
+                        this.customerList = response.data;
+                    })
+                    .catch((error) => {
+                        this.searchLoading = false;
+                        util.errorProcessor(this, error);
+                    });
+            } else if (this.customerIdValue !== '') {
+                var self = this;
+                util.ajax.get('/customer/' + this.customerIdValue)
+                    .then(function (response) {
+                        if (response.status === 200) {
+                            self.searchLoading = false;
+                            if (response.data) {
+                                self.customerList = [ response.data ];
+                                self.$refs.custSelect.setQuery(response.data.name);
+                            }
+                        }
+                    })
+                    .catch(function (error) {
+                        self.searchLoading = false;
+                        util.errorProcessor(self, error);
+                    });
+            }
         },
 
         onChange (data) {
