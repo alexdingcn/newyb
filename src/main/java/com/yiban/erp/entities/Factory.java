@@ -2,6 +2,7 @@ package com.yiban.erp.entities;
 
 import com.alibaba.fastjson.JSON;
 
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -286,7 +287,7 @@ public class Factory {
     }
 
     public List<PlaceCode> getPlaceCodes() {
-        return placeCodes;
+        return placeCodes == null ? Collections.emptyList() : placeCodes;
     }
 
     public void setPlaceCodes(List<PlaceCode> placeCodes) {

@@ -40,7 +40,7 @@
                     <Row>
                         <Col span="8">
                             <FormItem label="城市" prop="placeCodes">
-                                <al-cascader v-model="formItem.placeCodes" level="2"/>
+                                <al-cascader v-model="placeCodeList" level="2"/>
                             </FormItem>
                         </Col>
                         <Col span="11">
@@ -167,6 +167,7 @@
 
 <script>
 import Vue from 'vue';
+import moment from 'moment';
 import iviewArea from 'iview-area';
 import util from '@/libs/util.js';
 import fileDetail from '@/views/basic-data/file-detail.vue';
@@ -189,7 +190,10 @@ export default {
         return {
             spinShow: false,
             loading: false,
-            formItem: {},
+            formItem: {
+                placeCodes: []
+            },
+            placeCodeList: [],
             categoryList: [],
             ruleValidate: {
                 name: [
@@ -212,7 +216,10 @@ export default {
                 util.ajax.get('/factory/' + this.factoryId)
                     .then(function (response) {
                         self.spinShow = false;
-                        self.formItem = response.data;
+                        let data = response.data;
+                        data.permitExp = data.permitExp ? moment(data.permitExp).format('YYYY-MM-DD') : '';
+                        data.licenseExp = data.licenseExp ? moment(data.licenseExp).format('YYYY-MM-DD') : '';
+                        self.formItem = data;
                         var placeCodes = [];
                         var rawCodes = response.data.placeCodes;
                         if (rawCodes) {
@@ -220,7 +227,7 @@ export default {
                                 placeCodes.push(rawCodes[i].code);
                             }
                         }
-                        self.formItem.placeCodes = placeCodes;
+                        self.placeCodeList = placeCodes;
                     })
                     .catch(function (error) {
                         self.spinShow = false;
@@ -237,11 +244,15 @@ export default {
             var self = this;
             this.spinShow = true;
             self.loading = true;
+            this.formItem.placeCodes = this.placeCodeList;
             util.ajax.post('/factory/save', this.formItem)
                 .then(function (response) {
                     self.spinShow = false;
                     self.loading = false;
-                    self.formItem = response.data;
+                    let data = response.data;
+                    data.permitExp = data.permitExp ? moment(data.permitExp).format('YYYY-MM-DD') : '';
+                    data.licenseExp = data.licenseExp ? moment(data.licenseExp).format('YYYY-MM-DD') : '';
+                    self.formItem = data;
                     self.$Message.success('生产企业' + self.formItem.name + '保存成功');
                     self.$emit('save-ok', self.formItem, action);
                 })
