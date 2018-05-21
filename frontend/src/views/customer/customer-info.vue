@@ -81,7 +81,7 @@
                 <Row type="flex" justify="center">
                   <Col span="8">
                     <FormItem label="所在城市" >
-                      <al-cascader v-model="formItem.placeCodes" level="2" />
+                      <al-cascader v-model="placeCodeLsit" level="2" />
                     </FormItem>
                   </Col>
                   <Col span="16">
@@ -311,8 +311,10 @@ export default {
             isReadOnly: false,
             submitBtnLoading: false,
             formItem: {
+                placeCodes: [],
                 pinyin: ''
             },
+            placeCodeLsit: [],
             fileUploadModal: false,
             repTabLoading: false,
             repTabData: [],
@@ -462,7 +464,7 @@ export default {
                                 placeCodes.push(rawCodes[i].code);
                             }
                         }
-                        this.formItem.placeCodes = placeCodes;
+                        this.placeCodeLsit = placeCodes;
                         this.businessScopeChooseList = this.formItem.businessScopeIdList ? this.formItem.businessScopeIdList : [];
                         this.refreshRepData();
                     })
@@ -486,6 +488,7 @@ export default {
 
         doAddCustomer () {
             this.submitBtnLoading = true;
+            this.formItem.placeCodes = this.placeCodeLsit;
             util.ajax.post('/customer/add', this.formItem)
                 .then((response) => {
                     this.submitBtnLoading = false;
@@ -500,6 +503,7 @@ export default {
         },
 
         doUpdateCustomer () {
+            this.formItem.placeCodes = this.placeCodeLsit;
             let reqData = this.formItem;
             if (!this.formItem.id) {
                 this.$Notice.error({
