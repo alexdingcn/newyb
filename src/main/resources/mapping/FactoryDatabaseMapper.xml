@@ -1,0 +1,344 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.yiban.erp.dao.FactoryDatabaseMapper" >
+  <resultMap id="BaseResultMap" type="com.yiban.erp.entities.FactoryDatabase" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="company_name" property="companyName" jdbcType="VARCHAR" />
+    <result column="permit" property="permit" jdbcType="VARCHAR" />
+    <result column="category_code" property="categoryCode" jdbcType="VARCHAR" />
+    <result column="legal_person" property="legalPerson" jdbcType="VARCHAR" />
+    <result column="responsible_person" property="responsiblePerson" jdbcType="VARCHAR" />
+    <result column="scope" property="scope" jdbcType="VARCHAR" />
+    <result column="city" property="city" jdbcType="VARCHAR" />
+    <result column="reg_address" property="regAddress" jdbcType="VARCHAR" />
+    <result column="address" property="address" jdbcType="VARCHAR" />
+    <result column="issue_date" property="issueDate" jdbcType="DATE" />
+    <result column="expired_date" property="expiredDate" jdbcType="DATE" />
+    <result column="license" property="license" jdbcType="VARCHAR" />
+    <result column="quality_person" property="qualityPerson" jdbcType="VARCHAR" />
+    <result column="phone" property="phone" jdbcType="VARCHAR" />
+    <result column="fax" property="fax" jdbcType="VARCHAR" />
+    <result column="email" property="email" jdbcType="VARCHAR" />
+    <result column="website" property="website" jdbcType="VARCHAR" />
+    <result column="issued_by" property="issuedBy" jdbcType="VARCHAR" />
+    <result column="issuer" property="issuer" jdbcType="VARCHAR" />
+    <result column="audit" property="audit" jdbcType="VARCHAR" />
+    <result column="auditor" property="auditor" jdbcType="VARCHAR" />
+    <result column="audit_phone" property="auditPhone" jdbcType="VARCHAR" />
+    <result column="created_time" property="createdTime" jdbcType="TIMESTAMP" />
+    <result column="source" property="source" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, company_name, permit, category_code, legal_person, responsible_person, scope, 
+    city, reg_address, address, issue_date, expired_date, license, quality_person, phone, 
+    fax, email, website, issued_by, issuer, audit, auditor, audit_phone, created_time, 
+    source
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select 
+    <include refid="Base_Column_List" />
+    from factory_db
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+
+    <select id="searchByNameOrPermit" resultMap="BaseResultMap" >
+        select
+        <include refid="Base_Column_List" />
+        from factory_db
+        where 1 = 1
+        <if test="permit != null" >
+            and permit = #{permit, jdbcType=VARCHAR}
+        </if>
+        <if test="license != null" >
+            and license = #{license, jdbcType=VARCHAR}
+        </if>
+        <if test="companyName != null" >
+            <bind name="pattern" value="'%' + companyName + '%'"/>
+            and company_name like #{pattern}
+        </if>
+    </select>
+
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
+    delete from factory_db
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="com.yiban.erp.entities.FactoryDatabase" useGeneratedKeys="true" keyProperty="id">
+    insert into factory_db (company_name, permit,
+      category_code, legal_person, responsible_person, 
+      scope, city, reg_address, 
+      address, issue_date, expired_date, 
+      license, quality_person, phone, 
+      fax, email, website, 
+      issued_by, issuer, audit, 
+      auditor, audit_phone, created_time, 
+      source)
+    values (#{companyName,jdbcType=VARCHAR}, #{permit,jdbcType=VARCHAR},
+      #{categoryCode,jdbcType=VARCHAR}, #{legalPerson,jdbcType=VARCHAR}, #{responsiblePerson,jdbcType=VARCHAR}, 
+      #{scope,jdbcType=VARCHAR}, #{city,jdbcType=VARCHAR}, #{regAddress,jdbcType=VARCHAR}, 
+      #{address,jdbcType=VARCHAR}, #{issueDate,jdbcType=DATE}, #{expiredDate,jdbcType=DATE}, 
+      #{license,jdbcType=VARCHAR}, #{qualityPerson,jdbcType=VARCHAR}, #{phone,jdbcType=VARCHAR}, 
+      #{fax,jdbcType=VARCHAR}, #{email,jdbcType=VARCHAR}, #{website,jdbcType=VARCHAR}, 
+      #{issuedBy,jdbcType=VARCHAR}, #{issuer,jdbcType=VARCHAR}, #{audit,jdbcType=VARCHAR}, 
+      #{auditor,jdbcType=VARCHAR}, #{auditPhone,jdbcType=VARCHAR}, #{createdTime,jdbcType=TIMESTAMP}, 
+      #{source,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.yiban.erp.entities.FactoryDatabase" useGeneratedKeys="true" keyProperty="id">
+    insert into factory_db
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+
+      <if test="companyName != null" >
+        company_name,
+      </if>
+      <if test="permit != null" >
+        permit,
+      </if>
+      <if test="categoryCode != null" >
+        category_code,
+      </if>
+      <if test="legalPerson != null" >
+        legal_person,
+      </if>
+      <if test="responsiblePerson != null" >
+        responsible_person,
+      </if>
+      <if test="scope != null" >
+        scope,
+      </if>
+      <if test="city != null" >
+        city,
+      </if>
+      <if test="regAddress != null" >
+        reg_address,
+      </if>
+      <if test="address != null" >
+        address,
+      </if>
+      <if test="issueDate != null" >
+        issue_date,
+      </if>
+      <if test="expiredDate != null" >
+        expired_date,
+      </if>
+      <if test="license != null" >
+        license,
+      </if>
+      <if test="qualityPerson != null" >
+        quality_person,
+      </if>
+      <if test="phone != null" >
+        phone,
+      </if>
+      <if test="fax != null" >
+        fax,
+      </if>
+      <if test="email != null" >
+        email,
+      </if>
+      <if test="website != null" >
+        website,
+      </if>
+      <if test="issuedBy != null" >
+        issued_by,
+      </if>
+      <if test="issuer != null" >
+        issuer,
+      </if>
+      <if test="audit != null" >
+        audit,
+      </if>
+      <if test="auditor != null" >
+        auditor,
+      </if>
+      <if test="auditPhone != null" >
+        audit_phone,
+      </if>
+      <if test="createdTime != null" >
+        created_time,
+      </if>
+      <if test="source != null" >
+        source,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+
+      <if test="companyName != null" >
+        #{companyName,jdbcType=VARCHAR},
+      </if>
+      <if test="permit != null" >
+        #{permit,jdbcType=VARCHAR},
+      </if>
+      <if test="categoryCode != null" >
+        #{categoryCode,jdbcType=VARCHAR},
+      </if>
+      <if test="legalPerson != null" >
+        #{legalPerson,jdbcType=VARCHAR},
+      </if>
+      <if test="responsiblePerson != null" >
+        #{responsiblePerson,jdbcType=VARCHAR},
+      </if>
+      <if test="scope != null" >
+        #{scope,jdbcType=VARCHAR},
+      </if>
+      <if test="city != null" >
+        #{city,jdbcType=VARCHAR},
+      </if>
+      <if test="regAddress != null" >
+        #{regAddress,jdbcType=VARCHAR},
+      </if>
+      <if test="address != null" >
+        #{address,jdbcType=VARCHAR},
+      </if>
+      <if test="issueDate != null" >
+        #{issueDate,jdbcType=DATE},
+      </if>
+      <if test="expiredDate != null" >
+        #{expiredDate,jdbcType=DATE},
+      </if>
+      <if test="license != null" >
+        #{license,jdbcType=VARCHAR},
+      </if>
+      <if test="qualityPerson != null" >
+        #{qualityPerson,jdbcType=VARCHAR},
+      </if>
+      <if test="phone != null" >
+        #{phone,jdbcType=VARCHAR},
+      </if>
+      <if test="fax != null" >
+        #{fax,jdbcType=VARCHAR},
+      </if>
+      <if test="email != null" >
+        #{email,jdbcType=VARCHAR},
+      </if>
+      <if test="website != null" >
+        #{website,jdbcType=VARCHAR},
+      </if>
+      <if test="issuedBy != null" >
+        #{issuedBy,jdbcType=VARCHAR},
+      </if>
+      <if test="issuer != null" >
+        #{issuer,jdbcType=VARCHAR},
+      </if>
+      <if test="audit != null" >
+        #{audit,jdbcType=VARCHAR},
+      </if>
+      <if test="auditor != null" >
+        #{auditor,jdbcType=VARCHAR},
+      </if>
+      <if test="auditPhone != null" >
+        #{auditPhone,jdbcType=VARCHAR},
+      </if>
+      <if test="createdTime != null" >
+        #{createdTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="source != null" >
+        #{source,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.yiban.erp.entities.FactoryDatabase" >
+    update factory_db
+    <set >
+      <if test="companyName != null" >
+        company_name = #{companyName,jdbcType=VARCHAR},
+      </if>
+      <if test="permit != null" >
+        permit = #{permit,jdbcType=VARCHAR},
+      </if>
+      <if test="categoryCode != null" >
+        category_code = #{categoryCode,jdbcType=VARCHAR},
+      </if>
+      <if test="legalPerson != null" >
+        legal_person = #{legalPerson,jdbcType=VARCHAR},
+      </if>
+      <if test="responsiblePerson != null" >
+        responsible_person = #{responsiblePerson,jdbcType=VARCHAR},
+      </if>
+      <if test="scope != null" >
+        scope = #{scope,jdbcType=VARCHAR},
+      </if>
+      <if test="city != null" >
+        city = #{city,jdbcType=VARCHAR},
+      </if>
+      <if test="regAddress != null" >
+        reg_address = #{regAddress,jdbcType=VARCHAR},
+      </if>
+      <if test="address != null" >
+        address = #{address,jdbcType=VARCHAR},
+      </if>
+      <if test="issueDate != null" >
+        issue_date = #{issueDate,jdbcType=DATE},
+      </if>
+      <if test="expiredDate != null" >
+        expired_date = #{expiredDate,jdbcType=DATE},
+      </if>
+      <if test="license != null" >
+        license = #{license,jdbcType=VARCHAR},
+      </if>
+      <if test="qualityPerson != null" >
+        quality_person = #{qualityPerson,jdbcType=VARCHAR},
+      </if>
+      <if test="phone != null" >
+        phone = #{phone,jdbcType=VARCHAR},
+      </if>
+      <if test="fax != null" >
+        fax = #{fax,jdbcType=VARCHAR},
+      </if>
+      <if test="email != null" >
+        email = #{email,jdbcType=VARCHAR},
+      </if>
+      <if test="website != null" >
+        website = #{website,jdbcType=VARCHAR},
+      </if>
+      <if test="issuedBy != null" >
+        issued_by = #{issuedBy,jdbcType=VARCHAR},
+      </if>
+      <if test="issuer != null" >
+        issuer = #{issuer,jdbcType=VARCHAR},
+      </if>
+      <if test="audit != null" >
+        audit = #{audit,jdbcType=VARCHAR},
+      </if>
+      <if test="auditor != null" >
+        auditor = #{auditor,jdbcType=VARCHAR},
+      </if>
+      <if test="auditPhone != null" >
+        audit_phone = #{auditPhone,jdbcType=VARCHAR},
+      </if>
+      <if test="createdTime != null" >
+        created_time = #{createdTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="source != null" >
+        source = #{source,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.yiban.erp.entities.FactoryDatabase" >
+    update factory_db
+    set company_name = #{companyName,jdbcType=VARCHAR},
+      permit = #{permit,jdbcType=VARCHAR},
+      category_code = #{categoryCode,jdbcType=VARCHAR},
+      legal_person = #{legalPerson,jdbcType=VARCHAR},
+      responsible_person = #{responsiblePerson,jdbcType=VARCHAR},
+      scope = #{scope,jdbcType=VARCHAR},
+      city = #{city,jdbcType=VARCHAR},
+      reg_address = #{regAddress,jdbcType=VARCHAR},
+      address = #{address,jdbcType=VARCHAR},
+      issue_date = #{issueDate,jdbcType=DATE},
+      expired_date = #{expiredDate,jdbcType=DATE},
+      license = #{license,jdbcType=VARCHAR},
+      quality_person = #{qualityPerson,jdbcType=VARCHAR},
+      phone = #{phone,jdbcType=VARCHAR},
+      fax = #{fax,jdbcType=VARCHAR},
+      email = #{email,jdbcType=VARCHAR},
+      website = #{website,jdbcType=VARCHAR},
+      issued_by = #{issuedBy,jdbcType=VARCHAR},
+      issuer = #{issuer,jdbcType=VARCHAR},
+      audit = #{audit,jdbcType=VARCHAR},
+      auditor = #{auditor,jdbcType=VARCHAR},
+      audit_phone = #{auditPhone,jdbcType=VARCHAR},
+      created_time = #{createdTime,jdbcType=TIMESTAMP},
+      source = #{source,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+</mapper>

@@ -6,10 +6,10 @@
 	<groupId>com.yiban</groupId>
 	<artifactId>erp</artifactId>
 	<version>0.1.0-SNAPSHOT</version>
-    <modules>
-        <module>job</module>
-    </modules>
-    <packaging>pom</packaging>
+    <!--<modules>-->
+        <!--<module>job</module>-->
+    <!--</modules>-->
+    <packaging>jar</packaging>
 
 	<name>yiban_erp</name>
 	<description>ERP project for Yiban</description>
@@ -134,7 +134,7 @@
         <dependency>
             <groupId>com.aliyun</groupId>
             <artifactId>aliyun-java-sdk-core</artifactId>
-            <version>3.5.1</version>
+            <version>3.6.0</version>
         </dependency>
 
         <dependency>
@@ -158,8 +158,8 @@
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 				<configuration>
-					<!--<source>1.7</source>-->
-					<!--<target>1.7</target>-->
+					<source>1.7</source>
+					<target>1.8</target>
 					<fork>true</fork>
 				</configuration>
 			</plugin>

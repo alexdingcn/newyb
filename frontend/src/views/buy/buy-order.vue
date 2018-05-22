@@ -77,7 +77,7 @@
 				<Table border highlight-row
 					   class="margin-top-8"
 					   :columns="orderColumns" :data="orderItems"
-					   ref="buyOrderTable" style="width: 100%;" size="small"
+					   ref="buyOrderTable" size="small"
 					   no-data-text="在商品输入框选择后添加"
 					   @on-row-dblclick="handleRowDbClick">
 					<div slot="footer">
@@ -237,10 +237,12 @@
                                 },
                                 on: {
                                     'on-change' (event) {
+                                        console.log('change:' + event.target.value);
                                         var row = self.orderItems[params.index];
                                         row[params.column.key] = event.target.value;
                                     },
  									'on-blur' (event) {
+                                         console.log('blur:' + event.target.value);
  										var row = self.orderItems[params.index];
  										var qty = row['quantity'];
  										var price = event.target.value;
@@ -250,6 +252,7 @@
                                         }
  									},
                                     'on-enter' (event) {
+                                        console.log('enter:' + event.target.value);
                                         var index = params.index * 2 + 1;
                                         var inputList = self.$refs.buyOrderTable.$el.querySelectorAll('input');
                                         if (inputList && index + 2 <= inputList.length) {
@@ -347,7 +350,7 @@
         mounted () {
         },
         activated () {
-                this.clearData();
+            this.clearData();
         },
         watch: {
         	orderItems: function () {
