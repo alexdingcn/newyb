@@ -430,7 +430,7 @@ export default {
                                 label += rawCodes[i].name + ' ';
                             }
                         }
-                        return label;
+                        return h('span', label);
                     }
                 },
                 {

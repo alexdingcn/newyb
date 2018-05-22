@@ -317,7 +317,7 @@
                         align: 'center',
                         width: 120,
                         render: (h, params) => {
-                            return params.row.goods.factoryName;
+                            return h('span', params.row.goods.factoryName);
                         }
                     },
                     {

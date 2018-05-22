@@ -107,7 +107,7 @@ export default {
                     key: 'customerReceivable',
                     width: 120,
                     render: (h, params) => {
-                        return params.row.customerReceivable && params.row.customerReceivable < 0 ? -params.row.customerReceivable : '';
+                        return h('span', params.row.customerReceivable && params.row.customerReceivable < 0 ? -params.row.customerReceivable : '');
                     }
                 },
                 {
@@ -115,7 +115,7 @@ export default {
                     key: 'customerPayable',
                     width: 120,
                     render: (h, params) => {
-                        return params.row.customerReceivable && params.row.customerReceivable > 0 ? params.row.customerReceivable : '';
+                        return h('span', params.row.customerReceivable && params.row.customerReceivable > 0 ? params.row.customerReceivable : '');
                     }
                 },
                 {

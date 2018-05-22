@@ -221,7 +221,7 @@
                         align: 'center',
                         width: 120,
                         render: (h, params) => {
-                            return moment(params.row.expDate).format('YYYY-MM-DD');
+                            return h('span', moment(params.row.expDate).format('YYYY-MM-DD'));
                         }
                     },
 
@@ -239,7 +239,7 @@
                         render: (h, params) => {
                             var self = this;
                             if(self.orderItems[params.index]["formStatus"]=="CHECKED"){
-                                return self.orderItems[params.index][params.column.key];
+                                return h('span', self.orderItems[params.index][params.column.key]);
                             }else{
                                 return h('Input', {
                                     props: {

@@ -264,7 +264,7 @@
                         align: 'center',
                         width: 120,
                         render: (h, params) => {
-                            return moment(params.row.eta).format('YYYY-MM-DD');
+                            return h('span', moment(params.row.eta).format('YYYY-MM-DD'));
                         }
                     },
                     {
@@ -273,7 +273,7 @@
                         align: 'center',
                         width: 120,
                         render: (h, params) => {
-                            return moment(params.row.eta).format('YYYY-MM-DD');
+                            return h('span', moment(params.row.eta).format('YYYY-MM-DD'));
                         }
                     }
                 ] ,
@@ -368,7 +368,7 @@
                         align: 'center',
                         width: 80,
                         render: (h, params) => {
-                            return moment(params.row.eta).format('YYYY-MM-DD');
+                            return h('span', moment(params.row.eta).format('YYYY-MM-DD'));
                         }
                     },
                     {
@@ -377,7 +377,7 @@
                         align: 'center',
                         width: 80,
                         render: (h, params) => {
-                            return moment(params.row.eta).format('YYYY-MM-DD');
+                            return h('span', moment(params.row.eta).format('YYYY-MM-DD'));
                         }
                     },
 

@@ -159,7 +159,7 @@ export default {
                   key: 'expDate',
                   width: 120, 
                   render: (h, params) => {
-                    return params.row.expDate ? moment(params.row.expDate).format('YYYY-MM-DD') : '';
+                    return h('span', params.row.expDate ? moment(params.row.expDate).format('YYYY-MM-DD') : '');
                   }
               },
               {
@@ -167,7 +167,7 @@ export default {
                   key: 'productDate',
                   width: 120, 
                   render: (h, params) => {
-                    return params.row.productDate ? moment(params.row.productDate).format('YYYY-MM-DD') : '';
+                    return h('span', params.row.productDate ? moment(params.row.productDate).format('YYYY-MM-DD') : '');
                   }
               },
               {

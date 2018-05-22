@@ -63,7 +63,7 @@ export default {
                     key: 'receiveDate',
                     render: (h, params) => {
                         let receiveDate = params.row.receiveDate;
-                        return receiveDate ? moment(receiveDate).format('YYYY-MM-DD') : '';
+                        return h('span', receiveDate ? moment(receiveDate).format('YYYY-MM-DD') : '');
                     }
                 },
                 {
