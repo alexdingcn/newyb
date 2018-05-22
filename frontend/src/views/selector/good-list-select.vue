@@ -151,11 +151,6 @@
                 ]
             };
         },
-        watch: {
-            warehouseId(val) {
-                this.warehouseId = val;
-            }
-        },
         methods: {
             reload() {
                 this.currentPage = 1;
