@@ -13,6 +13,7 @@ import com.yiban.erp.exception.BizRuntimeException;
 import com.yiban.erp.exception.ErrorCode;
 import com.yiban.erp.service.goods.GoodsService;
 import com.yiban.erp.util.UtilTool;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,6 +48,73 @@ public class SellOrderService {
     private RepertoryOutDetailMapper repertoryOutDetailMapper;
     @Autowired
     private RabbitmqQueueConfig rabbitmqQueueConfig;
+    @Autowired
+    private CustomerMapper customerMapper;
+    @Autowired
+    private GoodsBlackListMapper goodsBlackListMapper;
+
+
+    /**
+     * 主要验证销售客户是否配置了地域限制和销售限制，如果有，返回
+     * @param order
+     * @throws BizException
+     */
+    public List<String> orderValidate(SellOrder order, User user) throws BizException {
+        List<String> errorList = new ArrayList<>();
+
+        //先获取客户信息
+        Customer customer = customerMapper.getCustomerDetailById(user.getCompanyId(), order.getCustomerId());
+        if (customer == null || customer.getEnabled() == null || !customer.getEnabled()) {
+            logger.warn("customer get fail. customerId:{}", order.getCustomerId());
+            throw new BizException(ErrorCode.CUSTOMER_GET_FAIL_OR_UNENABLE);
+        }
+        //获取商品的详情ID
+        List<SellOrderDetail> orderDetails = order.getDetails();
+        if (orderDetails == null || orderDetails.isEmpty()) {
+            //空列表直接返回通过
+            return errorList;
+        }
+        List<Long> goodsDetailIdList = new ArrayList<>();
+        orderDetails.stream().forEach(item -> goodsDetailIdList.add(item.getGoodsId()));
+        if (goodsDetailIdList.isEmpty()) {
+            return errorList;
+        }
+        //获取所有选择的商品中的商品限制规则
+        List<GoodsBlackListWithBLOBs> blackLists = goodsBlackListMapper.getByGoodsDetailIds(goodsDetailIdList);
+        // 返回时返回所有的不合规的规则列表
+        if (blackLists == null || blackLists.isEmpty()) {
+            logger.info("goodsIds black list is empty.");
+            return errorList;
+        }
+
+        //先验证是否存在客户不在禁止销售列表中
+        for (GoodsBlackListWithBLOBs black : blackLists) {
+            //客户限制
+            Map<Long, Customer> customerBlack = black.getCustomerMap();
+            if (customerBlack.containsKey(customer.getId())) {
+                //解析，并且查询当前客户是否在列表中
+                String error = "商品“" + black.getGoodsName() + "”配置有对客户“" + customer.getName() + "”限制条件";
+                errorList.add(error);
+            }
+
+            //客户类别限制
+            Set<Integer> custCatSet = black.getCustomerCategoryIdSet();
+            if (customer.getCategoryId() != null && custCatSet.contains(customer.getCategoryId())) {
+                String error = "商品：" + black.getGoodsName() + "配置有客户类“" + customer.getCategoryName() + "”限制条件";
+                errorList.add(error);
+            }
+
+            //地域限制
+            if (customer.getPlaceCodes() != null && black.isInRegionsBlack(customer.getPlaceCodes())) {
+                //存在地域限制
+                String error = "商品“" + black.getGoodsName() + "”配置有对客户“"+ customer.getName() + "”的地域限制条件";
+                errorList.add(error);
+            }
+
+        }
+
+        return errorList;
+    }
 
     @Transactional
     public SellOrder orderSave(User user, SellOrder sellOrder) throws BizException {

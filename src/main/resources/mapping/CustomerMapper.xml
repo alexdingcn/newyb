@@ -227,6 +227,7 @@
     <result column="company_id" property="companyId" jdbcType="INTEGER" />
     <result column="customer_no" property="customerNo" jdbcType="VARCHAR" />
     <result column="category_id" property="categoryId" jdbcType="INTEGER" />
+    <result column="category_name" property="categoryName" jdbcType="VARCHAR"/>
     <result column="name" property="name" jdbcType="VARCHAR" />
     <result column="pinyin" property="pinyin" jdbcType="VARCHAR" />
     <result column="status" property="status" jdbcType="VARCHAR" />
@@ -269,7 +270,6 @@
     <association property="customerCategory" javaType="com.yiban.erp.entities.CustomerCategory">
       <id column="category_id" property="id" jdbcType="INTEGER" />
       <result column="company_id" property="companyId" jdbcType="INTEGER" />
-      <result column="category_no" property="categoryNo" jdbcType="VARCHAR" />
       <result column="cat_name" property="name" jdbcType="VARCHAR" />
       <result column="parent_id" property="parentId" jdbcType="INTEGER" />
       <result column="sequence_no" property="sequenceNo" jdbcType="INTEGER" />
@@ -282,7 +282,7 @@
       <result column="rep_contact_phone" property="contactPhone" jdbcType="VARCHAR" />
       <result column="rep_repertory_address" property="repertoryAddress" jdbcType="VARCHAR" />
       <result column="rep_postcode" property="postcode" jdbcType="VARCHAR" />
-      <result column="rep_is_disable" property="isDisable" jdbcType="BIT" />
+      <result column="rep_enabled" property="enabled" jdbcType="BIT" />
       <result column="rep_default_time" property="defaultTime" jdbcType="TIMESTAMP" />
       <result column="rep_comment" property="comment" jdbcType="VARCHAR" />
       <result column="rep_create_time" property="createTime" jdbcType="TIMESTAMP" />
@@ -293,7 +293,7 @@
   </resultMap>
 
   <sql id="CUSTOMER_DETAIL_COL">
-    t1.id, t1.company_id, t1.customer_no, t1.category_id, t1.name, t1.pinyin, t1.status, t1.enabled, t1.can_sale_special,
+    t1.id, t1.company_id, t1.customer_no, t1.category_id, t2.name as category_name, t1.name, t1.pinyin, t1.status, t1.enabled, t1.can_sale_special,
     t1.is_limit_special, t1.city, t1.address, t1.postcode, t1.legal_person, t1.employee,
     t1.contact_phone, t1.contact_fax, t1.email, t1.is_direction, t1.sale_area, t1.sale_man, t1.member_level,
     t1.class_att_one, t1.class_att_two, t1.stamp_template, t1.bill_template, t1.is_cold_business, t1.is_two_ticket,
@@ -301,10 +301,10 @@
     t1.account_name, t1.bank_account, t1.bank_name, t1.tax_account,
     t1.qua_check, t1.file_no, t1.supervise_no, t1.comment, t1.create_time,
     t1.update_time, t1.create_by, t1.update_by, t1.account_amount,
-    t2.category_no, t2.name as cat_name, t2.parent_id, t2.sequence_no, t2.comment as cat_comment,
+    t2.name as cat_name, t2.parent_id, t2.sequence_no, t2.comment as cat_comment,
     t4.id as rep_id, t4.customer_id as rep_customer_id, t4.name as rep_name,
     t4.contact_phone as rep_contact_phone, t4.repertory_address as rep_repertory_address,
-    t4.postcode as rep_postcode, t4.is_disable as rep_is_disable, t4.default_time as rep_default_time,
+    t4.postcode as rep_postcode, t4.enabled as rep_enabled, t4.default_time as rep_default_time,
     t4.comment as rep_comment, t4.create_time as rep_create_time,
     t4.update_time as rep_update_time, t4.create_by as rep_create_by, t4.update_by as rep_update_by
   </sql>

@@ -51,6 +51,14 @@ public class SellOrderController {
         return ResponseEntity.ok().body(JSON.toJSONString(result, SerializerFeature.DisableCircularReferenceDetect));
     }
 
+
+    @RequestMapping(value = "/order/validate", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> sellOrderValidate(@RequestBody SellOrder sellOrder,
+                                                    @AuthenticationPrincipal User user) throws Exception {
+        List<String> errorList = sellOrderService.orderValidate(sellOrder, user);
+        return ResponseEntity.ok().body(JSON.toJSONString(errorList));
+    }
+
     @RequestMapping(value = "/order/save", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> orderSave(@RequestBody SellOrder sellOrder,
                                             @AuthenticationPrincipal User user) throws Exception {

@@ -169,6 +169,10 @@
             <sell-good-history :excludedOrderId="historyExcludeId" :customerId="historyCustomerId" :goodsId="historyGoodsId"></sell-good-history>
             <div slot="footer"></div>
         </Modal>
+
+        <Modal v-model="errorListModal" width="40" :mask-closable="false" title="销售限制提示" ok-text="继续提交" @on-ok="saveContinue">
+          <h4 style="margin-bottom: 5px;" v-for="(item, index) in errorList" :key="index" >{{index+1}}. {{item}}</h4>
+        </Modal>
     </div>
 </template>
 
@@ -485,7 +489,9 @@ export default {
       historyExcludeId: "",
       historyCustomerId: "",
       historyGoodsId: "",
-      goodHistoryModal: false
+      goodHistoryModal: false,
+      errorListModal: false,
+      errorList: []
     };
   },
   watch: {
@@ -638,10 +644,6 @@ export default {
           this.$$Message.warning("需要添加商品");
           return;
         }
-        let saleGoodVidate = this.customerCanSaleGoodValidate();
-        if (!saleGoodVidate) {
-          return; //客户不能经营特殊管理产品
-        }
         //查询是否存在小于等于0的销售数量
         for (let i = 0; i < this.detailsData.length; i++) {
           let item = this.detailsData[i];
@@ -665,8 +667,38 @@ export default {
             return;
           }
         }
+
         let self = this;
-        this.$Modal.confirm({
+        //后台校验一步客户是否可以购买选择的商品列表
+        this.sellOrderFormData.details = this.detailsData;
+        util.ajax.post('/sell/order/validate', this.sellOrderFormData)
+          .then((response) => {
+              //返回的验证结果是限制列表，如果存在有值，提示，如果没有，直接跳过
+              let data = response.data;
+              if (!data || data.length <= 0) {
+                  self.$Modal.confirm({
+                      title: "保存提交确认",
+                      content: "请确认数据是否正确，提交后不能修改.",
+                      onOk: () => {
+                        self.saveSellOrder("INIT");
+                      },
+                      onCancel: () => {}
+                    });
+              }else {
+                  //有限制条件，提示是否继续
+                  self.errorList = data;
+                  self.errorListModal = true;
+              }
+          })
+          .catch((error) => {
+                util.errorProcessor(self, error);
+          });
+      });
+    },
+
+    saveContinue() {
+      let self = this;
+      this.$Modal.confirm({
           title: "保存提交确认",
           content: "请确认数据是否正确，提交后不能修改.",
           onOk: () => {
@@ -674,41 +706,6 @@ export default {
           },
           onCancel: () => {}
         });
-      });
-    },
-
-    customerCanSaleGoodValidate() {
-      //检查客户是否是可经营特殊管控的商品的，如果不是，需要检查选择的商品列表中是否存在特殊管控的商品
-      if (!this.currChooseCustomer || !this.currChooseCustomer.canSaleSpecial) {
-        for (let i = 0; i < this.detailsData.length; i++) {
-          let detailItem = this.detailsData[i];
-          let goods = detailItem.goods;
-          if (goods && goods.SpecialManaged) {
-            this.$Modal.error({
-              title: "客户商品选择限制",
-              content:
-                this.currChooseCustomer.name +
-                "不能经营特殊管控商品, 但是商品列表中存在管控商品:" +
-                goods.name
-            });
-            return false;
-          }
-          let repQuantity = detailItem.repertoryQuantity
-            ? detailItem.repertoryQuantity
-            : 0;
-          let onWayQuantity = detailItem.onWayQuantity
-            ? detailItem.onWayQuantity
-            : 0;
-          if (repQuantity - onWayQuantity < detailItem.quantity) {
-            this.$Modal.error({
-              title: "商品库存量不足",
-              content: detailItem.goodsName + "库存量不足"
-            });
-            return false;
-          }
-        }
-      }
-      return true;
     },
 
     orderSearchModalClose() {

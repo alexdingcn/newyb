@@ -159,4 +159,15 @@
       updated_time = #{updatedTime,jdbcType=TIMESTAMP}
     where id = #{id,jdbcType=BIGINT}
   </update>
+
+  <select id="getByGoodsDetailIds" parameterType="map" resultMap="ResultMapWithBLOBs">
+    select DISTINCT b.goods_id as goodsId, g.name as goodsName, b.regions, b.customer_ids, customer_category_ids
+    from goods_black_list b, goods_info g, goods_detail d
+    where b.goods_id = g.id and g.id = d.goods_info_id
+    and d.id in
+      <foreach collection="goodsIds" item="item" open="(" close=")" separator=", ">
+        #{item}
+      </foreach>
+  </select>
+
 </mapper>
