@@ -119,7 +119,7 @@ export default {
                     render: (h, params) =>　{
                         return h(goodsSpecTags, {
                             props: {
-                                tags: params.row.goods.goodsSpecs,
+                                tags: params.row.goods.goodsSpecs ? params.row.goods.goodsSpecs : [],
                                 color: 'blue'
                             }
                         });
@@ -131,7 +131,7 @@ export default {
                     align: 'center',
                     width: 120,
                     render: (h, params) => {
-                        return params.row.goods.factoryName;
+                        return h('span', params.row.goods.factoryName ? params.row.goods.factoryName : '');
                     }
                 },
               {

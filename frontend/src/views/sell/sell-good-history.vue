@@ -71,7 +71,8 @@ export default {
                   key: 'createOrderDate',
                   width: 150,
                   render: (h, params) => {
-                      return moment(params.row.createOrderDate).format('YYYY-MM-DD');
+                      let label = params.row.createOrderDate ? moment(params.row.createOrderDate).format('YYYY-MM-DD') : '';
+                      return h('span', label);
                   }
               },
               {

@@ -307,7 +307,7 @@ export default {
           align: "center",
           width: 180,
           render: (h, params) => {
-              return params.row.goods.factoryName;
+              return h('span', {}, params.row.factoryName);
           }
         },
         {
@@ -621,10 +621,6 @@ export default {
           this.$Message.warning("需要添加商品");
           return;
         }
-        let saleGoodVidate = this.customerCanSaleGoodValidate();
-        if (!saleGoodVidate) {
-          return; //客户不能经营特殊管理产品
-        }
         //两步资料完整，可以直接保存
         this.saveSellOrder("TEMP_STORAGE");
       });
@@ -751,6 +747,8 @@ export default {
     },
 
     orderFormChangeToEditModel(data) {
+      data.payOrderDate = data.payOrderDate ? moment(data.payOrderDate).format('YYYY-MM-DD') : '';
+      data.createOrderDate = data.createOrderDate ? moment(data.createOrderDate).format('YYYY-MM-DD') : '';
       this.sellOrderFormData = data;
       if (data.customerId !== this.currChooseCustomer.id) {
         this.$Notice.error({
@@ -795,6 +793,7 @@ export default {
     },
     warehouseChange(warehouseId, warehouseItem) {
       this.chooseWarehouse = warehouseItem;
+      console.log(this.chooseWarehouse);
     },
 
     addGoodBtnClick() {
@@ -830,6 +829,7 @@ export default {
       }
       let addList = chooseList.map(item => {
         let goods = item.goods;
+        console.log(goods);
         let temp = {
           sellOrderId: self.sellOrderFormData.id,
           repertoryId: item.id,

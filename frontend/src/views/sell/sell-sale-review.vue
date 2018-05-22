@@ -140,17 +140,14 @@ export default {
             orderList: [],
             orderListColumns: [
                 {
-                    type: '#',
-                    width: 30
-                },
-                {
                     title: '制单日',
                     key: 'createOrderDate',
                     align: "center",
                     width: 120,
                     sortable: true,
                     render:(h, params) => {
-                        return moment(params.row.createOrderDate).format('YYYY-MM-DD');
+                        let label = params.row.createOrderDate ? moment(params.row.createOrderDate).format('YYYY-MM-DD') : '';
+                        return h('span', label);
                     }
                 },
                 {
@@ -196,12 +193,12 @@ export default {
                     align: "center",
                     width: 140
                 },
-                {
-                    title: '提货员',
-                    key: 'takeGoodsUser',
-                    align: "center",
-                    width: 140
-                },
+                // {
+                //     title: '提货员',
+                //     key: 'takeGoodsUser',
+                //     align: "center",
+                //     width: 140
+                // },
                 {
                     title: '销售单号',
                     key: 'orderNumber',
@@ -299,7 +296,7 @@ export default {
                     key: "factoryName",
                     width: 180,
                     render: (h, params) => {
-                        return params.row.goods.factoryName;
+                        return h('span', params.row.goods.factoryName);
                     }
                 },
                 {
@@ -351,7 +348,8 @@ export default {
                     width: 120,
                     key: 'productData',
                     render: (h, params) => {
-                        return params.row.productDate ? moment(params.row.productDate).format('YYYY-MM-DD') : '';
+                        let label = params.row.productDate ? moment(params.row.productDate).format('YYYY-MM-DD') : '';
+                        return h('span', label);
                     }
                 },
                 {
@@ -359,7 +357,8 @@ export default {
                     key: 'expDate',
                     width: 120,
                     render: (h, params) => {
-                        return params.row.expDate ? moment(params.row.expDate).format('YYYY-MM-DD') : '';
+                        let label = params.row.expDate ? moment(params.row.expDate).format('YYYY-MM-DD') : '';
+                        return h('span', label);
                     }
                 },
                 {
