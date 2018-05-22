@@ -85,6 +85,7 @@ public enum ErrorCode {
     CUSTOMER_CERT_REMOVE_PARAMS(2008, "请选择需要删除的证件"),
     CUSTOMER_REP_PARAMS_ERROR(2009, "验证客户代表人信息必输项失败"),
     CUSTOMER_REP_REMOVE_PARAMS(2010, "请选择需要删除的代表人信息"),
+    CUSTOMER_GET_FAIL_OR_UNENABLE(2011, "获取客户信息失败或者客户已经禁用"),
 
     // 21xx - 档案
     FILE_TYPE_CREATE_FAIL(2101, "新增档案类型失败"),
