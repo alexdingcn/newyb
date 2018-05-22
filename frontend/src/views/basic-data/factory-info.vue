@@ -9,6 +9,7 @@
                 <p slot="title">
                     <Icon type="compose"></Icon>
                      {{ formItem.name || '生产企业' }}
+                     
                 </p>
 
                 <div slot="extra">
@@ -19,6 +20,7 @@
 
                 <Form :model="formItem" :rules="ruleValidate" :label-width="80">
                     <h3>基本信息</h3>
+                    <Alert show-icon>修改企业名称或者生产许可证自动补全信息</Alert>
                     <hr style="width: 50%; margin-bottom:15px;" size="1"/>
                     <Row>
                         <Col span="8">
@@ -106,7 +108,7 @@
                     <Row>
                         <Col span="8">
                             <FormItem label="生产许可证" prop="permit">
-                                <Input v-model="formItem.permit"/>
+                                <Input v-model="formItem.permit" @on-blur="onChangePermit"/>
                             </FormItem>
                         </Col>
                         <Col span="8">
@@ -268,6 +270,57 @@ export default {
                 util.ajax.post('/util/pinyinAbbr', { name: this.formItem.name })
                     .then(function (response) {
                         self.formItem.pinyin = response.data;
+                    })
+                    .catch(function (error) {
+                        util.errorProcessor(self, error);
+                    });
+                
+                util.ajax.post('/factory/database/search', { companyName: this.formItem.name })
+                    .then(function (response) {
+                        if (response.status === 200 && response.data.length > 0) {
+                            self.$Modal.confirm({
+                                title: '是否补全数据',
+                                content: '基础数据库检测到企业:' + response.data[0].companyName + ',是否补全数据',
+                                onOk: () => {
+                                    self.fulfillData(response.data[0])
+                                }
+                            });
+                        }
+                    })
+                    .catch(function (error) {
+                        util.errorProcessor(self, error);
+                    });
+            }
+        },
+        fulfillData(factoryInfo) {
+            // TODO add selector for more results
+            this.formItem.name = factoryInfo.companyName;
+            this.formItem.origin = factoryInfo.city;
+            this.formItem.address = factoryInfo.address;
+            this.formItem.contact = factoryInfo.legalPerson;
+            this.formItem.phone = factoryInfo.phone;
+            this.formItem.fax = factoryInfo.fax;
+            this.formItem.email = factoryInfo.email;
+            this.formItem.permit = factoryInfo.permit;
+            this.formItem.permitExp = factoryInfo.expiredDate;
+            this.formItem.license = factoryInfo.license;
+            this.formItem.comment = factoryInfo.scope;
+            this.formItem.employee = factoryInfo.responsiblePerson;
+        },
+        onChangePermit(val) {
+            if (this.formItem.permit) {
+                var self = this;
+                util.ajax.post('/factory/database/search', { permit: this.formItem.permit })
+                    .then(function (response) {
+                        if (response.status === 200 && response.data.length > 0) {
+                            self.$Modal.confirm({
+                                title: '是否补全数据',
+                                content: '基础数据库检测到企业:' + response.data[0].companyName,
+                                onOk: () => {
+                                    self.fulfillData(response.data[0])
+                                }
+                            });
+                        }
                     })
                     .catch(function (error) {
                         util.errorProcessor(self, error);

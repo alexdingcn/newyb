@@ -55,7 +55,6 @@ export default {
     data () {
         return {
             goodsId: '',
-            warehouseId: '',
             selectGoodsModal: false,
             selectSize: this.size,
             goodsLoading: false,
@@ -65,9 +64,6 @@ export default {
     watch: {
         value(newValue) {
             this.goodsId = newValue;
-        },
-        warehouseId(val) {
-            this.warehouseId = val;
         }
     },
     computed: {

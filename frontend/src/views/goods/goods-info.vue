@@ -159,17 +159,17 @@
                         <Row class="row-margin-bottom">
                             <i-col span="6">
                                 <FormItem label="批发价" :label-width="100" prop="useSpec">
-                                     <InputNumber :min="0" v-model="formData.batchPrice" style="width: 100%;" />
+                                     <Input v-model="formData.batchPrice" style="width: 100%;" />
                                 </FormItem>
                             </i-col>
                             <i-col span="6">
                                 <FormItem label="市场价" :label-width="100" prop="useSpec">
-                                     <InputNumber :min="0" v-model="formData.retailPrice" style="width: 100%;" />
+                                     <Input v-model="formData.retailPrice" style="width: 100%;" />
                                 </FormItem>
                             </i-col>
                             <i-col span="6">
                                 <FormItem label="参考进货价" :label-width="100" prop="useSpec">
-                                     <InputNumber :min="0" v-model="formData.inPrice" style="width: 100%;" />
+                                     <Input v-model="formData.inPrice" style="width: 100%;" />
                                 </FormItem>
                             </i-col>
                         </Row>
@@ -810,9 +810,8 @@ export default {
 
         inputRender (h, params) {
             let self = this;
-            return h('InputNumber', {
+            return h('Input', {
                 props: {
-                    min: 0,
                     value: self.goodsDetails[params.index][params.column.key]
                 },
                 on: {

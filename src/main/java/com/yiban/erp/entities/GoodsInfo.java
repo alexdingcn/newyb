@@ -33,6 +33,8 @@ public class GoodsInfo {
 
     private Long factoryId;
 
+    private String factoryName;
+
     private Long unit;
 
     private Long packUnit;
@@ -827,5 +829,13 @@ public class GoodsInfo {
 
     public void setBlackList(String blackList) {
         this.blackList = blackList;
+    }
+
+    public String getFactoryName() {
+        return factoryName;
+    }
+
+    public void setFactoryName(String factoryName) {
+        this.factoryName = factoryName;
     }
 }
