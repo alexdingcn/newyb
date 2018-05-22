@@ -73,14 +73,14 @@ import moment from 'moment';
 import customerSelect from "@/views/selector/customer-select.vue";
 import saleSelect from "@/views/selector/sale-select.vue";
 import goodsExpand from "@/views/goods/goods-expand.vue";
-import goodsSepcTags from '../goods/goods-spec-tabs.vue';
+import goodsSpecTags from '../goods/goods-spec-tabs.vue';
 
 export default {
     name: 'sell-sale-review',
     components: {
         customerSelect,
         saleSelect,
-        goodsSepcTags,
+        goodsSpecTags,
         goodsExpand
     },
     props: {
@@ -214,6 +214,16 @@ export default {
                     width: 120
                 },
                 {
+                    title: '免零金额',
+                    key: 'freeAmount',
+                    width: 120
+                },
+                {
+                    title: '整单折扣率',
+                    key: 'disRate',
+                    width: 120
+                },
+                {
                     title: '总计金额',
                     key: 'totalAmount',
                     width: 120
@@ -260,26 +270,29 @@ export default {
             detailChooseItems: [],
             sellDetailColumns: [
                 {
-                    type: "expand",
-                    width: 50,
-                    render: (h, params) => {
-                        let goods = params.row.goods;
-                        let productDate = params.row.productDate ? moment(params.row.productDate).format('YYYY-MM-DD') : '';
-                        let expDate = params.row.expDate ? moment(params.row.expDate).format('YYYY-MM-DD') : '';
-                        return h(goodsExpand, {
-                        props: {
-                            good: goods,
-                            productDate: productDate,
-                            expDate: expDate
-                        }
-                        })
-                    }
-                },
-                {
                     title: "商品名称",
                     key: "goodsName",
                     sortable: true,
-                    width: 180
+                    width: 180,
+                    render: (h, params) => {
+                        let self = this;
+                        return h('Button', {
+                        props:{
+                            type: 'text',
+                            icon: 'eye'
+                        },
+                        on: {
+                            click: () => {
+                            self.expandProductDate = params.row.productDate ? moment(params.row.productDate).format("YYYY-MM-DD") : "";
+                            self.expandExpDate = params.row.expDate ? moment(params.row.expDate).format("YYYY-MM-DD") : "";
+                            self.expandGoodsSpecs = params.row.goods.goodsSpecs ? params.row.goods.goodsSpecs : [];
+                            let goodsId = params.row.goods.id;
+                            self.$refs.goodsExpand.loadGoodsData(goodsId);
+                            self.goodsExpandModal = true;
+                            }
+                        }
+                        }, params.row.goodsName);
+                    }
                 },
                 {
                     title: "生产企业",
@@ -304,7 +317,7 @@ export default {
                     key: "spec",
                     width: 120,
                     render: (h, params) =>　{
-                        return h(goodsSepcTags, {
+                        return h(goodsSpecTags, {
                             props: {
                                 tags: params.row.goods.goodsSpecs,
                                 color: 'blue'
@@ -415,7 +428,11 @@ export default {
             ],
             totalCount: 0,
             totalAmount: 0,
-            chooseOrderItem: {}
+            chooseOrderItem: {},
+            goodsExpandModal: false,
+            expandGoodsSpecs: [],
+            expandProductDate: '',
+            expandExpDate: ''
         }
     },
     watch: {

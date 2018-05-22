@@ -213,6 +213,16 @@ export default {
                     width: 100
                 },
                 {
+                    title: '免零金额',
+                    key: 'freeAmount',
+                    width: 120
+                },
+                {
+                    title: '整单折扣率',
+                    key: 'disRate',
+                    width: 120
+                },
+                {
                     title: '总计金额',
                     key: 'totalAmount',
                     width: 100

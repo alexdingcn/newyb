@@ -113,7 +113,7 @@
     import optionSelect from '@/views/selector/option-select.vue';
     import warehouseSelect from "@/views/selector/warehouse-select.vue";
     import goodSelect from '@/views/selector/good-select.vue';
-    import goodsSepcTags from '../goods/goods-spec-tabs.vue';
+    import goodsSpecTags from '../goods/goods-spec-tabs.vue';
 
     export default {
         name: 'buy_order',
@@ -124,7 +124,7 @@
             optionSelect,
             goodSelect,
             warehouseSelect,
-            goodsSepcTags
+            goodsSpecTags
         },
         data () {
             return {
@@ -165,7 +165,7 @@
                         title: '规格',
                         width: 120,
                         render: (h, params) =>　{
-                            return h(goodsSepcTags, {
+                            return h(goodsSpecTags, {
                                 props: {
                                     tags: params.row.goodsSpecs,
                                     color: 'blue'

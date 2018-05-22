@@ -98,6 +98,13 @@ public class GoodsController {
         return ResponseEntity.ok().body(JSON.toJSONString(goodsInfo));
     }
 
+    @RequestMapping(value = "/info", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> getInfoByDetailId(@RequestParam("detailId") Long detailId,
+                                                    @AuthenticationPrincipal User user) throws Exception {
+        Goods goods = goodsService.getInfoByDetailId(detailId, user);
+        return ResponseEntity.ok().body(JSON.toJSONString(goods));
+    }
+
     @RequestMapping(value = "/remove/{infoId}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> remove(@PathVariable Long infoId,
                                          @AuthenticationPrincipal User user) throws Exception {

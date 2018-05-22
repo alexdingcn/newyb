@@ -25,7 +25,7 @@
                                     <span>同一个商品可能对于不同的客户既定的报价不同，所以请先选择客户，再选择商品，自动匹配既定的报价。</span>
                                 </div>
                             </customer-select>
-                            <Input v-else type="text" :disabled="editMode" v-model="sellOrderFormData.customerName"></Input>
+                            <Input v-else type="text" :disabled="editMode" v-model="sellOrderFormData.customerName" />
                         </FormItem>
                     </i-col>
 
@@ -34,7 +34,6 @@
                             <DatePicker v-model="sellOrderFormData.payOrderDate" type="date" placeholder="请选择收款期限" ></DatePicker>
                         </FormItem>
                     </i-col>
-
                 </Row>
 
                 <Row type="flex" justify="start">
@@ -45,24 +44,33 @@
                     </i-col>
                     <i-col span="8">
                         <FormItem label="自定单号" >
-                            <Input type="text" v-model="sellOrderFormData.refNo" ></Input>
+                            <Input type="text" v-model="sellOrderFormData.refNo" />
                         </FormItem>
                     </i-col>
-                    <!--<i-col span="6">-->
-                        <!--<FormItem label="制单日期" >-->
-                            <!--<DatePicker v-model="sellOrderFormData.createOrderDate" type="date" placeholder="请选择制单日期" ></DatePicker>-->
-                        <!--</FormItem>-->
-                    <!--</i-col>-->
-                    <!--<i-col span="6">-->
-                        <!--<FormItem label="加价率" >-->
-                            <!--<Input v-model="sellOrderFormData.markUpRate" number ></Input>-->
-                        <!--</FormItem>-->
-                    <!--</i-col>-->
-                    <!--<i-col span="6">-->
-                        <!--<FormItem label="提货人" >-->
-                            <!--<Input type="text" v-model="sellOrderFormData.takeGoodsUser" placeholder="请输入提货人"></Input>-->
-                        <!--</FormItem>-->
-                    <!--</i-col>-->
+                </Row>
+
+                <Row type="flex" justify="start">
+                    <i-col span="8">
+                        <FormItem label="免零金额" prop="freeAmount">
+                            <Input number v-model="sellOrderFormData.freeAmount" @on-blur="resetTotalAmount"/>
+                        </FormItem>
+                    </i-col>
+                    <i-col span="8">
+                        <FormItem label="整单折扣率" >
+                            <Input number v-model="sellOrderFormData.disRate" @on-blur="resetTotalAmount"/>
+                        </FormItem>
+                    </i-col>
+                    <i-col span="8">
+                        <FormItem label="订单总金额" >
+                            <Input number v-model="sellOrderFormData.totalAmount" style="width: 95%" />
+                            <Tooltip transfer placement="left-start">
+                              <Icon type="ios-help-outline"></Icon>
+                              <div slot="content" >
+                                  <p>订单总金额 = (商品总金额 * 整单折扣率/100) - 免零金额</p>
+                              </div>
+                          </Tooltip>
+                        </FormItem>
+                    </i-col>
                 </Row>
 
                 <Row type="flex" justify="start">
@@ -73,7 +81,7 @@
                     </i-col>
                     <i-col span="16">
                         <FormItem label="备注" >
-                            <Input type="text" v-model="sellOrderFormData.comment" placeholder="请输入备注"></Input>
+                            <Input type="text" v-model="sellOrderFormData.comment" placeholder="请输入备注" />
                         </FormItem>
                     </i-col>
                 </Row>
@@ -92,8 +100,8 @@
                        @on-row-dblclick="handleRowDbClick">
                     <div slot="footer">
                         <h3 class="padding-left-20" >
-                            <b>合计数量: {{totalQuantity}}</b>  <b class="margin-left-50">合计金额:</b> ￥{{ totalAmount }}
-                            <span class="margin-left-50"> 提示: 金额 = (数量 - 赠送) x 实价 x (1 - 折扣%) </span>
+                            <b>商品合计数量: {{totalQuantity}}</b>  <b class="margin-left-50">商品合计金额:</b> ￥{{ totalAmount }}
+                            <span class="margin-left-50"> 提示: 金额 = (数量 - 赠送) x 实价 x 折扣% </span>
                         </h3>
                     </div>
                 </Table>
@@ -122,7 +130,7 @@
                     </i-col>
                 </Row>
                 <Row type="flex" justify="start">
-                    <Col span="20">
+                    <i-col span="20">
                         <FormItem label="送货地址" prop="customerRepId">
 
                             <RadioGroup v-model="sellOrderFormData.customerRepId"
@@ -139,17 +147,7 @@
                         </FormItem>
 
                         <customer-rep ref="repModal" @on-closed="refreshCustomerRepList"></customer-rep>
-                    </Col>
-                    <!--<i-col span="8">-->
-                        <!--<FormItem label="收货电话" prop="contactPhone">-->
-                            <!--<Input type="text" readonly v-model="sellOrderFormData.contactPhone" ></Input>-->
-                        <!--</FormItem>-->
-                    <!--</i-col>-->
-                    <!--<i-col span="10">-->
-                        <!--<FormItem label="收货地址" prop="repertoryAddress">-->
-                            <!--<Input type="text" readonly v-model="sellOrderFormData.repertoryAddress" ></Input>-->
-                        <!--</FormItem>-->
-                    <!--</i-col>-->
+                    </i-col>
                 </Row>
             </Form>
         </Card>
@@ -165,14 +163,18 @@
           <repertory-info-select ref="repertorySelect" :warehouse="chooseWarehouse" @on-choosed="repertoryInfoChoonsed" ></repertory-info-select>
         </Modal>
 
-        <Modal v-model="goodHistoryModal" width="75" :mask-closable="false" title="客户商品销售历史价格">
+        <Modal v-model="goodHistoryModal" width="75" :mask-closable="false" title="客户商品销售历史价格" :footerHide="true">
             <sell-good-history :excludedOrderId="historyExcludeId" :customerId="historyCustomerId" :goodsId="historyGoodsId"></sell-good-history>
-            <div slot="footer"></div>
         </Modal>
 
         <Modal v-model="errorListModal" width="40" :mask-closable="false" title="销售限制提示" ok-text="继续提交" @on-ok="saveContinue">
           <h4 style="margin-bottom: 5px;" v-for="(item, index) in errorList" :key="index" >{{index+1}}. {{item}}</h4>
         </Modal>
+
+        <Modal v-model="goodsExpandModal" width="60" :mask-closable="false" title="商品详情信息" :footerHide="true">
+          <goods-expand ref="goodsExpand" :goodsSpecs="expandGoodsSpecs" :productDate="expandProductDate" :expDate="expandExpDate"></goods-expand>
+        </Modal>
+
     </div>
 </template>
 
@@ -190,12 +192,12 @@ import optionSelect from "@/views/selector/option-select.vue";
 import shipCompanySelect from "@/views/selector/ship-company-select.vue";
 import repertoryInfoSelect from "@/views/selector/repertory-info-select.vue";
 import customerRep from "../customer/customer-rep.vue";
-import goodsSepcTags from '../goods/goods-spec-tabs.vue';
+import goodsSpecTags from '../goods/goods-spec-tabs.vue';
 
 export default {
   name: "sell_order_make",
   components: {
-    goodsSepcTags,
+    goodsSpecTags,
     customerSelect,
     customerRep,
     sellOrderSearch,
@@ -216,6 +218,9 @@ export default {
         customerRepId: "",
         saleId: "",
         warehouseId: "",
+        freeAmount: 0,
+        disRate: 100,
+        totalAmount: 0,
         payOrderDate: moment()
           .add("7", "d")
           .format("YYYY-MM-DD"),
@@ -271,31 +276,30 @@ export default {
       detailsData: [],
       detailsColumns: [
         {
-          type: "expand",
-          width: 50,
-          render: (h, params) => {
-            let goods = params.row.goods;
-            let productDate = params.row.productDate
-              ? moment(params.row.productDate).format("YYYY-MM-DD")
-              : "";
-            let expDate = params.row.expDate
-              ? moment(params.row.expDate).format("YYYY-MM-DD")
-              : "";
-            return h(goodExpand, {
-              props: {
-                good: goods,
-                productDate: productDate,
-                expDate: expDate
-              }
-            });
-          }
-        },
-        {
           title: "商品名称",
           key: "goodsName",
           align: "center",
           sortable: true,
-          width: 180
+          width: 180,
+          render: (h, params) => {
+            let self = this;
+            return h('Button', {
+              props:{
+                  type: 'text',
+                  icon: 'eye'
+              },
+              on: {
+                click: () => {
+                  self.expandProductDate = params.row.productDate ? moment(params.row.productDate).format("YYYY-MM-DD") : "";
+                  self.expandExpDate = params.row.expDate ? moment(params.row.expDate).format("YYYY-MM-DD") : "";
+                  self.expandGoodsSpecs = params.row.goods.goodsSpecs ? params.row.goods.goodsSpecs : [];
+                  let goodsId = params.row.goods.id;
+                  self.$refs.goodsExpand.loadGoodsData(goodsId);
+                  self.goodsExpandModal = true;
+                }
+              }
+            }, params.row.goodsName);
+          }
         },
         {
           title: "生产企业",
@@ -324,7 +328,7 @@ export default {
           align: "center",
           width: 120,
           render: (h, params) =>　{
-              return h(goodsSepcTags, {
+              return h(goodsSpecTags, {
                   props: {
                       tags: params.row.goods.goodsSpecs,
                       color: 'blue'
@@ -338,12 +342,6 @@ export default {
           width: 100,
           align: "center"
         },
-        // {
-        //   title: "在单数",
-        //   key: "onWayQuantity",
-        //   width: 100,
-        //   align: "center"
-        // },
         {
           title: "销售数量",
           key: "quantity",
@@ -491,7 +489,11 @@ export default {
       historyGoodsId: "",
       goodHistoryModal: false,
       errorListModal: false,
-      errorList: []
+      errorList: [],
+      goodsExpandModal: false,
+      expandGoodsSpecs: [],
+      expandProductDate: '',
+      expandExpDate: ''
     };
   },
   watch: {
@@ -513,9 +515,20 @@ export default {
         this.totalQuantity = 0;
         this.totalAmount = 0;
       }
+      this.resetTotalAmount();
     }
   },
   methods: {
+    resetTotalAmount() {
+      let freeAmount = this.sellOrderFormData.freeAmount ? parseFloat(this.sellOrderFormData.freeAmount) : 0;
+      let disRate = this.sellOrderFormData.disRate ? parseFloat(this.sellOrderFormData.disRate) : 100;
+      let goodsTotalAmount = this.totalAmount ? this.totalAmount : 0;
+      
+      //订单的总金额 = 商品总金额 * disRate/100) - freeAmount;
+      let totalAmount = (goodsTotalAmount * disRate/100 - freeAmount).toFixed(2);
+      this.sellOrderFormData.totalAmount = totalAmount; 
+    },
+
     customerChange(customerId, customer) {
       this.currChooseCustomer = customer;
       if (customer && customer.id) {
@@ -668,6 +681,22 @@ export default {
           }
         }
 
+        //看看免零金额和订单总金额是否小于0
+        if (this.sellOrderFormData.freeAmount < 0) {
+          this.$Modal.warning({
+            title: '免零金额错误提示',
+            content: '免零金额必须大于等于0',
+          });
+          return;
+        }
+        if (this.sellOrderFormData.totalAmount < 0) {
+          this.$Modal.warning({
+            title: '整单总金额错误提示',
+            content: '整单总金额必须大于等于0',
+          });
+          return;
+        }
+
         let self = this;
         //后台校验一步客户是否可以购买选择的商品列表
         this.sellOrderFormData.details = this.detailsData;
@@ -810,7 +839,7 @@ export default {
           onWayQuantity: item.onWayQuantity,
           quantity: 0,
           fixPrice: goods ? goods.batchPrice : 0,
-          disPrice: 0,
+          disPrice: 100,
           free: 0,
           realPrice: goods ? goods.batchPrice : 0,
           singlePrice: goods ? goods.batchPrice : 0,
@@ -820,7 +849,7 @@ export default {
           productDate: item.productDate,
           expDate: item.expDate,
           location: item.location,
-          factoryName: goods.factory,
+          factoryName: goods.factoryName,
           origin: goods.origin,
           jx: goods.jxName,
           spec: goods.spec,
@@ -847,11 +876,11 @@ export default {
     resetGoodSDataAmount(index) {
       let row = this.detailsData[index];
       let realPrice = row["realPrice"] && !isNaN(row["realPrice"]) ? row["realPrice"] : 0;
-      let disPrice = row["disPrice"] && !isNaN(row["disPrice"]) ? row["disPrice"] : 0;
+      let disPrice = row["disPrice"] && !isNaN(row["disPrice"]) ? row["disPrice"] : 100;
       let free = row["free"] && !isNaN(row["free"]) ? row["free"] : 0;
       let quantity = row["quantity"] && !isNaN(row["quantity"]) ? row["quantity"] : 0;
       let num = quantity - free > 0 ? quantity - free : 0;
-      row.amount = (num * realPrice * (1 - disPrice / 100)).toFixed(2);
+      row.amount = (num * realPrice * disPrice / 100).toFixed(2);
       this.$set(this.detailsData, index, row);
     },
 

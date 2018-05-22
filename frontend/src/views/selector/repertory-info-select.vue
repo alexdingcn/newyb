@@ -59,13 +59,13 @@ import util from "@/libs/util.js";
 import moment from 'moment';
 import goodSelect from "@/views/selector/good-select.vue";
 import supplierSelect from '@/views/selector/supplier-select.vue';
-import goodsSepcTags from '../goods/goods-spec-tabs.vue';
+import goodsSpecTags from '../goods/goods-spec-tabs.vue';
 
 export default {
   name: 'repertory-info-select',
   components: {
       goodSelect,
-      goodsSepcTags,
+      goodsSpecTags,
       supplierSelect
   },
   props: {
@@ -117,7 +117,7 @@ export default {
                     key: 'goodsSpecs',
                     width: 120,
                     render: (h, params) =>　{
-                        return h(goodsSepcTags, {
+                        return h(goodsSpecTags, {
                             props: {
                                 tags: params.row.goods.goodsSpecs,
                                 color: 'blue'

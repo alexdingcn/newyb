@@ -127,12 +127,12 @@ import factorySelect from "@/views/selector/factory-select.vue";
 import supplierSelect from "@/views/selector/supplier-select.vue";
 import goodSelect from "@/views/selector/good-select.vue";
 import buyerSelect from "@/views/selector/buyer-select.vue";
-import goodsSepcTags from '../goods/goods-spec-tabs.vue';
+import goodsSpecTags from '../goods/goods-spec-tabs.vue';
 
 export default {
   name: "store_now",
   components: {
-    goodsSepcTags,
+    goodsSpecTags,
     warehouseSelect,
     factorySelect,
     supplierSelect,
@@ -181,7 +181,7 @@ export default {
             key: 'goodsSpecs',
             width: 120,
             render: (h, params) =>　{
-                return h(goodsSepcTags, {
+                return h(goodsSpecTags, {
                     props: {
                         tags: params.row.goods ? params.row.goods.goodsSpecs : "",
                         color: 'blue'

@@ -10,6 +10,7 @@
 <script>
 import util from '@/libs/util.js';
 import moment from 'moment';
+import goodsSpecTags from '@/views/goods/goods-spec-tabs.vue';
 
 export default {
   name: 'sell-good-history',
@@ -17,6 +18,9 @@ export default {
       excludedOrderId: Number|String,
       customerId: Number|String,
       goodsId: Number|String
+  },
+  components: {
+      goodsSpecTags
   },
   data() {
       return {
@@ -50,14 +54,17 @@ export default {
                   width: 150,
               },
               {
-                  title: '剂型',
-                  key: 'jx',
-                  width: 150
-              },
-              {
                   title: '规格',
                   key: 'spec',
-                  width: 150
+                  width: 150,
+                  render: (h, params) =>　{
+                        return h(goodsSpecTags, {
+                            props: {
+                                tags: params.row.goods.goodsSpecs ? params.row.goods.goodsSpecs : [],
+                                color: 'blue'
+                            }
+                        });
+                    }
               },
               {
                   title: '制单日',
@@ -105,16 +112,6 @@ export default {
                   title: '金额',
                   key: 'amount',
                   width: 120
-              },
-              {
-                  title: '批准文号',
-                  key: 'permitNo',
-                  width: 170
-              },
-              {
-                  title: '存储条件',
-                  key: 'storageConditionName',
-                  width: 150
               }
           ]
       }

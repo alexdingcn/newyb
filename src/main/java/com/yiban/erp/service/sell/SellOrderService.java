@@ -122,19 +122,21 @@ public class SellOrderService {
             logger.warn("user:{} save order but order validate is error.", user.getId());
             throw new BizException(ErrorCode.SELL_ORDER_PARAM_ERROR);
         }
+        //总金额和免零金额都不能小于0
+        if (sellOrder.getTotalAmount() != null && BigDecimal.ZERO.compareTo(sellOrder.getTotalAmount()) > 0) {
+            throw new BizException(ErrorCode.SELL_TOTAL_AMOUNT_ERROR);
+        }
+        if (sellOrder.getFreeAmount() != null && BigDecimal.ZERO.compareTo(sellOrder.getFreeAmount()) > 0) {
+            throw new BizException(ErrorCode.SELL_FREE_AMOUNT_ERROR);
+        }
+
         List<SellOrderDetail> details = sellOrder.getDetails();
         //验证客户是否允许经营特殊管理药品 同时统计总销售数量和总金额
         BigDecimal totalQuantity = BigDecimal.ZERO;
-        BigDecimal totalAmount = BigDecimal.ZERO;
         List<Long> goodIdList = new ArrayList<>();
         for (SellOrderDetail item : details) {
             goodIdList.add(item.getGoodsId());
             totalQuantity = totalQuantity.add(item.getQuantity() == null ? BigDecimal.ZERO : item.getQuantity());
-            totalAmount = totalAmount.add(item.getAmount() == null ? BigDecimal.ZERO : item.getAmount());
-        }
-        if (!isCustomerCanSellGoods(sellOrder.getCustomerId(), goodIdList)) {
-            logger.warn("user: {} save sell order detail good have special managed but customer:{} can not shell.", user.getId(), sellOrder.getCustomerId());
-            throw new BizException(ErrorCode.SELL_ORDER_CUSTOMER_CANNOT_SELL_GOOD);
         }
 
         if (sellOrder.getId() == null) {
@@ -146,7 +148,9 @@ public class SellOrderService {
             sellOrder.setCreateBy(user.getNickname());
             sellOrder.setCreateTime(new Date());
             sellOrder.setTotalQuantity(totalQuantity);
-            sellOrder.setTotalAmount(totalAmount);
+            sellOrder.setTotalAmount(sellOrder.getTotalAmount() == null ? BigDecimal.ZERO : sellOrder.getTotalAmount());
+            sellOrder.setFreeAmount(sellOrder.getFreeAmount() == null ? BigDecimal.ZERO : sellOrder.getFreeAmount());
+            sellOrder.setDisRate(sellOrder.getDisRate() == null ? BigDecimal.valueOf(100.0): sellOrder.getDisRate());
             int count = sellOrderMapper.insert(sellOrder);
             if (count > 0 && sellOrder.getId() > 0) {
                 //保存详情信息
@@ -161,7 +165,9 @@ public class SellOrderService {
             }
         } else {
             sellOrder.setTotalQuantity(totalQuantity);
-            sellOrder.setTotalAmount(totalAmount);
+            sellOrder.setTotalAmount(sellOrder.getTotalAmount() == null ? BigDecimal.ZERO : sellOrder.getTotalAmount());
+            sellOrder.setFreeAmount(sellOrder.getFreeAmount() == null ? BigDecimal.ZERO : sellOrder.getFreeAmount());
+            sellOrder.setDisRate(sellOrder.getDisRate() == null ? BigDecimal.valueOf(100.0): sellOrder.getDisRate());
             sellOrder.setUpdateTime(new Date());
             sellOrder.setUpdateBy(user.getNickname());
             int count = sellOrderMapper.updateByPrimaryKeySelective(sellOrder);
@@ -296,11 +302,6 @@ public class SellOrderService {
         details.stream().forEach(item -> item.setGoods(goodsMap.get(item.getGoodsId())));
     }
 
-
-    public boolean isCustomerCanSellGoods(Long customerId, List<Long> goodIds) throws BizException {
-        //TODO 检验客户是否能否购买这些产品信息
-        return true;
-    }
 
     public int removeSellOrderDetail(User user, Long detailId) throws BizException {
         if (detailId == null || detailId <= 0) {
