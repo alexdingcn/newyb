@@ -76,7 +76,7 @@
     import moment from 'moment';
     import util from '@/libs/util.js';
     import supplierSelect from "@/views/selector/supplier-select.vue";
-    import goodsSepcTags from '../goods/goods-spec-tabs.vue';
+    import goodsSpecTags from '../goods/goods-spec-tabs.vue';
 
     export default {
         name: 'buy_order',
@@ -88,7 +88,7 @@
         },
         components: {
             supplierSelect,
-            goodsSepcTags
+            goodsSpecTags
         },
         data () {
             return {
@@ -272,7 +272,7 @@
                         key: 'goodsSpecs',
                         width: 120,
                         render: (h, params) =>　{
-                            return h(goodsSepcTags, {
+                            return h(goodsSpecTags, {
                                 props: {
                                     tags: params.row.goods.goodsSpecs,
                                     color: 'blue'

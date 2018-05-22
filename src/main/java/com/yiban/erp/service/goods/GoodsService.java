@@ -200,6 +200,33 @@ public class GoodsService {
         return goods;
     }
 
+    public Goods getInfoByDetailId(Long detailId, User user) throws BizException {
+        List<Goods> goodsList = getGoodsById(Arrays.asList(detailId));
+        if (goodsList == null || goodsList.isEmpty()) {
+            throw new BizException(ErrorCode.GOODS_GET_RESULT_NULL);
+        }
+        //如果有，应该只有一个
+        Goods goods = goodsList.get(0);
+        //自定义属性
+        goods.setAttributeRefs(getGoodsAttributeRef(goods.getGoodsInfoId(), user.getCompanyId()));
+        return goods;
+    }
+
+    private List<GoodsAttributeRef> getGoodsAttributeRef(Long goodsInfoId, Integer companyId) {
+        //自定义属性
+        List<GoodsAttributeRef> attributeRefs = goodsAttributeRefMapper.getByGoodsInfoId(goodsInfoId);
+        if (attributeRefs != null && !attributeRefs.isEmpty()) {
+            Map<Long, GoodsAttribute> attributeMap = goodsAttrService.getGoodsAttMap(companyId);
+            for (GoodsAttributeRef ref : attributeRefs) {
+                GoodsAttribute attribute = attributeMap.get(ref.getAttId());
+                if (attribute != null) {
+                    ref.setAttName(attribute.getAttName());
+                }
+            }
+        }
+        return attributeRefs;
+    }
+
 
     public GoodsInfo getGoodsInfoById(Long id) throws BizException {
         GoodsInfo goodsInfo = goodsInfoMapper.selectByPrimaryKey(id);
@@ -209,19 +236,8 @@ public class GoodsService {
         List<GoodsDetail> details = goodsDetailMapper.getByGoodsInfoId(goodsInfo.getId(), false);
         goodsInfo.setGoodsDetails(details); //详情
         setGoodsInfoOptionName(goodsInfo); //option的值
-
         //自定义属性
-        List<GoodsAttributeRef> attributeRefs = goodsAttributeRefMapper.getByGoodsInfoId(id);
-        if (attributeRefs != null && !attributeRefs.isEmpty()) {
-            Map<Long, GoodsAttribute> attributeMap = goodsAttrService.getGoodsAttMap(goodsInfo.getCompanyId());
-            for (GoodsAttributeRef ref : attributeRefs) {
-                GoodsAttribute attribute = attributeMap.get(ref.getAttId());
-                if (attribute != null) {
-                    ref.setAttName(attribute.getAttName());
-                }
-            }
-        }
-        goodsInfo.setAttributeRefs(attributeRefs);
+        goodsInfo.setAttributeRefs(getGoodsAttributeRef(goodsInfo.getId(), goodsInfo.getCompanyId()));
 
         return goodsInfo;
     }

@@ -66,12 +66,12 @@ import moment from 'moment';
 import warehouseSelect from "@/views/selector/warehouse-select.vue";
 import supplierSelect from "@/views/selector/supplier-select.vue";
 import fileDetail from "@/views/basic-data/file-detail.vue";
-import goodsSepcTags from '../goods/goods-spec-tabs.vue';
+import goodsSpecTags from '../goods/goods-spec-tabs.vue';
 
 export default {
     name: 'in-check',
     components: {
-        goodsSepcTags,
+        goodsSpecTags,
         warehouseSelect,
         supplierSelect,
         fileDetail
@@ -210,7 +210,7 @@ export default {
                     key: 'goodsSpecs',
                     width: 120,
                     render: (h, params) =>　{
-                        return h(goodsSepcTags, {
+                        return h(goodsSpecTags, {
                             props: {
                                 tags: params.row.goods.goodsSpecs,
                                 color: 'blue'

@@ -5,95 +5,105 @@
 <template>
     <div class="padding-left-100">
         <Row type="flex" justify="center">
-            <Col span="24">
+            <i-col span="24">
                 <Row class="title-show">
                     <span>{{orderDetail.orderNumber}}</span>
                     <hr/>
                 </Row>
                 <Row class="content-row">
-                    <Col span="6">
+                    <i-col span="6">
                         <span class="label-key">订单编号:</span>
                         <span class="label-value">{{orderDetail.orderNumber}}</span>
-                    </Col>
-                    <Col span="6">
+                    </i-col>
+                    <i-col span="6">
                         <span class="label-key">制单日期:</span>
                         <span class="label-value">{{orderDetail.createOrderDate | dateFormat}}</span>
-                    </Col>
-                    <Col span="6">
+                    </i-col>
+                    <i-col span="6">
                         <span class="label-key">客户:</span>
                         <span class="label-value">{{orderDetail.customerName}}</span>
-                    </Col>
-                    <Col span="6">
+                    </i-col>
+                    <i-col span="6">
                         <span class="label-key">客户代表:</span>
                         <span class="label-value">{{orderDetail.customerRepName}}</span>
-                    </Col>
+                    </i-col>
                 </Row>
                 <Row class="content-row">
-                    <Col span="6">
+                    <i-col span="6">
                         <span class="label-key">总计数量:</span>
                         <span class="label-value">{{orderDetail.totalQuantity}}</span>
-                    </Col>
-                    <Col span="6">
+                    </i-col>
+                    <i-col span="6">
                         <span class="label-key">总计金额:</span>
                         <span class="label-value">{{orderDetail.totalAmount}}</span>
-                    </Col>
+                    </i-col>
                 </Row>
                 <Row class="content-row">
-                    <Col span="6">
+                    <i-col span="6">
+                        <span class="label-key">免零金额:</span>
+                        <span class="label-value">{{orderDetail.freeAmount}}</span>
+                    </i-col>
+                    <i-col span="6">
+                        <span class="label-key">整单折扣率(%):</span>
+                        <span class="label-value">{{orderDetail.disRate}}</span>
+                    </i-col>
+                </Row>
+                <Row class="content-row">
+                    <i-col span="6">
                         <span class="label-key">销售员:</span>
                         <span class="label-value">{{orderDetail.saleNickName}}</span>
-                    </Col>
-                    <Col span="6">
+                    </i-col>
+                    <i-col span="6">
                         <span class="label-key">收货电话:</span>
                         <span class="label-value">{{orderDetail.customerRepContactPhone}}</span>
-                    </Col>
-                    <Col span="12">
+                    </i-col>
+                    <i-col span="12">
                         <span class="label-key">收货地址:</span>
                         <span class="label-value">{{orderDetail.customerRepRepertoryAddress}}</span>
-                    </Col>
+                    </i-col>
                 </Row>
                 <Row class="content-row">
-                    <Col span="6">
+                    <i-col span="6">
                         <span class="label-key">提货人:</span>
                         <span class="label-value">{{orderDetail.takeGoodsUser}}</span>
-                    </Col>
-                    <Col span="6">
+                    </i-col>
+                    <i-col span="6">
                         <span class="label-key">湿控方式:</span>
                         <span class="label-value">{{orderDetail.temperControlName}}</span>
-                    </Col>
-                    <Col span="6">
+                    </i-col>
+                    <i-col span="6">
                         <span class="label-key">收款日期:</span>
                         <span class="label-value">{{orderDetail.payOrderDate | dateFormat}}</span>
-                    </Col>
-                     <Col span="6">
+                    </i-col>
+                     <i-col span="6">
                         <span class="label-key">加价率:</span>
                         <span class="label-value">{{orderDetail.markUpRate}}</span>
-                    </Col>
+                    </i-col>
                 </Row>
                 <Row class="content-row">
-                    <Col span="6">
+                    <i-col span="6">
                         <span class="label-key">制单人:</span>
                         <span class="label-value">{{orderDetail.createBy}}</span>
-                    </Col>
-                    <Col span="6">
+                    </i-col>
+                    <i-col span="6">
                         <span class="label-key">运输方式:</span>
                         <span class="label-value">{{orderDetail.shipMethodName}}</span>
-                    </Col>
-                    <Col span="6">
+                    </i-col>
+                    <i-col span="6">
                         <span class="label-key">运输工具:</span>
                         <span class="label-value">{{orderDetail.shipToolName}}</span>
-                    </Col>
-                    <Col span="6">
+                    </i-col>
+                    <i-col span="6">
                         <span class="label-key">备注信息:</span>
                         <span class="label-value">{{orderDetail.comment}}</span>
-                    </Col>
+                    </i-col>
                 </Row>
                 <h3 style="margin-top:20px;">订单详情信息</h3>
                 <hr size="1" style="width:100%; margin-bottom: 10px;"/>
                 <Table ref="detailTable" size="small" border highlight-row style="width: 100%;" 
                     :columns="tabColumns" :data="detailsData">
                 </Table>
-            </Col>
+            </i-col>
         </Row>
     </div>
 </template>
@@ -101,7 +111,7 @@
 <script>
 import util from "@/libs/util.js";
 import moment from 'moment';
-import goodsExpand from "@/views/goods/goods-expand.vue";
+import goodsSpecTags from '@/views/goods/goods-spec-tabs.vue';
 
 export default {
   name: 'review-detail',
@@ -109,7 +119,7 @@ export default {
       sellOrderId: Number
   },
   components: {
-      goodsExpand
+      goodsSpecTags
   },
   data() {
       return {
@@ -145,12 +155,15 @@ export default {
             {
                 title: "规格",
                 key: "spec",
-                width: 120
-            },
-            {
-                title: "剂型",
-                key: "jx",
-                width: 120
+                width: 120,
+                render: (h, params) => {
+                    return h(goodsSpecTags, {
+                        props: {
+                            tags: params.row.goods.goodsSpecs ? params.row.goods.goodsSpecs : [],
+                            color: 'blue'
+                        }
+                    });
+                }
             },
             {
                 title: '单位',

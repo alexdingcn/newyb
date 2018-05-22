@@ -55,6 +55,9 @@ public class SellOrder {
 
     private BigDecimal totalQuantity;
     private BigDecimal totalAmount;
+    private BigDecimal freeAmount; //免零金额
+    private BigDecimal disRate; //整单折扣率
+
 
     private String warehouseName;
 
@@ -395,5 +398,21 @@ public class SellOrder {
 
     public void setTotalAmount(BigDecimal totalAmount) {
         this.totalAmount = totalAmount;
+    }
+
+    public BigDecimal getFreeAmount() {
+        return freeAmount;
+    }
+
+    public void setFreeAmount(BigDecimal freeAmount) {
+        this.freeAmount = freeAmount;
+    }
+
+    public BigDecimal getDisRate() {
+        return disRate;
+    }
+
+    public void setDisRate(BigDecimal disRate) {
+        this.disRate = disRate;
     }
 }

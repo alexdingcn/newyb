@@ -64,12 +64,12 @@
 
 <script>
 import util from '@/libs/util.js';
-import goodsSepcTags from './goods-spec-tabs.vue';
+import goodsSpecTags from './goods-spec-tabs.vue';
 
 export default {
     name: 'goods-spec',
     components: {
-        goodsSepcTags
+        goodsSpecTags
     },
     data() {
         return {
@@ -96,7 +96,7 @@ export default {
                     key: 'subGoodsSpecs',
                     minWidth: 200,
                     render: (h, params) =>　{
-                        return h(goodsSepcTags, {
+                        return h(goodsSpecTags, {
                                 props: {
                                     tags: params.row.subGoodsSpecs,
                                     color: 'blue'

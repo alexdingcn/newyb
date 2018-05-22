@@ -1,5 +1,6 @@
 package com.yiban.erp.dto;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
 
 import java.util.Calendar;
@@ -53,7 +54,7 @@ public class SellOrderQuery {
     }
 
     public String getRefNo() {
-        return refNo;
+        return StringUtils.isNotBlank(refNo.trim()) ? this.refNo.trim() : null;
     }
 
     public void setRefNo(String refNo) {

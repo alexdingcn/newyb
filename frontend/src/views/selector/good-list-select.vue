@@ -1,21 +1,21 @@
 <template>
     <div>
         <Row :gutter="16">
-            <Col span="8">
-                <Input v-model="goodsQuery" clearable
+            <i-col span="8">
+                <i-input v-model="goodsQuery" clearable
                        @on-enter="queryGoods"
                        @on-change="clearQueryInput"
                        placeholder="商品名称/拼音">
                     <span slot="append">
                         <Button type="primary" size="small" icon="ios-search" @click="searchGoods"></Button>
                     </span>
-                </Input>
-            </Col>
-            <Col span="5">
+                </i-input>
+            </i-col>
+            <i-col span="5">
                 <Select v-model="goodsTypeQuery" @on-change="onGoodsCategoryChange">
                     <Option v-for="item in goodsCategoryList" :value="item.id" :key="item.id">{{ item.name }}</Option>
                 </Select>
-            </Col>
+            </i-col>
         </Row>
         <Table ref="goodsSelect" size="small" border
                :columns="goodsColumns" :data="goodsList"
@@ -32,14 +32,18 @@
 
 <script>
     import util from '@/libs/util.js';
-    import goodsSepcTags from '../goods/goods-spec-tabs.vue';
+    import goodsSpecTags from '../goods/goods-spec-tabs.vue';
 
     export default {
         name: 'goodsListSelect',
         components: {
-            goodsSepcTags
+            goodsSpecTags
         },
-        props: ['warehouseId', 'disabled', 'size'],
+        props: {
+            warehouseId: {type:String|Number, default:''}, 
+            disabled: Boolean|String, 
+            size: String
+        },
         data () {
             return {
                 currentPage: 1,
@@ -59,22 +63,25 @@
                     },
                     {
                         key: 'name',
-                        title: '商品名称'
+                        title: '商品名称',
+                        minWidth: 170
                     },
                     {
                         key: 'categoryName',
-                        title: '商品类型'
+                        title: '商品类型',
+                        minWidth: 150
                     },
                     {
                         key: 'origin',
-                        title: '产地'
+                        title: '产地',
+                        width: 120
                     },
                     {
                         key: 'goodsSpecs',
                         title: '规格',
                         minWidth: 200,
                         render: (h, params) =>　{
-                            return h(goodsSepcTags, {
+                            return h(goodsSpecTags, {
                                 props: {
                                     tags: params.row.goodsSpecs,
                                     color: 'blue'
@@ -84,38 +91,46 @@
                     },
                     {
                         key: 'supplierName',
-                        title: '供应商'
+                        title: '供应商',
+                        minWidth: 150,
                     },
                     {
                         key: 'factoryName',
-                        title: '生产企业'
+                        title: '生产企业',
+                        minWidth: 150
                     },
                     {
                         key: 'unitName',
-                        title: '单位'
+                        title: '单位',
+                        width: 100
                     },
                     {
                         key: 'packUnitName',
-                        title: '整件单位'
+                        title: '整件单位',
+                        width: 100
                     },
                     {
                         key: 'packUnit',
-                        title: '大件装量'
+                        title: '大件装量',
+                        width: 100
                     },
                     {
                         key: 'inPrice',
                         title: '参考采购价',
+                        minWidth: 110,
                         render: (h, params) => {
                             return h('span', { }, '￥' + (params.row.inPrice ? params.row.inPrice.toFixed(2): '0.00'));
                         }
                     },
                     {
                         key: 'currRepQuatity',
-                        title: '当前库存'
+                        title: '当前库存',
+                        minWidth: 110,
                     },
                     {
                         key: 'lastBuyPrice',
                         title: '最近采购价',
+                        minWidth: 110,
                         render: (h, params) => {
                             return h('span', { },  params.row.lastBuyPrice ? '￥' + params.row.lastBuyPrice.toFixed(2): '');
                         }

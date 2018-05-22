@@ -4,36 +4,34 @@
 
 <template>
     <div>
-        <Modal v-model="isShowModal" :width="70" :mask-closable="false" :closable="false" title="查询获取暂挂订单">
-            <Row type="flex" justify="start">
-                <Form ref="searchForm" :model="formItem" :label-width="100" >
-                    <Row type="flex" justify="center">
-                        <Col span="6">
-                            <FormItem label="客户">
-                                <customer-select size="small" v-model="formItem.customerId" ></customer-select>
-                            </FormItem>
-                        </Col>
-                        <Col span="6">
-                            <FormItem label="销售员">
-                                <sale-select size="small" v-model="formItem.saleId"></sale-select>
-                            </FormItem>
-                        </Col>
-                        <Col span="6">
-                            <FormItem label="自定订号">
-                                <Input size="small" type="text" v-model="formItem.refNo" ></Input>
-                            </FormItem>
-                        </Col>
-                        <Col span="6">
-                            <FormItem label="制单日期">
-                                <DatePicker v-model="dateRange" type="daterange" placement="bottom-end" placeholder="制单日期" style="width:180px"></DatePicker>
-                            </FormItem>
-                        </Col>
-                    </Row>
-                    <Row type="flex" justify="center" >
-                        <Button size="small" type="primary" icon="ios-search" class="margin-let-10" @click="searchBtnClicked">查询</Button>
-                    </Row>
-                </Form>
-            </Row>
+        <Modal v-model="isShowModal" :width="75" :mask-closable="false" :closable="false" title="查询获取暂挂订单">
+            <Form ref="searchForm" :model="formItem" :label-width="100" >
+                <Row >
+                    <i-col span="8">
+                        <FormItem label="客户">
+                            <customer-select size="small" v-model="formItem.customerId" ></customer-select>
+                        </FormItem>
+                    </i-col>
+                    <i-col span="8">
+                        <FormItem label="销售员">
+                            <sale-select size="small" v-model="formItem.saleId"></sale-select>
+                        </FormItem>
+                    </i-col>
+                    <!-- <i-col span="6">
+                        <FormItem label="自定订号">
+                            <Input size="small" type="text" v-model="formItem.refNo" ></Input>
+                        </FormItem>
+                    </i-col> -->
+                    <i-col span="8">
+                        <FormItem label="制单日期">
+                            <DatePicker v-model="dateRange" type="daterange" placement="bottom-end" placeholder="制单日期"></DatePicker>
+                        </FormItem>
+                    </i-col>
+                </Row>
+                <Row type="flex" justify="center" >
+                    <Button size="small" type="primary" icon="ios-search" class="margin-let-10" @click="searchBtnClicked">查询</Button>
+                </Row>
+            </Form>
 
             <Row type="flex" justify="center" align="middle" class="margin-top-20">
                 <Table border highlight-row :columns="tabColumns" :data="tabData" 
@@ -126,7 +124,7 @@ export default {
                     render: (h, params) => {
                         let saleNickName = params.row.saleNickName ? params.row.saleNickName : '';
                         let saleRealName = params.row.saleRealName ? params.row.saleRealName : '';
-                        return saleNickName + (saleRealName ? '---' + saleRealName : '');
+                        return h('span', saleNickName + (saleRealName ? '---' + saleRealName : ''));
                     }
                 },
                 {
@@ -143,7 +141,7 @@ export default {
                     width: 180,
                     render: (h, params) => {
                         let date = params.row.createOrderDate;
-                        return date ? moment(date).format('YYYY-MM-DD') : '';
+                        return h('span', date ? moment(date).format('YYYY-MM-DD') : '');
                     }
                 },
                 {
@@ -154,7 +152,7 @@ export default {
                     width: 180,
                     render: (h, params) => {
                         let date = params.row.payOrderDate;
-                        return date ? moment(date).format('YYYY-MM-DD') : '';
+                        return h('span', date ? moment(date).format('YYYY-MM-DD') : '');
                     }
                 },
                 {

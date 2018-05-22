@@ -195,7 +195,8 @@ export default {
                     align: 'center',
                     render: (h, params) => {
                         let issuanceDate = params.row.issuanceDate;
-                        return issuanceDate ? moment(issuanceDate).format('YYYY-MM-DD HH:mm') : '';
+                        let label = issuanceDate ? moment(issuanceDate).format('YYYY-MM-DD HH:mm') : '';
+                        return h('span', label);
                     }
                 },
                 {
@@ -316,7 +317,8 @@ export default {
                     align: 'center',
                     render: (h, params) => {
                         let shipStartTime = params.row.shipStartTime;
-                        return shipStartTime ? moment(shipStartTime).format('YYYY-MM-DD HH:mm') : '';
+                        let label = shipStartTime ? moment(shipStartTime).format('YYYY-MM-DD HH:mm') : '';
+                        return h('span', label);
                     }
                 },
                 {
@@ -326,7 +328,8 @@ export default {
                     align: 'center',
                     render: (h, params) => {
                         let shipEndTime = params.row.shipEndTime;
-                        return shipEndTime ? moment(shipEndTime).format('YYYY-MM-DD HH:mm') : '';
+                        let label = shipEndTime ? moment(shipEndTime).format('YYYY-MM-DD HH:mm') : '';
+                        return h('span', label);
                     }
                 },
                 {

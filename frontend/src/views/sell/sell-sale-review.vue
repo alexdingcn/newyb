@@ -73,14 +73,14 @@ import moment from 'moment';
 import customerSelect from "@/views/selector/customer-select.vue";
 import saleSelect from "@/views/selector/sale-select.vue";
 import goodsExpand from "@/views/goods/goods-expand.vue";
-import goodsSepcTags from '../goods/goods-spec-tabs.vue';
+import goodsSpecTags from '../goods/goods-spec-tabs.vue';
 
 export default {
     name: 'sell-sale-review',
     components: {
         customerSelect,
         saleSelect,
-        goodsSepcTags,
+        goodsSpecTags,
         goodsExpand
     },
     props: {
@@ -140,17 +140,14 @@ export default {
             orderList: [],
             orderListColumns: [
                 {
-                    type: '#',
-                    width: 30
-                },
-                {
                     title: '制单日',
                     key: 'createOrderDate',
                     align: "center",
                     width: 120,
                     sortable: true,
                     render:(h, params) => {
-                        return moment(params.row.createOrderDate).format('YYYY-MM-DD');
+                        let label = params.row.createOrderDate ? moment(params.row.createOrderDate).format('YYYY-MM-DD') : '';
+                        return h('span', label);
                     }
                 },
                 {
@@ -196,12 +193,12 @@ export default {
                     align: "center",
                     width: 140
                 },
-                {
-                    title: '提货员',
-                    key: 'takeGoodsUser',
-                    align: "center",
-                    width: 140
-                },
+                // {
+                //     title: '提货员',
+                //     key: 'takeGoodsUser',
+                //     align: "center",
+                //     width: 140
+                // },
                 {
                     title: '销售单号',
                     key: 'orderNumber',
@@ -211,6 +208,16 @@ export default {
                 {
                     title: '总计数量',
                     key: 'totalQuantity',
+                    width: 120
+                },
+                {
+                    title: '免零金额',
+                    key: 'freeAmount',
+                    width: 120
+                },
+                {
+                    title: '整单折扣率',
+                    key: 'disRate',
                     width: 120
                 },
                 {
@@ -260,33 +267,36 @@ export default {
             detailChooseItems: [],
             sellDetailColumns: [
                 {
-                    type: "expand",
-                    width: 50,
-                    render: (h, params) => {
-                        let goods = params.row.goods;
-                        let productDate = params.row.productDate ? moment(params.row.productDate).format('YYYY-MM-DD') : '';
-                        let expDate = params.row.expDate ? moment(params.row.expDate).format('YYYY-MM-DD') : '';
-                        return h(goodsExpand, {
-                        props: {
-                            good: goods,
-                            productDate: productDate,
-                            expDate: expDate
-                        }
-                        })
-                    }
-                },
-                {
                     title: "商品名称",
                     key: "goodsName",
                     sortable: true,
-                    width: 180
+                    width: 180,
+                    render: (h, params) => {
+                        let self = this;
+                        return h('Button', {
+                        props:{
+                            type: 'text',
+                            icon: 'eye'
+                        },
+                        on: {
+                            click: () => {
+                            self.expandProductDate = params.row.productDate ? moment(params.row.productDate).format("YYYY-MM-DD") : "";
+                            self.expandExpDate = params.row.expDate ? moment(params.row.expDate).format("YYYY-MM-DD") : "";
+                            self.expandGoodsSpecs = params.row.goods.goodsSpecs ? params.row.goods.goodsSpecs : [];
+                            let goodsId = params.row.goods.id;
+                            self.$refs.goodsExpand.loadGoodsData(goodsId);
+                            self.goodsExpandModal = true;
+                            }
+                        }
+                        }, params.row.goodsName);
+                    }
                 },
                 {
                     title: "生产企业",
                     key: "factoryName",
                     width: 180,
                     render: (h, params) => {
-                        return params.row.goods.factoryName;
+                        return h('span', params.row.goods.factoryName);
                     }
                 },
                 {
@@ -304,7 +314,7 @@ export default {
                     key: "spec",
                     width: 120,
                     render: (h, params) =>　{
-                        return h(goodsSepcTags, {
+                        return h(goodsSpecTags, {
                             props: {
                                 tags: params.row.goods.goodsSpecs,
                                 color: 'blue'
@@ -338,7 +348,8 @@ export default {
                     width: 120,
                     key: 'productData',
                     render: (h, params) => {
-                        return params.row.productDate ? moment(params.row.productDate).format('YYYY-MM-DD') : '';
+                        let label = params.row.productDate ? moment(params.row.productDate).format('YYYY-MM-DD') : '';
+                        return h('span', label);
                     }
                 },
                 {
@@ -346,7 +357,8 @@ export default {
                     key: 'expDate',
                     width: 120,
                     render: (h, params) => {
-                        return params.row.expDate ? moment(params.row.expDate).format('YYYY-MM-DD') : '';
+                        let label = params.row.expDate ? moment(params.row.expDate).format('YYYY-MM-DD') : '';
+                        return h('span', label);
                     }
                 },
                 {
@@ -415,7 +427,11 @@ export default {
             ],
             totalCount: 0,
             totalAmount: 0,
-            chooseOrderItem: {}
+            chooseOrderItem: {},
+            goodsExpandModal: false,
+            expandGoodsSpecs: [],
+            expandProductDate: '',
+            expandExpDate: ''
         }
     },
     watch: {

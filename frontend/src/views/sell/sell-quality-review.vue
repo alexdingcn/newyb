@@ -3,34 +3,34 @@
         <div class="search-div">
             <Form ref="searchForm" :model="query" :label-width="100">
                 <Row>
-                    <Col span="8">
+                    <i-col span="8">
                         <FormItem label="制单日期">
                             <DatePicker v-model="dateRange" type="daterange" placement="bottom-start" placeholder="制单日期" style="width:180px"></DatePicker>
                         </FormItem>
-                    </Col>
-                    <Col span="8">
+                    </i-col>
+                    <i-col span="8">
                         <FormItem label="客户">
                             <customer-select v-model="query.customerId"></customer-select>
                         </FormItem>
-                    </Col>
-                    <Col span="8"></Col>
+                    </i-col>
+                    <i-col span="8"></i-col>
                 </Row>
                 <Row>
-                    <Col span="8">
+                    <i-col span="8">
                         <FormItem label="销售员">
                             <sale-select v-model="query.saleId"></sale-select>
                         </FormItem>
-                    </Col>
-                    <Col span="8" >
+                    </i-col>
+                    <i-col span="8" >
                         <FormItem label="状态">
                             <Select v-model="query.status" placeholder="状态">
                                 <Option v-for="option in statusOptions" :value="option.key" :label="option.name" :key="option.key">{{option.name}}</Option>
                             </Select>
                         </FormItem>
-                    </Col>
-                    <Col span="7" offset="1">
+                    </i-col>
+                    <i-col span="7" offset="1">
                         <Button type="primary" icon="ios-search" :loading="sellOrderLoading" @click="querySellOrderList"></Button>
-                    </Col>
+                    </i-col>
                 </Row>
             </Form>
         </div>
@@ -46,21 +46,21 @@
 
         <div class="table-div">
             <Row type="flex" justify="start">
-                <Col span="12">
+                <i-col span="12">
                     <Row type="flex" justify="start">
                         <h4 class="padding-left-20" >
                             <b>合计数量:</b> ￥{{ totalCount }} <b class="margin-left-30">合计金额:</b> ￥{{ totalAmount }}
                         </h4>
                     </Row>
-                </Col>
-                <Col span="12">
+                </i-col>
+                <i-col span="12">
                     <Row type="flex" justify="end">
                         <ButtonGroup size="small">
                             <Button type="success" icon="checkmark-round" :loading="detailLoading" @click="reviewOkBtnClick">审核通过</Button>
                             <Button type="error" icon="close-round" :loading="detailLoading" @click="reviewCancelBtnClick">取消审核</Button>
                         </ButtonGroup>
                     </Row>
-                </Col>
+                </i-col>
             </Row>
             <Table border highlight-row height="300" :loading="detailLoading" 
                    :columns="sellDetailColumns" :data="sellDetailList"
@@ -86,6 +86,10 @@
             </div>
         </Modal>
 
+        <Modal v-model="goodsExpandModal" width="60" :mask-closable="false" title="商品详情信息" :footerHide="true">
+          <goods-expand ref="goodsExpand" :goodsSpecs="expandGoodsSpecs" :productDate="expandProductDate" :expDate="expandExpDate"></goods-expand>
+        </Modal>
+
     </div>
 </template>
 
@@ -95,14 +99,14 @@ import moment from 'moment';
 import customerSelect from "@/views/selector/customer-select.vue";
 import saleSelect from "@/views/selector/sale-select.vue";
 import goodsExpand from "@/views/goods/goods-expand.vue";
-import goodsSepcTags from '../goods/goods-spec-tabs.vue';
+import goodsSpecTags from '../goods/goods-spec-tabs.vue';
 
 export default {
     name: 'sell-quality-review',
     components: {
         customerSelect,
         saleSelect,
-        goodsSepcTags,
+        goodsSpecTags,
         goodsExpand
     },
     data() {
@@ -168,7 +172,8 @@ export default {
                     width: 120,
                     sortable: true,
                     render:(h, params) => {
-                        return moment(params.row.createOrderDate).format('YYYY-MM-DD');
+                        let label = params.row.createOrderDate ? moment(params.row.createOrderDate).format('YYYY-MM-DD') : '';
+                        return h('span', label);
                     }
                 },
                 {
@@ -214,17 +219,27 @@ export default {
                     align: "center",
                     width: 140
                 },
-                {
-                    title: '提货员',
-                    key: 'takeGoodsUser',
-                    align: "center",
-                    width: 140
-                },
+                // {
+                //     title: '提货员',
+                //     key: 'takeGoodsUser',
+                //     align: "center",
+                //     width: 140
+                // },
                 {
                     title: '销售单号',
                     key: 'orderNumber',
                     align: 'center',
                     width: 180
+                },
+                {
+                    title: '免零金额',
+                    key: 'freeAmount',
+                    width: 120
+                },
+                {
+                    title: '整单折扣率',
+                    key: 'disRate',
+                    width: 120
                 },
                 {
                     title: '总计数量',
@@ -278,23 +293,6 @@ export default {
             detailChooseItems: [],
             sellDetailColumns: [
                 {
-                    type: "expand",
-                    fixed: 'left',
-                    width: 50,
-                    render: (h, params) => {
-                        let goods = params.row.goods;
-                        let productDate = params.row.productDate ? moment(params.row.productDate).format('YYYY-MM-DD') : '';
-                        let expDate = params.row.expDate ? moment(params.row.expDate).format('YYYY-MM-DD') : '';
-                        return h(goodsExpand, {
-                        props: {
-                            good: goods,
-                            productDate: productDate,
-                            expDate: expDate
-                        }
-                        })
-                    }
-                },
-                {
                     type: 'selection',
                     fixed: 'left',
                     width: 60,
@@ -304,14 +302,33 @@ export default {
                     title: "商品名称",
                     key: "goodsName",
                     sortable: true,
-                    width: 180
+                    width: 180,
+                    render: (h, params) => {
+                        let self = this;
+                        return h('Button', {
+                        props:{
+                            type: 'text',
+                            icon: 'eye'
+                        },
+                        on: {
+                            click: () => {
+                            self.expandProductDate = params.row.productDate ? moment(params.row.productDate).format("YYYY-MM-DD") : "";
+                            self.expandExpDate = params.row.expDate ? moment(params.row.expDate).format("YYYY-MM-DD") : "";
+                            self.expandGoodsSpecs = params.row.goods.goodsSpecs ? params.row.goods.goodsSpecs : [];
+                            let goodsId = params.row.goods.id;
+                            self.$refs.goodsExpand.loadGoodsData(goodsId);
+                            self.goodsExpandModal = true;
+                            }
+                        }
+                        }, params.row.goodsName);
+                    }
                 },
                 {
                     title: "生产企业",
                     key: "factoryName",
                     width: 180,
                     render: (h, params) => {
-                        return params.row.goods.factoryName;
+                        return h('span', params.row.goods.factoryName);
                     }
                 },
                 {
@@ -329,7 +346,7 @@ export default {
                     key: "spec",
                     width: 120,
                     render: (h, params) =>　{
-                        return h(goodsSepcTags, {
+                        return h(goodsSpecTags, {
                             props: {
                                 tags: params.row.goods.goodsSpecs,
                                 color: 'blue'
@@ -347,7 +364,8 @@ export default {
                     width: 120,
                     key: 'productData',
                     render: (h, params) => {
-                        return params.row.productDate ? moment(params.row.productDate).format('YYYY-MM-DD') : '';
+                        let label = params.row.productDate ? moment(params.row.productDate).format('YYYY-MM-DD') : '';
+                        return h('span', label);
                     }
                 },
                 {
@@ -355,7 +373,8 @@ export default {
                     key: 'expDate',
                     width: 120,
                     render: (h, params) => {
-                        return params.row.expDate ? moment(params.row.expDate).format('YYYY-MM-DD') : '';
+                        let label = params.row.expDate ? moment(params.row.expDate).format('YYYY-MM-DD') : '';
+                        return h('span', label);
                     }
                 },
                 {
@@ -442,7 +461,11 @@ export default {
             reviewOkModal: false,
             checkStatus: '',
             checkResult: '',
-            checkSubimitLoading: false
+            checkSubimitLoading: false,
+            goodsExpandModal: false,
+            expandGoodsSpecs: [],
+            expandProductDate: '',
+            expandExpDate: ''
         }
     },
     watch: {

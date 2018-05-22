@@ -222,7 +222,7 @@
     import buyOrderList from "@/views/buy/buy-order-list.vue";
     import warehouseLocationModal from "@/views/selector/warehouse-location-modal.vue";
     import optionSelect from "@/views/selector/option-select.vue";
-    import goodsSepcTags from '../goods/goods-spec-tabs.vue';
+    import goodsSpecTags from '../goods/goods-spec-tabs.vue';
 
     export default {
         name: 'in-make',
@@ -237,7 +237,7 @@
             buyOrderList,
             warehouseLocationModal,
             optionSelect,
-            goodsSepcTags
+            goodsSpecTags
         },
         data () {
             const addWarehouseLocation = (h, location, rowData, index) => {
@@ -303,7 +303,7 @@
                         key: 'goodsSpecs',
                         width: 120,
                         render: (h, params) =>　{
-                            return h(goodsSepcTags, {
+                            return h(goodsSpecTags, {
                                 props: {
                                     tags: params.row.goods.goodsSpecs,
                                     color: 'blue'

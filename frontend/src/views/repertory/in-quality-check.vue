@@ -196,7 +196,7 @@ import optionSelect from "@/views/selector/option-select.vue";
 import goodSelect from "@/views/selector/good-select.vue";
 import fileDetail from "@/views/basic-data/file-detail.vue";
 import warehouseLocationModal from "@/views/selector/warehouse-location-modal.vue";
-import goodsSepcTags from '../goods/goods-spec-tabs.vue';
+import goodsSpecTags from '../goods/goods-spec-tabs.vue';
 
 export default {
     name: 'in-quality-check',
@@ -206,7 +206,7 @@ export default {
         inSurveyCheck,
         optionSelect,
         goodSelect,
-        goodsSepcTags,
+        goodsSpecTags,
         fileDetail,
         warehouseLocationModal
     },
@@ -385,7 +385,7 @@ export default {
                     key: 'goodsSpecs',
                     width: 120,
                     render: (h, params) =>　{
-                        return h(goodsSepcTags, {
+                        return h(goodsSpecTags, {
                             props: {
                                 tags: params.row.goods.goodsSpecs,
                                 color: 'blue'

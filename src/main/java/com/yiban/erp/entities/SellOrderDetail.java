@@ -72,6 +72,7 @@ public class SellOrderDetail {
         this.goods = goods;
         if (goods != null) {
             this.goodsName = goods.getName();
+            this.factoryName = goods.getFactoryName();
             this.origin = goods.getOrigin();
             this.jx = goods.getJxName();
             this.unitName = goods.getUnitName();
