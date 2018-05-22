@@ -126,7 +126,7 @@
                         key: 'createdTime',
                         width: 120,
                         render: (h, params) => {
-                            return moment(params.row.createdTime).format('YYYY-MM-DD');
+                            return h('span', {}, moment(params.row.createdTime).format('YYYY-MM-DD'));
                         }
                     },
                     {
@@ -264,7 +264,7 @@
                         key: 'origin',
                         align: 'center',
                         render: (h, params) => {
-                            return params.row.goods.origin;
+                            return h('span', {}, params.row.goods.origin);
                         }
                     },
                     {
@@ -285,7 +285,7 @@
                         key: 'factoryName',
                         align: 'center',
                         render: (h, params) => {
-                            return params.row.goods.factoryName;
+                            return h('span', {}, params.row.goods.factoryName);
                         }
                     },
                     {
@@ -293,7 +293,7 @@
                         key: 'unitName',
                         align: 'center',
                         render: (h, params) => {
-                            return params.row.goods.unitName;
+                            return h('span', {}, params.row.goods.unitName);
                         }
                     },
 
@@ -317,7 +317,7 @@
                         key: 'bigPack',
                         align: 'center',
                         render: (h, params) => {
-                            return params.row.goods.bigPack;
+                            return h('span', {}, params.row.goods.bigPack);
                         }
                     },
                     {
@@ -325,7 +325,7 @@
                         key: 'retailPrice',
                         align: 'center',
                         render: (h, params) => {
-                            return params.row.goods.retailPrice;
+                            return h('span', {}, params.row.goods.retailPrice);
                         }
                     },
                     {
@@ -333,7 +333,7 @@
                         key: 'batchPrice',
                         align: 'center',
                         render: (h, params) => {
-                            return params.row.goods.batchPrice;
+                            return h('span', {}, params.row.goods.batchPrice);
                         }
                     },
                     {
@@ -374,6 +374,7 @@
                 this.orderLoading = true;
                 util.ajax.post('/buy/list', this.query)
                     .then(function (response) {
+                        console.log(response.data);
                         self.orderLoading = false;
                         if (response.status === 200 && response.data) {
                             self.orderList = response.data;
