@@ -137,6 +137,8 @@ public class GoodsInfo {
 
     private Boolean useSpec;
 
+    private String specDesc; //规格描述，单规格时使用，存在detail表中的
+
     private String barCode;
 
     private List<GoodsDetail> goodsDetails;
@@ -837,5 +839,13 @@ public class GoodsInfo {
 
     public void setFactoryName(String factoryName) {
         this.factoryName = factoryName;
+    }
+
+    public String getSpecDesc() {
+        return specDesc;
+    }
+
+    public void setSpecDesc(String specDesc) {
+        this.specDesc = specDesc;
     }
 }

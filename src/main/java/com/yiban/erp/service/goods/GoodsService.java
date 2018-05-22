@@ -519,7 +519,7 @@ public class GoodsService {
             logger.info("update detail success. goodsInfoId:{}", goodsInfo.getId());
         } else {
             //如果获取不到，说明原来是多规格的，现在变更为了单规格，根据key创建一个新的
-            GoodsDetail detail = makeNewGoodsDeail(goodsInfo, user);
+            GoodsDetail detail = makeNewGoodsDetail(goodsInfo, user);
             goodsDetailMapper.insert(detail);
             logger.info("update goods info created detail success");
         }
@@ -530,7 +530,7 @@ public class GoodsService {
         goodsInfoMapper.updateByPrimaryKeySelective(goodsInfo);
     }
 
-    private GoodsDetail makeNewGoodsDeail(GoodsInfo goodsInfo, User user) {
+    private GoodsDetail makeNewGoodsDetail(GoodsInfo goodsInfo, User user) {
         GoodsDetail detail = new GoodsDetail();
         detail.setCompanyId(user.getCompanyId());
         detail.setGoodsInfoId(goodsInfo.getId());
