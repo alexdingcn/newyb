@@ -184,7 +184,6 @@
                         align: 'center',
                         width: 80
                     },
-
                     {
                         title: '数量',
                         key: 'quantity',
@@ -194,35 +193,34 @@
                         	var self = this;
                             return h('Input', {
                                 props: {
-								  	value: self.orderItems[params.index][params.column.key],
+                                    value: self.orderItems[params.index][params.column.key],
                                     number: true
                                 },
                                 on: {
-                                    'on-change' (event) {
-                                        var row = self.orderItems[params.index];
-                                        row[params.column.key] = event.target.value;
-                                    },
  									'on-blur' (event) {
  										var row = self.orderItems[params.index];
  										var price = row['price'];
- 										var qty = event.target.value;
-                                        if (!isNaN(qty) && !isNaN(price)) {
+                                        var qty = event.target.value;
+                                        row[params.column.key] = qty;
+                                        if (qty != '' && !isNaN(qty) && !isNaN(price)) {
                                             row.amount = (qty * price).toFixed(2);
                                             self.$set(self.orderItems, params.index, row);
                                         }
  									},
-                                    'on-enter' (event) {
-                                        var index = params.index * 2;
-                                        var inputList = self.$refs.buyOrderTable.$el.querySelectorAll('input');
-                                        if (inputList && index + 2 <= inputList.length) {
-                                        // move to next
-                                            inputList[index + 1].focus();
+                                    'on-keydown' (event) {
+                                        if (event.keyCode === 13 || event.keyCode === 9) {
+                                            var index = params.index * 2;
+                                            var inputList = self.$refs.buyOrderTable.$el.querySelectorAll('input');
+                                            if (inputList && index + 2 <= inputList.length) {
+                                                inputList[index + 1].focus();
+                                            }
                                         }
                                     }
                                 }
                             });
                         }
                     },
+                    
                     {
                         title: '采购单价',
                         key: 'price',
@@ -232,47 +230,46 @@
                         	var self = this;
                             return h('Input', {
                                 props: {
-								  	value: self.orderItems[params.index][params.column.key],
+                                    value: self.orderItems[params.index][params.column.key],
                                     number: true
                                 },
                                 on: {
-                                    'on-change' (event) {
-                                        console.log('change:' + event.target.value);
-                                        var row = self.orderItems[params.index];
-                                        row[params.column.key] = event.target.value;
-                                    },
  									'on-blur' (event) {
-                                         console.log('blur:' + event.target.value);
- 										var row = self.orderItems[params.index];
+                                        var row = self.orderItems[params.index];
  										var qty = row['quantity'];
- 										var price = event.target.value;
-                                        if (!isNaN(qty) && !isNaN(price)) {
+                                        var price = event.target.value;
+                                        row[params.column.key] = price;
+                                        if (price != '' && !isNaN(qty) && !isNaN(price)) {
                                             row.amount = (qty * price).toFixed(2);
                                             self.$set(self.orderItems, params.index, row);
                                         }
  									},
-                                    'on-enter' (event) {
-                                        console.log('enter:' + event.target.value);
-                                        var index = params.index * 2 + 1;
-                                        var inputList = self.$refs.buyOrderTable.$el.querySelectorAll('input');
-                                        if (inputList && index + 2 <= inputList.length) {
-                                        // move to next line
-                                            inputList[index + 1].focus();
-                                        }
-                                        if (index + 2 >= inputList.length) {
-                                            var row = self.orderItems[params.index];
-                                            var qty = row['quantity'];
-                                            var price = event.target.value;
-                                            if (!isNaN(qty) && !isNaN(price)) {
-                                                row.amount = (qty * price).toFixed(2);
-                                                self.$set(self.orderItems, params.index, row);
+                                    'on-keydown' (event) {
+                                        console.log(event.keyCode);
+                                        if (event.keyCode === 13 || event.keyCode === 9) {
+                                            var index = params.index * 2 + 1;
+                                            var inputList = self.$refs.buyOrderTable.$el.querySelectorAll('input');
+                                            if (inputList && index + 2 <= inputList.length) {
+                                                // move to next line                                            
+                                                inputList[index + 1].focus();
+                                            }
+                                            if (index + 2 >= inputList.length) {
+                                                var row = self.orderItems[params.index];
+                                                var qty = row['quantity'];
+                                                var price = event.target.value;
+                                                if (!isNaN(qty) && !isNaN(price)) {
+                                                    //row.amount = (qty * price).toFixed(2);
+                                                    self.$set(self.orderItems, params.index, row);
+                                                }
                                             }
                                         }
+                                        
                                     }
                                 }
                             });
                         }
                     },
+
                     {
                         title: '金额',
                         key: 'amount',
