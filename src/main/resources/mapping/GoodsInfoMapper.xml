@@ -71,6 +71,7 @@
     <result column="normal_limit" property="normalLimit" jdbcType="DECIMAL"/>
     <result column="low_limit" property="lowLimit" jdbcType="DECIMAL"/>
     <result column="high_limit" property="highLimit" jdbcType="DECIMAL"/>
+    <result column="spec_desc" property="specDesc" jdbcType="VARCHAR" />
   </resultMap>
   <sql id="Base_Column_List" >
     id, company_id, category_id, goods_no, brand_id, supplier_id, status, name, full_name, 
@@ -82,7 +83,7 @@
     is_shebao, specific_med_id, jx_id, base_med_id, func_cat_id, medication_id, care_time_id, 
     gmp_type_id, abc_type_id, scope_id, new_type_id, created_by, updated_by, created_time, 
     updated_time, tags, use_spec, bar_code, retail_price, batch_price, in_price,
-    normal_limit, low_limit, high_limit
+    normal_limit, low_limit, high_limit, spec_desc
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
     select 
@@ -116,7 +117,7 @@
       new_type_id, created_by, updated_by, 
       created_time, updated_time, tags,
       use_spec, bar_code, retail_price, batch_price, in_price,
-      normal_limit, low_limit, high_limit)
+      normal_limit, low_limit, high_limit, spec_desc)
     values (#{companyId,jdbcType=INTEGER}, #{categoryId,jdbcType=INTEGER},
       #{goodsNo,jdbcType=VARCHAR}, #{brandId,jdbcType=BIGINT}, #{supplierId,jdbcType=BIGINT}, 
       #{status,jdbcType=VARCHAR}, #{name,jdbcType=VARCHAR}, #{fullName,jdbcType=VARCHAR}, 
@@ -139,7 +140,8 @@
       #{createdTime,jdbcType=TIMESTAMP}, #{updatedTime,jdbcType=TIMESTAMP}, #{tags,jdbcType=VARCHAR},
       #{useSpec,jdbcType=BIT}, #{barCode,jdbcType=VARCHAR}, #{retailPrice,jdbcType=DECIMAL},
       #{batchPrice,jdbcType=DECIMAL}, #{inPrice,jdbcType=DECIMAL},
-      #{normalLimit,jdbcType=DECIMAL}, #{lowLimit,jdbcType=DECIMAL}, #{highLimit,jdbcType=DECIMAL})
+      #{normalLimit,jdbcType=DECIMAL}, #{lowLimit,jdbcType=DECIMAL}, #{highLimit,jdbcType=DECIMAL},
+      #{specDesc,jdbcType=VARCHAR})
   </insert>
 
   <update id="updateByPrimaryKeySelective" parameterType="com.yiban.erp.entities.GoodsInfo" >
@@ -349,6 +351,9 @@
       <if test="highLimit != null">
         high_limit = #{highLimit,jdbcType=DECIMAL},
       </if>
+      <if test="specDesc != null">
+        spec_desc = #{specDesc,jdbcType=VARCHAR},
+      </if>
     </set>
     where id = #{id,jdbcType=BIGINT}
   </update>
@@ -455,7 +460,7 @@
     gi.gmp_type_id as gmpTypeId, gi.abc_type_id as abcTypeId, gi.scope_id as scopeId,
     gi.new_type_id as newTypeId, gi.created_by as createdBy, gi.updated_by as updatedBy, gi.created_time as createdTime,
     gi.updated_time as updatedTime, gi.tags as tags, gi.use_spec as useSpec,
-    gi.normal_limit as normalLimit, gi.low_limit as lowLimit, gi.high_limit as highLimit,
+    gi.normal_limit as normalLimit, gi.low_limit as lowLimit, gi.high_limit as highLimit, gi.spec_desc as specDesc,
     gc.name as categoryName,
     f.name as factoryName,
     s.name as supplierName

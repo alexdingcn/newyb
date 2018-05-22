@@ -175,9 +175,13 @@
                         </Row>
 
                         <div v-if="!formData.useSpec">
-                            <FormItem label="单规格描述" :label-width="100" prop="useSpec">
-                                    <Input v-model="formData.specDesc" style="width: 100%;" />
-                            </FormItem>
+                            <Row class="row-margin-bottom">
+                                <i-col span="6">
+                                    <FormItem label="单规格描述" :label-width="100" prop="useSpec">
+                                            <Input v-model="formData.specDesc" style="width: 100%;" />
+                                    </FormItem>
+                                </i-col>
+                            </Row>
                         </div>
 
                         <div v-if="formData.useSpec" >
