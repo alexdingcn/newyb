@@ -81,7 +81,7 @@ export default {
     methods: {
         loadBackground: function () {
             var self = this;
-            util.ajax.get('https://www.bing.com/HPImageArchive.aspx', {
+            util.ajax.get('/login/dynamic-bg', {
                     params: {
                         format: 'js',
                         idx: 1,
@@ -96,7 +96,7 @@ export default {
                     }
                 })
                 .catch(function (error) {
-                    util.errorProcessor(self, error);
+                    self.bgImage = 'https://www.bing.com/az/hprichbg/rb/OakTreeMaize_ZH-CN10523296117_1920x1080.jpg';
                 });
         },
         handleSubmit () {
