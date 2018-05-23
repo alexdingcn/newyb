@@ -245,8 +245,9 @@
 
   <select id="getByOrderId" parameterType="java.lang.Long" resultMap="BaseResultMap">
     select
-      <include refid="Base_Column_List"/>
-    from repertory_in_detail
+      r.*, o.value as checkTempMethodName
+    from repertory_in_detail r
+    left join options o on r.check_temp_method = o.id
     where in_order_id = #{inOrderId}
   </select>
 

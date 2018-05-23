@@ -5,10 +5,10 @@
 
 <template>
   <Row class="goods-list" :gutter="10">
-          <Col :span="showSider ? '4' : '0'">
+          <i-col :span="showSider ? '4' : '0'">
             <goods-category :is-sider="true" v-show="showSider" @on-choose="categoryChoose" ></goods-category>
-          </Col>
-          <Col :span="showSider ? '20' : '24'">
+          </i-col>
+          <i-col :span="showSider ? '20' : '24'">
               <Card>
                     <p slot="title">
                         <a href="javascript:void(0)" @click="changeSiderShow" style="margin-right: 5px;" >
@@ -45,7 +45,7 @@
                     </Row>
 
                 </Card>
-          </Col>
+          </i-col>
 
           <Modal v-model="goodsModal" title="商品信息维护" :footerHide="true" :mask-closable="false" width="75">
               <goods-info ref="goodsInfoModal" :goodsInfoId="editId" @save-ok="goodsSaveOk" ></goods-info>

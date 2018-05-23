@@ -821,8 +821,22 @@
                     this.receiveTemp = false;
                     return;
                 }
+                data.receiveDate = data.receiveDate ? moment(data.receiveDate).format('YYYY-MM-DD') : '';
+                data.payDate = data.payDate ? moment(data.payDate).format('YYYY-MM-DD') : '';
+                data.shipStartDate = data.shipStartDate ? moment(data.shipStartDate).format('YYYY-MM-DD HH:mm') : '';
+                data.shipEndDate = data.shipEndDate ? moment(data.shipEndDate).format('YYYY-MM-DD HH:mm') : '';
+
                 this.editView = true;
                 this.order = data;
+                //需要对data detail中的日期做字符串处理功能
+                for(let i=0; i<data.details.length; i++) {
+                    // productDate/expDate; 
+                    let productDate = data.details[i].productDate ? moment(data.details[i].productDate).format('YYYY-MM-DD') : '';
+                    let expDate = data.details[i].expDate ? moment(data.details[i].expDate).format('YYYY-MM-DD') : '';
+                    data.details[i].expDate = expDate;
+                    data.details[i].productDate = productDate;
+                }
+
                 this.orderItems = data.details;
                 let itemIds = [];
                 if(this.orderItems && this.orderItems.length > 0) {

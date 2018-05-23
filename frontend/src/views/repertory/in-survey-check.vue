@@ -205,7 +205,9 @@ export default {
             if(!data && !data.id) {
                 return;
             }
-            this.formItem.receiveDate = data.receiveDate;
+            this.formItem.receiveDate = data.receiveDate ? moment(data.receiveDate).format('YYYY-MM-DD') : '';
+            this.formItem.productDate = data.productDate ? moment(data.productDate).format('YYYY-MM-DD') : '';
+            this.formItem.expDate = data.expDate ? moment(data.expDate).format('YYYY-MM-DD') : '';
             this.formItem.warehouseName = data.warehouseName;
             this.formItem.supplierName = data.supplierName;
             this.formItem.receiveUser = data.createBy;
@@ -225,9 +227,9 @@ export default {
             this.formItem.storageCondition = data.storageCondition;
             this.formItem.batchCode = data.batchCode;
             this.formItem.receiveQuality = data.receiveQuality;
-            this.formItem.productDate = data.productDate;
-            this.formItem.expDate = data.expDate;
-            this.formItem.surveyDate = data.surveyDate ? data.surveyDate : moment().format('YYYY-MM-DD HH:mm');
+            this.formItem.productDate = data.productDate ? moment(data.productDate).format('YYYY-MM-DD') : '';
+            this.formItem.expDate = data.expDate ? moment(data.expDate).format('YYYY-MM-DD') : '';
+            this.formItem.surveyDate = data.surveyDate ? moment(data.surveyDate).format('YYYY-MM-DD HH:mm') : moment().format('YYYY-MM-DD HH:mm');
             this.formItem.surveyQuality = data.surveyQuality;
             this.formItem.surveyUser = data.surveyUser;
             this.formItem.surveyAddress = data.surveyAddress;
