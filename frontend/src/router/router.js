@@ -227,7 +227,8 @@ export const appRouter = [
         component: Main,
         children: [
             { path: 'index', title: '权限管理', name: 'access_index', component: () => import('@/views/access/access.vue') },
-            { path: 'add/user', title: '新建用户', name: 'add_user', component: () => import('@/views/access/add-user.vue')}
+            { path: 'add/user', title: '新建用户', name: 'add_user', component: () => import('@/views/access/add-user.vue')},
+            { path: 'company', title: '公司设置', name: 'company', component: () => import('@/views/access/company.vue')},
         ]
     },
     /*
