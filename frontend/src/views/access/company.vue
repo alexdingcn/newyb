@@ -28,7 +28,7 @@
                     <Row>
                         <Col span="8">
                             <FormItem label="公司地址" prop="placeCodes">
-                                <al-cascader v-model="formItem.placeCodes" level="2"/>
+                                <al-cascader v-model="formItem.placeCodeList" level="2" />
                             </FormItem>
                         </Col>
                     </Row>
@@ -114,10 +114,12 @@
 </template>
 <script>
 import Vue from 'vue';
+import moment from 'moment';
 import iviewArea from 'iview-area';
 import util from '@/libs/util.js';
+import fileDetail from '@/views/basic-data/file-detail.vue';
 
-
+Vue.use(iviewArea);
 export default {
     name: 'company',
     data () {
@@ -253,10 +255,10 @@ export default {
                                 placeCodes.push(rawCodes[i].code);
                             }
                         }
-                        this.formItem.placeCodes = placeCodes;
+                        this.formItem.placeCodeList = placeCodes;
                 })
                 .catch(function (error) {
-                        util.errorProcessor(self, error);
+                        util.errorProcessor(this, error);
                     });
     },
     methods:{
@@ -266,7 +268,7 @@ export default {
                    alert("公司信息修改成功！");
                 })
                 .catch(function (error) {
-                        util.errorProcessor(self, error);
+                        util.errorProcessor(this, error);
                     });
         },
         cancel(){
@@ -280,7 +282,7 @@ export default {
                                 placeCodes.push(rawCodes[i].code);
                             }
                         }
-                        this.formItem.placeCodes = placeCodes;
+                        this.formItem.placeCodeList = placeCodes;
                 })
                 .catch(function (error) {
                         util.errorProcessor(self, error);
