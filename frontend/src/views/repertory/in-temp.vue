@@ -1,12 +1,17 @@
+<style lang="less">
+    @import '../../styles/common.less';
+</style>
+
+
 
 <template>
   <div>
-        <Row type="flex" justify="start">
-            <Col span="6">
+        <Row class="row-margin-bottom">
+            <i-col span="6">
                 <span style="width:100px; margin-right:10px;">收货日期</span>
                 <DatePicker v-model="dateRange" type="daterange" placement="bottom-start" placeholder="收货日期" style="width:200px"></DatePicker>
-            </Col>
-            <Col span="18">
+            </i-col>
+            <i-col span="18">
                 <Row type="flex" justify="end">
                     <ButtonGroup size="small">
                         <Button type="primary" icon="ios-search" :loading="orderLoading" @click="refreshTempStatusOrder" >查询</Button>
@@ -14,7 +19,7 @@
                         <Button type="error" icon="close-round" :loading="orderLoading" @click="removeOrder" >删除订单</Button>
                     </ButtonGroup>
                 </Row>
-            </Col>
+            </i-col>
         </Row>
         <Table ref="orderTable" border highlight-row disabled-hover height="250" 
             size="small" :columns="orderColumns" :data="orderData" :loading="orderLoading" 
@@ -34,6 +39,7 @@
 <script>
 import util from '@/libs/util.js';
 import moment from 'moment';
+import goodsSpecTags from '@/views/goods/goods-spec-tabs.vue';
 
 export default {
     name: 'in-temp',
@@ -43,6 +49,9 @@ export default {
             type: Boolean,
             default: false
         }
+    },
+    components:{
+        goodsSpecTags
     },
     data() {
         return {
@@ -110,16 +119,23 @@ export default {
                     key: 'origin'
                 },
                 {
-                    title: '剂型',
-                    key: 'jx'
-                },
-                {
                     title: '规格',
-                    key: 'spec'
+                    key: 'spec',
+                    render: (h, params) =>　{
+                        return h(goodsSpecTags, {
+                            props: {
+                                tags: params.row.goods.goodsSpecs,
+                                color: 'blue'
+                            }
+                        });
+                    }
                 },
                 {
                     title: '生产企业',
-                    key: 'factoryName'
+                    key: 'factoryName',
+                    render: (h, params) => {
+                        return h('span', params.row.goods.factoryName);
+                    }
                 },
                 {
                     title: '单位',

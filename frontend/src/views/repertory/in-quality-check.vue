@@ -628,7 +628,7 @@ export default {
                 
                 {
                     title: "温控方式验收",
-                    key: 'checkTempMethod',
+                    key: 'checkTempMethodName',
                     width: 140
                 },
                 {

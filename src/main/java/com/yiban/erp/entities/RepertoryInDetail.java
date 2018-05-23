@@ -64,6 +64,8 @@ public class RepertoryInDetail {
 
     private Long checkTempMethod;
 
+    private String checkTempMethodName;
+
     private String checkUser;
 
     private Date checkTime;
@@ -441,5 +443,13 @@ public class RepertoryInDetail {
 
     public void setUpdateTime(Date updateTime) {
         this.updateTime = updateTime;
+    }
+
+    public String getCheckTempMethodName() {
+        return checkTempMethodName;
+    }
+
+    public void setCheckTempMethodName(String checkTempMethodName) {
+        this.checkTempMethodName = checkTempMethodName;
     }
 }

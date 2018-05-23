@@ -101,7 +101,7 @@ export default {
                 {
                     title: '收货时间',
                     key: 'receiveDate',
-                    width: 100,
+                    width: 120,
                     render: (h, params) => {
                         let receiveDate = params.row.receiveDate;
                         return h('span', receiveDate ? moment(receiveDate).format("YYYY-MM-DD") : '');
@@ -124,15 +124,18 @@ export default {
                 },
                 {
                     title: '入库方式',
-                    key: 'refTypeName'
+                    key: 'refTypeName',
+                    width: 120,
                 },
                 {
                     title: '入库仓库',
                     key: 'warehouseName',
+                    width: 120,
                 },
                 {
                     title: '供应商',
                     key: 'supplierName',
+                    width: 170,
                 },
                 {
                     title: '供应商代表',
@@ -142,6 +145,7 @@ export default {
                 {
                     title: '采购员',
                     key: 'saleNickName',
+                    width: 150,
                     render: (h, params) => {
                         let saleNickName = params.row.saleNickName;
                         let saleRealName = params.row.saleRealName;
@@ -154,34 +158,42 @@ export default {
                 },
                 {
                     title: '总计入库数量',
+                    width: 120,
                     key: 'totalQuantity'
                 },
                 {
                     title: '总计金额',
+                    width: 120,
                     key: 'totalAmount'
                 },
                 {
                     title: '收货员',
+                    width: 120,
                     key: 'createBy'
                 },
                 {
                     title: '到货温度',
+                    width: 120,
                     key: 'receiveTemp'
                 },
                 {
                     title: '验收温度',
+                    width: 120,
                     key: 'checkTemp'
                 },
                 {
                     title: '系统单号',
+                    width: 190,
                     key: 'orderNumber'
                 },
                 {
                     title: '采购属性',
+                    width: 120,
                     key: 'buyTypeName',
                 },
                 {
                     title: '到货时间',
+                    width: 140,
                     key: 'shipEndDate',
                     render: (h, params) => {
                         let shipEndDate = params.row.shipEndDate;
@@ -347,7 +359,7 @@ export default {
                 },
                 {
                     title: "温控方式验收",
-                    key: 'checkTempMethod',
+                    key: 'checkTempMethodName',
                     width: 140
                 },
                 {
