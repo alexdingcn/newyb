@@ -19,6 +19,7 @@
         </Row>
         <Table ref="goodsSelect" size="small" border
                :columns="goodsColumns" :data="goodsList"
+               :loading="goodsLoading"
                @on-row-click="chooseGoods"
                 class="margin-top-10 goods-select-table">
         </Table>

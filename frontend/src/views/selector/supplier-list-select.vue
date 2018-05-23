@@ -14,6 +14,7 @@
         </Row>
         <Table ref="supplierSelect" size="small" border
                :columns="supplierColumns" :data="supplierList"
+               :loading="supplierLoading"
                @on-row-click="choosesupplier"
                 class="margin-top-10 supplier-select-table">
         </Table>

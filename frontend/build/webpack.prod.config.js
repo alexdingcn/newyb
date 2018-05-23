@@ -18,7 +18,7 @@ fs.open('./build/env.js', 'w', function(err, fd) {
 
 module.exports = merge(webpackBaseConfig, {
     output: {
-        publicPath: 'http://erp.yibanjf.com/',  // 修改 https://iv...admin 这部分为你的服务器域名
+        publicPath: 'http://erp.yibanjf.com/dist/',  // 修改 https://iv...admin 这部分为你的服务器域名
         filename: '[name].[hash].js',
         chunkFilename: '[name].[hash].chunk.js'
     },
@@ -41,12 +41,22 @@ module.exports = merge(webpackBaseConfig, {
                 NODE_ENV: '"production"'
             }
         }),
+        /*
         new webpack.optimize.UglifyJsPlugin({
-            compress: {
-                warnings: false
+            parallel: true,
+            uglifyOptions: {
+                ecma: 6,
+                compress: false // hangs without this
             },
+            cache: path.join(__dirname, 'webpack-cache/uglify-cache'),
+            compress: {
+                warnings: false,
+                drop_console: true
+            },
+            comments: false,
             sourceMap: true
         }),
+        */
         new UglifyJsParallelPlugin({
             workers: os.cpus().length,
             mangle: true,

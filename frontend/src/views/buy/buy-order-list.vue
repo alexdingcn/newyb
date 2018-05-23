@@ -425,20 +425,19 @@
                     content: '请确认采购订单信息正确？',
                     onCancel: () => {},
                     onOk: () => {
+                        self.checkModalShow = false;
                         util.ajax.post('/buy/status', {
                             orderId: self.currchooseItem.id,
                             orderStatus: result ? 'CHECKED' : 'REJECTED',
                             checkResult: this.checkResult
                             })
                             .then(function (response) {
-                                self.checkModalShow = false;
                                 self.$Message.success('审核结果提交成功');
                                 if (response.status === 200) {
                                     self.queryOrderList();
                                 }
                             })
                             .catch(function (error) {
-                                self.checkModalShow = false;
                                 util.errorProcessor(self, error);
                             });
                     }
