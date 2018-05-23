@@ -158,21 +158,31 @@
                         </Row>
                         <Row class="row-margin-bottom">
                             <i-col span="6">
-                                <FormItem label="批发价" :label-width="100" prop="useSpec">
+                                <FormItem label="批发价" :label-width="100" prop="batchPrice">
                                      <Input v-model="formData.batchPrice" style="width: 100%;" />
                                 </FormItem>
                             </i-col>
                             <i-col span="6">
-                                <FormItem label="市场价" :label-width="100" prop="useSpec">
+                                <FormItem label="市场价" :label-width="100" prop="retailPrice">
                                      <Input v-model="formData.retailPrice" style="width: 100%;" />
                                 </FormItem>
                             </i-col>
                             <i-col span="6">
-                                <FormItem label="参考进货价" :label-width="100" prop="useSpec">
+                                <FormItem label="参考进货价" :label-width="100" prop="inPrice">
                                      <Input v-model="formData.inPrice" style="width: 100%;" />
                                 </FormItem>
                             </i-col>
                         </Row>
+
+                        <div v-if="!formData.useSpec">
+                            <Row class="row-margin-bottom">
+                                <i-col span="6">
+                                    <FormItem label="单规格描述" :label-width="100" prop="useSpec">
+                                            <Input v-model="formData.specDesc" style="width: 100%;" />
+                                    </FormItem>
+                                </i-col>
+                            </Row>
+                        </div>
 
                         <div v-if="formData.useSpec" >
                             <Alert type="succuess" v-if="goodsSpesList.length<=0">

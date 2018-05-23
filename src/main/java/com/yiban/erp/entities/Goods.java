@@ -158,6 +158,7 @@ public class Goods {
     private List<String> tagList;
 
     private Boolean useSpec;
+    private String specDesc;
 
     private BigDecimal batchPrice;
     private BigDecimal retailPrice;
@@ -1053,6 +1054,14 @@ public class Goods {
         this.highLimit = highLimit;
     }
 
+    public String getSpecDesc() {
+        return specDesc;
+    }
+
+    public void setSpecDesc(String specDesc) {
+        this.specDesc = specDesc;
+    }
+
     public List<GoodsAttributeRef> getAttributeRefs() {
         return attributeRefs;
     }
@@ -1080,6 +1089,13 @@ public class Goods {
             spec = new GoodsSpec();
             spec.setId(this.specThreeId);
             spec.setSpecName(this.specThreeName);
+            result.add(spec);
+        }
+        if (!useSpec && StringUtils.isNotBlank(this.specDesc)) {
+            //使用的是单规格，这时候列表返回一个规格描述当列表的值
+            spec = new GoodsSpec();
+            spec.setId(-1L);
+            spec.setSpecName(this.specDesc);
             result.add(spec);
         }
         return result;

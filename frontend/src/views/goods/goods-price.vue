@@ -124,9 +124,10 @@ export default {
                     render: (h, params) => {
                         let useSpec = params.row.useSpec;
                         if (!useSpec) {
-                            return '';
+                            let specDesc = params.row.specDesc;
+                            return h('span', specDesc);
                         }else {
-                            return h('span', params.row.detailsSize + '种');
+                            return h('span', '多规格共' + params.row.detailsSize + '种');
                         }
                     }
                 },
