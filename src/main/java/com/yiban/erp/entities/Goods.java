@@ -1091,7 +1091,7 @@ public class Goods {
             spec.setSpecName(this.specThreeName);
             result.add(spec);
         }
-        if (!useSpec && StringUtils.isNotBlank(this.specDesc)) {
+        if (this.useSpec != null && !this.useSpec && StringUtils.isNotBlank(this.specDesc)) {
             //使用的是单规格，这时候列表返回一个规格描述当列表的值
             spec = new GoodsSpec();
             spec.setId(-1L);
