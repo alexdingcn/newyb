@@ -17,7 +17,7 @@ util.title = function (title) {
 const ajaxUrl = env === 'development'
     ? 'http://localhost:8000'
     : env === 'production'
-        ? 'https://wx.yibanmed.com'
+        ? 'http://erp.yibanjf.com'
         : 'https://debug.yibanjf.com';
 
 util.baseUrl = ajaxUrl;
