@@ -192,6 +192,8 @@
                 </Col>
             </Row>
 
+
+
             <Tabs value="cert" type="card" @on-click="changeTabs">
                 <TabPane label="证件" name="cert" icon="document-text">
                     <Row>
@@ -211,7 +213,7 @@
                         </Col>
                         <Col span="10">
                             <FormItem label="营业执照有效期" prop="licenseExp" :label-width="140">
-                                <DatePicker type="date" placeholder="营业执照有效期至" v-model="formItem.licenseExp"/>
+                                <DatePicker type="date"  placeholder="营业执照有效期至" v-model="formItem.licenseExp" transfer/>
                             </FormItem>
                         </Col>
                     </Row>
@@ -296,7 +298,7 @@
                         </Col>
                         <Col span="8">
                             <FormItem label="创建时间" prop="createdTime">
-                                <DatePicker type="datetime" format="yyyy-MM-DD HH:mm" disabled v-model="formItem.createdTime"/>
+                                <DatePicker type="datetime" format="yyyy-MM-DD HH:mm" disabled v-model="formItem.createdTime" transfer/>
                             </FormItem>
                         </Col>
                     </Row>
@@ -308,7 +310,7 @@
                         </Col>
                         <Col span="8">
                             <FormItem label="修改人时间" prop="updatedTime">
-                                <DatePicker type="datetime" format="yyyy-MM-DD HH:mm" disabled v-model="formItem.updatedTime"/>
+                                <DatePicker type="datetime" format="yyyy-MM-DD HH:mm" disabled v-model="formItem.updatedTime" transfer/>
                             </FormItem>
                         </Col>
                     </Row>
