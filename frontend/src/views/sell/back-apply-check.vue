@@ -77,13 +77,15 @@ import moment from 'moment';
 import warehouseSelect from '@/views/selector/warehouse-select.vue';
 import customerSelect from '@/views/selector/customer-select.vue';
 import saleSelect from '@/views/selector/sale-select.vue';
+import goodsSpecTags from '@/views/goods/goods-spec-tabs.vue';
 
 export default {
     name: 'sell-back-apply-check',
     components: {
         warehouseSelect,
         customerSelect,
-        saleSelect
+        saleSelect,
+        goodsSpecTags
     },
     data() {
         const statusShow = function(h, row) {
@@ -270,20 +272,31 @@ export default {
                     key: 'origin',
                     width: 150
                 },
-                {
-                    title: '剂型',
-                    key: 'jx',
-                    width: 120
-                },
+                // {
+                //     title: '剂型',
+                //     key: 'jx',
+                //     width: 120
+                // },
                 {
                     title: '规格',
                     key: 'spec',
-                    width: 120
+                    width: 120,
+                    render: (h, params) =>　{
+                        return h(goodsSpecTags, {
+                            props: {
+                                tags: params.row.goods.goodsSpecs,
+                                color: 'blue'
+                            }
+                        });
+                    }
                 },
                 {
                     title: '生产企业',
                     key: 'factoryName',
-                    width: 150
+                    width: 150,
+                    render: (h, params) => {
+                        return h('span', params.row.goods.factoryName);
+                    }
                 },
                 {
                     title: '单位',
@@ -315,7 +328,8 @@ export default {
                     key: 'expDate',
                     width: 150,
                     render: (h, params) => {
-                        return params.row.expDate ? moment(params.row.expDate).format('YYYY-MM-DD') : '';
+                        let expDate = params.row.expDate ? moment(params.row.expDate).format('YYYY-MM-DD') : '';
+                        return h('span', expDate);
                     }
                 },
                 {
@@ -323,7 +337,8 @@ export default {
                     key: 'productDate',
                     width: 150,
                     render: (h, params) => {
-                        return params.row.productDate ? moment(params.row.productDate).format('YYYY-MM-DD') : '';
+                        let productDate =  params.row.productDate ? moment(params.row.productDate).format('YYYY-MM-DD') : '';
+                        return h('span', productDate);
                     }
                 },
                 {
