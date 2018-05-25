@@ -376,4 +376,36 @@
       file_no = #{fileNo,jdbcType=VARCHAR}
     where id = #{id,jdbcType=BIGINT}
   </update>
+
+    <select id="selectAllCount" parameterType="map" resultType="java.lang.Integer">
+        select
+        count(1) as count
+        from factory
+        where company_id = #{companyId}
+        <if test="search != null" >
+            <bind name="pattern" value="'%' + search + '%'"/>
+            and (name like #{pattern} or
+            contact_phone like #{pattern} or
+            lower(pinyin) like lower(#{pattern}) OR
+            contact like #{pattern} )
+        </if>
+    </select>
+
+
+    <select id="selectAllPaged" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List" />
+        from factory
+        where company_id = #{companyId}
+        <if test="search != null" >
+            <bind name="pattern" value="'%' + search + '%'"/>
+            and (name like #{pattern} or
+            contact_phone like #{pattern} or
+            lower(pinyin) like lower(#{pattern}) OR
+            contact like #{pattern} )
+        </if>
+        <if test="offset != null and limit != null">
+            limit #{offset}, #{limit}
+        </if>
+    </select>
 </mapper>

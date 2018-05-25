@@ -68,7 +68,8 @@ export default {
     watch: {
         value(data) {
             this.supplierId = data;
-            if (this.supplierOptions === undefined || this.supplierOptions.length == 0) {
+            if (this.supplierOptions === undefined || this.supplierOptions.length == 0 ||
+                (this.supplierOptions.length === 1 && this.supplierOptions[0].id != data)) {
                 this.querySupplier();
             }
         }

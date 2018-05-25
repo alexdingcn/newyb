@@ -5,9 +5,11 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.yiban.erp.dao.FactoryMapper;
 import com.yiban.erp.entities.Factory;
+import com.yiban.erp.entities.Supplier;
 import com.yiban.erp.entities.User;
 import com.yiban.erp.exception.BizRuntimeException;
 import com.yiban.erp.exception.ErrorCode;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +18,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -36,9 +37,23 @@ public class FactoryController {
      * @return
      */
     @RequestMapping(value = "/list", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> list(@AuthenticationPrincipal User user) {
-        List<Factory> factoryList = factoryMapper.selectAll(user.getCompanyId());
-        return ResponseEntity.ok().body(JSON.toJSONString(factoryList));
+    public ResponseEntity<String> list(@RequestParam(name = "page", required = false) Integer page,
+                                       @RequestParam(name = "size", required = false) Integer size,
+                                       @RequestParam(name = "search", required = false) String search,
+                                       @AuthenticationPrincipal User user) {
+        logger.info("get factory list page:{}, size:{}, search：{}", page, size, search);
+        Integer pageSize = size == null ? 10 : size;
+        Integer offset = (page == null || page <= 0 ? 0 : page - 1) * pageSize;
+        if (StringUtils.isBlank(search)) {
+            search = null;
+        }
+
+        int count = factoryMapper.selectAllCount(user.getCompanyId(), search);
+        List<Supplier> supplierList = factoryMapper.selectAllPaged(user.getCompanyId(), search, pageSize, offset);
+        JSONObject result = new JSONObject();
+        result.put("count", count);
+        result.put("data", supplierList);
+        return ResponseEntity.ok().body(JSON.toJSONString(result));
     }
 
     @RequestMapping(value = "/search", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -49,7 +64,8 @@ public class FactoryController {
             List<Factory> factoryList = factoryMapper.searchByNameOrContact(user.getCompanyId(), searchStr);
             return ResponseEntity.ok().body(JSON.toJSONString(factoryList));
         } else {
-            return list(user);
+            List<Factory> factoryList = factoryMapper.selectAll(user.getCompanyId());
+            return ResponseEntity.ok().body(JSON.toJSONString(factoryList));
         }
     }
 

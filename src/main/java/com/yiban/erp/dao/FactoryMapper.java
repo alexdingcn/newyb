@@ -1,6 +1,7 @@
 package com.yiban.erp.dao;
 
 import com.yiban.erp.entities.Factory;
+import com.yiban.erp.entities.Supplier;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -25,4 +26,12 @@ public interface FactoryMapper {
     List<Factory> searchByNameOrContact(
             @Param(value = "companyId") Integer companyId,
             @Param(value = "searchStr") String searchStr);
+
+    int selectAllCount(@Param("companyId") Integer companyId,
+                       @Param("search") String search);
+
+    List<Supplier> selectAllPaged(@Param("companyId") Integer companyId,
+                                  @Param("search") String search,
+                                  @Param("limit") Integer limit,
+                                  @Param("offset") Integer offset);
 }
