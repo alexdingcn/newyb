@@ -232,6 +232,7 @@ export default {
             }, 800)
     },
     methods: {
+        
         changeSiderShow() {
             this.showSider = !this.showSider;
         },

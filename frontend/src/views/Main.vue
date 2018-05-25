@@ -31,6 +31,7 @@
                     </div>
                 </div>
                 <div class="header-avator-con">
+                    <page-refresht ></page-refresht>
                     <full-screen v-model="isFullScreen" @on-change="fullscreenChange"></full-screen>
                     <lock-screen></lock-screen>
                     <message-tip v-model="mesCount"></message-tip>
@@ -80,6 +81,7 @@
     import themeSwitch from './main-components/theme-switch/theme-switch.vue';
     import helpMenu from './main-components/help-center/help-menu.vue';
     import mainHelp from './main-components/help-center/main-help.vue';
+    import pageRefresht from './main-components/page-refresh.vue';
     import Cookies from 'js-cookie';
     import util from '@/libs/util.js';
     
@@ -93,7 +95,8 @@
             messageTip,
             themeSwitch,
             helpMenu,
-            mainHelp
+            mainHelp,
+            pageRefresht
         },
         data () {
             return {
