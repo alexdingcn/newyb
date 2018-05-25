@@ -2,25 +2,25 @@
     <div>
         <Row :gutter="16">
             <Col span="8">
-                <Input v-model="supplierQuery" clearable
-                       @on-enter="querySuppliers"
+                <Input v-model="factoryQuery" clearable
+                       @on-enter="queryFactorys"
                        @on-change="clearQueryInput"
-                       placeholder="供应商/编号/拼音/联系人">
+                       placeholder="生产企业/拼音/联系人/联系人电话">
                     <span slot="append">
-                        <Button type="primary" size="small" icon="ios-search" @click="searchsupplier"></Button>
+                        <Button type="primary" size="small" icon="ios-search" @click="searchfactory"></Button>
                     </span>
                 </Input>
             </Col>
         </Row>
-        <Table ref="supplierSelect" size="small" border
-               :columns="supplierColumns" :data="supplierList"
-               :loading="supplierLoading"
-               @on-row-click="choosesupplier"
-                class="margin-top-10 supplier-select-table">
+        <Table ref="factorySelect" size="small" border
+               :columns="factoryColumns" :data="factoryList"
+               :loading="factoryLoading"
+               @on-row-click="choosefactory"
+                class="margin-top-10 factory-select-table">
         </Table>
         <Row class="margin-top-8">
             <div style="float: right;">
-                <Page :total="totalsupplierCount" :current="currentPage" :page-size="pageSize" @on-change="changePage" size="small" show-total></Page>
+                <Page :total="totalfactoryCount" :current="currentPage" :page-size="pageSize" @on-change="changePage" size="small" show-total></Page>
             </div>
         </Row>
     </div>
@@ -30,19 +30,19 @@
     import util from '@/libs/util.js';
 
     export default {
-        name: 'supplierListSelect',
+        name: 'factoryListSelect',
 
         props: ['disabled', 'size'],
         data () {
             return {
                 currentPage: 1,
                 pageSize: 10,
-                totalsupplierCount: 0,
-                supplierQuery: '',
+                totalfactoryCount: 0,
+                factoryQuery: '',
                 selectSize: this.size,
-                supplierLoading: false,
-                supplierList: [],
-                supplierColumns: [
+                factoryLoading: false,
+                factoryList: [],
+                factoryColumns: [
                     {
                         type: 'index',
                         width: 60,
@@ -51,6 +51,10 @@
                     {
                         key: 'name',
                         title: '名称'
+                    },
+                    {
+                        key: 'cityName',
+                        title: '城市'
                     },
                     {
                         key: 'address',
@@ -83,61 +87,61 @@
         methods: {
             reload() {
                 this.currentPage = 1;
-                this.totalsupplierCount = 0;
-                this.querySuppliers();
+                this.totalfactoryCount = 0;
+                this.queryFactorys();
             },
             changePage(page) {
                 this.currentPage = page;
-                this.querySuppliers();
+                this.queryFactorys();
             },
-            querySuppliers () {
+            queryFactorys () {
                 var self = this;
                 let queryObj = {
                     page: this.currentPage,
                     size: this.pageSize
                 };
 
-                if (this.supplierQuery !== '') {
-                    queryObj['search'] = this.supplierQuery;
+                if (this.factoryQuery !== '') {
+                    queryObj['search'] = this.factoryQuery;
                 }
 
-                this.supplierLoading = true;
-                util.ajax.get('/supplier/list',
+                this.factoryLoading = true;
+                util.ajax.get('/factory/list',
                         {params: queryObj})
                         .then(function (response) {
-                            self.supplierLoading = false;
-                            self.supplierList = response.data.data;
-                            self.totalsupplierCount = response.data.count;
+                            self.factoryLoading = false;
+                            self.factoryList = response.data.data;
+                            self.totalfactoryCount = response.data.count;
                         })
                         .catch(function (error) {
-                            self.supplierLoading = false;
+                            self.factoryLoading = false;
                             util.errorProcessor(self, error);
                         });
             },
-            searchsupplier() {
-                this.querySuppliers();
+            searchfactory() {
+                this.queryFactorys();
             },
 
             clearQueryInput(event) {
                 if (event.target.value === '') {
-                    this.querySuppliers();
+                    this.queryFactorys();
                 }
             },
-            choosesupplier(row, index) {
+            choosefactory(row, index) {
                 this.$emit('on-choosed', row);
             },
             onChange (data) {
-                let suppliers = this.supplierList.filter(item => item.id === data);
-                let supplier = suppliers[0] ? suppliers[0] : '';
+                let factorys = this.factoryList.filter(item => item.id === data);
+                let factory = factorys[0] ? factorys[0] : '';
                 this.$emit('input', data);
-                this.$emit('on-change', data, supplier);
+                this.$emit('on-change', data, factory);
             }
         }
 
     };
 </script>
 <style>
-    .supplier-select-table td {
+    .factory-select-table td {
         cursor: pointer;
     }
 </style>

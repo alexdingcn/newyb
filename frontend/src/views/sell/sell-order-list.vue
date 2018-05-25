@@ -8,7 +8,7 @@
             销售订单列表
         </p>
         <Row >
-            <Form ref="searchForm" :model="searchFormItem" :label-width="90">
+            <Form ref="searchForm" :model="searchFormItem" :label-width="90" class="sellOrderQueryForm">
                 <Row type="flex" justify="center">
                     <Col span="8" >
                         <FormItem label="客户">
@@ -44,7 +44,7 @@
         <Table border highlight-row :columns="tabColumns" :data="tabData" 
                 :loading="searching"  
                 no-data-text="点击上方查询按钮获取数据"
-                ref="table" class="margin-top-10" size="small">
+                ref="table" class="margin-top-10 sellOrderTbl" size="small">
         </Table>
 
         <Row type="flex" justify="end" class="margin-top-10">
@@ -53,16 +53,17 @@
             </Page>
         </Row>
 
-        <Modal v-model="showOrderDetailView" :width="70" :mask-closable="false" title="销售订单详细信息">
+        <Modal v-model="showOrderDetailView" :width="70" :mask-closable="false" title="销售订单详细信息" :footerHide="true">
             <review-detail :sellOrderId="showDetailViewId" @on-cancel="showOrderDetailViewClose"></review-detail>
-            <div slot="footer"></div>
         </Modal>
 
-        <Modal v-model="showShipDetailView" :width="75" :mask-closable="false" :title="shipDetailTitle" @on-cancel="ShowShipDetailViewClose">
+        <Modal v-model="showShipDetailView" :width="75" :mask-closable="false" :title="shipDetailTitle" @on-cancel="ShowShipDetailViewClose" :footerHide="true">
             <sell-order-ship :order="shipOrder" ></sell-order-ship>
-            <div slot="footer"></div>
         </Modal>
 
+        <Modal v-model="paymentModal" :width="75" :mask-closable="false" :title="paymentModalTitle" :footerHide="true">
+            <sell-order-ship :order="shipOrder" ></sell-order-ship>
+        </Modal>
     </Card>
 </template>
 
@@ -84,7 +85,7 @@ export default {
     },
 
     data () {
-        const stautsShow = function(h, status) {
+        const statusShow = function(h, status) {
             let label = '';
             let color = '';
             switch (status) {
@@ -107,7 +108,34 @@ export default {
             }
             return h('Tag', {
                 props: {
-                    type: 'dot',
+                    color: color
+                }
+            }, label);
+        }
+
+        const payStatusShow = function(h, totalAmt, paidAmt) {
+            let label = '';
+            let color = '';
+            let remainingAmt = totalAmt - paidAmt;
+            console.log(totalAmt + ' ' + paidAmt);
+            if (remainingAmt == 0) {
+                label = '已支付';
+                color = 'green'
+            } else if (remainingAmt > 0 && paidAmt == 0) {
+                label = '未支付';
+                color = 'red';
+            } else if (remainingAmt > 0 && paidAmt > 0) {
+                label = '余￥' + remainingAmt.toFixed(2);
+                color = 'yellow';
+            } else if (remainingAmt < 0) {
+                label = '超额支付￥' + -remainingAmt.toFixed(2);
+                color = 'blue';
+            } else {
+                label = '';
+                color = '';
+            }
+            return h('Tag', {
+                props: {
                     color: color
                 }
             }, label);
@@ -181,7 +209,16 @@ export default {
                     width: 150,
                     align: 'center',
                     render: (h, params) => {
-                        return stautsShow(h, params.row.status);
+                        return statusShow(h, params.row.status);
+                    }
+                },
+                {
+                    title: '付款状态',
+                    key: 'payStatus',
+                    width: 150,
+                    align: 'center',
+                    render: (h, params) => {
+                        return payStatusShow(h, params.row.totalAmount, params.row.paidAmount);
                     }
                 },
                 {
@@ -270,22 +307,40 @@ export default {
                     width: 110
                 },
                 {
-                    title: '补录运输记录',
+                    title: '操作',
                     align: 'center',
-                    width: 100,
+                    class: 'yy',
+                    width: 180,
                     fixed: 'right',
                     render: (h, params) => {
-                        return h('Button', {
+                        return h('ButtonGroup', {
                             props: {
-                                type: 'primary',
                                 size: 'small'
-                            },
-                            on: {
-                                click: () => {
-                                    this.openShowShipDetailView(params.row);
-                                }
                             }
-                        }, '运输记录');
+                        }, [
+                            h('Button', {
+                                props: {
+                                    type: 'primary',
+                                    icon: "edit"
+                                },
+                                on: {
+                                    click: () => {
+                                        this.addPayment(params.row);
+                                    }
+                                }
+                            }, '收款'),
+                            h('Button', {
+                                props: {
+                                    type: 'ghost',
+                                    icon: 'model-s'
+                                },
+                                on: {
+                                    click: () => {
+                                        this.openShowShipDetailView(params.row);
+                                    }
+                                }
+                            }, '运输记录')
+                        ]);
                     }
                 }
             ],
@@ -296,7 +351,9 @@ export default {
             pageSize: 50,
             showShipDetailView: false,
             shipOrder: {},
-            shipDetailTitle: ''
+            shipDetailTitle: '',
+            paymentModal: false,
+            paymentModalTitle: ''
         };
     },
     mounted() {
@@ -343,20 +400,29 @@ export default {
         },
         openShowShipDetailView (order) {
             this.shipOrder = order;
-            this.shipDetailTitle = '订单运输记录 ->' + order.orderNumber;
+            this.shipDetailTitle = '订单运输记录 - ' + order.orderNumber;
             this.showShipDetailView = true;
         },
         ShowShipDetailViewClose () {
             this.showShipDetailView = false;
+        },
+        addPayment(order) {
+            this.paymentModal = true;
+            this.paymentModalTitle = '添加支付记录 - ' + order.orderNumber;
         }
     }
-
 };
 </script>
 
 <style>
-.ivu-form-item {
+.sellOrderQueryForm .ivu-form-item {
     margin-bottom: 5px;
+}
+.sellOrderTbl .ivu-btn-group {
+    display: none;
+}
+.sellOrderTbl .ivu-table-row-hover .ivu-btn-group {
+    display: block;
 }
 </style>
 

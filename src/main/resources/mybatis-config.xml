@@ -62,6 +62,7 @@
         <mapper resource="mapping/BizLockMapper.xml"/>
         <mapper resource="mapping/OperationLogMapper.xml"/>
         <mapper resource="mapping/SystemConfigMapper.xml"/>
+        <mapper resource="mapping/UpdateHistoryMapper.xml"/>
 
     </mappers>
 </configuration>

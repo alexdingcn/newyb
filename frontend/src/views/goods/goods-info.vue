@@ -341,7 +341,9 @@
         <Modal v-model="fileUploadModal" title="商品档案管理" :footerHide="true" :mask-closable="false" width="50" class="file-upload-low">
             <file-detail :fileNo="uploadFileNo" @add-file-success="addFileSuccess" ></file-detail>
         </Modal>
-
+        <Spin fix size="large" v-if="loading">
+            别着急，商品加载中...
+        </Spin>
     </div>
 </template>
 
@@ -375,6 +377,7 @@ export default {
     },
     data() {
         return {
+            loading: false,
             currTabs: 'general',
             saveLoading: false,
             formData: {
@@ -428,6 +431,8 @@ export default {
             this.currTabs = 'general';
             if(id && id > 0) {
                 this.loadGoodsInfo(id);
+            } else {
+                this.formData = {};
             }
         }
     },
@@ -475,8 +480,11 @@ export default {
             }
         },
         loadGoodsInfo(id) {
+            var self = this;
+            this.loading = true;
             util.ajax.get('/goods/' + id)
                 .then((response) => {
+                    self.loading = false;
                     let data = response.data;
                     data.enable = data.enable ? 1 : 0;
                     data.cert1ExpDate = data.cert1ExpDate ? moment(data.cert1ExpDate).format('YYYY-MM-DD') : '';
@@ -496,6 +504,7 @@ export default {
                     
                 })
                 .catch((error) => {
+                    self.loading = false;
                     util.errorProcessor(this, error);
                 });
         },
