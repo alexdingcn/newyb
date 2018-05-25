@@ -18,6 +18,23 @@
             </div>
         </Modal>
 
+        <Modal v-model="showUpdateHistory" class="updateModal" :closable="false" 
+            @on-ok="onUpdateClose"  @on-cancel="onUpdateClose">
+            <p slot="header">
+                <Icon type="ios-information-outline"></Icon>
+                <span>更新历史</span>
+            </p>
+            <Carousel ref="updateHistoryList" v-model="updateHistoryIdx" :autoplay="updateHistories.length > 1" :autoplay-speed=4000>
+                <CarouselItem v-for="(history, index) in updateHistories" :key="index">
+                    <div class="update-carousel">
+                        <h2>{{ history.title }}</h2>
+                        <div v-html="history.content"></div>
+                        <img :src="history.imageUrl" v-if="history.imageUrl"/>
+                    </div>
+                </CarouselItem>
+            </Carousel>
+        </Modal>
+
         <Alert type="error" v-show="loggedUser.companyExpiredTime > 0" show-icon closable>
             <p>您的系统使用期限即将到期，请尽快续费购买，以免影响您的正常使用！</p>
             <span slot="close">升级</span>
@@ -216,6 +233,7 @@
 </template>
 
 <script>
+import Cookies from 'js-cookie';
 import Vue from 'vue';
 import cityData from './map-data/get-city-value.js';
 import homeMap from './components/map.vue';
@@ -271,10 +289,15 @@ export default {
             showAddNewTodo: false,
             newToDoItemValue: '',
             amountStats: [],
-            goodsStats: []
+            goodsStats: [],
+            updateHistories: [],
+            updateHistoryIdx: 0,
+            lastUpdateIdx: 0,
+            showUpdateHistory: false
         };
     },
     mounted() {
+        this.getUpdates();
         this.loadOrderStats();
         this.loadAmountStats();
         this.loadGoodsStats();
@@ -285,6 +308,26 @@ export default {
         }
     },
     methods: {
+        getUpdates() {
+            var self = this;
+            var lastViewUpdate = Cookies.get('last-updateid') || '';
+            util.ajax.get('/home/updates?lt=' + lastViewUpdate)
+                .then(function (response) {
+                    if (response.status === 200 && response.data && response.data.length > 0) {
+                        self.updateHistories = response.data;
+                        self.showUpdateHistory = true;
+                        self.lastUpdateIdx = response.data[response.data.length - 1].id;
+                        self.$nextTick(() => { self.$refs.updateHistoryList.handleResize(); } );
+                    }
+                })
+                .catch(function (error) {
+                    console.log(error);
+                    //util.errorProcessor(self, error);
+                });
+        },
+        onUpdateClose() {
+            Cookies.set('last-updateid', this.lastUpdateIdx);
+        },
         loadOrderStats() {
             var self = this;
             util.ajax.post('/home/orderstats')
