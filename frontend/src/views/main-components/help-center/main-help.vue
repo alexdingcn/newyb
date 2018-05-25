@@ -37,7 +37,6 @@
             
         </Row>
         
-        </a>
     </Card>
 </template>
 

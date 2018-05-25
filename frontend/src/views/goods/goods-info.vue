@@ -185,7 +185,7 @@
                         </div>
 
                         <div v-if="formData.useSpec" >
-                            <Alert type="succuess" v-if="goodsSpesList.length<=0">
+                            <Alert type="success" v-if="goodsSpesList.length<=0">
                                 <strong>温馨提示: </strong>还没有维护商品多规格配置，请先维护商品多规格配置信息!
                             </Alert>
                             <Row class="row-margin-bottom" >
