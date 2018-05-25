@@ -342,7 +342,7 @@
             <file-detail :fileNo="uploadFileNo" @add-file-success="addFileSuccess" ></file-detail>
         </Modal>
         <Spin fix size="large" v-if="loading">
-            加载中...
+            别着急，商品加载中...
         </Spin>
     </div>
 </template>
