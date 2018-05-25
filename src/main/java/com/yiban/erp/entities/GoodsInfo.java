@@ -513,7 +513,7 @@ public class GoodsInfo {
     }
 
     public Boolean getNeedCare() {
-        return needCare;
+        return needCare == null ? false: needCare;
     }
 
     public void setNeedCare(Boolean needCare) {

@@ -217,6 +217,15 @@
                         </div>
                     </TabPane>
                     <TabPane icon="ios-pricetags" name="attribute" label="预警/扩展属性">
+                        <h2 style="margin-bottom: 10px;">商品养护</h2>
+                        <Row class="row-margin-bottom">
+                            <i-col span="24" >
+                                <FormItem label="是否需养护" :label-width="100">
+                                    <Checkbox v-model="formData.needCare"></Checkbox>
+                                </FormItem>
+                            </i-col>
+                        </Row>
+
                         <h2 style="margin-bottom: 10px;">库存预警信息</h2>
                         <Row class="row-margin-bottom">
                             <i-col span="8">
@@ -316,9 +325,9 @@
                         <Row class="row-margin-bottom">
                             <i-col span="10">
                                 <FormItem label="档案附件">
-                                    <Input v-model="formData.fileNo" readonly>
+                                    <i-input v-model="formData.fileNo" readonly>
                                         <Button slot="append" type="text" icon="edit" @click="openFileUpload(formData.fileNo)"></Button>
-                                    </Input>
+                                    </i-input>
                                 </FormItem>
                             </i-col>
                         </Row>
@@ -378,6 +387,7 @@ export default {
                 batchPrice: 0,
                 retailPrice: 0,
                 inPrice: 0,
+                needCare: false,
                 goodsDetails: [],
                 fileNo: '',
                 attributeRefs: [],
