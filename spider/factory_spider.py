@@ -20,7 +20,7 @@ class BlogSpider(scrapy.Spider):
 		"Referer": "http://db.yaozh.com/"
 	}
 	cookies = {
-		'kztoken':'nJail6zJp6iXaJqWl2tpYGRvZ5iY',
+		'kztoken':'nJail6zJp6iXaJqWl2tpYmJoZpma',
 		'his':'a%3A3%3A%7Bi%3A0%3Bs%3A28%3A%22nJail6zJp6iXaJqWl2toaWhqY5mZ%22%3Bi%3A1%3Bs%3A28%3A%22nJail6zJp6iXaJqWl2toaWhqY5qY%22%3Bi%3A2%3Bs%3A28%3A%22nJail6zJp6iXaJqWl2toaWhqY5qa%22%3B%7D',
 		'think_language':'zh-CN',
 		'PHPSESSID':'jv9tjk2hcfr7uf5re2i23j56d7',
@@ -29,7 +29,7 @@ class BlogSpider(scrapy.Spider):
 		
 		
 	def start_requests(self):
-		for i in range(5430,7509):
+		for i in range(6425,7509):
 			yield Request(self.url_prefix + str(i) + '.html', method="get", cookies = self.cookies, headers= self.headers)
 
 	def parse(self, response):
