@@ -53,6 +53,8 @@ public class Goods {
 
     private Boolean enable;
 
+    private Boolean ifConser;//是否养护
+
     private Boolean isProxy;
 
     private Long factoryId;
@@ -398,6 +400,10 @@ public class Goods {
     public void setEnable(Boolean enable) {
         this.enable = enable;
     }
+
+    public Boolean getIfConser() { return ifConser; }
+
+    public void setIfConser(Boolean ifConser) { this.ifConser = ifConser; }
 
     public Boolean getProxy() {
         return isProxy;

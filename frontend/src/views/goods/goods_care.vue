@@ -9,14 +9,8 @@
             <Col span="9">
                 <Card>
                     <p slot="title">
-                        <Icon type="ios-flask-outline"></Icon> 生产企业
+                        <Icon type="ios-flask-outline"></Icon> 商品
                     </p>
-                    <div slot="extra">
-                        <ButtonGroup size="small" class="padding-left-20">
-                            <Button type="primary" icon="android-add-circle" @click="addFactory">添加</Button>
-                            <Button type="error" icon="android-remove-circle"  @click="delFactory">删除</Button>
-                        </ButtonGroup>
-                    </div>
                     <Row type="flex" justify="end">
                         <Input size="small" v-model="searchFactoryVal" placeholder="企业名称/联系人/拼音简称" clearable 
                             @on-enter="validateSearch">
@@ -111,18 +105,10 @@
                 util.ajax.get('/factory/list')
                     .then(function (response) {
                         self.tabLoading = false;
-<<<<<<< HEAD
-                        if (response.status === 200) {
-                            self.factoryData = response.data.data;
-                            self.currFactoryId = '';
-                            self.$refs.factoryTable.clearCurrentRow();
-                        }
-=======
                         self.factoryData = response.data;
                         self.currFactoryId = '';
                         self.$refs.factoryTable.clearCurrentRow();
                         
->>>>>>> add care
                     })
                     .catch(function (error) {
                         self.tabLoading = false;

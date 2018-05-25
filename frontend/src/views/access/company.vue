@@ -62,7 +62,7 @@
                     </Row>
                     <Row>
                         <Col span="8">
-                            <FormItem label="联系电话" prop="contactPhone">
+                            <FormItem label="联系电话" prop="contactPhone" >
                                 <Input v-model="formItem.contactPhone" />
                             </FormItem>
                         </Col>
@@ -263,9 +263,25 @@ export default {
     },
     methods:{
         submit(){
+            this.$refs.formItem.validate(valid => {
+                if (!valid) {
+                    return;
+                }
+               this.doSubmit();
+                
+            });
+
+            
+        },
+        doSubmit(){
              util.ajax.post('/company/updateCompany',this.formItem )
                 .then((response) => {
+<<<<<<< HEAD
                    this.$Message.info("公司信息修改成功！");
+=======
+                   this.$Message.success("公司信息修改成功！");
+                   
+>>>>>>> add care
                 })
                 .catch(function (error) {
                         util.errorProcessor(this, error);

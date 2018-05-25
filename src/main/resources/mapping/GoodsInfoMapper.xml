@@ -13,6 +13,7 @@
     <result column="full_name" property="fullName" jdbcType="VARCHAR" />
     <result column="origin" property="origin" jdbcType="VARCHAR" />
     <result column="enable" property="enable" jdbcType="BIT" />
+    <result column="if_conser" property="ifConser" jdbcType="BIT"/>
     <result column="is_proxy" property="isProxy" jdbcType="BIT" />
     <result column="factory_id" property="factoryId" jdbcType="BIGINT" />
     <result column="unit" property="unit" jdbcType="BIGINT" />
@@ -76,7 +77,7 @@
   </resultMap>
   <sql id="Base_Column_List" >
     id, company_id, category_id, goods_no, brand_id, supplier_id, status, name, full_name, 
-    origin, enable, is_proxy, factory_id, unit, pack_unit, medium_unit, medium_pack, 
+    origin, enable,if_conser, is_proxy, factory_id, unit, pack_unit, medium_unit, medium_pack,
     big_pack, pinyin, storage_condition, comment, cert1_name, cert1_exp_date, cert1_no,
     cert2_name,cert2_exp_date, cert2_no, cert3_name, cert3_exp_date, cert3_no,
     file_no, in_check, first_check, special_manage, cold_manage, need_care, in_tax, out_tax, valid_months,
@@ -100,7 +101,7 @@
     insert into goods_info (company_id, category_id,
       goods_no, brand_id, supplier_id, 
       status, name, full_name, 
-      origin, enable, is_proxy, factory_id, 
+      origin, enable,if_conser, is_proxy, factory_id,
       unit, pack_unit, medium_unit, 
       medium_pack, big_pack, pinyin, 
       storage_condition, comment,
@@ -122,7 +123,7 @@
     values (#{companyId,jdbcType=INTEGER}, #{categoryId,jdbcType=INTEGER},
       #{goodsNo,jdbcType=VARCHAR}, #{brandId,jdbcType=BIGINT}, #{supplierId,jdbcType=BIGINT}, 
       #{status,jdbcType=VARCHAR}, #{name,jdbcType=VARCHAR}, #{fullName,jdbcType=VARCHAR}, 
-      #{origin,jdbcType=VARCHAR}, #{enable,jdbcType=BIT}, #{isProxy,jdbcType=BIT}, #{factoryId,jdbcType=BIGINT}, 
+      #{origin,jdbcType=VARCHAR}, #{enable,jdbcType=BIT},#{ifConser,jdbcType=BIT}, #{isProxy,jdbcType=BIT}, #{factoryId,jdbcType=BIGINT},
       #{unit,jdbcType=BIGINT}, #{packUnit,jdbcType=BIGINT}, #{mediumUnit,jdbcType=BIGINT}, 
       #{mediumPack,jdbcType=DECIMAL}, #{bigPack,jdbcType=DECIMAL}, #{pinyin,jdbcType=VARCHAR}, 
       #{storageCondition,jdbcType=BIGINT}, #{comment,jdbcType=VARCHAR}, #{cert1Name,jdbcType=VARCHAR},
@@ -177,6 +178,9 @@
       </if>
       <if test="enable != null" >
         enable = #{enable,jdbcType=BIT},
+      </if>
+      <if test="ifConser != null" >
+        if_conser = #{ifConser,jdbcType=BIT},
       </if>
       <if test="isProxy != null" >
         is_proxy = #{isProxy,jdbcType=BIT},
@@ -449,7 +453,7 @@
     gi.id as goodsInfoId, gi.company_id as companyId, gi.category_id as categoryId,
     gi.goods_no as goodsNo, gi.brand_id as brandId, gi.supplier_id as supplierId,
     gi.status as status, gi.name as name, gi.full_name as fullName,
-    gi.origin as origin, gi.enable as enable, gi.is_proxy as isProxy, gi.factory_id as factoryId,
+    gi.origin as origin, gi.enable as enable,gi.if_conser as ifConser, gi.is_proxy as isProxy, gi.factory_id as factoryId,
     gi.unit as unit, gi.pack_unit as packUnit, gi.medium_unit as mediumUnit, gi.medium_pack as mediumPack,
     gi.big_pack as bigPack, gi.pinyin as pinyin, gi.storage_condition as storageCondition, gi.comment as comment,
     gi.cert1_name as cert1Name, gi.cert1_exp_date as cert1ExpDate, gi.cert1_no as cert1No,

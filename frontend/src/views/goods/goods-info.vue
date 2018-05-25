@@ -81,7 +81,7 @@
                             </i-col>
                         </Row>
                         <Row class="row-margin-bottom">
-                            <i-col span="16">
+                            <i-col span="10">
                                 <FormItem label="商品标签" prop="tagList">
                                     <CheckboxGroup v-model="formData.tagList">
                                         <Checkbox label="NEW_GOODS">
@@ -97,6 +97,18 @@
                                             <span>赠品</span>
                                         </Checkbox>
                                     </CheckboxGroup>
+                                </FormItem>
+                            </i-col>
+                            <i-col span="10">
+                                <FormItem label="是否养护" prop="ifConser">
+                                    <RadioGroup v-model="formData.ifConser">
+                                         <Radio :label="1">
+                                            <span>是</span>
+                                        </Radio>
+                                        <Radio :label="0">
+                                            <span>否</span>
+                                        </Radio>
+                                    </RadioGroup>
                                 </FormItem>
                             </i-col>
                         </Row>
@@ -399,6 +411,7 @@ export default {
                 goodsNo: '',
                 pinyin: '',
                 enable: 1,
+                ifConser:1,
                 tagList: [],
                 useSpec: false,
                 batchPrice: 0,
@@ -478,6 +491,7 @@ export default {
                 goodsNo: '',
                 pinyin: '',
                 enable: 1,
+                ifConser:1,
                 tagList: [],
                 useSpec: false,
                 batchPrice: 0,
@@ -520,6 +534,7 @@ export default {
                     self.loading = false;
                     let data = response.data;
                     data.enable = data.enable ? 1 : 0;
+                    data.ifConser = data.ifConser ? 0 : 1;
                     data.cert1ExpDate = data.cert1ExpDate ? moment(data.cert1ExpDate).format('YYYY-MM-DD') : '';
                     data.cert2ExpDate = data.cert2ExpDate ? moment(data.cert2ExpDate).format('YYYY-MM-DD') : '';
                     data.cert3ExpDate = data.cert3ExpDate ? moment(data.cert3ExpDate).format('YYYY-MM-DD') : '';
