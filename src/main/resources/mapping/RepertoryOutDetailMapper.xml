@@ -176,6 +176,41 @@
     where repertory_out_id = #{repertoryOutId}
   </select>
 
+
+  <select id="getOutDetailList"  parameterType="com.yiban.erp.dto.RepertoryOutListReq"  resultMap="BaseResultMap">
+    select
+    outDetail.id, outDetail.repertory_out_id, outDetail.repertory_info_id, outDetail.goods_id, outDetail.batch_code, outDetail.location,
+    outDetail.product_date, outDetail.exp_date,outDetail.quantity, outDetail.free,outDetail.price, outDetail.dis_price, outDetail.amount,
+    outDetail.tax_rate, outDetail.check_status,outDetail.review_user_id,outDetail.review_next_user_id,outDetail.review_result,outDetail.status,
+    outDetail.check_user, outDetail.check_date, outDetail.check_result, outDetail.created_by, outDetail.updated_by, outDetail.created_time,
+    outDetail.updated_time
+    from repertory_out_detail outDetail
+    left join repertory_out o on outDetail.repertory_out_id = o.id
+
+    where
+    ( outDetail.status != 'DELETE' or outDetail.status is NULL)
+    <if test="warehouseId != null">
+      and o.warehouse_id = #{warehouseId}
+    </if>
+    <if test="startOutDate != null">
+      and o.created_time >= #{startOutDate}
+    </if>
+    <if test="endOutDate != null">
+      and o.created_time &lt;= #{endOutDate}
+    </if>
+    <if test="outTypeList != null" >
+      and o.ref_type in
+      <foreach collection="outTypeList" item="item" open="(" close=")" separator=", ">
+        #{item}
+      </foreach>
+    </if>
+  </select>
+
+
+
+
+
+
   <select id="getLastBuyPrice" parameterType="map" resultType="com.yiban.erp.dto.CurrentBalanceResp">
     select
       t1.goods_id as goodsId,

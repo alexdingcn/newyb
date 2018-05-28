@@ -4,6 +4,7 @@ import com.yiban.erp.constant.*;
 import com.yiban.erp.dao.*;
 import com.yiban.erp.dto.ReceiveListReq;
 import com.yiban.erp.dto.ReceiveSetReq;
+import com.yiban.erp.dto.RepertoryOutListReq;
 import com.yiban.erp.entities.*;
 import com.yiban.erp.exception.BizException;
 import com.yiban.erp.exception.BizRuntimeException;
@@ -207,6 +208,44 @@ public class RepertoryOutService {
         details.stream().forEach(item -> item.setGoods(goodsMap.get(item.getGoodsId())));
         return details;
     }
+
+    public List<RepertoryOut> getOutListById(List<Long> ids) {
+        if (ids == null || ids.isEmpty()) {
+            return Collections.emptyList();
+        }
+        List<RepertoryOut> repertoryOutList = repertoryOutMapper.getOutListById(ids);
+        return repertoryOutList;
+    }
+    public List<RepertoryOutDetail> getOutDetailList(RepertoryOutListReq reqlist) {
+
+
+        List<RepertoryOutDetail> details = repertoryOutDetailMapper.getOutDetailList(reqlist);
+
+
+
+        if (details == null || details.isEmpty()) {
+            return Collections.emptyList();
+        }
+        List<Long> goodsIdList = new ArrayList<>();
+
+
+        details.stream().forEach(item -> goodsIdList.add(item.getGoodsId()));
+        List<Goods> goods = goodsService.getGoodsById(goodsIdList);
+        Map<Long, Goods> goodsMap = new HashMap<>();
+        goods.stream().forEach(item -> goodsMap.put(item.getId(), item));
+        details.stream().forEach(item -> item.setGoods(goodsMap.get(item.getGoodsId())));
+
+        List<Long> outIdList = new ArrayList<>();
+        details.stream().forEach(item -> outIdList.add(item.getRepertoryOutId()));
+        List<RepertoryOut> repertoryOuts = getOutListById(outIdList);
+        Map<Long, RepertoryOut> repertoryOutMap = new HashMap<>();
+        repertoryOuts.stream().forEach(item -> repertoryOutMap.put(item.getId(), item));
+        details.stream().forEach(item -> item.setRepertoryOut(repertoryOutMap.get(item.getRepertoryOutId())));
+        return details;
+    }
+
+
+
     @Transactional
     public void setOrderOutCheck(User user, Long orderId) throws BizException {
         RepertoryOut order = repertoryOutMapper.selectByPrimaryKey(orderId);

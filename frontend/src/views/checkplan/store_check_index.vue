@@ -1,7 +1,7 @@
 <template>
     <div>
         <Card>
-            <p slot="title">盘点制单</p>
+            <p slot="title">盘点单列表</p>
             <div slot="extra">
                 <ButtonGroup>
                     <Button size="small" type="primary" icon="ios-search" :loading="orderLoading" @click="refreshOrder">查询</Button>

@@ -1,6 +1,7 @@
 package com.yiban.erp.dao;
 
 import com.yiban.erp.dto.CurrentBalanceResp;
+import com.yiban.erp.dto.RepertoryOutListReq;
 import com.yiban.erp.entities.RepertoryOutDetail;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -20,6 +21,8 @@ public interface RepertoryOutDetailMapper {
     int insertBatch(@Param("details") List<RepertoryOutDetail> outDetails);
 
     List<RepertoryOutDetail> getByOrderId(Long orderId);
+
+    List<RepertoryOutDetail> getOutDetailList(RepertoryOutListReq reqlist);
 
     /**
      * 获取某一客户商品列表中的最近一次销售价

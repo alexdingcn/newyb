@@ -184,8 +184,8 @@ export const appRouter = [
         component: Main,
         menuGroup: [
             { title: "入库", icon: 'icon-peizaizhuangche-xianxing', start: 0, end: 4 },
-            { title: "出库", icon: 'icon-baoguofahuo-xianxing', start: 5, end: 9 },
-            { title: "盘点", icon: 'icon-zhongzhuanzhan-xianxing', start: 10, end: 13 }
+            { title: "出库", icon: 'icon-baoguofahuo-xianxing', start: 5, end: 10 },
+            { title: "盘点", icon: 'icon-zhongzhuanzhan-xianxing', start: 11, end: 13 }
         ],
         children: [
             { path: 'store_now', title: '实时库存', name: 'store_now', component: () => import('@/views/warehouse/store_now.vue') },
@@ -199,6 +199,7 @@ export const appRouter = [
             { path: 'out-review', title: '出库复核', name: 'out-review', component: () => import('@/views/out-store/out-review.vue') },
             { path: 'out-review-next', title: '双人复核', name: 'out-review-next', component: () => import('@/views/out-store/out-review-next.vue') },
             { path: 'out-check', title: '出库审核', name: 'out-check', component: () => import('@/views/out-store/out-check.vue') },
+            { path: 'out-order-list', title: '出库明细', name: 'out-order-list', divided: true, component: () => import('@/views/out-store/out-order-list.vue') },
 
             { path: 'store_check_index', title: '盘点单列表', name: 'store_check_index', component: () => import('@/views/checkplan/store_check_index.vue') },{ path: 'store_check_add', title: '盘点制单', name: 'store_check_add', component: () => import('@/views/checkplan/store_check_add.vue') },
             { path: 'store_check_do_list', title: '执行盘点', name: 'store_check_do_list', component: () => import('@/views/checkplan/store_check_do_list.vue') },

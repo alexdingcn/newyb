@@ -55,10 +55,10 @@ public class RepertoryOut {
     private Date createdTime;
 
     private Date updatedTime;
-
+    //展示字段
     private String  warehouseName;
-
     private String refTypeName;
+    private String customerTel;
 
     private List<RepertoryOutDetail> outDetailList;
     public Long getId() {

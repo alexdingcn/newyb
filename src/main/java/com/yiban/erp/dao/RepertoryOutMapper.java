@@ -1,8 +1,10 @@
 package com.yiban.erp.dao;
 
 import com.yiban.erp.dto.ReceiveListReq;
+import com.yiban.erp.dto.RepertoryOutListReq;
 import com.yiban.erp.entities.RepertoryOut;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -17,5 +19,6 @@ public interface RepertoryOutMapper {
     int updateByPrimaryKeySelective(RepertoryOut record);
 
     List<RepertoryOut> getList(ReceiveListReq listReq);
-
+    List<RepertoryOut> getOutListById(@Param("ids") List<Long> listId);
+    List<RepertoryOut> getOutList(RepertoryOutListReq listReq);
 }
