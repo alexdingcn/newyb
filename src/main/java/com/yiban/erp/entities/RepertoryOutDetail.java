@@ -72,7 +72,7 @@ public class RepertoryOutDetail {
     private String permit;
     private String brandNo; //商标编号
     private String storageCondition;
-    private Boolean specialManaged;
+    private Boolean specialManage;
 
     public Goods getGoods() {
         return goods;
@@ -259,8 +259,8 @@ public class RepertoryOutDetail {
     }
 
 
-    public Boolean getSpecialManaged() {
-        return this.goods == null ? null : this.goods.getSpecialManaged();
+    public Boolean getSpecialManage() {
+        return this.goods == null ? null : this.goods.getSpecialManage();
     }
 
     public String getStorageCondition() {

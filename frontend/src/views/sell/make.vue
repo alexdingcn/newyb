@@ -536,7 +536,6 @@ export default {
               }
           })
           .catch((error) => {
-              this.saveLoading = false;
               util.errorProcessor(this, error);
           });
     },

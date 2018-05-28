@@ -35,7 +35,8 @@
     <result column="file_no" property="fileNo" jdbcType="VARCHAR" />
     <result column="in_check" property="inCheck" jdbcType="BIT" />
     <result column="first_check" property="firstCheck" jdbcType="BIT" />
-    <result column="special_managed" property="specialManaged" jdbcType="BIT" />
+    <result column="special_manage" property="specialManage" jdbcType="BIT" />
+    <result column="cold_manage" property="coldManage" jdbcType="BIT" />
     <result column="need_care" property="needCare" jdbcType="BIT" />
     <result column="in_tax" property="inTax" jdbcType="DECIMAL" />
     <result column="out_tax" property="outTax" jdbcType="DECIMAL" />
@@ -78,7 +79,7 @@
     origin, enable, is_proxy, factory_id, unit, pack_unit, medium_unit, medium_pack, 
     big_pack, pinyin, storage_condition, comment, cert1_name, cert1_exp_date, cert1_no,
     cert2_name,cert2_exp_date, cert2_no, cert3_name, cert3_exp_date, cert3_no,
-    file_no, in_check, first_check, special_managed, need_care, in_tax, out_tax, valid_months,
+    file_no, in_check, first_check, special_manage, cold_manage, need_care, in_tax, out_tax, valid_months,
     warning_days, contact, cure_range, sale_policy, is_foreign, prescription_id, med_type_id, 
     is_shebao, specific_med_id, jx_id, base_med_id, func_cat_id, medication_id, care_time_id, 
     gmp_type_id, abc_type_id, scope_id, new_type_id, created_by, updated_by, created_time, 
@@ -106,7 +107,7 @@
       cert1_name, cert1_exp_date, cert1_no,
       cert2_name,cert2_exp_date, cert2_no,
       cert3_name, cert3_exp_date, cert3_no,
-      file_no, in_check, first_check, special_managed,
+      file_no, in_check, first_check, special_manage, cold_manage,
       need_care, in_tax, out_tax, 
       valid_months, warning_days, contact, 
       cure_range, sale_policy, is_foreign, 
@@ -128,7 +129,7 @@
       #{cert1ExpDate,jdbcType=DATE}, #{cert1No,jdbcType=VARCHAR}, #{cert2Name,jdbcType=VARCHAR},
       #{cert2ExpDate,jdbcType=DATE}, #{cert2No,jdbcType=VARCHAR}, #{cert3Name,jdbcType=VARCHAR},
       #{cert3ExpDate,jdbcType=DATE}, #{cert3No,jdbcType=VARCHAR}, #{fileNo,jdbcType=VARCHAR},
-      #{inCheck,jdbcType=BIT}, #{firstCheck,jdbcType=BIT}, #{specialManaged,jdbcType=BIT}, 
+      #{inCheck,jdbcType=BIT}, #{firstCheck,jdbcType=BIT}, #{specialManage,jdbcType=BIT}, #{coldManage,jdbcType=BIT},
       #{needCare,jdbcType=BIT}, #{inTax,jdbcType=DECIMAL}, #{outTax,jdbcType=DECIMAL}, 
       #{validMonths,jdbcType=INTEGER}, #{warningDays,jdbcType=INTEGER}, #{contact,jdbcType=VARCHAR}, 
       #{cureRange,jdbcType=VARCHAR}, #{salePolicy,jdbcType=VARCHAR}, #{isForeign,jdbcType=BIT}, 
@@ -243,8 +244,11 @@
       <if test="firstCheck != null" >
         first_check = #{firstCheck,jdbcType=BIT},
       </if>
-      <if test="specialManaged != null" >
-        special_managed = #{specialManaged,jdbcType=BIT},
+      <if test="specialManage != null" >
+        special_manage = #{specialManage,jdbcType=BIT},
+      </if>
+      <if test="coldManage != null" >
+        cold_manage = #{coldManage,jdbcType=BIT},
       </if>
       <if test="needCare != null" >
         need_care = #{needCare,jdbcType=BIT},
@@ -452,7 +456,7 @@
     gi.cert2_name as cert2Name, gi.cert2_exp_date as cert2ExpDate, gi.cert2_no as cert2No,
     gi.cert3_name as cert3Name, gi.cert3_exp_date as cert3ExpDate, gi.cert3_no as cert3No,
     gi.file_no as fileNo, gi.in_check as inCheck, gi.first_check as firstCheck,
-    gi.special_managed as specialManaged, gi.need_care as needCare, gi.in_tax as inTax, gi.out_tax as outTax,
+    gi.special_manage as specialManage, gi.cold_manage as coldManage, gi.need_care as needCare, gi.in_tax as inTax, gi.out_tax as outTax,
     gi.valid_months as validMonths, gi.warning_days as warningDays, gi.contact as contact, gi.cure_range as cureRange,
     gi.sale_policy as salePolicy, gi.is_foreign as isForeign, gi.prescription_id as prescriptionId, gi.med_type_id as medTypeId,
     gi.is_shebao as isSheBao, gi.specific_med_id as specificMedId, gi.jx_id as jxId, gi.base_med_id baseMedId, gi.func_cat_id as funcCatId,

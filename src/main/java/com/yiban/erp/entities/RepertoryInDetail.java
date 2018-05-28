@@ -94,12 +94,12 @@ public class RepertoryInDetail {
     private String packUnitName;
     private BigDecimal bigPack;
     private String storageCondition;
-    private Boolean specialManaged;
+    private Boolean specialManage;
 
 
 
-    public Boolean getSpecialManaged() {
-        return this.goods == null ? null : this.goods.getSpecialManaged();
+    public Boolean getSpecialManage() {
+        return this.goods == null ? null : this.goods.getSpecialManage();
     }
 
     public String getStorageCondition() {
