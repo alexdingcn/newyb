@@ -58,11 +58,11 @@
         </Modal>
 
         <Modal v-model="showShipDetailView" :width="75" :mask-closable="false" :title="shipDetailTitle" @on-cancel="ShowShipDetailViewClose" :footerHide="true">
-            <sell-order-ship :order="shipOrder" ></sell-order-ship>
+            <sell-order-ship :order="selectedOrder" ></sell-order-ship>
         </Modal>
 
-        <Modal v-model="paymentModal" :width="75" :mask-closable="false" :title="paymentModalTitle" :footerHide="true">
-            <sell-order-ship :order="shipOrder" ></sell-order-ship>
+        <Modal v-model="paymentModal" :width="60" :mask-closable="false" :title="paymentModalTitle" :footerHide="true">
+            <sell-order-payment :order="selectedOrder" @payment-updated="onPaymentUpdated" ></sell-order-payment>
         </Modal>
     </Card>
 </template>
@@ -72,6 +72,7 @@ import util from "@/libs/util.js";
 import moment from 'moment';
 import reviewDetail from "./review-detail.vue";
 import sellOrderShip from "./sell-order-ship.vue";
+import sellOrderPayment from "./sell-order-payment.vue";
 import customerSelect from "@/views/selector/customer-select.vue";
 import saleSelect from "@/views/selector/sale-select.vue";
 
@@ -80,6 +81,7 @@ export default {
     components: {
         reviewDetail,
         sellOrderShip,
+        sellOrderPayment,
         customerSelect,
         saleSelect
     },
@@ -117,7 +119,6 @@ export default {
             let label = '';
             let color = '';
             let remainingAmt = totalAmt - paidAmt;
-            console.log(totalAmt + ' ' + paidAmt);
             if (remainingAmt == 0) {
                 label = '已支付';
                 color = 'green'
@@ -222,6 +223,29 @@ export default {
                     }
                 },
                 {
+                    title: '总计金额',
+                    key: 'totalAmount',
+                    width: 100,
+                    render: (h, params) => {
+                        return h('span', '￥'+params.row.totalAmount)
+                    }
+                },
+                {
+                    title: '总计数量',
+                    key: 'totalQuantity',
+                    width: 100
+                },
+                {
+                    title: '免零金额',
+                    key: 'freeAmount',
+                    width: 120
+                },
+                {
+                    title: '整单折扣率',
+                    key: 'disRate',
+                    width: 120
+                },
+                {
                     title: '销售员',
                     key: 'saleId',
                     width: 120,
@@ -243,26 +267,6 @@ export default {
                     key: 'createBy',
                     width: 100,
                     align: 'center'
-                },
-                {
-                    title: '总计数量',
-                    key: 'totalQuantity',
-                    width: 100
-                },
-                {
-                    title: '免零金额',
-                    key: 'freeAmount',
-                    width: 120
-                },
-                {
-                    title: '整单折扣率',
-                    key: 'disRate',
-                    width: 120
-                },
-                {
-                    title: '总计金额',
-                    key: 'totalAmount',
-                    width: 100
                 },
                 {
                     title: '提货员',
@@ -325,7 +329,7 @@ export default {
                                 },
                                 on: {
                                     click: () => {
-                                        this.addPayment(params.row);
+                                        this.showPayment(params.row);
                                     }
                                 }
                             }, '收款'),
@@ -350,7 +354,7 @@ export default {
             currentPage: 1,
             pageSize: 50,
             showShipDetailView: false,
-            shipOrder: {},
+            selectedOrder: {},
             shipDetailTitle: '',
             paymentModal: false,
             paymentModalTitle: ''
@@ -376,16 +380,17 @@ export default {
             reqData['endDate'] = this.dateRange[1];
             this.searching = true;
             let self = this;
-            console.log(reqData);
             util.ajax.post("/sell/order/all/list", reqData)
                 .then((response) => {
+                    self.searching = false;
                     self.tabData = response.data.data;
                     self.totalCount = response.data.count;
                 })
                 .catch((error) => {
+                    self.searching = false;
                     util.errorProcessor(self, error);
                 });
-            this.searching = false;
+            
         },
         showReviewDetail (orderId) {
             this.showOrderDetailView = true;
@@ -399,16 +404,20 @@ export default {
             this.refreshTableData();
         },
         openShowShipDetailView (order) {
-            this.shipOrder = order;
+            this.selectedOrder = order;
             this.shipDetailTitle = '订单运输记录 - ' + order.orderNumber;
             this.showShipDetailView = true;
         },
         ShowShipDetailViewClose () {
             this.showShipDetailView = false;
         },
-        addPayment(order) {
+        showPayment(order) {
+            this.selectedOrder = order;
             this.paymentModal = true;
             this.paymentModalTitle = '添加支付记录 - ' + order.orderNumber;
+        },
+        onPaymentUpdated(data) {
+            this.refreshTableData();
         }
     }
 };

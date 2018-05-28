@@ -8,6 +8,7 @@ import com.yiban.erp.entities.StatusCount;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
@@ -49,4 +50,6 @@ public interface SellOrderMapper {
                                       @Param("customerId") Long customerId,
                                       @Param("startDate") Date startDate,
                                       @Param("endDate") Date endDate);
+
+    int updatePayment(@Param("orderId") Long orderId, @Param("payAmount") BigDecimal payAmount);
 }

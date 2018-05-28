@@ -16,7 +16,8 @@ public interface UpdateHistoryMapper {
 
     UpdateHistory selectByPrimaryKey(Integer id);
 
-    List<UpdateHistory> selectFromLastId(@Param("id") Integer id);
+    List<UpdateHistory> selectFromLastId(@Param("companyId") Integer companyId,
+                                         @Param("id") Integer id);
 
     int updateByPrimaryKeySelective(UpdateHistory record);
 

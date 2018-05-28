@@ -5,6 +5,8 @@ import java.util.Date;
 public class UpdateHistory {
     private Integer id;
 
+    private Integer companyId;
+
     private String title;
 
     private String content;
@@ -81,5 +83,13 @@ public class UpdateHistory {
 
     public void setUpdatedTime(Date updatedTime) {
         this.updatedTime = updatedTime;
+    }
+
+    public Integer getCompanyId() {
+        return companyId;
+    }
+
+    public void setCompanyId(Integer companyId) {
+        this.companyId = companyId;
     }
 }

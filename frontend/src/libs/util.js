@@ -342,12 +342,12 @@ function showErrorMessage (vm, data) {
     if (!data) {
         vm.$Notice.error({
             title: '系统异常',
-            desc: '系统数据格式错误, 请联系技术人员'
+            desc: '未收到返回数据, 请联系客服'
         });
     }
     let display = data.display ? data.display : 1;
     let code = data.code ? data.code : 9999;
-    let message = data.message ? data.message : '交易出现异常';
+    let message = data.message ? data.message : '服务器连接中断';
     switch (display) {
         case 1:
             // vm.$Message.error(message);
