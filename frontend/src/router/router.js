@@ -106,6 +106,7 @@ export const appRouter = [
         title: '系统',
         component: Main,
         children: [
+            { path: 'config', title: '系统配置', name: 'system-config', component: () => import('@/views/config/config.vue') },
             { path: 'factory', title: '生产企业', name: 'basic_data_factory', component: () => import('@/views/basic-data/factory.vue') },
             { path: 'supplier', title: '供应商', name: 'basic_data_supplier', component: () => import('@/views/basic-data/supplier.vue') },
             { path: 'customer', title: '客户档案', name: 'basic_data_customer', component: () => import('@/views/basic-data/customer.vue') },
@@ -228,7 +229,8 @@ export const appRouter = [
         component: Main,
         children: [
             { path: 'index', title: '权限管理', name: 'access_index', component: () => import('@/views/access/access.vue') },
-            { path: 'add/user', title: '新建用户', name: 'add_user', component: () => import('@/views/access/add-user.vue')}
+            { path: 'add/user', title: '新建用户', name: 'add_user', component: () => import('@/views/access/add-user.vue')},
+            { path: 'company', title: '公司设置', name: 'company', component: () => import('@/views/access/company.vue')},
         ]
     },
     /*

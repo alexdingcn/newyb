@@ -75,7 +75,9 @@ public class GoodsInfo {
 
     private Boolean firstCheck;
 
-    private Boolean specialManaged;
+    private Boolean specialManage;
+
+    private Boolean coldManage;
 
     private Boolean needCare;
 
@@ -136,6 +138,8 @@ public class GoodsInfo {
     private List<String> tagList;
 
     private Boolean useSpec;
+
+    private String specDesc; //规格描述，单规格时使用，存在detail表中的
 
     private String barCode;
 
@@ -502,16 +506,24 @@ public class GoodsInfo {
         this.firstCheck = firstCheck;
     }
 
-    public Boolean getSpecialManaged() {
-        return specialManaged;
+    public Boolean getSpecialManage() {
+        return specialManage;
     }
 
-    public void setSpecialManaged(Boolean specialManaged) {
-        this.specialManaged = specialManaged;
+    public void setSpecialManage(Boolean specialManage) {
+        this.specialManage = specialManage;
+    }
+
+    public Boolean getColdManage() {
+        return coldManage;
+    }
+
+    public void setColdManage(Boolean coldManage) {
+        this.coldManage = coldManage;
     }
 
     public Boolean getNeedCare() {
-        return needCare;
+        return needCare == null ? false: needCare;
     }
 
     public void setNeedCare(Boolean needCare) {
@@ -837,5 +849,13 @@ public class GoodsInfo {
 
     public void setFactoryName(String factoryName) {
         this.factoryName = factoryName;
+    }
+
+    public String getSpecDesc() {
+        return specDesc;
+    }
+
+    public void setSpecDesc(String specDesc) {
+        this.specDesc = specDesc;
     }
 }

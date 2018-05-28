@@ -87,7 +87,7 @@ export default {
                     key: 'createdTime',
                     width: 140,
                     render: (h, params) => {
-                        return params.row.createdTime ? moment(params.row.createdTime).format('YYYY-MM-DD HH:mm') : '';
+                        return h('span', params.row.createdTime ? moment(params.row.createdTime).format('YYYY-MM-DD HH:mm') : '');
                     }
                 },
                 {
@@ -95,7 +95,7 @@ export default {
                     key: 'backTime',
                     width: 140,
                     render: (h, params) => {
-                        return params.row.backTime ? moment(params.row.backTime).format('YYYY-MM-DD HH:mm') : '';
+                        return h('span', params.row.backTime ? moment(params.row.backTime).format('YYYY-MM-DD HH:mm') : '');
                     }
                 },
                 {
@@ -282,7 +282,7 @@ export default {
                     key: 'expDate',
                     width: 150,
                     render: (h, params) => {
-                        return params.row.expDate ? moment(params.row.expDate).format('YYYY-MM-DD') : '';
+                        return h('span', params.row.expDate ? moment(params.row.expDate).format('YYYY-MM-DD') : '');
                     }
                 },
                 {
@@ -290,7 +290,7 @@ export default {
                     key: 'productDate',
                     width: 150,
                     render: (h, params) => {
-                        return params.row.productDate ? moment(params.row.productDate).format('YYYY-MM-DD') : '';
+                        return h('span', params.row.productDate ? moment(params.row.productDate).format('YYYY-MM-DD') : '');
                     }
                 },
                 {

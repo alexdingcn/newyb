@@ -101,10 +101,10 @@ export default {
                 {
                     title: '收货时间',
                     key: 'receiveDate',
-                    width: 100,
+                    width: 120,
                     render: (h, params) => {
                         let receiveDate = params.row.receiveDate;
-                        return receiveDate ? moment(receiveDate).format("YYYY-MM-DD") : '';
+                        return h('span', receiveDate ? moment(receiveDate).format("YYYY-MM-DD") : '');
                     }
                 },
                 {
@@ -114,7 +114,7 @@ export default {
                     render: (h, params) => {
                         let color = params.row.status === 'IN_CHECKED' ? 'green' : '#ff9900';
                         let label = params.row.status === 'IN_CHECKED' ? '已审查' : '未审查';
-                        return  h('Tag', {
+                        return h('Tag', {
                             props: {
                                 type: 'dot',
                                 color: color
@@ -124,15 +124,18 @@ export default {
                 },
                 {
                     title: '入库方式',
-                    key: 'refTypeName'
+                    key: 'refTypeName',
+                    width: 120,
                 },
                 {
                     title: '入库仓库',
                     key: 'warehouseName',
+                    width: 120,
                 },
                 {
                     title: '供应商',
                     key: 'supplierName',
+                    width: 170,
                 },
                 {
                     title: '供应商代表',
@@ -142,50 +145,59 @@ export default {
                 {
                     title: '采购员',
                     key: 'saleNickName',
+                    width: 150,
                     render: (h, params) => {
                         let saleNickName = params.row.saleNickName;
                         let saleRealName = params.row.saleRealName;
                         if (saleNickName && saleRealName) {
                             return h('span', saleNickName + ' - [' + saleRealName + ']');
-                        }else {
+                        } else {
                             return h('span', saleNickName);
                         }
                     }
                 },
                 {
                     title: '总计入库数量',
+                    width: 120,
                     key: 'totalQuantity'
                 },
                 {
                     title: '总计金额',
+                    width: 120,
                     key: 'totalAmount'
                 },
                 {
                     title: '收货员',
+                    width: 120,
                     key: 'createBy'
                 },
                 {
                     title: '到货温度',
+                    width: 120,
                     key: 'receiveTemp'
                 },
                 {
                     title: '验收温度',
+                    width: 120,
                     key: 'checkTemp'
                 },
                 {
                     title: '系统单号',
+                    width: 190,
                     key: 'orderNumber'
                 },
                 {
                     title: '采购属性',
+                    width: 120,
                     key: 'buyTypeName',
                 },
                 {
                     title: '到货时间',
+                    width: 140,
                     key: 'shipEndDate',
                     render: (h, params) => {
                         let shipEndDate = params.row.shipEndDate;
-                        return shipEndDate ? moment(shipEndDate).format("YYYY-MM-DD") : '';
+                        return h('span', shipEndDate ? moment(shipEndDate).format("YYYY-MM-DD") : '');
                     }
                 }
             ],
@@ -224,7 +236,7 @@ export default {
                     align: 'center',
                     width: 120,
                     render: (h, params) => {
-                        return params.row.goods.factoryName;
+                        return h('span', params.row.goods.factoryName);
                     }
                 },
                 {
@@ -234,11 +246,11 @@ export default {
                 },
                 {
                     title: "特殊药品",
-                    key: 'specialManaged',
+                    key: 'specialManage',
                     width: 120,
                     render (h, params) {
-                        let specialManaged = params.row.specialManaged;
-                        if (specialManaged) {
+                        let specialManage = params.row.specialManage;
+                        if (specialManage) {
                             return h('Tag', {props:{type:'dot', color:'red'}}, '是');
                         }else{
                             return h('Tag', {props:{type:'dot', color:'blue'}}, '否');
@@ -260,7 +272,7 @@ export default {
                     key: 'productDate',
                     width: 140,
                     render: (h, params) => {
-                        return params.row.productDate ? moment(params.row.productDate).format('YYYY-MM-DD') : '';
+                        return h('span', params.row.productDate ? moment(params.row.productDate).format('YYYY-MM-DD') : '');
                     }
                 },
                 {
@@ -268,7 +280,7 @@ export default {
                     key: 'expDate',
                     width: 140,
                     render: (h, params) => {
-                        return params.row.expDate ? moment(params.row.expDate).format('YYYY-MM-DD') : '';
+                        return h('span', params.row.expDate ? moment(params.row.expDate).format('YYYY-MM-DD') : '');
                     }
                 },
                 {
@@ -347,7 +359,7 @@ export default {
                 },
                 {
                     title: "温控方式验收",
-                    key: 'checkTempMethod',
+                    key: 'checkTempMethodName',
                     width: 140
                 },
                 {
@@ -366,7 +378,7 @@ export default {
                     width: 140,
                     render: (h, params) => {
                         let checkTime = params.row.checkTime;
-                        return checkTime ? moment(checkTime).format('YYYY-MM-DD HH:mm') : '';
+                        return h('span', checkTime ? moment(checkTime).format('YYYY-MM-DD HH:mm') : '');
                     }
                 }
             ],

@@ -133,7 +133,7 @@
                         align: 'center',
                         width: 120,
                         render: (h, params) => {
-                            return moment(params.row.checkDate).format('YYYY-MM-DD');
+                            return h('span', moment(params.row.checkDate).format('YYYY-MM-DD'));
                         }
                     },
                     {

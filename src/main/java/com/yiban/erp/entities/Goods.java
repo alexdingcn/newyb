@@ -97,7 +97,9 @@ public class Goods {
 
     private Boolean firstCheck;
 
-    private Boolean specialManaged;
+    private Boolean specialManage;
+
+    private Boolean coldManage;
 
     private Boolean needCare;
 
@@ -158,6 +160,7 @@ public class Goods {
     private List<String> tagList;
 
     private Boolean useSpec;
+    private String specDesc;
 
     private BigDecimal batchPrice;
     private BigDecimal retailPrice;
@@ -572,12 +575,20 @@ public class Goods {
         this.firstCheck = firstCheck;
     }
 
-    public Boolean getSpecialManaged() {
-        return specialManaged;
+    public Boolean getSpecialManage() {
+        return specialManage;
     }
 
-    public void setSpecialManaged(Boolean specialManaged) {
-        this.specialManaged = specialManaged;
+    public void setSpecialManage(Boolean specialManage) {
+        this.specialManage = specialManage;
+    }
+
+    public Boolean getColdManage() {
+        return coldManage;
+    }
+
+    public void setColdManage(Boolean coldManage) {
+        this.coldManage = coldManage;
     }
 
     public Boolean getNeedCare() {
@@ -1053,6 +1064,14 @@ public class Goods {
         this.highLimit = highLimit;
     }
 
+    public String getSpecDesc() {
+        return specDesc;
+    }
+
+    public void setSpecDesc(String specDesc) {
+        this.specDesc = specDesc;
+    }
+
     public List<GoodsAttributeRef> getAttributeRefs() {
         return attributeRefs;
     }
@@ -1080,6 +1099,13 @@ public class Goods {
             spec = new GoodsSpec();
             spec.setId(this.specThreeId);
             spec.setSpecName(this.specThreeName);
+            result.add(spec);
+        }
+        if (this.useSpec != null && !this.useSpec && StringUtils.isNotBlank(this.specDesc)) {
+            //使用的是单规格，这时候列表返回一个规格描述当列表的值
+            spec = new GoodsSpec();
+            spec.setId(-1L);
+            spec.setSpecName(this.specDesc);
             result.add(spec);
         }
         return result;

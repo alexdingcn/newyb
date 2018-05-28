@@ -123,6 +123,7 @@ import warehouseLocationModal from "@/views/selector/warehouse-location-modal.vu
 import optionSelect from '@/views/selector/option-select.vue';
 import inTempVue from '../repertory/in-temp.vue';
 import sellSaleRevivew from './sell-sale-review.vue';
+import goodsSpecTags from '@/views/goods/goods-spec-tabs.vue';
 
 export default {
     name: 'sell-back-apply',
@@ -133,7 +134,8 @@ export default {
         goodSelect,
         warehouseLocationModal,
         optionSelect,
-        sellSaleRevivew
+        sellSaleRevivew,
+        goodsSpecTags
     },
     data() {
         const addWarehouseLocation = (h, location, rowData, index) => {
@@ -179,11 +181,6 @@ export default {
                     width: 80
                 },
                 {
-                    title: '货号',
-                    key: 'goodsId',
-                    width: 100 
-                },
-                {
                     title: "商品名称",
                     key: "goodsName",
                     width: 180
@@ -191,7 +188,7 @@ export default {
                 {
                     title: "生产企业",
                     key: "factoryName",
-                    width: 180
+                    width: 180,
                 },
                 {
                     title: "产地",
@@ -201,12 +198,15 @@ export default {
                 {
                     title: "规格",
                     key: "spec",
-                    width: 120
-                },
-                {
-                    title: "剂型",
-                    key: "jx",
-                    width: 120
+                    width: 120,
+                    render: (h, params) =>　{
+                        return h(goodsSpecTags, {
+                            props: {
+                                tags: params.row.goods.goodsSpecs,
+                                color: 'blue'
+                            }
+                        });
+                    }
                 },
                 {
                     title: '单位',
@@ -247,6 +247,7 @@ export default {
                             props: {
                                 type: 'date',
                                 placement: 'top',
+                                transfer: true,
                                 value: params.row.productDate
                             },
                             on: {
@@ -269,6 +270,7 @@ export default {
                             props: {
                                 type: 'date',
                                 placement: 'top',
+                                transfer: true,
                                 value: params.row.expDate
                             },
                             on: {
@@ -544,7 +546,7 @@ export default {
             let item = {
                 goodsId: goods.id,
                 goodsName: goods.name,
-                factoryName: goods.factory,
+                factoryName: goods.factoryName,
                 origin: goods.origin,
                 spec: goods.spec,
                 jx: goods.jxName,
@@ -562,7 +564,8 @@ export default {
                 taxRate: goods.outRate,
                 storageConditionName: goods.storageConditionName,
                 baseMedName: goods.baseMedName,
-                permitNo: goods.permitNo
+                permitNo: goods.permitNo,
+                goods: goods
             };
             this.details.push(item);
             this.$refs.goodsSelect.clearSingleSelect();
@@ -690,18 +693,19 @@ export default {
             for (let i=0; i<orderDetails.length; i++) {
                 let detail = orderDetails[i];
                 let goods = detail.goods;
+                console.log(goods);
                 let item = {
                     sellDetailId: detail.id,
                     goodsId: goods.id,
                     goodsName: goods.name,
-                    factoryName: goods.factory,
+                    factoryName: goods.factoryName,
                     origin: goods.origin,
                     spec: goods.spec,
                     jx: goods.jxName,
                     unitName: goods.unitName,
                     batchCode: detail.batchCode,
-                    productDate: detail.productDate,
-                    expDate: detail.expDate,
+                    productDate: detail.productDate ? moment(detail.productDate).format('YYYY-MM-DD') : '',
+                    expDate: detail.expDate ? moment(detail.expDate).format('YYYY-MM-DD') : '',
                     saleQuantity: detail.quantity,
                     alreadyBackQuantity: detail.backQuantity,
                     backQuantity: 0,
@@ -712,7 +716,8 @@ export default {
                     location: detail.location,
                     storageConditionName: goods.storageConditionName,
                     baseMedName: goods.baseMedName,
-                    permitNo: goods.permitNo
+                    permitNo: goods.permitNo,
+                    goods: goods
                 };
                 this.details.push(item);
             }

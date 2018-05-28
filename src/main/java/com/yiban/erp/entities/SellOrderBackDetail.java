@@ -80,6 +80,7 @@ public class SellOrderBackDetail {
         if (goods != null) {
             this.goodsName = goods.getName();
             this.origin = goods.getOrigin();
+            this.factoryName = goods.getFactoryName();
             this.jx = goods.getJxName();
             this.unitName = goods.getUnitName();
             this.baseMedName = goods.getBaseMedName();

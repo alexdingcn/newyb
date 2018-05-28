@@ -16,7 +16,7 @@
                 <Row class="form-item-class">
                     <i-col span="6">
                         <FormItem label="仓库点" :error="warehouseError">
-                            <warehouse-select ref="warehouseSelect" v-model="formItem.warehouseId" @on-change="warehouseChonge"></warehouse-select>
+                            <warehouse-select ref="warehouseSelect" v-model="formItem.warehouseId" @on-change="onWarehouseChange"></warehouse-select>
                         </FormItem>
                     </i-col>
                     <i-col span="6">
@@ -43,7 +43,7 @@
                     </i-col>
                     <i-col span="6">
                         <FormItem label="退货日期">
-                            <DatePicker type="datetime" format="yyyy-MM-dd HH:mm" placeholder="退货日期" v-model="formItem.backTime"></DatePicker>
+                            <DatePicker type="datetime" format="yyyy-MM-dd HH:mm:ss" placeholder="退货日期" v-model="formItem.backTime"></DatePicker>
                         </FormItem>
                     </i-col>
                     <i-col span="12">
@@ -53,7 +53,7 @@
                     </i-col>
                 </Row>
 
-                <Table ref="table" border highlight-row size="small"  style="width: 100%;"
+                <Table ref="table" border highlight-row size="small" 
                     no-data-text="在商品输入框选择后添加" :loading="saveLoading" 
                     :columns="tableColumns" :data="tableData">
                 </Table> 
@@ -61,8 +61,8 @@
             </Form>
       </Card>
 
-      <Modal v-model="selectRepertoryModal" width="60" :mask-closable="false" title="选择库存商品" >
-          <repertory-info-select :warehouse="currWarehouse" @on-choosed="repertoryInfoChoosed" ></repertory-info-select>
+      <Modal v-model="selectRepertoryModal" width="70" :mask-closable="false" title="选择库存商品" >
+          <repertory-info-select ref="repertoryGoodsSelector" :warehouse="currWarehouse" @on-choosed="repertoryInfoChoosed" ></repertory-info-select>
           <span slot="footer"></span>
       </Modal>
 
@@ -95,7 +95,7 @@ export default {
                 supplierContactId: '',
                 supplierName: '',
                 buyerId: '',
-                backTime: moment().format('YYYY-MM-DD HH:mm'),
+                backTime: moment().format('YYYY-MM-DD HH:mm:ss'),
                 keyWord: '',
                 details: []
             },
@@ -230,7 +230,7 @@ export default {
                     width: 120,
                     key: 'productData',
                     render: (h, params) => {
-                        return moment(params.row.productDate).format('YYYY-MM-DD');
+                        return h('span', moment(params.row.productDate).format('YYYY-MM-DD'));
                     }
                 },
                 {
@@ -238,7 +238,7 @@ export default {
                     key: 'expDate',
                     width: 120,
                     render: (h, params) => {
-                        return moment(params.row.expDate).format('YYYY-MM-DD');
+                        return h('span', moment(params.row.expDate).format('YYYY-MM-DD'));
                     }
                 },
                 {
@@ -277,7 +277,7 @@ export default {
         }
     },
     methods: {
-        warehouseChonge(warehouseId, warehouse) {
+        onWarehouseChange(warehouseId, warehouse) {
             this.tableData = [];
             this.warehouseError = '';
             this.buyerError = '';
@@ -288,14 +288,14 @@ export default {
                 supplierContactId: '',
                 supplierName: '',
                 buyerId: '',
-                backTime: moment().format('YYYY-MM-DD HH:mm'),
+                backTime: moment().format('YYYY-MM-DD HH:mm:ss'),
                 keyWord: '',
                 details: []
             };
             if (warehouse.id) {
                 this.currWarehouse = warehouse;
                 this.formItem.warehouseId = warehouse.id;
-            }else {
+            } else {
                 this.currWarehouse = {};
                 this.formItem.warehouseId = '';
             }
@@ -305,6 +305,7 @@ export default {
                 this.$Message.warning('请先选择对应仓库');
                 return;
             }
+            this.$refs.repertoryGoodsSelector.searchBtnClicked();
             this.selectRepertoryModal = true;
         },
         repertoryInfoChoosed(data) {

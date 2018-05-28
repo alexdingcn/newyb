@@ -283,11 +283,11 @@ export default {
                 },
                 {
                     title: "特殊药品",
-                    key: 'specialManaged',
+                    key: 'specialManage',
                     width: 120,
                     render (h, params) {
-                        let specialManaged = params.row.specialManaged;
-                        if (specialManaged) {
+                        let specialManage = params.row.specialManage;
+                        if (specialManage) {
                             return h('Tag', {props:{type:'dot', color:'red'}}, '是');
                         }else{
                             return h('Tag', {props:{type:'dot', color:'blue'}}, '否');

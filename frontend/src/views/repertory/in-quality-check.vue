@@ -261,7 +261,7 @@ export default {
                     key: 'receiveDate',
                     render: (h, params) => {
                         let receiveDate = params.row.receiveDate;
-                        return receiveDate ? moment(receiveDate).format("YYYY-MM-DD") : '';
+                        return h('span', receiveDate ? moment(receiveDate).format("YYYY-MM-DD") : '');
                     }
                 },
                 {
@@ -288,7 +288,7 @@ export default {
                         let saleRealName = params.row.saleRealName;
                         if (saleNickName && saleRealName) {
                             return h('span', saleNickName + ' - [' + saleRealName + ']');
-                        }else {
+                        } else {
                             return h('span', saleNickName);
                         }
                     }
@@ -345,7 +345,7 @@ export default {
                     key: 'shipEndDate',
                     render: (h, params) => {
                         let shipEndDate = params.row.shipEndDate;
-                        return shipEndDate ? moment(shipEndDate).format("YYYY-MM-DD") : '';
+                        return h('span', shipEndDate ? moment(shipEndDate).format("YYYY-MM-DD") : '');
                     }
                 }
             ],
@@ -399,7 +399,7 @@ export default {
                     align: 'center',
                     width: 120,
                     render: (h, params) => {
-                        return params.row.goods.factoryName;
+                        return h('span', params.row.goods.factoryName);
                     }
                 },
                 {
@@ -414,11 +414,11 @@ export default {
                 },
                 {
                     title: "特殊药品",
-                    key: 'specialManaged',
+                    key: 'specialManage',
                     width: 120,
                     render (h, params) {
-                        let specialManaged = params.row.specialManaged;
-                        if (specialManaged) {
+                        let specialManage = params.row.specialManage;
+                        if (specialManage) {
                             return h('Tag', {props:{type:'dot', color:'red'}}, '是');
                         }else{
                             return h('Tag', {props:{type:'dot', color:'blue'}}, '否');
@@ -459,14 +459,14 @@ export default {
                     width: 140,
                     render: (h, params) => {
                         if (params.row.checkStatus) {
-                            return params.row.productDate ? moment(params.row.productDate).format('YYYY-MM-DD') : '';
+                            return h('span', params.row.productDate ? moment(params.row.productDate).format('YYYY-MM-DD') : '');
                         }else {
                             let self = this;
                             return h('DatePicker', {
                                 props: {
                                     type: 'date',
                                     placement: 'top',
-                                    value: params.row.productDate
+                                    value: moment(params.row.productDate).format('YYYY-MM-DD')
                                 },
                                 on: {
                                     'on-change': (date) =>{
@@ -484,14 +484,14 @@ export default {
                     width: 140,
                     render: (h, params) => {
                         if (params.row.checkStatus) {
-                            return params.row.expDate ? moment(params.row.expDate).format('YYYY-MM-DD') : '';
+                            return h('span', params.row.expDate ? moment(params.row.expDate).format('YYYY-MM-DD') : '');
                         }else {
                             let self = this;
                             return h('DatePicker', {
                                 props: {
                                     type: 'date',
                                     placement: 'top',
-                                    value: params.row.expDate
+                                    value: moment(params.row.expDate).format('YYYY-MM-DD')
                                 },
                                 on: {
                                     'on-change': (date) =>{
@@ -628,7 +628,7 @@ export default {
                 
                 {
                     title: "温控方式验收",
-                    key: 'checkTempMethod',
+                    key: 'checkTempMethodName',
                     width: 140
                 },
                 {
@@ -647,7 +647,7 @@ export default {
                     width: 140,
                     render: (h, params) => {
                         let checkTime = params.row.checkTime;
-                        return checkTime ? moment(checkTime).format('YYYY-MM-DD HH:mm') : '';
+                        return h('span', checkTime ? moment(checkTime).format('YYYY-MM-DD HH:mm') : '');
                     }
                 }
             ],

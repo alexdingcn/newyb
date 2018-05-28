@@ -5,10 +5,10 @@
 
 <template>
   <Row class="goods-list" :gutter="10">
-          <Col :span="showSider ? '4' : '0'">
+          <i-col :span="showSider ? '4' : '0'">
             <goods-category :is-sider="true" v-show="showSider" @on-choose="categoryChoose" ></goods-category>
-          </Col>
-          <Col :span="showSider ? '20' : '24'">
+          </i-col>
+          <i-col :span="showSider ? '20' : '24'">
               <Card>
                     <p slot="title">
                         <a href="javascript:void(0)" @click="changeSiderShow" style="margin-right: 5px;" >
@@ -45,7 +45,7 @@
                     </Row>
 
                 </Card>
-          </Col>
+          </i-col>
 
           <Modal v-model="goodsModal" title="商品信息维护" :footerHide="true" :mask-closable="false" width="75">
               <goods-info ref="goodsInfoModal" :goodsInfoId="editId" @save-ok="goodsSaveOk" ></goods-info>
@@ -151,9 +151,10 @@ export default {
                     render: (h, params) => {
                         let useSpec = params.row.useSpec;
                         if (!useSpec) {
-                            return '';
+                            let specDesc = params.row.specDesc;
+                            return h('span', specDesc);
                         }else {
-                            return h('span', params.row.detailsSize + '种');
+                            return h('span', "多规格共" + params.row.detailsSize + '种');
                         }
                     }
                 },
@@ -231,6 +232,7 @@ export default {
             }, 800)
     },
     methods: {
+        
         changeSiderShow() {
             this.showSider = !this.showSider;
         },

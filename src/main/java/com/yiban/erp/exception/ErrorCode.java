@@ -134,6 +134,9 @@ public enum ErrorCode {
     SELL_BACK_RIGHT_QUANTITY_ERROR(2233, "合格数据错误."),
     SELL_TOTAL_AMOUNT_ERROR(2234, "销售订单总金额不能小于0"),
     SELL_FREE_AMOUNT_ERROR(2235, "免零金额不能小于0"),
+    SELL_ORDER_ALREADY_PAID(2236, "订单已付清"),
+    SELL_ORDER_COMPANY_NOT_MATCH(2237, "订单信息错误"),
+    SELL_ORDER_UPDATE_PAYMENT_FAIL(2238, "更新支付信息错误"),
 
 
     // 23xx -承运公司

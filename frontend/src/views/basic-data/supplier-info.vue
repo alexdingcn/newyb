@@ -192,6 +192,8 @@
                 </Col>
             </Row>
 
+
+
             <Tabs value="cert" type="card" @on-click="changeTabs">
                 <TabPane label="证件" name="cert" icon="document-text">
                     <Row>
@@ -211,7 +213,7 @@
                         </Col>
                         <Col span="10">
                             <FormItem label="营业执照有效期" prop="licenseExp" :label-width="140">
-                                <DatePicker type="date" placeholder="营业执照有效期至" v-model="formItem.licenseExp"/>
+                                <DatePicker type="date"  placeholder="营业执照有效期至" v-model="formItem.licenseExp" transfer/>
                             </FormItem>
                         </Col>
                     </Row>
@@ -223,7 +225,7 @@
                         </Col>
                         <Col span="10">
                             <FormItem label="组织机构代码证有效期" prop="organizationExp" :label-width="140">
-                                <DatePicker type="date" placeholder="组织机构代码证有效期" v-model="formItem.organizationExp"/>
+                                <DatePicker type="date" placeholder="组织机构代码证有效期" v-model="formItem.organizationExp" transfer/>
                             </FormItem>
                         </Col>
                     </Row>
@@ -235,7 +237,7 @@
                         </Col>
                         <Col span="10">
                             <FormItem label="GPS/GMP证书有效期" prop="gspGmpExp" :label-width="140">
-                                <DatePicker type="date" placeholder="GPS/GMP证书有效期" v-model="formItem.gspGmpExp"/>
+                                <DatePicker type="date" placeholder="GPS/GMP证书有效期" v-model="formItem.gspGmpExp" transfer/>
                             </FormItem>
                         </Col>
                     </Row>
@@ -247,7 +249,7 @@
                         </Col>
                         <Col span="10">
                             <FormItem label="质量保证协议有效期" prop="qualityProtocolExp" :label-width="140">
-                                <DatePicker type="date" placeholder="质量保证协议有效期" v-model="formItem.qualityProtocolExp"/>
+                                <DatePicker type="date" placeholder="质量保证协议有效期" v-model="formItem.qualityProtocolExp" transfer/>
                             </FormItem>
                         </Col>
                     </Row>
@@ -259,7 +261,7 @@
                         </Col>
                         <Col span="10">
                             <FormItem label="购销合同协议有效期" prop="saleProtocolExp" :label-width="140">
-                                <DatePicker type="date" placement="top-start" placeholder="购销合同协议有效期" v-model="formItem.saleProtocolExp"/>
+                                <DatePicker type="date" placement="top-start" placeholder="购销合同协议有效期" v-model="formItem.saleProtocolExp" transfer/>
                             </FormItem>
                         </Col>
                     </Row>
@@ -271,7 +273,7 @@
                         </Col>
                         <Col span="10">
                             <FormItem label="法人委托书有效期" prop="legalProtocolExp" :label-width="140">
-                                <DatePicker type="date" placement="top-start" placeholder="法人委托书有效期" v-model="formItem.legalProtocolExp"/>
+                                <DatePicker type="date" placement="top-start" placeholder="法人委托书有效期" v-model="formItem.legalProtocolExp" transfer/>
                             </FormItem>
                         </Col>
                     </Row>
@@ -283,7 +285,7 @@
                         </Col>
                         <Col span="10">
                             <FormItem label="其他协议有效期" prop="otherProtocolExp" :label-width="140">
-                                <DatePicker type="date" placement="top-start" placeholder="法人委托书有效期" v-model="formItem.otherProtocolExp"/>
+                                <DatePicker type="date" placement="top-start" placeholder="法人委托书有效期" v-model="formItem.otherProtocolExp" transfer/>
                             </FormItem>
                         </Col>
                     </Row>
@@ -296,7 +298,7 @@
                         </Col>
                         <Col span="8">
                             <FormItem label="创建时间" prop="createdTime">
-                                <DatePicker type="datetime" format="yyyy-MM-DD HH:mm" disabled v-model="formItem.createdTime"/>
+                                <DatePicker type="datetime" format="yyyy-MM-DD HH:mm" disabled v-model="formItem.createdTime" transfer/>
                             </FormItem>
                         </Col>
                     </Row>
@@ -308,7 +310,7 @@
                         </Col>
                         <Col span="8">
                             <FormItem label="修改人时间" prop="updatedTime">
-                                <DatePicker type="datetime" format="yyyy-MM-DD HH:mm" disabled v-model="formItem.updatedTime"/>
+                                <DatePicker type="datetime" format="yyyy-MM-DD HH:mm" disabled v-model="formItem.updatedTime" transfer/>
                             </FormItem>
                         </Col>
                     </Row>
@@ -430,7 +432,7 @@ export default {
                                 label += rawCodes[i].name + ' ';
                             }
                         }
-                        return label;
+                        return h('span', label);
                     }
                 },
                 {

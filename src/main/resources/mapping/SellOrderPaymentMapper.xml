@@ -1,0 +1,252 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.yiban.erp.dao.SellOrderPaymentMapper" >
+  <resultMap id="BaseResultMap" type="com.yiban.erp.entities.SellOrderPayment" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="company_id" property="companyId" jdbcType="INTEGER" />
+    <result column="order_id" property="orderId" jdbcType="BIGINT" />
+    <result column="pay_amount" property="payAmount" jdbcType="DECIMAL" />
+    <result column="status" property="status" jdbcType="VARCHAR" />
+    <result column="pay_method" property="payMethod" jdbcType="VARCHAR" />
+    <result column="ref_id" property="refId" jdbcType="VARCHAR" />
+    <result column="result" property="result" jdbcType="VARCHAR" />
+    <result column="end_time" property="endTime" jdbcType="TIMESTAMP" />
+    <result column="comment" property="comment" jdbcType="VARCHAR" />
+    <result column="created_time" property="createdTime" jdbcType="TIMESTAMP" />
+    <result column="created_by" property="createdBy" jdbcType="VARCHAR" />
+    <result column="updated_time" property="updatedTime" jdbcType="TIMESTAMP" />
+    <result column="updated_by" property="updatedBy" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, company_id, order_id, pay_amount, status, pay_method, ref_id, result, end_time, 
+    comment, created_time, created_by, updated_time, updated_by
+  </sql>
+
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select 
+    <include refid="Base_Column_List" />
+    from sell_order_payment
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+
+
+    <select id="getPaymentHistoryCount" resultType="java.lang.Integer" parameterType="map" >
+        select
+        count(1)
+        from sell_order_payment sop, sell_order so
+        where sop.order_id = so.id
+        <if test="customerId != null" >
+            and so.customer_id = #{customerId}
+        </if>
+        <if test="companyId != null">
+            and so.company_id = #{companyId}
+        </if>
+        <if test="sellOrderId != null">
+            and so.id = #{sellOrderId}
+        </if>
+        <if test="status != null" >
+            and sop.status = #{status}
+        </if>
+        <if test="formCreateOrderDate != null">
+            and so.create_time >= #{formCreateOrderDate}
+        </if>
+        <if test="toCreateOrderDate != null">
+            and #{toCreateOrderDate} > so.create_time
+        </if>
+    </select>
+
+    <select id="getPaymentHistory" resultMap="BaseResultMap" parameterType="map" >
+        select
+        sop.*
+        from sell_order_payment sop, sell_order so
+        where sop.order_id = so.id
+        <if test="customerId != null" >
+            and so.customer_id = #{customerId}
+        </if>
+        <if test="companyId != null">
+            and so.company_id = #{companyId}
+        </if>
+        <if test="sellOrderId != null">
+            and so.id = #{sellOrderId}
+        </if>
+        <if test="status != null" >
+            and sop.status = #{status}
+        </if>
+        <if test="formCreateOrderDate != null">
+            and so.create_time >= #{formCreateOrderDate}
+        </if>
+        <if test="toCreateOrderDate != null">
+            and #{toCreateOrderDate} > so.create_time
+        </if>
+        order by sop.id desc
+        <if test="offset != null and limit != null">
+            limit #{offset}, #{limit};
+        </if>
+    </select>
+
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
+    delete from sell_order_payment
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="com.yiban.erp.entities.SellOrderPayment" useGeneratedKeys="true" keyProperty="id">
+    insert into sell_order_payment (company_id, order_id,
+      pay_amount, status, pay_method, 
+      ref_id, result, end_time, 
+      comment, created_time, created_by, 
+      updated_time, updated_by)
+    values (#{companyId,jdbcType=INTEGER}, #{orderId,jdbcType=BIGINT},
+      #{payAmount,jdbcType=DECIMAL}, #{status,jdbcType=VARCHAR}, #{payMethod,jdbcType=VARCHAR}, 
+      #{refId,jdbcType=VARCHAR}, #{result,jdbcType=VARCHAR}, #{endTime,jdbcType=TIMESTAMP}, 
+      #{comment,jdbcType=VARCHAR}, #{createdTime,jdbcType=TIMESTAMP}, #{createdBy,jdbcType=VARCHAR}, 
+      #{updatedTime,jdbcType=TIMESTAMP}, #{updatedBy,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.yiban.erp.entities.SellOrderPayment" >
+    insert into sell_order_payment
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+
+      <if test="companyId != null" >
+        company_id,
+      </if>
+      <if test="orderId != null" >
+        order_id,
+      </if>
+      <if test="payAmount != null" >
+        pay_amount,
+      </if>
+      <if test="status != null" >
+        status,
+      </if>
+      <if test="payMethod != null" >
+        pay_method,
+      </if>
+      <if test="refId != null" >
+        ref_id,
+      </if>
+      <if test="result != null" >
+        result,
+      </if>
+      <if test="endTime != null" >
+        end_time,
+      </if>
+      <if test="comment != null" >
+        comment,
+      </if>
+      <if test="createdTime != null" >
+        created_time,
+      </if>
+      <if test="createdBy != null" >
+        created_by,
+      </if>
+      <if test="updatedTime != null" >
+        updated_time,
+      </if>
+      <if test="updatedBy != null" >
+        updated_by,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+
+      <if test="companyId != null" >
+        #{companyId,jdbcType=INTEGER},
+      </if>
+      <if test="orderId != null" >
+        #{orderId,jdbcType=BIGINT},
+      </if>
+      <if test="payAmount != null" >
+        #{payAmount,jdbcType=DECIMAL},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=VARCHAR},
+      </if>
+      <if test="payMethod != null" >
+        #{payMethod,jdbcType=VARCHAR},
+      </if>
+      <if test="refId != null" >
+        #{refId,jdbcType=VARCHAR},
+      </if>
+      <if test="result != null" >
+        #{result,jdbcType=VARCHAR},
+      </if>
+      <if test="endTime != null" >
+        #{endTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="comment != null" >
+        #{comment,jdbcType=VARCHAR},
+      </if>
+      <if test="createdTime != null" >
+        #{createdTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createdBy != null" >
+        #{createdBy,jdbcType=VARCHAR},
+      </if>
+      <if test="updatedTime != null" >
+        #{updatedTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updatedBy != null" >
+        #{updatedBy,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.yiban.erp.entities.SellOrderPayment" >
+    update sell_order_payment
+    <set >
+      <if test="companyId != null" >
+        company_id = #{companyId,jdbcType=INTEGER},
+      </if>
+      <if test="orderId != null" >
+        order_id = #{orderId,jdbcType=BIGINT},
+      </if>
+      <if test="payAmount != null" >
+        pay_amount = #{payAmount,jdbcType=DECIMAL},
+      </if>
+      <if test="status != null" >
+        status = #{status,jdbcType=VARCHAR},
+      </if>
+      <if test="payMethod != null" >
+        pay_method = #{payMethod,jdbcType=VARCHAR},
+      </if>
+      <if test="refId != null" >
+        ref_id = #{refId,jdbcType=VARCHAR},
+      </if>
+      <if test="result != null" >
+        result = #{result,jdbcType=VARCHAR},
+      </if>
+      <if test="endTime != null" >
+        end_time = #{endTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="comment != null" >
+        comment = #{comment,jdbcType=VARCHAR},
+      </if>
+      <if test="createdTime != null" >
+        created_time = #{createdTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createdBy != null" >
+        created_by = #{createdBy,jdbcType=VARCHAR},
+      </if>
+      <if test="updatedTime != null" >
+        updated_time = #{updatedTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updatedBy != null" >
+        updated_by = #{updatedBy,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.yiban.erp.entities.SellOrderPayment" >
+    update sell_order_payment
+    set company_id = #{companyId,jdbcType=INTEGER},
+      order_id = #{orderId,jdbcType=BIGINT},
+      pay_amount = #{payAmount,jdbcType=DECIMAL},
+      status = #{status,jdbcType=VARCHAR},
+      pay_method = #{payMethod,jdbcType=VARCHAR},
+      ref_id = #{refId,jdbcType=VARCHAR},
+      result = #{result,jdbcType=VARCHAR},
+      end_time = #{endTime,jdbcType=TIMESTAMP},
+      comment = #{comment,jdbcType=VARCHAR},
+      created_time = #{createdTime,jdbcType=TIMESTAMP},
+      created_by = #{createdBy,jdbcType=VARCHAR},
+      updated_time = #{updatedTime,jdbcType=TIMESTAMP},
+      updated_by = #{updatedBy,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+</mapper>

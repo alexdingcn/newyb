@@ -116,7 +116,7 @@
                   </i-col>
                   <i-col span="8">
                     <FormItem label="验收时间">
-                        <DatePicker format="yyyy-MM-dd HH:mm" type="datetime" v-model="checkFormItem.checkTime" />
+                        <DatePicker format="yyyy-MM-dd HH:mm:ss" type="datetime" v-model="checkFormItem.checkTime" />
                     </FormItem>
                   </i-col>
                   <i-col span="8">
@@ -144,6 +144,7 @@ import warehouseSelect from '@/views/selector/warehouse-select.vue';
 import customerSelect from '@/views/selector/customer-select.vue';
 import saleSelect from '@/views/selector/sale-select.vue';
 import optionSelect from '@/views/selector/option-select.vue';
+import goodsSpecTags from '@/views/goods/goods-spec-tabs.vue';
 
 export default {
     name: 'sell-back-quality-check',
@@ -151,7 +152,8 @@ export default {
         warehouseSelect,
         customerSelect,
         saleSelect,
-        optionSelect
+        optionSelect,
+        goodsSpecTags
     },
     data() {
         const statusShow = function(h, row) {
@@ -338,20 +340,31 @@ export default {
                     key: 'origin',
                     width: 150
                 },
-                {
-                    title: '剂型',
-                    key: 'jx',
-                    width: 120
-                },
+                // {
+                //     title: '剂型',
+                //     key: 'jx',
+                //     width: 120
+                // },
                 {
                     title: '规格',
                     key: 'spec',
-                    width: 120
+                    width: 120,
+                    render: (h, params) =>　{
+                        return h(goodsSpecTags, {
+                            props: {
+                                tags: params.row.goods.goodsSpecs,
+                                color: 'blue'
+                            }
+                        });
+                    }
                 },
                 {
                     title: '生产企业',
                     key: 'factoryName',
-                    width: 150
+                    width: 150,
+                    render: (h, params) => {
+                        return h('span', params.row.goods.factoryName);
+                    }
                 },
                 {
                     title: '单位',
@@ -468,7 +481,7 @@ export default {
                 badPlan: '',
                 badReason: '',
                 checkTempMethod: '',
-                checkTime: moment().format('YYYY-MM-DD HH:mm'),
+                checkTime: moment().format('YYYY-MM-DD HH:mm:ss'),
                 checkResult: ''
             },
             showCheckDetail: false,
@@ -568,7 +581,7 @@ export default {
                 badPlan: this.currDetailRow.badPlan,
                 badReason: this.currDetailRow.badReason,
                 checkTempMethod: this.currDetailRow.checkTempMethod,
-                checkTime: this.currDetailRow.checkTime ? this.currDetailRow.checkTime : moment().format('YYYY-MM-DD HH:mm'),
+                checkTime: this.currDetailRow.checkTime ? this.currDetailRow.checkTime : moment().format('YYYY-MM-DD HH:mm:ss'),
                 checkResult: this.currDetailRow.checkResult
             };
             this.rightQuantityError = '';
@@ -618,7 +631,7 @@ export default {
                 badPlan: this.currDetailRow.badPlan,
                 badReason: this.currDetailRow.badReason,
                 checkTempMethod: this.currDetailRow.checkTempMethod,
-                checkTime: this.currDetailRow.checkTime ? this.currDetailRow.checkTime : moment().format('YYYY-MM-DD HH:mm'),
+                checkTime: this.currDetailRow.checkTime ? this.currDetailRow.checkTime : moment().format('YYYY-MM-DD HH:mm:ss'),
                 checkResult: this.currDetailRow.checkResult
             };
             this.rightQuantityError = '';

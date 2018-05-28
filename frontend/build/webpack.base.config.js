@@ -7,6 +7,7 @@ var happyThreadPool = HappyPack.ThreadPool({ size: os.cpus().length });
 function resolve (dir) {
     return path.join(__dirname, dir);
 }
+// https://juejin.im/post/5a49fb696fb9a0451e402718
 module.exports = {
     entry: {
         main: '@/main',
@@ -79,6 +80,7 @@ module.exports = {
             id: 'happybabel',
             loaders: ['babel-loader'],
             threadPool: happyThreadPool,
+            cache: true,
             verbose: true
         })
     ],

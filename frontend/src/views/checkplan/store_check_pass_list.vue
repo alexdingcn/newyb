@@ -191,7 +191,7 @@
                         align: 'center',
                         width: 120,
                         render: (h, params) => {
-                            return moment(params.row.checkDate).format('YYYY-MM-DD');
+                            return h('span', moment(params.row.checkDate).format('YYYY-MM-DD'));
                         }
                     },
                     {
@@ -326,7 +326,7 @@
                         align: 'center',
                         width: 120,
                         render: (h, params) => {
-                            return moment(params.row.productDate).format('YYYY-MM-DD');
+                            return h('span', moment(params.row.productDate).format('YYYY-MM-DD'));
                         }
                     },
                     {
@@ -335,7 +335,7 @@
                         align: 'center',
                         width: 120,
                         render: (h, params) => {
-                            return moment(params.row.expDate).format('YYYY-MM-DD');
+                            return h('span', moment(params.row.expDate).format('YYYY-MM-DD'));
                         }
                     },
                     {

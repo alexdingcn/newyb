@@ -216,7 +216,7 @@ export default {
                     sortable: true,
                     width: 120,
                     render: (h, params) => {
-                        return params.row.logDate ? moment(params.row.logDate).format('YYYY-MM-DD') : '';
+                        return h('span', params.row.logDate ? moment(params.row.logDate).format('YYYY-MM-DD') : '');
                     }
                 },
                 {
@@ -281,7 +281,7 @@ export default {
                     key: 'createdTime',
                     width: 140,
                     render: (h, params) => {
-                        return params.row.createdTime ? moment(params.row.createdTime).format('YYYY-MM-DD HH:mm') : '';
+                        return h('span', params.row.createdTime ? moment(params.row.createdTime).format('YYYY-MM-DD HH:mm') : '');
                     }
                 },
                 {

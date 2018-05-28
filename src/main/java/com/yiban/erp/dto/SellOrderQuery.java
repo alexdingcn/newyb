@@ -9,6 +9,7 @@ import java.util.Date;
 public class SellOrderQuery {
 
     private Integer companyId;
+    private Long sellOrderId;
     private Long customerId;
     private Long saleId;
     private String refNo;
@@ -105,5 +106,13 @@ public class SellOrderQuery {
 
     public void setToCreateOrderDate(Date toCreateOrderDate) {
         this.toCreateOrderDate = toCreateOrderDate;
+    }
+
+    public Long getSellOrderId() {
+        return sellOrderId;
+    }
+
+    public void setSellOrderId(Long sellOrderId) {
+        this.sellOrderId = sellOrderId;
     }
 }

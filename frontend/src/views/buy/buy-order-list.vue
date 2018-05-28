@@ -126,7 +126,7 @@
                         key: 'createdTime',
                         width: 120,
                         render: (h, params) => {
-                            return moment(params.row.createdTime).format('YYYY-MM-DD');
+                            return h('span', {}, moment(params.row.createdTime).format('YYYY-MM-DD'));
                         }
                     },
                     {
@@ -204,7 +204,7 @@
                         key: 'checkTime',
                         width: 120,
                         render: (h, params) => {
-                            return params.row.checkTime ? moment(params.row.checkTime).format('YYYY-MM-DD') : '';
+                            return h('span', params.row.checkTime ? moment(params.row.checkTime).format('YYYY-MM-DD') : '');
                         }
                     },
 
@@ -214,7 +214,7 @@
                         key: 'eta',
                         width: 120,
                         render: (h, params) => {
-                            return moment(params.row.eta).format('YYYY-MM-DD');
+                            return h('span', moment(params.row.eta).format('YYYY-MM-DD'));
                         }
                     },
                     {
@@ -264,7 +264,7 @@
                         key: 'origin',
                         align: 'center',
                         render: (h, params) => {
-                            return params.row.goods.origin;
+                            return h('span', params.row.goods.origin);
                         }
                     },
                     {
@@ -285,7 +285,7 @@
                         key: 'factoryName',
                         align: 'center',
                         render: (h, params) => {
-                            return params.row.goods.factoryName;
+                            return h('span', params.row.goods.factoryName);
                         }
                     },
                     {
@@ -293,7 +293,7 @@
                         key: 'unitName',
                         align: 'center',
                         render: (h, params) => {
-                            return params.row.goods.unitName;
+                            return h('span', params.row.goods.unitName);
                         }
                     },
 
@@ -317,7 +317,7 @@
                         key: 'bigPack',
                         align: 'center',
                         render: (h, params) => {
-                            return params.row.goods.bigPack;
+                            return h('span', params.row.goods.bigPack);
                         }
                     },
                     {
@@ -325,7 +325,7 @@
                         key: 'retailPrice',
                         align: 'center',
                         render: (h, params) => {
-                            return params.row.goods.retailPrice;
+                            return h('span', params.row.goods.retailPrice);
                         }
                     },
                     {
@@ -333,7 +333,7 @@
                         key: 'batchPrice',
                         align: 'center',
                         render: (h, params) => {
-                            return params.row.goods.batchPrice;
+                            return h('span', params.row.goods.batchPrice);
                         }
                     },
                     {
@@ -374,6 +374,7 @@
                 this.orderLoading = true;
                 util.ajax.post('/buy/list', this.query)
                     .then(function (response) {
+                        console.log(response.data);
                         self.orderLoading = false;
                         if (response.status === 200 && response.data) {
                             self.orderList = response.data;
@@ -424,20 +425,19 @@
                     content: '请确认采购订单信息正确？',
                     onCancel: () => {},
                     onOk: () => {
+                        self.checkModalShow = false;
                         util.ajax.post('/buy/status', {
                             orderId: self.currchooseItem.id,
                             orderStatus: result ? 'CHECKED' : 'REJECTED',
                             checkResult: this.checkResult
                             })
                             .then(function (response) {
-                                self.checkModalShow = false;
                                 self.$Message.success('审核结果提交成功');
                                 if (response.status === 200) {
                                     self.queryOrderList();
                                 }
                             })
                             .catch(function (error) {
-                                self.checkModalShow = false;
                                 util.errorProcessor(self, error);
                             });
                     }

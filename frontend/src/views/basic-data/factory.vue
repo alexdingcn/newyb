@@ -109,9 +109,11 @@
                 util.ajax.get('/factory/list')
                     .then(function (response) {
                         self.tabLoading = false;
-                        self.factoryData = response.data;
-                        self.currFactoryId = '';
-                        self.$refs.factoryTable.clearCurrentRow();
+                        if (response.status === 200) {
+                            self.factoryData = response.data.data;
+                            self.currFactoryId = '';
+                            self.$refs.factoryTable.clearCurrentRow();
+                        }
                     })
                     .catch(function (error) {
                         self.tabLoading = false;

@@ -61,5 +61,8 @@
         <mapper resource="mapping/FinancialPreReceiveMapper.xml"/>
         <mapper resource="mapping/BizLockMapper.xml"/>
         <mapper resource="mapping/OperationLogMapper.xml"/>
+        <mapper resource="mapping/SystemConfigMapper.xml"/>
+        <mapper resource="mapping/UpdateHistoryMapper.xml"/>
+        <mapper resource="mapping/SellOrderPaymentMapper.xml"/>
     </mappers>
 </configuration>

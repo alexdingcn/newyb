@@ -150,6 +150,16 @@ public class Factory {
         }
     }
 
+    public String getCityName() {
+        StringBuilder sb = new StringBuilder();
+        if (this.placeCodes != null) {
+            for (PlaceCode placeCode : this.placeCodes) {
+                sb.append(placeCode.getName());
+            }
+        }
+        return sb.toString();
+    }
+
     public String getPostcode() {
         return postcode;
     }

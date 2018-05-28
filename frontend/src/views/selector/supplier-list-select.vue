@@ -5,7 +5,7 @@
                 <Input v-model="supplierQuery" clearable
                        @on-enter="querySuppliers"
                        @on-change="clearQueryInput"
-                       placeholder="客户/编号/拼音/联系人">
+                       placeholder="供应商/编号/拼音/联系人">
                     <span slot="append">
                         <Button type="primary" size="small" icon="ios-search" @click="searchsupplier"></Button>
                     </span>
@@ -14,6 +14,7 @@
         </Row>
         <Table ref="supplierSelect" size="small" border
                :columns="supplierColumns" :data="supplierList"
+               :loading="supplierLoading"
                @on-row-click="choosesupplier"
                 class="margin-top-10 supplier-select-table">
         </Table>

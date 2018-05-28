@@ -1,11 +1,11 @@
 
 <template>
   <div>
-        <Row>
+        <Row :gutter="16">
             <Col span="12">
                 <user-list ref="userList" @choose-user="chooseUser" :showAddBtn="true"></user-list>
             </Col>
-            <Col span="10" style="margin-left: 50px;">
+            <Col span="11">
                 <Card>
                     <p slot="title">
                         <Icon type="person"></Icon>

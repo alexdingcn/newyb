@@ -158,24 +158,34 @@
                         </Row>
                         <Row class="row-margin-bottom">
                             <i-col span="6">
-                                <FormItem label="批发价" :label-width="100" prop="useSpec">
+                                <FormItem label="批发价" :label-width="100" prop="batchPrice">
                                      <Input v-model="formData.batchPrice" style="width: 100%;" />
                                 </FormItem>
                             </i-col>
                             <i-col span="6">
-                                <FormItem label="市场价" :label-width="100" prop="useSpec">
+                                <FormItem label="市场价" :label-width="100" prop="retailPrice">
                                      <Input v-model="formData.retailPrice" style="width: 100%;" />
                                 </FormItem>
                             </i-col>
                             <i-col span="6">
-                                <FormItem label="参考进货价" :label-width="100" prop="useSpec">
+                                <FormItem label="参考进货价" :label-width="100" prop="inPrice">
                                      <Input v-model="formData.inPrice" style="width: 100%;" />
                                 </FormItem>
                             </i-col>
                         </Row>
 
+                        <div v-if="!formData.useSpec">
+                            <Row class="row-margin-bottom">
+                                <i-col span="6">
+                                    <FormItem label="单规格描述" :label-width="100" prop="useSpec">
+                                            <Input v-model="formData.specDesc" style="width: 100%;" />
+                                    </FormItem>
+                                </i-col>
+                            </Row>
+                        </div>
+
                         <div v-if="formData.useSpec" >
-                            <Alert type="succuess" v-if="goodsSpesList.length<=0">
+                            <Alert type="success" v-if="goodsSpesList.length<=0">
                                 <strong>温馨提示: </strong>还没有维护商品多规格配置，请先维护商品多规格配置信息!
                             </Alert>
                             <Row class="row-margin-bottom" >
@@ -207,6 +217,29 @@
                         </div>
                     </TabPane>
                     <TabPane icon="ios-pricetags" name="attribute" label="预警/扩展属性">
+                        <h2 style="margin-bottom: 10px;">商品养护</h2>
+                        <Row class="row-margin-bottom">
+                            <i-col span="24" >
+                                <FormItem label="是否需养护" :label-width="100">
+                                    <Checkbox v-model="formData.needCare"></Checkbox>
+                                </FormItem>
+                            </i-col>
+                        </Row>
+
+                        <h2 v-if="isMedicine" style="margin-bottom: 10px;">药品特殊管理</h2>
+                        <Row v-if="isMedicine" class="row-margin-bottom">
+                            <i-col span="4" >
+                                <FormItem label="是否特殊管理药品" :label-width="120">
+                                    <Checkbox v-model="formData.specialManage"></Checkbox>
+                                </FormItem>
+                            </i-col>
+                            <i-col span="4" >
+                                <FormItem label="是否冷链经营药品" :label-width="120">
+                                    <Checkbox v-model="formData.coldManage"></Checkbox>
+                                </FormItem>
+                            </i-col>
+                        </Row>
+
                         <h2 style="margin-bottom: 10px;">库存预警信息</h2>
                         <Row class="row-margin-bottom">
                             <i-col span="8">
@@ -306,9 +339,9 @@
                         <Row class="row-margin-bottom">
                             <i-col span="10">
                                 <FormItem label="档案附件">
-                                    <Input v-model="formData.fileNo" readonly>
+                                    <i-input v-model="formData.fileNo" readonly>
                                         <Button slot="append" type="text" icon="edit" @click="openFileUpload(formData.fileNo)"></Button>
-                                    </Input>
+                                    </i-input>
                                 </FormItem>
                             </i-col>
                         </Row>
@@ -322,7 +355,9 @@
         <Modal v-model="fileUploadModal" title="商品档案管理" :footerHide="true" :mask-closable="false" width="50" class="file-upload-low">
             <file-detail :fileNo="uploadFileNo" @add-file-success="addFileSuccess" ></file-detail>
         </Modal>
-
+        <Spin fix size="large" v-if="loading">
+            别着急，商品加载中...
+        </Spin>
     </div>
 </template>
 
@@ -356,6 +391,7 @@ export default {
     },
     data() {
         return {
+            loading: false,
             currTabs: 'general',
             saveLoading: false,
             formData: {
@@ -368,6 +404,7 @@ export default {
                 batchPrice: 0,
                 retailPrice: 0,
                 inPrice: 0,
+                needCare: false,
                 goodsDetails: [],
                 fileNo: '',
                 attributeRefs: [],
@@ -396,10 +433,12 @@ export default {
                 customerCategoryIds: [],
                 regions: [],
                 customerIds: []
-            }
+            },
+            isMedicine: false
         }
     },
     mounted() {
+        this.loadSystemConfig();
         this.loadGoodsSpecs();
         this.loadGoodsAttribute();
     },
@@ -408,10 +447,29 @@ export default {
             this.currTabs = 'general';
             if(id && id > 0) {
                 this.loadGoodsInfo(id);
+            } else {
+                this.formData = {};
             }
         }
     },
     methods: {
+        loadSystemConfig() {
+            //获取一些系统配置中的商品相关的配置信息
+            util.ajax.get('/config/list')
+                .then((response) => {
+                    let data = response.data;
+                    let valueInfo = data['COMPANY_TYPE'];
+                    if (valueInfo.keyValue === 'medicine') {
+                        this.isMedicine = true;
+                    }else {
+                        this.isMedicine = false;
+                    }
+                })
+                .catch((error) => {
+                    util.errorProcessor(this, error);
+                });
+        },
+
         addViewOpen() {
             //初始化一些新增产品的清空数据数据信息
             this.currTabs = 'general';
@@ -455,8 +513,11 @@ export default {
             }
         },
         loadGoodsInfo(id) {
+            var self = this;
+            this.loading = true;
             util.ajax.get('/goods/' + id)
                 .then((response) => {
+                    self.loading = false;
                     let data = response.data;
                     data.enable = data.enable ? 1 : 0;
                     data.cert1ExpDate = data.cert1ExpDate ? moment(data.cert1ExpDate).format('YYYY-MM-DD') : '';
@@ -476,6 +537,7 @@ export default {
                     
                 })
                 .catch((error) => {
+                    self.loading = false;
                     util.errorProcessor(this, error);
                 });
         },

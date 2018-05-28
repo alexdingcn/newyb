@@ -64,6 +64,8 @@ public class RepertoryInDetail {
 
     private Long checkTempMethod;
 
+    private String checkTempMethodName;
+
     private String checkUser;
 
     private Date checkTime;
@@ -92,12 +94,12 @@ public class RepertoryInDetail {
     private String packUnitName;
     private BigDecimal bigPack;
     private String storageCondition;
-    private Boolean specialManaged;
+    private Boolean specialManage;
 
 
 
-    public Boolean getSpecialManaged() {
-        return this.goods == null ? null : this.goods.getSpecialManaged();
+    public Boolean getSpecialManage() {
+        return this.goods == null ? null : this.goods.getSpecialManage();
     }
 
     public String getStorageCondition() {
@@ -441,5 +443,13 @@ public class RepertoryInDetail {
 
     public void setUpdateTime(Date updateTime) {
         this.updateTime = updateTime;
+    }
+
+    public String getCheckTempMethodName() {
+        return checkTempMethodName;
+    }
+
+    public void setCheckTempMethodName(String checkTempMethodName) {
+        this.checkTempMethodName = checkTempMethodName;
     }
 }
