@@ -210,7 +210,7 @@
                 <Card>
                     <p slot="title" class="card-title">
                         <Icon type="android-wifi"></Icon>
-                        本月发生金额
+                        今日采购/销售金额
                     </p>
                     <div class="data-source-row">
                         <user-flow></user-flow>
