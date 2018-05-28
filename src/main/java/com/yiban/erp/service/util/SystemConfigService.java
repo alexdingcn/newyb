@@ -1,6 +1,7 @@
 package com.yiban.erp.service.util;
 
 import com.alibaba.fastjson.JSON;
+import com.yiban.erp.constant.ConfigKey;
 import com.yiban.erp.dao.SystemConfigMapper;
 import com.yiban.erp.entities.SystemConfig;
 import com.yiban.erp.entities.User;
@@ -79,13 +80,18 @@ public class SystemConfigService {
     }
 
     @Transactional
-    public void saveOne(SystemConfig config, User user) throws BizException {
+    public void saveOne(SystemConfig config, User user, boolean cacheRefresh) throws BizException {
         if (config == null || StringUtils.isEmpty(config.getKeyName())) {
             throw new BizException(ErrorCode.PARAMETER_MISSING);
         }
         //如果id存在，验证下companyId
         if (config.getId() != null && !user.getCompanyId().equals(config.getCompanyId())) {
             throw new BizException(ErrorCode.ACCESS_PERMISSION);
+        }
+        ConfigKey key = ConfigKey.getByName(config.getKeyName());
+        if (key == null) {
+            logger.warn("system config key name is error.");
+            throw new BizException(ErrorCode.PARAMETER_MISSING);
         }
         //如果验证通过
         if (config.getId() != null) {
@@ -99,7 +105,25 @@ public class SystemConfigService {
             config.setCreatedTime(new Date());
             systemConfigMapper.insert(config);
         }
-        //去更新下缓存
+        if (cacheRefresh) {
+            //去更新下缓存
+            refreshCache(user.getCompanyId());
+        }
+    }
+
+
+    public void saveList(List<SystemConfig> configs, User user) throws BizException {
+        if (configs == null || configs.isEmpty()) {
+            logger.info("config list is empty.");
+            return;
+        }
+        //直接拆分循环一个保存
+        for (SystemConfig config : configs) {
+            saveOne(config, user, false);
+        }
+
+        //循环完成后，直接一次调用更新缓存数据
         refreshCache(user.getCompanyId());
     }
+
 }

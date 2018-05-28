@@ -49,7 +49,7 @@
                     </i-col>
                 </Row>
 
-                <Row type="flex" justify="start">
+                <Row type="flex" justify="start" v-if="salePriceOpen">
                     <i-col span="8">
                         <FormItem label="免零金额" prop="freeAmount">
                             <Input number v-model="sellOrderFormData.freeAmount" @on-blur="resetTotalAmount"/>
@@ -493,7 +493,8 @@ export default {
       goodsExpandModal: false,
       expandGoodsSpecs: [],
       expandProductDate: '',
-      expandExpDate: ''
+      expandExpDate: '',
+      salePriceOpen: false
     };
   },
   watch: {
@@ -518,7 +519,27 @@ export default {
       this.resetTotalAmount();
     }
   },
+  mounted() {
+    this.init();
+  },
   methods: {
+    init() {
+      // 获取系统配置中的是否允许特批价的配置
+      util.ajax.get('/config/list')
+          .then((response) => {
+              let data = response.data;
+              let valueInfo = data['SALE_PRICE'];
+              if (valueInfo.keyValue === 'open') {
+                  this.salePriceOpen = true;
+              }else {
+                  this.salePriceOpen = false;
+              }
+          })
+          .catch((error) => {
+              this.saveLoading = false;
+              util.errorProcessor(this, error);
+          });
+    },
     resetTotalAmount() {
       let freeAmount = this.sellOrderFormData.freeAmount ? parseFloat(this.sellOrderFormData.freeAmount) : 0;
       let disRate = this.sellOrderFormData.disRate ? parseFloat(this.sellOrderFormData.disRate) : 100;

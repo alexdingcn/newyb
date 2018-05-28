@@ -19,13 +19,10 @@
                 <Row>
                     <FormItem label="公司类型">
                         <RadioGroup v-model="formData.keyValue">
-                            <Radio label="MEDICINE">
+                            <Radio label="medicine">
                                 <span>药品经营类</span>
                             </Radio>
-                            <Radio label="MEDICALAPP">
-                                <span>医疗器械类</span>
-                            </Radio>
-                            <Radio label="OTHERS">
+                            <Radio label="others">
                                 <span>其他</span>
                             </Radio>
                         </RadioGroup>
@@ -36,7 +33,7 @@
 
         <Row class="button-footer">
             <ButtonGroup>
-                <Button type="success" icon="checkmark" @loading="saveLoading" @click="save">保存</Button>
+                <Button type="success" icon="checkmark" :loading="saveLoading" @click="save">保存</Button>
                 <Button type="ghost" icon="reply" @click="back">返回</Button>
             </ButtonGroup>
         </Row>
@@ -58,7 +55,7 @@ export default {
         return {
             formData: {
                 keyName: 'COMPANY_TYPE',
-                keyValue: 'OTHERS'
+                keyValue: 'others'
             },
             saveLoading: false
         }
