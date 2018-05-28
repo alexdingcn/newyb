@@ -74,7 +74,6 @@ public class RepertoryOutDetail {
     //private String permit;
     private String brandName; //商标编号
     private String storageCondition;
-    private Boolean specialManaged;
     private String customerName;
     private Integer customerRepId;
     private String customerRepName;
@@ -98,7 +97,6 @@ public class RepertoryOutDetail {
           //  this.baseMedName = goods.getBaseMedName();
             this.storageCondition = goods.getStorageConditionName();
             this.taxRate = goods.getOutTax();
-            this.specialManaged=goods.getSpecialManaged();
         }
     }
     public void setRepertoryOut(RepertoryOut repertoryOut) {
@@ -289,8 +287,8 @@ public class RepertoryOutDetail {
 //    }
 
 
-    public Boolean getSpecialManaged() {
-        return this.goods == null ? null : this.goods.getSpecialManaged();
+    public Boolean getSpecialManage() {
+        return this.goods == null ? null : this.goods.getSpecialManage();
     }
 
     public String getStorageCondition() {
