@@ -5,6 +5,7 @@ import com.yiban.erp.config.RabbitmqQueueConfig;
 import com.yiban.erp.constant.*;
 import com.yiban.erp.dao.*;
 import com.yiban.erp.dto.SellOrderAllAction;
+import com.yiban.erp.dto.SellOrderQuery;
 import com.yiban.erp.dto.SellReviewAction;
 import com.yiban.erp.dto.SellReviewOrderQuery;
 import com.yiban.erp.entities.*;
@@ -13,7 +14,6 @@ import com.yiban.erp.exception.BizRuntimeException;
 import com.yiban.erp.exception.ErrorCode;
 import com.yiban.erp.service.goods.GoodsService;
 import com.yiban.erp.util.UtilTool;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,6 +52,9 @@ public class SellOrderService {
     private CustomerMapper customerMapper;
     @Autowired
     private GoodsBlackListMapper goodsBlackListMapper;
+
+    @Autowired
+    private SellOrderPaymentMapper sellOrderPaymentMapper;
 
 
     /**
@@ -548,6 +551,21 @@ public class SellOrderService {
         return sellOrderShipMapper.getBySellOrderId(orderId);
     }
 
+
+    public Integer getOrderPaymentHistoryCount(SellOrderQuery query) {
+        if (query == null || query.getCompanyId() == null || query.getSellOrderId() == null) {
+            return 0;
+        }
+        return sellOrderPaymentMapper.getPaymentHistoryCount(query);
+    }
+
+    public List<SellOrderPayment> getOrderPaymentHistory(SellOrderQuery query) {
+        if (query == null || query.getCompanyId() == null || query.getSellOrderId() == null) {
+            return Collections.emptyList();
+        }
+        return sellOrderPaymentMapper.getPaymentHistory(query);
+    }
+
     public SellOrderShip saveOrderShip(User user, SellOrderShip sellOrderShip) throws BizException {
         SellOrderShip reqShip = sellOrderShip;
         if (reqShip == null || reqShip.getSellOrderId() == null) {
@@ -595,5 +613,28 @@ public class SellOrderService {
                 query.getStartDate(), query.getEndDate());
 
         return statusCounts;
+    }
+
+    public boolean addPayment(Long orderId, SellOrderPayment payment, User user) throws BizException {
+        if (orderId != null) {
+            SellOrder sellOrder = sellOrderMapper.selectByPrimaryKey(orderId);
+            if (sellOrder == null || "DELETE".equalsIgnoreCase(sellOrder.getStatus())) {
+                throw new BizException(ErrorCode.SELL_ORDER_DETAIL_GET_FAIL);
+            }
+
+            if (!sellOrder.getCompanyId().equals(user.getCompanyId())) {
+                throw new BizException(ErrorCode.SELL_ORDER_COMPANY_NOT_MATCH);
+            }
+
+            if (sellOrder.getPaidAmount().compareTo(sellOrder.getTotalAmount()) >= 0) {
+                throw new BizException(ErrorCode.SELL_ORDER_ALREADY_PAID);
+            }
+
+            int result = sellOrderMapper.updatePayment(orderId, payment.getPayAmount());
+            if (result > 0) {
+                return true;
+            }
+        }
+        return false;
     }
 }

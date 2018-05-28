@@ -29,7 +29,7 @@ public class HomeController {
     @RequestMapping(value = "/updates", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     private ResponseEntity<String> getUpdates(@RequestParam(value = "lt", required = false) Integer lastIndex,
                                               @AuthenticationPrincipal User user) {
-        List<UpdateHistory> histories = updateHistoryMapper.selectFromLastId(lastIndex);
+        List<UpdateHistory> histories = updateHistoryMapper.selectFromLastId(user.getCompanyId(), lastIndex);
         return ResponseEntity.ok().body(JSON.toJSONString(histories));
     }
 

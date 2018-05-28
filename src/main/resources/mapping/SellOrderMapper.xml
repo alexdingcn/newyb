@@ -69,6 +69,14 @@
       #{freeAmount,jdbcType=DECIMAL}, #{disRate,jdbcType=DECIMAL}, #{paidAmount,jdbcType=DECIMAL})
   </insert>
 
+
+    <update id="updatePayment" parameterType="map" >
+        update sell_order
+        set paid_amount = paid_amount + #{payAmount, jdbcType=DECIMAL}
+        where id = #{orderId,jdbcType=BIGINT}
+        and total_amount > paid_amount
+    </update>
+
   <update id="updateByPrimaryKeySelective" parameterType="com.yiban.erp.entities.SellOrder" >
     update sell_order
     <set >
