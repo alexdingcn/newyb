@@ -81,7 +81,14 @@
                     {
                         type: "index",
                         align: "center",
-                        width: 30
+                        width: 100
+                    }
+                    ,
+                    {
+                        title: "状态",
+                        align: "center",
+                        key: "status",
+                        width: 120
                     },
                     {
                         title: "出库类型",
@@ -135,7 +142,7 @@
 
                     {
                         title: '生产企业',
-                        key: 'factory',
+                        key: 'factoryName',
                         align: 'center',
                         width: 120
                     },

@@ -279,4 +279,12 @@ public class RepertoryOut {
     public void setRefTypeName(String refTypeName) {
         this.refTypeName = refTypeName;
     }
+
+    public String getCustomerTel() {
+        return customerTel;
+    }
+
+    public void setCustomerTel(String customerTel) {
+        this.customerTel = customerTel;
+    }
 }
