@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -37,8 +38,18 @@ public class SystemConfigController {
     public ResponseEntity<String> saveOne(@RequestBody SystemConfig config,
                                           @AuthenticationPrincipal User user) throws Exception {
         logger.info("user:{} request save one config:{}", user.getId(), JSON.toJSONString(config));
-        systemConfigService.saveOne(config, user);
+        systemConfigService.saveOne(config, user, true);
         return ResponseEntity.ok().build();
     }
+
+    @RequestMapping(value = "/save/list", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> saveList(@RequestBody List<SystemConfig> configs,
+                                           @AuthenticationPrincipal User user) throws Exception {
+        logger.info("user:{} request save config list:{}", user.getId(), JSON.toJSONString(configs));
+        systemConfigService.saveList(configs, user);
+        return ResponseEntity.ok().build();
+    }
+
+
 
 }

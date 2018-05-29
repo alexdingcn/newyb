@@ -23,7 +23,7 @@
             <Card>
                 <p slot="title" >
                     <Icon type="document"></Icon>
-                    盘点制单
+                    执行盘点
                 </p>
                 <div slot="extra">
                     <ButtonGroup size="small" >
@@ -433,6 +433,7 @@
             },
             onSelectRepertory (planDetailId) {
                 var planDetail = this.goodsOptions.filter(o => o.id === planDetailId);
+                alert(JSON.stringify(planDetail));
                 //根据id选择出数据
                 if (planDetail && planDetail.length == 1) {
                     var index = this.storeCheck.orderItemIds.indexOf(planDetailId);

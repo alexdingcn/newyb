@@ -8,6 +8,7 @@ import com.yiban.erp.dao.RepertoryOutMapper;
 import com.yiban.erp.dto.CurrentBalanceResp;
 import com.yiban.erp.dto.ReceiveListReq;
 import com.yiban.erp.dto.ReceiveSetReq;
+import com.yiban.erp.dto.RepertoryOutListReq;
 import com.yiban.erp.entities.*;
 import com.yiban.erp.exception.BizException;
 import com.yiban.erp.exception.ErrorCode;
@@ -91,6 +92,23 @@ public class RepertoryOutController {
         return ResponseEntity.ok().body(JSON.toJSONString(result));
     }
 
+    @RequestMapping(value = "/detaillist", method = RequestMethod.POST, name = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> detaillist(@RequestBody RepertoryOutListReq listReq,
+                                       @AuthenticationPrincipal User user) throws Exception {
+
+        Date endDate=listReq.getEndOutDate();
+        if(endDate!=null){
+            Calendar end = Calendar.getInstance();
+            end.setTime(endDate);
+            end.set(Calendar.HOUR_OF_DAY,23);
+            end.set( Calendar.MINUTE,59);
+            end.set(Calendar.SECOND,59);
+            listReq.setEndOutDate(end.getTime());
+        }
+        listReq.setCompanyId(user.getCompanyId());
+        List<RepertoryOutDetail> result = repertoryOutService.getOutDetailList(listReq);
+        return ResponseEntity.ok().body(JSON.toJSONString(result));
+    }
     @RequestMapping(value = "/detail/{orderId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> getOrderDetails(@PathVariable Long orderId) {
         JSONObject response = new JSONObject();

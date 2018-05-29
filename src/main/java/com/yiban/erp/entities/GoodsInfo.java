@@ -75,7 +75,9 @@ public class GoodsInfo {
 
     private Boolean firstCheck;
 
-    private Boolean specialManaged;
+    private Boolean specialManage;
+
+    private Boolean coldManage;
 
     private Boolean needCare;
 
@@ -504,12 +506,20 @@ public class GoodsInfo {
         this.firstCheck = firstCheck;
     }
 
-    public Boolean getSpecialManaged() {
-        return specialManaged;
+    public Boolean getSpecialManage() {
+        return specialManage;
     }
 
-    public void setSpecialManaged(Boolean specialManaged) {
-        this.specialManaged = specialManaged;
+    public void setSpecialManage(Boolean specialManage) {
+        this.specialManage = specialManage;
+    }
+
+    public Boolean getColdManage() {
+        return coldManage;
+    }
+
+    public void setColdManage(Boolean coldManage) {
+        this.coldManage = coldManage;
     }
 
     public Boolean getNeedCare() {

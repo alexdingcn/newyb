@@ -475,6 +475,7 @@ public class SellOrderService {
         RepertoryOut out = new RepertoryOut();
         out.setCompanyId(order.getCompanyId());
         out.setWarehouseId(order.getWarehouseId());
+        out.setStatus(RepertoryOutStatus.CHECKED.name());
         out.setRefType(RepertoryRefType.SELL_BATCH.name());
         out.setOutDate(new Date());
         out.setRefOrderId(order.getId());

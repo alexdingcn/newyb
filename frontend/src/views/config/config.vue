@@ -29,8 +29,20 @@
                 <h2 class="nav-title">订单相关</h2>
                 <Row>
                     <i-col :xs="12" :sm="8" :md="6" :lg="5">
+                        <config-sider-tag :active="currActive === 'orderFlow'" 
+                            title="订单流程设置" 
+                            desc="针对不同的业务特征，设置对应业务流程，提高效率" 
+                            icon="arrow-swap"
+                            @click="configNavClick('orderFlow')">
+                        </config-sider-tag>
                     </i-col>
                     <i-col :xs="12" :sm="8" :md="6" :lg="5">
+                        <config-sider-tag :active="currActive === 'salePrice'" 
+                            title="销售特批价调整" 
+                            desc="制作销售单时，是否启用销售订单特定价格调整功能" 
+                            icon="android-checkmark-circle" 
+                            @click="configNavClick('salePrice')">
+                        </config-sider-tag>
                     </i-col>
                     <i-col :xs="12" :sm="8" :md="6" :lg="5">
                     </i-col>
@@ -43,6 +55,8 @@
         </div> 
         <div v-if="!showNav">
             <config-company-type ref="companyType" v-if="currActive === 'companyType'" @back="back"></config-company-type>
+            <config-order-flow ref="orderFlow" v-if="currActive === 'orderFlow'" @back="back" ></config-order-flow>
+            <config-sale-price ref="salePrice" v-if="currActive === 'salePrice'" @back="back" ></config-sale-price>
         </div>
     </div>
 </template>
@@ -51,12 +65,16 @@
 import util from '@/libs/util.js';
 import configSiderTag from './config-sider-tag.vue';
 import configCompanyType from './components/config-company-type.vue';
+import configOrderFlow from './components/config-order-flow.vue';
+import configSalePrice from './components/config-sale-price.vue';
 
 export default {
     name: 'config',
     components:{
         configSiderTag,
-        configCompanyType
+        configCompanyType,
+        configOrderFlow,
+        configSalePrice
     },
     data() {
         return {

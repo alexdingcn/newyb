@@ -17,61 +17,39 @@
 
 			<Form :label-width="85" :rules="ruleValidate" :model="buyOrder" ref="buyOrderForm">
 				<Row>
-					<Col span="6">
+					<i-col span="6">
                         <FormItem label="供应商" prop="supplierId" >
                             <supplier-select v-model="buyOrder.supplierId" ></supplier-select>
                         </FormItem>
-					</Col>
+					</i-col>
+                    <i-col span="6">
+                        <FormItem label="仓库点" prop="warehouseId">
+                            <warehouse-select v-model="buyOrder.warehouseId" ></warehouse-select>
+                        </FormItem>
+					</i-col>
 					<!-- <Col span="5">
                         <FormItem label="供应商代表" prop="supplierContactId" >
                             <supplier-contact-select v-model="buyOrder.supplierContactId" :disabled="!buyOrder.supplierId" :supplierId="buyOrder.supplierId"></supplier-contact-select>
                         </FormItem>
 					</Col> -->
-					<Col span="6">
+					<i-col span="6">
                         <FormItem label="采购员" prop="buyerId">
                             <buyer-select v-model="buyOrder.buyerId" ></buyer-select>
                         </FormItem>
-					</Col>
+					</i-col>
 					<!-- <Col span="6">
                         <FormItem label="自定单号" prop="refNo">
                             <Input v-model="buyOrder.refNo" />
                         </FormItem>
 					</Col> -->
-                    <Col span="6">
-                        <FormItem label="仓库点" prop="warehouseId">
-                            <warehouse-select v-model="buyOrder.warehouseId" ></warehouse-select>
-                        </FormItem>
-					</Col>
 				</Row>
 				<Row>
-                    <Col span="5">
-						<FormItem label="预到货日期" prop="eta">
-							<DatePicker type="date" v-model="buyOrder.eta" />
-						</FormItem>
-					</Col>
-					<Col span="6">
-                        <FormItem label="运输方式" prop="shipMethodId">
-                            <option-select v-model="buyOrder.shipMethodId" optionType="SHIP_METHOD"></option-select>
-                        </FormItem>
-					</Col>
-					<Col span="5">
-                        <FormItem label="运输工具" prop="shipToolId">
-                            <option-select v-model="buyOrder.shipToolId" optionType="SHIP_TOOL"></option-select>
-                        </FormItem>
-					</Col>
-					<Col span="6">
-                        <FormItem label="温控方式" prop="temperControlId">
-                            <option-select v-model="buyOrder.temperControlId" optionType="TEMPER_CONTROL"></option-select>
-                        </FormItem>
-					</Col>
-				</Row>
-				<Row>
-					<Col span="8">
+					<i-col span="8">
 						<FormItem label="选择商品">
                             <good-select :disabled="!buyOrder.warehouseId" ref="goodsSelect" :warehouseId="buyOrder.warehouseId"
                             @on-change="onSelectGoods"></good-select>
 						</FormItem>
-					</Col>
+					</i-col>
 				</Row>
 
 				<Table border highlight-row
@@ -86,6 +64,30 @@
 						</h3>
 					</div>
 				</Table>
+
+                <h3 class="margin-top-10">配送和交货</h3>
+                <Row>
+                    <i-col span="5">
+                        <FormItem label="温控方式" prop="temperControlId">
+                            <option-select v-model="buyOrder.temperControlId" optionType="TEMPER_CONTROL"></option-select>
+                        </FormItem>
+					</i-col>
+                    <i-col span="5">
+                        <FormItem label="运输方式" prop="shipMethodId">
+                            <option-select v-model="buyOrder.shipMethodId" optionType="SHIP_METHOD"></option-select>
+                        </FormItem>
+					</i-col>
+					<i-col span="5">
+                        <FormItem label="运输工具" prop="shipToolId">
+                            <option-select v-model="buyOrder.shipToolId" optionType="SHIP_TOOL"></option-select>
+                        </FormItem>
+					</i-col>
+                    <i-col span="5">
+						<FormItem label="预到货日期" prop="eta">
+							<DatePicker type="date" v-model="buyOrder.eta" />
+						</FormItem>
+					</i-col>
+                </Row>
 
 				<div class="margin-top-10">
 				    <Input type="textarea" v-model="buyOrder.comment" :rows="2" placeholder="暂无备注信息"/>
@@ -471,13 +473,43 @@
                     name: pageName
                 });
             },
+
+            validateColdManage() {
+                //先看下温控方式和运输方式是否已经输入了，如果输出了，直接返回true, 否则验证是否存在有冷链管理产品
+                if (this.buyOrder.temperControlId > 0 && this.buyOrder.shipMethodId > 0) {
+                    return true; //已经输入，直接返回
+                }
+                //查询下添加的商品中，是否存在有冷链经营的商品，
+                let haveCold = false;
+                for (let i=0; i < this.orderItems.length; i++) {
+                    let goods = this.orderItems[i];
+                    if (goods && goods.coldManage) {
+                        haveCold = true;
+                        break;
+                    }
+                }
+                console.log('haveCold:' + haveCold);
+                return haveCold ? false : true;
+            },
+
             saveBuyOrder () {
                 this.buyOrder.orderItems = this.orderItems;
+                let self = this;
                 this.$refs.buyOrderForm.validate((valid) => {
                     if (!valid) {
-                        this.$Message.error('请检查输入!');
+                        self.$Message.error('请检查输入!');
                     } else {
-                        this.doSave();
+                        console.log('validate cold manage.');
+                        //验证是否存在冷链管理商品，如果存在，需要验证是否已经输入温控方式，冷链管理商品必输温控方式
+                        if (self.validateColdManage()) {
+                            self.doSave();
+                        }else {
+                            self.$Modal.info({
+                                title: '商品冷链管理运输提示',
+                                content: '存在冷链管理的商品，温控方式和运输方式必须输入!'
+                            });
+                            return;
+                        }
                     }
                 });
             }

@@ -178,4 +178,15 @@
     </if>
   </select>
 
+
+  <select id="getOutListById"  parameterType="map" resultType="com.yiban.erp.entities.RepertoryOut">
+    select
+    <include refid="listSql"/>,c_req.contact_phone as customerTel
+    from repertory_out o, warehouse w,customer_rep c_req
+    where  o.warehouse_id = w.id and o.customer_rep_id =c_req.id
+    and o.id in
+    <foreach collection="ids" item="item" open="(" close=")" separator=", ">
+      #{item}
+    </foreach>
+  </select>
 </mapper>

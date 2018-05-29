@@ -226,6 +226,20 @@
                             </i-col>
                         </Row>
 
+                        <h2 v-if="isMedicine" style="margin-bottom: 10px;">药品特殊管理</h2>
+                        <Row v-if="isMedicine" class="row-margin-bottom">
+                            <i-col span="4" >
+                                <FormItem label="是否特殊管理药品" :label-width="120">
+                                    <Checkbox v-model="formData.specialManage"></Checkbox>
+                                </FormItem>
+                            </i-col>
+                            <i-col span="4" >
+                                <FormItem label="是否冷链经营药品" :label-width="120">
+                                    <Checkbox v-model="formData.coldManage"></Checkbox>
+                                </FormItem>
+                            </i-col>
+                        </Row>
+
                         <h2 style="margin-bottom: 10px;">库存预警信息</h2>
                         <Row class="row-margin-bottom">
                             <i-col span="8">
@@ -419,10 +433,12 @@ export default {
                 customerCategoryIds: [],
                 regions: [],
                 customerIds: []
-            }
+            },
+            isMedicine: false
         }
     },
     mounted() {
+        this.loadSystemConfig();
         this.loadGoodsSpecs();
         this.loadGoodsAttribute();
     },
@@ -437,6 +453,23 @@ export default {
         }
     },
     methods: {
+        loadSystemConfig() {
+            //获取一些系统配置中的商品相关的配置信息
+            util.ajax.get('/config/list')
+                .then((response) => {
+                    let data = response.data;
+                    let valueInfo = data['COMPANY_TYPE'];
+                    if (valueInfo.keyValue === 'medicine') {
+                        this.isMedicine = true;
+                    }else {
+                        this.isMedicine = false;
+                    }
+                })
+                .catch((error) => {
+                    util.errorProcessor(this, error);
+                });
+        },
+
         addViewOpen() {
             //初始化一些新增产品的清空数据数据信息
             this.currTabs = 'general';
