@@ -21,18 +21,26 @@ module.exports = merge(webpackBaseConfig, {
         chunkFilename: '[name].chunk.js'
     },
     devServer: {
+        hot: true,
+        compress: true,
         headers: {
           'Access-Control-Allow-Origin': '*',
         },
     },
     plugins: [
+        new webpack.DefinePlugin({
+            'process.env': {
+                NODE_ENV: '"development"'
+            }
+        }),
         new ExtractTextPlugin({
             filename: '[name].css',
             allChunks: true
         }),
-        new webpack.optimize.CommonsChunkPlugin({
-            names: ['vendor'],
-        }),
+        new webpack.HotModuleReplacementPlugin(),
+        // new webpack.optimize.CommonsChunkPlugin({
+        //     names: ['vendor'],
+        // }),
         new HtmlWebpackPlugin({
             title: '医站通ERP v' + package.version,
             filename: '../index.html',

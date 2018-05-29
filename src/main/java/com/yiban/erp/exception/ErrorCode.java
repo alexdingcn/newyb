@@ -200,6 +200,10 @@ public enum ErrorCode {
     VERIFY_CODE_VALIDATE_FAIL(4107, "短信验证码错误"),
 
 
+    // 50xx - 首页
+    BANNER_NOT_EXISTED(5001, "广告不存在"),
+
+
     ACCESS_PERMISSION(9001, "无访问权限", ErrorDisplay.MODAL),
     PARAMETER_MISSING(9002, "缺少必填字段"),
     MESSAGE_GET_FAIL(9003, "获取消息信息失败"),

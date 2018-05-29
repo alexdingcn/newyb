@@ -11,16 +11,16 @@ const option = {
     },
     series: [
         {
-            name: '入流量',
+            name: '今日采购金额',
             type: 'gauge',
             min: 0,
-            max: 1000,
+            max: 10000,
             detail: {
-                formatter: '{value}Mb+',
+                formatter: '￥{value}',
                 fontSize: 18,
                 offsetCenter: [0, '50px']
             },
-            data: [{value: 50, name: '当前入流量'}],
+            data: [{value: 50, name: '今日采购'}],
             center: ['25%', '50%'],
             radius: '80%',
             title: {
@@ -37,12 +37,12 @@ const option = {
             }
         },
         {
-            name: '出流量',
+            name: '今日销售金额',
             type: 'gauge',
             min: 0,
             max: 1000,
             detail: {
-                formatter: '{value}Mb+',
+                formatter: '￥{value}',
                 fontSize: 18,
                 offsetCenter: [0, '50px']
             },

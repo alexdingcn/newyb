@@ -211,6 +211,29 @@ export default {
         }
     },
     methods: {
+        clearss(){
+            this.formItem.name="";
+            this.formItem.origin="";
+            this.formItem.pinyin="";
+            this.formItem.placeCodes="";
+            this.formItem.address="";
+            this.formItem.postcode="";
+            this.formItem.contact="";
+            this.formItem.employee="";
+            this.formItem.phone="";
+            this.formItem.fax="";
+            this.formItem.email="";
+            this.formItem.comment="";
+            this.formItem.fileNo="";
+            this.formItem.permit="";
+            this.formItem.permitExp="";
+            this.formItem.license="";
+            this.formItem.licenseExp="";
+            this.formItem.bankName="";
+            this.formItem.bankAccount="";
+            this.formItem.taxNumber="";
+            
+        },
         init () {
             var self = this;
             self.spinShow = true;
@@ -244,6 +267,7 @@ export default {
         },
         submitFactory (action) {
             var self = this;
+           
             this.spinShow = true;
             self.loading = true;
             this.formItem.placeCodes = this.placeCodeList;
@@ -255,8 +279,9 @@ export default {
                     data.permitExp = data.permitExp ? moment(data.permitExp).format('YYYY-MM-DD') : '';
                     data.licenseExp = data.licenseExp ? moment(data.licenseExp).format('YYYY-MM-DD') : '';
                     self.formItem = data;
-                    self.$Message.success('生产企业' + self.formItem.name + '保存成功');
-                    self.$emit('save-ok', self.formItem, action);
+                    self.$Message.success('生产企业' + self.formItem.name + '保存成功');                 
+                    self.$emit('save-ok', self.formItem, action); 
+                    
                 })
                 .catch(function (error) {
                     self.spinShow = false;
