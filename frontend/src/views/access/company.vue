@@ -276,12 +276,8 @@ export default {
         doSubmit(){
              util.ajax.post('/company/updateCompany',this.formItem )
                 .then((response) => {
-<<<<<<< HEAD
-                   this.$Message.info("公司信息修改成功！");
-=======
                    this.$Message.success("公司信息修改成功！");
                    
->>>>>>> add care
                 })
                 .catch(function (error) {
                         util.errorProcessor(this, error);

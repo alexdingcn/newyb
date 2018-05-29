@@ -185,13 +185,8 @@ export const appRouter = [
         component: Main,
         menuGroup: [
             { title: "入库", icon: 'icon-peizaizhuangche-xianxing', start: 0, end: 4 },
-<<<<<<< HEAD
-            { title: "出库", icon: 'icon-baoguofahuo-xianxing', start: 5, end: 10 },
-            { title: "盘点", icon: 'icon-zhongzhuanzhan-xianxing', start: 11, end: 13 }
-=======
             { title: "出库", icon: 'icon-baoguofahuo-xianxing', start: 5, end: 9 },
             { title: "盘点", icon: 'icon-zhongzhuanzhan-xianxing', start: 10, end: 15 }
->>>>>>> add care
         ],
         children: [
             { path: 'store_now', title: '实时库存', name: 'store_now', component: () => import('@/views/warehouse/store_now.vue') },
