@@ -99,6 +99,7 @@
                                     </CheckboxGroup>
                                 </FormItem>
                             </i-col>
+                            
                         </Row>
 
                         <h2 style="margin-bottom: 10px;">商品单位</h2>
@@ -399,6 +400,7 @@ export default {
                 goodsNo: '',
                 pinyin: '',
                 enable: 1,
+                ifConser:1,
                 tagList: [],
                 useSpec: false,
                 batchPrice: 0,
@@ -478,6 +480,7 @@ export default {
                 goodsNo: '',
                 pinyin: '',
                 enable: 1,
+                ifConser:1,
                 tagList: [],
                 useSpec: false,
                 batchPrice: 0,
@@ -520,6 +523,7 @@ export default {
                     self.loading = false;
                     let data = response.data;
                     data.enable = data.enable ? 1 : 0;
+                    data.ifConser = data.ifConser ? 0 : 1;
                     data.cert1ExpDate = data.cert1ExpDate ? moment(data.cert1ExpDate).format('YYYY-MM-DD') : '';
                     data.cert2ExpDate = data.cert2ExpDate ? moment(data.cert2ExpDate).format('YYYY-MM-DD') : '';
                     data.cert3ExpDate = data.cert3ExpDate ? moment(data.cert3ExpDate).format('YYYY-MM-DD') : '';

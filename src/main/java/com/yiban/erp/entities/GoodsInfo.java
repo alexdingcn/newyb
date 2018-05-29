@@ -28,6 +28,7 @@ public class GoodsInfo {
     private String origin;
 
     private Boolean enable;
+    private Boolean ifConser;
 
     private Boolean isProxy;
 
@@ -328,6 +329,14 @@ public class GoodsInfo {
 
     public void setEnable(Boolean enable) {
         this.enable = enable;
+    }
+
+    public Boolean getIfConser() {
+        return ifConser;
+    }
+
+    public void setIfConser(Boolean ifConser) {
+        this.ifConser = ifConser;
     }
 
     public Boolean getIsProxy() {
