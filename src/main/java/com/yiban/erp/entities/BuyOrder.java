@@ -50,8 +50,6 @@ public class BuyOrder {
 
     private List<BuyOrderDetail> details;
 
-    private List<BuyOrderRequest> orderItems;
-
     private String supplier;
 
     private String supplierContact;
@@ -236,13 +234,6 @@ public class BuyOrder {
         this.checkTime = checkTime;
     }
 
-    public List<BuyOrderRequest> getOrderItems() {
-        return orderItems;
-    }
-
-    public void setOrderItems(List<BuyOrderRequest> orderItems) {
-        this.orderItems = orderItems;
-    }
 
     public List<BuyOrderDetail> getDetails() {
         return details;
@@ -250,24 +241,6 @@ public class BuyOrder {
 
     public void setDetails(List<BuyOrderDetail> details) {
         this.details = details;
-    }
-
-    public void generateOrderDetails() {
-        if (this.orderItems != null) {
-            this.details = new ArrayList<>();
-            for (BuyOrderRequest req : this.orderItems) {
-                BuyOrderDetail detail = new BuyOrderDetail();
-                detail.setGoodsId(req.getId());
-                detail.setGoodsName(req.getName());
-                detail.setQuantity(req.getQuantity());
-                detail.setBuyPrice(req.getPrice());
-                detail.setAmount(req.getAmount());
-                detail.setShippedQuantity(BigDecimal.ZERO);
-                detail.setBuyOrderId(this.getId());
-                detail.setAlreadyFapiao(false);
-                this.details.add(detail);
-            }
-        }
     }
 
     public BuyOrderStatus getOrderStatus() {
@@ -281,7 +254,9 @@ public class BuyOrder {
     }
 
     public boolean canUpdateDetails() {
-        if (BuyOrderStatus.INIT.name().equals(this.status) || BuyOrderStatus.CHECKING.name().equals(this.status)) {
+        if (BuyOrderStatus.INIT.name().equals(this.status)
+                || BuyOrderStatus.CHECKING.name().equals(this.status)
+                || BuyOrderStatus.REJECTED.name().equals(this.status)) {
             return true;
         }
         return false;

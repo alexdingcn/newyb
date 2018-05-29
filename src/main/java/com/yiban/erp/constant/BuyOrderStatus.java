@@ -8,5 +8,6 @@ public enum BuyOrderStatus {
     SHIPPING,
     SHIPPED,
     UNKNOWN,
+    DELETE,
     ALL;
 }

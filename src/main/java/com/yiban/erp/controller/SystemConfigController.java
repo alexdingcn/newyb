@@ -30,7 +30,7 @@ public class SystemConfigController {
 
     @RequestMapping(value = "/list", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<JSON> configList(@AuthenticationPrincipal User user) throws Exception {
-        Map<String, SystemConfig> result = systemConfigService.getConfigMap(user);
+        Map<String, SystemConfig> result = systemConfigService.getConfigMap(user.getCompanyId());
         return ResponseEntity.ok().body((JSON) JSON.toJSON(result));
     }
 

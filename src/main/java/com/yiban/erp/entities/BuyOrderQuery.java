@@ -3,6 +3,7 @@ package com.yiban.erp.entities;
 import com.yiban.erp.constant.BuyOrderStatus;
 
 import java.util.Date;
+import java.util.List;
 
 public class BuyOrderQuery {
 
@@ -17,6 +18,8 @@ public class BuyOrderQuery {
     private Date endDate;
 
     private BuyOrderStatus status;
+
+    private List<String> statusNames; //查询多种状态的时候
 
     private String checkResult;
 
@@ -84,5 +87,13 @@ public class BuyOrderQuery {
 
     public void setCheckResult(String checkResult) {
         this.checkResult = checkResult;
+    }
+
+    public List<String> getStatusNames() {
+        return statusNames;
+    }
+
+    public void setStatusNames(List<String> statusNames) {
+        this.statusNames = (statusNames == null || statusNames.isEmpty()) ? null : statusNames;
     }
 }

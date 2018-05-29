@@ -60,6 +60,8 @@ public enum ErrorCode {
     BUY_BACK_ORDER_GET_FAIL(1306, "获取退出单信息失败"),
     BUY_BACK_ORDER_STATUS_CANNOT_CHECK(1307, "当前状态下不能对退出单审核"),
     BUY_BACK_CHECK_CANCEL_ERROR(1308, "退出单状态不是质量复核通过，不能进行取消复核操作"),
+    BUY_ORDER_COLD_MANAGE_ERROR(1309, "存在有冷链经营类型产品，采购单的温控方式和运输方式必输"),
+    BUY_ORDER_STATUS_CANNOT_REMOVE(1310, "采购订单当前状态下不能删除"),
 
 
     // 15xx - 盘点

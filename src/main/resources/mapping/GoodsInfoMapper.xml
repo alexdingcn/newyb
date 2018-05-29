@@ -521,4 +521,14 @@
     where id = #{id}
   </update>
 
+  <select id="getColdManageByDetailIds" parameterType="map" resultMap="BaseResultMap">
+    select g.*
+    from goods_info g, goods_detail d
+    where g.id = d.goods_info_id and g.cold_manage = 1
+    and d.id in
+    <foreach collection="detailIds" item="item" open="(" close=")" separator=", ">
+      #{item}
+    </foreach>
+  </select>
+
 </mapper>

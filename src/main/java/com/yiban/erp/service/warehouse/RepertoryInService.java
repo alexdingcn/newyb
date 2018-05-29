@@ -152,7 +152,7 @@ public class RepertoryInService {
             logger.info("set buy order status to shiped. buyOrderId:{}", order.getRefOrderId());
             BuyOrder buyOrder = buyOrderMapper.selectByPrimaryKey(order.getRefOrderId());
             if (buyOrder != null) {
-                buyOrder.setStatus(BuyOrderStatus.SHIPPED.name());
+                buyOrder.setStatus(BuyOrderStatus.SHIPPED);
                 buyOrder.setUpdatedBy(user.getNickname());
                 buyOrder.setUpdatedTime(new Date());
                 buyOrderMapper.updateByPrimaryKeySelective(buyOrder);
