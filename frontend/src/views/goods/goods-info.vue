@@ -81,7 +81,7 @@
                             </i-col>
                         </Row>
                         <Row class="row-margin-bottom">
-                            <i-col span="10">
+                            <i-col span="16">
                                 <FormItem label="商品标签" prop="tagList">
                                     <CheckboxGroup v-model="formData.tagList">
                                         <Checkbox label="NEW_GOODS">
@@ -99,18 +99,7 @@
                                     </CheckboxGroup>
                                 </FormItem>
                             </i-col>
-                            <i-col span="10">
-                                <FormItem label="是否养护" prop="ifConser">
-                                    <RadioGroup v-model="formData.ifConser">
-                                         <Radio :label="1">
-                                            <span>是</span>
-                                        </Radio>
-                                        <Radio :label="0">
-                                            <span>否</span>
-                                        </Radio>
-                                    </RadioGroup>
-                                </FormItem>
-                            </i-col>
+                            
                         </Row>
 
                         <h2 style="margin-bottom: 10px;">商品单位</h2>

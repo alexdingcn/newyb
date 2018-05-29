@@ -212,7 +212,7 @@ export const appRouter = [
             { path: 'store_check_do_list', title: '执行盘点', name: 'store_check_do_list', component: () => import('@/views/checkplan/store_check_do_list.vue') },
             { path: 'store_check_table_list', title: '盘点表确认', name: 'store_check_table_list', component: () => import('@/views/checkplan/store_check_table_list.vue') },
             { path: "store_check_pass_list", title: '盘点审核', name: 'store_check_pass_list', component: () => import('@/views/checkplan/store_check_pass_list.vue')},
-            { path: "goods_care", title: '养护', name: 'goods_care', component: () => import('@/views/goods/goods_care.vue')},
+            { path: "goods-care-list", title: '养护', name: 'goods-care-list', component: () => import('@/views/goods/goods-care-list.vue')},
         ]
     },
 
