@@ -208,6 +208,17 @@ export const appRouter = [
             { path: "store_check_pass_list", title: '盘点审核', name: 'store_check_pass_list', component: () => import('@/views/checkplan/store_check_pass_list.vue')},
         ]
     },
+    {
+        path: '/marketing',
+        icon: 'social-yen',
+        name: 'marketing',
+        title: '营销',
+        component: Main,
+        children: [
+            { path: 'home-banner', title: '首页广告位', name: 'home-banner', component: () => import('@/views/marketing/home-banner.vue') },
+            { path: 'announcement', title: '公告', name: 'announcement', component: () => import('@/views/marketing/announcement.vue') },
+        ]
+    },
 
     {
         path: '/financial',
@@ -221,7 +232,7 @@ export const appRouter = [
             { path: 'flow', title: '往来账', name: 'financial-flow', component: () => import('@/views/financial/financial-flow.vue') },
         ]
     },
-{
+    {
         path: '/access',
         icon: 'key',
         name: 'access',
