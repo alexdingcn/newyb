@@ -48,6 +48,7 @@ public class GoodsService {
     private BuyOrderMapper buyOrderMapper;
 
 
+
     public void setGoodsOptionName(List<Goods> goodsList) {
         if (goodsList == null || goodsList.isEmpty()) {
             return;
@@ -661,6 +662,9 @@ public class GoodsService {
         goodsDetailMapper.updateByPrimaryKeySelective(detail);
     }
 
+    public List<GoodsAttribute> getDefaultAttr(Integer companyId){
+        return goodsAttributeRefMapper.getDefaultAttr(companyId);
+    }
 
     public boolean haveColdManageGoods(List<Long> detailIds) {
         //查询是否存在有冷链经营性商品

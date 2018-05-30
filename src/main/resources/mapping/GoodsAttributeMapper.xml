@@ -9,9 +9,10 @@
     <result column="updated_by" property="updatedBy" jdbcType="VARCHAR" />
     <result column="created_time" property="createdTime" jdbcType="TIMESTAMP" />
     <result column="updated_time" property="updatedTime" jdbcType="TIMESTAMP" />
+    <result column="enable_default" property="enableDefault" jdbcType="BIT" />
   </resultMap>
   <sql id="Base_Column_List" >
-    id, company_id, att_name, created_by, updated_by, created_time, updated_time
+    id, company_id, att_name, created_by, updated_by, created_time, updated_time,enable_default
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
     select 
@@ -36,10 +37,10 @@
   <insert id="insert" parameterType="com.yiban.erp.entities.GoodsAttribute" keyProperty="id" useGeneratedKeys="true" >
     insert into goods_attribute (company_id, att_name,
       created_by, updated_by, created_time, 
-      updated_time)
+      updated_time,enable_default)
     values (#{companyId,jdbcType=INTEGER}, #{attName,jdbcType=VARCHAR},
       #{createdBy,jdbcType=VARCHAR}, #{updatedBy,jdbcType=VARCHAR}, #{createdTime,jdbcType=TIMESTAMP}, 
-      #{updatedTime,jdbcType=TIMESTAMP})
+      #{updatedTime,jdbcType=TIMESTAMP},#{enableDefault,jdbcType=BIT})
   </insert>
 
   <update id="updateByPrimaryKeySelective" parameterType="com.yiban.erp.entities.GoodsAttribute" >
@@ -60,12 +61,15 @@
       <if test="updatedTime != null" >
         updated_time = #{updatedTime,jdbcType=TIMESTAMP},
       </if>
+      <if test="enableDefault != null" >
+        enable_default = #{enableDefault,jdbcType=BIT},
+      </if>
     </set>
     where id = #{id,jdbcType=BIGINT}
   </update>
-
   <select id="isUsedAttribute" parameterType="java.lang.Long" resultType="java.lang.Boolean">
     select count(1) > 0 from goods_attribute_ref where att_id = #{id};
   </select>
+
 
 </mapper>

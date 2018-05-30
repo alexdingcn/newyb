@@ -16,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import javax.xml.ws.Response;
 import java.util.*;
 
 
@@ -137,6 +138,11 @@ public class GoodsController {
         return ResponseEntity.ok().build();
     }
 
+    @RequestMapping(value="/defaultAttr", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> getDefaultAttr(@AuthenticationPrincipal User user){
+        Integer id=user.getCompanyId();
+        return ResponseEntity.ok().body(JSON.toJSONString(goodsService.getDefaultAttr(id)));
+    }
 
 
 }

@@ -46,6 +46,7 @@ public class RepertoryController {
     @RequestMapping(value = "/select", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> selectList(@RequestBody RepertorySelectQuery query,
                                              @AuthenticationPrincipal User user) throws Exception {
+        logger.info("select as RepertorySelectQuery {}" ,query);
         query.setCompanyId(user.getCompanyId());
         query.setByPage(true);
         Integer count = repertoryInfoMapper.querySelectCount(query);
@@ -59,7 +60,6 @@ public class RepertoryController {
         response.put("count", count);
         response.put("data", infos);
         return ResponseEntity.ok().body(JSON.toJSONString(response, SerializerFeature.DisableCircularReferenceDetect));
-
     }
 
 }

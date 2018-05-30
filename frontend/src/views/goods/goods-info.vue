@@ -494,6 +494,15 @@ export default {
             this.currSpecIds = [[], [], []],
             this.goodsDetails = [];
             this.goodsDetailColumn = [];
+            //获取默认的自定义属性
+            util.ajax
+            .get('/goods/defaultAttr')
+            .then((response) =>{
+                this.currAttributes=response.data;
+            })
+            .catch((error) => {
+                util.errorProcessor(this, error);
+            });
         },
 
         switchTabPane(tabName) {

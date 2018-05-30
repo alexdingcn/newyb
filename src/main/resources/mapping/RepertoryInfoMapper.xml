@@ -396,7 +396,7 @@
         <if test="goodsId != null" >
             and r.goods_id = #{goodsId}
         </if>
-        <if test="supplierId != null">
+        <if test="supplierId != null">in
             and r.supplier_id = #{supplierId}
         </if>
         <if test="batchCode != null">
@@ -406,11 +406,12 @@
         <if test="minQuantity != null" >
             and r.quantity > #{minQuantity}
         </if>
-        <if test="byPage != null and byPage and offset != null and limit != null">
+
+        <if test="byPage != null  and offset != null and limit != null">
             limit #{offset}, #{limit}
         </if>
-    </select>
 
+    </select>
 
 
 </mapper>
