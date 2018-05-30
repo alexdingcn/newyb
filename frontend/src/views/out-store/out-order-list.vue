@@ -55,10 +55,12 @@
     import util from "@/libs/util.js";
     import moment from 'moment';
     import warehouseSelect from "@/views/selector/warehouse-select.vue";
+    import goodsSpecTags from '@/views/goods/goods-spec-tabs.vue';
     export default {
         name: 'out-order-list',
         components: {
-            warehouseSelect
+            warehouseSelect,
+            goodsSpecTags
         },
 
         data () {
@@ -134,11 +136,20 @@
                           key: 'jx',
                           width: 120
                       },
-                      {
-                          title: '规格',
-                          key: 'spec',
-                          width: 120
-                      },
+                    {
+                        key: 'goodsSpecs',
+                        title: '规格',
+                        width: 120,
+                        render: (h, params) =>　{
+                            let goodsSpecs=params.row.repertoryInfo.goods.goodsSpecs;
+                            return h(goodsSpecTags, {
+                                props: {
+                                    tags: goodsSpecs,
+                                    color: 'blue'
+                                }
+                            });
+                        }
+                    },
 
                     {
                         title: '生产企业',
