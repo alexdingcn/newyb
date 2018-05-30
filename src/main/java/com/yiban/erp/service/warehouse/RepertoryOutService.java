@@ -33,6 +33,8 @@ public class RepertoryOutService {
     @Autowired
     private RepertoryOutDetailMapper  repertoryOutDetailMapper;
     @Autowired
+    private RepertoryService repertoryService;
+    @Autowired
     private RepertoryInfoMapper repertoryInfoMapper;
     @Autowired
     private OptionsMapper optionsMapper;
@@ -226,14 +228,17 @@ public class RepertoryOutService {
         if (details == null || details.isEmpty()) {
             return Collections.emptyList();
         }
-        List<Long> goodsIdList = new ArrayList<>();
+        //出库记录需要使用的库存的信息而非商品模板表中的信息
+        List<Long> storeIdList = new ArrayList<>();
+        details.stream().forEach(item -> storeIdList.add(item.getRepertoryInfoId()));
+        Map<Long, RepertoryInfo> repertoryInfoMap =  repertoryService.getMapByIdList(storeIdList);
+        details.stream().forEach(item -> item.setRepertoryInfo(repertoryInfoMap.get(item.getRepertoryInfoId())));
 
-
-        details.stream().forEach(item -> goodsIdList.add(item.getGoodsId()));
-        List<Goods> goods = goodsService.getGoodsById(goodsIdList);
-        Map<Long, Goods> goodsMap = new HashMap<>();
-        goods.stream().forEach(item -> goodsMap.put(item.getId(), item));
-        details.stream().forEach(item -> item.setGoods(goodsMap.get(item.getGoodsId())));
+//        details.stream().forEach(item -> goodsIdList.add(item.getGoodsId()));
+//        List<Goods> goods = goodsService.getGoodsById(goodsIdList);
+//        Map<Long, Goods> goodsMap = new HashMap<>();
+//        goods.stream().forEach(item -> goodsMap.put(item.getId(), item));
+//        details.stream().forEach(item -> item.setGoods(goodsMap.get(item.getGoodsId())));
 
         List<Long> outIdList = new ArrayList<>();
         details.stream().forEach(item -> outIdList.add(item.getRepertoryOutId()));

@@ -1,6 +1,7 @@
 package com.yiban.erp.dao;
 
 import com.yiban.erp.dto.ReceiveSetReq;
+import com.yiban.erp.dto.RepertoryInListReq;
 import com.yiban.erp.entities.RepertoryInDetail;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -22,6 +23,8 @@ public interface RepertoryInDetailMapper {
     int insertBatch(@Param("details") List<RepertoryInDetail> details);
 
     List<RepertoryInDetail> getByOrderId(Long orderId);
+
+    List<RepertoryInDetail>   getInDetailList(RepertoryInListReq reqlist);
 
     int setCheckByOrder(ReceiveSetReq setReq); //一次验收一笔订单
 

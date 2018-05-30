@@ -5,7 +5,7 @@
 <template>
     <Card>
         <p slot="title">
-            出库明细列表
+            入库明细列表
         </p>
         <Row >
             <Form ref="searchForm" :model="searchFormItem" :label-width="90">
@@ -16,12 +16,12 @@
                         </FormItem>
                     </Col>
                     <Col span="6" >
-                        <FormItem label="出库日期">
+                        <FormItem label="入库日期">
                     <DatePicker v-model="dateRange" type="daterange" placement="bottom-start" placeholder="制单日期" style="width:200px"></DatePicker>
                 </FormItem>
                     </Col>
                     <Col span="5" >
-                         <FormItem label="出库类型">
+                         <FormItem label="入库类型">
                              <Select v-model="searchFormItem.outType" prop="outType">
                                  <Option v-for="option in storeOptions" :value="option.id" :label="option.name" :key="option.id">
                                      {{option.name}}
@@ -57,7 +57,7 @@
     import warehouseSelect from "@/views/selector/warehouse-select.vue";
     import goodsSpecTags from '@/views/goods/goods-spec-tabs.vue';
     export default {
-        name: 'out-order-list',
+        name: 'in-order-list',
         components: {
             warehouseSelect,
             goodsSpecTags
@@ -65,13 +65,11 @@
 
         data () {
             return {
-
-                storeOptions: [{ id: "ALL", name: "全部" },{ id: "SELL_BATCH", name: "批发出库" },{ id: "CHECK_LOSE", name: "盘亏出库" },{ id: "MOVE_OUT", name: "转库出库" },{ id: "DIRECT_OUT", name: "直调出库" },{ id: "DAMAGE_OUT", name: "破损出库" }],
-
+                storeOptions: [{ id: "ALL", name: "全部" },{ id: "BUY_ORDER", name: "采购入库" },{ id: "BUY_DIRECT", name: "直调入库" },{ id: "CHECK_SURPLUS", name: "盘盈入库" },{ id: "MOVE_IN", name: "转库入库" },{ id: "DIRECT_IN", name: "直调入库" }],
                 searchFormItem: {
                     warehouseId:'',
                     outType:'ALL'
-            },
+                },
                 dateRange: [
                     this.$route.query.start_date ? this.$route.query.start_date : moment().add(-1,'w').format('YYYY-MM-DD'),
                     this.$route.query.end_date ? this.$route.query.end_date : moment().format('YYYY-MM-DD'),
@@ -79,69 +77,72 @@
                 searching: false,
                 tabData: [],
                 tabColumns: [
-
                     {
                         type: "index",
                         align: "center",
                         width: 100
-                    }
-                    ,
-                    {
-                        title: "状态",
-                        align: "center",
-                        key: "status",
-                        width: 120
                     },
+                    // {
+                    //     title: "状态",
+                    //     align: "center",
+                    //     key: "inStatus",
+                    //     width: 120
+                    // },
                     {
-                        title: "出库类型",
-                        align: "center",
-                        key: "refTypeName",
-                        width: 120
-                    }, {
-                        title: "出库仓库",
+                        title: "入库仓库",
                         align: "center",
                         key: "warehouseName",
                         width: 120
-                    },
-                    {
-                      title: "出库日期",
+                    }, {
+                      title: "入库日期",
                       align: "center",
                       key: "checkDate",
                       width: 160,
                         render: (h, params) => {
-                            let checkDate = params.row.checkDate;
-                            return h('span', checkDate ? moment(checkDate).format('YYYY-MM-DD HH:mm') : '');
+                            let checkDate = params.row.repertoryIn.receiveDate;
+                            return h('span', checkDate ? moment(checkDate).format('YYYY-MM-DD') : '');
                         }
                     },
                     {
-                      title: "客户名称",
-                      key: "customerName",
-                      align: "center",
-                      width: 150
+                        title: "供应商ID",
+                        align: "center",
+                        key: "supplierId",
+                        width: 120
                     },
                     {
-                        title: "联系电话",
-                        key: "customerTel",
+                        title: "来货单位",
                         align: "center",
-                        width: 150
-                    }
-                    ,
+                        key: "supplierName",
+                        width: 120
+                    },
+                    {
+                        title: "供应商代表",
+                        align: "center",
+                        key: "supplierContactName",
+                        width: 120
+                    },
+                    {
+                        title: "货号",
+                        align: "center",
+                        key: "goodsNo",
+                        width: 120
+
+                    },
                     {
                         title: '商品名称',
                         key: 'goodsName',
                         width: 120
+                    }, {
+                        title: '剂型',
+                        key: 'jx',
+                        width: 120
                     },
-                      {
-                          title: '剂型',
-                          key: 'jx',
-                          width: 120
-                      },
                     {
                         key: 'goodsSpecs',
                         title: '规格',
                         width: 120,
                         render: (h, params) =>　{
-                            let goodsSpecs=params.row.repertoryInfo.goods.goodsSpecs;
+                            let goodsSpecs = params.row.goods.goodsSpecs ? params.row.goods.goodsSpecs : [];
                             return h(goodsSpecTags, {
                                 props: {
                                     tags: goodsSpecs,
@@ -150,57 +151,108 @@
                             });
                         }
                     },
-
                     {
                         title: '生产企业',
                         key: 'factoryName',
                         align: 'center',
-                        width: 120
+                        width: 120,
+                        render: (h, params) => {
+                            let factoryName = params.row.goods.factoryName;
+                            return h('span', factoryName ? factoryName : '');
+                        }
+                    },
+                    {
+                        title: '基药',
+                        key: 'base_med_id',
+                        align: 'center',
+                        width: 120  ,
+                        render: (h, params) => {
+                            let base_med_id = params.row.goods.baseMedName;
+                            return h('span', base_med_id ? base_med_id : '');
+                        }
                     },
 
                     {
-                      title: "单位",
-                      key: "unitName",
-                      align: "center",
-                      width: 50
+                        title: "单位",
+                        key: "unitName",
+                        align: "center",
+                        width: 50
                     },
-                      {
-                          title: "数量",
-                          key: "quantity",
-                          align: "center",
-                          width: 80
-                      },
+                    {
+                        title: "数量",
+                        key: "receiveQuality",
+                        align: "center",
+                        width: 80
+                    },
+                    {
+                        title: "单价",
+                        key: "price",
+                        align: "center",
+                        width: 100
+                    },
 
-                      {
-                          title: "free",
-                          key: "free",
-                          align: "center",
-                          width: 80
-                      },
-                      {
-                          title: "单价",
-                          key: "price",
-                          align: "center",
-                          width: 80
-                      },
-                      {
-                          title: "disPrice",
-                          key: "disPrice",
-                          align: "center",
-                          width: 80
-                      },
-                      {
-                          title: "数量",
-                          key: "amount",
-                          align: "center",
-                          width: 80
-                      },
-                      {
-                          title: "taxRate",
-                          key: "taxRate",
-                          align: "center",
-                          width: 80
-                      }
+                    {
+                        title: "金额",
+                        key: "",
+                        align: "center",
+                        width: 100
+                    },
+
+                    {
+                      title: "批号",
+                      key: "batchCode",
+                      align: "center",
+                      width: 150
+                    },
+                    {
+                        title: "有效期至",
+                        key: "expDate",
+                        align: "center",
+                        width: 120,
+                        render: (h, params) => {
+                            let expDate = params.row.expDate;
+                            return h('span', expDate ? moment(expDate).format('YYYY-MM-DD ') : '');
+                        }
+                    },
+                    {
+                        title: "现库存数",
+                        key: "",
+                        align: "center",
+                        width: 150
+                    },
+                    {
+                        title: "批准文号",
+                        key: "cert1No",
+                        align: "center",
+                        width: 150,
+                        render: (h, params) => {
+                            let cert1No = params.row.goods.cert1No;
+                            return h('span', cert1No ? cert1No: '');
+                        }
+                    }, {
+                        title: "入库方式",
+                        align: "center",
+                        key: "refTypeName",
+                        width: 120
+                    },
+                    {
+                        title: "采购员",
+                        key: "",
+                        align: "center",
+                        width: 100
+                    },
+                    {
+                        title: "制单人",
+                        key: "createBy",
+                        align: "center",
+                        width: 100
+                    },
+                    {
+                        title: "备注",
+                        key: "",
+                        align: "center",
+                        width: 100
+                    }
                 ],
                 showOrderDetailView: false,
                 showDetailViewId: -1,
@@ -228,7 +280,7 @@
                 };
                 let outTypeList = [];
                 if (this.searchFormItem.outType === 'ALL') {
-                    outTypeList = ['SELL_BATCH','CHECK_LOSE','MOVE_OUT','DIRECT_OUT','DAMAGE_OUT'];
+                    outTypeList = ['BUY_ORDER','BUY_DIRECT','CHECK_SURPLUS','MOVE_IN','DIRECT_IN'];
                 }else {
                     outTypeList = [this.searchFormItem.outType];
                 }
@@ -238,7 +290,7 @@
                 this.searching = true;
                 let self = this;
                 console.log(reqData);
-                util.ajax.post("/repertory/out/detaillist", reqData)
+                util.ajax.post("/repertory/in/detaillist", reqData)
                     .then((response) => {
                         self.tabData = response.data;
                         self.totalCount = response.data.count;
@@ -271,7 +323,7 @@
     };
 </script>
 
-<style scoped>
+<style>
     .ivu-form-item {
         margin-bottom: 5px;
     }
