@@ -297,7 +297,7 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
 .title-show > span {
     font-size: 1.25em;
     font-weight: bold;

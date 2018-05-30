@@ -235,7 +235,7 @@
 
     };
 </script>
-<style>
+<style scoped>
     .goods-select-table td {
         cursor: pointer;
     }

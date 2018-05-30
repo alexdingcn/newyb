@@ -74,7 +74,7 @@ public class FileService {
     private OSSClient client;
 
     @PostConstruct
-    public OSSClient getOssClient(){
+    public OSSClient getOssClient() {
         if (client == null) {
             client = new OSSClient(ossEndPoint, ossAccessKeyId, ossAccessKeySecret);
         }
@@ -83,6 +83,7 @@ public class FileService {
 
     /**
      * 获取档案类型列表
+     *
      * @param companyId
      * @return
      */
@@ -95,6 +96,7 @@ public class FileService {
 
     /**
      * 新建档案类型
+     *
      * @param user
      * @param typeName
      * @return
@@ -117,11 +119,11 @@ public class FileService {
             int count = fileTypeMapper.insertSelective(fileType);
             if (count > 0) {
                 return fileType;
-            }else {
+            } else {
                 logger.warn("insert database fail.");
                 throw new BizRuntimeException(ErrorCode.FAILED_INSERT_FROM_DB);
             }
-        }catch (DuplicateKeyException e) {
+        } catch (DuplicateKeyException e) {
             logger.warn("user:{} add file type {} but type name is exist.", user.getNickname(), name);
             throw new BizException(ErrorCode.FILE_TYPE_EXIST);
         }
@@ -133,14 +135,16 @@ public class FileService {
 
     /**
      * 获取档案列表
+     *
      * @param companyId 必须
-     * @param fileType 档案类型
-     * @param fileName 档案名称(模糊匹配)
-     * @param page 页码
-     * @param size 每页条数
+     * @param fileType  档案类型
+     * @param fileName  档案名称(模糊匹配)
+     * @param page      页码
+     * @param size      每页条数
      * @return
      */
-    public List<FileInfo> getList(Integer companyId, String fileType, String fileName, String fileNo, Integer page, Integer size) {
+    public List<FileInfo> getList(Integer companyId, String fileType, String fileName, String fileNo, Integer page,
+                                  Integer size) {
         if (companyId == null) {
             logger.warn("get file info list but company id is null.");
             return Collections.emptyList();
@@ -213,15 +217,15 @@ public class FileService {
         reqData.setUpdateTime(new Date());
         int count = 0;
         try {
-            count =  fileInfoMapper.insertSelective(reqData);
-        }catch (DuplicateKeyException e) {
+            count = fileInfoMapper.insertSelective(reqData);
+        } catch (DuplicateKeyException e) {
             reqData.setFileNo(getFileNo(user.getCompanyId())); //因为唯一键失败时，重新获取档案编号再次插入
             count = fileInfoMapper.insertSelective(reqData);
         }
         if (count > 0 && reqData.getId() > 0) {
             logger.info("user:{} add file info success. id:{}", user.getNickname(), reqData.getId());
             return reqData;
-        }else {
+        } else {
             logger.warn("user:{} add file info insert database fail.", user.getNickname());
             throw new BizRuntimeException(ErrorCode.FAILED_INSERT_FROM_DB);
         }
@@ -249,6 +253,7 @@ public class FileService {
     /**
      * 生成档案编号的规则
      * 公司ID + yyMMddhhmmss + 3位随机数
+     *
      * @param companyId
      * @return
      */
@@ -262,6 +267,7 @@ public class FileService {
 
     /**
      * 删除档案
+     *
      * @param user
      * @param ids
      * @return
@@ -276,6 +282,7 @@ public class FileService {
 
     /**
      * 保存上传的档案文件
+     *
      * @param user
      * @param fileId
      * @param comment
@@ -314,7 +321,7 @@ public class FileService {
         if (count > 0) {
             logger.info("user:{} upload file success. original name:{} url:{}", user.getId(), originalName, url);
             return url;
-        }else {
+        } else {
             logger.warn("user:{} upload persistence file success but insert database fail.", user.getId());
             throw new BizRuntimeException(ErrorCode.FAILED_INSERT_FROM_DB);
         }
@@ -322,16 +329,18 @@ public class FileService {
 
     /**
      * 持久化文件(写入磁盘)
+     *
      * @param file
-     * @return  返回两个值的数组，第一个是文件的定位标识，第二个是访问文件的url路径
-     *  如果成功，必须两个值都返回，失败直接抛出异常
+     * @return 返回两个值的数组，第一个是文件的定位标识，第二个是访问文件的url路径
+     * 如果成功，必须两个值都返回，失败直接抛出异常
      * @throws BizException
      */
-    public Map<String, Object>  persistenceFile(Long userId, Integer companyId, Integer fileId, MultipartFile file) throws BizException {
+    public Map<String, Object> persistenceFile(Long userId, Integer companyId, Integer fileId,
+                                               MultipartFile file) throws BizException {
         if ("oss".equalsIgnoreCase(saveLocation)) {
             logger.info("upload file save to aliyuncs oss. userId{}", userId);
             return saveToOss(userId, companyId, fileId, file);
-        }else {
+        } else {
             logger.info("upload file save to local.");
             return saveToLocal(userId, companyId, fileId, file);
         }
@@ -364,7 +373,7 @@ public class FileService {
             map.put("url", url);
             map.put("expiration", expiration);
             return map;
-        }catch (Exception e) {
+        } catch (Exception e) {
             logger.error("upload file to aliyun oss have exception.", e);
             throw new BizRuntimeException(ErrorCode.FILE_UPLOAD_FAIL);
         }
@@ -372,6 +381,7 @@ public class FileService {
 
     /**
      * oss 对象获取有效期的签名url
+     *
      * @param key
      * @param expiration
      * @return
@@ -382,7 +392,7 @@ public class FileService {
             OSSClient ossClient = getOssClient();
             URL url = ossClient.generatePresignedUrl(ossBucket, key, expiration);
             return url.toString();
-        }catch (Exception e) {
+        } catch (Exception e) {
             logger.error("oss file get url signed fail. key:{}", key, e);
             return null;
         }
@@ -419,7 +429,7 @@ public class FileService {
             map.put("url", url.toString());
             map.put("expiration", null);
             return map;
-        }catch (Exception e) {
+        } catch (Exception e) {
             logger.error("write file have exception. ", e);
             throw new BizRuntimeException(ErrorCode.FILE_UPLOAD_FAIL);
         }
@@ -427,6 +437,7 @@ public class FileService {
 
     /**
      * 文件名：档案ID+日期+20位随机码+文件后缀名
+     *
      * @param originalName
      * @return
      */
@@ -450,23 +461,24 @@ public class FileService {
         OSSClient ossClient = getOssClient();
         if (ossClient.doesObjectExist(ossBucket, key)) {
             ossClient.deleteObject(ossBucket, key);
-        }else {
+        } else {
             logger.error("oss object key:{} is not exist.", key);
         }
     }
 
     /**
      * 根据文件位置删除文件
+     *
      * @param location
      */
     private void removeLocationFile(String location) {
-        try{
+        try {
             File file = new File(baseLocation + File.separator + location);
             if (file.exists() && file.isFile()) {
                 logger.info("remove location:{} file.", location);
                 file.delete();
             }
-        }catch (Exception e) {
+        } catch (Exception e) {
             logger.error("remove location:{} file fail.", location);
         }
     }
@@ -480,13 +492,13 @@ public class FileService {
         //根据location删除持久化文件
         if ("oss".equalsIgnoreCase(saveLocation)) {
             removeOSSObject(fileUpload.getLocation());
-        }else {
+        } else {
             removeLocationFile(fileUpload.getLocation());
         }
         int count = fileUploadMapper.deleteByPrimaryKey(id);
         if (count > 0) {
             logger.info("user:{} delete file upload record success, id:{}", user.getId(), id);
-        }else {
+        } else {
             logger.warn("user:{} delete file upload record fail. id:{}", user.getId(), id);
             throw new BizRuntimeException(ErrorCode.FAILED_DELETE_FROM_DB);
         }

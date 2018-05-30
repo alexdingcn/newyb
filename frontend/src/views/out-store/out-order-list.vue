@@ -283,7 +283,7 @@
 
 </script>
 
-<style>
+<style scoped>
     .ivu-form-item {
         margin-bottom: 5px;
     }

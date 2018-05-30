@@ -457,7 +457,7 @@
     };
 </script>
 
-<style>
+<style scoped>
     .ivu-table .table-row-checking {
         background-color: #2db7f5;
         color: #fff;
