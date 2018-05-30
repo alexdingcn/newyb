@@ -2,6 +2,7 @@ package com.yiban.erp.dao;
 
 import com.yiban.erp.dto.ReceiveListReq;
 import com.yiban.erp.entities.RepertoryIn;
+import com.yiban.erp.entities.RepertoryOut;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -19,6 +20,8 @@ public interface RepertoryInMapper {
     int updateByPrimaryKeySelective(RepertoryIn record);
 
     List<RepertoryIn> getList(ReceiveListReq listReq);
+
+    List<RepertoryIn> getInListById(@Param("ids") List<Long> listId);
 
     RepertoryIn getByRefOrder(@Param("companyId") Integer companyId,
                               @Param("refType") String refType,

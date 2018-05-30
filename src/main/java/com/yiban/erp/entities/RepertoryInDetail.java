@@ -84,8 +84,17 @@ public class RepertoryInDetail {
     private BigDecimal buyOrderQuality;
 
     private Goods goods;
+    private RepertoryIn repertoryIn;
+    private String refTypeName;
+    private String warehouseName;
+    private Date inDate;
+    private Long supplierId;
+    private String supplierName;
+    private String supplierContactName;
+    private String inStatus;
 
     private String goodsName;
+    private String goodsNo;
     private String origin;
     private String jx;
     private String spec;
@@ -96,7 +105,45 @@ public class RepertoryInDetail {
     private String storageCondition;
     private Boolean specialManage;
 
+    public RepertoryIn getRepertoryIn() {
+        return repertoryIn;
+    }
 
+    public void setRepertoryIn(RepertoryIn repertoryIn) {
+        this.repertoryIn = repertoryIn;
+        if(repertoryIn!=null){
+            this.refTypeName=repertoryIn.getRefTypeName();
+            this.warehouseName=repertoryIn.getWarehouseName();
+            this.inStatus=repertoryIn.getStatus();
+            this.inDate=repertoryIn.getReceiveDate();
+            this.supplierId=repertoryIn.getSupplierId();
+            this.supplierName=repertoryIn.getSupplierName();
+            this.supplierContactName=repertoryIn.getSupplierContactName();
+
+        }
+
+    }
+    public void setGoods(Goods goods) {
+        this.goods = goods;
+        if (goods != null) {
+            this.goodsName = goods.getName();
+            this.factory = goods.getFactoryName();
+            this.goodsNo=goods.getGoodsNo();
+            this.origin = goods.getOrigin();
+            this.jx = goods.getJxName();
+            this.unitName = goods.getUnitName();
+            this.packUnitName = goods.getPackUnitName();
+            this.storageCondition = goods.getStorageConditionName();
+        }
+
+    }
+    public String getInStatus() {
+        return inStatus;
+    }
+
+    public void setInStatus(String inStatus) {
+        this.inStatus = inStatus;
+    }
 
     public Boolean getSpecialManage() {
         return this.goods == null ? null : this.goods.getSpecialManage();
@@ -134,9 +181,7 @@ public class RepertoryInDetail {
         return goods;
     }
 
-    public void setGoods(Goods goods) {
-        this.goods = goods;
-    }
+
 
     public Long getId() {
         return id;
@@ -451,5 +496,109 @@ public class RepertoryInDetail {
 
     public void setCheckTempMethodName(String checkTempMethodName) {
         this.checkTempMethodName = checkTempMethodName;
+    }
+
+    public String getRefTypeName() {
+        return refTypeName;
+    }
+
+    public void setRefTypeName(String refTypeName) {
+        this.refTypeName = refTypeName;
+    }
+
+    public String getWarehouseName() {
+        return warehouseName;
+    }
+
+    public void setWarehouseName(String warehouseName) {
+        this.warehouseName = warehouseName;
+    }
+
+    public void setGoodsName(String goodsName) {
+        this.goodsName = goodsName;
+    }
+
+    public void setOrigin(String origin) {
+        this.origin = origin;
+    }
+
+    public void setJx(String jx) {
+        this.jx = jx;
+    }
+
+    public String getSpec() {
+        return spec;
+    }
+
+    public void setSpec(String spec) {
+        this.spec = spec;
+    }
+
+    public String getFactory() {
+        return factory;
+    }
+
+    public void setFactory(String factory) {
+        this.factory = factory;
+    }
+
+    public void setUnitName(String unitName) {
+        this.unitName = unitName;
+    }
+
+    public void setPackUnitName(String packUnitName) {
+        this.packUnitName = packUnitName;
+    }
+
+    public void setBigPack(BigDecimal bigPack) {
+        this.bigPack = bigPack;
+    }
+
+    public void setStorageCondition(String storageCondition) {
+        this.storageCondition = storageCondition;
+    }
+
+    public void setSpecialManage(Boolean specialManage) {
+        this.specialManage = specialManage;
+    }
+
+    public Date getInDate() {
+        return inDate;
+    }
+
+    public void setInDate(Date inDate) {
+        this.inDate = inDate;
+    }
+
+    public Long getSupplierId() {
+        return supplierId;
+    }
+
+    public void setSupplierId(Long supplierId) {
+        this.supplierId = supplierId;
+    }
+
+    public String getSupplierName() {
+        return supplierName;
+    }
+
+    public void setSupplierName(String supplierName) {
+        this.supplierName = supplierName;
+    }
+
+    public String getSupplierContactName() {
+        return supplierContactName;
+    }
+
+    public void setSupplierContactName(String supplierContactName) {
+        this.supplierContactName = supplierContactName;
+    }
+
+    public String getGoodsNo() {
+        return goodsNo;
+    }
+
+    public void setGoodsNo(String goodsNo) {
+        this.goodsNo = goodsNo;
     }
 }
