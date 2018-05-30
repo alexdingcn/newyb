@@ -30,14 +30,17 @@
                         </FormItem>
                     </Col>
                     <Col span="3" offset="1" >
-                       <Button icon="ios-search" type="primary" :loading="searching" @click="searchBtnClick">查询</Button>
+                    <Button icon="ios-search" type="primary" :loading="searching" @click="searchBtnClick">查询</Button>
+                      <Button icon="ios-download-outline" type="primary"  @click="exportExcel">导出</Button>
+
                     </Col>
+
                 </Row>
 
             </Form>
         </Row>
 
-        <Table border highlight-row :columns="tabColumns" :data="tabData"
+        <Table border highlight-row :columns="tabColumns" :data="tabData" id="outDetailtable"
                :loading="searching"
                no-data-text="点击上方查询按钮获取数据"
                ref="table" class="margin-top-10" size="small">
@@ -62,17 +65,14 @@
             warehouseSelect,
             goodsSpecTags
         },
-
         data () {
             return {
-
                 storeOptions: [{ id: "ALL", name: "全部" },{ id: "SELL_BATCH", name: "批发出库" },{ id: "CHECK_LOSE", name: "盘亏出库" },{ id: "MOVE_OUT", name: "转库出库" },{ id: "DIRECT_OUT", name: "直调出库" },{ id: "DAMAGE_OUT", name: "破损出库" }],
-
                 searchFormItem: {
                     warehouseId:'',
                     outType:'ALL'
             },
-                dateRange: [
+            dateRange: [
                     this.$route.query.start_date ? this.$route.query.start_date : moment().add(-1,'w').format('YYYY-MM-DD'),
                     this.$route.query.end_date ? this.$route.query.end_date : moment().format('YYYY-MM-DD'),
                 ],
@@ -141,13 +141,18 @@
                         title: '规格',
                         width: 120,
                         render: (h, params) =>　{
-                            let goodsSpecs=params.row.repertoryInfo.goods.goodsSpecs;
-                            return h(goodsSpecTags, {
-                                props: {
-                                    tags: goodsSpecs,
-                                    color: 'blue'
-                                }
-                            });
+                            try{
+                                let goodsSpecs=  goodsSpecs=params.row.repertoryInfo.goods.goodsSpecs;
+                                return h(goodsSpecTags, {
+                                    props: {
+                                        tags: goodsSpecs,
+                                        color: 'blue'
+                                    }
+                                });
+                            }catch (e) {
+                                return h('span','');
+                            }
+
                         }
                     },
 
@@ -220,6 +225,11 @@
                 this.currentPage = 1;
                 this.refreshTableData();
             },
+            exportExcel () {
+                this.$refs.table.exportCsv({
+                    filename: '出库记录明细表'
+                });
+            },
             refreshTableData () {
                 let reqData = {
                     warehouseId: this.searchFormItem.warehouseId,
@@ -269,6 +279,8 @@
         }
 
     };
+    
+
 </script>
 
 <style>
