@@ -387,7 +387,7 @@ export default {
 </script>
 
 
-<style>
+<style scoped>
 .spin-icon-load {
   animation: ani-demo-spin 1s linear infinite;
 }

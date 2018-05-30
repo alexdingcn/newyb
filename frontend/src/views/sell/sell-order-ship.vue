@@ -447,7 +447,7 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
 .title-show > hr {
     width: 100%;
     height: 2px;

@@ -177,7 +177,7 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
 .label-key {
     width: 110px;
     text-align: right;

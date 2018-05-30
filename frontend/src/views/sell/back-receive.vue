@@ -571,7 +571,7 @@ methods: {
 }
 </script>
 
-<style>
+<style scoped>
 
 </style>
 

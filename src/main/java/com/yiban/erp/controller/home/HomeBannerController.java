@@ -1,5 +1,6 @@
 package com.yiban.erp.controller.home;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.yiban.erp.dao.BannerMapper;
 import com.yiban.erp.dto.PagedQuery;
@@ -27,8 +28,8 @@ public class HomeBannerController {
     private BannerMapper bannerMapper;
 
     @RequestMapping(value = "/list", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-    private ResponseEntity<String> getBannerList(@RequestBody PagedQuery query,
-                                                 @AuthenticationPrincipal User user) {
+    private ResponseEntity<JSON> getBannerList(@RequestBody PagedQuery query,
+                                               @AuthenticationPrincipal User user) {
         query.setCompanyId(user.getCompanyId());
         Integer count = bannerMapper.selectAllCount(query);
         JSONObject obj = new JSONObject();
@@ -36,11 +37,11 @@ public class HomeBannerController {
             List<Banner> banners = bannerMapper.selectAll(query);
             obj.put("data", banners);
             obj.put("count", count);
-            return ResponseEntity.ok().body(obj.toString());
+            return ResponseEntity.ok().body(obj);
         }
         obj.put("data", Collections.emptyList());
         obj.put("count", 0);
-        return ResponseEntity.ok().body(obj.toString());
+        return ResponseEntity.ok().body(obj);
     }
 
     @RequestMapping(value = "/add", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -68,7 +69,7 @@ public class HomeBannerController {
     @RequestMapping(value = "/{bannerId}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)
     private ResponseEntity<String> deleteBanner(@PathVariable Long bannerId,
                                                 @AuthenticationPrincipal User user) {
-        logger.warn("user:{} request remove banner id:{}", user.getId(), bannerId);
+        logger.info("user:{} request remove banner id:{}", user.getId(), bannerId);
         Banner banner = bannerMapper.selectByPrimaryKey(bannerId);
         if (banner == null) {
             return ResponseEntity.badRequest().body(ErrorCode.BANNER_NOT_EXISTED.toString());
