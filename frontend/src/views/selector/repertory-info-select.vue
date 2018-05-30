@@ -239,6 +239,9 @@ export default {
             .catch((error) => {
                 util.errorProcessor(this, error);
             });
+            /**
+             * 获取默认自定义属性列
+             */
             util.ajax
             .get("/goods/defaultAttr")
             .then((response) =>{
