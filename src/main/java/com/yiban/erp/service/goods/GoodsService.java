@@ -668,5 +668,11 @@ public class GoodsService {
         return goodsInfos != null && !goodsInfos.isEmpty();
     }
 
+    public boolean haveSpecialManageGoods(List<Long> detailIds) {
+        //查询是否存在有冷链经营性商品
+        List<GoodsInfo> goodsInfos = goodsInfoMapper.getSpecialManageByDetailIds(detailIds);
+        return goodsInfos != null && !goodsInfos.isEmpty();
+    }
+
 
 }

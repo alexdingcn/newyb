@@ -14,6 +14,7 @@
     <result column="status" property="status" jdbcType="VARCHAR" />
     <result column="key_word" property="keyWord" jdbcType="VARCHAR" />
     <result column="receive_date" property="receiveDate" jdbcType="TIMESTAMP" />
+    <result column="receive_user" property="receiveUser" jdbcType="VARCHAR" />
     <result column="pay_date" property="payDate" jdbcType="TIMESTAMP" />
     <result column="goods_bill_no" property="goodsBillNo" jdbcType="VARCHAR" />
     <result column="temp_control_method" property="tempControlMethod" jdbcType="BIGINT" />
@@ -44,7 +45,7 @@
   </resultMap>
   <sql id="Base_Column_List" >
     id, company_id, ref_order_id, ref_type, order_number, ref_no, supplier_id, supplier_contact_id, 
-    buyer_id, status, key_word, receive_date, pay_date, goods_bill_no, temp_control_method, 
+    buyer_id, status, key_word, receive_date, receive_user, pay_date, goods_bill_no, temp_control_method,
     receive_temp, check_temp, temp_control_status, ship_company_id, ship_method, ship_tool, 
     ship_car_no, ship_driver_name, ship_start_date, ship_end_date, ship_entrust_no, ship_start_address, 
     warehouse_id, buy_type, term, come_from, bill_type, file_no, create_by, create_time, 
@@ -64,7 +65,7 @@
     insert into repertory_in (company_id, ref_order_id,
       ref_type, order_number, ref_no, 
       supplier_id, supplier_contact_id, buyer_id, 
-      status, key_word, receive_date, 
+      status, key_word, receive_date, receive_user,
       pay_date, goods_bill_no, temp_control_method, 
       receive_temp, check_temp, temp_control_status, 
       ship_company_id, ship_method, ship_tool, 
@@ -77,7 +78,7 @@
     values (#{companyId,jdbcType=INTEGER}, #{refOrderId,jdbcType=BIGINT},
       #{refType,jdbcType=VARCHAR}, #{orderNumber,jdbcType=VARCHAR}, #{refNo,jdbcType=VARCHAR}, 
       #{supplierId,jdbcType=BIGINT}, #{supplierContactId,jdbcType=BIGINT}, #{buyerId,jdbcType=BIGINT}, 
-      #{status,jdbcType=VARCHAR}, #{keyWord,jdbcType=VARCHAR}, #{receiveDate,jdbcType=TIMESTAMP}, 
+      #{status,jdbcType=VARCHAR}, #{keyWord,jdbcType=VARCHAR}, #{receiveDate,jdbcType=TIMESTAMP}, #{receiveUser,jdbcType=VARCHAR},
       #{payDate,jdbcType=TIMESTAMP}, #{goodsBillNo,jdbcType=VARCHAR}, #{tempControlMethod,jdbcType=BIGINT}, 
       #{receiveTemp,jdbcType=DECIMAL}, #{checkTemp,jdbcType=DECIMAL}, #{tempControlStatus,jdbcType=BIGINT}, 
       #{shipCompanyId,jdbcType=INTEGER}, #{shipMethod,jdbcType=BIGINT}, #{shipTool,jdbcType=BIGINT}, 
@@ -124,6 +125,9 @@
       </if>
       <if test="receiveDate != null" >
         receive_date = #{receiveDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="receiveUser != null" >
+        receive_user = #{receiveUser, jdbcType=VARCHAR},
       </if>
       <if test="payDate != null" >
         pay_date = #{payDate,jdbcType=TIMESTAMP},
@@ -212,22 +216,13 @@
 
 
   <sql id="listSql" >
-      o.id as id, o.company_id as companyId, o.ref_order_id as refOrderId, o.ref_type as refType,
-      o.order_number as orderNumber, o.ref_no as refNo, o.supplier_id as supplierId, o.supplier_contact_id as supplierContactId,
-      o.buyer_id as buyerId, o.status as status, o.key_word as keyWord, o.receive_date as receiveDate,
-      o.pay_date as payDate, o.goods_bill_no as goodsBillNo, o.temp_control_method as tempControlMethod,
-      o.receive_temp as receiveTemp, o.check_temp as checkTemp, o.temp_control_status as tempControlStatus,
-      o.ship_company_id as shipCompanyId, o.ship_method as shipMethod, ship_tool as shipTool,
-      o.ship_car_no as shipCardNo, o.ship_driver_name as shipDriverName, o.ship_start_date as shipStartDate,
-      o.ship_end_date as shipEndDate, o.ship_entrust_no as shipEntrustNo, o.ship_start_address as shipStartAddress,
-      o.warehouse_id as warehouseId, o.buy_type as buyType, o.term as term, o.come_from as comeFrom, o.bill_type as billType,
-      o.file_no as fileNo, o.create_by as createBy, o.create_time as createTime, o.total_quantity as totalQuantity, o.total_amount as totalAmount,
-      o.update_by as updateBy, o.update_time as updateTime,
-      s.name as supplierName, sc.name as supplierContactName, w.name as warehouseName,
+      o.*,
+      s.name as supplierName, s.is_cold_business as supplierColdManage, s.can_special as supplierSpecialManage,
+      sc.name as supplierContactName, w.name as warehouseName,
       u.nickname as saleNickName, u.realname as saleRealName
   </sql>
 
-  <select id="getList" parameterType="com.yiban.erp.dto.ReceiveListReq" resultType="com.yiban.erp.entities.RepertoryIn">
+  <select id="getList" parameterType="com.yiban.erp.dto.ReceiveListReq" resultMap="BaseResultMap">
     select
     <include refid="listSql"/>
     from repertory_in o, supplier s, supplier_contact sc, warehouse w, users u
@@ -256,7 +251,7 @@
     </if>
   </select>
 
-  <select id="getByRefOrder" parameterType="map" resultType="com.yiban.erp.entities.RepertoryIn">
+  <select id="getByRefOrder" parameterType="map" resultMap="BaseResultMap">
     select
     <include refid="listSql"/>
     from repertory_in o, supplier s, supplier_contact sc, warehouse w, users u
@@ -269,7 +264,7 @@
     and o.ref_order_id = #{refOrderId}
   </select>
 
-  <select id="getByIdWithSupplierInfo" parameterType="java.lang.Long" resultType="com.yiban.erp.entities.RepertoryIn">
+  <select id="getByIdWithSupplierInfo" parameterType="java.lang.Long" resultMap="BaseResultMap">
     select
       <include refid="listSql"/>
     from repertory_in o, supplier s, supplier_contact sc, warehouse w, users u

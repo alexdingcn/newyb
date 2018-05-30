@@ -479,8 +479,8 @@
       left join supplier s on s.id = gi.supplier_id
       , goods_detail gd
       left join goods_spec gs1 on gd.spec_one_id = gs1.id
-      left join goods_spec gs2 on gd.spec_one_id = gs2.id
-      left join goods_spec gs3 on gd.spec_one_id = gs3.id
+      left join goods_spec gs2 on gd.spec_two_id = gs2.id
+      left join goods_spec gs3 on gd.spec_three_id = gs3.id
     where gd.goods_info_id = gi.id and gi.status != 'DELETE' AND gd.status != 'DELETE'
     and gi.company_id = #{companyId}
     <if test="search != null">
@@ -502,8 +502,8 @@
     left join supplier s on s.id = gi.supplier_id
     , goods_detail gd
     left join goods_spec gs1 on gd.spec_one_id = gs1.id
-    left join goods_spec gs2 on gd.spec_one_id = gs2.id
-    left join goods_spec gs3 on gd.spec_one_id = gs3.id
+    left join goods_spec gs2 on gd.spec_two_id = gs2.id
+    left join goods_spec gs3 on gd.spec_three_id = gs3.id
     where gd.goods_info_id = gi.id and gi.status != 'DELETE' AND gd.status != 'DELETE'
     and gd.id in
     <foreach collection="ids" item="item" open="(" close=")" separator=", ">
@@ -525,6 +525,16 @@
     select g.*
     from goods_info g, goods_detail d
     where g.id = d.goods_info_id and g.cold_manage = 1
+    and d.id in
+    <foreach collection="detailIds" item="item" open="(" close=")" separator=", ">
+      #{item}
+    </foreach>
+  </select>
+
+  <select id="getSpecialManageByDetailIds" parameterType="map" resultMap="BaseResultMap">
+    select g.*
+    from goods_info g, goods_detail d
+    where g.id = d.goods_info_id and g.special_manage = 1
     and d.id in
     <foreach collection="detailIds" item="item" open="(" close=")" separator=", ">
       #{item}

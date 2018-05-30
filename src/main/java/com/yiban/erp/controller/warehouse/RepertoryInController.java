@@ -2,6 +2,7 @@ package com.yiban.erp.controller.warehouse;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.yiban.erp.dao.RepertoryInMapper;
 import com.yiban.erp.dto.CurrentBalanceResp;
 import com.yiban.erp.dto.ReceiveListReq;
 import com.yiban.erp.dto.ReceiveSetReq;
@@ -33,6 +34,8 @@ public class RepertoryInController {
 
     @Autowired
     private RepertoryInService repertoryInService;
+    @Autowired
+    private RepertoryInMapper repertoryInMapper;
 
     /**
      * 获取某一产品当前采购的订单数，当前库存，和最近一次的采购价
@@ -108,8 +111,12 @@ public class RepertoryInController {
     }
 
     @RequestMapping(value = "/detail/{orderId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> getOrderDetails(@PathVariable Long orderId) {
-        List<RepertoryInDetail> details = repertoryInService.getDetailList(orderId);
+    public ResponseEntity<String> getOrderDetails(@PathVariable Long orderId) throws Exception {
+        RepertoryIn order = repertoryInMapper.selectByPrimaryKey(orderId);
+        if (order == null || order.getId() == null) {
+            throw new BizException(ErrorCode.RECEIVE_ORDER_GET_FAIL);
+        }
+        List<RepertoryInDetail> details = repertoryInService.getDetailList(order);
         return ResponseEntity.ok().body(JSON.toJSONString(details));
     }
 

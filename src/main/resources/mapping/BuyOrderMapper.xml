@@ -72,7 +72,9 @@
 
   <select id="getOrderById" resultMap="BaseResultMap" parameterType="java.lang.Long">
     select
-        bo.*, su.name as supplier, sc.name as supplierContact, w.name as warehouse,
+        bo.*,
+        su.name as supplier, su.is_cold_business as supplierColdManage, su.can_special as supplierSpecialManage,
+        sc.name as supplierContact, w.name as warehouse,
         o.value as shipMethod, o1.value as shipTool, o2.value as temperControl
         from buy_order bo
             left join supplier su on bo.supplier_id = su.id

@@ -5,6 +5,7 @@ import com.yiban.erp.config.RabbitmqQueueConfig;
 import com.yiban.erp.constant.*;
 import com.yiban.erp.dao.*;
 import com.yiban.erp.dto.CurrentBalanceResp;
+import com.yiban.erp.dto.GoodsQuery;
 import com.yiban.erp.dto.ReceiveListReq;
 import com.yiban.erp.dto.ReceiveSetReq;
 import com.yiban.erp.entities.*;
@@ -49,6 +50,8 @@ public class RepertoryInService {
     private WarehouseMapper warehouseMapper;
     @Autowired
     private RabbitmqQueueConfig rabbitmqQueueConfig;
+    @Autowired
+    private SupplierMapper supplierMapper;
 
     /**
      * 获取某商品当前库存和申购订单信息
@@ -96,6 +99,71 @@ public class RepertoryInService {
         return resp;
     }
 
+    private void validateSpecialManage(RepertoryIn order, Supplier supplier) throws BizException {
+        //检验特殊管理药品的收货条件
+        List<Long> goodsIds = new ArrayList<>();
+        if (order.getDetails() == null || order.getDetails().isEmpty()) {
+            return;
+        }
+        for (RepertoryInDetail detail : order.getDetails()) {
+            if (detail.getGoodsId() != null) {
+                goodsIds.add(detail.getGoodsId());
+            }
+        }
+
+        //1. 检查商品中商品中是否存在有特殊管理药品
+        if (!goodsService.haveSpecialManageGoods(goodsIds)) {
+            return; //没有特殊经营管理的商品，直接返回
+        }
+        //2. 如果存在有特殊经营管理的商品，需要验证供应商是否有该类资质
+        if (supplier.getCanSpecial() == null || !supplier.getCanSpecial()) {
+            logger.warn("supplier can special validate fail. supplierId:{}", supplier.getId());
+            throw new BizException(ErrorCode.RECEIVE_SUPPLIER_SPECIAL_VALIDATE_FAIL);
+        }
+
+        //3. 验证是否已经是双人验收，
+        String receiveUser = order.getReceiveUser();
+        if (StringUtils.isEmpty(receiveUser)) {
+            logger.warn("receive user is empty.");
+            throw new BizException(ErrorCode.RECEIVE_SPECIAL_RECEIVE_USER_ERROR);
+        }
+        String[] users = receiveUser.split(";");
+        String[] users1 = receiveUser.split("；");
+        if (users.length < 2 || users1.length < 2) {
+            logger.warn("receive user size < 2");
+            throw new BizException(ErrorCode.RECEIVE_SPECIAL_RECEIVE_USER_ERROR);
+        }
+    }
+
+    private void validateColdManage(RepertoryIn order, Supplier supplier) throws BizException {
+        //商品冷链经营管理的验证条件
+        List<Long> goodsIds = new ArrayList<>();
+        if (order.getDetails() == null || order.getDetails().isEmpty()) {
+            return;
+        }
+        for (RepertoryInDetail detail : order.getDetails()) {
+            if (detail.getGoodsId() != null) {
+                goodsIds.add(detail.getGoodsId());
+            }
+        }
+        if (!goodsService.haveColdManageGoods(goodsIds)) {
+            return;
+        }
+
+        //2. 如果是冷链经营的，供应商也需要对应的资质
+        if (supplier.getColdBusiness() == null || !supplier.getColdBusiness()) {
+            logger.warn("supplier cold manage validate fail. supplierId:{}", supplier.getId());
+            throw new BizException(ErrorCode.RECEIVE_SUPPLIER_COLD_VALIDATE_FAIL);
+        }
+
+        // 3. 如果是冷链经营信息，温控方式，到货温度，温控状态，运输方式为必输项
+        if (order.getTempControlMethod() == null || order.getReceiveTemp() == null
+                || order.getTempControlStatus() == null || order.getShipMethod() == null) {
+            logger.warn("cold manage need params validate fail.");
+            throw new BizException(ErrorCode.RECEIVE_COLD_NEED_PARAMS_ERROR);
+        }
+    }
+
     /**
      * 保存收货入库订单信息
      * @param user
@@ -106,6 +174,16 @@ public class RepertoryInService {
         if (!saveValidate(order)) {
             throw new BizException(ErrorCode.RECEIVE_SAVE_PRAMS_INVALID);
         }
+        Supplier supplier = supplierMapper.selectByPrimaryKey(order.getSupplierId());
+        if (supplier == null) {
+            logger.warn("get supplier fail by id:{}", order.getSupplierId());
+            throw new BizException(ErrorCode.PARAMETER_MISSING);
+        }
+        //验证特殊管制商品的条件
+        validateSpecialManage(order, supplier);
+        //验证冷链经营商品的条件
+        validateColdManage(order, supplier);
+
         setRepertoryInTotalAmount(order, order.getDetails()); //保存的之前先对订单的总入库数和总金额计算
         if (order.getId() == null) {
             //新建
@@ -251,14 +329,19 @@ public class RepertoryInService {
         order.setOptionName(options);
     }
 
-    public List<RepertoryInDetail> getDetailList(Long orderId) {
-        List<RepertoryInDetail> details = repertoryInDetailMapper.getByOrderId(orderId);
+    public List<RepertoryInDetail> getDetailList(RepertoryIn order) {
+        List<RepertoryInDetail> details = repertoryInDetailMapper.getByOrderId(order.getId());
         if (details == null || details.isEmpty()) {
             return Collections.emptyList();
         }
         List<Long> goodsIdList = new ArrayList<>();
         details.stream().forEach(item -> goodsIdList.add(item.getGoodsId()));
         List<Goods> goods = goodsService.getGoodsById(goodsIdList);
+        //嵌入当前库存信息，最近采购价
+        Integer warehouseId = order.getWarehouseId(); //逻辑上同一个订单的仓库ID相同
+        List<String> options = Arrays.asList(GoodsQuery.OPTION_LW, GoodsQuery.OPTION_LB, GoodsQuery.OPTION_CBQ);
+        goodsService.setGoodsExtra(null, warehouseId, options, goods);
+
         Map<Long, Goods> goodsMap = new HashMap<>();
         goods.stream().forEach(item -> goodsMap.put(item.getId(), item));
         details.stream().forEach(item -> item.setGoods(goodsMap.get(item.getGoodsId())));
@@ -273,11 +356,11 @@ public class RepertoryInService {
         if (order == null) {
             throw new BizException(ErrorCode.RECEIVE_ORDER_GET_FAIL);
         }
-        if (!RepertoryInStatus.TEMP_STORAGE.name().equalsIgnoreCase(order.getStatus())) {
-            throw new BizException(ErrorCode.RECEIVE_ORDER_CAN_NOT_REMOVE);
-        }
         if (!user.getCompanyId().equals(order.getCompanyId())) {
             throw new BizRuntimeException(ErrorCode.ACCESS_PERMISSION);
+        }
+        if (!RepertoryInStatus.TEMP_STORAGE.name().equalsIgnoreCase(order.getStatus())) {
+            throw new BizException(ErrorCode.RECEIVE_ORDER_CAN_NOT_REMOVE);
         }
         order.setStatus(RepertoryInStatus.DELETE.name());
         order.setUpdateBy(user.getNickname());
@@ -307,7 +390,7 @@ public class RepertoryInService {
             return makeReceiveOrderByBuyOrder(user, buyOrder);
         }else {
             //获取所有订单对应的详情信息
-            List<RepertoryInDetail> details = getDetailList(order.getId());
+            List<RepertoryInDetail> details = getDetailList(order);
             order.setDetails(details);
             return order;
         }
@@ -320,6 +403,8 @@ public class RepertoryInService {
         order.setRefType(RepertoryRefType.BUY_ORDER.name());
         order.setSupplierId(buyOrder.getSupplierId());
         order.setSupplierName(buyOrder.getSupplier());
+        order.setSupplierColdManage(buyOrder.getSupplierColdManage());
+        order.setSupplierSpecialManage(buyOrder.getSupplierSpecialManage());
         order.setSupplierContactId(buyOrder.getSupplierContactId());
         order.setSupplierContactName(buyOrder.getSupplierContact());
         order.setBuyerId(buyOrder.getBuyerId());
@@ -338,11 +423,14 @@ public class RepertoryInService {
         List<Long> goodsIdList = new ArrayList<>();
         buyOrderDetails.stream().forEach(item -> goodsIdList.add(item.getGoodsId()));
         List<Goods> goodsList = goodsService.getGoodsById(goodsIdList);
+        //嵌入当前库存信息，最近采购价
+        Integer warehouseId = order.getWarehouseId(); //逻辑上同一个订单的仓库ID相同
+        List<String> options = Arrays.asList(GoodsQuery.OPTION_LW, GoodsQuery.OPTION_LB, GoodsQuery.OPTION_CBQ);
+        goodsService.setGoodsExtra(null, warehouseId, options, goodsList);
         Map<Long, Goods> goodsMap = new HashMap<>();
         goodsList.stream().forEach(item -> goodsMap.put(item.getId(), item));
 
         List<RepertoryInDetail> details = new ArrayList<>();
-
         buyOrderDetails.stream().forEach(item -> {
             Goods goods = goodsMap.get(item.getGoodsId());
             RepertoryInDetail detail = new RepertoryInDetail();

@@ -52,4 +52,11 @@ public interface GoodsInfoMapper {
      * @return
      */
     List<GoodsInfo> getColdManageByDetailIds(@Param("detailIds") List<Long> detailIds);
+
+    /**
+     * 根据详情ID查询这些商品中存在药品特殊经营性管理的数据
+     * @param detailIds
+     * @return
+     */
+    List<GoodsInfo> getSpecialManageByDetailIds(@Param("detailIds") List<Long> detailIds);
 }

@@ -51,6 +51,8 @@ public class BuyOrder {
     private List<BuyOrderDetail> details;
 
     private String supplier;
+    private Boolean supplierColdManage; // 供应商是否冷链经营
+    private Boolean supplierSpecialManage; //供应上是否有药品特殊管理资质
 
     private String supplierContact;
 
@@ -266,7 +268,6 @@ public class BuyOrder {
         BuyOrderStatus orderStatus = getOrderStatus();
         switch (orderStatus) {
             case INIT:
-            case CHECKED:
             case REJECTED:
             case CHECKING:
                 return true;
@@ -289,6 +290,22 @@ public class BuyOrder {
 
     public void setSupplier(String supplier) {
         this.supplier = supplier;
+    }
+
+    public Boolean getSupplierColdManage() {
+        return supplierColdManage;
+    }
+
+    public void setSupplierColdManage(Boolean supplierColdManage) {
+        this.supplierColdManage = supplierColdManage;
+    }
+
+    public Boolean getSupplierSpecialManage() {
+        return supplierSpecialManage;
+    }
+
+    public void setSupplierSpecialManage(Boolean supplierSpecialManage) {
+        this.supplierSpecialManage = supplierSpecialManage;
     }
 
     public String getShipTool() {

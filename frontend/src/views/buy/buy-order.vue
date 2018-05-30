@@ -1,5 +1,5 @@
 <style lang="less">
-    @import '../../styles/common.less';
+@import "../../styles/common.less";
 </style>
 
 <template>
@@ -85,8 +85,8 @@
                         </div>
                     </Table>
 
-                    <h3 class="margin-top-10">配送</h3>
-                    <Row>
+                    <h3 v-if="isMedicine" class="margin-top-10">配送</h3>
+                    <Row v-if="isMedicine">
                         <i-col span="5">
                             <FormItem label="温控方式" prop="temperControlId">
                                 <option-select v-model="buyOrder.temperControlId" optionType="TEMPER_CONTROL"></option-select>
@@ -128,598 +128,666 @@
 </template>
 
 <script>
-    import axios from 'axios';
-    import moment from 'moment';
-    import util from '@/libs/util.js';
-    import supplierSelect from '@/views/selector/supplier-select.vue';
-    import supplierContactSelect from '@/views/selector/supplier-contact-select.vue';
-    import buyerSelect from '@/views/selector/buyer-select.vue';
-    import optionSelect from '@/views/selector/option-select.vue';
-    import warehouseSelect from "@/views/selector/warehouse-select.vue";
-    import goodSelect from '@/views/selector/good-select.vue';
-    import goodsSpecTags from '../goods/goods-spec-tabs.vue';
+import axios from "axios";
+import moment from "moment";
+import util from "@/libs/util.js";
+import supplierSelect from "@/views/selector/supplier-select.vue";
+import supplierContactSelect from "@/views/selector/supplier-contact-select.vue";
+import buyerSelect from "@/views/selector/buyer-select.vue";
+import optionSelect from "@/views/selector/option-select.vue";
+import warehouseSelect from "@/views/selector/warehouse-select.vue";
+import goodSelect from "@/views/selector/good-select.vue";
+import goodsSpecTags from "../goods/goods-spec-tabs.vue";
 
-    export default {
-        name: 'buy_order',
-        components: {
-            supplierSelect,
-            supplierContactSelect,
-            buyerSelect,
-            optionSelect,
-            goodSelect,
-            warehouseSelect,
-            goodsSpecTags
+export default {
+  name: "buy_order",
+  components: {
+    supplierSelect,
+    supplierContactSelect,
+    buyerSelect,
+    optionSelect,
+    goodSelect,
+    warehouseSelect,
+    goodsSpecTags
+  },
+  data() {
+    return {
+      saving: false,
+      totalAmount: 0,
+      edittingRow: {},
+      closeConfirm: false,
+      orderItems: [],
+      buyOrder: {
+        supplierId: null,
+        eta: moment()
+          .add(1, "d")
+          .format("YYYY-MM-DD"),
+        orderItemIds: []
+      },
+      orderColumns: [
+        {
+          type: "index",
+          title: "",
+          width: 30
         },
-        data () {
-            return {
-                saving: false,
-            	totalAmount: 0,
-            	edittingRow: {},
-                closeConfirm: false,
-                orderItems: [],
-                buyOrder: {
-                    supplierId: null,
-                	eta: moment().add(1, 'd').format('YYYY-MM-DD'),
-                	orderItemIds: []
+        {
+          title: "商品名称",
+          key: "goodsName",
+          width: 200,
+          sortable: true,
+          render: (h, params) => {
+            let goodsName = params.row.goods.name;
+            return h("span", goodsName);
+          }
+        },
+        {
+          title: "产地",
+          key: "origin",
+          width: 100,
+          render: (h, params) => {
+            let origin = params.row.goods.origin;
+            return h("span", origin);
+          }
+        },
+        {
+          key: "goodsSpecs",
+          title: "规格",
+          width: 120,
+          render: (h, params) => {
+            let goodsSpecs = params.row.goods.goodsSpecs
+              ? params.row.goods.goodsSpecs
+              : [];
+            return h(goodsSpecTags, {
+              props: {
+                tags: goodsSpecs,
+                color: "blue"
+              }
+            });
+          }
+        },
+        {
+          title: "商品条码",
+          key: "barCode",
+          width: 150,
+          render: (h, params) => {
+            let barCode =
+              params.row.goods && params.row.goods.barCode
+                ? params.row.goods.barCode
+                : "";
+            return h("span", barCode);
+          }
+        },
+        {
+          title: "生产企业",
+          key: "factoryName",
+          width: 150,
+          render: (h, params) => {
+            let factoryName = params.row.goods.factoryName;
+            return h("span", factoryName);
+          }
+        },
+        {
+          title: "单位",
+          key: "unitName",
+          align: "center",
+          width: 80,
+          render: (h, params) => {
+            let unitName = params.row.goods.unitName;
+            return h("span", unitName);
+          }
+        },
+        {
+          title: "数量",
+          key: "quantity",
+          align: "center",
+          width: 100,
+          render: (h, params) => {
+            var self = this;
+            return h("Input", {
+              props: {
+                value: self.orderItems[params.index][params.column.key],
+                number: true
+              },
+              on: {
+                "on-blur"(event) {
+                  var row = self.orderItems[params.index];
+                  var price = row["buyPrice"];
+                  var qty = event.target.value;
+                  row[params.column.key] = qty;
+                  if (qty != "" && !isNaN(qty) && !isNaN(price)) {
+                    row.amount = (qty * price).toFixed(2);
+                    self.$set(self.orderItems, params.index, row);
+                  }
                 },
-                orderColumns: [
-                    {
-                        type: 'index',
-                        title: '',
-                        width: 30
-                    },
-                    {
-                        title: '商品名称',
-                        key: 'goodsName',
-                        width: 200,
-                        sortable: true,
-                        render: (h, params) => {
-                            let goodsName = params.row.goods.name;
-                            return h('span', goodsName);
-                        }
-                    },
-                    {
-                        title: '产地',
-                        key: 'origin',
-                        width: 100,
-                        render: (h, params) => {
-                            let origin = params.row.goods.origin;
-                            return h('span', origin);
-                        }
-                    },
-                    {
-                        key: 'goodsSpecs',
-                        title: '规格',
-                        width: 120,
-                        render: (h, params) =>　{
-                            let goodsSpecs = params.row.goods.goodsSpecs ? params.row.goods.goodsSpecs : [];
-                            return h(goodsSpecTags, {
-                                props: {
-                                    tags: goodsSpecs,
-                                    color: 'blue'
-                                }
-                            });
-                        }
-                    },
-                    {
-                        title: '商品条码',
-                        key: 'barCode',
-                        width: 150,
-                        render: (h, params) => {
-                            let barCode = params.row.goods && params.row.goods.barCode ? params.row.goods.barCode : '';
-                            return h('span', barCode);
-                        }
-                    },
-                    {
-                        title: '生产企业',
-                        key: 'factoryName',
-                        width: 150,
-                        render: (h, params) => {
-                            let factoryName = params.row.goods.factoryName;
-                            return h('span', factoryName);
-                        }
-                    },
-                    {
-                        title: '单位',
-                        key: 'unitName',
-                        align: 'center',
-                        width: 80,
-                        render: (h, params) => {
-                            let unitName = params.row.goods.unitName;
-                            return h('span', unitName);
-                        }
-                    },
-                    {
-                        title: '数量',
-                        key: 'quantity',
-                        align: 'center',
-                        width: 100,
-                        render: (h, params) => {
-                        	var self = this;
-                            return h('Input', {
-                                props: {
-                                    value: self.orderItems[params.index][params.column.key],
-                                    number: true
-                                },
-                                on: {
- 									'on-blur' (event) {
- 										var row = self.orderItems[params.index];
- 										var price = row['buyPrice'];
-                                        var qty = event.target.value;
-                                        row[params.column.key] = qty;
-                                        if (qty != '' && !isNaN(qty) && !isNaN(price)) {
-                                            row.amount = (qty * price).toFixed(2);
-                                            self.$set(self.orderItems, params.index, row);
-                                        }
- 									},
-                                    'on-keydown' (event) {
-                                        if (event.keyCode === 13 || event.keyCode === 9) {
-                                            var index = params.index * 2;
-                                            var inputList = self.$refs.buyOrderTable.$el.querySelectorAll('input');
-                                            if (inputList && index + 2 <= inputList.length) {
-                                                inputList[index + 1].focus();
-                                            }
-                                        }
-                                    }
-                                }
-                            });
-                        }
-                    },
-                    {
-                        title: '采购单价',
-                        key: 'buyPrice',
-                        align: 'center',
-                        width: 100,
-                        render: (h, params) => {
-                        	var self = this;
-                            return h('Input', {
-                                props: {
-                                    value: self.orderItems[params.index][params.column.key],
-                                    number: true
-                                },
-                                on: {
- 									'on-blur' (event) {
-                                        var row = self.orderItems[params.index];
- 										var qty = row['quantity'];
-                                        var price = event.target.value;
-                                        row[params.column.key] = price;
-                                        if (price != '' && !isNaN(qty) && !isNaN(price)) {
-                                            row.amount = (qty * price).toFixed(2);
-                                            self.$set(self.orderItems, params.index, row);
-                                        }
- 									},
-                                    'on-keydown' (event) {
-                                        console.log(event.keyCode);
-                                        if (event.keyCode === 13 || event.keyCode === 9) {
-                                            var index = params.index * 2 + 1;
-                                            var inputList = self.$refs.buyOrderTable.$el.querySelectorAll('input');
-                                            if (inputList && index + 2 <= inputList.length) {
-                                                // move to next line                                            
-                                                inputList[index + 1].focus();
-                                            }
-                                            if (index + 2 >= inputList.length) {
-                                                var row = self.orderItems[params.index];
-                                                var qty = row['quantity'];
-                                                var price = event.target.value;
-                                                if (!isNaN(qty) && !isNaN(price)) {
-                                                    //row.amount = (qty * price).toFixed(2);
-                                                    self.$set(self.orderItems, params.index, row);
-                                                }
-                                            }
-                                        }
-                                        
-                                    }
-                                }
-                            });
-                        }
-                    },
-                    {
-                        title: '金额',
-                        key: 'amount',
-                        align: 'center',
-                        width: 100
-                    },
-                    {
-                        title: '最近采购价',
-                        key: 'lastBuyPrice',
-                        align: 'center',
-                        width: 100,
-                        render: (h, params) => {
-                            let lastBuyPrice = params.row.goods.lastBuyPrice ? params.row.goods.lastBuyPrice : '';
-                            return h('span', lastBuyPrice);
-                        }
-                    },
-                    {
-                        title: '整件单位',
-                        key: 'packUnitName',
-                        align: 'center',
-                        width: 100,
-                        render: (h, params) => {
-                            let packUnitName = params.row.goods.packUnitName;
-                            return h('span', packUnitName);
-                        }
-                    },
-                    {
-                        title: '大件装量',
-                        key: 'bigPack',
-                        align: 'center',
-                        width: 80,
-                        render: (h, params) => {
-                            let bigPack = params.row.goods.bigPack;
-                            return h('span', bigPack);
-                        }
-                    },
-                    {
-                        title: '库存',
-                        key: 'currRepQuatity',
-                        align: 'center',
-                        width: 100,
-                        render: (h, params) => {
-                            let currRepQuatity = params.row.goods.currRepQuatity ? params.row.goods.currRepQuatity : '';
-                            return h('span', currRepQuatity);
-                        }
-                    },
-                    {
-                        title: '在单数量',
-                        key: 'currBuyQuality',
-                        align: 'center',
-                        width: 100,
-                        render: (h, params) => {
-                            let currBuyQuality = params.row.goods.currBuyQuality ? params.row.goods.currBuyQuality : '';
-                            return h('span', currBuyQuality);
-                        }
+                "on-keydown"(event) {
+                  if (event.keyCode === 13 || event.keyCode === 9) {
+                    var index = params.index * 2;
+                    var inputList = self.$refs.buyOrderTable.$el.querySelectorAll(
+                      "input"
+                    );
+                    if (inputList && index + 2 <= inputList.length) {
+                      inputList[index + 1].focus();
                     }
-        	    ],
-                ruleValidate: {
-                    supplierId: [
-                        { required: true, type: 'number', message: '请选择供应商' }
-                    ],
-                    buyerId: [
-                        { required: true, type: 'number', message: '请选择采购员' }
-                    ],
-                    warehouseId: [
-                        { required: true, type: 'number', message: '请选择仓库点' }
-                    ],
-                    details: [
-                        { required: true, type: 'array', array: {min: 1}, message: '请添加商品' }
-                    ]
+                  }
+                }
+              }
+            });
+          }
+        },
+        {
+          title: "采购单价",
+          key: "buyPrice",
+          align: "center",
+          width: 100,
+          render: (h, params) => {
+            var self = this;
+            return h("Input", {
+              props: {
+                value: self.orderItems[params.index][params.column.key],
+                number: true
+              },
+              on: {
+                "on-blur"(event) {
+                  var row = self.orderItems[params.index];
+                  var qty = row["quantity"];
+                  var price = event.target.value;
+                  row[params.column.key] = price;
+                  if (price != "" && !isNaN(qty) && !isNaN(price)) {
+                    row.amount = (qty * price).toFixed(2);
+                    self.$set(self.orderItems, params.index, row);
+                  }
                 },
-                showSider: true,
-                uncheckTabLoading: false,
-                uncheckData: [],
-                uncheckColumns: [
-                    {
-                        title: '采购单',
-                        key: 'id',
-                        render: (h, params) => {
-                            let orderNumnber = params.row.orderNumber;
-                            let supplier = params.row.supplier;
-                            let createdTime = moment(params.row.createdTime).format('YYYY-MM-DD HH:mm');
-                            let createdBy = params.row.createdBy;
-                            let warehouse = params.row.warehouse;
-                            return h('div', {
-                                    style: {
-                                        margin: '0.5em'
-                                    }
-                                }, [
-                                    h('h5', {
-                                        style: {
-                                            color: '#9ea7b4',
-                                            fontSize: '12px'
-                                        }
-                                    }, orderNumnber),
-                                    h('h4', supplier + '[' + warehouse + ']'),
-                                    h('h5', {
-                                        style: {
-                                            color: '#9ea7b4',
-                                            fontSize: '12px'
-                                        }
-                                    }, createdTime + '[' + createdBy + ']'),
-                                ]
-                            );
-                        }
-                    },
-                    {
-                        title: ' ',
-                        key: 'action',
-                        align: 'right',
-                        maxWidth: 60,
-                        render: (h, params) => {
-                            let self = this;
-                            let status = params.row.status;
-                            let statusLabel = status === 'REJECTED' ? '审核拒绝' : '待审核';
-                            let statusColor = status === 'REJECTED' ? 'red' : 'blue';
-                            let statusH = h('span', {
-                                    class: {
-                                        statusClass: true
-                                    },
-                                    style: {
-                                        color: statusColor
-                                    }
-                                }, statusLabel);
-                            let buttonH = h('ButtonGroup', {
-                                props: {
-                                    vertical: true,
-                                    size: 'small'
-                                }
-                            }, [
-                                h('Button', {
-                                    props: {
-                                        type: 'info'
-                                    },
-                                    on: {
-                                        click: () => {
-                                            self.editBuyOrder(params.row);
-                                        } 
-                                    }
-                                }, '修改'),
-                                h('Button', {
-                                    props: {
-                                        type: 'error'
-                                    },
-                                    on: {
-                                        click: () => {
-                                            self.removeBuyOrder(params.row.id);
-                                        }
-                                    }
-                                }, '删除')
-                            ]);
-                            return  h('div', [statusH, buttonH]);
-                        }
+                "on-keydown"(event) {
+                  console.log(event.keyCode);
+                  if (event.keyCode === 13 || event.keyCode === 9) {
+                    var index = params.index * 2 + 1;
+                    var inputList = self.$refs.buyOrderTable.$el.querySelectorAll(
+                      "input"
+                    );
+                    if (inputList && index + 2 <= inputList.length) {
+                      // move to next line
+                      inputList[index + 1].focus();
                     }
-                ],
-                haveCheck: false
-            };
+                    if (index + 2 >= inputList.length) {
+                      var row = self.orderItems[params.index];
+                      var qty = row["quantity"];
+                      var price = event.target.value;
+                      if (!isNaN(qty) && !isNaN(price)) {
+                        //row.amount = (qty * price).toFixed(2);
+                        self.$set(self.orderItems, params.index, row);
+                      }
+                    }
+                  }
+                }
+              }
+            });
+          }
         },
-        mounted () {
-            this.init();
+        {
+          title: "金额",
+          key: "amount",
+          align: "center",
+          width: 100
         },
-        activated () {
-            this.clearData();
+        {
+          title: "最近采购价",
+          key: "lastBuyPrice",
+          align: "center",
+          width: 100,
+          render: (h, params) => {
+            let lastBuyPrice = params.row.goods.lastBuyPrice
+              ? params.row.goods.lastBuyPrice
+              : "";
+            return h("span", lastBuyPrice);
+          }
         },
-        watch: {
-        	orderItems: function () {
-        		this.totalAmount = this.orderItems.reduce(function (total, item) { return total + parseFloat(item.amount); }, 0);
-        	}
+        {
+          title: "整件单位",
+          key: "packUnitName",
+          align: "center",
+          width: 100,
+          render: (h, params) => {
+            let packUnitName = params.row.goods.packUnitName;
+            return h("span", packUnitName);
+          }
         },
-        methods: {
-            init() {
-                //先获取系统的流程配置参数,
-                this.loadSystemConfig();
-            },
-
-            loadSystemConfig() {
-                //获取一些系统配置中的采购单的审核流程，主要确认是否显示侧边栏目和加载侧边栏的数据
-                util.ajax.get('/config/list')
-                    .then((response) => {
-                        let data = response.data;
-                        let config = data['BUY_CHECK'];
-                        if (config.keyValue === 'open') {
-                            this.haveCheck = true;
-                            this.reloadUncheckData();
-                            this.showSider = true;
-                        }else {
-                            this.haveCheck = false;
-                            this.showSider = false;
-                        }
-                    })
-                    .catch((error) => {
-                        console.log(error);
-                        util.errorProcessor(this, error);
-                    });
-            },
-            moment: function () {
-                return moment();
-            },
-            handleRowDbClick (row) {
-            	this.$Modal.confirm({
-                    title: '确认删除商品？',
-                    content: '<p>确认删除商品 ' + row.name + '?</p>',
-                    onOk: () => {
-                        for (var i = 0; i < this.orderItems.length; i++) {
-                            if (row.goodsId === this.orderItems[i].goodsId) {
-                                this.orderItems.splice(i, 1);
-                                this.buyOrder.orderItemIds.splice(i, 1);
-                            }
-                        }
-                    },
-                    onCancel: () => {}
-                });
-            },
-            onSelectGoods (goodsId, goods) {
-                if (goodsId && goods) {
-                    var index = this.buyOrder.orderItemIds.indexOf(goods.id);
-                    if (index < 0) {
-                        this.setBuyOrderDetails(goods);
-                    } else {
-                        this.$Message.warning('该商品已经添加');
-                    }
-                    this.$refs.goodsSelect.clearSingleSelect();
-                }
-            },
-
-            setBuyOrderDetails(goods) {
-                if(!goods.id) {
-                    return;
-                }
-                //制造一个采购单详情的记录信息
-                let item = {
-                    goodsId: goods.id,
-                    goodsName: goods.name,
-                    quantity: 0,
-                    buyPrice: goods.inPrice,
-                    amount: 0,
-                    goods: goods
-                };
-                console.log(item);
-                this.orderItems.push(item);
-                this.buyOrder.orderItemIds.push(goods.id);
-                let self = this;
-                setTimeout(function () {
-                    self.$refs.buyOrderTable.$el.querySelector('.ivu-table-body tr:last-child input').focus();
-                }, 400);
-            },
-
-            clearData () {
-                this.buyOrder = {
-                    supplierId: null,
-                    eta: moment().add(1, 'd').format('YYYY-MM-DD'),
-                    orderItemIds: []
-                };
-                this.orderItems = [];
-                this.$refs.buyOrderForm.resetFields();
-            },
-            closeTab () {
-                this.clearData();
-                let pageName = util.closeCurrentTab(this);
-                this.$router.push({
-                    name: pageName
-                });
-            },
-
-            doSave () {
-                var self = this;
-                this.$Modal.confirm({
-                    title: '提交确认',
-                    content: '请确认采购数据录入完全正确, 提交到下一步: ' + (this.haveCheck ? '“采购单审核”' : '“采购收货”'),
-                    onCancel:() => {},
-                    onOk:() => {
-                        self.saving = true;
-                        util.ajax.post('/buy/add', self.buyOrder)
-                            .then(function (response) {
-                                self.saving = false;
-                                if (response.status === 200 && response.data) {
-                                    self.buyOrder.id = response.data.orderId;
-                                    self.buyOrder.status = response.data.status;
-                                    self.$Message.success('采购入库订单保存成功');
-                                    self.closeConfirm = true;
-                                    self.reloadUncheckData();
-                                }
-                            })
-                            .catch(function (error) {
-                                self.saving = false;
-                                util.errorProcessor(self, error);
-                            });
-                    }
-                });
-            },
-
-            validateColdManage() {
-                //先看下温控方式和运输方式是否已经输入了，如果输出了，直接返回true, 否则验证是否存在有冷链管理产品
-                if (this.buyOrder.temperControlId > 0 && this.buyOrder.shipMethodId > 0) {
-                    return true; //已经输入，直接返回
-                }
-                //查询下添加的商品中，是否存在有冷链经营的商品，
-                let haveCold = false;
-                for (let i=0; i < this.orderItems.length; i++) {
-                    let goods = this.orderItems[i].goods;
-                    if (goods && goods.coldManage) {
-                        haveCold = true;
-                        break;
-                    }
-                }
-                console.log('haveCold:' + haveCold);
-                return haveCold ? false : true;
-            },
-
-            saveBuyOrder () {
-                this.buyOrder.details = this.orderItems;
-                let self = this;
-                this.$refs.buyOrderForm.validate((valid) => {
-                    if (!valid) {
-                        self.$Message.error('请检查输入!');
-                    } else {
-                        console.log('validate cold manage.');
-                        //验证是否存在冷链管理商品，如果存在，需要验证是否已经输入温控方式，冷链管理商品必输温控方式
-                        if (self.validateColdManage()) {
-                            self.doSave();
-                        }else {
-                            self.$Modal.info({
-                                title: '商品冷链管理运输提示',
-                                content: '存在冷链管理的商品，温控方式和运输方式必须输入!'
-                            });
-                            return;
-                        }
-                    }
-                });
-            },
-
-            changeSiderShow() {
-                this.showSider = !this.showSider;
-            },
-
-            editBuyOrder(row) {
-                if (!row.id || row.id <= 0) {
-                    return;
-                }
-                row.eta = row.eta ? moment(row.eta).format('YYYY-MM-DD') : '';
-                console.log(row);
-                this.buyOrder = row;
-                let self = this;
-                this.orderItems = [];
-                this.buyOrder.orderItemIds = [];
-                //获取该笔订单的详情信息
-                util.ajax.get('/buy/orderdetail/' + row.id)
-                    .then((response) => {
-                        let data = response.data;
-                        console.log(data);
-                        if (data && data.length > 0) {
-                            self.orderItems = data;
-                            for(let i=0; i<data.length; i++) {
-                                self.buyOrder.orderItemIds.push(data[i].goodsId);
-                            }
-                        }
-                    })
-                    .catch((error) => {
-                        util.errorProcessor(self, error);
-                    });
-            },
-
-            reloadUncheckData() {
-                let query = {
-                    statusNames: ['INIT', 'REJECTED']
-                };
-                let self = this;
-                this.uncheckTabLoading = true;
-                util.ajax.post('/buy/list', query)
-                    .then(function (response) {
-                        console.log(response.data);
-                        self.uncheckTabLoading = false;
-                        if (response.status === 200 && response.data) {
-                            self.uncheckData = response.data;
-                        }
-                        self.$refs.uncheckTable.clearCurrentRow();
-                    })
-                    .catch(function (error) {
-                        self.uncheckTabLoading = false;
-                        util.errorProcessor(self, error);
-                    });
-            },
-
-            removeBuyOrder(buyOrderId) {
-                console.log('remove buy order id:' + buyOrderId);
-                let self = this;
-                this.$Modal.confirm({
-                    title: '删除订单确认',
-                    content: '是否确认删除采购单',
-                    onOk: () => {
-                        //删除操作请求
-                        self.uncheckTabLoading = true;
-                        util.ajax.delete('/buy/remove/' + buyOrderId)
-                            .then((response) => {
-                                self.uncheckTabLoading = false;
-                                self.$Message.success('采购单删除成功');
-                                self.reloadUncheckData();
-                            })
-                            .catch((error) => {
-                                self.uncheckTabLoading = false;
-                                util.errorProcessor(self, error);
-                            });
-                    }
-                });
-            }
+        {
+          title: "大件装量",
+          key: "bigPack",
+          align: "center",
+          width: 80,
+          render: (h, params) => {
+            let bigPack = params.row.goods.bigPack;
+            return h("span", bigPack);
+          }
+        },
+        {
+          title: "库存",
+          key: "currRepQuatity",
+          align: "center",
+          width: 100,
+          render: (h, params) => {
+            let currRepQuatity = params.row.goods.currRepQuatity
+              ? params.row.goods.currRepQuatity
+              : "";
+            return h("span", currRepQuatity);
+          }
+        },
+        {
+          title: "在单数量",
+          key: "currBuyQuality",
+          align: "center",
+          width: 100,
+          render: (h, params) => {
+            let currBuyQuality = params.row.goods.currBuyQuality
+              ? params.row.goods.currBuyQuality
+              : "";
+            return h("span", currBuyQuality);
+          }
         }
+      ],
+      ruleValidate: {
+        supplierId: [
+          { required: true, type: "number", message: "请选择供应商" }
+        ],
+        buyerId: [{ required: true, type: "number", message: "请选择采购员" }],
+        warehouseId: [
+          { required: true, type: "number", message: "请选择仓库点" }
+        ],
+        details: [
+          {
+            required: true,
+            type: "array",
+            array: { min: 1 },
+            message: "请添加商品"
+          }
+        ]
+      },
+      showSider: true,
+      uncheckTabLoading: false,
+      uncheckData: [],
+      uncheckColumns: [
+        {
+          title: "采购单",
+          key: "id",
+          render: (h, params) => {
+            let orderNumnber = params.row.orderNumber;
+            let supplier = params.row.supplier;
+            let createdTime = moment(params.row.createdTime).format(
+              "YYYY-MM-DD HH:mm"
+            );
+            let createdBy = params.row.createdBy;
+            let warehouse = params.row.warehouse;
+            return h(
+              "div",
+              {
+                style: {
+                  margin: "0.5em"
+                }
+              },
+              [
+                h(
+                  "h5",
+                  {
+                    style: {
+                      color: "#9ea7b4",
+                      fontSize: "12px"
+                    }
+                  },
+                  orderNumnber
+                ),
+                h("h4", supplier + "[" + warehouse + "]"),
+                h(
+                  "h5",
+                  {
+                    style: {
+                      color: "#9ea7b4",
+                      fontSize: "12px"
+                    }
+                  },
+                  createdTime + "[" + createdBy + "]"
+                )
+              ]
+            );
+          }
+        },
+        {
+          title: " ",
+          key: "action",
+          align: "right",
+          maxWidth: 60,
+          render: (h, params) => {
+            let self = this;
+            let status = params.row.status;
+            let statusLabel = status === "REJECTED" ? "审核拒绝" : "待审核";
+            let statusColor = status === "REJECTED" ? "#ed3f14" : "#2b85e4";
+            let statusH = h(
+              "span",
+              {
+                class: {
+                  statusClass: true
+                },
+                style: {
+                  color: statusColor
+                }
+              },
+              statusLabel
+            );
+            let buttonH = h(
+              "ButtonGroup",
+              {
+                props: {
+                  vertical: true,
+                  size: "small"
+                }
+              },
+              [
+                h(
+                  "Button",
+                  {
+                    props: {
+                      type: "info"
+                    },
+                    on: {
+                      click: () => {
+                        self.editBuyOrder(params.row);
+                      }
+                    }
+                  },
+                  "修改"
+                ),
+                h(
+                  "Button",
+                  {
+                    props: {
+                      type: "error"
+                    },
+                    on: {
+                      click: () => {
+                        self.removeBuyOrder(params.row.id);
+                      }
+                    }
+                  },
+                  "删除"
+                )
+              ]
+            );
+            return h("div", [statusH, buttonH]);
+          }
+        }
+      ],
+      haveCheck: false,
+      isMedicine: false
     };
+  },
+  mounted() {
+    this.init();
+  },
+  activated() {
+    this.clearData();
+  },
+  watch: {
+    orderItems: function() {
+      this.totalAmount = this.orderItems.reduce(function(total, item) {
+        return total + parseFloat(item.amount);
+      }, 0);
+    }
+  },
+  methods: {
+    init() {
+      //先获取系统的流程配置参数,
+      this.loadSystemConfig();
+    },
+
+    loadSystemConfig() {
+      //获取一些系统配置中的采购单的审核流程，主要确认是否显示侧边栏目和加载侧边栏的数据
+      util.ajax
+        .get("/config/list")
+        .then(response => {
+          let data = response.data;
+          let config = data["BUY_CHECK"];
+          if (config.keyValue === "open") {
+            this.haveCheck = true;
+            this.reloadUncheckData();
+            this.showSider = true;
+          } else {
+            this.haveCheck = false;
+            this.showSider = false;
+          }
+          let config2 = data["COMPANY_TYPE"];
+          if ("medicine" === config2.keyValue) {
+            this.isMedicine = true;
+          } else {
+            this.isMedicine = false;
+          }
+        })
+        .catch(error => {
+          console.log(error);
+          util.errorProcessor(this, error);
+        });
+    },
+    moment: function() {
+      return moment();
+    },
+    handleRowDbClick(row) {
+      this.$Modal.confirm({
+        title: "确认删除商品？",
+        content: "<p>确认删除商品 " + row.name + "?</p>",
+        onOk: () => {
+          for (var i = 0; i < this.orderItems.length; i++) {
+            if (row.goodsId === this.orderItems[i].goodsId) {
+              this.orderItems.splice(i, 1);
+              this.buyOrder.orderItemIds.splice(i, 1);
+            }
+          }
+        },
+        onCancel: () => {}
+      });
+    },
+    onSelectGoods(goodsId, goods) {
+      if (goodsId && goods) {
+        var index = this.buyOrder.orderItemIds.indexOf(goods.id);
+        if (index < 0) {
+          this.setBuyOrderDetails(goods);
+        } else {
+          this.$Message.warning("该商品已经添加");
+        }
+        this.$refs.goodsSelect.clearSingleSelect();
+      }
+    },
+
+    setBuyOrderDetails(goods) {
+      if (!goods.id) {
+        return;
+      }
+      //制造一个采购单详情的记录信息
+      let item = {
+        goodsId: goods.id,
+        goodsName: goods.name,
+        quantity: 0,
+        buyPrice: goods.inPrice,
+        amount: 0,
+        goods: goods
+      };
+      console.log(item);
+      this.orderItems.push(item);
+      this.buyOrder.orderItemIds.push(goods.id);
+      let self = this;
+      setTimeout(function() {
+        self.$refs.buyOrderTable.$el
+          .querySelector(".ivu-table-body tr:last-child input")
+          .focus();
+      }, 400);
+    },
+
+    clearData() {
+      this.buyOrder = {
+        supplierId: null,
+        eta: moment()
+          .add(1, "d")
+          .format("YYYY-MM-DD"),
+        orderItemIds: []
+      };
+      this.orderItems = [];
+      this.$refs.buyOrderForm.resetFields();
+    },
+    closeTab() {
+      this.clearData();
+      let pageName = util.closeCurrentTab(this);
+      this.$router.push({
+        name: pageName
+      });
+    },
+
+    doSave() {
+      var self = this;
+      this.$Modal.confirm({
+        title: "提交确认",
+        content:
+          "请确认采购数据录入完全正确, 提交到下一步: " +
+          (this.haveCheck ? "“采购单审核”" : "“采购收货”"),
+        onCancel: () => {},
+        onOk: () => {
+          self.saving = true;
+          util.ajax
+            .post("/buy/add", self.buyOrder)
+            .then(function(response) {
+              self.saving = false;
+              if (response.status === 200 && response.data) {
+                self.buyOrder.id = response.data.orderId;
+                self.buyOrder.status = response.data.status;
+                self.$Message.success("采购入库订单保存成功");
+                self.closeConfirm = true;
+                self.reloadUncheckData();
+              }
+            })
+            .catch(function(error) {
+              self.saving = false;
+              util.errorProcessor(self, error);
+            });
+        }
+      });
+    },
+
+    validateColdManage() {
+      //先看下温控方式和运输方式是否已经输入了，如果输出了，直接返回true, 否则验证是否存在有冷链管理产品
+      if (this.buyOrder.temperControlId > 0 && this.buyOrder.shipMethodId > 0) {
+        return true; //已经输入，直接返回
+      }
+      //查询下添加的商品中，是否存在有冷链经营的商品，
+      let haveCold = false;
+      for (let i = 0; i < this.orderItems.length; i++) {
+        let goods = this.orderItems[i].goods;
+        if (goods && goods.coldManage) {
+          haveCold = true;
+          break;
+        }
+      }
+      console.log("haveCold:" + haveCold);
+      return haveCold ? false : true;
+    },
+
+    saveBuyOrder() {
+      this.buyOrder.details = this.orderItems;
+      let self = this;
+      this.$refs.buyOrderForm.validate(valid => {
+        if (!valid) {
+          self.$Message.error("请检查输入!");
+        } else {
+          console.log("validate cold manage.");
+          //验证是否存在冷链管理商品，如果存在，需要验证是否已经输入温控方式，冷链管理商品必输温控方式
+          if (self.validateColdManage()) {
+            self.doSave();
+          } else {
+            self.$Modal.info({
+              title: "商品冷链管理运输提示",
+              content: "存在冷链管理的商品，温控方式和运输方式必须输入!"
+            });
+            return;
+          }
+        }
+      });
+    },
+
+    changeSiderShow() {
+      this.showSider = !this.showSider;
+    },
+
+    editBuyOrder(row) {
+      if (!row.id || row.id <= 0) {
+        return;
+      }
+      row.eta = row.eta ? moment(row.eta).format("YYYY-MM-DD") : "";
+      console.log(row);
+      this.buyOrder = row;
+      let self = this;
+      this.orderItems = [];
+      this.buyOrder.orderItemIds = [];
+      //获取该笔订单的详情信息
+      util.ajax
+        .get("/buy/orderdetail/" + row.id)
+        .then(response => {
+          let data = response.data;
+          console.log(data);
+          if (data && data.length > 0) {
+            self.orderItems = data;
+            for (let i = 0; i < data.length; i++) {
+              self.buyOrder.orderItemIds.push(data[i].goodsId);
+            }
+          }
+        })
+        .catch(error => {
+          util.errorProcessor(self, error);
+        });
+    },
+
+    reloadUncheckData() {
+      let query = {
+        statusNames: ["INIT", "REJECTED"]
+      };
+      let self = this;
+      this.uncheckTabLoading = true;
+      util.ajax
+        .post("/buy/list", query)
+        .then(function(response) {
+          console.log(response.data);
+          self.uncheckTabLoading = false;
+          if (response.status === 200 && response.data) {
+            self.uncheckData = response.data;
+          }
+          self.$refs.uncheckTable.clearCurrentRow();
+        })
+        .catch(function(error) {
+          self.uncheckTabLoading = false;
+          util.errorProcessor(self, error);
+        });
+    },
+
+    removeBuyOrder(buyOrderId) {
+      console.log("remove buy order id:" + buyOrderId);
+      let self = this;
+      this.$Modal.confirm({
+        title: "删除订单确认",
+        content: "是否确认删除采购单",
+        onOk: () => {
+          //删除操作请求
+          self.uncheckTabLoading = true;
+          util.ajax
+            .delete("/buy/remove/" + buyOrderId)
+            .then(response => {
+              self.uncheckTabLoading = false;
+              self.$Message.success("采购单删除成功");
+              self.reloadUncheckData();
+            })
+            .catch(error => {
+              self.uncheckTabLoading = false;
+              util.errorProcessor(self, error);
+            });
+        }
+      });
+    }
+  }
+};
 </script>
 
 <style>
@@ -728,36 +796,40 @@
   color: #999;
 }
 .ivu-form-item {
-    margin-bottom: 15px;
+  margin-bottom: 15px;
 }
 
 .ivu-table-cell {
-    padding-left: 5px;
-    padding-right: 5px;
+  padding-left: 5px;
+  padding-right: 5px;
 }
 th .ivu-table-cell {
-	white-space: nowrap;
+  white-space: nowrap;
 }
-.ivu-table-body, .ivu-table-tip { min-height: 300px; }
+.ivu-table-body,
+.ivu-table-tip {
+  min-height: 300px;
+}
 @media (max-height: 800px) {
-    .ivu-table-body, .ivu-table-tip { min-height: 120px; }
+  .ivu-table-body,
+  .ivu-table-tip {
+    min-height: 120px;
+  }
 }
 
 .uncheck-table .statusClass {
-    display: block;
+  display: block;
 }
 
 .uncheck-table .ivu-table-row-hover .statusClass {
-    display: none;
+  display: none;
 }
 
 .uncheck-table .ivu-btn-group {
-    display: none;
+  display: none;
 }
 
 .uncheck-table .ivu-table-row-hover .ivu-btn-group {
-    display: block;
+  display: block;
 }
-
-
 </style>

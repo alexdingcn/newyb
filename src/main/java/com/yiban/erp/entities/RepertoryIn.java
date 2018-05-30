@@ -33,6 +33,9 @@ public class RepertoryIn {
 
     private Date receiveDate;
 
+    //收货员(如果商品是配置了特殊经营管理特性时，需要验证供应商需要有对应资质和收货员需要双人收货, 双人收货双人姓名是直接按";"(不区分英文和中午分号)分号切割)
+    private String receiveUser;
+
     private Date payDate;
 
     private String goodsBillNo;
@@ -87,6 +90,9 @@ public class RepertoryIn {
     private BigDecimal totalAmount;
 
     private String supplierName;
+    private Boolean supplierColdManage; // 供应商是否冷链经营
+    private Boolean supplierSpecialManage; //供应上是否有药品特殊管理资质
+
     private String supplierContactName;
     private String warehouseName;
     private String saleNickName;
@@ -233,6 +239,14 @@ public class RepertoryIn {
 
     public void setReceiveDate(Date receiveDate) {
         this.receiveDate = receiveDate;
+    }
+
+    public String getReceiveUser() {
+        return receiveUser;
+    }
+
+    public void setReceiveUser(String receiveUser) {
+        this.receiveUser = receiveUser;
     }
 
     public Date getPayDate() {
@@ -441,6 +455,22 @@ public class RepertoryIn {
 
     public void setSupplierName(String supplierName) {
         this.supplierName = supplierName;
+    }
+
+    public Boolean getSupplierColdManage() {
+        return supplierColdManage;
+    }
+
+    public void setSupplierColdManage(Boolean supplierColdManage) {
+        this.supplierColdManage = supplierColdManage;
+    }
+
+    public Boolean getSupplierSpecialManage() {
+        return supplierSpecialManage;
+    }
+
+    public void setSupplierSpecialManage(Boolean supplierSpecialManage) {
+        this.supplierSpecialManage = supplierSpecialManage;
     }
 
     public String getSupplierContactName() {
