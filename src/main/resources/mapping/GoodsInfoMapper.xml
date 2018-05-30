@@ -76,7 +76,7 @@
   </resultMap>
   <sql id="Base_Column_List" >
     id, company_id, category_id, goods_no, brand_id, supplier_id, status, name, full_name, 
-    origin, enable, is_proxy, factory_id, unit, pack_unit, medium_unit, medium_pack, 
+    origin, enable, is_proxy, factory_id, unit, pack_unit, medium_unit, medium_pack,
     big_pack, pinyin, storage_condition, comment, cert1_name, cert1_exp_date, cert1_no,
     cert2_name,cert2_exp_date, cert2_no, cert3_name, cert3_exp_date, cert3_no,
     file_no, in_check, first_check, special_manage, cold_manage, need_care, in_tax, out_tax, valid_months,
@@ -100,7 +100,7 @@
     insert into goods_info (company_id, category_id,
       goods_no, brand_id, supplier_id, 
       status, name, full_name, 
-      origin, enable, is_proxy, factory_id, 
+      origin, enable, is_proxy, factory_id,
       unit, pack_unit, medium_unit, 
       medium_pack, big_pack, pinyin, 
       storage_condition, comment,
@@ -122,7 +122,7 @@
     values (#{companyId,jdbcType=INTEGER}, #{categoryId,jdbcType=INTEGER},
       #{goodsNo,jdbcType=VARCHAR}, #{brandId,jdbcType=BIGINT}, #{supplierId,jdbcType=BIGINT}, 
       #{status,jdbcType=VARCHAR}, #{name,jdbcType=VARCHAR}, #{fullName,jdbcType=VARCHAR}, 
-      #{origin,jdbcType=VARCHAR}, #{enable,jdbcType=BIT}, #{isProxy,jdbcType=BIT}, #{factoryId,jdbcType=BIGINT}, 
+      #{origin,jdbcType=VARCHAR}, #{enable,jdbcType=BIT}, #{isProxy,jdbcType=BIT}, #{factoryId,jdbcType=BIGINT},
       #{unit,jdbcType=BIGINT}, #{packUnit,jdbcType=BIGINT}, #{mediumUnit,jdbcType=BIGINT}, 
       #{mediumPack,jdbcType=DECIMAL}, #{bigPack,jdbcType=DECIMAL}, #{pinyin,jdbcType=VARCHAR}, 
       #{storageCondition,jdbcType=BIGINT}, #{comment,jdbcType=VARCHAR}, #{cert1Name,jdbcType=VARCHAR},
@@ -520,5 +520,15 @@
           updated_time = #{updatedTime}
     where id = #{id}
   </update>
+
+  <select id="getColdManageByDetailIds" parameterType="map" resultMap="BaseResultMap">
+    select g.*
+    from goods_info g, goods_detail d
+    where g.id = d.goods_info_id and g.cold_manage = 1
+    and d.id in
+    <foreach collection="detailIds" item="item" open="(" close=")" separator=", ">
+      #{item}
+    </foreach>
+  </select>
 
 </mapper>

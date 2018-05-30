@@ -31,7 +31,7 @@
                 </Card>
             </Col>
             <Col span="14" style="margin-left: 5px;">
-                <factoty-info ref="factoryInfo" :factoryId="currFactoryId" @save-ok="factorySaveOk" ></factoty-info>
+                <factoty-info ref="ssss" :factoryId="currFactoryId" @save-ok="factorySaveOk" ></factoty-info>
             </Col>
         </Row>
     </div>
@@ -81,6 +81,7 @@
         },
         mounted () {
             this.loadFactoryList();
+            //this.$refs.factoryinfo.resetFields();
         },
         computed: {
         },
@@ -90,6 +91,7 @@
             },
             searchFactory () {
                 var self = this;
+                
                 self.tabLoading = true;
                 util.ajax.post('/factory/search', {search: this.searchFactoryVal})
                     .then(function (response) {
@@ -154,7 +156,8 @@
                 this.currFactoryId = row.id;
             },
             factorySaveOk(data, action) {
-                if (action === 'edit') {
+               this.$refs.ssss.clearss();
+                if (action === 'edit') {     
                     if (data && data.id) {
                         let self = this;
                         self.factoryData.forEach((item, index) => {
@@ -164,7 +167,8 @@
                         });
                     }
                 }else {
-                    this.searchFactory();
+                    this.loadFactoryList();
+                    //this.searchFactory();
                 }
                 
             }

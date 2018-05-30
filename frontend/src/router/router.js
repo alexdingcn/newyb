@@ -203,10 +203,23 @@ export const appRouter = [
             { path: 'out-check', title: '出库审核', name: 'out-check', component: () => import('@/views/out-store/out-check.vue') },
             { path: 'out-order-list', title: '出库明细', name: 'out-order-list', divided: true, component: () => import('@/views/out-store/out-order-list.vue') },
 
-            { path: 'store_check_index', title: '盘点单列表', name: 'store_check_index', component: () => import('@/views/checkplan/store_check_index.vue') },{ path: 'store_check_add', title: '盘点制单', name: 'store_check_add', component: () => import('@/views/checkplan/store_check_add.vue') },
+            { path: 'store_check_index', title: '盘点单列表', name: 'store_check_index', component: () => import('@/views/checkplan/store_check_index.vue') },
+            { path: 'store_check_add', title: '盘点制单', name: 'store_check_add', component: () => import('@/views/checkplan/store_check_add.vue') },
             { path: 'store_check_do_list', title: '执行盘点', name: 'store_check_do_list', component: () => import('@/views/checkplan/store_check_do_list.vue') },
             { path: 'store_check_table_list', title: '盘点表确认', name: 'store_check_table_list', component: () => import('@/views/checkplan/store_check_table_list.vue') },
             { path: "store_check_pass_list", title: '盘点审核', name: 'store_check_pass_list', component: () => import('@/views/checkplan/store_check_pass_list.vue')},
+            { path: "goods-care-list", title: '养护', name: 'goods-care-list', component: () => import('@/views/goods/goods-care-list.vue')},
+        ]
+    },
+    {
+        path: '/marketing',
+        icon: 'social-yen',
+        name: 'marketing',
+        title: '营销',
+        component: Main,
+        children: [
+            { path: 'home-banner', title: '首页广告位', name: 'home-banner', component: () => import('@/views/marketing/home-banner.vue') },
+            { path: 'announcement', title: '公告', name: 'announcement', component: () => import('@/views/marketing/announcement.vue') },
         ]
     },
 

@@ -3,98 +3,120 @@
 </style>
 
 <template>
-	<Row>
-		<Card>
-			<p slot="title" >
-				<Icon type="document"></Icon> 采购入库制单
-			</p>
-			<div slot="extra">
+	<Row :gutter="10">
+        <i-col :span="showSider ? '4' : '0'">
+            <Card>
+                <p slot="title">
+                    未审核采购单
+                    <Tooltip transfer placement="right-start">
+                        <Icon type="ios-help-outline"></Icon>
+                        <div slot="content" >
+                            <p>展现采购单录入后未审核通过的列表</p>
+                        </div>
+                    </Tooltip>
+                </p>
+                <div slot="extra">
+                    <a href="javascript:void(0)" @click="reloadUncheckData" style="margin-right: 5px;" >
+                        <Icon type="refresh"></Icon>
+                    </a>
+                </div>
+                
+                <Table stripe highlight-row :loading="uncheckTabLoading" 
+                        :columns="uncheckColumns" :data="uncheckData" ref="uncheckTable" 
+                        style="width: 100%;" class="uncheck-table" 
+                        size="small">
+                </Table>
+            </Card>
+        </i-col>
+        <i-col :span="showSider ? '20' : '24'">
+            <Card>
+                <p slot="title" >
+                    <a href="javascript:void(0)" @click="changeSiderShow" style="margin-right: 5px;" >
+                        <Icon v-if="showSider" type="chevron-left"></Icon>
+                        <Icon v-else type="chevron-right"></Icon>
+                    </a>
 
-				<ButtonGroup class="padding-left-20">
-					<Button type="primary" icon="android-list" @click="saveBuyOrder" :loading="saving">保存</Button>
-				</ButtonGroup>
-			</div>
+                    <Icon type="document"></Icon> 采购入库制单
+                </p>
+                <div slot="extra">
 
-			<Form :label-width="85" :rules="ruleValidate" :model="buyOrder" ref="buyOrderForm">
-				<Row>
-					<i-col span="6">
-                        <FormItem label="供应商" prop="supplierId" >
-                            <supplier-select v-model="buyOrder.supplierId" ></supplier-select>
-                        </FormItem>
-					</i-col>
-                    <i-col span="6">
-                        <FormItem label="仓库点" prop="warehouseId">
-                            <warehouse-select v-model="buyOrder.warehouseId" ></warehouse-select>
-                        </FormItem>
-					</i-col>
-					<!-- <Col span="5">
-                        <FormItem label="供应商代表" prop="supplierContactId" >
-                            <supplier-contact-select v-model="buyOrder.supplierContactId" :disabled="!buyOrder.supplierId" :supplierId="buyOrder.supplierId"></supplier-contact-select>
-                        </FormItem>
-					</Col> -->
-					<i-col span="6">
-                        <FormItem label="采购员" prop="buyerId">
-                            <buyer-select v-model="buyOrder.buyerId" ></buyer-select>
-                        </FormItem>
-					</i-col>
-					<!-- <Col span="6">
-                        <FormItem label="自定单号" prop="refNo">
-                            <Input v-model="buyOrder.refNo" />
-                        </FormItem>
-					</Col> -->
-				</Row>
-				<Row>
-					<i-col span="8">
-						<FormItem label="选择商品">
-                            <good-select :disabled="!buyOrder.warehouseId" ref="goodsSelect" :warehouseId="buyOrder.warehouseId"
-                            @on-change="onSelectGoods"></good-select>
-						</FormItem>
-					</i-col>
-				</Row>
+                    <ButtonGroup class="padding-left-20">
+                        <Button type="success" icon="android-list" @click="saveBuyOrder" :loading="saving">保存</Button>
+                    </ButtonGroup>
+                </div>
 
-				<Table border highlight-row
-					   class="margin-top-8"
-					   :columns="orderColumns" :data="orderItems"
-					   ref="buyOrderTable" size="small"
-					   no-data-text="在商品输入框选择后添加"
-					   @on-row-dblclick="handleRowDbClick">
-					<div slot="footer">
-						<h3 class="padding-left-20" >
-							<b>合计金额:</b> ￥{{ totalAmount }}
-						</h3>
-					</div>
-				</Table>
+                <Form :label-width="85" :rules="ruleValidate" :model="buyOrder" ref="buyOrderForm">
+                    <Row>
+                        <i-col span="6">
+                            <FormItem label="供应商" prop="supplierId" >
+                                <supplier-select v-model="buyOrder.supplierId" ></supplier-select>
+                            </FormItem>
+                        </i-col>
+                        <i-col span="6">
+                            <FormItem label="仓库点" prop="warehouseId">
+                                <warehouse-select v-model="buyOrder.warehouseId" ></warehouse-select>
+                            </FormItem>
+                        </i-col>
+                        <i-col span="6">
+                            <FormItem label="采购员" prop="buyerId">
+                                <buyer-select v-model="buyOrder.buyerId" ></buyer-select>
+                            </FormItem>
+                        </i-col>
+                    </Row>
+                    <Row>
+                        <i-col span="8">
+                            <FormItem label="选择商品">
+                                <good-select :disabled="!buyOrder.warehouseId" ref="goodsSelect" :warehouseId="buyOrder.warehouseId" options="LW;LB;CBQ" 
+                                @on-change="onSelectGoods"></good-select>
+                            </FormItem>
+                        </i-col>
+                    </Row>
 
-                <h3 class="margin-top-10">配送和交货</h3>
-                <Row>
-                    <i-col span="5">
-                        <FormItem label="温控方式" prop="temperControlId">
-                            <option-select v-model="buyOrder.temperControlId" optionType="TEMPER_CONTROL"></option-select>
-                        </FormItem>
-					</i-col>
-                    <i-col span="5">
-                        <FormItem label="运输方式" prop="shipMethodId">
-                            <option-select v-model="buyOrder.shipMethodId" optionType="SHIP_METHOD"></option-select>
-                        </FormItem>
-					</i-col>
-					<i-col span="5">
-                        <FormItem label="运输工具" prop="shipToolId">
-                            <option-select v-model="buyOrder.shipToolId" optionType="SHIP_TOOL"></option-select>
-                        </FormItem>
-					</i-col>
-                    <i-col span="5">
-						<FormItem label="预到货日期" prop="eta">
-							<DatePicker type="date" v-model="buyOrder.eta" />
-						</FormItem>
-					</i-col>
-                </Row>
+                    <Table border highlight-row
+                        class="margin-top-8"
+                        :columns="orderColumns" :data="orderItems"
+                        ref="buyOrderTable" size="small"
+                        no-data-text="在商品输入框选择后添加"
+                        @on-row-dblclick="handleRowDbClick">
+                        <div slot="footer">
+                            <h3 class="padding-left-20" >
+                                <b>合计金额:</b> ￥{{ totalAmount }}
+                            </h3>
+                        </div>
+                    </Table>
 
-				<div class="margin-top-10">
-				    <Input type="textarea" v-model="buyOrder.comment" :rows="2" placeholder="暂无备注信息"/>
-				</div>
-				
-			</Form>
-		</Card>
+                    <h3 class="margin-top-10">配送</h3>
+                    <Row>
+                        <i-col span="5">
+                            <FormItem label="温控方式" prop="temperControlId">
+                                <option-select v-model="buyOrder.temperControlId" optionType="TEMPER_CONTROL"></option-select>
+                            </FormItem>
+                        </i-col>
+                        <i-col span="5">
+                            <FormItem label="运输方式" prop="shipMethodId">
+                                <option-select v-model="buyOrder.shipMethodId" optionType="SHIP_METHOD"></option-select>
+                            </FormItem>
+                        </i-col>
+                        <i-col span="5">
+                            <FormItem label="运输工具" prop="shipToolId">
+                                <option-select v-model="buyOrder.shipToolId" optionType="SHIP_TOOL"></option-select>
+                            </FormItem>
+                        </i-col>
+                        <i-col span="5">
+                            <FormItem label="预到货日期" prop="eta">
+                                <DatePicker type="date" v-model="buyOrder.eta" />
+                            </FormItem>
+                        </i-col>
+                    </Row>
+
+                    <div class="margin-top-10">
+                        <Input type="textarea" v-model="buyOrder.comment" :rows="2" placeholder="暂无备注信息"/>
+                    </div>
+                    
+                </Form>
+            </Card>
+        </i-col>
+		
 		<Modal v-model="closeConfirm"
 			   title="是否继续下单"
 			   @on-ok="clearData"
@@ -147,44 +169,65 @@
                         width: 30
                     },
                     {
-                        title: '货号',
-                        key: 'id',
-                        width: 50
-                    },
-                    {
                         title: '商品名称',
-                        key: 'name',
+                        key: 'goodsName',
                         width: 200,
-                        sortable: true
+                        sortable: true,
+                        render: (h, params) => {
+                            let goodsName = params.row.goods.name;
+                            return h('span', goodsName);
+                        }
                     },
                     {
                         title: '产地',
                         key: 'origin',
-                        width: 100
+                        width: 100,
+                        render: (h, params) => {
+                            let origin = params.row.goods.origin;
+                            return h('span', origin);
+                        }
                     },
                     {
                         key: 'goodsSpecs',
                         title: '规格',
                         width: 120,
                         render: (h, params) =>　{
+                            let goodsSpecs = params.row.goods.goodsSpecs ? params.row.goods.goodsSpecs : [];
                             return h(goodsSpecTags, {
                                 props: {
-                                    tags: params.row.goodsSpecs,
+                                    tags: goodsSpecs,
                                     color: 'blue'
                                 }
                             });
                         }
                     },
                     {
+                        title: '商品条码',
+                        key: 'barCode',
+                        width: 150,
+                        render: (h, params) => {
+                            let barCode = params.row.goods && params.row.goods.barCode ? params.row.goods.barCode : '';
+                            return h('span', barCode);
+                        }
+                    },
+                    {
                         title: '生产企业',
                         key: 'factoryName',
-                        width: 150
+                        width: 150,
+                        render: (h, params) => {
+                            let factoryName = params.row.goods.factoryName;
+                            return h('span', factoryName);
+                        }
                     },
                     {
                         title: '单位',
                         key: 'unitName',
                         align: 'center',
-                        width: 80
+                        width: 80,
+                        render: (h, params) => {
+                            let unitName = params.row.goods.unitName;
+                            return h('span', unitName);
+                        }
                     },
                     {
                         title: '数量',
@@ -201,7 +244,7 @@
                                 on: {
  									'on-blur' (event) {
  										var row = self.orderItems[params.index];
- 										var price = row['price'];
+ 										var price = row['buyPrice'];
                                         var qty = event.target.value;
                                         row[params.column.key] = qty;
                                         if (qty != '' && !isNaN(qty) && !isNaN(price)) {
@@ -222,10 +265,9 @@
                             });
                         }
                     },
-                    
                     {
                         title: '采购单价',
-                        key: 'price',
+                        key: 'buyPrice',
                         align: 'center',
                         width: 100,
                         render: (h, params) => {
@@ -271,7 +313,6 @@
                             });
                         }
                     },
-
                     {
                         title: '金额',
                         key: 'amount',
@@ -279,57 +320,56 @@
                         width: 100
                     },
                     {
+                        title: '最近采购价',
+                        key: 'lastBuyPrice',
+                        align: 'center',
+                        width: 100,
+                        render: (h, params) => {
+                            let lastBuyPrice = params.row.goods.lastBuyPrice ? params.row.goods.lastBuyPrice : '';
+                            return h('span', lastBuyPrice);
+                        }
+                    },
+                    {
                         title: '整件单位',
                         key: 'packUnitName',
                         align: 'center',
-                        width: 100
+                        width: 100,
+                        render: (h, params) => {
+                            let packUnitName = params.row.goods.packUnitName;
+                            return h('span', packUnitName);
+                        }
                     },
                     {
                         title: '大件装量',
                         key: 'bigPack',
                         align: 'center',
-                        width: 80
+                        width: 80,
+                        render: (h, params) => {
+                            let bigPack = params.row.goods.bigPack;
+                            return h('span', bigPack);
+                        }
                     },
                     {
                         title: '库存',
-                        key: 'balance',
+                        key: 'currRepQuatity',
                         align: 'center',
-                        width: 100
+                        width: 100,
+                        render: (h, params) => {
+                            let currRepQuatity = params.row.goods.currRepQuatity ? params.row.goods.currRepQuatity : '';
+                            return h('span', currRepQuatity);
+                        }
                     },
                     {
-                        title: '在单数',
-                        key: 'buyOrderCount',
+                        title: '在单数量',
+                        key: 'currBuyQuality',
                         align: 'center',
-                        width: 100
-                    },
-                    {
-                        title: '在单总数',
-                        key: 'ongoingCount',
-                        align: 'center',
-                        width: 100
-                    },
-                    {
-                        title: '最近采购价',
-                        key: 'lastPrice',
-                        align: 'center',
-                        width: 100
-                    },
-                    {
-                        title: '存储条件',
-                        key: 'storageConditionName',
-                        width: 120
-                    },
-                    {
-                        title: '药基',
-                        key: 'baseMedName',
-                        width: 120
-                    },
-                    {
-                        title: '批准文号',
-                        key: 'permitNo',
-                        width: 200
+                        width: 100,
+                        render: (h, params) => {
+                            let currBuyQuality = params.row.goods.currBuyQuality ? params.row.goods.currBuyQuality : '';
+                            return h('span', currBuyQuality);
+                        }
                     }
-        	],
+        	    ],
                 ruleValidate: {
                     supplierId: [
                         { required: true, type: 'number', message: '请选择供应商' }
@@ -340,13 +380,99 @@
                     warehouseId: [
                         { required: true, type: 'number', message: '请选择仓库点' }
                     ],
-                    orderItems: [
+                    details: [
                         { required: true, type: 'array', array: {min: 1}, message: '请添加商品' }
                     ]
-                }
+                },
+                showSider: true,
+                uncheckTabLoading: false,
+                uncheckData: [],
+                uncheckColumns: [
+                    {
+                        title: '采购单',
+                        key: 'id',
+                        render: (h, params) => {
+                            let orderNumnber = params.row.orderNumber;
+                            let supplier = params.row.supplier;
+                            let createdTime = moment(params.row.createdTime).format('YYYY-MM-DD HH:mm');
+                            let createdBy = params.row.createdBy;
+                            let warehouse = params.row.warehouse;
+                            return h('div', {
+                                    style: {
+                                        margin: '0.5em'
+                                    }
+                                }, [
+                                    h('h5', {
+                                        style: {
+                                            color: '#9ea7b4',
+                                            fontSize: '12px'
+                                        }
+                                    }, orderNumnber),
+                                    h('h4', supplier + '[' + warehouse + ']'),
+                                    h('h5', {
+                                        style: {
+                                            color: '#9ea7b4',
+                                            fontSize: '12px'
+                                        }
+                                    }, createdTime + '[' + createdBy + ']'),
+                                ]
+                            );
+                        }
+                    },
+                    {
+                        title: ' ',
+                        key: 'action',
+                        align: 'right',
+                        maxWidth: 60,
+                        render: (h, params) => {
+                            let self = this;
+                            let status = params.row.status;
+                            let statusLabel = status === 'REJECTED' ? '审核拒绝' : '待审核';
+                            let statusColor = status === 'REJECTED' ? 'red' : 'blue';
+                            let statusH = h('span', {
+                                    class: {
+                                        statusClass: true
+                                    },
+                                    style: {
+                                        color: statusColor
+                                    }
+                                }, statusLabel);
+                            let buttonH = h('ButtonGroup', {
+                                props: {
+                                    vertical: true,
+                                    size: 'small'
+                                }
+                            }, [
+                                h('Button', {
+                                    props: {
+                                        type: 'info'
+                                    },
+                                    on: {
+                                        click: () => {
+                                            self.editBuyOrder(params.row);
+                                        } 
+                                    }
+                                }, '修改'),
+                                h('Button', {
+                                    props: {
+                                        type: 'error'
+                                    },
+                                    on: {
+                                        click: () => {
+                                            self.removeBuyOrder(params.row.id);
+                                        }
+                                    }
+                                }, '删除')
+                            ]);
+                            return  h('div', [statusH, buttonH]);
+                        }
+                    }
+                ],
+                haveCheck: false
             };
         },
         mounted () {
+            this.init();
         },
         activated () {
             this.clearData();
@@ -357,6 +483,31 @@
         	}
         },
         methods: {
+            init() {
+                //先获取系统的流程配置参数,
+                this.loadSystemConfig();
+            },
+
+            loadSystemConfig() {
+                //获取一些系统配置中的采购单的审核流程，主要确认是否显示侧边栏目和加载侧边栏的数据
+                util.ajax.get('/config/list')
+                    .then((response) => {
+                        let data = response.data;
+                        let config = data['BUY_CHECK'];
+                        if (config.keyValue === 'open') {
+                            this.haveCheck = true;
+                            this.reloadUncheckData();
+                            this.showSider = true;
+                        }else {
+                            this.haveCheck = false;
+                            this.showSider = false;
+                        }
+                    })
+                    .catch((error) => {
+                        console.log(error);
+                        util.errorProcessor(this, error);
+                    });
+            },
             moment: function () {
                 return moment();
             },
@@ -366,22 +517,20 @@
                     content: '<p>确认删除商品 ' + row.name + '?</p>',
                     onOk: () => {
                         for (var i = 0; i < this.orderItems.length; i++) {
-                            if (row.id === this.orderItems[i].id) {
+                            if (row.goodsId === this.orderItems[i].goodsId) {
                                 this.orderItems.splice(i, 1);
                                 this.buyOrder.orderItemIds.splice(i, 1);
                             }
                         }
                     },
-                    onCancel: () => {
-    
-                    }
+                    onCancel: () => {}
                 });
             },
             onSelectGoods (goodsId, goods) {
                 if (goodsId && goods) {
                     var index = this.buyOrder.orderItemIds.indexOf(goods.id);
                     if (index < 0) {
-                        this.setGoodsBalance(goods);
+                        this.setBuyOrderDetails(goods);
                     } else {
                         this.$Message.warning('该商品已经添加');
                     }
@@ -389,75 +538,28 @@
                 }
             },
 
-            setGoodsBalance(goods) {
+            setBuyOrderDetails(goods) {
                 if(!goods.id) {
                     return;
                 }
-                //根据当前仓库和商品ID获取最近价格和库存信息
-                let reqDate = {
-                    warehouseId: this.buyOrder.warehouseId,
-                    goodsIdList: JSON.stringify([goods.id])
+                //制造一个采购单详情的记录信息
+                let item = {
+                    goodsId: goods.id,
+                    goodsName: goods.name,
+                    quantity: 0,
+                    buyPrice: goods.inPrice,
+                    amount: 0,
+                    goods: goods
                 };
-                util.ajax.get("/repertory/in/current/balance", {params: reqDate})
-                    .then((response) => {
-                        let data = response.data;
-                        let record ='';
-                        if(data) {
-                            record = data[goods.id];
-                        }
-                        goods['lastPrice'] = record ? record.lastPrice : '';
-                        goods['buyOrderCount'] = record ? record.buyOrderCount : '';
-                        goods['balance'] = record ? record.balance : '';
-                        goods['ongoingCount'] = record ? record.ongoingCount : '';
-                        goods['amount'] = 0;
-                        // 填入参考买入价
-                        goods['price'] = goods['inPrice'];
-                        console.log(goods);
-                        this.orderItems.push(goods);
-                        this.buyOrder.orderItemIds.push(goods.id);
-                        var self = this;
-                        setTimeout(function () {
-                            self.$refs.buyOrderTable.$el.querySelector('.ivu-table-body tr:last-child input').focus();
-                        }, 400);
-                    })
-                    .catch((error) => {
-                        util.errorProcessor(this, error);
-                        goods['amount'] = 0;
-                        this.orderItems.push(goods);
-                        this.buyOrder.orderItemIds.push(goods.id);
-                        var self = this;
-                        setTimeout(function () {
-                            self.$refs.buyOrderTable.$el.querySelector('.ivu-table-body tr:last-child input').focus();
-                        }, 400);
-                    });
+                console.log(item);
+                this.orderItems.push(item);
+                this.buyOrder.orderItemIds.push(goods.id);
+                let self = this;
+                setTimeout(function () {
+                    self.$refs.buyOrderTable.$el.querySelector('.ivu-table-body tr:last-child input').focus();
+                }, 400);
             },
 
-            doSave () {
-                this.$Modal.confirm({
-                    title: '提交确认',
-                    content: '请确认采购数据录入完全正确, 提交后不可修改.',
-                    onCancel:() => {},
-                    onOk:() => {
-                        var self = this;
-                        this.saving = true;
-                        util.ajax.post('/buy/add', this.buyOrder)
-                            .then(function (response) {
-                                if (response.status === 200 && response.data) {
-                                    self.buyOrder.id = response.data.orderId;
-                                    self.buyOrder.status = response.data.status;
-                                    self.$Message.info('采购入库订单保存成功');
-                                    self.closeConfirm = true;
-                                }
-                                self.saving = false;
-                            })
-                            .catch(function (error) {
-                                self.saving = false;
-                                self.$Message.error('保存采购订单错误');
-                                util.erorProcessor(self, error);
-                            });
-                    }
-                });
-            },
             clearData () {
                 this.buyOrder = {
                     supplierId: null,
@@ -465,12 +567,40 @@
                     orderItemIds: []
                 };
                 this.orderItems = [];
+                this.$refs.buyOrderForm.resetFields();
             },
             closeTab () {
                 this.clearData();
                 let pageName = util.closeCurrentTab(this);
                 this.$router.push({
                     name: pageName
+                });
+            },
+
+            doSave () {
+                var self = this;
+                this.$Modal.confirm({
+                    title: '提交确认',
+                    content: '请确认采购数据录入完全正确, 提交到下一步: ' + (this.haveCheck ? '“采购单审核”' : '“采购收货”'),
+                    onCancel:() => {},
+                    onOk:() => {
+                        self.saving = true;
+                        util.ajax.post('/buy/add', self.buyOrder)
+                            .then(function (response) {
+                                self.saving = false;
+                                if (response.status === 200 && response.data) {
+                                    self.buyOrder.id = response.data.orderId;
+                                    self.buyOrder.status = response.data.status;
+                                    self.$Message.success('采购入库订单保存成功');
+                                    self.closeConfirm = true;
+                                    self.reloadUncheckData();
+                                }
+                            })
+                            .catch(function (error) {
+                                self.saving = false;
+                                util.errorProcessor(self, error);
+                            });
+                    }
                 });
             },
 
@@ -482,7 +612,7 @@
                 //查询下添加的商品中，是否存在有冷链经营的商品，
                 let haveCold = false;
                 for (let i=0; i < this.orderItems.length; i++) {
-                    let goods = this.orderItems[i];
+                    let goods = this.orderItems[i].goods;
                     if (goods && goods.coldManage) {
                         haveCold = true;
                         break;
@@ -493,7 +623,7 @@
             },
 
             saveBuyOrder () {
-                this.buyOrder.orderItems = this.orderItems;
+                this.buyOrder.details = this.orderItems;
                 let self = this;
                 this.$refs.buyOrderForm.validate((valid) => {
                     if (!valid) {
@@ -510,6 +640,81 @@
                             });
                             return;
                         }
+                    }
+                });
+            },
+
+            changeSiderShow() {
+                this.showSider = !this.showSider;
+            },
+
+            editBuyOrder(row) {
+                if (!row.id || row.id <= 0) {
+                    return;
+                }
+                row.eta = row.eta ? moment(row.eta).format('YYYY-MM-DD') : '';
+                console.log(row);
+                this.buyOrder = row;
+                let self = this;
+                this.orderItems = [];
+                this.buyOrder.orderItemIds = [];
+                //获取该笔订单的详情信息
+                util.ajax.get('/buy/orderdetail/' + row.id)
+                    .then((response) => {
+                        let data = response.data;
+                        console.log(data);
+                        if (data && data.length > 0) {
+                            self.orderItems = data;
+                            for(let i=0; i<data.length; i++) {
+                                self.buyOrder.orderItemIds.push(data[i].goodsId);
+                            }
+                        }
+                    })
+                    .catch((error) => {
+                        util.errorProcessor(self, error);
+                    });
+            },
+
+            reloadUncheckData() {
+                let query = {
+                    statusNames: ['INIT', 'REJECTED']
+                };
+                let self = this;
+                this.uncheckTabLoading = true;
+                util.ajax.post('/buy/list', query)
+                    .then(function (response) {
+                        console.log(response.data);
+                        self.uncheckTabLoading = false;
+                        if (response.status === 200 && response.data) {
+                            self.uncheckData = response.data;
+                        }
+                        self.$refs.uncheckTable.clearCurrentRow();
+                    })
+                    .catch(function (error) {
+                        self.uncheckTabLoading = false;
+                        util.errorProcessor(self, error);
+                    });
+            },
+
+            removeBuyOrder(buyOrderId) {
+                console.log('remove buy order id:' + buyOrderId);
+                let self = this;
+                this.$Modal.confirm({
+                    title: '删除订单确认',
+                    content: '是否确认删除采购单',
+                    onOk: () => {
+                        //删除操作请求
+                        self.uncheckTabLoading = true;
+                        util.ajax.delete('/buy/remove/' + buyOrderId)
+                            .then((response) => {
+                                self.uncheckTabLoading = false;
+                                self.$Message.success('采购单删除成功');
+                                self.reloadUncheckData();
+                            })
+                            .catch((error) => {
+                                self.uncheckTabLoading = false;
+                                util.errorProcessor(self, error);
+                            });
                     }
                 });
             }
@@ -537,4 +742,22 @@ th .ivu-table-cell {
 @media (max-height: 800px) {
     .ivu-table-body, .ivu-table-tip { min-height: 120px; }
 }
+
+.uncheck-table .statusClass {
+    display: block;
+}
+
+.uncheck-table .ivu-table-row-hover .statusClass {
+    display: none;
+}
+
+.uncheck-table .ivu-btn-group {
+    display: none;
+}
+
+.uncheck-table .ivu-table-row-hover .ivu-btn-group {
+    display: block;
+}
+
+
 </style>

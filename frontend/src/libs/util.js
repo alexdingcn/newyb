@@ -402,7 +402,6 @@ util.errorProcessor = function (vm, error, callback) {
     } else {
         showErrorMessage(vm, '服务器连接中断');
     }
-
 };
 
 export default util;

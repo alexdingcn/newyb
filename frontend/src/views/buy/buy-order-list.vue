@@ -351,9 +351,6 @@
         mounted () {
             this.queryOrderList();
         },
-    activated () {
-
-    },
         watch: {
         	orderItems: function () {
         		this.totalAmount = this.orderItems.reduce(function (total, item) { return total + parseFloat(item.amount); }, 0);

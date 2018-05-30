@@ -34,13 +34,50 @@ public class SystemConfigService {
     @Autowired
     private StringRedisTemplate stringRedisTemplate;
 
+    /**
+     * 判断某一步订单流程是否存在
+     * 注意，改方法只做审批流程的判断
+     * @param companyId
+     * @param key
+     * @return 默认流程未开启,
+     */
+    public boolean haveOrderFlow(Integer companyId, ConfigKey key) {
+        if (companyId ==null || key == null) {
+            return false;
+        }
+        SystemConfig config = getByKeyName(companyId, key.name());
+        if (config == null) {
+            return false;
+        }
+        switch (key) {
+            case BUY_CHECK:
+            case BUY_QUALITY_CHECK:
+            case BUY_FINAL_CHECK:
+            case BUY_BACK_BM_CHECK:
+            case BUY_BACK_QA_CHECK:
+            case BUY_BACK_QUALITY_CHECK:
+            case SALE_CHECK:
+            case SALE_BACK_SM_CHECK:
+            case SALE_BACK_QA_CHECK:
+            case SALE_BACK_QUALITY_CHECK:
+            case SALE_BACK_FINAL_CHECK:
+                return "open".equalsIgnoreCase(config.getKeyValue()); //不是打开状态的情况下直接返回未开启流程
+        }
+        return false;
+    }
 
-    public Map<String, SystemConfig> getConfigMap(User user) {
+    public SystemConfig getByKeyName(Integer companyId, String keyName) {
+        Map<String, SystemConfig> map = getConfigMap(companyId);
+        return map.get(keyName);
+    }
+
+
+    public Map<String, SystemConfig> getConfigMap(Integer companyId) {
         //先从缓存获取，如果缓存中存在，直接返回，如果缓存中不存在，查询数据库
-        if (user.getCompanyId() == null) {
+        if (companyId == null) {
             return new HashMap<>();
         }
-        String cacheKey = CACHE_KEY_PRE + user.getCompanyId();
+        String cacheKey = CACHE_KEY_PRE + companyId;
         ValueOperations<String, String> operations = stringRedisTemplate.opsForValue();
         String cacheValue = operations.get(cacheKey);
         if (StringUtils.isNotEmpty(cacheValue)) {
@@ -49,7 +86,7 @@ public class SystemConfigService {
             return listToMap(configs);
         }
         //如果缓存获取不到是，从数据库查询
-        List<SystemConfig> configList = systemConfigMapper.getAll(user.getCompanyId());
+        List<SystemConfig> configList = systemConfigMapper.getAll(companyId);
         if (!configList.isEmpty()) {
             //不为空的时候，存入缓存
             String cache = JSON.toJSONString(configList);

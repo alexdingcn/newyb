@@ -20,6 +20,7 @@
         <mapper resource="mapping/GoodsAttributeRefMapper.xml"/>
         <mapper resource="mapping/GoodsSpecMapper.xml"/>
         <mapper resource="mapping/GoodsBrandMapper.xml"/>
+        <mapper resource="mapping/GoodsCareMapper.xml"/>
         <mapper resource="mapping/PriceRuleMapper.xml"/>
         <mapper resource="mapping/FactoryMapper.xml"/>
         <mapper resource="mapping/FactoryDatabaseMapper.xml"/>
@@ -64,5 +65,6 @@
         <mapper resource="mapping/SystemConfigMapper.xml"/>
         <mapper resource="mapping/UpdateHistoryMapper.xml"/>
         <mapper resource="mapping/SellOrderPaymentMapper.xml"/>
+        <mapper resource="mapping/BannerMapper.xml"/>
     </mappers>
 </configuration>

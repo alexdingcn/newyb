@@ -197,6 +197,7 @@ public class Goods {
     private BigDecimal currRepQuatity; //当前库存量
     private BigDecimal lastBuyPrice;   //最近一次采购价
     private BigDecimal lastSalePrice; // 最近一次销售价
+    private BigDecimal currBuyQuality; //当前采购单在审核的数量
 
 
     public void setOptionName(List<Options> options) {
@@ -1133,5 +1134,13 @@ public class Goods {
 
     public void setLastSalePrice(BigDecimal lastSalePrice) {
         this.lastSalePrice = lastSalePrice;
+    }
+
+    public BigDecimal getCurrBuyQuality() {
+        return currBuyQuality;
+    }
+
+    public void setCurrBuyQuality(BigDecimal currBuyQuality) {
+        this.currBuyQuality = currBuyQuality;
     }
 }

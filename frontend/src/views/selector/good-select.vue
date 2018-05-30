@@ -32,7 +32,7 @@
         </Tooltip>
 
         <Modal v-model="selectGoodsModal" width="70" :mask-closable="false" title="选择商品" class="goods-modal">
-            <goodsListSelect ref="goodsSelectModal" :warehouseId="warehouseId" @on-choosed="goodsSelected" ></goodsListSelect>
+            <goodsListSelect ref="goodsSelectModal" :warehouseId="warehouseId" @on-choosed="goodsSelected" :options="options" ></goodsListSelect>
             <div slot="footer">
                 <Button type="text" @click="selectGoodsModal = false">取消</Button>
             </div>
@@ -48,7 +48,7 @@ const prefixCls = 'ivu-input';
 
 export default {
     name: 'good-select',
-    props: ['value', 'warehouseId', 'disabled', 'size'],
+    props: ['value', 'warehouseId', 'disabled', 'size', 'options'],
     components: {
         goodsListSelect
     },
@@ -97,11 +97,17 @@ export default {
         queryGoods (query) {
             var self = this;
             if (query !== '') {
+                let requestData = {
+                    search: query,
+                    page: 1,
+                    size: 80
+                };
+                if (this.warehouseId) {
+                    requestData['warehouseId'] = this.warehouseId;
+                    requestData['options'] = this.options;
+                }
                 this.goodsLoading = true;
-                util.ajax.get('/goods/list',
-                    { params:
-                        {search: query, page: 1, size: 80}
-                    })
+                util.ajax.get('/goods/list', { params: requestData})
                     .then(function (response) {
                         self.goodsLoading = false;
                         self.goodsOptions = response.data.data;

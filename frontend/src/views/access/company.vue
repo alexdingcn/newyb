@@ -62,7 +62,7 @@
                     </Row>
                     <Row>
                         <Col span="8">
-                            <FormItem label="联系电话" prop="contactPhone">
+                            <FormItem label="联系电话" prop="contactPhone" >
                                 <Input v-model="formItem.contactPhone" />
                             </FormItem>
                         </Col>
@@ -70,7 +70,7 @@
                     <Row>
                         <Col span="8">
                             <FormItem label="公司介绍" prop="introduce">
-                                <Input type="textarea" :rows="3" v-model="formItem.introduce" maxlength="200" placeholder="200字以内"/>
+                                <Input type="textarea" :rows="3" v-model="formItem.introduce" :maxlength="200" placeholder="200字以内"/>
                             </FormItem>
                         </Col>
                     </Row>
@@ -113,15 +113,15 @@
     
 </template>
 <script>
-import Vue from 'vue';
 import moment from 'moment';
-import iviewArea from 'iview-area';
 import util from '@/libs/util.js';
-import fileDetail from '@/views/basic-data/file-detail.vue';
+import alCascader from '../my-components/area-linkage/components/al-cascader.vue';
 
-Vue.use(iviewArea);
 export default {
     name: 'company',
+    components: {
+        alCascader
+    },
     data () {
         const valideMobile = (rule, value, callback) => {
             if (!value) {
@@ -263,9 +263,21 @@ export default {
     },
     methods:{
         submit(){
+            this.$refs.formItem.validate(valid => {
+                if (!valid) {
+                    return;
+                }
+               this.doSubmit();
+                
+            });
+
+            
+        },
+        doSubmit(){
              util.ajax.post('/company/updateCompany',this.formItem )
                 .then((response) => {
-                   alert("公司信息修改成功！");
+                   this.$Message.success("公司信息修改成功！");
+                   
                 })
                 .catch(function (error) {
                         util.errorProcessor(this, error);
