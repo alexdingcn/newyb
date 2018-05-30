@@ -1,8 +1,10 @@
 package com.yiban.erp.dto;
 
+import com.yiban.erp.entities.GoodsAttributeRef;
 import org.apache.commons.lang3.StringUtils;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 public class RepertorySelectQuery {
 
@@ -13,6 +15,13 @@ public class RepertorySelectQuery {
     private Long supplierId;
     private Integer page;
     private Integer size;
+
+    private List<GoodsAttributeRef> currAttributes;
+
+
+    /**
+     * 默认属性筛选
+     */
 
     private BigDecimal minQuantity; //最低库存
 
@@ -99,4 +108,9 @@ public class RepertorySelectQuery {
     public void setMinQuantity(BigDecimal minQuantity) {
         this.minQuantity = minQuantity;
     }
+
+    public List<GoodsAttributeRef> getCurrAttributes() { return currAttributes; }
+
+    public void setCurrAttributes(List<GoodsAttributeRef> currAttributes) { this.currAttributes = currAttributes; }
+
 }

@@ -18,4 +18,6 @@ public interface GoodsAttributeMapper {
     List<GoodsAttribute> getByCompanyId(Integer companyId);
 
     boolean isUsedAttribute(Long id);
+
+
 }

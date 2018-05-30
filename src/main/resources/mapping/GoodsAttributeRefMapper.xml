@@ -6,6 +6,7 @@
     <result column="goods_info_id" property="goodsInfoId" jdbcType="BIGINT" />
     <result column="att_id" property="attId" jdbcType="BIGINT" />
     <result column="att_value" property="attValue" jdbcType="VARCHAR" />
+    <result column="att_name" property="attName" jdbcType="VARCHAR" />
   </resultMap>
   <sql id="Base_Column_List" >
     id, goods_info_id, att_id, att_value
@@ -56,4 +57,11 @@
     where goods_info_id = #{goodsInfoId}
   </select>
 
+  <select id="getDefaultAttr" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select
+      id AS att_id, att_name
+    from goods_attribute
+    where company_id = #{companyId,jdbcType=INTEGER} AND enable_default = '1'
+    order by id asc
+  </select>
 </mapper>

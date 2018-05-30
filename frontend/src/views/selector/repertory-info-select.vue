@@ -34,6 +34,13 @@
                         </FormItem>
                     </i-col>
                 </Row>
+                <Row class="row-margin-bottom"  :gutter="20">
+                    <i-col span="8"  v-for="(item) in currAttributes" :key="item.attId" >
+                        <FormItem :label="item.attName" :label-width="100">
+                            <Input type="text" v-model="item.attValue" />
+                        </FormItem>
+                    </i-col>
+                 </Row>
             </Form>
             <Row >
                 <span>已选中的商品: <strong style="color: red;">{{chooseGoods}} </strong></span> 
@@ -184,7 +191,8 @@ export default {
           totalCount: 0,
           currentPage: 1,
           tableCurrPageSize: 50,
-          tabCurrChooseList: []
+          tabCurrChooseList: [],
+          currAttributes: [],
       }
   },
   watch: {
@@ -220,12 +228,21 @@ export default {
               supplierId: this.formItem.supplierId,
               minQuantity: 0,
               page: this.currentPage,
-              size: this.tableCurrPageSize
+              size: this.tableCurrPageSize,
+              currAttributes:this.currAttributes,
           };
           util.ajax.post("/repertory/select", reqData)
             .then((response) => {
                 this.totalCount = response.data.count;
                 this.tabData = response.data.data;
+            })
+            .catch((error) => {
+                util.errorProcessor(this, error);
+            });
+            util.ajax
+            .get("/goods/defaultAttr")
+            .then((response) =>{
+                this.currAttributes=response.data;
             })
             .catch((error) => {
                 util.errorProcessor(this, error);

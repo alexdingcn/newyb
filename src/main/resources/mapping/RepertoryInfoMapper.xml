@@ -364,50 +364,76 @@
     <select id="querySelectCount" resultType="java.lang.Integer" parameterType="com.yiban.erp.dto.RepertorySelectQuery">
         select count(1)
         from repertory_info
-        where company_id = #{companyId}
-        <if test="warehouseId != null" >
-            and warehouse_id = #{warehouseId}
+        where company_id = #{query.companyId}
+        <if test="query.warehouseId != null" >
+            and warehouse_id = #{query.warehouseId}
         </if>
-        <if test="goodsId != null" >
-            and goods_id = #{goodsId}
+        <if test="query.goodsId != null" >
+            and goods_id = #{query.goodsId}
         </if>
-        <if test="supplierId != null">
-            and supplier_id = #{supplierId}
+        <if test="query.supplierId != null">
+            and supplier_id = #{query.supplierId}
         </if>
-        <if test="batchCode != null">
+        <if test="query.batchCode != null">
             <bind name="pattern" value="'%' + batchCode + '%'"/>
             and batch_code like #{pattern}
         </if>
-        <if test="minQuantity != null" >
-            and quantity > #{minQuantity}
+        <if test="goodsIds != null and goodsIds.size() > 0" >
+            and goods_id in
+            <foreach collection="goodsIds" open="(" close=")" item="item" separator=",">
+                #{item}
+            </foreach>
+        </if>
+        <if test="query.minQuantity != null" >
+            and quantity > #{query.minQuantity}
         </if>
     </select>
 
-    <select id="querySelectList" resultMap="BaseResultMap" parameterType="com.yiban.erp.dto.RepertorySelectQuery">
+    <select id="querySelectList" resultMap="BaseResultMap">
         select
           r.*, s.name as supplierName, w.name as warehouseName
         from repertory_info r
         left join supplier s on r.supplier_id = s.id
         left join warehouse w on r.warehouse_id = w.id
-        where r.company_id = #{companyId}
-        <if test="warehouseId != null" >
-            and r.warehouse_id = #{warehouseId}
+        where r.company_id = #{query.companyId}
+        <if test="query.warehouseId != null" >
+            and r.warehouse_id = #{query.warehouseId}
         </if>
-        <if test="goodsId != null" >
-            and r.goods_id = #{goodsId}
+        <if test="query.goodsId != null" >
+            and r.goods_id = #{query.goodsId}
         </if>
-        <if test="supplierId != null">
-            and r.supplier_id = #{supplierId}
+        <if test="query.supplierId != null">in
+            and r.supplier_id = #{query.supplierId}
         </if>
-        <if test="batchCode != null">
+        <if test="query.batchCode != null">
             <bind name="pattern" value="'%' + batchCode + '%'"/>
             and r.batch_code like #{pattern}
         </if>
-        <if test="minQuantity != null" >
-            and r.quantity > #{minQuantity}
+        <if test="query.minQuantity != null" >
+            and r.quantity > #{query.minQuantity}
         </if>
-        <if test="byPage != null and byPage and offset != null and limit != null">
-            limit #{offset}, #{limit}
+        <if test="goodsIds != null and goodsIds.size() > 0" >
+            and r.goods_id in
+        <foreach collection="goodsIds" open="(" close=")" item="item" separator=",">
+            #{item}
+        </foreach>
+        </if>
+        <if test="query.byPage != null  and query.offset != null and query.limit != null">
+            limit #{query.offset}, #{query.limit}
+        </if>
+
+    </select>
+
+    <select id="getGoodsId" resultType="java.lang.Long" >
+        select
+        goods_info_id
+        from goods_attribute_ref
+        where 1=1
+        <if test="attrId != null" >
+            and att_id = #{attrId}
+        </if>
+        <if test="attrValue != null" >
+            and att_value = #{attrValue}
         </if>
     </select>
 

@@ -18,6 +18,8 @@ public class GoodsAttribute implements Serializable {
 
     private Date updatedTime;
 
+    private Boolean enableDefault;
+
     public Long getId() {
         return id;
     }
@@ -73,4 +75,8 @@ public class GoodsAttribute implements Serializable {
     public void setUpdatedTime(Date updatedTime) {
         this.updatedTime = updatedTime;
     }
+
+    public Boolean getEnableDefault() { return enableDefault; }
+
+    public void setEnableDefault(Boolean enableDefault) { this.enableDefault = enableDefault; }
 }

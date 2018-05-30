@@ -50,4 +50,15 @@ public class GoodsAttributeRef {
     public void setAttName(String attName) {
         this.attName = attName;
     }
+
+    @Override
+    public String toString() {
+        return "GoodsAttributeRef{" +
+                "id=" + id +
+                ", goodsInfoId=" + goodsInfoId +
+                ", attId=" + attId +
+                ", attValue='" + attValue + '\'' +
+                ", attName='" + attName + '\'' +
+                '}';
+    }
 }

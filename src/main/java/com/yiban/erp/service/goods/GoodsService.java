@@ -44,7 +44,8 @@ public class GoodsService {
     private RepertoryInfoMapper repertoryInfoMapper;
     @Autowired
     private RepertoryOutDetailMapper repertoryOutDetailMapper;
-
+    @Autowired
+    private GoodsAttributeMapper goodsAttributeMapper;
 
 
     public void setGoodsOptionName(List<Goods> goodsList) {
@@ -649,5 +650,8 @@ public class GoodsService {
         goodsDetailMapper.updateByPrimaryKeySelective(detail);
     }
 
+    public List<GoodsAttribute> getDefaultAttr(Integer companyId){
+        return goodsAttributeRefMapper.getDefaultAttr(companyId);
+    }
 
 }
