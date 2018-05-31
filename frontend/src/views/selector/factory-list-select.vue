@@ -140,7 +140,7 @@
 
     };
 </script>
-<style>
+<style scoped>
     .factory-select-table td {
         cursor: pointer;
     }

@@ -1,5 +1,5 @@
 <style lang="less">
-    @import './message.less';
+@import "./message.less";
 </style>
 
 <template>
@@ -96,233 +96,267 @@ import util from "@/libs/util.js";
 import moment from "moment";
 
 export default {
-    name: 'message',
-    filters: {
-        timeFilter(time) {
-            return time ? moment(time).format('YYYY-MM-DD HH:mm:ss') : '';
-        }
-    },
-    data () {
-        const markProcessBtn = (h, params) => {
-            return h('Button', {
-                props: {
-                    size: 'small'
-                },
-                on: {
-                    click: () => {
-                        //标识为处理
-                        this.doMarkProcess(params.row.id);
-                    }
-                }
-            }, '标为已处理');
-        };
-        return {
-            dateRange: [
-                moment().subtract(1, 'M').format('YYYY-MM-DD'),
-                moment().add(1, 'd').format('YYYY-MM-DD')
-            ],
-            dataLoading: false,
-            currentMesList: [],
-            unreadMesList: [],
-            hasreadMesList: [],
-            currentMessageType: 'unprocess',
-            showMesTitleList: true,
-            unreadCount: 0,
-            hasreadCount: 0,
-            recyclebinCount: 0,
-            noDataText: '暂无未处理消息',
-            mes: {
-                id: '',
-                title: '',
-                time: '',
-                content: '',
-                options: [],
-            },
-            mesTitleColumns: [
-                {
-                    title: ' ',
-                    key: 'title',
-                    align: 'left',
-                    ellipsis: true,
-                    render: (h, params) => {
-                        return h('a', {
-                            on: {
-                                click: () => {
-                                    this.showMesTitleList = false;
-                                    this.mes.id = params.row.id;
-                                    this.mes.title = params.row.title;
-                                    this.mes.time = params.row.createTime ? moment(params.row.createTime).format('YYYY-MM-DD HH:mm:ss') : '';
-                                    this.mes.content = params.row.content;
-                                    this.mes.options = params.row.options;
-                                }
-                            }
-                        }, params.row.title);
-                    }
-                },
-                {
-                    title: ' ',
-                    key: 'time',
-                    align: 'right',
-                    width: 300,
-                    render: (h, params) => {
-                        let timeStr = params.row.createTime ? moment(params.row.createTime).format('YYYY-MM-DD HH:mm:ss') : '';
-                        if (this.currentMessageType === 'unprocess') {
-                            return h('div', [
-                                h('Icon', {
-                                    props: {
-                                        type: 'android-time',
-                                        size: 12
-                                    },
-                                    style: {
-                                        margin: '0 5px'
-                                    }
-                                }),
-                                h('span', {
-                                    props: {
-                                        type: 'android-time',
-                                        size: 12
-                                    },
-                                    style: {
-                                        margin: '0 10px'
-                                    }
-                                }, timeStr),
-                                markProcessBtn(h, params)
-                            ]);
-                        }else {
-                            return h('span', [
-                                h('Icon', {
-                                    props: {
-                                        type: 'android-time',
-                                        size: 12
-                                    },
-                                    style: {
-                                        margin: '0 5px'
-                                    }
-                                }),
-                                h('span', {
-                                    props: {
-                                        type: 'android-time',
-                                        size: 12
-                                    }
-                                }, timeStr)
-                            ]);
-                        }
-                    }
-                }
-            ],
-            addOptionModal: false,
-            optionFormItem: {
-                messageId: '',
-                optionResult: ''
-            }
-        };
-    },
-    methods: {
-        backMesTitleList () {
-            this.showMesTitleList = true;
-        },
-        setCurrentMesType (type) {
-            this.showMesTitleList = true;
-            this.currentMessageType = type;
-            if (type === 'unprocess') {
-                this.noDataText = '暂无未处理消息';
-                this.currentMesList = this.unreadMesList;
-            } else {
-                this.noDataText = '暂无已处理消息';
-                this.currentMesList = this.hasreadMesList;
-            }
-        },
-
-        getMessageList() {
-            let reqDate = {
-                startDate: this.dateRange[0],
-                endDate: this.dateRange[1]
-            };
-            this.dataLoading = true;
-            util.ajax.post("/message/list", reqDate)
-                .then((response) => {
-                    this.dataLoading = false;
-                    let data = response.data;
-                    if (data) {
-                        this.setData(data);
-                    }
-                })
-                .catch((error) => {
-                    this.dataLoading = false;
-                    util.errorProcessor(this, error);
-                });
-        },
-        setData(data) {
-            this.unreadMesList = data.unProcessList;
-            this.currentMesList = this.unreadMesList;
-            this.hasreadMesList = data.processedList;
-        },
-
-        submitProcess(action, messageId, status, result) {
-            if (!messageId || !status) {
-                this.$Message.warning('参数错误');
-                return;
-            }
-            let reqData = {
-                messageId: messageId,
-                status: status,
-                optionResult: result,
-                startDate: this.dateRange[0],
-                endDate: this.dateRange[1]
-            };
-
-            util.ajax.post("/message/process", reqData)
-                .then((response) => {
-                    this.$Message.success('提交成功');
-                    if (action === 'mark') {
-                        this.getMessageList();
-                    }else {
-                        let data = response.data;
-                        this.mes.id = data.id;
-                        this.mes.title = data.title;
-                        this.mes.time = data.createTime ? moment(data.createTime).format('YYYY-MM-DD HH:mm:ss') : '';
-                        this.mes.content = data.content;
-                        this.mes.options = data.options;
-                    }
-                })
-                .catch((error) => {
-                    util.errorProcessor(this, error);
-                });
-        },
-
-        doMarkProcess(messageId) {
-            this.submitProcess('mark', messageId, 'PROCESSED', '');
-        },
-
-        addOptionsBtnClick(messageId) {
-            this.optionFormItem.id = messageId;
-            this.addOptionModal = true;
-        },
-        submitOption() {
-            if (!this.optionFormItem.id || !this.optionFormItem.optionResult) {
-                this.$Message.warning('参数错误，请关闭后重新操作');
-                return;
-            }
-            this.submitProcess('option', this.optionFormItem.id, 'UNPROCESS', this.optionFormItem.optionResult);
-        },
-        cancelOption() {
-            this.optionFormItem.id = '';
-            this.addOptionModal = false;
-        }
-
-    },
-    mounted () {
-        this.getMessageList();
-    },
-    watch: {
-        unreadMesList (arr) {
-            this.unreadCount = arr.length;
-            this.$store.commit('setMessageCount', this.unreadCount);
-        },
-        hasreadMesList (arr) {
-            this.hasreadCount = arr.length;
-        }
+  name: "message",
+  filters: {
+    timeFilter(time) {
+      return time ? moment(time).format("YYYY-MM-DD HH:mm:ss") : "";
     }
+  },
+  data() {
+    const markProcessBtn = (h, params) => {
+      return h(
+        "Button",
+        {
+          props: {
+            size: "small"
+          },
+          on: {
+            click: () => {
+              //标识为处理
+              this.doMarkProcess(params.row.id);
+            }
+          }
+        },
+        "标为已处理"
+      );
+    };
+    return {
+      dateRange: [
+        moment()
+          .subtract(1, "M")
+          .format("YYYY-MM-DD"),
+        moment()
+          .add(1, "d")
+          .format("YYYY-MM-DD")
+      ],
+      dataLoading: false,
+      currentMesList: [],
+      unreadMesList: [],
+      hasreadMesList: [],
+      currentMessageType: "unprocess",
+      showMesTitleList: true,
+      unreadCount: 0,
+      hasreadCount: 0,
+      recyclebinCount: 0,
+      noDataText: "暂无未处理消息",
+      mes: {
+        id: "",
+        title: "",
+        time: "",
+        content: "",
+        options: []
+      },
+      mesTitleColumns: [
+        {
+          title: " ",
+          key: "title",
+          align: "left",
+          ellipsis: true,
+          render: (h, params) => {
+            return h(
+              "a",
+              {
+                on: {
+                  click: () => {
+                    this.showMesTitleList = false;
+                    this.mes.id = params.row.id;
+                    this.mes.title = params.row.title;
+                    this.mes.time = params.row.createTime
+                      ? moment(params.row.createTime).format(
+                          "YYYY-MM-DD HH:mm:ss"
+                        )
+                      : "";
+                    this.mes.content = params.row.content;
+                    this.mes.options = params.row.options;
+                  }
+                }
+              },
+              params.row.title
+            );
+          }
+        },
+        {
+          title: " ",
+          key: "time",
+          align: "right",
+          width: 300,
+          render: (h, params) => {
+            let timeStr = params.row.createTime
+              ? moment(params.row.createTime).format("YYYY-MM-DD HH:mm:ss")
+              : "";
+            if (this.currentMessageType === "unprocess") {
+              return h("div", [
+                h("Icon", {
+                  props: {
+                    type: "android-time",
+                    size: 12
+                  },
+                  style: {
+                    margin: "0 5px"
+                  }
+                }),
+                h(
+                  "span",
+                  {
+                    props: {
+                      type: "android-time",
+                      size: 12
+                    },
+                    style: {
+                      margin: "0 10px"
+                    }
+                  },
+                  timeStr
+                ),
+                markProcessBtn(h, params)
+              ]);
+            } else {
+              return h("span", [
+                h("Icon", {
+                  props: {
+                    type: "android-time",
+                    size: 12
+                  },
+                  style: {
+                    margin: "0 5px"
+                  }
+                }),
+                h(
+                  "span",
+                  {
+                    props: {
+                      type: "android-time",
+                      size: 12
+                    }
+                  },
+                  timeStr
+                )
+              ]);
+            }
+          }
+        }
+      ],
+      addOptionModal: false,
+      optionFormItem: {
+        messageId: "",
+        optionResult: ""
+      }
+    };
+  },
+  methods: {
+    backMesTitleList() {
+      this.showMesTitleList = true;
+    },
+    setCurrentMesType(type) {
+      this.showMesTitleList = true;
+      this.currentMessageType = type;
+      if (type === "unprocess") {
+        this.noDataText = "暂无未处理消息";
+        this.currentMesList = this.unreadMesList;
+      } else {
+        this.noDataText = "暂无已处理消息";
+        this.currentMesList = this.hasreadMesList;
+      }
+    },
+
+    getMessageList() {
+      let reqDate = {
+        startDate: this.dateRange[0],
+        endDate: this.dateRange[1]
+      };
+      this.dataLoading = true;
+      util.ajax
+        .post("/message/list", reqDate)
+        .then(response => {
+          this.dataLoading = false;
+          let data = response.data;
+          if (data) {
+            this.setData(data);
+          }
+        })
+        .catch(error => {
+          this.dataLoading = false;
+          util.errorProcessor(this, error);
+        });
+    },
+    setData(data) {
+      this.unreadMesList = data.unProcessList;
+      this.currentMesList = this.unreadMesList;
+      this.hasreadMesList = data.processedList;
+    },
+
+    submitProcess(action, messageId, status, result) {
+      if (!messageId || !status) {
+        this.$Message.warning("参数错误");
+        return;
+      }
+      let reqData = {
+        messageId: messageId,
+        status: status,
+        optionResult: result,
+        startDate: this.dateRange[0],
+        endDate: this.dateRange[1]
+      };
+
+      util.ajax
+        .post("/message/process", reqData)
+        .then(response => {
+          this.$Message.success("提交成功");
+          if (action === "mark") {
+            this.getMessageList();
+          } else {
+            let data = response.data;
+            this.mes.id = data.id;
+            this.mes.title = data.title;
+            this.mes.time = data.createTime
+              ? moment(data.createTime).format("YYYY-MM-DD HH:mm:ss")
+              : "";
+            this.mes.content = data.content;
+            this.mes.options = data.options;
+          }
+        })
+        .catch(error => {
+          util.errorProcessor(this, error);
+        });
+    },
+
+    doMarkProcess(messageId) {
+      this.submitProcess("mark", messageId, "PROCESSED", "");
+    },
+
+    addOptionsBtnClick(messageId) {
+      this.optionFormItem.id = messageId;
+      this.addOptionModal = true;
+    },
+    submitOption() {
+      if (!this.optionFormItem.id || !this.optionFormItem.optionResult) {
+        this.$Message.warning("参数错误，请关闭后重新操作");
+        return;
+      }
+      this.submitProcess(
+        "option",
+        this.optionFormItem.id,
+        "UNPROCESS",
+        this.optionFormItem.optionResult
+      );
+    },
+    cancelOption() {
+      this.optionFormItem.id = "";
+      this.addOptionModal = false;
+    }
+  },
+  mounted() {
+    this.getMessageList();
+  },
+  watch: {
+    unreadMesList(arr) {
+      this.unreadCount = arr.length;
+      this.$store.commit("setMessageCount", this.unreadCount);
+    },
+    hasreadMesList(arr) {
+      this.hasreadCount = arr.length;
+    }
+  }
 };
 </script>
 

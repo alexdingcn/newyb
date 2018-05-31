@@ -30,6 +30,7 @@ public class RepertoryService {
     private GoodsService goodsService;
 
     public List<RepertoryInfo> querySelectList(RepertorySelectQuery query) {
+
         List<RepertoryInfo> list = repertoryInfoMapper.querySelectList(query);
         return setGoodsToList(list);
     }

@@ -17,10 +17,6 @@ public class RepertorySelectQuery {
     private Integer size;
 
 
-
-
-
-
     private BigDecimal minQuantity; //最低库存
 
     private boolean byPage; // 是否分页，只有当true的时候才考虑分页，否则不考虑

@@ -99,7 +99,7 @@ export default {
                         self.supplierLoading = false;
                         util.errorProcessor(self, error);
                     });
-            } else if (this.supplierId !== '') {
+            } else if (this.supplierId && this.supplierId !== '') {
                 util.ajax.get('/supplier/' + this.supplierId)
                     .then(function (response) {
                         if (response.status === 200) {
@@ -138,5 +138,5 @@ export default {
 
 };
 </script>
-<style>
+<style scoped>
 </style>

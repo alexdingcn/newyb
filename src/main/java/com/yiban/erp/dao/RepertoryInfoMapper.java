@@ -42,7 +42,7 @@ public interface RepertoryInfoMapper {
     //获取某一商品最近一次的采购价
     List<CurrentBalanceResp> getLastBuyPrice(@Param("warehouseId") Integer warehouseId, @Param("goodsIdList") List<Long> goodsIdList);
 
-    Integer querySelectCount(RepertorySelectQuery query); //选择存库商品列表的查询项
+    Integer querySelectCount( RepertorySelectQuery query); //选择存库商品列表的查询项
 
     List<RepertoryInfo> querySelectList(RepertorySelectQuery query);
 

@@ -60,6 +60,8 @@ public class RepertoryOutDetail {
     private RepertoryOut repertoryOut;
 
     private Goods goods;
+    private RepertoryInfo repertoryInfo;
+
     //展示字段
     private String refTypeName;
 
@@ -67,28 +69,26 @@ public class RepertoryOutDetail {
     private String origin;
     private String jx;
     private String spec;
-    private String factory;
+    private String factoryName;
     private String unitName;
     private String packUnitName;
     private BigDecimal bigPack;
-    //private String permit;
     private String brandName; //商标编号
     private String storageCondition;
     private String customerName;
     private Integer customerRepId;
     private String customerRepName;
+    private String customerTel;
     private String warehouseName;
 
-    public Goods getGoods() {
-        return goods;
-    }
+
 
 
     public void setGoods(Goods goods) {
         this.goods = goods;
         if (goods != null) {
             this.goodsName = goods.getName();
-            this.factory = goods.getFactoryName();
+            this.factoryName = goods.getFactoryName();
             this.origin = goods.getOrigin();
             this.jx = goods.getJxName();
             this.unitName = goods.getUnitName();
@@ -101,15 +101,40 @@ public class RepertoryOutDetail {
     }
     public void setRepertoryOut(RepertoryOut repertoryOut) {
         this.repertoryOut = repertoryOut;
-
         if (repertoryOut != null) {
             this.refTypeName = repertoryOut.getRefTypeName();
             this.customerName=repertoryOut.getCustomerName();
             this.customerRepName=repertoryOut.getCustomerRepName();
             this.customerRepId=repertoryOut.getCustomerRepId();
             this.warehouseName=repertoryOut.getWarehouseName();
+            this.customerTel=repertoryOut.getCustomerTel();
         }
     }
+    public void setRepertoryInfo(RepertoryInfo repertoryInfo) {
+        this.repertoryInfo = repertoryInfo;
+        if (repertoryInfo != null) {
+            this.goodsName = repertoryInfo.getGoodsName();
+            this.factoryName = repertoryInfo.getFactoryName();
+            this.origin = repertoryInfo.getOrigin();
+            this.jx = repertoryInfo.getJx();
+            this.unitName = repertoryInfo.getUnitName();
+            this.storageCondition = repertoryInfo.getStorageConditionName();
+            this.taxRate = repertoryInfo.getTaxRate();
+        }
+    }
+
+    public RepertoryOut getRepertoryOut() {
+        return repertoryOut;
+    }
+
+    public Goods getGoods() {
+        return goods;
+    }
+
+    public RepertoryInfo getRepertoryInfo() {
+        return repertoryInfo;
+    }
+
     public Long getId() {
         return id;
     }
@@ -222,12 +247,52 @@ public class RepertoryOutDetail {
         this.taxRate = taxRate;
     }
 
+    public Boolean getCheckStatus() {
+        return checkStatus;
+    }
+
+    public void setCheckStatus(Boolean checkStatus) {
+        this.checkStatus = checkStatus;
+    }
+
+    public Long getReviewUserId() {
+        return reviewUserId;
+    }
+
+    public void setReviewUserId(Long reviewUserId) {
+        this.reviewUserId = reviewUserId;
+    }
+
+    public Long getReviewNextUserId() {
+        return reviewNextUserId;
+    }
+
+    public void setReviewNextUserId(Long reviewNextUserId) {
+        this.reviewNextUserId = reviewNextUserId;
+    }
+
+    public String getReviewResult() {
+        return reviewResult;
+    }
+
+    public void setReviewResult(String reviewResult) {
+        this.reviewResult = reviewResult;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
     public String getCheckUser() {
         return checkUser;
     }
 
     public void setCheckUser(String checkUser) {
-        this.checkUser = checkUser == null ? null : checkUser.trim();
+        this.checkUser = checkUser;
     }
 
     public Date getCheckDate() {
@@ -243,7 +308,7 @@ public class RepertoryOutDetail {
     }
 
     public void setCheckResult(String checkResult) {
-        this.checkResult = checkResult == null ? null : checkResult.trim();
+        this.checkResult = checkResult;
     }
 
     public String getCreatedBy() {
@@ -251,7 +316,7 @@ public class RepertoryOutDetail {
     }
 
     public void setCreatedBy(String createdBy) {
-        this.createdBy = createdBy == null ? null : createdBy.trim();
+        this.createdBy = createdBy;
     }
 
     public String getUpdatedBy() {
@@ -259,7 +324,7 @@ public class RepertoryOutDetail {
     }
 
     public void setUpdatedBy(String updatedBy) {
-        this.updatedBy = updatedBy == null ? null : updatedBy.trim();
+        this.updatedBy = updatedBy;
     }
 
     public Date getCreatedTime() {
@@ -278,67 +343,6 @@ public class RepertoryOutDetail {
         this.updatedTime = updatedTime;
     }
 
-//    public List<RepertoryOutDetail> getDetails() {
-//        return details;
-//    }
-//
-//    public void setDetails(List<RepertoryOutDetail> details) {
-//        this.details = details;
-//    }
-
-
-    public Boolean getSpecialManage() {
-        return this.goods == null ? null : this.goods.getSpecialManage();
-    }
-
-    public String getStorageCondition() {
-        return this.goods == null ? null : this.goods.getStorageConditionName();
-    }
-
-    public String getGoodsName() {
-        return this.goods == null ? null : this.goods.getName();
-    }
-
-    public String getOrigin() {
-        return this.goods == null ? null : this.goods.getOrigin();
-    }
-
-    public String getJx() {
-        return this.goods == null ? null : this.goods.getJxName();
-    }
-
-    public String getUnitName() {
-        return this.goods == null ? null : this.goods.getUnitName();
-    }
-
-    public String getPackUnitName() {
-        return this.goods == null ? null : this.goods.getPackUnitName();
-    }
-
-    public BigDecimal getBigPack() {
-        return this.goods == null ? null : this.goods.getBigPack();
-    }
-
-    public Boolean getCheckStatus() { return checkStatus; }
-
-    public void setCheckStatus(Boolean checkStatus) {this.checkStatus = checkStatus; }
-
-    public Long getReviewUserId() { return reviewUserId; }
-
-    public void setReviewUserId(Long reviewUserId) { this.reviewUserId = reviewUserId; }
-
-    public Long getReviewNextUserId() { return reviewNextUserId; }
-
-    public void setReviewNextUserId(Long reviewNextUserId) { this.reviewNextUserId = reviewNextUserId; }
-
-    public String getReviewResult() { return reviewResult; }
-
-    public void setReviewResult(String reviewResult) { this.reviewResult = reviewResult; }
-
-    public String getStatus() { return status; }
-
-    public void setStatus(String status) { this.status = status; }
-
     public String getRefTypeName() {
         return refTypeName;
     }
@@ -347,8 +351,84 @@ public class RepertoryOutDetail {
         this.refTypeName = refTypeName;
     }
 
-    public RepertoryOut getRepertoryOut() {
-        return repertoryOut;
+    public String getGoodsName() {
+        return goodsName;
+    }
+
+    public void setGoodsName(String goodsName) {
+        this.goodsName = goodsName;
+    }
+
+    public String getOrigin() {
+        return origin;
+    }
+
+    public void setOrigin(String origin) {
+        this.origin = origin;
+    }
+
+    public String getJx() {
+        return jx;
+    }
+
+    public void setJx(String jx) {
+        this.jx = jx;
+    }
+
+    public String getSpec() {
+        return spec;
+    }
+
+    public void setSpec(String spec) {
+        this.spec = spec;
+    }
+
+    public String getFactoryName() {
+        return factoryName;
+    }
+
+    public void setFactoryName(String factoryName) {
+        this.factoryName = factoryName;
+    }
+
+    public String getUnitName() {
+        return unitName;
+    }
+
+    public void setUnitName(String unitName) {
+        this.unitName = unitName;
+    }
+
+    public String getPackUnitName() {
+        return packUnitName;
+    }
+
+    public void setPackUnitName(String packUnitName) {
+        this.packUnitName = packUnitName;
+    }
+
+    public BigDecimal getBigPack() {
+        return bigPack;
+    }
+
+    public void setBigPack(BigDecimal bigPack) {
+        this.bigPack = bigPack;
+    }
+
+    public String getBrandName() {
+        return brandName;
+    }
+
+    public void setBrandName(String brandName) {
+        this.brandName = brandName;
+    }
+
+    public String getStorageCondition() {
+        return storageCondition;
+    }
+
+    public void setStorageCondition(String storageCondition) {
+        this.storageCondition = storageCondition;
     }
 
     public String getCustomerName() {
@@ -359,12 +439,28 @@ public class RepertoryOutDetail {
         this.customerName = customerName;
     }
 
+    public Integer getCustomerRepId() {
+        return customerRepId;
+    }
+
+    public void setCustomerRepId(Integer customerRepId) {
+        this.customerRepId = customerRepId;
+    }
+
     public String getCustomerRepName() {
         return customerRepName;
     }
 
     public void setCustomerRepName(String customerRepName) {
         this.customerRepName = customerRepName;
+    }
+
+    public String getCustomerTel() {
+        return customerTel;
+    }
+
+    public void setCustomerTel(String customerTel) {
+        this.customerTel = customerTel;
     }
 
     public String getWarehouseName() {

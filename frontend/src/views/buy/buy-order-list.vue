@@ -351,9 +351,6 @@
         mounted () {
             this.queryOrderList();
         },
-    activated () {
-
-    },
         watch: {
         	orderItems: function () {
         		this.totalAmount = this.orderItems.reduce(function (total, item) { return total + parseFloat(item.amount); }, 0);
@@ -460,7 +457,7 @@
     };
 </script>
 
-<style>
+<style scoped>
     .ivu-table .table-row-checking {
         background-color: #2db7f5;
         color: #fff;

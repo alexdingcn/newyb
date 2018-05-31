@@ -6,8 +6,9 @@ import java.util.List;
 
 public class GoodsQuery {
 
-    public static final String OPTION_LW = "LW";
-    public static final String OPTION_LB = "LB";
+    public static final String OPTION_LW = "LW"; //当前库存
+    public static final String OPTION_LB = "LB"; //最近一次采购价
+    public static final String OPTION_CBQ = "CBQ"; //当前采购在单数量
     public static final String OPTION_LS = "LS";
 
     private Integer companyId;

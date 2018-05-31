@@ -143,5 +143,4 @@ public class GoodsController {
         Integer id=user.getCompanyId();
         return ResponseEntity.ok().body(JSON.toJSONString(goodsService.getDefaultAttr(id)));
     }
-
 }

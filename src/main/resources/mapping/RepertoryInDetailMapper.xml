@@ -301,4 +301,35 @@
   </update>
 
 
+  <select id="getInDetailList"  parameterType="com.yiban.erp.dto.RepertoryInListReq"  resultMap="BaseResultMap">
+    select
+    rinDetail.*
+    from repertory_in_detail as rinDetail
+    left join repertory_in as rin on ( rinDetail.in_order_id=rin.id)
+    where 1=1
+    <if test="companyId != null">
+      and  rin.company_id = #{companyId}
+    </if>
+
+    <if test="inStatus != null">
+      and rin.status = #{inStatus}
+    </if>
+    <if test="warehouseId != null">
+      and rin.warehouse_id = #{warehouseId}
+    </if>
+    <if test="startInDate != null">
+      and rin.receive_date >= #{startInDate}
+    </if>
+    <if test="endInDate != null">
+      and rin.receive_date &lt;= #{endInDate}
+    </if>
+    <if test="inTypeList != null" >
+      and rin.ref_type in
+      <foreach collection="inTypeList" item="item" open="(" close=")" separator=", ">
+        #{item}
+      </foreach>
+    </if>
+  </select>
+
+
 </mapper>

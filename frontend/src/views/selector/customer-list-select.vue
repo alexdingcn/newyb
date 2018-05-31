@@ -167,7 +167,7 @@
 
     };
 </script>
-<style>
+<style scoped>
     .customer-select-table td {
         cursor: pointer;
     }

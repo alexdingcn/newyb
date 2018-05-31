@@ -44,6 +44,8 @@ public class GoodsService {
     private RepertoryInfoMapper repertoryInfoMapper;
     @Autowired
     private RepertoryOutDetailMapper repertoryOutDetailMapper;
+    @Autowired
+    private BuyOrderMapper buyOrderMapper;
 
 
 
@@ -141,9 +143,10 @@ public class GoodsService {
     /**
      * LW:当前库存，
      * LB: last buy 最近采购价
+     * CBQ: current buy count 当前采购在单数量
      * LS: last sale 最近一次销售价
      */
-    private List<Goods> setGoodsExtra(Long customerId, Integer warehouseId, List<String> options, List<Goods> goods) {
+    public List<Goods> setGoodsExtra(Long customerId, Integer warehouseId, List<String> options, List<Goods> goods) {
         if (options == null || options.isEmpty() || goods.isEmpty()) {
             return goods;
         }
@@ -168,6 +171,16 @@ public class GoodsService {
                 goods.stream().forEach(item -> {
                     CurrentBalanceResp resp = tempMap.get(item.getId());
                     item.setLastBuyPrice(resp != null && resp.getLastPrice() != null ? resp.getLastPrice() : null);
+                });
+            }
+            if (GoodsQuery.OPTION_CBQ.equalsIgnoreCase(option)) {
+                //当前采购单申购的数量，只计算INIT 和 CHECKED 状态下的订单数量
+                List<CurrentBalanceResp> orderResp = buyOrderMapper.getGoodsOrderCount(goodsIds);
+                Map<Long, CurrentBalanceResp> tempMap = new HashMap<>();
+                orderResp.stream().forEach(item -> tempMap.put(item.getGoodsId(), item));
+                goods.stream().forEach(item -> {
+                    CurrentBalanceResp resp = tempMap.get(item.getId());
+                    item.setCurrBuyQuality(resp != null && resp.getOngoingCount() != null ? resp.getOngoingCount() : null);
                 });
             }
             if (customerId != null && GoodsQuery.OPTION_LS.equalsIgnoreCase(option)) {
@@ -652,5 +665,13 @@ public class GoodsService {
     public List<GoodsAttribute> getDefaultAttr(Integer companyId){
         return goodsAttributeRefMapper.getDefaultAttr(companyId);
     }
+
+
+    public boolean haveColdManageGoods(List<Long> detailIds) {
+        //查询是否存在有冷链经营性商品
+        List<GoodsInfo> goodsInfos = goodsInfoMapper.getColdManageByDetailIds(detailIds);
+        return goodsInfos != null && !goodsInfos.isEmpty();
+    }
+
 
 }

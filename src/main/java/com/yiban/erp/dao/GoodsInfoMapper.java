@@ -45,4 +45,11 @@ public interface GoodsInfoMapper {
     List<Goods> getChooseListDetailById(@Param("ids") List<Long> ids);
 
     int updatePrice(GoodsInfo goodsInfo);
+
+    /**
+     * 根据详情ID查询这些商品中存在冷链经营管理的数据
+     * @param detailIds
+     * @return
+     */
+    List<GoodsInfo> getColdManageByDetailIds(@Param("detailIds") List<Long> detailIds);
 }

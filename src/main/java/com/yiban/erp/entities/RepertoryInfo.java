@@ -93,8 +93,10 @@ public class RepertoryInfo {
         if (goods != null) {
             this.goodsNo = goods.getGoodsNo();
             this.goodsName = goods.getName();
+            this.factoryName=goods.getFactoryName();
             this.origin = goods.getOrigin();
             this.jx = goods.getJxName();
+            this.spec=goods.getSpecDesc();
             this.unitName = goods.getUnitName();
             this.baseMedName = goods.getBaseMedName();
             this.storageConditionName = goods.getStorageConditionName();

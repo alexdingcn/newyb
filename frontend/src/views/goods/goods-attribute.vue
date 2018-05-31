@@ -1,5 +1,9 @@
 <style lang="less">
+<<<<<<< HEAD
 @import "../../styles/common.less";
+=======
+       @import '../../styles/common.less';
+>>>>>>> master
 </style>
 
 <template>
@@ -68,18 +72,18 @@ export default {
       tableData: [],
       tableColumns: [
         {
-          title: "#",
-          type: "index",
+                  title: '#',
+                  type: 'index',
           width: 60
         },
         {
-          title: "系统编号",
-          key: "id",
-          width: 150
+                  title: '系统编号',
+                  key: 'id',
+                  width: 150,
         },
         {
-          title: "自定义属性名称",
-          key: "attName"
+                  title: '自定义属性名称',
+                  key: 'attName'
         },
         {
           title: "是否默认",

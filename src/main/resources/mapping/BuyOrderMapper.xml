@@ -33,7 +33,7 @@
     select 
     <include refid="Base_Column_List" />
     from buy_order
-    where id = #{id,jdbcType=BIGINT}
+    where id = #{id,jdbcType=BIGINT} and status != 'DELETE'
   </select>
     <select id="queryOrders" resultMap="BaseResultMap" parameterType="com.yiban.erp.entities.BuyOrderQuery" >
         select
@@ -46,7 +46,7 @@
             left join options o on o.id = bo.ship_method_id
             left join options o1 on o1.id = bo.ship_tool_id
             left join options o2 on o2.id = bo.temper_control_id
-        where 1=1
+        where 1=1 and bo.status != 'DELETE'
         <if test="supplierId != null" >
           and bo.supplier_id = #{supplierId, jdbcType=BIGINT}
         </if>
@@ -58,6 +58,12 @@
         </if>
         <if test="endDate != null" >
             and #{endDate,jdbcType=TIMESTAMP} > bo.created_time
+        </if>
+        <if test="statusNames != null" >
+            and bo.status in
+            <foreach collection="statusNames" item="item" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
         </if>
         <if test="companyId != null" >
           and bo.company_id = #{companyId,jdbcType=VARCHAR}
@@ -75,7 +81,7 @@
             left join options o on o.id = bo.ship_method_id
             left join options o1 on o1.id = bo.ship_tool_id
             left join options o2 on o2.id = bo.temper_control_id
-        where bo.id = #{orderId}
+        where bo.id = #{orderId} and bo.status != 'DELETE'
   </select>
 
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >

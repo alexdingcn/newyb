@@ -184,16 +184,17 @@ export const appRouter = [
         title: '库存',
         component: Main,
         menuGroup: [
-            { title: "入库", icon: 'icon-peizaizhuangche-xianxing', start: 0, end: 4 },
-            { title: "出库", icon: 'icon-baoguofahuo-xianxing', start: 5, end: 9 },
-            { title: "盘点", icon: 'icon-zhongzhuanzhan-xianxing', start: 10, end: 15 }
+            { title: "入库", icon: 'icon-peizaizhuangche-xianxing', start: 0, end: 5 },
+            { title: "出库", icon: 'icon-baoguofahuo-xianxing', start: 6, end: 11 },
+            { title: "盘点", icon: 'icon-zhongzhuanzhan-xianxing', start: 12, end: 15 }
         ],
         children: [
             { path: 'store_now', title: '实时库存', name: 'store_now', component: () => import('@/views/warehouse/store_now.vue') },
             { path: 'in-make', title: '录制入库单', name: 'in-make', divided: true, component: () => import('@/views/repertory/in-make.vue') },
             { path: "in-quality-check", title: '入库质量验收', name: 'in-quality-check', component: () => import('@/views/repertory/in-quality-check.vue')},
             { path: "in-check", title: '入库审核', name: 'in-check', component: () => import('@/views/repertory/in-check.vue')},
-            { path: 'setting', title: '仓库点设置', name: 'wh_setting', divided: true, component: () => import('@/views/warehouse/setting.vue') },
+            { path: 'in-order-list', title: '入库明细', name: 'in-order-list', divided: true, component: () => import('@/views/repertory/in-order-list') },
+            { path: 'setting', title: '仓库点设置', divided: true, name: 'wh_setting',  component: () => import('@/views/warehouse/setting.vue') },
 
             { path: 'change-repertory-index', title: '转库出库', name: 'change-repertory-index',  component: () => import('@/views/out-store/change-repertory-index.vue') },
             { path: 'broken-out-index', title: '损耗出库', name: 'broken-out-index', component: () => import('@/views/out-store/broken-out-index.vue') },
@@ -208,6 +209,17 @@ export const appRouter = [
             { path: 'store_check_table_list', title: '盘点表确认', name: 'store_check_table_list', component: () => import('@/views/checkplan/store_check_table_list.vue') },
             { path: "store_check_pass_list", title: '盘点审核', name: 'store_check_pass_list', component: () => import('@/views/checkplan/store_check_pass_list.vue')},
             { path: "goods-care-list", title: '养护', name: 'goods-care-list', component: () => import('@/views/goods/goods-care-list.vue')},
+        ]
+    },
+    {
+        path: '/marketing',
+        icon: 'social-yen',
+        name: 'marketing',
+        title: '营销',
+        component: Main,
+        children: [
+            { path: 'home-banner', title: '首页广告位', name: 'home-banner', component: () => import('@/views/marketing/home-banner.vue') },
+            { path: 'announcement', title: '公告', name: 'announcement', component: () => import('@/views/marketing/announcement.vue') },
         ]
     },
 

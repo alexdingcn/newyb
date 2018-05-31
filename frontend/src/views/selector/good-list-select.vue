@@ -43,7 +43,8 @@
         props: {
             warehouseId: {type:String|Number, default:''}, 
             disabled: Boolean|String, 
-            size: String
+            size: String,
+            options: {type:String, default: ''}
         },
         data () {
             return {
@@ -178,7 +179,7 @@
                 }
                 // 最新库存, 最后采购价
                 if (this.warehouseId) {
-                    queryObj['options'] = 'LW;LB';
+                    queryObj['options'] = this.options;
                     queryObj['warehouseId'] = this.warehouseId;
                 }
 
@@ -234,7 +235,7 @@
 
     };
 </script>
-<style>
+<style scoped>
     .goods-select-table td {
         cursor: pointer;
     }
