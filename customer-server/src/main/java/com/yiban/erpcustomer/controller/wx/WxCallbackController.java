@@ -135,6 +135,7 @@ public class WxCallbackController {
             user.setMobile("");
             user.setCreatedBy("weixin");
             user.setSex(wxUserInfo.getSex());
+            user.setAvatarUrl(wxUserInfo.getHeadimgurl());
 
             user.setStatus(UserStatus.NORMAL.getCode());
             user.setSuperUser(true); //超级管理员
