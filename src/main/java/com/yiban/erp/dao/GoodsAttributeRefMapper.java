@@ -24,4 +24,9 @@ public interface GoodsAttributeRefMapper {
     int deleteByGoodsInfoId(Long goodsInfoId);
 
     List<GoodsAttribute> getDefaultAttr(Integer companyId);
+
+    List<GoodsAttributeRef> getDefaultAttrRefs(@Param("infoIds") List<Long> Id,
+                                               @Param("companyId") Integer companyId);
+
+    List<GoodsAttributeRef> getDefaultAttrRef(Integer companyId);
 }

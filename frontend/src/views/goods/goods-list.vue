@@ -83,6 +83,7 @@ export default {
             goodsModal: false,
             tableLoading: false,
             tableData:[],
+            num:0,
             defaultAttr:[],//存放默认属性
             tableCulumns: [
                 {
@@ -246,12 +247,28 @@ export default {
             get('/goods/defaultAttr')
             .then((response) =>{
                 this.defaultAttr=response.data;
-                    console.log("length----------"+this.defaultAttr[2].attName);
                 for(var i=0;i<this.defaultAttr.length;i++){
                     this.tableCulumns.push({
                         title: this.defaultAttr[i].attName,
-                        key: this.defaultAttr[i].id,
-                        width: 100
+                        key: 'attributeRefs',
+                        width:100,
+                        render: (h, params) => {
+                            const data = params.row.attributeRefs;
+                            var text="";
+                            if(data){
+                                //console.log("data.length--"+data.length);
+                                //console.log("data.title----"+params.column.title);
+                                for(var m=0;m<data.length;m++){ 
+                                    if(data[m].attName==params.column.title){
+                                        text = data[m].attValue;
+                                       // console.log("m---"+m+"text----"+text);
+                                    }
+                                }
+                            }
+                        //console.log("text----"+text);
+                        //console.log(data && data[0] ? data[0].attValue : "");
+                        return h("span", text);
+                    }
                     });
                 }
             })

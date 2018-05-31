@@ -1,9 +1,5 @@
 <style lang="less">
-<<<<<<< HEAD
-@import "../../styles/common.less";
-=======
        @import '../../styles/common.less';
->>>>>>> master
 </style>
 
 <template>

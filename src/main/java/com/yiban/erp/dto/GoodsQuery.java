@@ -1,5 +1,6 @@
 package com.yiban.erp.dto;
 
+import com.yiban.erp.entities.GoodsAttributeRef;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
@@ -22,6 +23,10 @@ public class GoodsQuery {
     private Integer pageSize;
 
     private Boolean includeDetail;
+
+    private List<GoodsAttributeRef>  defaultAttr;//自定义属性
+
+    private Long defaultGoodId;//存放自定义属性的商品id 用来与商品关联
 
     /**
      * LW:当前库存，
@@ -155,5 +160,20 @@ public class GoodsQuery {
 
     public void setCustomerId(Long customerId) {
         this.customerId = customerId;
+    }
+
+    public List<GoodsAttributeRef> getDefaultAttr() { return defaultAttr; }
+
+    public void setDefaultAttr(List<GoodsAttributeRef> defaultAttr) { this.defaultAttr = defaultAttr; }
+
+    public Long getDefaultGoodId() {
+        return defaultGoodId;
+    }
+
+    public void setDefaultGoodId(Long defaultGoodId) {
+        if(defaultAttr.size()>0){
+            defaultGoodId=defaultAttr.get(0).getGoodsInfoId();
+        }
+        this.defaultGoodId = defaultGoodId;
     }
 }

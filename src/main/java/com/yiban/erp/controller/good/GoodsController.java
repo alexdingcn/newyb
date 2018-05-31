@@ -64,6 +64,7 @@ public class GoodsController {
         query.setPageSize(size);
         query.setOptions(optionList);
         query.setWarehouseId(warehouseId);
+
         Long count = 0L;
         count = goodsService.getChooseListDetailCount(query);
         List<Goods> details = new ArrayList<>();
@@ -80,6 +81,7 @@ public class GoodsController {
     public ResponseEntity<String> searchList(@RequestBody GoodsQuery query,
                                              @AuthenticationPrincipal User user) {
         query.setCompanyId(user.getCompanyId());
+        query.setDefaultAttr(goodsService.getDefaultAttrRef(user.getCompanyId()));
         Long count = goodsService.searchListCount(query);
         List<GoodsInfo> result = new ArrayList<>();
         if (count > 0) {
