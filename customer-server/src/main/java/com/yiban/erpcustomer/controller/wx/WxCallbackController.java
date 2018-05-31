@@ -43,10 +43,10 @@ public class WxCallbackController {
         String url = String.format("https://api.weixin.qq.com/sns/oauth2/access_token?appid=%s&secret=%s&code=%s&grant_type=authorization_code", wxAppId, wxAppSecret, code);
 
         try {
-            ResponseEntity<JSONObject> resp = restTemplate.getForEntity(url, JSONObject.class);
+            ResponseEntity<String> resp = restTemplate.getForEntity(url, String.class);
             if (resp != null) {
                 if (resp.getStatusCode() == HttpStatus.OK) {
-                    JSONObject respBody = resp.getBody();
+                    String respBody = resp.getBody();
                     /*
                     {   "access_token":"ACCESS_TOKEN",
                         "expires_in":7200,
@@ -54,17 +54,18 @@ public class WxCallbackController {
                         "openid":"OPENID",
                         "scope":"SCOPE" }
                      */
+                    JSONObject obj = JSON.parseObject(respBody);
                     logger.info("response body:" + respBody.toString());
 
 
-                    logger.info("User info:" + getUserInfo(respBody.getString("access_token"), respBody.getString("openid")));
+                    logger.info("User info:" + getUserInfo(obj.getString("access_token"), obj.getString("openid")));
 
                 }
             }
 
             return ResponseEntity.ok().build();
         } catch (RestClientException ex) {
-            logger.error("Failed to get faceId token, {}", ex.getMessage());
+            logger.error("Failed to get token, {}", ex.getMessage());
         }
         return ResponseEntity.ok().build();
     }
