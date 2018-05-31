@@ -144,5 +144,4 @@ public class GoodsController {
         return ResponseEntity.ok().body(JSON.toJSONString(goodsService.getDefaultAttr(id)));
     }
 
-
 }

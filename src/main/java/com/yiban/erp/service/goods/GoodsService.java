@@ -44,8 +44,7 @@ public class GoodsService {
     private RepertoryInfoMapper repertoryInfoMapper;
     @Autowired
     private RepertoryOutDetailMapper repertoryOutDetailMapper;
-    @Autowired
-    private GoodsAttributeMapper goodsAttributeMapper;
+
 
 
     public void setGoodsOptionName(List<Goods> goodsList) {
@@ -104,7 +103,7 @@ public class GoodsService {
     }
 
     public List<Goods> getGoodsById(List<Long> ids) {
-        if (ids == null || ids.isEmpty()) {
+        if (ids == null || ids.isEmpty()) {;
             return Collections.emptyList();
         }
         List<Goods> goodsList = goodsInfoMapper.getChooseListDetailById(ids);

@@ -83,6 +83,7 @@ export default {
             goodsModal: false,
             tableLoading: false,
             tableData:[],
+            defaultAttr:[],//存放默认属性
             tableCulumns: [
                 {
                     type: 'selection',
@@ -221,6 +222,7 @@ export default {
         }
     },
     mounted() {
+        this.getDefaultAttr();
       this.refreshGoodsList();
     },
     watch: {
@@ -238,6 +240,24 @@ export default {
         },
         categoryChoose(categoryId) {
             this.searchCategoryId = categoryId;
+        },
+        getDefaultAttr(){
+            util.ajax.
+            get('/goods/defaultAttr')
+            .then((response) =>{
+                this.defaultAttr=response.data;
+                    console.log("length----------"+this.defaultAttr[2].attName);
+                for(var i=0;i<this.defaultAttr.length;i++){
+                    this.tableCulumns.push({
+                        title: this.defaultAttr[i].attName,
+                        key: this.defaultAttr[i].id,
+                        width: 100
+                    });
+                }
+            })
+            .catch((error) => {
+                util.errorProcessor(this, error);
+            });
         },
         refreshGoodsList() {
             let reqData = {

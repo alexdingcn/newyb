@@ -42,11 +42,9 @@ public interface RepertoryInfoMapper {
     //获取某一商品最近一次的采购价
     List<CurrentBalanceResp> getLastBuyPrice(@Param("warehouseId") Integer warehouseId, @Param("goodsIdList") List<Long> goodsIdList);
 
-    Integer querySelectCount(@Param("query") RepertorySelectQuery query,
-                             @Param("goodsIds") List<Long> goods); //选择存库商品列表的查询项
+    Integer querySelectCount(RepertorySelectQuery query); //选择存库商品列表的查询项
 
-    List<RepertoryInfo> querySelectList(@Param("query") RepertorySelectQuery query,
-                                        @Param("goodsIds") List<Long> goods);
+    List<RepertoryInfo> querySelectList(RepertorySelectQuery query);
 
     int updateOnWayQuantity(@Param("id") Long id, @Param("onWayQuantity") BigDecimal backQuantity);
 
@@ -58,6 +56,4 @@ public interface RepertoryInfoMapper {
 
     int sellOrderReleaseOnWayQuantity(@Param("sellOrderId") Long sellOrderId); //释放锁定的销售在单数量
 
-    Long getGoodsId(@Param("attrId") Long attId,
-                    @Param("attrValue") String attrValue);
 }

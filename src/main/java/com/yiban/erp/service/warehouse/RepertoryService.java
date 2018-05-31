@@ -30,15 +30,7 @@ public class RepertoryService {
     private GoodsService goodsService;
 
     public List<RepertoryInfo> querySelectList(RepertorySelectQuery query) {
-        List<GoodsAttributeRef> attrs = query.getCurrAttributes();
-        List<Long> goods = new ArrayList<>();
-        for(int i=0; i<attrs.size();i++){
-            if(!("").equals(attrs.get(i).getAttValue())&&attrs.get(i).getAttValue()!=null){
-                Long m = repertoryInfoMapper.getGoodsId(attrs.get(i).getAttId(),attrs.get(i).getAttValue());
-                goods.add(m);
-            }
-        }
-        List<RepertoryInfo> list = repertoryInfoMapper.querySelectList(query,goods);
+        List<RepertoryInfo> list = repertoryInfoMapper.querySelectList(query);
         return setGoodsToList(list);
     }
 

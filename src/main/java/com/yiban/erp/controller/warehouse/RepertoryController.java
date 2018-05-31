@@ -49,18 +49,9 @@ public class RepertoryController {
                                              @AuthenticationPrincipal User user) throws Exception {
         logger.info("select as RepertorySelectQuery {}" ,query);
 
-
-        List<GoodsAttributeRef> attrs = query.getCurrAttributes();
-        List<Long> goods = new ArrayList<>();
-        for(int i=0; i<attrs.size();i++){
-            if(!("").equals(attrs.get(i).getAttValue())&&attrs.get(i).getAttValue()!=null){
-                Long m = repertoryInfoMapper.getGoodsId(attrs.get(i).getAttId(),attrs.get(i).getAttValue());
-                goods.add(m);
-            }
-        }
         query.setCompanyId(user.getCompanyId());
         query.setByPage(true);
-        Integer count = repertoryInfoMapper.querySelectCount(query,goods);
+        Integer count = repertoryInfoMapper.querySelectCount(query);
         List<RepertoryInfo> infos = new ArrayList<>();
         if (count == null || count <= 0) {
             count = 0;

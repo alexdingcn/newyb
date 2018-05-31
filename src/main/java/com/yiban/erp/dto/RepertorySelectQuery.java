@@ -16,12 +16,10 @@ public class RepertorySelectQuery {
     private Integer page;
     private Integer size;
 
-    private List<GoodsAttributeRef> currAttributes;
 
 
-    /**
-     * 默认属性筛选
-     */
+
+
 
     private BigDecimal minQuantity; //最低库存
 
@@ -109,8 +107,5 @@ public class RepertorySelectQuery {
         this.minQuantity = minQuantity;
     }
 
-    public List<GoodsAttributeRef> getCurrAttributes() { return currAttributes; }
-
-    public void setCurrAttributes(List<GoodsAttributeRef> currAttributes) { this.currAttributes = currAttributes; }
 
 }
