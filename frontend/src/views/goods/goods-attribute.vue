@@ -84,6 +84,11 @@ export default {
         {
           title: "是否默认",
           key: "enableDefault",
+          render: (h, params) => { 
+            const row = params.row;
+            const text = row.enableDefault === true ? '是' : '';           
+                        return h('span',text);
+                    }
         },
         {
           title: "操作",
