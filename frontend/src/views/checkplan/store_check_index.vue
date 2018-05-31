@@ -91,441 +91,406 @@
 </template>
 
 <script>
-    import util from "@/libs/util.js";
-    import moment,{ isMoment } from 'moment';
-    import warehouseSelect from "@/views/selector/warehouse-select.vue";
-    import goodSelect from "@/views/selector/good-select.vue";
-    import table2excel from '@/libs/table2excel.js';
+import util from "@/libs/util.js";
+import moment, { isMoment } from "moment";
+import warehouseSelect from "@/views/selector/warehouse-select.vue";
+import goodSelect from "@/views/selector/good-select.vue";
+import table2excel from "@/libs/table2excel.js";
 
-    export default {
-        name: 'store_check_index',
-        props: {
-            chooseModal: {
-                type: Boolean,
-                default: false
-            }
-        },
-        components: {
-            warehouseSelect,
-            goodSelect,
-        },
-        data() {
-            return {
-                statusOptions: [
-                    {key: '', name: '所有'},
-                    {key: 0, name: '待审核'},
-                    {key: 1, name: '已审核'}
-                ],
-                checkTypeOptions:[{ id: 0, name:'库存盘点'},{ id: 1, name:'直接盘库'},{ id: 2, name:'单品盘点'}],
-                query: {
-                    warehouseId: '',
-                    supplierId: '',
-                    status: 'CHECKING'
-                },
-                dateRange: [
-                    moment().add(-1,'w').format('YYYY-MM-DD'),
-                    moment().format('YYYY-MM-DD')
-                ],
-                storeCheck:{},
-                orderLoading: false,
-                currEditLocationRow: {},
-                currDditLocationIndex: '',
-                locationModal: false,
-                orderList: [],
-                orderListColumns: [
-                    {
-                        title: '序号',
-                        type: 'index',
-                        width: 80
-                    },
-                    {
-                        title: '状态',
-                        align: 'center',
-                        key: 'state',
-                        width: 120,
-                        render: (h, params) => {
-                            let state  = params.row.state;
-                            if (0==state) {
-                                return h('Tag', {props: {color: 'yellow'}}, '待审核');
-                            }else if (1==state) {
-                                return h('Tag', {props: {color: 'green'}}, '已审核');
-                            }
-
-                        }
-                    },
-                    {
-                        title: '盘点单号',
-                        align: 'center',
-                        key: 'checkCode',
-                        width: 160
-                    },
-                    {
-                        title: '盘点类型',
-                        key: 'checkType',
-                        align: 'center',
-                        width: 120,
-                        render: (h, params) => {
-                            let checkType  = params.row.checkType;
-                            if (0==checkType) {
-                                return h('Tag', {props: {color: 'green'}}, '库存盘点');
-                            }else if (1==checkType) {
-                                return h('Tag', {props: {color: 'green'}}, '直接盘库');
-                            }else if (2==checkType){
-                                return h('Tag', {props: {color: 'green'}}, '单品盘点');
-                            }
-                        }
-                    },
-                    {
-                        title: '仓库',
-                        key: 'warehouseName',
-                        align: 'center',
-                        width: 100
-                    },
-
-                    {
-                        title: '盘点时间',
-                        key: 'checkDate',
-                        align: 'center',
-                        width: 120,
-                        render: (h, params) => {
-                            return h('span', moment(params.row.checkDate).format('YYYY-MM-DD'));
-                        }
-                    },
-                    {
-                        title: '制单人',
-                        key: 'createBy',
-                        align: 'center',
-                        width: 80
-                    },
-                    {
-                        title: '备注',
-                        key: 'comment',
-                        align: 'center',
-                        width: 150
-                    },
-                    {
-                        title: '总经理',
-                        key: 'manager',
-                        align: 'center',
-                        width: 120
-                    },
-                    {
-                        title: '总经理意见',
-                        key: 'managerNote',
-                        align: 'center',
-                        width: 150
-                    },
-                    {
-                        title: '财务经理',
-                        key: 'finance',
-                        align: 'center',
-                        width: 120
-                    },
-                    {
-                        title: '财务经理意见',
-                        key: 'financeNote',
-                        align: 'center',
-                        width: 150
-                    }
-                ],
-                currentChooseOrder: {},
-                detailLoading: false,
-                detailList: [],
-                detailColumns: [
-                    {
-                        title: "序号",
-                        type: 'index',
-                        width: 60
-                    },
-                    {
-                        title: '状态',
-                        key: 'checkStatus',
-                        align: 'center',
-                        width: 120,
-                        render: (h, params) =>{
-                            let state = params.row.checkStatus;
-                            if (state==undefined) {
-                                return h('Tag', {props:{ color:'yellow'}}, '待处理');
-                            }else if(0==state){
-                                return h('Tag', {props:{ color:'blue'}}, '正常');
-                            }else if(1==state){
-                                return h('Tag', {props:{ color:'red'}}, '盘盈');
-                            }else if(-1==state){
-                                return h('Tag', {props:{ color:'red'}}, '盘亏');
-                            }
-                        }
-                    },
-                    // {
-                    //     title: '货号',
-                    //     align: 'center',
-                    //     key: 'code',
-                    //     width: 160
-                    // },
-                    {
-                        title: '品名',
-                        align: 'center',
-                        key: 'goodsName',
-                        width: 160
-                    },
-                    {
-                        title: '剂型',
-                        key: 'jx',
-                        align: 'center',
-                        width: 80
-                    },
-                    {
-                        title: '规格',
-                        key: 'spec',
-                        align: 'center',
-                        width: 80
-                    },
-                    {
-                        title: '产地',
-                        key: 'origin',
-                        align: 'center',
-                        width: 80
-                    },
-
-
-                    {
-                        title: '生产企业',
-                        key: 'factoryName',
-                        align: 'center',
-                        width: 160
-                    },
-                    {
-                        title: '单位',
-                        key: 'unitName',
-                        align: 'center',
-                        width: 80
-                    },
-                    {
-                        title: '库存数量',
-                        key: 'accLimit',
-                        align: 'center',
-                        width: 120
-                    },
-                    {
-                        title: '盘点数量',
-                        key: 'checkLimit',
-                        align: 'center',
-                        width: 120
-                    },
-                    {
-                        title: '批号',
-                        key: 'batchCode',
-                        align: 'center',
-                        width: 80
-                    },
-                    {
-                        title: '生产日期',
-                        key: 'productDate',
-                        align: 'center',
-                        width: 120,
-                        render: (h, params) => {
-                            return h('span', moment(params.row.productDate).format('YYYY-MM-DD'));
-                        }
-                    },
-                    {
-                        title: '有效期至',
-                        key: 'expDate',
-                        align: 'center',
-                        width: 120,
-                        render: (h, params) => {
-                            return h('span', moment(params.row.expDate).format('YYYY-MM-DD'));
-                        }
-                    },
-                    {
-                        title: '单价',
-                        key: 'price',
-                        align: 'center',
-                        width: 80
-                    },
-                    {
-                        title: '货位号',
-                        key: 'location',
-                        align: 'center',
-                        width: 80
-                    }
-                ],
-                currChooseDetail: {},
-                totalAmount: 0,
-                totalReceiveCount: 0,
-                totalInCount: 0,
-                totalRightCount: 0,
-                totalErrorCount: 0,
-                totalSurveyQuality: 0,
-                surveyModal: false,
-                checkDetail: false,
-                checkFormItem: {},
-                checkModal: false,
-                checkFileNo: '',
-                checkFileModal: false
-            }
-        },
-        watch: {
-            // detailList(data) {
-            //     if(!data || data.length <= 0) {
-            //         this.totalAmount = 0;
-            //         this.totalReceiveCount = 0;
-            //         this.totalInCount = 0;
-            //         this.totalRightCount = 0;
-            //         this.totalErrorCount = 0;
-            //         this.totalSurveyQuality = 0;
-            //     }else {
-            //         this.totalAmount = data.reduce((total, item) => {return item.amount ? total + item.amount : total + 0}, 0);
-            //         this.totalReceiveCount = data.reduce((total, item) => {return item.receiveQuality ? total + item.receiveQuality : total + 0}, 0);
-            //         this.totalInCount = data.reduce((total, item) => {return item.inCount ? total + item.inCount : total + 0}, 0);
-            //         this.totalRightCount = data.reduce((total, item) => {return item.rightCount ? total + item.rightCount : total + 0}, 0);
-            //         this.totalErrorCount = data.reduce((total, item) => {return item.errorCount ? total + item.errorCount : total + 0}, 0);
-            //         this.totalSurveyQuality = data.reduce((total, item) => {return item.surveyQuality ? total + item.surveyQuality : total + 0}, 0);
-            //     }
-            // }
-        },
-        methods: {
-            refreshOrder() {
-                var self = this;
-                let reqData = {
-                    checkType:  this.query.checkType,
-                    warehouseId: this.query.warehouseId,
-                    state:this.query.state,
-                    startDate:this.dateRange[0],
-                    endDate:  this.dateRange[1]
-                };
-                this.repertoryCheckItems = [];
-                self.orderLoading = true;
-                util.ajax.post('/repertory/check/list',reqData)
-                    .then(function (response) {
-                        if (response.status === 200 && response.data) {
-                            self.orderLoading = false;
-                            self.orderList = response.data.data;
-                        }
-                    })
-                    .catch(function (error) {
-                        self.orderLoading = false;
-                        util.errorProcessor(this, error);
-                    });
-
-                this.currentChooseOrder = {};
-                this.currChooseDetail = {};
-                this.detailList = [];
-            },
-            handleSelectOrder(rowData) {
-                if (!rowData || !rowData.id) {
-                    this.currentChooseOrder = {};
-                    this.detailList = [];
-                    return;
-                }
-                this.currentChooseOrder = rowData;
-                this.reloadOrderDetail();
-            },
-
-            handleSelectDetail(rowData) {
-                if (!rowData || !rowData.id) {
-                    this.currChooseDetail = {};
-                }else {
-                    this.currChooseDetail = rowData;
-                }
-            },
-
-            surveyClose() {
-                this.surveyModal = false;
-            },
-            surveySuccess() {
-                this.surveyModal = false;
-                this.reloadOrderDetail();
-            },
-
-            reloadOrderDetail() {
-                var self=this;
-                this.detailLoading = true;
-                util.ajax.post('/repertory/check/orderinfoList?checkPlanId='+this.currentChooseOrder.id )
-                    .then(function (response) {
-                        self.detailLoading = false;
-                        let data = response.data;
-                        if (data) {
-                            self.detailList = data.checkDetailList;
-                            this.currChooseDetail = {};
-                        }
-                    })
-                    .catch((error) => {
-                        self.detailLoading = false;
-                       // util.errorProcessor(self, error);
-                    });
-
-            },  exportExcel () {
-                table2excel.transform(this.$refs.detailTable, 'hrefToExportTable', '盘点计划明细表');
-            }
-
-            // removeDetail() {
-            //     if (!this.currChooseDetail || !this.currChooseDetail.id) {
-            //         this.$Message.warning('请先选择需要删除的商品记录');
-            //         return;
-            //     }
-            //     if (this.currChooseDetail.checkStatus) {
-            //         this.$Message.warning('已经验证通过的数据不能删除.');
-            //         return;
-            //     }
-            //     let detailItem = this.currChooseDetail;
-            //     this.$Modal.confirm({
-            //         title: '删除确认',
-            //         content: '是否确认删除商品:' + detailItem.goodsName  + '，删除后不可恢复!',
-            //         onOk: () => {
-            //             util.ajax.delete('/repertory/in/detail/remove/' + detailItem.id)
-            //                 .then((response) => {
-            //                     this.$Message.success('删除成功');
-            //                     this.reloadOrderDetail();
-            //                 })
-            //                 .catch((error) => {util.errorProcessor(this, error);})
-            //         },
-            //         onCancel: () => {}
-            //     });
-            // },
-            //
-            // saveOroderDetail() {
-            //     if(!this.detailList || this.detailList.length <= 0) {
-            //         this.$Message.warning('订单没有商品数据需要保存');
-            //         return;
-            //     }
-            //     if(!this.currentChooseOrder || !this.currentChooseOrder.id) {
-            //         this.$Message.warning('获取选定的订单失败，请重新选择订单');
-            //         return;
-            //     }
-            //     let reqData = {
-            //         orderId: this.currentChooseOrder.id,
-            //         detailList: this.detailList
-            //     };
-            //     this.detailLoading = true;
-            //     util.ajax.post('/repertory/in/set/save/detail', reqData)
-            //         .then((response) => {
-            //             this.detailLoading = false;
-            //             this.$Message.success('保存成功');
-            //             this.reloadOrderDetail();
-            //         })
-            //         .catch((error) => {
-            //             this.detailLoading = false;
-            //             util.errorProcessor(this, error);
-            //         })
-            // },
-        }
+export default {
+  name: "store_check_index",
+  props: {
+    chooseModal: {
+      type: Boolean,
+      default: false
     }
+  },
+  components: {
+    warehouseSelect,
+    goodSelect
+  },
+  data() {
+    return {
+      statusOptions: [
+        { key: "", name: "所有" },
+        { key: 0, name: "待审核" },
+        { key: 1, name: "已审核" }
+      ],
+      checkTypeOptions: [
+        { id: 0, name: "库存盘点" },
+        { id: 1, name: "直接盘库" },
+        { id: 2, name: "单品盘点" }
+      ],
+      query: {
+        warehouseId: "",
+        supplierId: "",
+        status: "CHECKING"
+      },
+      dateRange: [
+        moment()
+          .add(-1, "w")
+          .format("YYYY-MM-DD"),
+        moment().format("YYYY-MM-DD")
+      ],
+      storeCheck: {},
+      orderLoading: false,
+      currEditLocationRow: {},
+      currDditLocationIndex: "",
+      locationModal: false,
+      orderList: [],
+      orderListColumns: [
+        {
+          title: "序号",
+          type: "index",
+          width: 80
+        },
+        {
+          title: "状态",
+          align: "center",
+          key: "state",
+          width: 120,
+          render: (h, params) => {
+            let state = params.row.state;
+            if (0 == state) {
+              return h("Tag", { props: { color: "yellow" } }, "待审核");
+            } else if (1 == state) {
+              return h("Tag", { props: { color: "green" } }, "已审核");
+            }
+          }
+        },
+        {
+          title: "盘点单号",
+          align: "center",
+          key: "checkCode",
+          width: 160
+        },
+        {
+          title: "盘点类型",
+          key: "checkType",
+          align: "center",
+          width: 120,
+          render: (h, params) => {
+            let checkType = params.row.checkType;
+            if (0 == checkType) {
+              return h("Tag", { props: { color: "green" } }, "库存盘点");
+            } else if (1 == checkType) {
+              return h("Tag", { props: { color: "green" } }, "直接盘库");
+            } else if (2 == checkType) {
+              return h("Tag", { props: { color: "green" } }, "单品盘点");
+            }
+          }
+        },
+        {
+          title: "仓库",
+          key: "warehouseName",
+          align: "center",
+          width: 100
+        },
+
+        {
+          title: "盘点时间",
+          key: "checkDate",
+          align: "center",
+          width: 120,
+          render: (h, params) => {
+            return h("span", moment(params.row.checkDate).format("YYYY-MM-DD"));
+          }
+        },
+        {
+          title: "制单人",
+          key: "createBy",
+          align: "center",
+          width: 80
+        },
+        {
+          title: "备注",
+          key: "comment",
+          align: "center",
+          width: 150
+        },
+        {
+          title: "总经理",
+          key: "manager",
+          align: "center",
+          width: 120
+        },
+        {
+          title: "总经理意见",
+          key: "managerNote",
+          align: "center",
+          width: 150
+        },
+        {
+          title: "财务经理",
+          key: "finance",
+          align: "center",
+          width: 120
+        },
+        {
+          title: "财务经理意见",
+          key: "financeNote",
+          align: "center",
+          width: 150
+        }
+      ],
+      currentChooseOrder: {},
+      detailLoading: false,
+      detailList: [],
+      detailColumns: [
+        {
+          title: "序号",
+          type: "index",
+          width: 60
+        },
+        {
+          title: "状态",
+          key: "checkStatus",
+          align: "center",
+          width: 120,
+          render: (h, params) => {
+            let state = params.row.checkStatus;
+            if (state == undefined) {
+              return h("Tag", { props: { color: "yellow" } }, "待处理");
+            } else if (0 == state) {
+              return h("Tag", { props: { color: "blue" } }, "正常");
+            } else if (1 == state) {
+              return h("Tag", { props: { color: "red" } }, "盘盈");
+            } else if (-1 == state) {
+              return h("Tag", { props: { color: "red" } }, "盘亏");
+            }
+          }
+        },
+        // {
+        //     title: '货号',
+        //     align: 'center',
+        //     key: 'code',
+        //     width: 160
+        // },
+        {
+          title: "品名",
+          align: "center",
+          key: "goodsName",
+          width: 160
+        },
+        {
+          title: "剂型",
+          key: "jx",
+          align: "center",
+          width: 80
+        },
+        {
+          title: "规格",
+          key: "spec",
+          align: "center",
+          width: 80
+        },
+        {
+          title: "产地",
+          key: "origin",
+          align: "center",
+          width: 80
+        },
+
+        {
+          title: "生产企业",
+          key: "factoryName",
+          align: "center",
+          width: 160
+        },
+        {
+          title: "单位",
+          key: "unitName",
+          align: "center",
+          width: 80
+        },
+        {
+          title: "库存数量",
+          key: "accLimit",
+          align: "center",
+          width: 120
+        },
+        {
+          title: "盘点数量",
+          key: "checkLimit",
+          align: "center",
+          width: 120
+        },
+        {
+          title: "批号",
+          key: "batchCode",
+          align: "center",
+          width: 80
+        },
+        {
+          title: "生产日期",
+          key: "productDate",
+          align: "center",
+          width: 120,
+          render: (h, params) => {
+            return h(
+              "span",
+              moment(params.row.productDate).format("YYYY-MM-DD")
+            );
+          }
+        },
+        {
+          title: "有效期至",
+          key: "expDate",
+          align: "center",
+          width: 120,
+          render: (h, params) => {
+            return h("span", moment(params.row.expDate).format("YYYY-MM-DD"));
+          }
+        },
+        {
+          title: "单价",
+          key: "price",
+          align: "center",
+          width: 80
+        },
+        {
+          title: "货位号",
+          key: "location",
+          align: "center",
+          width: 80
+        }
+      ],
+      currChooseDetail: {},
+      totalAmount: 0,
+      totalReceiveCount: 0,
+      totalInCount: 0,
+      totalRightCount: 0,
+      totalErrorCount: 0,
+      totalSurveyQuality: 0,
+      surveyModal: false,
+      checkDetail: false,
+      checkFormItem: {},
+      checkModal: false,
+      checkFileNo: "",
+      checkFileModal: false
+    };
+  },
+  watch: {
+    // detailList(data) {
+    //     if(!data || data.length <= 0) {
+    //         this.totalAmount = 0;
+    //         this.totalReceiveCount = 0;
+    //         this.totalInCount = 0;
+    //         this.totalRightCount = 0;
+    //         this.totalErrorCount = 0;
+    //         this.totalSurveyQuality = 0;
+    //     }else {
+    //         this.totalAmount = data.reduce((total, item) => {return item.amount ? total + item.amount : total + 0}, 0);
+    //         this.totalReceiveCount = data.reduce((total, item) => {return item.receiveQuality ? total + item.receiveQuality : total + 0}, 0);
+    //         this.totalInCount = data.reduce((total, item) => {return item.inCount ? total + item.inCount : total + 0}, 0);
+    //         this.totalRightCount = data.reduce((total, item) => {return item.rightCount ? total + item.rightCount : total + 0}, 0);
+    //         this.totalErrorCount = data.reduce((total, item) => {return item.errorCount ? total + item.errorCount : total + 0}, 0);
+    //         this.totalSurveyQuality = data.reduce((total, item) => {return item.surveyQuality ? total + item.surveyQuality : total + 0}, 0);
+    //     }
+    // }
+  },
+  methods: {
+    refreshOrder() {
+      var self = this;
+      let reqData = {
+        checkType: this.query.checkType,
+        warehouseId: this.query.warehouseId,
+        state: this.query.state,
+        startDate: this.dateRange[0],
+        endDate: this.dateRange[1]
+      };
+      this.repertoryCheckItems = [];
+      self.orderLoading = true;
+      util.ajax
+        .post("/repertory/check/list", reqData)
+        .then(function(response) {
+          if (response.status === 200 && response.data) {
+            self.orderLoading = false;
+            self.orderList = response.data.data;
+          }
+        })
+        .catch(function(error) {
+          self.orderLoading = false;
+          util.errorProcessor(this, error);
+        });
+
+      this.currentChooseOrder = {};
+      this.currChooseDetail = {};
+      this.detailList = [];
+    },
+    handleSelectOrder(rowData) {
+      if (!rowData || !rowData.id) {
+        this.currentChooseOrder = {};
+        this.detailList = [];
+        return;
+      }
+      this.currentChooseOrder = rowData;
+      this.reloadOrderDetail();
+    },
+
+    handleSelectDetail(rowData) {
+      if (!rowData || !rowData.id) {
+        this.currChooseDetail = {};
+      } else {
+        this.currChooseDetail = rowData;
+      }
+    },
+
+    surveyClose() {
+      this.surveyModal = false;
+    },
+    surveySuccess() {
+      this.surveyModal = false;
+      this.reloadOrderDetail();
+    },
+
+    reloadOrderDetail() {
+      var self = this;
+      this.detailLoading = true;
+      util.ajax
+        .post(
+          "/repertory/check/orderinfoList?checkPlanId=" +
+            this.currentChooseOrder.id
+        )
+        .then(function(response) {
+          self.detailLoading = false;
+          let data = response.data;
+          if (data) {
+            self.detailList = data.checkDetailList;
+            this.currChooseDetail = {};
+          }
+        })
+        .catch(error => {
+          self.detailLoading = false;
+          // util.errorProcessor(self, error);
+        });
+    },
+    exportExcel() {
+      table2excel.transform(
+        this.$refs.detailTable,
+        "hrefToExportTable",
+        "盘点计划明细表"
+      );
+    }
+  }
+};
 </script>
 
 <style>
-    .ivu-form-item {
-        margin-bottom: 5px;
-    }
-    .detail-div {
-        margin-top: 10px;
-    }
-    .detail-count-content {
-        margin-left: 10px;
-    }
-    .detail-count-content-b {
-        margin-left: 40px;
-    }
-    .add-goods-class {
-        margin-left: 10px;
-        width: 300px;
-    }
+.ivu-form-item {
+  margin-bottom: 5px;
+}
+.detail-div {
+  margin-top: 10px;
+}
+.detail-count-content {
+  margin-left: 10px;
+}
+.detail-count-content-b {
+  margin-left: 40px;
+}
+.add-goods-class {
+  margin-left: 10px;
+  width: 300px;
+}
 </style>

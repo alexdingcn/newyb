@@ -58,8 +58,7 @@
                         <Row class="row-margin-bottom">
                             <i-col span="6">
                                 <FormItem label="供应商" prop="supplierId" >
-                                    <Input v-if="editView" v-model="order.supplierName" :disabled="true" />
-                                    <supplier-select v-if="!editView" v-model="order.supplierId" @on-change="supplierChange" ></supplier-select>
+                                    <supplier-select v-model="order.supplierId" @on-change="supplierChange" ></supplier-select>
                                 </FormItem>
                             </i-col>
                             <i-col span="6">
@@ -143,7 +142,7 @@
                                 <i-col span="6">
                                     <FormItem label="收货人员" >
                                         <Row>
-                                            <Input :number="true" v-model="order.receiveUser" style="width: 90%;" placeholder="张三;李四" />
+                                            <Input v-model="order.receiveUser" style="width: 90%;" placeholder="张三;李四" />
                                             <Tooltip transfer >
                                                 <Icon type="ios-information-outline" size="20"></Icon>
                                                 <div slot="content" >
@@ -541,6 +540,10 @@ export default {
                 "on-change": date => {
                   let row = self.orderItems[params.index];
                   row[params.column.key] = date;
+                },
+                "on-blur"(event) {
+                  let row = self.orderItems[params.index];
+                  row[params.column.key] = event.target.value;
                 }
               }
             });
@@ -562,6 +565,10 @@ export default {
                 "on-change": date => {
                   let row = self.orderItems[params.index];
                   row[params.column.key] = date;
+                },
+                "on-blur"(event) {
+                  let row = self.orderItems[params.index];
+                  row[params.column.key] = event.target.value;
                 }
               }
             });
@@ -724,7 +731,7 @@ export default {
       isMedicine: false,
       showSider: true,
       uncheckTabLoading: false,
-      currFlowContent: "检查外包装，确认数量",
+      currFlowContent: "检查外包装，确认数量和批次信息",
       uncheckData: [],
       uncheckColumns: [
         {
@@ -903,7 +910,7 @@ export default {
           }
           if (!this.haveQAFlow && !this.haveFNFlow) {
             this.currFlowContent =
-              "检查外包装，确认数量, 保存后直接入库且修改库存";
+              "检查外包装，确认数量和批次信息, 保存后直接入库且修改库存";
           }
         })
         .catch(error => {
@@ -979,6 +986,26 @@ export default {
       }
       var index = this.order.orderItemIds.indexOf(goods.id);
       if (index < 0) {
+        if (goods.specialManage && !this.supplierSpecialManage) {
+          this.$Modal.info({
+            title: "药品特殊经营监管提示",
+            content:
+              "商品：" +
+              goods.name +
+              "存在“药品特殊经营”标识，而供应商没有该资质，不能添加该商品."
+          });
+          return;
+        }
+        if (goods.coldManage && !this.supplierColdManage) {
+          this.$Modal.info({
+            title: "冷链经营管理监管提示",
+            content:
+              "商品：" +
+              goods.name +
+              "存在“冷链经营管理”标识，而供应商没有该资质，不能添加该商品."
+          });
+          return;
+        }
         //根据选择的商品信息，组织入库详情信息
         this.addOrdderItem(goods);
       } else {
@@ -1016,6 +1043,7 @@ export default {
         .then(function(response) {
           self.saving = false;
           self.$Message.info("采购入库订单保存成功");
+          self.reloadUncheckData();
           self.closeConfirm = true;
         })
         .catch(function(error) {
@@ -1094,7 +1122,7 @@ export default {
       for (let i = 0; i < this.orderItems.length; i++) {
         let goods = this.orderItems[i].goods;
         if (goods && goods.coldManage) {
-          haveSpecial = true;
+          haveCold = true;
           goodsName = goods.name;
           break;
         }
@@ -1134,7 +1162,7 @@ export default {
     saveOrderBtnClick() {
       this.order.details = this.orderItems;
       //验证药品类型商品的特殊经营管理类商品，需要双人收货的信息验证
-      let specialValidate = self.validateSpecialManage();
+      let specialValidate = this.validateSpecialManage();
       if (specialValidate.code < 0) {
         this.$Modal.info({
           title: "商品药品特殊经营管理提示",
@@ -1144,7 +1172,7 @@ export default {
       }
 
       //验证是否冷链经营的必输信息以及供应商也需要冷链经营标识
-      let coldValidate = self.validateColdManage();
+      let coldValidate = this.validateColdManage();
       if (coldValidate.code < 0) {
         this.$Modal.info({
           title: "商品冷链经营管理提示",
@@ -1244,6 +1272,7 @@ export default {
     chooseLocation(data) {
       this.locationModal = false;
       this.currEditLocationRow.warehouseLocation = data.location;
+      console.log(this.currEditLocationRow);
       this.$set(
         this.orderItems,
         this.currDditLocationIndex,
@@ -1264,22 +1293,26 @@ export default {
       if (!row || !row.id) {
         return;
       }
+      let json = JSON.parse(JSON.stringify(row)); //创建一个新的对象来修改
+
       //设置当前单子的供应商冷链和特殊药品标识
-      this.supplierColdManage = row.supplierColdManage ? true : false;
-      this.supplierSpecialManage = row.supplierSpecialManage ? true : false;
-      row.receiveDate = row.receiveDate
-        ? moment(row.receiveDate).format("YYYY-MM-DD")
+      this.supplierColdManage = json.supplierColdManage ? true : false;
+      this.supplierSpecialManage = json.supplierSpecialManage ? true : false;
+      json.receiveDate = json.receiveDate
+        ? moment(json.receiveDate).format("YYYY-MM-DD")
         : moment().format("YYYY-MM-DD");
-      row.payDate = row.payDate ? moment(row.payDate).format("YYYY-MM-DD") : "";
-      row.shipStartDate = row.shipStartDate
-        ? moment(row.shipStartDate).format("YYYY-MM-DD HH:mm")
+      json.payDate = json.payDate
+        ? moment(json.payDate).format("YYYY-MM-DD")
         : "";
-      row.shipEndDate = row.shipEndDate
-        ? moment(row.shipEndDate).format("YYYY-MM-DD HH:mm")
+      json.shipStartDate = json.shipStartDate
+        ? moment(json.shipStartDate).format("YYYY-MM-DD HH:mm")
+        : "";
+      json.shipEndDate = json.shipEndDate
+        ? moment(json.shipEndDate).format("YYYY-MM-DD HH:mm")
         : "";
 
       this.editView = true;
-      this.order = row;
+      this.order = json;
 
       //获取入库单详情
       util.ajax
@@ -1299,6 +1332,28 @@ export default {
         this.order["orderItemIds"] = [];
       }
       for (let i = 0; i < details.length; i++) {
+        //没有值的数据需要初始化存在输入框的值
+        details[i].batchCode = details[i].batchCode ? details[i].batchCode : "";
+        details[i].receiveQuality = details[i].receiveQuality
+          ? details[i].receiveQuality
+          : 0;
+        details[i].bigQuality = details[i].bigQuality
+          ? details[i].bigQuality
+          : 0;
+        details[i].free = details[i].free ? details[i].free : 0;
+        details[i].price = details[i].price ? details[i].price : 0;
+        details[i].amount = details[i].amount ? details[i].amount : 0;
+        details[i].warehouseLocation = details[i].warehouseLocation
+          ? details[i].warehouseLocation
+          : "";
+        details[i].rejectQuality = details[i].rejectQuality
+          ? details[i].rejectQuality
+          : 0;
+        details[i].rejectComment = details[i].rejectComment
+          ? details[i].rejectComment
+          : "";
+        details[i].taxRate = details[i].taxRate ? details[i].taxRate : 0;
+
         // productDate/expDate;
         let productDate = details[i].productDate
           ? moment(details[i].productDate).format("YYYY-MM-DD")
@@ -1361,6 +1416,10 @@ export default {
 .ivu-table-cell {
   padding-left: 5px;
   padding-right: 5px;
+}
+.ivu-table-body,
+.ivu-table-tip {
+  min-height: 300px;
 }
 
 .uncheck-table .statusClass {

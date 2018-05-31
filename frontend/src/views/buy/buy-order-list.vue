@@ -194,30 +194,6 @@ export default {
           }
         },
         {
-          title: "审核结论",
-          key: "checkResult",
-          width: 150
-        },
-        {
-          title: "审核人",
-          key: "checkBy",
-          width: 120
-        },
-        {
-          title: "审核日期",
-          key: "checkTime",
-          width: 120,
-          render: (h, params) => {
-            return h(
-              "span",
-              params.row.checkTime
-                ? moment(params.row.checkTime).format("YYYY-MM-DD")
-                : ""
-            );
-          }
-        },
-
-        {
           title: "预计到货日",
           key: "eta",
           width: 120,
@@ -244,6 +220,29 @@ export default {
           title: "运输方式",
           key: "shipMethod",
           width: 100
+        },
+        {
+          title: "审核结论",
+          key: "checkResult",
+          width: 150
+        },
+        {
+          title: "审核人",
+          key: "checkBy",
+          width: 120
+        },
+        {
+          title: "审核日期",
+          key: "checkTime",
+          width: 120,
+          render: (h, params) => {
+            return h(
+              "span",
+              params.row.checkTime
+                ? moment(params.row.checkTime).format("YYYY-MM-DD")
+                : ""
+            );
+          }
         }
       ],
       orderColumns: [

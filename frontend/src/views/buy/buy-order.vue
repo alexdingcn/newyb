@@ -49,7 +49,7 @@
                     <Row>
                         <i-col span="6">
                             <FormItem label="供应商" prop="supplierId" >
-                                <supplier-select v-model="buyOrder.supplierId" ></supplier-select>
+                                <supplier-select v-model="buyOrder.supplierId"  @on-change="supplierChange" ></supplier-select>
                             </FormItem>
                         </i-col>
                         <i-col span="6">
@@ -517,7 +517,9 @@ export default {
         }
       ],
       haveCheck: false,
-      isMedicine: false
+      isMedicine: false,
+      supplierColdManage: false,
+      supplierSpecialManage: false
     };
   },
   mounted() {
@@ -572,7 +574,7 @@ export default {
     handleRowDbClick(row) {
       this.$Modal.confirm({
         title: "确认删除商品？",
-        content: "<p>确认删除商品 " + row.name + "?</p>",
+        content: "<p>确认删除商品 " + row.goods.name + "?</p>",
         onOk: () => {
           for (var i = 0; i < this.orderItems.length; i++) {
             if (row.goodsId === this.orderItems[i].goodsId) {
@@ -588,6 +590,29 @@ export default {
       if (goodsId && goods) {
         var index = this.buyOrder.orderItemIds.indexOf(goods.id);
         if (index < 0) {
+          //验证下供应商和商品是否存在特殊监管条件
+          if (goods.specialManage && !this.supplierSpecialManage) {
+            this.$Modal.info({
+              title: "药品特殊经营监管提示",
+              content:
+                "商品：" +
+                goods.name +
+                "存在“药品特殊经营”标识，而供应商没有该资质，不能添加该商品."
+            });
+            this.$refs.goodsSelect.clearSingleSelect();
+            return;
+          }
+          if (goods.coldManage && !this.supplierColdManage) {
+            this.$Modal.info({
+              title: "冷链经营管理监管提示",
+              content:
+                "商品：" +
+                goods.name +
+                "存在“冷链经营管理”标识，而供应商没有该资质，不能添加该商品."
+            });
+            this.$refs.goodsSelect.clearSingleSelect();
+            return;
+          }
           this.setBuyOrderDetails(goods);
         } else {
           this.$Message.warning("该商品已经添加");
@@ -653,6 +678,7 @@ export default {
             .post("/buy/add", self.buyOrder)
             .then(function(response) {
               self.saving = false;
+              console.log(response);
               if (response.status === 200 && response.data) {
                 self.buyOrder.id = response.data.orderId;
                 self.buyOrder.status = response.data.status;
@@ -669,22 +695,78 @@ export default {
       });
     },
 
-    validateColdManage() {
-      //先看下温控方式和运输方式是否已经输入了，如果输出了，直接返回true, 否则验证是否存在有冷链管理产品
-      if (this.buyOrder.temperControlId > 0 && this.buyOrder.shipMethodId > 0) {
-        return true; //已经输入，直接返回
+    validateSpecialManage() {
+      // 药品特殊管理标识，如果商品中存在有，需要验证供应商是否有对应的资质
+      let result = {
+        code: 1,
+        message: ""
+      };
+      let haveSpecial = false;
+      let goodsName = "";
+      for (let i = 0; i < this.orderItems.length; i++) {
+        let goods = this.orderItems[i].goods;
+        if (goods && goods.specialManage) {
+          haveSpecial = true;
+          goodsName = goods.name;
+          break;
+        }
       }
-      //查询下添加的商品中，是否存在有冷链经营的商品，
+      if (!haveSpecial) {
+        return result; //没有这样的商品，直接返回
+      }
+      //存在特殊管理药品, 需要验证供应商是否也有这个资质
+      if (!this.supplierSpecialManage) {
+        result.code = -1;
+        result.message =
+          "商品：" +
+          goodsName +
+          "存在有“药品特殊管理”标识, 而供应商没有“药品特殊经营管理”资质";
+        return result;
+      }
+      return result;
+    },
+
+    validateColdManage() {
+      //冷链经营标识，需要验证供应商是否也存在“冷链经营”资质, 且：温控方式，到货温度，温控状态，运输方式为必输项
+      //先检查下商品中是否存在有冷链经营标识
+      let result = {
+        code: 1,
+        message: ""
+      };
       let haveCold = false;
+      let goodsName = "";
       for (let i = 0; i < this.orderItems.length; i++) {
         let goods = this.orderItems[i].goods;
         if (goods && goods.coldManage) {
           haveCold = true;
+          goodsName = goods.name;
           break;
         }
       }
-      console.log("haveCold:" + haveCold);
-      return haveCold ? false : true;
+      if (!haveCold) {
+        return result; //没有这样的商品，直接返回
+      }
+      //存在冷链经营商品, 需要验证供应商是否也有这个资质
+      if (!this.supplierColdManage) {
+        result.code = -1;
+        result.message =
+          "商品：" +
+          goodsName +
+          "存在有“冷链经营”标识, 而供应商没有“冷链经营”资质";
+        return result;
+      }
+      //如果供应商也有资质，则验证：温控方式，到货温度，温控状态，运输方式为必输项
+
+      if (!this.buyOrder.temperControlId || !this.buyOrder.shipMethodId) {
+        result.code = -2;
+        result.message =
+          "商品：" +
+          goodsName +
+          "存在有“冷链经营”标识, 温控方式、运输方式为必输项";
+        return result;
+      }
+      //都能验证通过的话，才能通过
+      return result;
     },
 
     saveBuyOrder() {
@@ -695,16 +777,26 @@ export default {
           self.$Message.error("请检查输入!");
         } else {
           console.log("validate cold manage.");
-          //验证是否存在冷链管理商品，如果存在，需要验证是否已经输入温控方式，冷链管理商品必输温控方式
-          if (self.validateColdManage()) {
-            self.doSave();
-          } else {
+          //如果商品存在有“药品特殊监管”标识，需要供应商也存在有这个资质
+          let specialValidate = self.validateSpecialManage();
+          if (specialValidate.code < 0) {
             self.$Modal.info({
-              title: "商品冷链管理运输提示",
-              content: "存在冷链管理的商品，温控方式和运输方式必须输入!"
+              title: "商品药品特殊经营管理提示",
+              content: specialValidate.message
             });
             return;
           }
+
+          //验证是否存在冷链管理商品，如果存在，需要验证是否已经输入温控方式，冷链管理商品必输温控方式
+          let coldValidate = self.validateColdManage();
+          if (coldValidate.code < 0) {
+            self.$Modal.info({
+              title: "商品冷链经营管理提示",
+              content: coldValidate.message
+            });
+            return;
+          }
+          self.doSave();
         }
       });
     },
@@ -717,15 +809,20 @@ export default {
       if (!row.id || row.id <= 0) {
         return;
       }
-      row.eta = row.eta ? moment(row.eta).format("YYYY-MM-DD") : "";
-      console.log(row);
-      this.buyOrder = row;
+      let json = JSON.parse(JSON.stringify(row));
+      //设置当前单子的供应商冷链和特殊药品标识
+      this.supplierColdManage = json.supplierColdManage ? true : false;
+      this.supplierSpecialManage = json.supplierSpecialManage ? true : false;
+
+      json.eta = json.eta ? moment(json.eta).format("YYYY-MM-DD") : "";
+      console.log(json);
+      this.buyOrder = json;
       let self = this;
       this.orderItems = [];
       this.buyOrder.orderItemIds = [];
       //获取该笔订单的详情信息
       util.ajax
-        .get("/buy/orderdetail/" + row.id)
+        .get("/buy/orderdetail/" + json.id)
         .then(response => {
           let data = response.data;
           console.log(data);
@@ -785,6 +882,12 @@ export default {
             });
         }
       });
+    },
+
+    supplierChange(supplierId, supplier) {
+      //赋值特殊管理标识
+      this.supplierColdManage = supplier.coldBusiness ? true : false;
+      this.supplierSpecialManage = supplier.canSpecial ? true : false;
     }
   }
 };

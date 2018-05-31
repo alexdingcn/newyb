@@ -8,6 +8,7 @@ import com.yiban.erp.constant.OrderNumberType;
 import com.yiban.erp.dao.BuyOrderDetailMapper;
 import com.yiban.erp.dao.BuyOrderMapper;
 import com.yiban.erp.dao.RepertoryInfoMapper;
+import com.yiban.erp.dao.SupplierMapper;
 import com.yiban.erp.dto.CurrentBalanceResp;
 import com.yiban.erp.dto.GoodsQuery;
 import com.yiban.erp.entities.*;
@@ -43,9 +44,9 @@ public class BuyOrderController {
     @Autowired
     private BuyOrderDetailMapper buyOrderDetailMapper;
     @Autowired
-    private RepertoryInfoMapper repertoryInfoMapper;
-    @Autowired
     private SystemConfigService systemConfigService;
+    @Autowired
+    private SupplierMapper supplierMapper;
 
 
     @RequestMapping(value = "/list", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -121,10 +122,13 @@ public class BuyOrderController {
         if (!validateBuyOrder(buyOrder)) {
             throw new BizException(ErrorCode.BUY_ORDER_PARAMS_INVALID);
         }
-        //验证下是否符合冷链经营管理的需求
-        if (!validateColdManage(buyOrder)) {
-            throw new BizException(ErrorCode.BUY_ORDER_COLD_MANAGE_ERROR);
+        Supplier supplier = supplierMapper.selectByPrimaryKey(buyOrder.getSupplierId());
+        if (supplier == null) {
+            throw new BizException(ErrorCode.PARAMETER_MISSING);
         }
+        //验证下是否符合特殊药品经营管理和冷链经营管理的需求
+        validateSpecialManage(supplier, buyOrder);
+        validateColdManage(supplier, buyOrder);
 
         boolean haveCheckFlow = systemConfigService.haveOrderFlow(user.getCompanyId(), ConfigKey.BUY_CHECK);
 
@@ -174,12 +178,26 @@ public class BuyOrderController {
         throw new BizRuntimeException(ErrorCode.FAILED_INSERT_FROM_DB);
     }
 
-    private boolean validateColdManage(BuyOrder buyOrder) {
-        //先看下订单的温控方式和运输方式是否都已经输入了，如果都输入了，没必要再验证
-        if (buyOrder.getTemperControlId() != null && buyOrder.getTemperControlId() > 0
-                && buyOrder.getShipMethodId() != null && buyOrder.getShipMethodId() > 0) {
-            return true;
+    private void validateSpecialManage(Supplier supplier, BuyOrder buyOrder) throws BizException {
+
+        //如果存在空的数据，需要验证是否存在有冷链经营性商品，如果有，返回验证不通过
+        List<Long> goodsIds = new ArrayList<>();
+        for (BuyOrderDetail detail : buyOrder.getDetails()) {
+            goodsIds.add(detail.getGoodsId());
         }
+        //查询是否存在这些商品ID中是否存在冷链经营类型的商品
+        boolean haveCold = goodsService.haveSpecialManageGoods(goodsIds);
+        if (!haveCold) {
+            return;
+        }
+        //验证供应商是否有改资质
+        if (supplier.getCanSpecial() == null || !supplier.getCanSpecial()) {
+            logger.warn("supplier can not cold manage. supplier:{}", supplier.getId());
+            throw new BizException(ErrorCode.RECEIVE_SUPPLIER_SPECIAL_VALIDATE_FAIL);
+        }
+    }
+
+    private void validateColdManage(Supplier supplier, BuyOrder buyOrder) throws BizException {
         //如果存在空的数据，需要验证是否存在有冷链经营性商品，如果有，返回验证不通过
         List<Long> goodsIds = new ArrayList<>();
         for (BuyOrderDetail detail : buyOrder.getDetails()) {
@@ -187,7 +205,20 @@ public class BuyOrderController {
         }
         //查询是否存在这些商品ID中是否存在冷链经营类型的商品
         boolean haveCold = goodsService.haveColdManageGoods(goodsIds);
-        return haveCold ? false : true;
+        if (!haveCold) {
+            return;
+        }
+        //验证供应商是否有改资质
+        if (supplier.getColdBusiness() == null || !supplier.getColdBusiness()) {
+            logger.warn("supplier can not cold manage. supplier:{}", supplier.getId());
+            throw new BizException(ErrorCode.RECEIVE_SUPPLIER_COLD_VALIDATE_FAIL);
+        }
+
+        //先看下订单的温控方式和运输方式是否都已经输入了，如果都输入了，没必要再验证
+        if (buyOrder.getTemperControlId() == null || buyOrder.getTemperControlId() <= 0
+                || buyOrder.getShipMethodId() == null || buyOrder.getShipMethodId() <= 0) {
+            throw new BizException(ErrorCode.BUY_ORDER_COLD_MANAGE_ERROR);
+        }
     }
 
     private boolean validateBuyOrder(BuyOrder buyOrder) {

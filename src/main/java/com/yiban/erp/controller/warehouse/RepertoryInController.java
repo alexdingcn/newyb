@@ -132,8 +132,10 @@ public class RepertoryInController {
     public ResponseEntity<String> setCheck(@RequestBody ReceiveSetReq setReq,
                                            @AuthenticationPrincipal User user) throws Exception {
         logger.warn("user:{} submit check info {}", user.getId(), JSON.toJSONString(setReq));
-        repertoryInService.setCheckResult(user, setReq);
-        return ResponseEntity.ok().build();
+        int refresh = repertoryInService.setCheckResult(user, setReq);
+        JSONObject result = new JSONObject();
+        result.put("refresh", refresh);
+        return ResponseEntity.ok().body(result.toJSONString());
     }
 
     @RequestMapping(value = "/set/check/order/{orderId}", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -150,16 +152,6 @@ public class RepertoryInController {
         logger.info("user:{} set uncheck order detail:{}", user.getId(), detailId);
         repertoryInService.setUncheckDetail(user, detailId);
         return ResponseEntity.ok().build();
-    }
-
-    @RequestMapping(value = "/set/save/detail", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> setSaveDetail(@RequestBody ReceiveSetReq setReq,
-                                                @AuthenticationPrincipal User user) throws Exception {
-        logger.warn("user:{} update order detail info.", user.getId());
-        int count = repertoryInService.setSaveDetail(user, setReq);
-        JSONObject response = new JSONObject();
-        response.put("count", count);
-        return ResponseEntity.ok().body(response.toJSONString());
     }
 
     @RequestMapping(value = "/order/fileNo", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)

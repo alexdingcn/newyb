@@ -109,7 +109,8 @@ public class RepertoryIn {
 
     public boolean canUpdateDetail() {
         if (RepertoryInStatus.TEMP_STORAGE.name().equalsIgnoreCase(this.status)
-                || RepertoryInStatus.INIT.name().equalsIgnoreCase(this.status)) {
+                || RepertoryInStatus.INIT.name().equalsIgnoreCase(this.status)
+                || RepertoryInStatus.CHECKED.name().equalsIgnoreCase(this.status)) {
             return true;
         }
         return false;

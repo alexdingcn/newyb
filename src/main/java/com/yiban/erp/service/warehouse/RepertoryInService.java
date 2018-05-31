@@ -1,6 +1,7 @@
 package com.yiban.erp.service.warehouse;
 
 import com.alibaba.fastjson.JSON;
+import com.sun.org.apache.bcel.internal.generic.IF_ACMPEQ;
 import com.yiban.erp.config.RabbitmqQueueConfig;
 import com.yiban.erp.constant.*;
 import com.yiban.erp.dao.*;
@@ -13,6 +14,7 @@ import com.yiban.erp.exception.BizException;
 import com.yiban.erp.exception.BizRuntimeException;
 import com.yiban.erp.exception.ErrorCode;
 import com.yiban.erp.service.goods.GoodsService;
+import com.yiban.erp.service.util.SystemConfigService;
 import com.yiban.erp.util.UtilTool;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -47,11 +49,13 @@ public class RepertoryInService {
     @Autowired
     private FileInfoMapper fileInfoMapper;
     @Autowired
-    private WarehouseMapper warehouseMapper;
+    private WarehouseService warehouseService;
     @Autowired
     private RabbitmqQueueConfig rabbitmqQueueConfig;
     @Autowired
     private SupplierMapper supplierMapper;
+    @Autowired
+    private SystemConfigService systemConfigService;
 
     /**
      * 获取某商品当前库存和申购订单信息
@@ -164,12 +168,52 @@ public class RepertoryInService {
         }
     }
 
+    private RepertoryInStatus getSaveStatusByConfig(Integer companyId, RepertoryIn order) throws BizException {
+        //先获取提交上来的状态,如果是暂存，直接返回暂存状态
+        RepertoryInStatus status = RepertoryInStatus.getByName(order.getStatus());
+        if (status == null) {
+            logger.warn("get status fail.");
+            throw new BizException(ErrorCode.RECEIVE_SAVE_STATUS_ERROR);
+        }
+        if (RepertoryInStatus.TEMP_STORAGE.equals(status)) {
+            return RepertoryInStatus.TEMP_STORAGE;
+        }
+        if (!RepertoryInStatus.INIT.equals(status)) {
+            //这个方法只针对收货单录入的保存
+            logger.warn("repertory in request save status error.");
+            throw new BizException(ErrorCode.RECEIVE_SAVE_STATUS_ERROR);
+        }
+
+        // 获取系统配置的入库流程
+        Map<String, SystemConfig> configMap = systemConfigService.getConfigMap(companyId);
+        boolean haveQAFlow = false;
+        //获取入库质量验收流程和入库终审流程配置
+        SystemConfig qaConfig = configMap.get(ConfigKey.BUY_QUALITY_CHECK.name());
+        if (qaConfig != null && "open".equalsIgnoreCase(qaConfig.getKeyValue())) {
+            logger.info("have quality flow.");
+            haveQAFlow = true;
+        }
+        boolean haveFNFlow = false; //是否有终审
+        SystemConfig fnConfig = configMap.get(ConfigKey.BUY_FINAL_CHECK.name());
+        if (fnConfig != null && "open".equalsIgnoreCase(fnConfig.getKeyValue())) {
+            haveFNFlow = true;
+        }
+        if (haveQAFlow) {
+            return RepertoryInStatus.INIT; //设置为INIT状态，使下一步直接可以进行质量验证
+        }else if (haveFNFlow) {
+            return RepertoryInStatus.CHECKED; // 设置为CHECKED 状态，直接进入终审流程
+        }else {
+            return RepertoryInStatus.IN_CHECKED; //直接进入终审通过的状态, 这种状态是需要修改库存信息和生成财务流水的
+        }
+    }
+
     /**
      * 保存收货入库订单信息
      * @param user
      * @param order
      * @throws BizException
      */
+    @Transactional
     public void saveOrder(User user, RepertoryIn order) throws BizException {
         if (!saveValidate(order)) {
             throw new BizException(ErrorCode.RECEIVE_SAVE_PRAMS_INVALID);
@@ -179,10 +223,24 @@ public class RepertoryInService {
             logger.warn("get supplier fail by id:{}", order.getSupplierId());
             throw new BizException(ErrorCode.PARAMETER_MISSING);
         }
-        //验证特殊管制商品的条件
-        validateSpecialManage(order, supplier);
-        //验证冷链经营商品的条件
-        validateColdManage(order, supplier);
+        //如果是暂存状态的，不需要验证下面这两个条件
+        if (!RepertoryInStatus.TEMP_STORAGE.name().equalsIgnoreCase(order.getStatus())) {
+            //验证特殊管制商品的条件
+            validateSpecialManage(order, supplier);
+            //验证冷链经营商品的条件
+            validateColdManage(order, supplier);
+
+            //根据系统配置，获取流程状态信息
+            RepertoryInStatus status = getSaveStatusByConfig(user.getCompanyId(), order);
+            logger.info("save next flow status is {}", status.name());
+            order.setStatus(status.name());
+            //如果是直接跳过终审的状态，需要验证当前仓库是否正在冻结盘库，
+            if (!warehouseService.isFrozen(order.getWarehouseId())) {
+                logger.warn("warehouse is frozen now, status is not normal. can not do repertory in. warehouse:{} order:{}",
+                        order.getWarehouseId(), order.getId());
+                throw new BizException(ErrorCode.RECEIVE_ORDER_WAREHOUSE_FROZEN);
+            }
+        }
 
         setRepertoryInTotalAmount(order, order.getDetails()); //保存的之前先对订单的总入库数和总金额计算
         if (order.getId() == null) {
@@ -194,6 +252,8 @@ public class RepertoryInService {
             order.setOrderNumber(UtilTool.makeOrderNumber(user.getCompanyId(), OrderNumberType.IN_CHECK));
             order.setCreateBy(user.getNickname());
             order.setCreateTime(new Date());
+            order.setUpdateBy(user.getNickname());
+            order.setUpdateTime(new Date());
             int count = repertoryInMapper.insert(order);
             if (count <= 0 || order.getId() == null) {
                 logger.warn("save order insert fail.");
@@ -222,9 +282,26 @@ public class RepertoryInService {
             }
         }
         logger.info("begin save repository order details.");
-        saveOrderDetail(user, order);
+        //直接删除原有的，然后重新插入数据
+        List<RepertoryInDetail> details = order.getDetails();
+        repertoryInDetailMapper.deleteByOrderId(order.getId());
+        details.stream().forEach(item -> {
+            item.setInOrderId(order.getId());
+            item.setCreateBy(user.getNickname());
+            item.setCreateTime(new Date());
+            item.setUpdateBy(user.getNickname());
+            item.setUpdateTime(new Date());
+        });
+        repertoryInDetailMapper.insertBatch(details);
 
-        //如果是保存操作，验证是否存在采购单号，如果存在，修改到已经收货的状态
+        //如果不是暂存状态的操作，需要处理后续逻辑
+        if (!RepertoryInStatus.TEMP_STORAGE.name().equalsIgnoreCase(order.getStatus())) {
+            doSaveAfter(user, order);
+        }
+    }
+
+    private void doSaveAfter(User user, RepertoryIn order) {
+        //验证是否存在采购单号，如果存在，修改到已经收货的状态
         if (RepertoryRefType.BUY_ORDER.name().equalsIgnoreCase(order.getRefType())
                 && order.getRefOrderId() != null) {
             logger.info("set buy order status to shiped. buyOrderId:{}", order.getRefOrderId());
@@ -235,6 +312,12 @@ public class RepertoryInService {
                 buyOrder.setUpdatedTime(new Date());
                 buyOrderMapper.updateByPrimaryKeySelective(buyOrder);
             }
+        }
+
+        //如果状态是终审通过的状态，会直接修改库存和触发对应事件，计算财务流水
+        if (RepertoryInStatus.IN_CHECKED.name().equalsIgnoreCase(order.getStatus())) {
+            logger.info("repertory in order save status is IN_CHECKED, need update repertory info and make in event. orderId:{}", order.getId());
+            changeRepertoryInfo(user, order);
         }
     }
 
@@ -257,21 +340,6 @@ public class RepertoryInService {
         order.setTotalAmount(totalAmount);
     }
 
-    private int saveOrderDetail(User user, RepertoryIn order) {
-        List<RepertoryInDetail> details = order.getDetails();
-        if (!order.canUpdateDetail()) {
-            logger.error("can update detail result is false. user:{} orderId:{}", user.getId(), order.getId());
-            return -1;
-        }
-        //直接删除原有的，然后重新插入数据
-        repertoryInDetailMapper.deleteByOrderId(order.getId());
-        details.stream().forEach(item -> {
-            item.setInOrderId(order.getId());
-            item.setCreateBy(user.getNickname());
-            item.setCreateTime(new Date());
-        });
-        return repertoryInDetailMapper.insertBatch(details);
-    }
 
     private boolean saveValidate(RepertoryIn order) {
         if (order == null) {
@@ -482,23 +550,24 @@ public class RepertoryInService {
         repertoryInDetailMapper.updateByPrimaryKeySelective(detail);
     }
 
-    public void setCheckResult(User user, ReceiveSetReq setReq) throws BizException {
+    public int setCheckResult(User user, ReceiveSetReq setReq) throws BizException {
         if (setReq == null || (setReq.getOrderId() == null && setReq.getDetailId() == null)) {
             logger.warn("request params order id or detail id is null.");
             throw new BizException(ErrorCode.PARAMETER_MISSING);
         }
+
         if (setReq.getOrderId() != null) {
             //整单验证通过
-            checkOneOrder(user, setReq);
+            return checkOneOrder(user, setReq);
         }else if (setReq.getDetailId() != null) {
             //单笔详情验证
-            checkOneDetail(user, setReq);
+            return checkOneDetail(user, setReq);
         }else {
             throw new BizException(ErrorCode.PARAMETER_MISSING);
         }
     }
 
-    private void checkOneOrder(User user, ReceiveSetReq setReq) throws BizException {
+    private int checkOneOrder(User user, ReceiveSetReq setReq) throws BizException {
         RepertoryIn order = repertoryInMapper.selectByPrimaryKey(setReq.getOrderId());
         if (order == null) {
             logger.warn("get order info fail by id:{}", setReq.getOrderId());
@@ -508,18 +577,30 @@ public class RepertoryInService {
             logger.error("user get company is not match. orderId:{} user:{}", setReq.getOrderId(), user.getId());
             throw new BizRuntimeException(ErrorCode.ACCESS_PERMISSION);
         }
+        //获取系统流程
+        boolean haveFNFlow = systemConfigService.haveOrderFlow(user.getCompanyId(), ConfigKey.BUY_FINAL_CHECK);
         setReq.setUpdateBy(user.getNickname());
         setReq.setUpdateTime(new Date());
         repertoryInDetailMapper.setCheckByOrder(setReq);
+        if (haveFNFlow) {
+            //存在有终审流程，直接修改到终审状态
+            order.setStatus(RepertoryInStatus.CHECKED.name());
+            order.setUpdateBy(user.getNickname());
+            order.setUpdateTime(new Date());
+            repertoryInMapper.updateByPrimaryKeySelective(order);
+        }else {
+            //已经没有终审流程，直接修改登记后直接登记到终审通过，并且触发对应事件
+            order.setStatus(RepertoryInStatus.IN_CHECKED.name());
+            order.setUpdateBy(user.getNickname());
+            order.setUpdateTime(new Date());
+            repertoryInMapper.updateByPrimaryKeySelective(order);
 
-        //直接把订单的状态修改为意见验收通过的的状态
-        order.setStatus(RepertoryInStatus.CHECKED.name());
-        order.setUpdateBy(user.getNickname());
-        order.setUpdateTime(new Date());
-        repertoryInMapper.updateByPrimaryKeySelective(order);
+            changeRepertoryInfo(user, order); //修改库存
+        }
+        return 1;
     }
 
-    private void checkOneDetail(User user, ReceiveSetReq setReq) throws BizException {
+    private int checkOneDetail(User user, ReceiveSetReq setReq) throws BizException {
         RepertoryInDetail detail = repertoryInDetailMapper.selectByPrimaryKey(setReq.getDetailId());
         if (detail == null) {
             logger.warn("get order detail fail by id:{}", setReq.getDetailId());
@@ -540,21 +621,38 @@ public class RepertoryInService {
 
         //验证订单的是否意见全部验证通过，如果是，需要把订单修改为已经验收完毕的状态
         List<RepertoryInDetail> details = repertoryInDetailMapper.getByOrderId(detail.getInOrderId());
-        setRepertoryInTotalAmount(repertoryIn, details);
-
 
         boolean checked = true;
         for (RepertoryInDetail item : details) {
-            if (item.getCheckStatus() != null && !item.getCheckStatus()) {
+            if (item.getCheckStatus() == null || !item.getCheckStatus()) {
                 checked = false;
                 break;
             }
         }
         if (checked) {
-            logger.warn("user:{} check order detail:{} then order check over. orderId:{}", user.getId(), detail.getId(), detail.getInOrderId());
-            repertoryIn.setStatus(RepertoryInStatus.CHECKED.name());
+            logger.info("user:{} check order detail:{} then order check over. orderId:{}", user.getId(), detail.getId(), detail.getInOrderId());
+            //获取系统流程，
+            boolean haveFNFlow = systemConfigService.haveOrderFlow(user.getCompanyId(), ConfigKey.BUY_FINAL_CHECK);
+            if (haveFNFlow) {
+                // 修改到终审状态
+                repertoryIn.setStatus(RepertoryInStatus.CHECKED.name());
+                repertoryIn.setUpdateTime(new Date());
+                repertoryIn.setUpdateBy(user.getNickname());
+                repertoryInMapper.updateByPrimaryKeySelective(repertoryIn);
+            }else {
+                logger.info("update to IN_CHECKED status and change repertory info.");
+                // 修改到终审通过的状态
+                repertoryIn.setStatus(RepertoryInStatus.IN_CHECKED.name());
+                repertoryIn.setUpdateTime(new Date());
+                repertoryIn.setUpdateBy(user.getNickname());
+                repertoryInMapper.updateByPrimaryKeySelective(repertoryIn);
+
+                changeRepertoryInfo(user, repertoryIn); //修改库存
+            }
+            return 1;  //返回1代表需要刷新整个入库单列表
+        }else {
+            return 0;
         }
-        repertoryInMapper.updateByPrimaryKeySelective(repertoryIn);
     }
 
     public void setUncheckOrder(User user, Long orderId) throws BizException {
@@ -606,61 +704,6 @@ public class RepertoryInService {
         repertoryInDetailMapper.deleteByPrimaryKey(detailId);
     }
 
-    @Transactional
-    public int setSaveDetail(User user, ReceiveSetReq setReq) throws BizException {
-        RepertoryIn order = repertoryInMapper.selectByPrimaryKey(setReq.getOrderId());
-        if (order == null) {
-            logger.warn("get order by id fail. id:{}", setReq.getOrderId());
-            throw new BizException(ErrorCode.RECEIVE_ORDER_GET_FAIL);
-        }
-        List<RepertoryInDetail> updateList = setReq.getDetailList();
-        if (updateList == null || updateList.isEmpty()) {
-            logger.warn("detail update list is null.");
-            return 0;
-        }
-        Map<Long, RepertoryInDetail> updateMap = new HashMap<>();
-        updateList.stream().forEach(item -> updateMap.put(item.getId(), item));
-        for (RepertoryInDetail detail : updateList) {
-            if (!order.getId().equals(detail.getInOrderId())) {
-                logger.warn("order id is not equals detail repository id. detailId:{} orderId:{}", detail.getId(), order.getId());
-                throw new BizException(ErrorCode.RECEIVE_DETAIL_SAVE_PARAMS_ERROR);
-            }
-        }
-        List<RepertoryInDetail> details = repertoryInDetailMapper.getByOrderId(order.getId());
-        //只修改没有验证通过，如果验证都过了，不能修改
-        List<RepertoryInDetail> canUpdateList = new ArrayList<>();
-        details.stream().forEach(item -> {
-            if (item.getCheckStatus() == null || !item.getCheckStatus()) {
-                canUpdateList.add(item);
-            }
-        });
-        if (canUpdateList.isEmpty()) {
-            logger.info("order detail is all checked, can not update.");
-            return 0;
-        }
-        setRepertoryInTotalAmount(order, details);
-        repertoryInMapper.updateByPrimaryKeySelective(order); //重新保存总数和金额
-        int count = 0;
-        for (RepertoryInDetail detail : canUpdateList) {
-            RepertoryInDetail mergeItem = updateMap.get(detail.getId());
-            if (mergeItem == null) {
-                continue;
-            }
-            detail.setBatchCode(mergeItem.getBatchCode());
-            detail.setProductDate(mergeItem.getProductDate());
-            detail.setExpDate(mergeItem.getExpDate());
-            detail.setReceiveQuality(mergeItem.getReceiveQuality());
-            detail.setInCount(mergeItem.getInCount());
-            detail.setRightCount(mergeItem.getRightCount());
-            detail.setErrorCount(mergeItem.getErrorCount());
-            detail.setAmount(mergeItem.getAmount());
-            detail.setWarehouseLocation(mergeItem.getWarehouseLocation());
-            int result = repertoryInDetailMapper.updateByPrimaryKeySelective(detail);
-            count += result;
-        }
-        return count;
-    }
-
     public void setOrderFileNo(User user, Long orderId, String fileNo) throws BizException{
         RepertoryIn order = repertoryInMapper.selectByPrimaryKey(orderId);
         if (order == null) {
@@ -705,12 +748,8 @@ public class RepertoryInService {
             logger.warn("order detail have check status is false. orderId:{}", orderId);
             throw new BizException(ErrorCode.RECEIVE_ORDER_STATUS_NOT_CHECKED);
         }
-        Warehouse warehouse = warehouseMapper.selectByPrimaryKey(order.getWarehouseId());
-        if (warehouse == null) {
-            logger.error("order get warehouse fail.");
-            throw new BizException(ErrorCode.RECEIVE_ORDER_WAREHOUSE_NULL);
-        }
-        if (!WarehouseStatus.NORMAL.name().equalsIgnoreCase(warehouse.getStatus())) {
+
+        if (!warehouseService.isFrozen(order.getWarehouseId())) {
             logger.warn("warehouse is frozen now, status is not normal. can not do repertory in. warehouse:{} order:{}",
                     order.getWarehouseId(), order.getId());
             throw new BizException(ErrorCode.RECEIVE_ORDER_WAREHOUSE_FROZEN);
@@ -723,11 +762,18 @@ public class RepertoryInService {
             logger.error("update order status fail. order id:{}", order.getId());
             throw new BizRuntimeException(ErrorCode.FAILED_UPDATE_FROM_DB);
         }
+
+        changeRepertoryInfo(user, order);
+    }
+
+    // 变动库存和生产对应事件
+    private void changeRepertoryInfo(User user, RepertoryIn order) {
+        //重新拉一次详情信息，因为有些数据保存了修改
+        List<RepertoryInDetail> details = repertoryInDetailMapper.getByOrderId(order.getId());
         //把数据插入到库存中
         List<RepertoryInfo> infoList = createRepertoryInfos(user, order, details);
         int inCount = repertoryInfoMapper.insertBatch(infoList);
         logger.info("insert repertory info count:{}", inCount);
-
         // 生成一个入库信息
         rabbitmqQueueConfig.sendMessage("RepertoryInService", RabbitmqQueueConfig.ORDER_BUY, order);
     }
