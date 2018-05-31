@@ -12,6 +12,8 @@ public class User {
 
     private String companyName;
 
+    private String type;
+
     private String nickname;
 
     private String mobile;
@@ -286,5 +288,13 @@ public class User {
 
     public void setAvatarUrl(String avatarUrl) {
         this.avatarUrl = avatarUrl;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 }
