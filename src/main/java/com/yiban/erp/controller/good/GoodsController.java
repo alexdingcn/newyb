@@ -16,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import javax.xml.ws.Response;
 import java.util.*;
 
 
@@ -63,6 +64,7 @@ public class GoodsController {
         query.setPageSize(size);
         query.setOptions(optionList);
         query.setWarehouseId(warehouseId);
+
         Long count = 0L;
         count = goodsService.getChooseListDetailCount(query);
         List<Goods> details = new ArrayList<>();
@@ -79,6 +81,7 @@ public class GoodsController {
     public ResponseEntity<String> searchList(@RequestBody GoodsQuery query,
                                              @AuthenticationPrincipal User user) {
         query.setCompanyId(user.getCompanyId());
+        query.setDefaultAttr(goodsService.getDefaultAttrRef(user.getCompanyId()));
         Long count = goodsService.searchListCount(query);
         List<GoodsInfo> result = new ArrayList<>();
         if (count > 0) {
@@ -137,6 +140,9 @@ public class GoodsController {
         return ResponseEntity.ok().build();
     }
 
-
-
+    @RequestMapping(value="/defaultAttr", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> getDefaultAttr(@AuthenticationPrincipal User user){
+        Integer id=user.getCompanyId();
+        return ResponseEntity.ok().body(JSON.toJSONString(goodsService.getDefaultAttr(id)));
+    }
 }

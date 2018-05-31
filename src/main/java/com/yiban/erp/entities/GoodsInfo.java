@@ -867,4 +867,5 @@ public class GoodsInfo {
     public void setSpecDesc(String specDesc) {
         this.specDesc = specDesc;
     }
+
 }
