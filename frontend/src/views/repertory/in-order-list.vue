@@ -31,6 +31,7 @@
                     </Col>
                     <Col span="3" offset="1" >
                        <Button icon="ios-search" type="primary" :loading="searching" @click="searchBtnClick">查询</Button>
+                       <Button icon="ios-download-outline" type="primary"  @click="exportExcel">导出</Button>
                     </Col>
                 </Row>
 
@@ -142,13 +143,18 @@
                         title: '规格',
                         width: 120,
                         render: (h, params) =>　{
-                            let goodsSpecs = params.row.goods.goodsSpecs ? params.row.goods.goodsSpecs : [];
-                            return h(goodsSpecTags, {
-                                props: {
-                                    tags: goodsSpecs,
-                                    color: 'blue'
-                                }
-                            });
+                            try{
+                                let goodsSpecs = params.row.goods.goodsSpecs ? params.row.goods.goodsSpecs : [];
+                                return h(goodsSpecTags, {
+                                    props: {
+                                        tags: goodsSpecs,
+                                        color: 'blue'
+                                    }
+                                });
+                            }catch (e) {
+                                return h('span', '');
+                            }
+
                         }
                     },
                     {
@@ -157,19 +163,19 @@
                         align: 'center',
                         width: 120,
                         render: (h, params) => {
-                            let factoryName = params.row.goods.factoryName;
-                            return h('span', factoryName ? factoryName : '');
+                            try{
+                                let factoryName = params.row.goods.factoryName;
+                                return h('span', factoryName ? factoryName : '');
+                            }catch (e) {
+                                return h('span', '');
+                            }
                         }
                     },
                     {
                         title: '基药',
                         key: 'base_med_id',
                         align: 'center',
-                        width: 120  ,
-                        render: (h, params) => {
-                            let base_med_id = params.row.goods.baseMedName;
-                            return h('span', base_med_id ? base_med_id : '');
-                        }
+                        width: 120
                     },
 
                     {
@@ -226,8 +232,13 @@
                         align: "center",
                         width: 150,
                         render: (h, params) => {
-                            let cert1No = params.row.goods.cert1No;
-                            return h('span', cert1No ? cert1No: '');
+                            try{
+                                let cert1No = params.row.goods.cert1No;
+                                return h('span', cert1No ? cert1No: '');
+                            }catch (e) {
+                                return h('span','');
+                            }
+
                         }
                     }, {
                         title: "入库方式",
@@ -271,6 +282,11 @@
             searchBtnClick () {
                 this.currentPage = 1;
                 this.refreshTableData();
+            },
+            exportExcel () {
+                this.$refs.table.exportCsv({
+                    filename: '入库记录明细表'
+                });
             },
             refreshTableData () {
                 let reqData = {
