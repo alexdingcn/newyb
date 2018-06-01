@@ -64,27 +64,27 @@
                     </FormItem>
                     <FormItem label="真实姓名：" >
                         <div style="display:inline-block;width:250px;">
-                            <Input v-model="userDetail.realname" ></Input>
+                            <Input v-model="userDetail.realname" />
                         </div>
                     </FormItem>
                     <FormItem label="电子邮箱：" >
                         <div style="display:inline-block;width:250px;">
-                            <Input v-model="userDetail.email" ></Input>
+                            <Input v-model="userDetail.email" />
                         </div>
                     </FormItem>
                     <FormItem label="固定电话：" >
                         <div style="display:inline-block;width:250px;">
-                            <Input v-model="userDetail.phone" ></Input>
+                            <Input v-model="userDetail.phone" />
                         </div>
                     </FormItem>
                     <FormItem label="身份证号：" >
                         <div style="display:inline-block;width:250px;">
-                            <Input v-model="userDetail.idcard" ></Input>
+                            <Input v-model="userDetail.idcard" />
                         </div>
                     </FormItem>
                     <FormItem label="联系地址：" >
                         <div style="display:inline-block;width:400px;">
-                            <Input v-model="userDetail.address" ></Input>
+                            <Input v-model="userDetail.address" />
                         </div>
                     </FormItem>
 
@@ -95,13 +95,13 @@
             <h3 slot="header" style="color:#2D8CF0">修改密码</h3>
             <Form ref="editPasswordForm" :model="editPasswordForm" :label-width="100" label-position="right" :rules="passwordValidate">
                 <FormItem label="原密码" prop="oldPass" :error="oldPassError">
-                    <Input type="password" v-model="editPasswordForm.oldPass" placeholder="请输入现在使用的密码" ></Input>
+                    <Input type="password" v-model="editPasswordForm.oldPass" placeholder="请输入现在使用的密码" />
                 </FormItem>
                 <FormItem label="新密码" prop="newPass">
-                    <Input type="password" v-model="editPasswordForm.newPass" placeholder="请输入新密码，至少6位字符" ></Input>
+                    <Input type="password" v-model="editPasswordForm.newPass" placeholder="请输入新密码，至少6位字符" />
                 </FormItem>
                 <FormItem label="确认新密码" prop="rePass">
-                    <Input type="password" v-model="editPasswordForm.rePass" placeholder="请再次输入新密码" ></Input>
+                    <Input type="password" v-model="editPasswordForm.rePass" placeholder="请再次输入新密码" />
                 </FormItem>
             </Form>
             <div slot="footer">
@@ -114,12 +114,12 @@
             <h3 slot="header" style="color:#2D8CF0">修改手机号</h3>
             <Form ref="editMobileForm" :model="editMobileForm" :label-width="100" label-position="right" :rules="mobileValidate">
                 <FormItem label="新手机号" prop="mobile">
-                    <Input v-model="editMobileForm.mobile" placeholder="请输入新手机号码" @on-blur="validMobileExist" >
+                    <i-input v-model="editMobileForm.mobile" placeholder="请输入新手机号码" @on-blur="validMobileExist" >
                         <Button slot="append" @click="handleVerifyCode" :disabled="sendVerifyCodeDisabled">{{verifyText}}</Button>
-                    </Input>
+                    </i-input>
                 </FormItem>
                 <FormItem label="验证码" prop="verifyCode">
-                    <Input v-model="editMobileForm.verifyCode" placeholder="请输入短信验证码" ></Input>
+                    <Input v-model="editMobileForm.verifyCode" placeholder="请输入短信验证码" />
                 </FormItem>
             </Form>
             <Alert type="error" v-show="validMessage" show-icon>{{ validMessage }}</Alert>
@@ -437,5 +437,5 @@ export default {
 };
 </script>
 
-<style scoped>
+<style >
 </style>

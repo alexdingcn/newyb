@@ -1,7 +1,7 @@
 <template>
     <div>
         <Row :gutter="gutterNum">
-            <Col :span="span" v-if="show(0)">
+            <i-col :span="span" v-if="show(0)">
                 <Select 
                     ref="prov"
                     v-model="currPro"
@@ -15,8 +15,8 @@
                     style="width:100%">
                     <Option v-for="item in provList" :value="item" :key="item">{{ item }}</Option>
                 </Select>
-            </Col>
-            <Col :span="span" v-if="show(1)">
+            </i-col>
+            <i-col :span="span" v-if="show(1)">
                 <Select
                     ref="city"
                     v-model="currCit"
@@ -30,8 +30,8 @@
                     style="width:100%">
                     <Option v-for="item in cityList" :value="item" :key="item">{{ item }}</Option>
                 </Select>
-            </Col>
-            <Col :span="span" v-if="show(2)">
+            </i-col>
+            <i-col :span="span" v-if="show(2)">
                 <Select 
                     ref="coun"
                     v-model="currCou"
@@ -45,8 +45,8 @@
                     style="width:100%">
                     <Option v-for="item in counList" :value="item" :key="item">{{ item }}</Option>
                 </Select>
-            </Col>
-            <Col :span="span" v-if="show(3)">
+            </i-col>
+            <i-col :span="span" v-if="show(3)">
                 <Select 
                     ref="stre"
                     v-model="currStr"
@@ -60,7 +60,7 @@
                     style="width:100%">
                     <Option v-for="item in streList" :value="item" :key="item">{{ item }}</Option>
                 </Select>
-            </Col>
+            </i-col>
         </Row>
         <slot></slot>
     </div>

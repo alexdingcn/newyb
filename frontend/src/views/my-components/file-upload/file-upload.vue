@@ -7,7 +7,7 @@
 <template>
     <div>
         <Row>
-            <Col span="8">
+            <i-col span="8">
                 <Card>
                     <p slot="title">
                         <Icon type="ios-cloud-upload-outline"></Icon>
@@ -21,8 +21,8 @@
                         </Row>
                     </div>
                 </Card>
-            </Col>
-            <Col span="8" class="padding-left-10">
+            </i-col>
+            <i-col span="8" class="padding-left-10">
                 <Card>
                     <p slot="title">
                         <Icon type="ios-copy-outline"></Icon>
@@ -37,8 +37,8 @@
                         </Row>
                     </div>
                 </Card>
-            </Col>
-            <Col span="8" class="padding-left-10">
+            </i-col>
+            <i-col span="8" class="padding-left-10">
                 <Card>
                     <p slot="title">
                         <Icon type="upload"></Icon>
@@ -57,10 +57,10 @@
                         </Row>
                     </div>
                 </Card>
-            </Col>
+            </i-col>
         </Row>
         <div class="margin-top-10">
-            <Col span="8">
+            <i-col span="8">
                 <div>
                     <Card>
                         <p slot="title">
@@ -105,8 +105,8 @@
                         </div>
                     </Card>
                 </div>
-            </Col>
-            <Col span="16">
+            </i-col>
+            <i-col span="16">
                 <div class="padding-left-10">
                     <Card>
                         <p slot="title">
@@ -114,7 +114,7 @@
                             综合实例
                         </p>
                         <div class="height-492px">
-                            <Col span="8">
+                            <i-col span="8">
                                 <Card>
                                     <Upload
                                         ref="upload"
@@ -138,8 +138,8 @@
                                         <img :src="'https://o5wwk8baw.qnssl.com/' + imgName + '/large'" v-if="visible" style="width: 100%">
                                     </Modal>
                                 </Card>
-                            </Col>
-                            <Col span="16" class="padding-left-10">
+                            </i-col>
+                            <i-col span="16" class="padding-left-10">
                                 <Card>
                                     <div class="height-460px">
                                         <div class="admin-upload-list" v-for="item in uploadList" :key="item.url">
@@ -156,11 +156,11 @@
                                         </div>
                                     </div>
                                 </Card>
-                            </Col>
+                            </i-col>
                         </div>
                     </Card>
                 </div>
-            </Col>
+            </i-col>
         </div>
     </div>
 </template>

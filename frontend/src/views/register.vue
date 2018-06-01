@@ -23,21 +23,21 @@
                 <Form ref="formCustom" :model="formCustom" :rules="ruleCustom" :label-width="110">
                     <small class="help">注意：<strong>需与当地政府颁发的商业许可证或企业注册证上的企业名称完全一致，信息审核成功后，企业名称不可修改</strong></small>
                     <Form-item style="margin-top: 10px;" label="企业名称" prop="company">
-                        <Input v-model="formCustom.company" placeholder="请输入公司名称"></Input>
+                        <Input v-model="formCustom.company" placeholder="请输入公司名称"/>
                     </Form-item>
                     <Form-item label="手机" prop="mobile">
-                        <Input v-model="formCustom.mobile" placeholder="请输入手机号">
-                        <Button slot="append" @click="handleVerifyCode"
-                                :disabled="formCustom.mobile === '' || countDown > 0">{{verifyText}}
-                        </Button>
-                        </Input>
+                        <i-input v-model="formCustom.mobile" placeholder="请输入手机号">
+                          <Button slot="append" @click="handleVerifyCode"
+                                  :disabled="formCustom.mobile === '' || countDown > 0">{{verifyText}}
+                          </Button>
+                        </i-input>
                     </Form-item>
                     <FormItem label="验证码" prop="verifyCode">
                         <Input v-model="formCustom.verifyCode" placeholder="验证码" :maxlength="6"/>
                     </FormItem>
 
                     <Form-item label="密码" prop="password">
-                        <Input v-model="formCustom.password" type="password"></Input>
+                        <Input v-model="formCustom.password" type="password"/>
                     </Form-item>
 
                     <Form-item v-show="loginResponse">

@@ -10,33 +10,33 @@
         <Row >
             <Form ref="searchForm" :model="searchFormItem" :label-width="90" class="sellOrderQueryForm">
                 <Row type="flex" justify="center">
-                    <Col span="8" >
+                    <i-col span="8" >
                         <FormItem label="客户">
                             <customer-select v-model="searchFormItem.customerId" ></customer-select>
                         </FormItem>
-                    </Col>
-                    <Col span="12" >
+                    </i-col>
+                    <i-col span="12" >
                         <FormItem label="制单日期">
                             <DatePicker v-model="dateRange" type="daterange" placement="bottom-start" placeholder="制单日期" style="width:200px"></DatePicker>
                         </FormItem>
-                    </Col>
-                    <Col span="4"></Col>
+                    </i-col>
+                    <i-col span="4"></i-col>
                 </Row>
                 <Row type="flex" justify="center">
-                    <Col span="8" >
+                    <i-col span="8" >
                         <FormItem label="销售单号">
-                            <Input type="text" v-model="searchFormItem.orderNumber" ></Input>
+                            <Input type="text" v-model="searchFormItem.orderNumber" />
                         </FormItem>
-                    </Col>
-                    <Col span="8" >
+                    </i-col>
+                    <i-col span="8" >
                         <FormItem label="销售员" >
                             <sale-select v-model="searchFormItem.saleId"></sale-select>
                         </FormItem>
-                    </Col>
-                    <Col span="3" offset="1" >
+                    </i-col>
+                    <i-col span="3" offset="1" >
                         <Button icon="ios-search" type="primary" :loading="searching" @click="searchBtnClick">查询</Button>
-                    </Col>
-                    <Col span="4"></Col>
+                    </i-col>
+                    <i-col span="4"></i-col>
                 </Row>
             </Form>
         </Row>
@@ -423,7 +423,7 @@ export default {
 };
 </script>
 
-<style scoped>
+<style >
 .sellOrderQueryForm .ivu-form-item {
     margin-bottom: 5px;
 }

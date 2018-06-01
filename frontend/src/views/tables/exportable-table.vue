@@ -1,4 +1,4 @@
-<style lang="less" scoped>
+<style lang="less" >
     @import '../../styles/common.less';
     @import './components/table.less';
 </style>
@@ -12,10 +12,10 @@
                     导出表格数据到 .Csv 文件
                 </h4>
                 <Row>
-                    <Col span="18">
+                    <i-col span="18">
                         <Table :columns="columnsCsv" :data="csvData" size="small" ref="tableCsv"></Table>
-                    </Col>
-                    <Col span='6' class="padding-left-10">
+                    </i-col>
+                    <i-col span='6' class="padding-left-10">
                         <div class="exportable-table-download-con1">
                             <span style="margin-right: 16px;"><Button type="primary" size="large" @click="exportData(1)"><Icon type="ios-download-outline"></Icon> 导出原始数据</Button></span>
                             <Button type="primary" size="large" @click="exportData(2)"><Icon type="ios-download-outline"></Icon> 导出排序和过滤后的数据</Button>
@@ -39,7 +39,7 @@
                                 <Button type="primary" size="large" @click="exportData(3)"><Icon type="ios-download-outline"></Icon> 导出自定义数据</Button>
                             </div>
                         </div>
-                    </Col>
+                    </i-col>
                 </Row>
             </Card>
         </Row>
@@ -50,10 +50,10 @@
                     导出表格数据到 .Xls 文件 (Excel)
                 </h4>
                 <Row>
-                    <Col span="18">
+                    <i-col span="18">
                         <Table :columns="excelColumns" height="390px" :data="table2excelData" size="small" ref="tableExcel"></Table>
-                    </Col>
-                    <Col span='6' class="padding-left-10">
+                    </i-col>
+                    <i-col span='6' class="padding-left-10">
                          <div class="margin-top-10 margin-left-10">
                             <span>输入文件名：</span>
                             <Input v-model="excelFileName" icon="document" placeholder="请输入文件名" style="width: 190px" />
@@ -62,7 +62,7 @@
                             <a id="hrefToExportTable" style="postion: absolute;left: -10px;top: -10px;width: 0px;height: 0px;"></a>
                             <Button type="primary" size="large" @click="exportExcel">下载表格数据</Button>
                         </div>
-                    </Col>
+                    </i-col>
                 </Row>
             </Card>
         </Row>

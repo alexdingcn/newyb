@@ -6,19 +6,19 @@
 <template>
     <div class="image-editor">
         <Row :gutter="10">
-            <Col span="12">
+            <i-col span="12">
                 <Card>
                     <p slot="title">
                         <Icon type="qr-scanner"></Icon>
                         基础实例
                     </p>
                     <Row :gutter="10">
-                        <Col span="14" class="image-editor-con1">
+                        <i-col span="14" class="image-editor-con1">
                             <div class="cropper">
                                 <img id="cropimg1" alt="">
                             </div>
-                        </Col>
-                        <Col span="10" class="image-editor-con1">
+                        </i-col>
+                        <i-col span="10" class="image-editor-con1">
                             <Row type="flex" justify="center" align="middle" class="image-editor-con1-preview-con">
                                 <div id="preview1"></div>
                             </Row>
@@ -31,23 +31,23 @@
                                 <p slot="header">预览裁剪之后的图片</p>
                                 <img :src="option1.cropedImg" alt="" v-if="option1.showCropedImage" style="width: 100%;">
                             </Modal>
-                        </Col>
+                        </i-col>
                     </Row>
                 </Card>
-            </Col>
-            <Col span="12">
+            </i-col>
+            <i-col span="12">
                 <Card>
                     <p slot="title">
                         <Icon type="android-options"></Icon>
                         获取图片数据
                     </p>
                     <Row :gutter="10">
-                        <Col span="14" class="image-editor-con2">
+                        <i-col span="14" class="image-editor-con2">
                             <div class="cropper">
                                 <img id="cropimg2" src="../../../images/cropper-test.png" alt="">
                             </div>
-                        </Col>
-                        <Col span="10" class="image-editor-con2">
+                        </i-col>
+                        <i-col span="10" class="image-editor-con2">
                             <p><b>x:</b>{{ cropdata2.x }}</p>
                             <p><b>y:</b>{{ cropdata2.y }}</p>
                             <p><b>width:</b>{{ cropdata2.w }}</p>
@@ -65,10 +65,10 @@
                                     <Button @click="cropper2.scaleY(-cropper2.getData().scaleY)" type="primary"><Icon :size="14" type="android-more-vertical"></Icon></Button>
                                 </ButtonGroup>
                             </div>
-                        </Col>
+                        </i-col>
                     </Row>
                 </Card>
-            </Col>
+            </i-col>
         </Row>
         <Row class="margin-top-10">
             <Card>
@@ -77,20 +77,20 @@
                     综合实例
                 </p>
                 <Row :gutter="10">
-                    <Col span="12" class="image-editor-con3">
+                    <i-col span="12" class="image-editor-con3">
                         <div class="cropper3">
                             <img id="cropimg3" src="../../../images/cropper-test.png" alt="">
                         </div>
-                    </Col>
-                    <Col span="6" class="image-editor-con3">
+                    </i-col>
+                    <i-col span="6" class="image-editor-con3">
                         <Row>
-                            <Col span="24" class="image-editor-con3-btn-box">
+                            <i-col span="24" class="image-editor-con3-btn-box">
                                 <input type="file" accept="image/png, image/jpeg, image/gif, image/jpg" @change="handleChange3" id="fileinput3" class="fileinput" />
                                 <label class="filelabel filelabel3" for="fileinput3"><Icon type="image"></Icon>&nbsp;选择图片</label>
-                            </Col>
+                            </i-col>
                         </Row>
                         <Row class="margin-top-10">
-                            <Col span="24" class="crop3-btn-box">
+                            <i-col span="24" class="crop3-btn-box">
                                 <Tooltip content="开始裁剪" placement="bottom">
                                     <Button @click="cropper3.crop()" type="primary"><Icon :size="18" type="checkmark-round"></Icon></Button>
                                 </Tooltip>
@@ -103,10 +103,10 @@
                                 <Tooltip content="可用" placement="bottom">
                                     <Button @click="cropper3.enable()" type="primary"><Icon :size="18" type="android-unlock"></Icon></Button>
                                 </Tooltip>
-                            </Col>
+                            </i-col>
                         </Row>
                         <Row class="margin-top-10" :gutter="10">
-                            <Col span="24" class="crop3-btn-box">
+                            <i-col span="24" class="crop3-btn-box">
                                 <Tooltip content="放大" placement="bottom">
                                     <Button @click="handlezooml" type="primary"><Icon :size="16" type="plus-round"></Icon></Button>
                                 </Tooltip>
@@ -119,10 +119,10 @@
                                 <Tooltip content="右转" placement="bottom">
                                     <Button @click="handlerotater" type="primary"><Icon :size="16" type="arrow-return-right"></Icon></Button>
                                 </Tooltip>
-                            </Col>
+                            </i-col>
                         </Row>
                         <Row class="margin-top-10" :gutter="10">
-                            <Col span="24" class="crop3-btn-box">
+                            <i-col span="24" class="crop3-btn-box">
                                 <Tooltip content="左移" placement="bottom">
                                     <Button @click="handlemovel" type="primary"><Icon :size="18" type="android-arrow-back"></Icon></Button>
                                 </Tooltip>
@@ -135,23 +135,23 @@
                                 <Tooltip content="下移" placement="bottom">
                                     <Button @click="handlemoved" type="primary"><Icon :size="18" type="android-arrow-down"></Icon></Button>
                                 </Tooltip>
-                            </Col>
+                            </i-col>
                         </Row>
                         <Row class="margin-top-10">
-                            <Col span="24" class="crop3-btn-box">
+                            <i-col span="24" class="crop3-btn-box">
                                 <Button @click="handlecrop3" style="width: 190px;" icon="crop" type="primary">裁剪</Button>
-                            </Col>
+                            </i-col>
                             <Modal v-model="option3.showCropedImage">
                                 <p slot="header">预览裁剪之后的图片</p>
                                 <img :src="option3.cropedImg" alt="" v-if="option3.showCropedImage" style="width: 100%;">
                             </Modal>
                         </Row>
-                    </Col>
-                    <Col span="6">
+                    </i-col>
+                    <i-col span="6">
                         <Row type="flex" justify="center" align="middle" class="image-editor-con3-preview-con">
                             <div id="preview3"></div>
                         </Row>
-                    </Col>
+                    </i-col>
                 </Row>
             </Card>
         </Row>
@@ -312,6 +312,6 @@ export default {
 };
 </script>
 
-<style scoped>
+<style >
 
 </style>

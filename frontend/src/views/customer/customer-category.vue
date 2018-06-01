@@ -6,7 +6,7 @@
     <Modal v-model="isShowModal" :closable="false" :title="modalTitle">
         <Form ref="custCatForm" :model="custCatFormData" :rules="ruleValidate" label-position="right" :label-width="100" class="margin-right-10">
             <FormItem label="类别名称" prop="name">
-                <Input type="text" v-model="custCatFormData.name" placeholder="输入客户类名称"></Input>
+                <Input type="text" v-model="custCatFormData.name" placeholder="输入客户类名称"/>
             </FormItem>
             <FormItem label="上级类别">
                 <Select v-model="custCatFormData.parentId" placeholder="选择上级类别">
@@ -25,15 +25,15 @@
         </Form>
         <div slot="footer">
           <Row >
-            <Col span="6" offset="6">
+            <i-col span="6" offset="6">
               <Button type="primary" :loading="loading" @click="ok" long>
                 <span v-if="!loading">提交</span>
                 <span v-else>正在提交...</span>
               </Button>
-            </Col>
-            <Col span=6 class="padding-left-10">
+            </i-col>
+            <i-col span=6 class="padding-left-10">
               <Button @click="closedModal" long>取消</Button>
-            </Col>
+            </i-col>
           </Row>
         </div>
     </Modal>
@@ -199,7 +199,7 @@ export default {
 };
 </script>
 
-<style scoped>
+<style >
 
 </style>
 

@@ -37,24 +37,24 @@
             <transition name="back-message-list">
                 <div v-if="!showMesTitleList" class="message-view-content-con">
                     <Row style="margin-top: 10px;">
-                        <Col span="2">
+                        <i-col span="2">
                             <Row type="flex" justify="start">
                                 <span><Button type="text" @click="backMesTitleList"><Icon type="chevron-left"></Icon>&nbsp;&nbsp;返回</Button></span>
                             </Row>
-                        </Col>
-                        <Col span="16">
+                        </i-col>
+                        <i-col span="16">
                             <Row type="flex" justify="center">
                                 <h3>{{ mes.title }}</h3>
                             </Row>
-                        </Col>
-                        <Col span="6">
+                        </i-col>
+                        <i-col span="6">
                             <Row type="flex" justify="end">
                                 <ButtonGroup size="small">
                                     <Button type="primary" icon="plus-round" @click="addOptionsBtnClick(mes.id)">添加评论信息</Button>
                                     <Button v-if="currentMessageType === 'unprocess'" type="success" icon="checkmark" @click="doMarkProcess(mes.id)">标为已处理</Button>
                                 </ButtonGroup>
                             </Row>
-                        </Col>
+                        </i-col>
                     </Row>
 
                     <p class="mes-time-con"><Icon type="android-time"></Icon>&nbsp;&nbsp;{{ mes.time }}</p>
@@ -79,11 +79,11 @@
         <Modal v-model="addOptionModal" title="添加评论信息" :mask-closable="false" width="50" @on-ok="submitOption" @on-cancel="cancelOption">
             <Form ref="optionForm" :model="optionFormItem" :label-width="90"> 
                 <Row type="flex" justify="center">
-                    <Col span="24">
+                    <i-col span="24">
                         <FormItem label="评论信息:">
                             <Input v-model="optionFormItem.optionResult" />
                         </FormItem>
-                    </Col>
+                    </i-col>
                 </Row>
             </Form>
         </Modal>

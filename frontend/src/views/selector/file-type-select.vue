@@ -113,7 +113,7 @@ export default {
 }
 </script>
 
-<style scoped>
+<style >
 
 .add-type-modal {
     position: fixed;

@@ -11,29 +11,29 @@
             </p>
             <div slot="extra" style="width:1000px">
                 <Row type="flex" justify="end">
-                    <Col span="2" >
+                    <i-col span="2" >
                         <Button  icon="plus-round" @click="addReperstoryInOrder" >新增</Button>
-                    </Col>
-                    <Col span="2" >
+                    </i-col>
+                    <i-col span="2" >
                     <Button icon="checkmark-round" @click="showCheckModal">审核</Button>
-                    </Col>
-                    <Col span="2" >
+                    </i-col>
+                    <i-col span="2" >
                     <Button icon="trash-a" @click="showCheckModal">撤销</Button>
-                    </Col>
-                    <Col span="5">
+                    </i-col>
+                    <i-col span="5">
                         <DatePicker v-model="dateRange" type="daterange" placement="bottom-end" placeholder="订单日期" style="width:180px"></DatePicker>
-                    </Col>
-                    <Col span="4" class="padding-2">
+                    </i-col>
+                    <i-col span="4" class="padding-2">
                      <supplier-select v-model="query.supplierId"></supplier-select>
-                    </Col>
-                    <Col span="2" class="padding-2" >
+                    </i-col>
+                    <i-col span="2" class="padding-2" >
                         <Select v-model="query.status" placeholder="状态">
                             <Option v-for="option in statusOptions" :value="option.key" :label="option.name" :key="option.key">{{option.name}}</Option>
                         </Select>
-                    </Col>
-                    <Col span="2" >
+                    </i-col>
+                    <i-col span="2" >
                         <Button type="primary" icon="ios-search" @click="queryOrderList"></Button>
-                    </Col>
+                    </i-col>
                 </Row>
             </div>
             <Table border highlight-row disabled-hover
@@ -263,7 +263,7 @@
     };
 </script>
 
-<style scoped>
+<style >
     .ivu-table .table-row-checking {
         background-color: #2db7f5;
         color: #fff;

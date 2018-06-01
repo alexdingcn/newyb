@@ -893,7 +893,7 @@ export default {
 };
 </script>
 
-<style scoped>
+<style >
 .option-goods-spec {
   float: right;
   color: #999;

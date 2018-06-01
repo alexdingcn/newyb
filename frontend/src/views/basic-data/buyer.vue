@@ -1,6 +1,6 @@
 <template>
     <Row>
-        <Col >
+        <i-col >
             <Card>
                 <p slot="title">
                     <Icon type="ios-flask-outline"></Icon> 采购员
@@ -31,7 +31,7 @@
                     </div>
                 </Transfer>
             </Card>
-        </Col>
+        </i-col>
     </Row>
 </template>
 <script>

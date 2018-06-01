@@ -23,136 +23,136 @@
                     <Alert show-icon>修改企业名称或者生产许可证自动补全信息</Alert>
                     <hr style="width: 50%; margin-bottom:15px;" size="1"/>
                     <Row>
-                        <Col span="8">
+                        <i-col span="8">
                             <FormItem label="企业名称" prop="name">
                                 <Input v-model="formItem.name" placeholder="生产企业名称" @on-blur="onChangeName"/>
                             </FormItem>
-                        </Col>
-                        <Col span="8">
+                        </i-col>
+                        <i-col span="8">
                             <FormItem label="产地" prop="origin">
                                 <Input v-model="formItem.origin" placeholder="例如 陕西"/>
                             </FormItem>
-                        </Col>
-                        <Col span="8">
+                        </i-col>
+                        <i-col span="8">
                             <FormItem label="拼音代码" prop="pinyin">
                                 <Input v-model="formItem.pinyin" placeholder="例如 SXRZ"/>
                             </FormItem>
-                        </Col>
+                        </i-col>
                     </Row>
                     <Row>
-                        <Col span="8">
+                        <i-col span="8">
                             <FormItem label="城市" prop="placeCodes">
                                 <al-cascader v-model="placeCodeList" level="2"/>
                             </FormItem>
-                        </Col>
-                        <Col span="11">
+                        </i-col>
+                        <i-col span="11">
                             <FormItem label="详细地址" prop="address">
                                 <Input v-model="formItem.address" placeholder="例如 某大道1号1203室"/>
                             </FormItem>
-                        </Col>
-                        <Col span="5">
+                        </i-col>
+                        <i-col span="5">
                             <FormItem label="邮编" prop="postcode">
                                 <Input v-model="formItem.postcode"/>
                             </FormItem>
-                        </Col>
+                        </i-col>
                     </Row>
                     <Row>
-                        <Col span="8">
+                        <i-col span="8">
                             <FormItem label="联系人" prop="contact">
                                 <Input v-model="formItem.contact"/>
                             </FormItem>
-                        </Col>
-                        <Col span="8">
+                        </i-col>
+                        <i-col span="8">
                             <FormItem label="联系人电话" prop="contactPhone">
                                 <Input v-model="formItem.contactPhone"/>
                             </FormItem>
-                        </Col>
-                        <Col span="8">
+                        </i-col>
+                        <i-col span="8">
                             <FormItem label="负责人" prop="employee">
                                 <Input v-model="formItem.employee"/>
                             </FormItem>
-                        </Col>
+                        </i-col>
                     </Row>
                     <Row>
-                        <Col span="8">
+                        <i-col span="8">
                             <FormItem label="固定电话" prop="phone">
                                 <Input v-model="formItem.phone"/>
                             </FormItem>
-                        </Col>
-                        <Col span="8">
+                        </i-col>
+                        <i-col span="8">
                             <FormItem label="传真" prop="fax">
                                 <Input v-model="formItem.fax"/>
                             </FormItem>
-                        </Col>
-                        <Col span="8">
+                        </i-col>
+                        <i-col span="8">
                             <FormItem label="电子邮件" prop="email">
                                 <Input v-model="formItem.email"/>
                             </FormItem>
-                        </Col>
+                        </i-col>
                     </Row>
                     <Row>
-                        <Col span="16">
+                        <i-col span="16">
                             <FormItem label="备注" prop="comment">
                                 <Input v-model="formItem.comment"/>
                             </FormItem>
-                        </Col>
-                        <Col span="8">
+                        </i-col>
+                        <i-col span="8">
                             <FormItem label="档案编号" prop="fileNo">
                                 <Input type="text" v-model="formItem.fileNo" readonly icon="upload" @on-click="uploadFile" />
                             </FormItem>
-                        </Col>
+                        </i-col>
                     </Row>
 
                     <h3 style="margin-top:10px;">证件</h3>
                     <hr style="width: 50%; margin-bottom:15px;" size="1"/>
                     <Row>
-                        <Col span="8">
+                        <i-col span="8">
                             <FormItem label="生产许可证" prop="permit">
                                 <Input v-model="formItem.permit" @on-blur="onChangePermit"/>
                             </FormItem>
-                        </Col>
-                        <Col span="8">
+                        </i-col>
+                        <i-col span="8">
                             <FormItem label="许可证期限" prop="permitExp">
                                 <DatePicker type="date" placement="top-start" placeholder="许可证到期日" v-model="formItem.permitExp"/>
                             </FormItem>
-                        </Col>
+                        </i-col>
                     </Row>
                     <Row>
-                        <Col span="8">
+                        <i-col span="8">
                             <FormItem label="营业执照号" prop="license">
                                 <Input v-model="formItem.license"/>
                             </FormItem>
-                        </Col>
-                        <Col span="8">
+                        </i-col>
+                        <i-col span="8">
                             <FormItem label="执照到期日" prop="licenseExp">
                                 <DatePicker type="date" placement="top-start" placeholder="营业执照到期日" v-model="formItem.licenseExp"/>
                             </FormItem>
-                        </Col>
-                        <Col span="8">
+                        </i-col>
+                        <i-col span="8">
                             <FormItem label="GMP认证">
                                 <Checkbox v-model="formItem.isGmp" />
                             </FormItem>
-                        </Col>
+                        </i-col>
                     </Row>
 
                     <h3 style="margin-top:10px;">银行帐户</h3>
                     <hr style="width: 50%; margin-bottom:15px;" size="1"/>
                     <Row>
-                        <Col span="8">
+                        <i-col span="8">
                             <FormItem label="开户银行" prop="bankName">
                                 <Input v-model="formItem.bankName"/>
                             </FormItem>
-                        </Col>
-                        <Col span="8">
+                        </i-col>
+                        <i-col span="8">
                             <FormItem label="银行帐号" prop="bankAccount">
                                 <Input v-model="formItem.bankAccount"/>
                             </FormItem>
-                        </Col>
-                        <Col span="8">
+                        </i-col>
+                        <i-col span="8">
                             <FormItem label="税号" prop="taxNumber">
                                 <Input v-model="formItem.taxNumber"/>
                             </FormItem>
-                        </Col>
+                        </i-col>
                     </Row>
                 </Form>
             </Card>
@@ -376,7 +376,7 @@ export default {
 };
 </script>
 
-<style scoped>
+<style >
 .ivu-form-item {
     margin-bottom: 20px;
 }

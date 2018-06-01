@@ -5,7 +5,7 @@
 <template>
     <div class="access">
         <Row :gutter="16">
-            <Col span="14">
+            <i-col span="14">
                 <Card>
                     <p slot="title">
                         <Icon type="social-buffer"></Icon> 仓库点
@@ -26,8 +26,8 @@
                          ></Table>
                     </Row>
                 </Card>
-            </Col>
-            <Col span="10">
+            </i-col>
+            <i-col span="10">
                 <Card>
                     <p slot="title">
                         <Icon type="ios-albums"></Icon> 库位 {{warehouseNameTitle ||  ''}}
@@ -46,7 +46,7 @@
                          ></Table>
                     </Row>
                 </Card>
-            </Col>
+            </i-col>
         </Row>
         <Modal v-model="warehouseModalShow" width="360" :mask-closable="false">
             <p slot="header">
@@ -357,6 +357,6 @@
     };
 </script>
 
-<style scoped>
+<style >
 
 </style>

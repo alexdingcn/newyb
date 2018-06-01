@@ -249,7 +249,7 @@ export default {
 }
 </script>
 
-<style scoped>
+<style >
 .ivu-form-item {
     margin-bottom: 5px;
 }

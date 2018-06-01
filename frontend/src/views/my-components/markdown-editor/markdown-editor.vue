@@ -7,13 +7,13 @@
 <template>
     <div>
         <Row class="margin-top-20">
-            <Col span="16" offset="4">
+            <i-col span="16" offset="4">
                 <div class="markdown-con">
                     <Card>
                         <textarea  id="iview_admin_markdown_editor" style="display:none;"></textarea>                
                     </Card>
                 </div>
-            </Col>
+            </i-col>
         </Row>
     </div>
 </template>

@@ -6,7 +6,7 @@
 <template>
     <div>
         <Row :gutter="10">
-            <Col span="17">
+            <i-col span="17">
                 <Card>
                     <p slot="title">
                         <Icon type="minus-round"></Icon>
@@ -33,8 +33,8 @@
                         </div>
                     </Row>
                 </Card>
-            </Col>
-            <Col span="7">
+            </i-col>
+            <i-col span="7">
                 <Card>
                     <p slot="title">
                         <Icon type="stats-bars"></Icon>
@@ -46,86 +46,86 @@
                         </pre>
                     </Row>
                 </Card>
-            </Col>
+            </i-col>
         </Row>
         <Row class="margin-top-10" :gutter="10">
-            <Col span="3">
+            <i-col span="3">
                 <Card>
                     <p slot="title">
                         一级
                     </p>
                     <al-selector v-model="res1" level="0"/>
                 </Card>
-            </Col>
-            <Col span="5">
+            </i-col>
+            <i-col span="5">
                 <Card>
                     <p slot="title">
                         二级
                     </p>
                     <al-selector v-model="res1" level="1"/>
                 </Card>
-            </Col>
-            <Col span="7">
+            </i-col>
+            <i-col span="7">
                 <Card>
                     <p slot="title">
                         三级
                     </p>
                     <al-selector v-model="res1" data-type="code" level="2"/>
                 </Card>
-            </Col>
-            <Col span="9">
+            </i-col>
+            <i-col span="9">
                 <Card>
                     <p slot="title">
                         四级
                     </p>
                     <al-selector v-model="res1" data-type="name" level="3"/>
                 </Card>
-            </Col>
+            </i-col>
         </Row>
         <Row class="margin-top-10" :gutter="10">
-            <Col span="8">
+            <i-col span="8">
                 <Card>
                     <p slot="title">
                         禁用指定级别
                     </p>
                     <al-selector v-model="res1" :disabled="2" level="3"/>
                 </Card>
-            </Col>
-            <Col span="4">
+            </i-col>
+            <i-col span="4">
                 <Card>
                     <p slot="title">
                         四级
                     </p>
                     <al-cascader v-model="res1" level="3"/>
                 </Card>
-            </Col>
-            <Col span="4">
+            </i-col>
+            <i-col span="4">
                 <Card>
                     <p slot="title">
                         三级
                     </p>
                     <al-cascader v-model="res1" level="2"/>
                 </Card>
-            </Col>
-            <Col span="4">
+            </i-col>
+            <i-col span="4">
                 <Card>
                     <p slot="title">
                         二级
                     </p>
                     <al-cascader v-model="res1" data-type="name" level="1"/>
                 </Card>
-            </Col>
-            <Col span="4">
+            </i-col>
+            <i-col span="4">
                 <Card>
                     <p slot="title">
                         一级
                     </p>
                     <al-cascader v-model="res1" data-type="code" level="0"/>
                 </Card>
-            </Col>
+            </i-col>
         </Row>
         <Row class="margin-top-10" :gutter="10">
-            <Col span="4">
+            <i-col span="4">
                 <Card>
                     <p slot="title">
                         三种尺寸
@@ -134,8 +134,8 @@
                     <al-selector style="margin-top:10px;" v-model="res1" size="default" level="0"/>
                     <al-selector style="margin-top:10px;" v-model="res1" size="small" level="0"/>
                 </Card>
-            </Col>
-            <Col span="4">
+            </i-col>
+            <i-col span="4">
                 <Card>
                     <p slot="title">
                         三种尺寸
@@ -144,8 +144,8 @@
                     <al-cascader style="margin-top:10px;" v-model="res1" level="1"/>
                     <al-cascader style="margin-top:10px;" v-model="res1" size="small" level="1"/>
                 </Card>
-            </Col>
-            <Col span="4">
+            </i-col>
+            <i-col span="4">
                 <Card>
                     <p slot="title">
                         自定义显示格式
@@ -160,8 +160,8 @@
                         />
                     </Row>
                 </Card>
-            </Col>
-            <Col span="12">
+            </i-col>
+            <i-col span="12">
                 <Card>
                     <p slot="title">
                         可搜索
@@ -173,7 +173,7 @@
                         />
                     </Row>
                 </Card>
-            </Col>
+            </i-col>
         </Row>
     </div>
 </template>

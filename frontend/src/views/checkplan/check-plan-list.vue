@@ -9,28 +9,28 @@
 			</p>
 			<div slot="extra" style="width: 1000px;">
 				<Row >
-					<Col span="6">
+					<i-col span="6">
 						<DatePicker v-model="dateRange" type="daterange" placement="bottom-end" placeholder="盘点日期" style="width:180px"></DatePicker>
-					</Col>
-					<Col span="3" class="">
+					</i-col>
+					<i-col span="3" class="">
                         <warehouse-select v-model="query.warehouseId" placeholder="仓库"  size="small"></warehouse-select>
-					</Col>
-                    <Col span="3" class="">
+					</i-col>
+                    <i-col span="3" class="">
                         <Select v-model="query.checkType" size="small"  prop="checkType"  placeholder="类型">
                             <Option v-for="option in checkTypeOptions" :value="option.id" :label="option.name" :key="option.id">
                                 {{option.name}}
                             </Option>
                         </Select>
-                    </Col>
-					<Col span="3" class="padding-2">
+                    </i-col>
+					<i-col span="3" class="padding-2">
                         <Select size="small" v-model="query.state" placeholder="状态">
                             <Option v-for="option in statusOptions" :value="option.key" :label="option.name" :key="option.key">{{option.name}}</Option>
                         </Select>
-                    </Col>
-                    <Col span="3" >
+                    </i-col>
+                    <i-col span="3" >
                         <Button type="primary" icon="ios-search" @click="queryOrderList"></Button>
                         <Button v-if="chooseModal" icon="checkmark-round" @click="choosedItem" >选择</Button>
-					</Col>
+					</i-col>
 				</Row>
 			</div>
 			<Table border highlight-row disabled-hover height="600"
@@ -228,7 +228,7 @@
     };
 </script>
 
-<style scoped>
+<style >
     .ivu-table .table-row-checking {
         background-color: #2db7f5;
         color: #fff;

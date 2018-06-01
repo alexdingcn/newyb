@@ -1,6 +1,6 @@
 <template>
     <Row>
-        <Col>
+        <i-col>
             <Card>
                 <p slot="title">
                     <Icon type="ios-cart"></Icon> 销售员
@@ -30,7 +30,7 @@
                     </div>
                 </Transfer>
             </Card>
-        </Col>
+        </i-col>
     </Row>
 </template>
 <script>

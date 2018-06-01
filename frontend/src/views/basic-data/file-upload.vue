@@ -2,7 +2,7 @@
 <template>
   <div>
       <Row>
-          <Col span="13">
+          <i-col span="13">
                 <Row style="margin-left:30px" type="flex" justify="start">
                     <Upload ref="uploadModal" multiple :before-upload="handleBeforeUpload" :show-upload-list="false"
                             :max-size="uploadMaxSize" 
@@ -29,13 +29,13 @@
                             @click="allSuccessUpload">确认已成功上传</Button>
                     </ButtonGroup>
                 </Row>
-          </Col>
-          <Col style="padding-left: 10px;" span="11">
+          </i-col>
+          <i-col style="padding-left: 10px;" span="11">
                 <Row type="flex" justify="start" v-for="(item, index) in chooseUploadFiles" :key="index">
                     <strong class="margin-right-5 margin-top-10">{{item.name}}</strong>
                     <a class="margin-top-10" href="#" :disabled="item.disabled" @click="removeChooseUploadFile(index)"><Icon size="20" :type="item.icon" :color="item.color"></Icon></a>
                 </Row>
-          </Col>
+          </i-col>
         </Row>
   </div>
 </template>

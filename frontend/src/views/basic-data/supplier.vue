@@ -6,14 +6,14 @@
 <template>
     <div class="access">
         <Row>
-            <Col span="8">
+            <i-col span="8">
                 <Card>
                     <p slot="title">
                         <Icon type="android-contacts"></Icon> 供应商
                     </p>
                     <div slot="extra">
                         <Input v-model="searchSupplierVal" placeholder="企业名称/联系人/拼音简称" clearable style="width: 300px"
-                            @on-enter="validateSearch"></Input>
+                            @on-enter="validateSearch"/>
                         <Button type="primary" shape="circle" icon="ios-search" @click="searchSupplier"></Button>
                         <ButtonGroup class="padding-left-20">
                             <Button type="primary" icon="android-add-circle" @click="addSupplier">添加</Button>
@@ -27,10 +27,10 @@
                             :data="supplierData" ref="supplierTable" style="width: 100%;" size="small"></Table>
                     </Row>
                 </Card>
-            </Col>
-            <Col span="15" style="margin-left: 10px;">
+            </i-col>
+            <i-col span="15" style="margin-left: 10px;">
                 <supplier-info :supplierId="currSupplierId" @save-ok="supplierSaveOk"></supplier-info>
-            </Col>            
+            </i-col>            
         </Row>
     </div>
 </template>
@@ -172,6 +172,6 @@
     };
 </script>
 
-<style scoped>
+<style >
 
 </style>

@@ -6,7 +6,7 @@
 <template>
     <div>
         <Row>
-            <Col span="18">
+            <i-col span="18">
                 <Card>
                     <Form :label-width="80">
                         <FormItem label="文章标题" :error="articleError">
@@ -30,8 +30,8 @@
                         <textarea id="articleEditor"></textarea>
                     </div>
                 </Card>
-            </Col>
-            <Col span="6" class="padding-left-10">
+            </i-col>
+            <i-col span="6" class="padding-left-10">
                 <Card>
                     <p slot="title">
                         <Icon type="paper-airplane"></Icon>
@@ -119,31 +119,31 @@
                             标签
                         </p>
                         <Row>
-                            <Col span="18">
+                            <i-col span="18">
                                 <Select v-model="articleTagSelected" multiple @on-change="handleSelectTag" placeholder="请选择文章标签">
                                     <Option v-for="item in articleTagList" :value="item.value" :key="item.value">{{ item.value }}</Option>
                                 </Select>
-                            </Col>
-                            <Col span="6" class="padding-left-10">
+                            </i-col>
+                            <i-col span="6" class="padding-left-10">
                                 <Button v-show="!addingNewTag" @click="handleAddNewTag" long type="ghost">新建</Button>
-                            </Col>
+                            </i-col>
                         </Row>
                         <transition name="add-new-tag">
                             <div v-show="addingNewTag" class="add-new-tag-con">
-                                <Col span="14">
+                                <i-col span="14">
                                     <Input v-model="newTagName" placeholder="请输入标签名" />                                
-                                </Col>
-                                <Col span="5" class="padding-left-10">
+                                </i-col>
+                                <i-col span="5" class="padding-left-10">
                                     <Button @click="createNewTag" long type="primary">确定</Button>
-                                </Col>
-                                <Col span="5" class="padding-left-10">
+                                </i-col>
+                                <i-col span="5" class="padding-left-10">
                                     <Button @click="cancelCreateNewTag" long type="ghost">取消</Button>
-                                </Col>
+                                </i-col>
                             </div>
                         </transition>
                     </Card>
                 </div>
-            </Col>
+            </i-col>
         </Row>
     </div>
 </template>

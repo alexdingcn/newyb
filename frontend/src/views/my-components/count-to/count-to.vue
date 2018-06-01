@@ -6,7 +6,7 @@
 <template>
     <div>
         <Row>
-            <Col span="3">
+            <i-col span="3">
                 <Card>
                     <p slot="title">
                         <Icon type="waterdrop"></Icon>
@@ -18,8 +18,8 @@
                         </div>
                     </Row>
                 </Card>
-            </Col>
-            <Col span="5" class="padding-left-10">
+            </i-col>
+            <i-col span="5" class="padding-left-10">
                 <Card>
                     <p slot="title">
                         <Icon type="code"></Icon>
@@ -34,8 +34,8 @@
                         </div>
                     </Row>
                 </Card>
-            </Col>
-            <Col span="8" class="padding-left-10">
+            </i-col>
+            <i-col span="8" class="padding-left-10">
                 <Card>
                     <p slot="title">
                         <Icon type="paintbucket"></Icon>
@@ -50,8 +50,8 @@
                         </div>
                     </Row>
                 </Card>
-            </Col>
-            <Col span="8" class="padding-left-10">
+            </i-col>
+            <i-col span="8" class="padding-left-10">
                 <Card>
                     <p slot="title">
                         <Icon type="settings"></Icon>
@@ -66,10 +66,10 @@
                         </div>
                     </Row>
                 </Card>
-            </Col>
+            </i-col>
         </Row>
         <Row class="margin-top-10">
-            <Col span="8">
+            <i-col span="8">
                 <Card>
                     <p slot="title">
                         <Icon type="ios-color-wand"></Icon>
@@ -84,8 +84,8 @@
                         </div>
                     </Row>
                 </Card>
-            </Col>
-            <Col span="8" class="padding-left-10">
+            </i-col>
+            <i-col span="8" class="padding-left-10">
                 <Card>
                     <p slot="title">
                         <Icon type="ios-shuffle-strong"></Icon>
@@ -105,8 +105,8 @@
                         </div>
                     </Row>
                 </Card>
-            </Col>
-            <Col span="8" class="padding-left-10">
+            </i-col>
+            <i-col span="8" class="padding-left-10">
                 <Card>
                     <p slot="title">
                         <Icon type="android-stopwatch"></Icon>
@@ -121,7 +121,7 @@
                         </div>
                     </Row>
                 </Card>
-            </Col>
+            </i-col>
         </Row>
         <Row class="margin-top-10">
             <Card>
