@@ -622,7 +622,7 @@ export default {
 }
 </script>
 
-<style scoped>
+<style >
 .margin-top-8 {
     margin-top: 8px;
 }

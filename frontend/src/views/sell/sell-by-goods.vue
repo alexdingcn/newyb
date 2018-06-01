@@ -10,19 +10,19 @@
         <Row >
             <Form ref="searchForm" :model="searchFormItem" :label-width="90">
                 <Row type="flex">
-                    <Col span="8" >
+                    <i-col span="8" >
                         <FormItem label="商品">
                             <goods-select v-model="searchFormItem.goodsId" ></goods-select>
                         </FormItem>
-                    </Col>
-                    <Col span="5" >
+                    </i-col>
+                    <i-col span="5" >
                         <FormItem label="订单日期">
                             <DatePicker v-model="dateRange" type="daterange" placement="bottom-start" placeholder="制单日期" style="width:200px"></DatePicker>
                         </FormItem>
-                    </Col>
-                    <Col span="3" offset="1" >
+                    </i-col>
+                    <i-col span="3" offset="1" >
                         <Button icon="ios-search" type="primary" :loading="searching" @click="searchBtnClick">查询</Button>
-                    </Col>
+                    </i-col>
                 </Row>
             </Form>
         </Row>

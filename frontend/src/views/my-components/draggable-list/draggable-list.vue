@@ -6,10 +6,10 @@
 <template>
     <div>
         <Row>
-            <Col span="16">
+            <i-col span="16">
                 <Card>
                     <Row>
-                        <Col span="12">
+                        <i-col span="12">
                             <Card dis-hover>
                                 <p slot="title">
                                     <Icon type="ios-list-outline"></Icon>
@@ -19,8 +19,8 @@
                                     <ul id="doList" class="iview-admin-draggable-list"></ul>
                                 </div>
                             </Card>
-                        </Col>
-                        <Col span="12" class="padding-left-10">
+                        </i-col>
+                        <i-col span="12" class="padding-left-10">
                             <Card dis-hover>
                                 <p slot="title">
                                     <Icon type="ios-list"></Icon>
@@ -34,11 +34,11 @@
                                     </ul>
                                 </div>
                             </Card>
-                        </Col>
+                        </i-col>
                     </Row>
                 </Card>
-            </Col>
-            <Col span="8" class="padding-left-10">
+            </i-col>
+            <i-col span="8" class="padding-left-10">
                 <Card>
                     <p slot="title">
                         <Icon type="ios-paper-outline"></Icon>
@@ -52,24 +52,24 @@
                         </ul>
                     </div>
                 </Card>
-            </Col>
+            </i-col>
         </Row>
         <Row class="margin-top-10">
-            <Col span="16">
+            <i-col span="16">
                 <Card>
                     <p slot="title">
                         <Icon type="navicon-round"></Icon>
                         可滚动拖拽
                     </p>
                     <Row>
-                        <Col span="12">
+                        <i-col span="12">
                             <Card dis-hover>
                                 <div style="height: 360px;">
                                     <ul id="affordList" class="iview-admin-draggable-list"></ul>
                                 </div>
                             </Card>
-                        </Col>
-                        <Col span="12" class="padding-left-10">
+                        </i-col>
+                        <i-col span="12" class="padding-left-10">
                             <Card dis-hover>
                                 <div style="height: 360px;">
                                     <ul id="shoppingList" class="iview-admin-draggable-list">
@@ -79,11 +79,11 @@
                                     </ul>
                                 </div>
                             </Card>
-                        </Col>
+                        </i-col>
                     </Row>
                 </Card>
-            </Col>
-            <Col span="8" class="padding-left-10">
+            </i-col>
+            <i-col span="8" class="padding-left-10">
                 <Card>
                     <p slot="title">
                         <Icon type="android-funnel"></Icon>
@@ -97,7 +97,7 @@
                         </ul>
                     </div>
                 </Card>
-            </Col>
+            </i-col>
         </Row>
     </div>
 </template>

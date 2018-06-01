@@ -2,10 +2,10 @@
 <template>
   <div>
         <Row>
-            <Col span="11">
+            <i-col span="11">
                 <goodscarelist  ref="goodscarelist"  @choose-good="chooseGood"></goodscarelist >
-            </Col>
-            <Col span="11" style="margin-left: 50px;">
+            </i-col>
+            <i-col span="11" style="margin-left: 50px;">
                 <Card>
                     <p slot="title">
                         <Icon type="person"></Icon>
@@ -44,7 +44,7 @@
                         <goodsCareRecord ref="carelist" ></goodsCareRecord>
                     </div>
                 </card>
-            </Col>
+            </i-col>
         </Row>
   </div>
 </template>
@@ -106,7 +106,7 @@ export default {
 }
 </script>
 
-<style scoped>
+<style >
 .ivu-form-item {
     margin-bottom: 20px;
 }

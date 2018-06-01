@@ -5,7 +5,7 @@
 <template>
   <div>
       <Row>
-          <Col span="7">
+          <i-col span="7">
             <Card>
               <p slot="title">
                 <Icon type="person-stalker" ></Icon> 客户分组
@@ -66,16 +66,16 @@
                     </Page>
                 </Row>
             </Card>
-          </Col>
+          </i-col>
         
-        <Col span="17" class="padding-left-10">
+        <i-col span="17" class="padding-left-10">
             <customer-info 
               :categorys="categorys" 
               :customerId="currCustomerId" 
               @add-success="customerAddSuccess" 
               @update-success="customerUpdateSuccess" 
               ></customer-info>
-        </Col>
+        </i-col>
       </Row>
 
       <customer-category 
@@ -387,7 +387,7 @@ export default {
 </script>
 
 
-<style scoped>
+<style >
 .spin-icon-load {
   animation: ani-demo-spin 1s linear infinite;
 }

@@ -2,7 +2,7 @@
 <template>
 <div>
         <Row>
-            <Col span="11">
+            <i-col span="11">
         <Card>
             <p slot="title">
                 <Icon type="person-stalker"></Icon> 商品列表
@@ -19,10 +19,10 @@
                 <Page :total="totalCount" :current="currentPage" :page-size="pageSize" @on-change="changePage" size="small" show-total></Page>
             </Row>
         </Card>
-        </Col>
-        <Col span="11">
+        </i-col>
+        <i-col span="11">
                 <goodsCareRecord ref="carelist" ></goodsCareRecord>
-    </Col>
+    </i-col>
         </Row>
 </div>
 </template>
@@ -121,6 +121,6 @@ export default {
 }
 </script>
 
-<style scoped>
+<style >
 
 </style>

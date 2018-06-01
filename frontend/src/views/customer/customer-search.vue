@@ -7,30 +7,30 @@
         <Modal v-model="isShowModal" :width="60" :mask-closable="false" :closable="false" title="查询获取客户">
             <Form ref="searchForm" :model="formItem" :label-width="100">
                 <Row type="flex" justify="center">
-                    <Col span="12">
+                    <i-col span="12">
                         <FormItem label="客户分组">
                             <Select v-model="formItem.categoryId" clearable >
                                 <Option v-for="item in categorys" :value="item.id" :key="item.id">{{ item.name }}</Option>
                             </Select>
                         </FormItem>
-                    </Col>
-                    <Col span="12">
+                    </i-col>
+                    <i-col span="12">
                         <FormItem label="客户编号">
-                            <Input type="text" v-model="formItem.customerNo" ></Input>
+                            <Input type="text" v-model="formItem.customerNo" />
                         </FormItem>
-                    </Col>
+                    </i-col>
                 </Row>
                 <Row type="flex" justify="center" >
-                    <Col span="12">
+                    <i-col span="12">
                         <FormItem label="客户名称">
-                            <Input type="text" v-model="formItem.customerName" ></Input>
+                            <Input type="text" v-model="formItem.customerName" />
                         </FormItem>
-                    </Col>
-                    <Col span="12">
+                    </i-col>
+                    <i-col span="12">
                         <FormItem label="简称">
-                            <Input type="text" v-model="formItem.shorName" ></Input>
+                            <Input type="text" v-model="formItem.shorName" />
                         </FormItem>
-                    </Col>
+                    </i-col>
                 </Row>
                 <Row type="flex" justify="center" >
                     <Button type="primary" size="small" icon="ios-search" class="margin-let-10" @click="searchBtnClicked">查询</Button>
@@ -55,14 +55,14 @@
 
             <div slot="footer">
                 <Row >
-                    <Col span="6" offset="6">
+                    <i-col span="6" offset="6">
                         <Button size="small" type="primary" @click="ok" long>
                             <span >确定</span>
                         </Button>
-                    </Col>
-                    <Col span=6 class="padding-left-10">
+                    </i-col>
+                    <i-col span=6 class="padding-left-10">
                         <Button size="small" @click="closedModal" long>取消</Button>
-                    </Col>
+                    </i-col>
                 </Row>
             </div>
         </Modal>
@@ -262,7 +262,7 @@ export default {
 };
 </script>
 
-<style scoped>
+<style >
 .ivu-form-item {
     margin-bottom: 5px;
 }

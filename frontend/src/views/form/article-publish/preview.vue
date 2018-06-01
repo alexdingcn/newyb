@@ -1,6 +1,6 @@
 <style lang="less">
-    @import '../../../styles/common.less';
-    @import './preview.less';
+@import "../../../styles/common.less";
+@import "./preview.less";
 </style>
 
 <template>
@@ -8,27 +8,27 @@
         <div class="preview-header">
             <Menu mode="horizontal" theme="dark" active-name="1">
                 <div class="preview-header-nav">
-                    <MenuItem name="1">
+                    <i-menuItem name="1">
                         <Icon type="ios-navigate"></Icon>
                         导航一
-                    </MenuItem>
-                    <MenuItem name="2">
+                    </i-menuItem>
+                    <i-menuItem name="2">
                         <Icon type="ios-keypad"></Icon>
                         导航二
-                    </MenuItem>
-                    <MenuItem name="3">
+                    </i-menuItem>
+                    <i-menuItem name="3">
                         <Icon type="ios-analytics"></Icon>
                         导航三
-                    </MenuItem>
-                    <MenuItem name="4">
+                    </i-menuItem>
+                    <i-menuItem name="4">
                         <Icon type="ios-paper"></Icon>
                         导航四
-                    </MenuItem>
+                    </i-menuItem>
                 </div>
             </Menu>
         </div>
         <Row class="margin-top-20">
-            <Col span="12" offset="5">
+            <i-col span="12" offset="5">
                 <div>
                     <Card>
                         <h1>{{ articleTitle }}</h1>
@@ -46,8 +46,8 @@
                         </div>
                     </Card>
                 </div>
-            </Col>
-            <Col span="4" class="padding-left-10">
+            </i-col>
+            <i-col span="4" class="padding-left-10">
                 <div>
                     <Card>
                         <p slot="title">
@@ -76,28 +76,32 @@
                         </div>
                     </Card>
                 </div>
-            </Col>
+            </i-col>
         </Row>
     </div>
 </template>
 
 <script>
 export default {
-    data () {
-        return {
-            articleTitle: '',
-            tagsList: '',
-            classificationSelected: [],
-            content: '',
-            publishTime: ''
-        };
-    },
-    mounted () {
-        this.articleTitle = localStorage.articleTitle;
-        this.tagsList = localStorage.tagsList ? JSON.parse(localStorage.tagsList) : [];
-        this.classificationSelected = localStorage.classificationSelected ? JSON.parse(localStorage.classificationSelected) : [];
-        this.content = localStorage.content;
-        this.publishTime = localStorage.publishTime;
-    }
+  data() {
+    return {
+      articleTitle: "",
+      tagsList: "",
+      classificationSelected: [],
+      content: "",
+      publishTime: ""
+    };
+  },
+  mounted() {
+    this.articleTitle = localStorage.articleTitle;
+    this.tagsList = localStorage.tagsList
+      ? JSON.parse(localStorage.tagsList)
+      : [];
+    this.classificationSelected = localStorage.classificationSelected
+      ? JSON.parse(localStorage.classificationSelected)
+      : [];
+    this.content = localStorage.content;
+    this.publishTime = localStorage.publishTime;
+  }
 };
 </script>

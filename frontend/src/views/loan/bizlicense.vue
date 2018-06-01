@@ -16,14 +16,14 @@
         <Layout>
             <Header class="blue-header padding-side-10">
                 <Row>
-                    <Col span="3">
+                    <i-col span="3">
                         <Button type="text" class="back-btn" @click="historyGoBack">
                             <Icon type="chevron-left" size="24" ></Icon>
                         </Button>
-                    </Col>
-                    <Col span="18" class="center">
+                    </i-col>
+                    <i-col span="18" class="center">
                         <h2>融资申请</h2>
-                    </Col>
+                    </i-col>
                 </Row>
             </Header>
             <Content>

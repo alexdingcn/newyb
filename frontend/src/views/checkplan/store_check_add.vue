@@ -36,12 +36,12 @@
 
                 <Form :label-width="85" :rules="ruleValidate" :model="storeCheck" ref="CheckOrderForm">
                     <Row>
-                        <Col span="5">
+                        <i-col span="5">
                         <FormItem label="仓库点" prop="warehouseId">
                             <warehouse-select v-model="storeCheck.warehouseId" size="small" :disabled="disable_warehouse"></warehouse-select>
                         </FormItem>
-                        </Col>
-                        <Col span="5">
+                        </i-col>
+                        <i-col span="5">
                         <FormItem label="盘点类型" prop="checkType">
                             <Select v-model="storeCheck.checkType" size="small"  prop="checkType"   @on-change="onSelectCheckType" :disabled="disable_checktype">
                                 <Option v-for="option in checkTypeOptions" :value="option.id" :label="option.name" :key="option.id">
@@ -49,16 +49,16 @@
                                 </Option>
                             </Select>
                         </FormItem>
-                        </Col>
-                        <Col span="6">
+                        </i-col>
+                        <i-col span="6">
                         <FormItem label="盘点日期" prop="checkDate" :disabled="disable_checkdate">
                             <DatePicker type="date" v-model="storeCheck.checkDate" size="small"/>
                         </FormItem>
-                        </Col>
+                        </i-col>
 
                     </Row>
                     <Row>
-                        <Col span="5">
+                        <i-col span="5">
                         <FormItem label="添加单品">
                             <Select
                                     ref="goodsSelect"
@@ -77,14 +77,14 @@
                                 </Option>
                             </Select>
                         </FormItem>
-                        </Col>
-                        <Col span="5">
+                        </i-col>
+                        <i-col span="5">
                         <FormItem label="备注" prop="comment">
-                            <Input v v-model="storeCheck.comment" size="small"    :disabled="disable_note"></Input>
+                            <Input v v-model="storeCheck.comment" size="small"    :disabled="disable_note"/>
 
                         </FormItem>
-                        </Col>
-                        <Col span="5">   <FormItem label="计划号：">{{checkPlanNo}}   </FormItem></Col>
+                        </i-col>
+                        <i-col span="5">   <FormItem label="计划号：">{{checkPlanNo}}   </FormItem></i-col>
                     </Row>
                     <Row>
                         <p class="ivu-card-head" >
@@ -385,6 +385,6 @@
     };
 </script>
 
-<style scoped>
+<style >
 
 </style>

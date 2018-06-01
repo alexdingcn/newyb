@@ -17,13 +17,13 @@
         </div>
         <Form :label-width="85" :model="storeNow" ref="storeNowForm">
          <Row>
-            <Col span="6">
+            <i-col span="6">
                 <FormItem label="仓库点" prop="warehouseId">
                     <warehouse-select v-model="storeNow.warehouseId"></warehouse-select>
                 </FormItem>
-            </Col>
+            </i-col>
 
-             <Col span="4">
+             <i-col span="4">
                 <FormItem label="库区" >
                     <Select v-model="storeNow.store_state" prop="store_state">
                         <Option v-for="option in storeOptions" :value="option.id" :label="option.name" :key="option.id">
@@ -31,8 +31,8 @@
                         </Option>
                     </Select>
                 </FormItem>
-             </Col>
-             <Col span="4">
+             </i-col>
+             <i-col span="4">
                 <FormItem label="库存状态" >
                     <Select v-model="storeNow.counter_state" prop="counter_state">
                         <Option v-for="option in counterOptions" :value="option.id" :label="option.name" :key="option.id">
@@ -40,8 +40,8 @@
                         </Option>
                     </Select>
                 </FormItem>
-             </Col>
-             <Col span="4">
+             </i-col>
+             <i-col span="4">
                 <FormItem label="可售状态" >
                     <Select v-model="storeNow.sale_state" prop="sale_state">
                         <Option v-for="option in saleOptions" :value="option.id" :label="option.name" :key="option.id">
@@ -49,56 +49,56 @@
                         </Option>
                     </Select>
                 </FormItem>
-             </Col>
-             <Col span="4">
+             </i-col>
+             <i-col span="4">
                 <FormItem label="零库存品种" >
                     <checkbox v-model="storeNow.is_zero_store"/>显示
                 </FormItem>
-             </Col>
+             </i-col>
 
         </Row>
         <Row>
-            <Col span="6">
+            <i-col span="6">
                 <FormItem label="供应商" prop="supplierId">
                     <supplier-select v-model="storeNow.supplierId" ></supplier-select>
                 </FormItem>
-            </Col>
-            <Col span="6">
+            </i-col>
+            <i-col span="6">
                 <FormItem label="厂商" prop="factoryId">
                     <factory-select v-model="storeNow.factoryId" ></factory-select>
                 </FormItem>
-            </Col>
+            </i-col>
 
 
-            <Col span="5">
+            <i-col span="5">
                 <FormItem label="采购员" prop="buyerId">
                     <buyer-select v-model="storeNow.in_user_id"></buyer-select>
                 </FormItem>
-            </Col>
-            <Col span="3">
+            </i-col>
+            <i-col span="3">
                 <FormItem label="库龄大于" >
                     <Input v-model="storeNow.keedays" placeholder="天"/>
                 </FormItem>
-            </Col>
+            </i-col>
             <!--
-            <Col span="3">
+            <i-col span="3">
                 <FormItem label="商品属性" >
                     <Input  size="small"/>
                 </FormItem>
-            </Col>
-             <Col span="3">
+            </i-col>
+             <i-col span="3">
                 <FormItem label="采购属性" >
                     <Input  size="small"/>
                 </FormItem>
-                </Col>-->
+                </i-col>-->
             </Row>
 
             <Row>
-                <Col span="6">
+                <i-col span="6">
                 <FormItem label="商品速查" prop="goodsId">
                     <good-select v-model="storeNow.goodsId"></good-select>
                 </FormItem>
-                </Col>
+                </i-col>
             </Row>
 
             <Table border highlight-row
@@ -359,5 +359,5 @@ export default {
   }
 };
 </script>
-<style scoped>
+<style >
 </style>

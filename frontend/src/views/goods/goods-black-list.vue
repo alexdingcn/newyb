@@ -48,12 +48,12 @@
                 </Header>
                 <Content>
                     <Row :gutter="16">
-                        <Col span="12">
+                        <i-col span="12">
                             <al-cascader v-model="addRegionQuery" level="1"/>
-                        </Col>
-                        <Col span="5">
+                        </i-col>
+                        <i-col span="5">
                             <Button type="success" @click="addRegionToBlackList">添加</Button>
-                        </Col>
+                        </i-col>
                     </Row>
                     <Table :columns="regionColumns" :data="goodsBlackList.regions" class="margin-top-10" stripe></Table>
                 </Content>
@@ -67,12 +67,12 @@
                 </Header>
                 <Content>
                     <Row :gutter="16">
-                        <Col span="12">
+                        <i-col span="12">
                             <customer-select ref="customerSelect" v-model="addCustomerId" @on-change="onCustomerSelected"></customer-select>
-                        </Col>
-                        <Col span="5">
+                        </i-col>
+                        <i-col span="5">
                             <Button type="success" @click="addCustomerToBlackList">添加</Button>
-                        </Col>
+                        </i-col>
                     </Row>
                     <Table :columns="customerColumns" :data="goodsBlackList.customerIds" class="margin-top-10" stripe></Table>
                 </Content>

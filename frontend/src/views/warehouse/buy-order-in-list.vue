@@ -25,22 +25,22 @@
 			</p>
 			<div slot="extra" style="width:600px">
 				<Row type="flex" justify="end">
-					<Col span="8">
+					<i-col span="8">
 						<DatePicker v-model="dateRange" type="daterange" placement="bottom-end" placeholder="订单日期" style="width:180px"></DatePicker>
-					</Col>
-					<Col span="6" class="padding-2">
+					</i-col>
+					<i-col span="6" class="padding-2">
                         <supplier-select v-model="query.supplierId"></supplier-select>
-					</Col>
-					<Col span="5" class="padding-2" v-if="!chooseModal">
+					</i-col>
+					<i-col span="5" class="padding-2" v-if="!chooseModal">
 						<Select v-model="query.status" placeholder="状态">
 							<Option v-for="option in statusOptions" :value="option.key" :label="option.name" :key="option.key">{{option.name}}</Option>
 						</Select>
-                    </Col>
-                    <Col span="5" >
+                    </i-col>
+                    <i-col span="5" >
                             <Button type="primary" icon="ios-search" @click="queryOrderList"></Button>
                             <Button v-if="!chooseModal" icon="checkmark-round" @click="showCheckModal">审核</Button>
                             <Button v-if="chooseModal" icon="checkmark-round" @click="choosedItem" >选择</Button>
-					</Col>
+					</i-col>
 				</Row>
 			</div>
 			<Table border highlight-row disabled-hover height="250"
@@ -439,7 +439,7 @@
     };
 </script>
 
-<style scoped>
+<style >
     .ivu-table .table-row-checking {
         background-color: #2db7f5;
         color: #fff;

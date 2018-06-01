@@ -10,99 +10,99 @@
                     <h3>公司信息</h3>
                     <hr style="text-align:left; width: 50%; margin-bottom:15px;" size="1"/>
                     <Row>
-                        <Col span="8">
+                        <i-col span="8">
                             <FormItem label="公司名称" prop="name">
                                 <Input  v-model="formItem.name" />
                             </FormItem>
-                        </Col>
+                        </i-col>
                     </Row>
                     <Row>
-                        <Col span="8">
+                        <i-col span="8">
                             <FormItem label="所属行业" prop="industry">
                             <Select v-model="formItem.industry" >
                                  <Option v-for="item in cityList" :value="item.value" :key="item.value">{{ item.label }}</Option>
                             </Select>
                             </FormItem>
-                        </Col>
+                        </i-col>
                     </Row>
                     <Row>
-                        <Col span="8">
+                        <i-col span="8">
                             <FormItem label="公司地址" prop="placeCodes">
                                 <al-cascader v-model="formItem.placeCodeList" level="2" />
                             </FormItem>
-                        </Col>
+                        </i-col>
                     </Row>
                     <Row>
-                        <Col span="8">
+                        <i-col span="8">
                         <FormItem  prop="address">
                                 <Input  placeholder="详细地址：如 某某大道12号1203室" v-model="formItem.address"/>
                         </FormItem>
-                        </Col>
+                        </i-col>
                     </Row>
                     <Row>
-                        <Col span="8">
+                        <i-col span="8">
                             <FormItem label="邮箱" prop="email">
                                 <Input  v-model="formItem.email"/>
                             </FormItem>
-                        </Col>
+                        </i-col>
                     </Row>
                     <Row>
-                        <Col span="8">
+                        <i-col span="8">
                             <FormItem label="传真" prop="fax">
                                 <Input  v-model="formItem.fax"/>
                             </FormItem>
-                        </Col>
+                        </i-col>
                     </Row>
                     <Row>
-                        <Col span="8">
+                        <i-col span="8">
                             <FormItem label="联系人" prop="contactPerson">
                                 <Input v-model="formItem.contactPerson"/>
                             </FormItem>
-                        </Col>
+                        </i-col>
                     </Row>
                     <Row>
-                        <Col span="8">
+                        <i-col span="8">
                             <FormItem label="联系电话" prop="contactPhone" >
                                 <Input v-model="formItem.contactPhone" />
                             </FormItem>
-                        </Col>
+                        </i-col>
                     </Row>
                     <Row>
-                        <Col span="8">
+                        <i-col span="8">
                             <FormItem label="公司介绍" prop="introduce">
                                 <Input type="textarea" :rows="3" v-model="formItem.introduce" :maxlength="200" placeholder="200字以内"/>
                             </FormItem>
-                        </Col>
+                        </i-col>
                     </Row>
                     <h3 style="margin-top:10px;">财务</h3>
                     <hr style="text-align:left;width: 50%; margin-bottom:15px;" size="1"/>
                     <Row>
-                        <Col span="8">
+                        <i-col span="8">
                             <FormItem label="开户名称" prop="accountName">
                                 <Input v-model="formItem.accountName"/>
                             </FormItem>
-                        </Col>
+                        </i-col>
                     </Row>
                     <Row>
-                        <Col span="8">
+                        <i-col span="8">
                             <FormItem label="开户银行" prop="accountBank">
                                 <Input v-model="formItem.accountBank" />
                             </FormItem>
-                        </Col>
+                        </i-col>
                     </Row>
                     <Row>
-                        <Col span="8">
+                        <i-col span="8">
                             <FormItem label="银行账号" prop="accountNum">
                                 <Input v-model="formItem.accountNum"/>
                             </FormItem>
-                        </Col>
+                        </i-col>
                     </Row>
                     <Row>
-                        <Col span="8">
+                        <i-col span="8">
                             <FormItem label="开票抬头" prop="billing">
                                 <Input v-model="formItem.billing"/>
                             </FormItem>
-                        </Col>
+                        </i-col>
                     </Row>
                 </Form>
                 <Button type="success" @click="submit">确定</Button>
@@ -308,7 +308,7 @@ export default {
 </script>
 
 
-<style scoped>
+<style >
 .ivu-form-item {
     margin-bottom: 20px;
 }

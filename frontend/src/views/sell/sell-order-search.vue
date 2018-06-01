@@ -19,7 +19,7 @@
                     </i-col>
                     <!-- <i-col span="6">
                         <FormItem label="自定订号">
-                            <Input size="small" type="text" v-model="formItem.refNo" ></Input>
+                            <Input size="small" type="text" v-model="formItem.refNo" />
                         </FormItem>
                     </i-col> -->
                     <i-col span="8">
@@ -256,7 +256,7 @@ export default {
 }
 </script>
 
-<style scoped>
+<style >
 .ivu-form-item {
     margin-bottom: 5px;
 }

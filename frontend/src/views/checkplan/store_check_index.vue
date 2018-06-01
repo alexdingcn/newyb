@@ -51,12 +51,12 @@
                 </Row>
                 <!--<Form ref="storeCheckForm" :model="storeCheck" :label-width="100">-->
                     <!--<Row>-->
-                        <!--<Col span="5">-->
+                        <!--<i-col span="5">-->
                         <!--<FormItem label="仓库点" prop="warehouseId">-->
                             <!--<warehouse-select v-model="storeCheck.warehouseId" size="small"></warehouse-select>-->
                         <!--</FormItem>-->
-                        <!--</Col>-->
-                        <!--<Col span="5">-->
+                        <!--</i-col>-->
+                        <!--<i-col span="5">-->
                         <!--<FormItem label="盘点类型" prop="checkType">-->
                             <!--<Select v-model="storeCheck.checkType" size="small"  prop="checkType"  >-->
                                 <!--<Option v-for="option in checkTypeOptions" :value="option.id" :label="option.name" :key="option.id">-->
@@ -64,12 +64,12 @@
                                 <!--</Option>-->
                             <!--</Select>-->
                         <!--</FormItem>-->
-                        <!--</Col>-->
-                        <!--<Col span="6">-->
+                        <!--</i-col>-->
+                        <!--<i-col span="6">-->
                         <!--<FormItem label="盘点日期" prop="inDate">-->
                             <!--<DatePicker type="date" v-model="storeCheck.checkDate" size="small"/>-->
                         <!--</FormItem>-->
-                        <!--</Col>-->
+                        <!--</i-col>-->
                     <!--</Row>-->
                 <!--</Form>-->
                 <Table border highlight-row height="300" :loading="detailLoading"

@@ -6,35 +6,35 @@
     <div>
         <Form ref="form" :model="formItem" :label-width="80" >
             <Row type="flex" justify="start">
-                <Col span="8">
+                <i-col span="8">
                     <FormItem label="收款日期">
                         <DatePicker v-model="formItem.createdTime" type="datetime" 
                             format="yyyy-MM-dd HH:mm:ss"></DatePicker>
                     </FormItem>
-                </Col>
-                <Col span="8">
+                </i-col>
+                <i-col span="8">
                     <FormItem label="收款方式">
                         <Select v-model="formItem.payMethod">
                             <Option v-for="item in payMethods" :value="item.value" :key="item.value">{{ item.label }}</Option>
                         </Select>
                     </FormItem>
-                </Col>
-                <Col span="8">
+                </i-col>
+                <i-col span="8">
                     <FormItem label="收款金额">
-                        <Input type="text" v-model="payAmount" placeholder="请输入金额"></Input>
+                        <Input type="text" v-model="payAmount" placeholder="请输入金额"/>
                     </FormItem>
-                </Col>
+                </i-col>
             </Row>
             <Row :gutter="16">
-                <Col span="12">
+                <i-col span="12">
                     <FormItem label="备注">
-                        <Input type="text" v-model="formItem.comment" ></Input>
+                        <Input type="text" v-model="formItem.comment" />
                     </FormItem>
-			    </Col>
-                <Col span="8">
+			    </i-col>
+                <i-col span="8">
                     <Button type="success" icon="ios-checkmark" @click="setAllPaid">全款结清</Button>
                     <Button type="primary" icon="ios-plus" :loading="saveLoading" @click="addPayment">添加</Button>
-                </Col>
+                </i-col>
             </Row>
         </Form>
 

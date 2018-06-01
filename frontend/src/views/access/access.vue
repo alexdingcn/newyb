@@ -11,10 +11,10 @@
             </p>
             <div>
                 <Row>
-                    <Col span="12">
+                    <i-col span="12">
                         <user-list ref="userList" @choose-user="chooseUser"></user-list>
-                    </Col>
-                    <Col span="10" style="margin-left: 50px;">
+                    </i-col>
+                    <i-col span="10" style="margin-left: 50px;">
                         <Card>
                             <Spin size="large" fix v-if="spinShow"></Spin>
                             <p slot="title">
@@ -47,7 +47,7 @@
                                 </div>
                             </div>
                         </Card>
-                    </Col>
+                    </i-col>
                 </Row>
             </div>
         </Card>

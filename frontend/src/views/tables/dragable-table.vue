@@ -6,7 +6,7 @@
 <template>
     <div>
         <Row>
-            <Col span="16">
+            <i-col span="16">
                 <Card>
                     <DragableTable 
                         v-model="tableData" 
@@ -15,8 +15,8 @@
                         @on-end="handleOnend1" 
                     ></DragableTable>
                 </Card>
-            </Col>
-            <Col span="8" class="padding-left-10 height-100" >
+            </i-col>
+            <i-col span="8" class="padding-left-10 height-100" >
                 <Card>
                     <p slot="title">
                         <Icon type="clipboard"></Icon>
@@ -37,10 +37,10 @@
                         </Card>
                     </Row>
                 </Card>
-            </Col>
+            </i-col>
         </Row>
         <Row class="margin-top-10">
-            <Col span="8" class="height-100" >
+            <i-col span="8" class="height-100" >
                 <Card>
                     <p slot="title">
                         <Icon type="clipboard"></Icon>
@@ -61,12 +61,12 @@
                         </Card>
                     </Row>
                 </Card>
-            </Col>
-            <Col span="16" class="padding-left-10">
+            </i-col>
+            <i-col span="16" class="padding-left-10">
                 <Card>
                     <DragableTable refs="table2" :columns-list="columnsList" v-model="tableData" @on-start="handleOnstart2" @on-end="handleOnend2" @on-choose="handleOnchoose2" ></DragableTable>
                 </Card>
-            </Col>
+            </i-col>
         </Row>
     </div>
 </template>

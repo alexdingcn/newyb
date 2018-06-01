@@ -13,18 +13,18 @@
                 <div class="form-con">
                     <Form ref="loginForm" :model="form" :rules="rules">
                         <FormItem prop="username">
-                            <Input v-model="form.username" placeholder="请输入用户名/手机号">
+                            <i-input v-model="form.username" placeholder="请输入用户名/手机号">
                                 <span slot="prepend">
                                     <Icon :size="16" type="person"></Icon>
                                 </span>
-                            </Input>
+                            </i-input>
                         </FormItem>
                         <FormItem prop="password">
-                            <Input type="password" v-model="form.password" placeholder="请输入密码">
+                            <i-input type="password" v-model="form.password" placeholder="请输入密码">
                                 <span slot="prepend">
                                     <Icon :size="14" type="locked"></Icon>
                                 </span>
-                            </Input>
+                            </i-input>
                         </FormItem>
 
                         <FormItem>
@@ -33,14 +33,14 @@
                         <Alert type="error" v-show="loginResponse" show-icon>{{ loginResponse }}</Alert>
 
                         <Row>
-                            <Col span="12">
+                            <i-col span="12">
                                 <Checkbox-group v-model="form.remember">
                                     <Checkbox label="记住我"></Checkbox>
                                 </Checkbox-group>
-                            </Col>
-                            <Col span="12">
+                            </i-col>
+                            <i-col span="12">
                                 <a style="float:right" @click="toRegister">新用户注册</a>
-                            </Col>
+                            </i-col>
                         </Row>
                     </Form>
 

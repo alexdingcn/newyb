@@ -10,17 +10,17 @@
         <Row >
             <Form ref="searchForm" :model="searchFormItem" :label-width="90">
                 <Row type="flex" justify="center">
-                    <Col span="5" >
+                    <i-col span="5" >
                         <FormItem label="仓库点" prop="warehouseId">
                             <warehouse-select v-model="searchFormItem.warehouseId"></warehouse-select>
                         </FormItem>
-                    </Col>
-                    <Col span="6" >
+                    </i-col>
+                    <i-col span="6" >
                         <FormItem label="入库日期">
                     <DatePicker v-model="dateRange" type="daterange" placement="bottom-start" placeholder="制单日期" style="width:200px"></DatePicker>
                 </FormItem>
-                    </Col>
-                    <Col span="5" >
+                    </i-col>
+                    <i-col span="5" >
                          <FormItem label="入库类型">
                              <Select v-model="searchFormItem.outType" prop="outType">
                                  <Option v-for="option in storeOptions" :value="option.id" :label="option.name" :key="option.id">
@@ -28,11 +28,11 @@
                                  </Option>
                              </Select>
                         </FormItem>
-                    </Col>
-                    <Col span="3" offset="1" >
+                    </i-col>
+                    <i-col span="3" offset="1" >
                        <Button icon="ios-search" type="primary" :loading="searching" @click="searchBtnClick">查询</Button>
                        <Button icon="ios-download-outline" type="primary"  @click="exportExcel">导出</Button>
-                    </Col>
+                    </i-col>
                 </Row>
 
             </Form>

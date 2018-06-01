@@ -409,7 +409,7 @@ export default {
 }
 </script>
 
-<style scoped>
+<style >
 .form-item-class {
     margin-bottom: 1.2em;
 }

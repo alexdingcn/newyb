@@ -41,12 +41,12 @@
         </Alert>
         <Card>
             <Row :gutter="10">
-                <Col span="3">
+                <i-col span="3">
                     <Row class-name="made-child-con-middle" type="flex" align="middle">
                         <img class="avator-img" :src="avatorPath" />
                     </Row>
-                </Col>
-                <Col span="12">
+                </i-col>
+                <i-col span="12">
                     <div>
                         <b class="card-user-infor-name">{{loggedUser.realname || loggedUser.mobile}}</b>
                         <p>{{loggedUser.nickname}}</p>
@@ -54,25 +54,25 @@
                     <Row class="margin-top-8">
                         <p class="notwrap">上次登录时间: {{ loggedUser.lastLoginTime | formatTime }} </p>
                     </Row>
-                </Col>
-                <Col span="5" v-show="loggedUser.companyExpiredTime > 0">
+                </i-col>
+                <i-col span="5" v-show="loggedUser.companyExpiredTime > 0">
                     <p>当前版本:试用版</p>
                     <br/>
                     <p>到期日: {{ loggedUser.companyExpiredTime | formatTime }} </p>
-                </Col>
-                <Col span="4">
+                </i-col>
+                <i-col span="4">
                     <!-- <ButtonGroup>
                         <Button>升级</Button>
                         <Button type="primary">充值</Button>
                     </ButtonGroup> -->
-                </Col>
+                </i-col>
             </Row>
         </Card>
 
         <Row :gutter="10" class="margin-top-10">
-            <Col :md="24" :lg="16">
+            <i-col :md="24" :lg="16">
                 <Row :gutter="5">
-                    <Col :xs="24" :sm="12" :md="4" :style="{marginBottom: '10px'}">
+                    <i-col :xs="24" :sm="12" :md="4" :style="{marginBottom: '10px'}">
                     <infor-card
                             id-name="user_created_count"
                             :end-val="count.init"
@@ -80,8 +80,8 @@
                             color="#2d8cf0"
                             intro-text="待审核"
                     ></infor-card>
-                    </Col>
-                    <Col :xs="24" :sm="12" :md="4" :style="{marginBottom: '10px'}">
+                    </i-col>
+                    <i-col :xs="24" :sm="12" :md="4" :style="{marginBottom: '10px'}">
                     <infor-card
                             id-name="visit_count"
                             :end-val="count.quality_checked"
@@ -89,8 +89,8 @@
                             color="#64d572"
                             intro-text="待出库"
                     ></infor-card>
-                    </Col>
-                    <Col :xs="24" :sm="12" :md="4" :style="{marginBottom: '10px'}">
+                    </i-col>
+                    <i-col :xs="24" :sm="12" :md="4" :style="{marginBottom: '10px'}">
                     <infor-card
                             id-name="collection_count"
                             :end-val="count.sale_checked"
@@ -98,8 +98,8 @@
                             color="#9b72ff"
                             intro-text="待发货"
                     ></infor-card>
-                    </Col>
-                    <Col :xs="24" :sm="12" :md="4" :style="{marginBottom: '10px'}">
+                    </i-col>
+                    <i-col :xs="24" :sm="12" :md="4" :style="{marginBottom: '10px'}">
                     <infor-card
                             id-name="transfer_count"
                             :end-val="count.settled"
@@ -107,8 +107,8 @@
                             color="#57a3f3"
                             intro-text="待确认收款"
                     ></infor-card>
-                    </Col>
-                    <Col :xs="24" :sm="12" :md="4" :style="{marginBottom: '10px'}">
+                    </i-col>
+                    <i-col :xs="24" :sm="12" :md="4" :style="{marginBottom: '10px'}">
                     <infor-card
                             id-name="transfer_count"
                             :end-val="count.returning"
@@ -116,8 +116,8 @@
                             color="#f25e43"
                             intro-text="退货待审核"
                     ></infor-card>
-                    </Col>
-                    <Col :xs="24" :sm="12" :md="4" :style="{marginBottom: '10px'}">
+                    </i-col>
+                    <i-col :xs="24" :sm="12" :md="4" :style="{marginBottom: '10px'}">
                     <infor-card
                             id-name="transfer_count"
                             :end-val="count.returned"
@@ -125,10 +125,10 @@
                             color="#f25e43"
                             intro-text="待确认退货"
                     ></infor-card>
-                    </Col>
+                    </i-col>
                 </Row>
                 <Row :gutter="10">
-                    <Col :md="24" :lg="12" :style="{marginBottom: '10px'}">
+                    <i-col :md="24" :lg="12" :style="{marginBottom: '10px'}">
                         <Card>
                             <p slot="title" class="card-title">
                                 <Icon type="android-map"></Icon>
@@ -138,8 +138,8 @@
                                 <sale-volume :content="amountStats"></sale-volume>
                             </div>
                         </Card>
-                    </Col>
-                    <Col :md="24" :lg="12" :style="{marginBottom: '10px'}">
+                    </i-col>
+                    <i-col :md="24" :lg="12" :style="{marginBottom: '10px'}">
                         <Card>
                             <p slot="title" class="card-title">
                                 <Icon type="ios-pulse-strong"></Icon>
@@ -149,12 +149,12 @@
                                 <data-source-pie :content="goodsStats"></data-source-pie>
                             </div>
                         </Card>
-                    </Col>
+                    </i-col>
                 </Row>
-            </Col>
-            <Col :md="24" :lg="8">
+            </i-col>
+            <i-col :md="24" :lg="8">
                 <Row class-name="home-page-row1" :gutter="10">
-                    <Col :md="12" :lg="24" :style="{marginBottom: '10px'}">
+                    <i-col :md="12" :lg="24" :style="{marginBottom: '10px'}">
                         <Card>
                             <p slot="title" class="card-title">
                                 <Icon type="android-checkbox-outline"></Icon>
@@ -182,31 +182,31 @@
                                 </div>
                             </div>
                         </Card>
-                    </Col>
+                    </i-col>
                 </Row>
-            </Col>
+            </i-col>
 
         </Row>
         <Row :gutter="10" class="margin-top-10">
-            <Col :md="24" :lg="16">
+            <i-col :md="24" :lg="16">
                 <Card :padding="0">
                     <p slot="title" class="card-title">
                         <Icon type="map"></Icon>
                         商品销售地理分布
                     </p>
                     <div class="map-con">
-                        <Col span="10">
+                        <i-col span="10">
                         <map-data-table :cityData="cityData" height="281" :style-obj="{margin: '12px 0 0 11px'}"></map-data-table>
-                        </Col>
-                        <Col span="14" class="map-incon">
+                        </i-col>
+                        <i-col span="14" class="map-incon">
                         <Row type="flex" justify="center" align="middle">
                             <home-map :city-data="cityData"></home-map>
                         </Row>
-                        </Col>
+                        </i-col>
                     </div>
                 </Card>
-            </Col>
-            <Col :md="24" :lg="8">
+            </i-col>
+            <i-col :md="24" :lg="8">
                 <Card>
                     <p slot="title" class="card-title">
                         <Icon type="android-wifi"></Icon>
@@ -216,7 +216,7 @@
                         <user-flow></user-flow>
                     </div>
                 </Card>
-            </Col>
+            </i-col>
         </Row>
         <Row class="margin-top-10">
             <Card>

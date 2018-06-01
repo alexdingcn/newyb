@@ -5,7 +5,7 @@
 <template>
     <div>
         <Row :gutter="10">
-            <Col span="4">
+            <i-col span="4">
                 <Card>
                     <p slot="title">
                         <Icon type="ios-toggle"></Icon>
@@ -26,30 +26,30 @@
                         <p class="switch-language-tip">{{ $t('tip') }}</p>
                     </Row>
                 </Card>
-            </Col>
-            <Col span="20">
+            </i-col>
+            <i-col span="20">
                 <Card>
                     <p slot="title">
                         <Icon type="ios-cog"></Icon>
                         {{ $t('iviewComponentTitle') }}
                     </p>
                     <Row :gutter="10" type="flex" justify="center" align="middle" class="switch-language-row1">
-                        <Col span="4" offset="1">
+                        <i-col span="4" offset="1">
                             <p>{{ $t('intro') }}</p>
-                        </Col>
-                        <Col span="6" offset="1">
-                            <Input :placeholder="placeholderText" style="width: 100%;"></Input>
+                        </i-col>
+                        <i-col span="6" offset="1">
+                            <Input :placeholder="placeholderText" style="width: 100%;"/>
                             <div style="margin-top: 25px;">
                                 <DatePicker type="date" :placeholder="placeholderDate" style="width: 100%;"></DatePicker>
                             </div>
                             <div style="margin-top: 25px;">
                                 <Rate show-text v-model="valueText"></Rate>
                             </div>
-                        </Col>
-                        <Col span="6">
+                        </i-col>
+                        <i-col span="6">
                             <Table :columns="columnsI18n" :data="dataI18n"></Table>
-                        </Col>
-                        <Col span="6">
+                        </i-col>
+                        <i-col span="6">
                             <Button type="primary" @click="showModal = true" long>{{ $t('btnText') }}</Button>
                             <Modal v-model="showModal" title="iView">
                                 <p>{{ $t('modalText') }}</p>
@@ -59,10 +59,10 @@
                                     <Button type="primary" long>{{ $t('showPoptipText') }}</Button>
                                 </Poptip>
                             </div>
-                        </Col>
+                        </i-col>
                     </Row>
                 </Card>
-            </Col>
+            </i-col>
         </Row>
     </div>
 </template>

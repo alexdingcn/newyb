@@ -6,7 +6,7 @@
 <template>
     <div>
         <Row :gutter="10">
-            <Col span="8">
+            <i-col span="8">
                 <Card>
                     <p slot="title">
                         <Icon type="pinpoint"></Icon>
@@ -19,8 +19,8 @@
                         <Table :columns="columns1" :data="data1"></Table>
                     </Row>
                 </Card>
-            </Col>
-            <Col span="8">
+            </i-col>
+            <i-col span="8">
                 <Card>
                     <p slot="title">
                         <Icon type="help-buoy"></Icon>
@@ -34,8 +34,8 @@
                         <Table :columns="columns1" :data="data2"></Table>
                     </Row>
                 </Card>
-            </Col>
-            <Col span="8">
+            </i-col>
+            <i-col span="8">
                 <Card>
                     <p slot="title">
                         <Icon type="mouse"></Icon>
@@ -50,7 +50,7 @@
                         <Table :columns="columns1" :data="data3"></Table>
                     </Row>
                 </Card>
-            </Col>
+            </i-col>
         </Row>
     </div>
 </template>

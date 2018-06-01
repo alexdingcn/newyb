@@ -5,12 +5,12 @@
 <template>
     <Card :padding="0">
 
-        <Col class="infor-card-icon-con" :style="{backgroundColor: color, color: 'white'}">
+        <i-col class="infor-card-icon-con" :style="{backgroundColor: color, color: 'white'}">
             <Row class="height-100" type="flex" align="middle" justify="center">
                 <Icon :type="iconType" :size="iconSize"></Icon>
                 <span class="infor-intro-text">{{ introText }}</span>
             </Row>
-        </Col>
+        </i-col>
 
         <div class="infor-card-con">
             <Row type="flex" align="middle" justify="center" class="height-100">
