@@ -597,7 +597,14 @@ export const appRouter = [
     name: "report",
     title: "报表",
     component: Main,
-    children: []
+    children: [
+      {
+        path: "goods-destory",
+        title: "商品销毁",
+        name: "goods-destory",
+        component: () => import("@/views/goods/goods-destory.vue")
+      }
+    ]
   }
   /*
     {
