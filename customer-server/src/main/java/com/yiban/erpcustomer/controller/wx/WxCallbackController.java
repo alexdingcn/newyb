@@ -16,19 +16,20 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.Date;
 
-@RestController
+@Controller
 @RequestMapping("/wx")
 public class WxCallbackController {
     private static final Logger logger = LoggerFactory.getLogger(WxCallbackController.class);
@@ -50,14 +51,10 @@ public class WxCallbackController {
     private UserAuthMapper userAuthMapper;
 
     @RequestMapping(value = "/callback", produces = MediaType.APPLICATION_JSON_VALUE)
-    private ResponseEntity<JSON> getCallback(HttpServletRequest request) {
+    private String getCallback(HttpServletRequest request, HttpServletResponse response) {
         String code = request.getParameter("code");
         String state = request.getParameter("state");
         logger.info("Receive wx callback, code={}, state={}", code, state);
-
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
         String url = String.format("https://api.weixin.qq.com/sns/oauth2/access_token?appid=%s&secret=%s&code=%s&grant_type=authorization_code", wxAppId, wxAppSecret, code);
 
@@ -74,7 +71,7 @@ public class WxCallbackController {
                         "scope":"SCOPE" }
                      */
                     JSONObject obj = JSON.parseObject(respBody);
-                    logger.info("response body:" + respBody.toString());
+                    logger.info("response body:" + respBody);
                     WxUserInfo wxUserInfo = getUserInfo(obj.getString("access_token"), obj.getString("openid"));
 
                     if (wxUserInfo != null) {
@@ -88,28 +85,37 @@ public class WxCallbackController {
                         }
                         if (user != null) {
                             // generate cookie
-                            return ResponseEntity.ok().body(generateJwtToken(user));
+                            Cookie cookie = new Cookie("userId", user.getId().toString());
+                            cookie.setMaxAge(3600*24*30); // expiry
+                            cookie.setSecure(true);
+                            cookie.setPath("/"); // this is the magic
+                            response.addCookie(cookie);
+                            cookie = new Cookie("token", generateJwtToken(user));
+                            cookie.setMaxAge(3600*24*30); // expiry
+                            cookie.setSecure(true);
+                            cookie.setPath("/"); // this is the magic
+
+                            String redirectUrl = request.getScheme() + "://erp.yibanjf.com/cp/";
+                            return "redirect:" + redirectUrl;
                         }
                     }
                 }
             }
-
-            return ResponseEntity.ok().build();
         } catch (RestClientException ex) {
             logger.error("Failed to get wx access_token, {}", ex.getMessage());
         }
-        return ResponseEntity.ok().build();
+        return "";
     }
 
 
-    private JSONObject generateJwtToken(User user) {
+    private String generateJwtToken(User user) {
         // 生成JWT
         String JWT = Jwts.builder()
                 // 保存权限（角色）
                 .claim("authorities", "")
                 // 用户名写入标题
 //                .setSubject(authentication.getName())
-                .claim("user", JSON.toJSONString(user))
+                .claim("user", JSON.toJSONString(user.getCompactUser()))
 //                .setSubject(authentication.getName())
                 // 有效期设置
                 .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
@@ -117,13 +123,7 @@ public class WxCallbackController {
                 .signWith(SignatureAlgorithm.HS512, SECRET)
                 .compact();
 
-        // 生成登录日志
-
-        JSONObject result = new JSONObject();
-        result.put("jwt", JWT);
-        result.put("userDetail", user);
-
-        return result;
+        return JWT;
     }
 
     private User register(WxUserInfo wxUserInfo) {
@@ -160,7 +160,7 @@ public class WxCallbackController {
 
 
     private WxUserInfo getUserInfo(String accessToken, String openId) {
-        String url = String.format("https://api.weixin.qq.com/sns/userinfo?access_token=%s&openid=%s&lang=zh_CN", accessToken, openId);
+        String url = String.format("https://api.weixin.qq.com/sns/userinfo?access_token=%s&openid=%s&lang=en", accessToken, openId);
 
         try {
             ResponseEntity<String> resp = restTemplate.getForEntity(url, String.class);
