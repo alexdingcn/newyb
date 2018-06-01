@@ -1,6 +1,17 @@
 <style lang="less">
 @import "../../styles/common.less";
+.banner-tbl {
+  .actions .ivu-btn {
+    display: none;
+  }
+  .ivu-table-row-hover .actions {
+    .ivu-btn {
+      display: block;
+    }
+  }
+}
 </style>
+
 
 <template>
   <div>
@@ -13,7 +24,7 @@
                 <Button type="success" icon="plus" :loading="loading" @click="addBtnClick">添加</Button>
             </div>
 
-            <Table ref="bannerTbl" highlight-row size="small" border :loading="loading" 
+            <Table ref="bannerTbl" highlight-row size="small" border :loading="loading" class="banner-tbl"
                 :columns="tableColumns" :data="tableData" @on-row-click="chooseRow">
             </Table>
             <Row type="flex" justify="end" class="margin-top-10">
@@ -27,12 +38,12 @@
                     <Row>
                         <i-col span="12">
                             <FormItem label="开始时间">
-                                <DatePicker type="date" v-model="addFormItem.startDate" transfer></DatePicker>
+                                <DatePicker type="datetime" v-model="addFormItem.startDate" transfer></DatePicker>
                             </FormItem>
                         </i-col>
                         <i-col span="12">
                             <FormItem label="结束时间">
-                                <DatePicker type="date" v-model="addFormItem.endDate" transfer></DatePicker>
+                                <DatePicker type="datetime" v-model="addFormItem.endDate" transfer></DatePicker>
                             </FormItem>
                         </i-col>
                     </Row>
@@ -53,14 +64,31 @@
                     <Row>
                         <i-col span="16" offset="3">
                             <Upload
-                                multiple
+                                :on-success="handleUploadSuccess"
+                                :format="['jpg','jpeg','png']"
+                                :max-size="2048"
+                                :on-format-error="handleFormatError"
+                                :on-exceeded-size="handleMaxSize"
                                 type="drag"
-                                action="//jsonplaceholder.typicode.com/posts/">
+                                action=""
+                                :before-upload="handleUpload">
                                 <div style="padding: 20px 0">
                                     <Icon type="ios-cloud-upload" size="52" style="color: #3399ff"></Icon>
                                     <p>点击或者拖入图片</p>
                                 </div>
                             </Upload>
+                        </i-col>
+                    </Row>
+                    <Row >
+                        <i-col span="18">
+                            <FormItem label="跳转地址" >
+                                <Input v-model="addFormItem.url" />
+                            </FormItem>
+                        </i-col>
+                        <i-col span="6">
+                            <FormItem label="顺序" >
+                                <Input v-model="addFormItem.sequence" />
+                            </FormItem>
                         </i-col>
                     </Row>
                     <Row >
@@ -94,15 +122,6 @@ import util from "@/libs/util.js";
 import moment from "moment";
 import goodSelect from "@/views/selector/good-select.vue";
 
-const initBanner = {
-  startDate: moment().format("YYYY-MM-DD HH:mm:ss"),
-  endDate: moment().format("YYYY-MM-DD HH:mm:ss"),
-  goodsId: "",
-  content: "",
-  comment: "",
-  imageUrl: ""
-};
-
 export default {
   name: "home-banner",
   components: {
@@ -116,15 +135,35 @@ export default {
       tableColumns: [
         {
           type: "index",
-          width: 60
+          width: 50
         },
         {
-          title: "内容",
+          title: "标题",
           key: "content"
         },
         {
           title: "图像URL",
-          key: "imageUrl"
+          key: "imageUrl",
+          render: (h, params) => {
+            return h(
+              "a",
+              {
+                attrs: {
+                  href: params.row.imageUrl ? params.row.imageUrl : "#",
+                  target: "_blank"
+                }
+              },
+              [
+                h("img", {
+                  attrs: {
+                    src: params.row.imageUrl
+                      ? params.row.imageUrl + "?x-oss-process=style/resize200"
+                      : ""
+                  }
+                })
+              ]
+            );
+          }
         },
         {
           title: "商品",
@@ -132,19 +171,89 @@ export default {
           width: 100
         },
         {
+          title: "跳转地址",
+          key: "url",
+          width: 100,
+          render: (h, params) => {
+            return h(
+              "a",
+              {
+                attrs: {
+                  href: params.row.url,
+                  target: "_blank"
+                }
+              },
+              params.row.url
+            );
+          }
+        },
+        {
           title: "开始时间",
           key: "startDate",
-          width: 120
+          width: 150,
+          render: (h, params) => {
+            return h(
+              "span",
+              moment(params.row.startDate).format("YYYY-MM-DD HH:mm:ss")
+            );
+          }
         },
         {
           title: "结束时间",
           key: "endDate",
-          width: 120
+          width: 150,
+          render: (h, params) => {
+            return h(
+              "span",
+              moment(params.row.endDate).format("YYYY-MM-DD HH:mm:ss")
+            );
+          }
         },
         {
           title: "顺序",
-          key: "order",
-          width: 170
+          key: "sequence",
+          width: 80,
+          render: (h, params) => {
+            var self = this;
+            let textSpan = h("span", params.row.sequence);
+            let buttonE = h(
+              "Button",
+              {
+                props: {
+                  type: "ghost"
+                },
+                on: {
+                  click: () => {
+                    self.editBanner(params.row);
+                  }
+                }
+              },
+              "编辑"
+            );
+            let buttonH = h(
+              "Button",
+              {
+                props: {
+                  type: "error"
+                },
+                on: {
+                  click: () => {
+                    self.removeBanner(params.row.id);
+                  }
+                }
+              },
+              "删除"
+            );
+            return h(
+              "div",
+              {
+                attrs: {
+                  class: "actions"
+                }
+              },
+              [textSpan, buttonE, buttonH]
+            );
+          }
         }
       ],
       totalCount: 0,
@@ -156,13 +265,27 @@ export default {
 
       addLoading: false,
       addBannerModal: false,
-      addFormItem: initBanner
+      addFormItem: this.initBanner()
     };
   },
   mounted() {
     this.refreshTableData();
   },
   methods: {
+    initBanner() {
+      return {
+        startDate: moment().format("YYYY-MM-DD HH:mm:ss"),
+        endDate: moment()
+          .add(1, "w")
+          .format("YYYY-MM-DD HH:mm:ss"),
+        goodsId: "",
+        content: "",
+        comment: "",
+        imageUrl: "",
+        url: "",
+        sequence: 0
+      };
+    },
     pageChange(data) {
       this.currentPage = data;
       this.refreshTableData();
@@ -176,8 +299,8 @@ export default {
       util.ajax
         .post("/home/banner/list", reqData)
         .then(response => {
-          this.loading = false;
           console.log(response);
+          this.loading = false;
           this.tableData = response.data.data;
           this.totalCount = response.data.count;
           this.currChooseRow = {};
@@ -192,25 +315,74 @@ export default {
       this.currChooseRow = row;
     },
 
-    openUploadFile(type, fileNo) {
-      this.uploadFileType = type;
-      this.uploadfileNo = fileNo;
-      this.fileUploadModal = true;
+    handleUpload(file) {
+      let reqData = new FormData();
+      var self = this;
+      reqData.append("file", file);
+      util.ajax
+        .post("/file/upload", reqData, {
+          headers: { "Content-Type": "multipart/form-data" }
+        })
+        .then(response => {
+          if (response.status === 200) {
+            self.addFormItem.imageUrl = response.data.url;
+          }
+        })
+        .catch(error => {
+          util.errorProcessor(this, error);
+        });
+      return false;
     },
-    addFileSuccess(data) {
-      if (this.uploadFileType === "ADD") {
-        this.addFormItem.fileNo = data.fileNo;
-      }
+    handleUploadSuccess(res, file) {},
+    handleFormatError(file) {
+      this.$Notice.warning({
+        title: "文件格式错误",
+        desc: "文件格式必须是jpg或者png"
+      });
+    },
+    handleMaxSize(file) {
+      this.$Notice.warning({
+        title: "Exceeding file size limit",
+        desc: "文件 " + file.name + " 太大,请勿超过2M."
+      });
     },
 
     addBtnClick() {
-      this.addFormItem = initBanner;
-      console.log(this.addFormItem);
+      this.addFormItem = this.initBanner();
       this.addBannerModal = true;
+    },
+    editBanner(row) {
+      this.addFormItem = JSON.parse(JSON.stringify(row));
+      console.log(this.addFormItem);
+      this.addFormItem.startDate = moment(this.addFormItem.startDate).format(
+        "YYYY-MM-DD HH:mm:ss"
+      );
+      this.addFormItem.endDate = moment(this.addFormItem.endDate).format(
+        "YYYY-MM-DD HH:mm:ss"
+      );
+      this.addBannerModal = true;
+    },
+    removeBanner(bannerId) {
+      var self = this;
+      this.$Modal.confirm({
+        title: "广告位",
+        content: "确认删除该广告位",
+        onOk: () => {
+          util.ajax
+            .delete("/home/banner/" + bannerId)
+            .then(response => {
+              self.$Message.success("采购单删除成功");
+              self.refreshTableData();
+            })
+            .catch(error => {
+              util.errorProcessor(self, error);
+            });
+        }
+      });
     },
 
     saveCancel() {
-      this.addFormItem = initBanner;
+      this.addFormItem = this.initBanner();
       this.addBannerModal = false;
     },
 
@@ -240,15 +412,4 @@ export default {
   }
 };
 </script>
-
-<style>
-.ivu-table td {
-  height: 2.5em;
-}
-.file-upload-modal {
-  position: fixed;
-  z-index: 1000;
-}
-</style>
-
 

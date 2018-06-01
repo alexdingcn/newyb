@@ -104,7 +104,7 @@ public class GoodsService {
     }
 
     public List<Goods> getGoodsById(List<Long> ids) {
-        if (ids == null || ids.isEmpty()) {
+        if (ids == null || ids.isEmpty()) {;
             return Collections.emptyList();
         }
         List<Goods> goodsList = goodsInfoMapper.getChooseListDetailById(ids);
@@ -124,9 +124,22 @@ public class GoodsService {
         if (query.getIncludeDetail() != null && query.getIncludeDetail()) {
             setGoodsInfoDetails(infos);
         }
+        //查询出默认属性值
+        setAttributeRefs(infos);
         return infos;
     }
 
+    private void setAttributeRefs(List<GoodsInfo> infos){
+        if (infos == null || infos.isEmpty()) {
+            return;
+        }
+        List<Long> infoIds = new ArrayList<>();
+        Integer companyId = infos.get(0).getCompanyId();
+        infos.stream().forEach(item -> infoIds.add(item.getId()));
+        List<GoodsAttributeRef> attr = goodsAttributeRefMapper.getDefaultAttrRefs(infoIds,companyId);
+        Map<Long, List<GoodsAttributeRef>> map = attr.stream().collect(Collectors.groupingBy(GoodsAttributeRef::getGoodsInfoId));
+        infos.stream().forEach(item -> item.setAttributeRefs(map.get(item.getId())));
+    }
     private void setGoodsInfoDetails(List<GoodsInfo> infos) {
         if (infos == null || infos.isEmpty()) {
             return;
@@ -661,6 +674,13 @@ public class GoodsService {
         goodsDetailMapper.updateByPrimaryKeySelective(detail);
     }
 
+    public List<GoodsAttribute> getDefaultAttr(Integer companyId){
+        return goodsAttributeRefMapper.getDefaultAttr(companyId);
+    }
+
+    public List<GoodsAttributeRef> getDefaultAttrRef(Integer companyId){
+        return goodsAttributeRefMapper.getDefaultAttrRef(companyId);
+    }
 
     public boolean haveColdManageGoods(List<Long> detailIds) {
         //查询是否存在有冷链经营性商品

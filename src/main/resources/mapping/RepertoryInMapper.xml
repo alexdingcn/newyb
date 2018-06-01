@@ -282,4 +282,17 @@
     where id = #{id}
   </update>
 
+
+  <select id="getInListById"  parameterType="map" resultType="com.yiban.erp.entities.RepertoryIn">
+    select
+    <include refid="listSql"/>
+    from repertory_in o, supplier s, supplier_contact sc, warehouse w, users u
+    where o.supplier_id = s.id and o.supplier_contact_id = sc.id
+    and o.warehouse_id = w.id
+    and o.buyer_id = u.id
+    and o.id in
+    <foreach collection="ids" item="item" open="(" close=")" separator=", ">
+      #{item}
+    </foreach>
+  </select>
 </mapper>

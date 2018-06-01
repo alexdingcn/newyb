@@ -9,6 +9,7 @@ import com.yiban.erp.dto.CurrentBalanceResp;
 import com.yiban.erp.dto.GoodsQuery;
 import com.yiban.erp.dto.ReceiveListReq;
 import com.yiban.erp.dto.ReceiveSetReq;
+import com.yiban.erp.dto.RepertoryInListReq;
 import com.yiban.erp.entities.*;
 import com.yiban.erp.exception.BizException;
 import com.yiban.erp.exception.BizRuntimeException;
@@ -46,6 +47,8 @@ public class RepertoryInService {
     private BuyOrderDetailMapper buyOrderDetailMapper;
     @Autowired
     private GoodsService goodsService;
+    @Autowired
+    private RepertoryInService repertoryInService;
     @Autowired
     private FileInfoMapper fileInfoMapper;
     @Autowired
@@ -814,5 +817,38 @@ public class RepertoryInService {
             infos.add(item);
         }
         return infos;
+    }
+
+
+    public List<RepertoryInDetail> getInDetailList(RepertoryInListReq reqlist) {
+
+        //根据请求条件对象 获取出库明细
+        List<RepertoryInDetail> details = repertoryInDetailMapper.getInDetailList(reqlist);
+        if (details == null || details.isEmpty()) {
+            return Collections.emptyList();
+        }
+        //出库记录需要使用的库存的信息而非商品模板表中的信息
+        List<Long> goodsIdList = new ArrayList<>();
+        details.stream().forEach(item -> goodsIdList.add(item.getGoodsId()));
+        List<Goods> goodsList = goodsService.getGoodsById(goodsIdList);
+        Map<Long, Goods> goodsMap = new HashMap<>();
+        goodsList.stream().forEach(item -> goodsMap.put(item.getId(), item));
+        details.stream().forEach(item -> item.setGoods(goodsMap.get(item.getGoodsId())));
+
+        List<Long> inIdList = new ArrayList<>();
+        details.stream().forEach(item -> inIdList.add(item.getInOrderId()));
+        List<RepertoryIn> repertoryIns = getInListById(inIdList);
+        Map<Long, RepertoryIn> repertoryInMap = new HashMap<>();
+        repertoryIns.stream().forEach(item -> repertoryInMap.put(item.getId(), item));
+        details.stream().forEach(item -> item.setRepertoryIn(repertoryInMap.get(item.getInOrderId())));
+        return details;
+    }
+
+    public List<RepertoryIn> getInListById(List<Long> ids) {
+        if (ids == null || ids.isEmpty()) {
+            return Collections.emptyList();
+        }
+        List<RepertoryIn> repertoryInList = repertoryInMapper.getInListById(ids);
+        return repertoryInList;
     }
 }

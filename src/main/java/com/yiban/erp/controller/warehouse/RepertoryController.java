@@ -6,6 +6,7 @@ import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.yiban.erp.dao.RepertoryInfoMapper;
 import com.yiban.erp.dto.RepertoryQuery;
 import com.yiban.erp.dto.RepertorySelectQuery;
+import com.yiban.erp.entities.GoodsAttributeRef;
 import com.yiban.erp.entities.RepertoryInfo;
 import com.yiban.erp.entities.User;
 import com.yiban.erp.service.warehouse.RepertoryService;
@@ -46,6 +47,8 @@ public class RepertoryController {
     @RequestMapping(value = "/select", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> selectList(@RequestBody RepertorySelectQuery query,
                                              @AuthenticationPrincipal User user) throws Exception {
+        logger.info("select as RepertorySelectQuery {}" ,query);
+
         query.setCompanyId(user.getCompanyId());
         query.setByPage(true);
         Integer count = repertoryInfoMapper.querySelectCount(query);
@@ -59,7 +62,6 @@ public class RepertoryController {
         response.put("count", count);
         response.put("data", infos);
         return ResponseEntity.ok().body(JSON.toJSONString(response, SerializerFeature.DisableCircularReferenceDetect));
-
     }
 
 }

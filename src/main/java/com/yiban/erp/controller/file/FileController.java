@@ -143,7 +143,7 @@ public class FileController {
         return ResponseEntity.ok().body(result.toJSONString());
     }
 
-    @RequestMapping(value = "/upload/avatar", method = RequestMethod.POST)
+    @RequestMapping(value = "/upload", method = RequestMethod.POST)
     public ResponseEntity<String> uploadAvatar(HttpServletRequest request,
                                              @AuthenticationPrincipal User user) throws Exception {
         MultipartHttpServletRequest mtRequest = (MultipartHttpServletRequest) request;

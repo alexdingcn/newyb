@@ -299,7 +299,7 @@ export default {
               return h(
                 "a",
                 {
-                  props: {
+                  attrs: {
                     href: "javascript:void(0)"
                   },
                   on: {

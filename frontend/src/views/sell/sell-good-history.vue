@@ -156,7 +156,7 @@ export default {
   }
 }
 </script>
-<style>
+<style scoped>
 
 .ivu-table td {
     height: 2.5em;

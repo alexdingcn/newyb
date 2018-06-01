@@ -7,6 +7,7 @@ import com.yiban.erp.dao.RepertoryInfoMapper;
 import com.yiban.erp.dto.RepertoryQuery;
 import com.yiban.erp.dto.RepertorySelectQuery;
 import com.yiban.erp.entities.Goods;
+import com.yiban.erp.entities.GoodsAttributeRef;
 import com.yiban.erp.entities.RepertoryInfo;
 import com.yiban.erp.entities.User;
 import com.yiban.erp.service.goods.GoodsService;
@@ -29,6 +30,7 @@ public class RepertoryService {
     private GoodsService goodsService;
 
     public List<RepertoryInfo> querySelectList(RepertorySelectQuery query) {
+
         List<RepertoryInfo> list = repertoryInfoMapper.querySelectList(query);
         return setGoodsToList(list);
     }

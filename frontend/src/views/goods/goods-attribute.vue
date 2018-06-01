@@ -1,5 +1,5 @@
 <style lang="less">
-    @import '../../styles/common.less';
+       @import '../../styles/common.less';
 </style>
 
 <template>
@@ -30,8 +30,20 @@
           <Form ref="form" :model="attForm" :label-width="90">
               <Row>
                   <FormItem label="属性名称" error="attNameError">
-                      <Input type="text" style="width: 250px" v-model="attForm.attName" />
+                      <Input type="text" style="width: 200px" v-model="attForm.attName" />
                   </FormItem>
+              </Row>
+              <Row>
+                  <FormItem label="是否默认" prop="enable">
+                    <RadioGroup v-model="attForm.enableDefault">
+                        <Radio :label="true">
+                            <span>是</span>
+                        </Radio>
+                        <Radio :label="false">
+                            <span>否</span>
+                        </Radio>
+                    </RadioGroup>
+                   </FormItem>
               </Row>
           </Form>
           <Row type="flex" justify="end" slot="footer" >
@@ -46,142 +58,165 @@
 </template>
 
 <script>
-import util from '@/libs/util.js';
+import util from "@/libs/util.js";
 
 export default {
-  name: 'goods-attribute',
+  name: "goods-attribute",
   data() {
-      return {
-          tableLoading: false,
-          tableData: [],
-          tableColumns: [
-              {
+    return {
+      tableLoading: false,
+      tableData: [],
+      tableColumns: [
+        {
                   title: '#',
                   type: 'index',
-                  width: 60
-              },
-              {
+          width: 60
+        },
+        {
                   title: '系统编号',
                   key: 'id',
                   width: 150,
-              },
-              {
+        },
+        {
                   title: '自定义属性名称',
                   key: 'attName'
-              }, 
-              {
-                  title: '操作',
-                  key: 'action',
-                  width: 150,
-                  render: (h, params) =>　{
-                        return h('ButtonGroup', {
-                            props: {
-                                size: 'small'
-                            }
-                        }, [
-                            h('Button', {
-                                props: {
-                                    type: 'primary',
-                                    icon: "edit"
-                                },
-                                on: {
-                                    click: () => {
-                                        this.edit(params.row);
-                                    }
-                                }
-                            }, '修改'),
-                            h('Button', {
-                                props: {
-                                    type: 'error',
-                                    icon: 'close'
-                                },
-                                on: {
-                                    click: () => {
-                                        this.removeItem(params.row.id);
-                                    }
-                                }
-                            }, '删除')
-                        ]);
+        },
+        {
+          title: "是否默认",
+          key: "enableDefault",
+          render: (h, params) => { 
+            const row = params.row;
+            const text = row.enableDefault === true ? '是' : '';           
+                        return h('span',text);
                     }
-              }
-          ],
-          modal: false,
-          attForm: {
-              id: '',
-              attName: ''
-          },
-          attNameError: '',
-          saveLoading: false
-      }
+        },
+        {
+          title: "操作",
+          key: "action",
+          width: 150,
+          render: (h, params) => {
+            return h(
+              "ButtonGroup",
+              {
+                props: {
+                  size: "small"
+                }
+              },
+              [
+                h(
+                  "Button",
+                  {
+                    props: {
+                      type: "primary",
+                      icon: "edit"
+                    },
+                    on: {
+                      click: () => {
+                        this.edit(params.row);
+                      }
+                    }
+                  },
+                  "修改"
+                ),
+                h(
+                  "Button",
+                  {
+                    props: {
+                      type: "error",
+                      icon: "close"
+                    },
+                    on: {
+                      click: () => {
+                        this.removeItem(params.row.id);
+                      }
+                    }
+                  },
+                  "删除"
+                )
+              ]
+            );
+          }
+        }
+      ],
+      modal: false,
+      attForm: {
+        id: "",
+        attName: ""
+      },
+      attNameError: "",
+      saveLoading: false
+    };
   },
   mounted() {
-      this.refreshGoodsAttribute();
+    this.refreshGoodsAttribute();
   },
   methods: {
-      refreshGoodsAttribute() {
-          this.tableLoading = true;
-          util.ajax.get('/goods/attribute/list')
-            .then((response) => {
-                this.tableLoading = false;
-                this.tableData = response.data;
-            })
-            .catch((error) => {
-                this.tableLoading = false;
-                util.errorProcessor(this, error);
-            })
-      },
-      modalCancel() {
-          this.attForm = {
-              id: '',
-              attName: ''
-          };
-          this.attNameError = '';
-          this.modal = false;
-      },
+    refreshGoodsAttribute() {
+      this.tableLoading = true;
+      util.ajax
+        .get("/goods/attribute/list")
+        .then(response => {
+          this.tableLoading = false;
+          this.tableData = response.data;
+        })
+        .catch(error => {
+          this.tableLoading = false;
+          util.errorProcessor(this, error);
+        });
+    },
+    modalCancel() {
+      this.attForm = {
+        id: "",
+        attName: ""
+      };
+      this.attNameError = "";
+      this.modal = false;
+    },
 
-      add() {
-          this.modal = true;
-      },
-      edit(row) {
-          this.attForm = row;
-          this.modal = true;
-      },
+    add() {
+      this.modal = true;
+    },
+    edit(row) {
+      this.attForm = row;
+      this.modal = true;
+    },
 
-      saveSubmit() {
-          this.attNameError = '';
-          if (!this.attForm.attName) {
-              this.attNameError = '属性名称必需';
-              return;
-          }
-          this.saveLoading = true;
-          util.ajax.post('/goods/attribute/save', this.attForm)
-            .then((response) => {
-                this.saveLoading = false;
-                this.$Message.success('保存成功.');
-                this.refreshGoodsAttribute();
-                this.modalCancel();
-            })
-            .catch((error) => {
-                this.saveLoading = false;
-                util.errorProcessor(this, error);
-            })
-      },
-
-      removeItem(id) {
-          this.tableLoading = true;
-          util.ajax.delete('/goods/attribute/remove/' + id)
-            .then((response) => {
-                this.tableLoading = false;
-                this.$Message.success('删除成功');
-                this.refreshGoodsAttribute();
-            })
-            .catch((error) => {
-                this.tableLoading = false;
-                util.errorProcessor(this, error);
-            })
+    saveSubmit() {
+      this.attNameError = "";
+      if (!this.attForm.attName) {
+        this.attNameError = "属性名称必需";
+        return;
       }
-  }
+      this.saveLoading = true;
+      util.ajax
+        .post("/goods/attribute/save", this.attForm)
+        .then(response => {
+          this.saveLoading = false;
+          this.$Message.success("保存成功.");
+          this.refreshGoodsAttribute();
+          this.modalCancel();
+        })
+        .catch(error => {
+          this.saveLoading = false;
+          util.errorProcessor(this, error);
+        });
+    },
 
-}
+    removeItem(id) {
+      this.tableLoading = true;
+      util.ajax
+        .delete("/goods/attribute/remove/" + id)
+        .then(response => {
+          this.tableLoading = false;
+          this.$Message.success("删除成功");
+          this.refreshGoodsAttribute();
+        })
+        .catch(error => {
+          this.tableLoading = false;
+          util.errorProcessor(this, error);
+        });
+    }
+  }
+};
 </script>
 

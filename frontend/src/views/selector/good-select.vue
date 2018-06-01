@@ -134,7 +134,7 @@ export default {
 
 };
 </script>
-<style>
+<style scoped>
 .option-goods-spec {
   float: right;
   color: #999;

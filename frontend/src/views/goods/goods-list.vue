@@ -83,6 +83,8 @@ export default {
             goodsModal: false,
             tableLoading: false,
             tableData:[],
+            num:0,
+            defaultAttr:[],//存放默认属性
             tableCulumns: [
                 {
                     type: 'selection',
@@ -221,6 +223,7 @@ export default {
         }
     },
     mounted() {
+        this.getDefaultAttr();
       this.refreshGoodsList();
     },
     watch: {
@@ -238,6 +241,40 @@ export default {
         },
         categoryChoose(categoryId) {
             this.searchCategoryId = categoryId;
+        },
+        getDefaultAttr(){
+            util.ajax.
+            get('/goods/defaultAttr')
+            .then((response) =>{
+                this.defaultAttr=response.data;
+                for(var i=0;i<this.defaultAttr.length;i++){
+                    this.tableCulumns.push({
+                        title: this.defaultAttr[i].attName,
+                        key: 'attributeRefs',
+                        width:100,
+                        render: (h, params) => {
+                            const data = params.row.attributeRefs;
+                            var text="";
+                            if(data){
+                                //console.log("data.length--"+data.length);
+                                //console.log("data.title----"+params.column.title);
+                                for(var m=0;m<data.length;m++){ 
+                                    if(data[m].attName==params.column.title){
+                                        text = data[m].attValue;
+                                       // console.log("m---"+m+"text----"+text);
+                                    }
+                                }
+                            }
+                        //console.log("text----"+text);
+                        //console.log(data && data[0] ? data[0].attValue : "");
+                        return h("span", text);
+                    }
+                    });
+                }
+            })
+            .catch((error) => {
+                util.errorProcessor(this, error);
+            });
         },
         refreshGoodsList() {
             let reqData = {

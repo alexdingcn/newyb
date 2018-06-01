@@ -184,7 +184,8 @@ export default {
           totalCount: 0,
           currentPage: 1,
           tableCurrPageSize: 50,
-          tabCurrChooseList: []
+          tabCurrChooseList: [],
+          currAttributes: [],
       }
   },
   watch: {
@@ -220,7 +221,8 @@ export default {
               supplierId: this.formItem.supplierId,
               minQuantity: 0,
               page: this.currentPage,
-              size: this.tableCurrPageSize
+              size: this.tableCurrPageSize,
+              currAttributes:this.currAttributes,
           };
           util.ajax.post("/repertory/select", reqData)
             .then((response) => {
@@ -247,7 +249,7 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
 .ivu-form-item {
     margin-bottom: 5px;
 }

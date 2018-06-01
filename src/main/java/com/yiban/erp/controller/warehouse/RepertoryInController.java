@@ -6,8 +6,10 @@ import com.yiban.erp.dao.RepertoryInMapper;
 import com.yiban.erp.dto.CurrentBalanceResp;
 import com.yiban.erp.dto.ReceiveListReq;
 import com.yiban.erp.dto.ReceiveSetReq;
+import com.yiban.erp.dto.RepertoryInListReq;
 import com.yiban.erp.entities.RepertoryIn;
 import com.yiban.erp.entities.RepertoryInDetail;
+import com.yiban.erp.entities.RepertoryOutDetail;
 import com.yiban.erp.entities.User;
 import com.yiban.erp.exception.BizException;
 import com.yiban.erp.exception.ErrorCode;
@@ -23,6 +25,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -168,6 +171,25 @@ public class RepertoryInController {
         logger.info("user:{} request order in repository check for orderId:{}", user.getId(), setReq.getOrderId());
         repertoryInService.setOrderInCheck(user, setReq.getOrderId());
         return ResponseEntity.ok().build();
+    }
+
+
+    @RequestMapping(value = "/detaillist", method = RequestMethod.POST, name = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> detaillist(@RequestBody RepertoryInListReq listReq,
+                                             @AuthenticationPrincipal User user) throws Exception {
+        Date endDate=listReq.getEndInDate();
+        if(endDate!=null){
+            Calendar end = Calendar.getInstance();
+            end.setTime(endDate);
+            end.set(Calendar.HOUR_OF_DAY,23);
+            end.set( Calendar.MINUTE,59);
+            end.set(Calendar.SECOND,59);
+            listReq.setEndInDate(end.getTime());
+        }
+        listReq.setCompanyId(user.getCompanyId());
+        listReq.setInStatus("IN_CHECKED");
+        List<RepertoryInDetail> result = repertoryInService.getInDetailList(listReq);
+        return ResponseEntity.ok().body(JSON.toJSONString(result));
     }
 
 }
