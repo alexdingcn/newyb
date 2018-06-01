@@ -14,7 +14,7 @@
                 <ButtonGroup>
                     <Button type="primary" icon="ios-search" :loading="orderLoading" @click="refreshOrder">查询</Button>
                     <Button type="success" icon="checkmark" @click="checkOneOrderBtn">验收一单</Button>
-                    <Button type="warning"  icon="close" @click="unCheckOneOrderBtn">取消验收一单</Button>
+                    <Button v-if="haveFNFlow" type="warning"  icon="close" @click="unCheckOneOrderBtn">取消验收一单</Button>
                     <Button type="info"  icon="images" @click="showCheckFile">检验档案</Button>
                 </ButtonGroup>
             </div>
@@ -59,7 +59,7 @@
                         <ButtonGroup>
                             <Button type="info" icon="android-bulb" @click="samplingSurveyBtnClick">抽样检查</Button>
                             <Button type="success" icon="checkmark" @click="checkOneDetailBtn">验收一条</Button>
-                            <Button type="warning" icon="close" @click="unCheckOneDetailBtn">取消验收一条</Button>
+                            <Button v-if="haveFNFlow" type="warning" icon="close" @click="unCheckOneDetailBtn">取消验收一条</Button>
                         </ButtonGroup>
                     </Row>
 
@@ -90,7 +90,7 @@
           <div slot="footer"></div>
       </Modal>
 
-      <Modal v-model="checkModal" title="验收结果" :mask-closable="false" width="50" @on-ok="checkSuccess" @on-cancel="checkCancel">
+      <Modal v-model="checkModal" title="验收结果" :mask-closable="false" width="50" >
           <Form ref="checkForm" :model="checkFormItem" :label-width="100">
               <Row v-if="checkDetail">
                   <i-col span="12">
@@ -155,7 +155,7 @@
                     </FormItem>
                   </i-col>
                   <i-col span="8">
-                    <FormItem label="验收员">
+                    <FormItem label="验收员" :error="checkUserError">
                         <Row >
                           <Input v-model="checkFormItem.checkUser" style="width: 90%;" placeholder="张三;李四"  />
                           <Tooltip transfer >
@@ -183,6 +183,11 @@
                   </i-col>
               </Row>
           </Form>
+
+          <ButtonGroup slot="footer">
+            <Button type="success" icon="checkmark" @click="checkSuccess">提交</Button>
+            <Button type="ghost" icon="reply" @click="checkCancel">取消</Button>
+          </ButtonGroup>
       </Modal>
 
       <Modal v-model="checkFileModal" title="检验报告档案" :footerHide="true" :mask-closable="false" width="50">
@@ -597,6 +602,7 @@ export default {
           }
         }
       ],
+      checkUserError: "",
       currChooseDetail: {},
       totalAmount: 0,
       totalReceiveCount: 0,
@@ -853,6 +859,7 @@ export default {
       this.checkModal = false;
     },
     checkSuccess() {
+      this.checkUserError = "";
       //需要验证商品是否有特殊经营管理的标识，如果有，需要验证是否为双人验收
       let checkUser = this.checkFormItem.checkUser;
       let haveSpecialGoods = false;
@@ -876,39 +883,35 @@ export default {
       if (haveSpecialGoods) {
         if (
           !checkUser ||
-          checkUser.indexOf(";") < 0 ||
-          checkUser.indexOf("；") < 0
+          (checkUser.indexOf(";") < 0 && checkUser.indexOf("；") < 0)
         ) {
-          this.$Modal.info({
-            title: "商品特殊经营管理标识提示",
-            content: "商品存在“药品特殊经营”标识，需要双人验收."
-          });
+          this.checkUserError = "商品存在“药品特殊经营”标识，需要双人验收.";
           return;
         }
       }
-
-      if (this.checkFormItem.checkTime) {
-        this.checkFormItem.checkTime = moment(
-          this.checkFormItem.checkTime,
-          "YYYY-MM-DD HH:mm"
-        );
+      let reqData = JSON.parse(JSON.stringify(this.checkFormItem));
+      if (reqData.checkTime) {
+        reqData.checkTime = moment(reqData.checkTime, "YYYY-MM-DD HH:mm:ss");
       }
       this.detailLoading = true;
+      let self = this;
       util.ajax
-        .put("/repertory/in/set/check", this.checkFormItem)
+        .put("/repertory/in/set/check", reqData)
         .then(response => {
-          this.detailLoading = false;
-          this.$Message.success("验收成功");
-          let refresh = response.refresh;
+          self.detailLoading = false;
+          self.$Message.success("验收成功");
+          let refresh = response.data.refresh;
+          console.log(refresh);
           if (refresh > 0) {
-            this.refreshOrder();
+            self.refreshOrder();
           } else {
-            this.reloadOrderDetail();
+            self.reloadOrderDetail();
           }
+          self.checkCancel();
         })
         .catch(error => {
-          this.detailLoading = false;
-          util.errorProcessor(this, error);
+          self.detailLoading = false;
+          util.errorProcessor(self, error);
         });
     },
     unCheckOneOrderBtn() {
@@ -920,7 +923,7 @@ export default {
         .put("/repertory/in/set/check/order/" + this.currentChooseOrder.id)
         .then(response => {
           this.$Message.success("取消成功");
-          this.reloadOrderDetail();
+          this.refreshOrder();
         })
         .catch(error => {
           util.errorProcessor(this, error);

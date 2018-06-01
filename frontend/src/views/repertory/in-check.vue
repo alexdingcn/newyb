@@ -16,16 +16,16 @@
           <Form ref="searchForm" :model="query" :label-width="80">
                 <Row type="flex" justify="start">
                     <FormItem label="收货日期">
-                        <DatePicker size="small" v-model="dateRange" type="daterange" placement="bottom-start" placeholder="收货日期" style="width:180px"></DatePicker>
+                        <DatePicker v-model="dateRange" type="daterange" placement="bottom-start" placeholder="收货日期" style="width:180px"></DatePicker>
                     </FormItem>
                     <FormItem label="仓库">
-                        <warehouse-select v-model="query.warehouseId" size="small"></warehouse-select>
+                        <warehouse-select v-model="query.warehouseId" @on-change="refreshOrder" ></warehouse-select>
                     </FormItem>
                     <FormItem label="供应商">
-                        <supplier-select v-model="query.supplierId" size="small"></supplier-select>
+                        <supplier-select v-model="query.supplierId" @on-change="refreshOrder" ></supplier-select>
                     </FormItem>
                     <FormItem label="状态">
-                        <Select size="small" v-model="query.status" placeholder="状态">
+                        <Select v-model="query.status" placeholder="状态" @on-change="refreshOrder" >
                                 <Option v-for="option in statusOptions" :value="option.key" :label="option.name" :key="option.key">{{option.name}}</Option>
                         </Select>
                     </FormItem>
@@ -99,6 +99,11 @@ export default {
         {
           type: "index",
           width: 50
+        },
+        {
+          title: "系统单号",
+          width: 190,
+          key: "orderNumber"
         },
         {
           title: "收货时间",
@@ -179,8 +184,16 @@ export default {
         },
         {
           title: "收货员",
-          width: 120,
-          key: "createBy"
+          key: "receiveUser",
+          width: 150,
+          render: (h, params) => {
+            let receiveUser = params.row.receiveUser;
+            if (!receiveUser) {
+              return h("span", params.row.createBy);
+            } else {
+              return h("span", receiveUser);
+            }
+          }
         },
         {
           title: "到货温度",
@@ -191,11 +204,6 @@ export default {
           title: "验收温度",
           width: 120,
           key: "checkTemp"
-        },
-        {
-          title: "系统单号",
-          width: 190,
-          key: "orderNumber"
         },
         {
           title: "采购属性",
@@ -222,14 +230,41 @@ export default {
           width: 50
         },
         {
+          title: "质检状态",
+          key: "checkStatus",
+          width: 140,
+          render(h, params) {
+            let checkStatus = params.row.checkStatus;
+            if (checkStatus) {
+              return h(
+                "Tag",
+                { props: { type: "dot", color: "green" } },
+                "已验收"
+              );
+            } else {
+              return h(
+                "Tag",
+                { props: { type: "dot", color: "red" } },
+                "未验收"
+              );
+            }
+          }
+        },
+        {
           title: "商品名称",
           key: "goodsName",
-          width: 160
+          width: 160,
+          render: (h, params) => {
+            return h("span", params.row.goods.name);
+          }
         },
         {
           title: "产地",
           key: "origin",
-          width: 160
+          width: 140,
+          render: (h, params) => {
+            return h("span", params.row.goods.origin);
+          }
         },
         {
           title: "规格",
@@ -251,24 +286,6 @@ export default {
           width: 120,
           render: (h, params) => {
             return h("span", params.row.goods.factoryName);
-          }
-        },
-        {
-          title: "存储条件",
-          key: "storageCondition",
-          width: 100
-        },
-        {
-          title: "特殊药品",
-          key: "specialManage",
-          width: 120,
-          render(h, params) {
-            let specialManage = params.row.specialManage;
-            if (specialManage) {
-              return h("Tag", { props: { type: "dot", color: "red" } }, "是");
-            } else {
-              return h("Tag", { props: { type: "dot", color: "blue" } }, "否");
-            }
           }
         },
         {
@@ -308,24 +325,51 @@ export default {
           }
         },
         {
+          title: "库区",
+          key: "warehouseLocation",
+          width: 150
+        },
+        {
+          title: "采购数量",
+          key: "buyOrderQuality",
+          width: 130
+        },
+        {
+          title: "拒收",
+          width: 150,
+          key: "rejectQuality",
+          render: (h, params) => {
+            let rejectQuality = params.row.rejectQuality
+              ? params.row.rejectQuality
+              : "0";
+            let rejectComment = params.row.rejectComment
+              ? params.row.rejectComment
+              : "";
+            return h("div", [
+              h("h4", "数量:" + rejectQuality),
+              h("span", "原因:" + rejectComment)
+            ]);
+          }
+        },
+        {
+          title: "收货数量",
+          width: 130,
+          key: "receiveQuality"
+        },
+        {
+          title: "赠送数量",
+          width: 120,
+          key: "free"
+        },
+        {
           title: "单价",
           width: 120,
           key: "price"
         },
         {
           title: "金额",
-          width: 120,
+          width: 140,
           key: "amount"
-        },
-        {
-          title: "到货数量",
-          width: 140,
-          key: "receiveQuality"
-        },
-        {
-          title: "赠送数量",
-          width: 140,
-          key: "free"
         },
         {
           title: "入库数量",
@@ -340,68 +384,35 @@ export default {
         {
           title: "不合格数量",
           key: "errorCount",
-          width: 140
+          width: 120
         },
         {
-          title: "采集数量",
+          title: "抽样数量",
           key: "surveyQuality",
           width: 140,
           render: (h, params) => {
-            let surveyQuality = params.row.surveyQuality;
+            let surveyQuality = params.row.surveyQuality
+              ? params.row.surveyQuality
+              : 0;
             let surveyDate = params.row.surveyDate
               ? moment(params.row.surveyDate).format("YYYY-MM-DD HH:mm")
               : "";
-            let surveyUser = params.row.surveyUser;
-            if (!surveyQuality) {
-              return h("span", "");
-            }
-            return h(
-              "Tooltip",
-              {
-                props: {
-                  placement: "top",
-                  content: "抽样员:" + surveyUser + ", 抽样时间:" + surveyDate
-                }
-              },
-              [h("span", surveyQuality)]
-            );
+            let surveyUser = params.row.surveyUser ? params.row.surveyUser : "";
+            return h("div", [
+              h("h4", "数量:" + surveyQuality),
+              h("span", surveyUser + "  " + surveyDate)
+            ]);
           }
         },
         {
-          title: "库区",
-          key: "warehouseLocation",
-          width: 140
-        },
-        {
-          title: "验收状态",
-          key: "checkStatus",
-          width: 140,
-          render(h, params) {
-            let checkStatus = params.row.checkStatus;
-            if (checkStatus) {
-              return h(
-                "Tag",
-                { props: { type: "dot", color: "green" } },
-                "已验收"
-              );
-            } else {
-              return h(
-                "Tag",
-                { props: { type: "dot", color: "red" } },
-                "未验收"
-              );
-            }
-          }
-        },
-        {
-          title: "温控方式验收",
+          title: "验收温控方式",
           key: "checkTempMethodName",
           width: 140
         },
         {
           title: "验收意见",
           key: "checkResult",
-          width: 140
+          width: 150
         },
         {
           title: "验收员",
@@ -428,6 +439,9 @@ export default {
       checkFileNo: "",
       checkFileModal: false
     };
+  },
+  mounted() {
+    this.refreshOrder();
   },
   watch: {
     detailList(data) {
@@ -513,21 +527,9 @@ export default {
         this.$Message.warning("请先选择需要审核的订单");
         return;
       }
-      //验证订单的详情是否意见全部通过，如果是，才能提交
-      let details = this.currentChooseOrder.details;
-      if (!details || details.length <= 0) {
-        this.$Message.warning("订单没有对应的商品详情信息");
+      if (this.currentChooseOrder.status != "CHECKED") {
+        this.$Message.info("当前状态不能做审核操作");
         return;
-      }
-      for (let i = 0; i < details.length; i++) {
-        let item = details[i];
-        if (!item || !item.checkStatus) {
-          this.$Modal.warning({
-            title: "信息提醒",
-            content: "订单存在有质量验收未通过的商品"
-          });
-          return;
-        }
       }
       let self = this;
       self.orderLoading = true;

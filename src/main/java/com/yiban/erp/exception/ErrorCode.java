@@ -164,6 +164,7 @@ public enum ErrorCode {
     RECEIVE_SUPPLIER_COLD_VALIDATE_FAIL(2416, "供应商无“冷链经营”的资质", ErrorDisplay.MODAL),
     RECEIVE_COLD_NEED_PARAMS_ERROR(2417, "“冷链经营”类型的商品，温控方式，到货温度，温控状态，运输方式为必输项", ErrorDisplay.MODAL),
     RECEIVE_SAVE_STATUS_ERROR(2418, "保存提交的状态信息错误"),
+    RECEIVE_QA_UNCHECK_STATUS_ERROR(2419, "入库单当前状态不能再取消质量验收"),
 
     WAREHOUSE_LOCATION_EXIST(2501, "仓库位置已经存在, 不能添加同名库位"),
     WAREHOUSE_GET_FAIL(2502, "获取仓库信息失败"),

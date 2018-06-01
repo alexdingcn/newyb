@@ -136,7 +136,7 @@ public class RepertoryInService {
         }
         String[] users = receiveUser.split(";");
         String[] users1 = receiveUser.split("；");
-        if (users.length < 2 || users1.length < 2) {
+        if (users.length < 2 && users1.length < 2) {
             logger.warn("receive user size < 2");
             throw new BizException(ErrorCode.RECEIVE_SPECIAL_RECEIVE_USER_ERROR);
         }
@@ -570,7 +570,8 @@ public class RepertoryInService {
         }
     }
 
-    private int checkOneOrder(User user, ReceiveSetReq setReq) throws BizException {
+    @Transactional
+    public int checkOneOrder(User user, ReceiveSetReq setReq) throws BizException {
         RepertoryIn order = repertoryInMapper.selectByPrimaryKey(setReq.getOrderId());
         if (order == null) {
             logger.warn("get order info fail by id:{}", setReq.getOrderId());
@@ -582,6 +583,13 @@ public class RepertoryInService {
         }
         //获取系统流程
         boolean haveFNFlow = systemConfigService.haveOrderFlow(user.getCompanyId(), ConfigKey.BUY_FINAL_CHECK);
+        //如果没有终审，需要验证下当前仓库是否被冻结
+        if (!haveFNFlow && warehouseService.isFrozen(order.getWarehouseId())) {
+            logger.warn("warehouse is frozen now, status is not normal. warehouse:{} order:{}",
+                    order.getWarehouseId(), order.getId());
+            throw new BizException(ErrorCode.RECEIVE_ORDER_WAREHOUSE_FROZEN);
+        }
+
         setReq.setUpdateBy(user.getNickname());
         setReq.setUpdateTime(new Date());
         repertoryInDetailMapper.setCheckByOrder(setReq);
@@ -603,7 +611,8 @@ public class RepertoryInService {
         return 1;
     }
 
-    private int checkOneDetail(User user, ReceiveSetReq setReq) throws BizException {
+    @Transactional
+    public int checkOneDetail(User user, ReceiveSetReq setReq) throws BizException {
         RepertoryInDetail detail = repertoryInDetailMapper.selectByPrimaryKey(setReq.getDetailId());
         if (detail == null) {
             logger.warn("get order detail fail by id:{}", setReq.getDetailId());
@@ -614,6 +623,15 @@ public class RepertoryInService {
             logger.warn("get order fail by id:{}", detail.getInOrderId());
             throw new BizException(ErrorCode.RECEIVE_ORDER_GET_FAIL);
         }
+        //获取系统流程，
+        boolean haveFNFlow = systemConfigService.haveOrderFlow(user.getCompanyId(), ConfigKey.BUY_FINAL_CHECK);
+        //如果没有终审，需要验证下当前仓库是否被冻结
+        if (!haveFNFlow && warehouseService.isFrozen(repertoryIn.getWarehouseId())) {
+            logger.warn("warehouse is frozen now, status is not normal. warehouse:{} order:{}",
+                    repertoryIn.getWarehouseId(), repertoryIn.getId());
+            throw new BizException(ErrorCode.RECEIVE_ORDER_WAREHOUSE_FROZEN);
+        }
+
         //直接调用验收逻辑
         setReq.setUpdateBy(user.getNickname());
         setReq.setUpdateTime(new Date());
@@ -621,7 +639,6 @@ public class RepertoryInService {
         if (count <= 0) {
             throw new BizRuntimeException(ErrorCode.FAILED_UPDATE_FROM_DB);
         }
-
         //验证订单的是否意见全部验证通过，如果是，需要把订单修改为已经验收完毕的状态
         List<RepertoryInDetail> details = repertoryInDetailMapper.getByOrderId(detail.getInOrderId());
 
@@ -634,8 +651,6 @@ public class RepertoryInService {
         }
         if (checked) {
             logger.info("user:{} check order detail:{} then order check over. orderId:{}", user.getId(), detail.getId(), detail.getInOrderId());
-            //获取系统流程，
-            boolean haveFNFlow = systemConfigService.haveOrderFlow(user.getCompanyId(), ConfigKey.BUY_FINAL_CHECK);
             if (haveFNFlow) {
                 // 修改到终审状态
                 repertoryIn.setStatus(RepertoryInStatus.CHECKED.name());
@@ -660,9 +675,15 @@ public class RepertoryInService {
 
     public void setUncheckOrder(User user, Long orderId) throws BizException {
         RepertoryIn order = repertoryInMapper.selectByPrimaryKey(orderId);
-        if (order == null) {
+        if (order == null || !user.getCompanyId().equals(order.getCompanyId())) {
             throw new BizException(ErrorCode.RECEIVE_ORDER_GET_FAIL);
         }
+        //能取消的前提是当前这笔订单的状态不是终审通过
+        if (RepertoryInStatus.IN_CHECKED.name().equalsIgnoreCase(order.getStatus())) {
+            logger.warn("repertory in order status is IN_CHECKED, can not change uncheck");
+            throw new BizException(ErrorCode.RECEIVE_QA_UNCHECK_STATUS_ERROR);
+        }
+
         ReceiveSetReq setReq = new ReceiveSetReq();
         setReq.setOrderId(orderId);
         setReq.setUpdateBy(user.getNickname());
@@ -682,6 +703,16 @@ public class RepertoryInService {
         if (detail == null) {
             throw new BizException(ErrorCode.RECEIVE_ORDER_GET_FAIL);
         }
+        RepertoryIn order = repertoryInMapper.selectByPrimaryKey(detail.getInOrderId());
+        if (order == null || !user.getCompanyId().equals(order.getCompanyId())) {
+            throw new BizException(ErrorCode.RECEIVE_ORDER_GET_FAIL);
+        }
+        //能取消的前提是当前这笔订单的状态不是终审通过
+        if (RepertoryInStatus.IN_CHECKED.name().equalsIgnoreCase(order.getStatus())) {
+            logger.warn("repertory in order status is IN_CHECKED, can not change uncheck");
+            throw new BizException(ErrorCode.RECEIVE_QA_UNCHECK_STATUS_ERROR);
+        }
+
         ReceiveSetReq setReq = new ReceiveSetReq();
         setReq.setDetailId(detailId);
         setReq.setUpdateBy(user.getNickname());
@@ -734,24 +765,8 @@ public class RepertoryInService {
             logger.warn("order status is not in CHECKED status, can not in check success.");
             throw new BizException(ErrorCode.RECEIVE_ORDER_STATUS_NOT_CHECKED);
         }
-        //保险检查每一个订单详情是否存在为审核通过的状态
-        List<RepertoryInDetail> details = repertoryInDetailMapper.getByOrderId(orderId);
-        if (details == null || details.isEmpty()) {
-            logger.warn("order in repository check but detail list is empty. orderId:{}", orderId);
-            throw new BizException(ErrorCode.RECEIVE_ORDER_DETAIL_EMPTY);
-        }
-        boolean checkStatus = true;
-        for (RepertoryInDetail detail : details) {
-            if (detail.getCheckStatus() == null || !detail.getCheckStatus()) {
-                checkStatus = false;
-                break;
-            }
-        }
-        if (!checkStatus) {
-            logger.warn("order detail have check status is false. orderId:{}", orderId);
-            throw new BizException(ErrorCode.RECEIVE_ORDER_STATUS_NOT_CHECKED);
-        }
 
+        // 仓库是否处于冻结状态，如果是，不能操作
         if (!warehouseService.isFrozen(order.getWarehouseId())) {
             logger.warn("warehouse is frozen now, status is not normal. can not do repertory in. warehouse:{} order:{}",
                     order.getWarehouseId(), order.getId());

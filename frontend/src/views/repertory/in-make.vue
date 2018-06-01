@@ -1087,6 +1087,7 @@ export default {
       }
       if (haveSpecial) {
         //存在特殊管理药品, 需要验证供应商是否也有这个资质
+        console.log(this.supplierSpecialManage);
         if (!this.supplierSpecialManage) {
           result.code = -1;
           result.message =
@@ -1097,7 +1098,10 @@ export default {
         }
         //如果供应商也有资质，则验证是否已经存在双人收货，特殊管理药品需要双人收货
         let receiveUser = this.order.receiveUser;
-        if (receiveUser.indexOf(";") <= 0 || receiveUser.indexOf("；") <= 0) {
+        if (
+          !receiveUser ||
+          (receiveUser.indexOf(";") <= 0 && receiveUser.indexOf("；") <= 0)
+        ) {
           result.code = -2;
           result.message =
             "商品：" +
@@ -1237,6 +1241,9 @@ export default {
             this.supplierSpecialManage = data.supplierSpecialManage
               ? true
               : false;
+            console.log(
+              this.supplierSpecialManage + ", " + this.supplierColdManage
+            );
             data.receiveDate = data.receiveDate
               ? moment(data.receiveDate).format("YYYY-MM-DD")
               : moment().format("YYYY-MM-DD");
@@ -1401,14 +1408,17 @@ export default {
 
     supplierChange(supplierId, supplier) {
       //赋值特殊管理标识
-      this.supplierColdManage = supplier.coldBusiness ? true : false;
-      this.supplierSpecialManage = supplier.canSpecial ? true : false;
+      console.log(supplier);
+      if (supplier && supplier.id) {
+        this.supplierColdManage = supplier.coldBusiness ? true : false;
+        this.supplierSpecialManage = supplier.canSpecial ? true : false;
+      }
     }
   }
 };
 </script>
 
-<style >
+<style>
 .ivu-form-item {
   margin-bottom: 0px;
 }

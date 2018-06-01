@@ -886,8 +886,11 @@ export default {
 
     supplierChange(supplierId, supplier) {
       //赋值特殊管理标识
-      this.supplierColdManage = supplier.coldBusiness ? true : false;
-      this.supplierSpecialManage = supplier.canSpecial ? true : false;
+      console.log(supplier);
+      if (supplier && supplier.id) {
+        this.supplierColdManage = supplier.coldBusiness ? true : false;
+        this.supplierSpecialManage = supplier.canSpecial ? true : false;
+      }
     }
   }
 };
