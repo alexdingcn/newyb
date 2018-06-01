@@ -38,6 +38,7 @@
                 <Dropdown transfer v-else placement="right-start" :key="index" @on-click="changeMenu">
                     <Button @click="changeMenu(item.children[0].name)" style="width: 70px;margin-left: -5px;padding:10px 0;" type="text">
                         <Icon :color="iconColor" :type="item.children[0].icon || item.icon"></Icon>
+                         {{ item.title }}
                     </Button>
                     <DropdownMenu style="width:150px;" slot="list">
                         <DropdownItem :name="item.children[0].name" :key="'d' + index"><Icon :type="item.children[0].icon || item.icon"></Icon><span style="padding-left:10px;">{{ itemTitle(item.children[0]) }}</span></DropdownItem>
@@ -50,35 +51,35 @@
 
 <script>
 export default {
-    name: 'sidebarMenuShrink',
-    props: {
-        menuList: {
-            type: Array
-        },
-        iconColor: {
-            type: String,
-            default: 'white'
-        },
-        menuTheme: {
-            type: String,
-            default: 'darck'
-        }
+  name: "sidebarMenuShrink",
+  props: {
+    menuList: {
+      type: Array
     },
-    methods: {
-        handleClick(name) {
-            console.log(name);
-        },
-        changeMenu (active) {
-            console.log('change');
-            this.$emit('on-change', active);
-        },
-        itemTitle (item) {
-            if (typeof item.title === 'object') {
-                return this.$t(item.title.i18n);
-            } else {
-                return item.title;
-            }
-        }
+    iconColor: {
+      type: String,
+      default: "white"
+    },
+    menuTheme: {
+      type: String,
+      default: "darck"
     }
+  },
+  methods: {
+    handleClick(name) {
+      console.log(name);
+    },
+    changeMenu(active) {
+      console.log("change");
+      this.$emit("on-change", active);
+    },
+    itemTitle(item) {
+      if (typeof item.title === "object") {
+        return this.$t(item.title.i18n);
+      } else {
+        return item.title;
+      }
+    }
+  }
 };
 </script>
