@@ -599,6 +599,12 @@ export const appRouter = [
     component: Main,
     children: [
       {
+        path: "index",
+        title: "报表",
+        name: "index",
+        component: () => import("@/views/report/index.vue")
+      },
+      {
         path: "goods-destory",
         title: "商品销毁",
         name: "goods-destory",
