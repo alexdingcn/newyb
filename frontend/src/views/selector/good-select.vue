@@ -41,97 +41,97 @@
 </template>
 
 <script>
-import util from '@/libs/util.js';
-import goodsListSelect from './good-list-select.vue';
-
-const prefixCls = 'ivu-input';
-
+import util from "@/libs/util.js";
+import goodsListSelect from "./good-list-select.vue";
+const prefixCls = "ivu-input";
 export default {
-    name: 'good-select',
-    props: ['value', 'warehouseId', 'disabled', 'size', 'options'],
-    components: {
-        goodsListSelect
-    },
-    data () {
-        return {
-            goodsId: '',
-            selectGoodsModal: false,
-            selectSize: this.size,
-            goodsLoading: false,
-            goodsOptions: []
-        };
-    },
-    watch: {
-        value(newValue) {
-            this.goodsId = newValue;
-        }
-    },
-    computed: {
-        hasHelpSlot () {
-            return !!this.$slots.helpContent
-        },
-        wrapClasses () {
-            return [
-                `${prefixCls}-wrapper`,
-                {
-                    [`${prefixCls}-group`]: true,
-                    [`${prefixCls}-group-with-prepend`]: true
-                }
-            ];
-        },
-    },
-    methods: {
-        showGoodsSelectModal() {
-            if (!this.disabled) {
-                this.selectGoodsModal = true;
-                this.$refs.goodsSelectModal.reload();
-            }
-        },
-        goodsSelected(item) {
-            this.goodsList = new Array();
-            this.goodsList.push(item);
-            this.$nextTick(() => { this.goodsId = item.id; });
-            this.selectGoodsModal = false;
-            this.$emit('on-change', item.id, item);
-        },
-        queryGoods (query) {
-            var self = this;
-            if (query !== '') {
-                let requestData = {
-                    search: query,
-                    page: 1,
-                    size: 80
-                };
-                if (this.warehouseId) {
-                    requestData['warehouseId'] = this.warehouseId;
-                    requestData['options'] = this.options;
-                }
-                this.goodsLoading = true;
-                util.ajax.get('/goods/list', { params: requestData})
-                    .then(function (response) {
-                        self.goodsLoading = false;
-                        self.goodsOptions = response.data.data;
-                    })
-                    .catch(function (error) {
-                        self.goodsLoading = false;
-                        util.errorProcessor(self, error);
-                    });
-            } else {
-                this.goodsOptions = [];
-            }
-        },
-        clearSingleSelect() {
-            this.goodsId = '';
-            this.$refs.goodsSelect.clearSingleSelect();
-        },
-        onChange (data) {
-            let goods = this.goodsOptions.filter(item => item.id === data);
-            let good = goods[0] ? goods[0] : '';
-            this.$emit('input', data);
-            this.$emit('on-change', data, good);
-        }
+  name: "good-select",
+  props: ["value", "warehouseId", "disabled", "size", "options"],
+  components: {
+    goodsListSelect
+  },
+  data() {
+    return {
+      goodsId: "",
+      selectGoodsModal: false,
+      selectSize: this.size,
+      goodsLoading: false,
+      goodsOptions: []
+    };
+  },
+  watch: {
+    value(newValue) {
+      this.goodsId = newValue;
     }
-
+  },
+  computed: {
+    hasHelpSlot() {
+      return !!this.$slots.helpContent;
+    },
+    wrapClasses() {
+      return [
+        `${prefixCls}-wrapper`,
+        {
+          [`${prefixCls}-group`]: true,
+          [`${prefixCls}-group-with-prepend`]: true
+        }
+      ];
+    }
+  },
+  methods: {
+    showGoodsSelectModal() {
+      if (!this.disabled) {
+        this.selectGoodsModal = true;
+        this.$refs.goodsSelectModal.reload();
+      }
+    },
+    goodsSelected(item) {
+      this.goodsOptions = new Array();
+      this.goodsOptions.push(item);
+      this.$nextTick(() => {
+        this.goodsId = item.id;
+      });
+      this.selectGoodsModal = false;
+      this.$emit("on-change", item.id, item);
+    },
+    queryGoods(query) {
+      var self = this;
+      if (query !== "") {
+        let requestData = {
+          search: query,
+          page: 1,
+          size: 80
+        };
+        if (this.warehouseId) {
+          requestData["warehouseId"] = this.warehouseId;
+          requestData["options"] = this.options;
+        }
+        this.goodsLoading = true;
+        util.ajax
+          .get("/goods/list", { params: requestData })
+          .then(function(response) {
+            self.goodsLoading = false;
+            self.goodsOptions = response.data.data;
+          })
+          .catch(function(error) {
+            self.goodsLoading = false;
+            util.errorProcessor(self, error);
+          });
+      } else {
+        this.goodsOptions = [];
+      }
+    },
+    clearSingleSelect() {
+      this.goodsId = "";
+      this.$refs.goodsSelect.clearSingleSelect();
+    },
+    onChange(data) {
+      let goods = this.goodsOptions.filter(item => item.id === data);
+      let good = goods[0] ? goods[0] : "";
+      this.$emit("input", data);
+      this.$emit("on-change", data, good);
+    }
+  }
 };
 </script>
 <style >
