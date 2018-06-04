@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.yiban.erp.dao.GoodsSourceMapper" >
+  <resultMap id="BaseResultMap" type="com.yiban.erp.entities.GoodsSpec" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="company_id" property="companyId" jdbcType="INTEGER" />
+    <result column="spec_no" property="specNo" jdbcType="VARCHAR" />
+    <result column="spec_name" property="specName" jdbcType="VARCHAR" />
+    <result column="parent_id" property="parentId" jdbcType="BIGINT" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, company_id, spec_no, spec_name, parent_id, parent_no, parent_name, created_by,
+    updated_by, created_time, updated_time
+  </sql>
+  <select id="getBatch" resultType="java.util.List" parameterType="java.lang.Long" >
+    select
+    batch_code
+    from repertory_info
+    where goods_id = #{goodId,jdbcType=BIGINT}
+  </select>
+</mapper>

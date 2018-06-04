@@ -395,7 +395,7 @@ export const appRouter = [
         title: "盘点",
         icon: "icon-zhongzhuanzhan-xianxing",
         start: 12,
-        end: 15
+        end: 18
       }
     ],
     children: [
