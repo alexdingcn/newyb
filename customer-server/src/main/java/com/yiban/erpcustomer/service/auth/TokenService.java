@@ -14,7 +14,9 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.AuthorityUtils;
+import org.springframework.util.StringUtils;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -76,6 +78,14 @@ public class TokenService {
     static Authentication getAuthentication(HttpServletRequest request) {
         // 从Header中拿到token
         String token = request.getHeader(HEADER_STRING);
+        if (StringUtils.isEmpty(token)) {
+            Cookie[] cookies = request.getCookies();
+            for (Cookie c : cookies) {
+                if (c.getName().equalsIgnoreCase("token")) {
+                    token = c.getValue();
+                }
+            }
+        }
         if (token != null) {
             try {
                 // 解析 Token

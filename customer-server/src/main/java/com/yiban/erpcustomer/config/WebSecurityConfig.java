@@ -1,11 +1,17 @@
 package com.yiban.erpcustomer.config;
 
+import com.yiban.erpcustomer.dao.OperationLogMapper;
+import com.yiban.erpcustomer.dao.UserAuthMapper;
+import com.yiban.erpcustomer.dao.UserMapper;
+import com.yiban.erpcustomer.service.auth.CustomAuthenticationProvider;
 import com.yiban.erpcustomer.service.auth.JWTAuthenticationFilter;
 import com.yiban.erpcustomer.service.auth.JWTLoginFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
@@ -26,12 +32,14 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     private static final Logger logger = LoggerFactory.getLogger(WebSecurityConfig.class);
 
-//    @Autowired
-//    private UserMapper userMapper;
+    @Autowired
+    private UserMapper userMapper;
 //    @Autowired
 //    private TokenManager tokenManager;
-//    @Autowired
-//    private OperationLogMapper operationLogMapper;
+    @Autowired
+    private UserAuthMapper userAuthMapper;
+    @Autowired
+    private OperationLogMapper operationLogMapper;
 
 
     @Override
@@ -56,8 +64,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .addFilterBefore(new JWTLoginFilter("/login", authenticationManager()),
                         UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(new JWTAuthenticationFilter(), BasicAuthenticationFilter.class);
-//                .addFilterBefore(new LoginFilter("/login", authenticationManager(), tokenManager),
-//                        UsernamePasswordAuthenticationFilter.class)
 //                .addFilterBefore(new AuthenticationFilter(tokenManager), BasicAuthenticationFilter.class);
     }
 
@@ -80,9 +86,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
 
-//    @Autowired
-//    public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
-//        auth.authenticationProvider(new CustomAuthenticationProvider(userMapper, operationLogMapper));
-//    }
+    @Autowired
+    public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
+        auth.authenticationProvider(new CustomAuthenticationProvider(userMapper, userAuthMapper, operationLogMapper));
+    }
 
 }

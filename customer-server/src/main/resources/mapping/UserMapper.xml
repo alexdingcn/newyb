@@ -226,6 +226,9 @@
       <if test="realname != null" >
         realname = #{realname,jdbcType=VARCHAR},
       </if>
+        <if test="nickname != null" >
+          nickname = #{nickname,jdbcType=VARCHAR},
+        </if>
       <if test="email != null" >
         email = #{email,jdbcType=VARCHAR},
       </if>
@@ -278,6 +281,7 @@
     update users
     set
       realname = #{realname,jdbcType=VARCHAR},
+      nickname = #{nickname,jdbcType=VARCHAR},
       email = #{email,jdbcType=VARCHAR},
       phone = #{phone,jdbcType=VARCHAR},
       idcard = #{idcard,jdbcType=VARCHAR},
