@@ -96,7 +96,7 @@
                        :columns="detailsColumns" :data="detailsData"
                        no-data-text="在保存订单信息后点击添加商品按钮添加"
                        ref="sellOrderGoodTable" style="min-height: 300px" size="small"
-                       class="margin-top-8"
+                       class="margin-top-8 goods-tbl"
                        @on-row-dblclick="handleRowDbClick">
                     <div slot="footer">
                         <h3 class="padding-left-20" >
@@ -192,7 +192,7 @@ import optionSelect from "@/views/selector/option-select.vue";
 import shipCompanySelect from "@/views/selector/ship-company-select.vue";
 import repertoryInfoSelect from "@/views/selector/repertory-info-select.vue";
 import customerRep from "../customer/customer-rep.vue";
-import goodsSpecTags from '../goods/goods-spec-tabs.vue';
+import goodsSpecTags from "../goods/goods-spec-tabs.vue";
 
 export default {
   name: "sell_order_make",
@@ -283,22 +283,32 @@ export default {
           width: 180,
           render: (h, params) => {
             let self = this;
-            return h('Button', {
-              props:{
-                  type: 'text',
-                  icon: 'eye'
-              },
-              on: {
-                click: () => {
-                  self.expandProductDate = params.row.productDate ? moment(params.row.productDate).format("YYYY-MM-DD") : "";
-                  self.expandExpDate = params.row.expDate ? moment(params.row.expDate).format("YYYY-MM-DD") : "";
-                  self.expandGoodsSpecs = params.row.goods.goodsSpecs ? params.row.goods.goodsSpecs : [];
-                  let goodsId = params.row.goods.id;
-                  self.$refs.goodsExpand.loadGoodsData(goodsId);
-                  self.goodsExpandModal = true;
+            return h(
+              "Button",
+              {
+                props: {
+                  type: "text",
+                  icon: "eye"
+                },
+                on: {
+                  click: () => {
+                    self.expandProductDate = params.row.productDate
+                      ? moment(params.row.productDate).format("YYYY-MM-DD")
+                      : "";
+                    self.expandExpDate = params.row.expDate
+                      ? moment(params.row.expDate).format("YYYY-MM-DD")
+                      : "";
+                    self.expandGoodsSpecs = params.row.goods.goodsSpecs
+                      ? params.row.goods.goodsSpecs
+                      : [];
+                    let goodsId = params.row.goods.id;
+                    self.$refs.goodsExpand.loadGoodsData(goodsId);
+                    self.goodsExpandModal = true;
+                  }
                 }
-              }
-            }, params.row.goodsName);
+              },
+              params.row.goodsName
+            );
           }
         },
         {
@@ -307,7 +317,7 @@ export default {
           align: "center",
           width: 180,
           render: (h, params) => {
-              return h('span', {}, params.row.factoryName);
+            return h("span", {}, params.row.factoryName);
           }
         },
         {
@@ -327,13 +337,13 @@ export default {
           key: "spec",
           align: "center",
           width: 120,
-          render: (h, params) =>　{
-              return h(goodsSpecTags, {
-                  props: {
-                      tags: params.row.goods.goodsSpecs,
-                      color: 'blue'
-                  }
-              });
+          render: (h, params) => {
+            return h(goodsSpecTags, {
+              props: {
+                tags: params.row.goods.goodsSpecs,
+                color: "blue"
+              }
+            });
           }
         },
         {
@@ -492,8 +502,8 @@ export default {
       errorList: [],
       goodsExpandModal: false,
       expandGoodsSpecs: [],
-      expandProductDate: '',
-      expandExpDate: '',
+      expandProductDate: "",
+      expandExpDate: "",
       salePriceOpen: false
     };
   },
@@ -525,28 +535,35 @@ export default {
   methods: {
     init() {
       // 获取系统配置中的是否允许特批价的配置
-      util.ajax.get('/config/list')
-          .then((response) => {
-              let data = response.data;
-              let valueInfo = data['SALE_PRICE'];
-              if (valueInfo.keyValue === 'open') {
-                  this.salePriceOpen = true;
-              }else {
-                  this.salePriceOpen = false;
-              }
-          })
-          .catch((error) => {
-              util.errorProcessor(this, error);
-          });
+      util.ajax
+        .get("/config/list")
+        .then(response => {
+          let data = response.data;
+          let valueInfo = data["SALE_PRICE"];
+          if (valueInfo.keyValue === "open") {
+            this.salePriceOpen = true;
+          } else {
+            this.salePriceOpen = false;
+          }
+        })
+        .catch(error => {
+          util.errorProcessor(this, error);
+        });
     },
     resetTotalAmount() {
-      let freeAmount = this.sellOrderFormData.freeAmount ? parseFloat(this.sellOrderFormData.freeAmount) : 0;
-      let disRate = this.sellOrderFormData.disRate ? parseFloat(this.sellOrderFormData.disRate) : 100;
+      let freeAmount = this.sellOrderFormData.freeAmount
+        ? parseFloat(this.sellOrderFormData.freeAmount)
+        : 0;
+      let disRate = this.sellOrderFormData.disRate
+        ? parseFloat(this.sellOrderFormData.disRate)
+        : 100;
       let goodsTotalAmount = this.totalAmount ? this.totalAmount : 0;
-      
+
       //订单的总金额 = 商品总金额 * disRate/100) - freeAmount;
-      let totalAmount = (goodsTotalAmount * disRate/100 - freeAmount).toFixed(2);
-      this.sellOrderFormData.totalAmount = totalAmount; 
+      let totalAmount = (goodsTotalAmount * disRate / 100 - freeAmount).toFixed(
+        2
+      );
+      this.sellOrderFormData.totalAmount = totalAmount;
     },
 
     customerChange(customerId, customer) {
@@ -575,10 +592,15 @@ export default {
         .then(response => {
           this.customerRepList = response.data;
           if (this.customerRepList && this.customerRepList.length > 0) {
-            if (!self.sellOrderFormData.customerRepId || self.sellOrderFormData.customerRepId <= 0) {
+            if (
+              !self.sellOrderFormData.customerRepId ||
+              self.sellOrderFormData.customerRepId <= 0
+            ) {
               for (var i = 0; i < this.customerRepList.length; i++) {
                 if (this.customerRepList[i].isDefault) {
-                  self.sellOrderFormData.customerRepId = this.customerRepList[i].id;
+                  self.sellOrderFormData.customerRepId = this.customerRepList[
+                    i
+                  ].id;
                   break;
                 }
               }
@@ -700,15 +722,15 @@ export default {
         //看看免零金额和订单总金额是否小于0
         if (this.sellOrderFormData.freeAmount < 0) {
           this.$Modal.warning({
-            title: '免零金额错误提示',
-            content: '免零金额必须大于等于0',
+            title: "免零金额错误提示",
+            content: "免零金额必须大于等于0"
           });
           return;
         }
         if (this.sellOrderFormData.totalAmount < 0) {
           this.$Modal.warning({
-            title: '整单总金额错误提示',
-            content: '整单总金额必须大于等于0',
+            title: "整单总金额错误提示",
+            content: "整单总金额必须大于等于0"
           });
           return;
         }
@@ -716,27 +738,28 @@ export default {
         let self = this;
         //后台校验一步客户是否可以购买选择的商品列表
         this.sellOrderFormData.details = this.detailsData;
-        util.ajax.post('/sell/order/validate', this.sellOrderFormData)
-          .then((response) => {
-              //返回的验证结果是限制列表，如果存在有值，提示，如果没有，直接跳过
-              let data = response.data;
-              if (!data || data.length <= 0) {
-                  self.$Modal.confirm({
-                      title: "保存提交确认",
-                      content: "请确认数据是否正确，提交后不能修改.",
-                      onOk: () => {
-                        self.saveSellOrder("INIT");
-                      },
-                      onCancel: () => {}
-                    });
-              }else {
-                  //有限制条件，提示是否继续
-                  self.errorList = data;
-                  self.errorListModal = true;
-              }
+        util.ajax
+          .post("/sell/order/validate", this.sellOrderFormData)
+          .then(response => {
+            //返回的验证结果是限制列表，如果存在有值，提示，如果没有，直接跳过
+            let data = response.data;
+            if (!data || data.length <= 0) {
+              self.$Modal.confirm({
+                title: "保存提交确认",
+                content: "请确认数据是否正确，提交后不能修改.",
+                onOk: () => {
+                  self.saveSellOrder("INIT");
+                },
+                onCancel: () => {}
+              });
+            } else {
+              //有限制条件，提示是否继续
+              self.errorList = data;
+              self.errorListModal = true;
+            }
           })
-          .catch((error) => {
-                util.errorProcessor(self, error);
+          .catch(error => {
+            util.errorProcessor(self, error);
           });
       });
     },
@@ -744,13 +767,13 @@ export default {
     saveContinue() {
       let self = this;
       this.$Modal.confirm({
-          title: "保存提交确认",
-          content: "请确认数据是否正确，提交后不能修改.",
-          onOk: () => {
-            self.saveSellOrder("INIT");
-          },
-          onCancel: () => {}
-        });
+        title: "保存提交确认",
+        content: "请确认数据是否正确，提交后不能修改.",
+        onOk: () => {
+          self.saveSellOrder("INIT");
+        },
+        onCancel: () => {}
+      });
     },
 
     orderSearchModalClose() {
@@ -767,8 +790,12 @@ export default {
     },
 
     orderFormChangeToEditModel(data) {
-      data.payOrderDate = data.payOrderDate ? moment(data.payOrderDate).format('YYYY-MM-DD') : '';
-      data.createOrderDate = data.createOrderDate ? moment(data.createOrderDate).format('YYYY-MM-DD') : '';
+      data.payOrderDate = data.payOrderDate
+        ? moment(data.payOrderDate).format("YYYY-MM-DD")
+        : "";
+      data.createOrderDate = data.createOrderDate
+        ? moment(data.createOrderDate).format("YYYY-MM-DD")
+        : "";
       this.sellOrderFormData = data;
       if (data.customerId !== this.currChooseCustomer.id) {
         this.$Notice.error({
@@ -895,10 +922,13 @@ export default {
 
     resetGoodSDataAmount(index) {
       let row = this.detailsData[index];
-      let realPrice = row["realPrice"] && !isNaN(row["realPrice"]) ? row["realPrice"] : 0;
-      let disPrice = row["disPrice"] && !isNaN(row["disPrice"]) ? row["disPrice"] : 100;
+      let realPrice =
+        row["realPrice"] && !isNaN(row["realPrice"]) ? row["realPrice"] : 0;
+      let disPrice =
+        row["disPrice"] && !isNaN(row["disPrice"]) ? row["disPrice"] : 100;
       let free = row["free"] && !isNaN(row["free"]) ? row["free"] : 0;
-      let quantity = row["quantity"] && !isNaN(row["quantity"]) ? row["quantity"] : 0;
+      let quantity =
+        row["quantity"] && !isNaN(row["quantity"]) ? row["quantity"] : 0;
       let num = quantity - free > 0 ? quantity - free : 0;
       row.amount = (num * realPrice * disPrice / 100).toFixed(2);
       this.$set(this.detailsData, index, row);
@@ -960,6 +990,12 @@ export default {
 };
 </script>
 
-<style >
+<style lang="less">
+.goods-tbl {
+  .ivu-table-cell {
+    padding-left: 2px;
+    padding-right: 2px;
+  }
+}
 </style>
 
