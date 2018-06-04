@@ -5,175 +5,204 @@
 
 <template>
     <div>
-        <Card>
-            <p slot="title">
-                <Icon type="ios-cart"></Icon> 销售订单制单
-            </p> 
-            <ButtonGroup slot="extra">
-                <Button type="success" icon="ios-checkmark" :loading="sellOrderSaveLoading" @click="sellOrderSaveBtnClick"> 保存 </Button>
-                <Button icon="bookmark" :loading="sellOrderSaveLoading" @click="tempStorageOrderBtnClick"> 暂挂 </Button>
-                <Button type="info" icon="filing" @click="getOldSellOrderBtnClick"> 暂挂提取 </Button>
-                <Button type="ghost" icon="ios-printer">打印</Button>
-            </ButtonGroup>
-
-            <Form ref="sellOrderForm" :model="sellOrderFormData" :label-width="100" :rules="sellOrderFormValidate">
-                <Row type="flex" justify="start">
-                    <i-col span="8">
-                        <FormItem label="客户" prop="customerId">
-                            <customer-select v-if="!editMode" :disabled="editMode" v-model="sellOrderFormData.customerId" @on-change="customerChange">
-                                <div slot="helpContent">
-                                    <span>同一个商品可能对于不同的客户既定的报价不同，所以请先选择客户，再选择商品，自动匹配既定的报价。</span>
-                                </div>
-                            </customer-select>
-                            <Input v-else type="text" :disabled="editMode" v-model="sellOrderFormData.customerName" />
-                        </FormItem>
-                    </i-col>
-
-                    <i-col span="8">
-                        <FormItem label="收款期限" >
-                            <DatePicker v-model="sellOrderFormData.payOrderDate" type="date" placeholder="请选择收款期限" ></DatePicker>
-                        </FormItem>
-                    </i-col>
-                </Row>
-
-                <Row type="flex" justify="start">
-                    <i-col span="8">
-                        <FormItem label="销售人员" prop="saleId">
-                            <sale-select v-model="sellOrderFormData.saleId" ></sale-select>
-                        </FormItem>
-                    </i-col>
-                    <i-col span="8">
-                        <FormItem label="自定单号" >
-                            <Input type="text" v-model="sellOrderFormData.refNo" />
-                        </FormItem>
-                    </i-col>
-                </Row>
-
-                <Row type="flex" justify="start" v-if="salePriceOpen">
-                    <i-col span="8">
-                        <FormItem label="免零金额" prop="freeAmount">
-                            <Input number v-model="sellOrderFormData.freeAmount" @on-blur="resetTotalAmount"/>
-                        </FormItem>
-                    </i-col>
-                    <i-col span="8">
-                        <FormItem label="整单折扣率" >
-                            <Input number v-model="sellOrderFormData.disRate" @on-blur="resetTotalAmount"/>
-                        </FormItem>
-                    </i-col>
-                    <i-col span="8">
-                        <FormItem label="订单总金额" >
-                            <Input number v-model="sellOrderFormData.totalAmount" style="width: 95%" />
-                            <Tooltip transfer placement="left-start">
-                              <Icon type="ios-help-outline"></Icon>
-                              <div slot="content" >
-                                  <p>订单总金额 = (商品总金额 * 整单折扣率/100) - 免零金额</p>
-                              </div>
-                          </Tooltip>
-                        </FormItem>
-                    </i-col>
-                </Row>
-
-                <Row type="flex" justify="start">
-                    <i-col span="8">
-                        <FormItem label="仓库点" prop="warehouseId">
-                            <warehouse-select v-model="sellOrderFormData.warehouseId" :disabled="warehouseDisable" @on-change="warehouseChange"></warehouse-select>
-                        </FormItem>
-                    </i-col>
-                    <i-col span="16">
-                        <FormItem label="备注" >
-                            <Input type="text" v-model="sellOrderFormData.comment" placeholder="请输入备注" />
-                        </FormItem>
-                    </i-col>
-                </Row>
-
-                <h3 class="margin-top-10">
-                    商品信息
-                    <ButtonGroup size="small">
-                        <Button type="primary" :disabled="!sellOrderFormData.warehouseId"  @click="addGoodBtnClick">添加商品</Button>
-                    </ButtonGroup>
-                </h3>
-                <Table border highlight-row :loading="saveGoodBtnLoading"
-                       :columns="detailsColumns" :data="detailsData"
-                       no-data-text="在保存订单信息后点击添加商品按钮添加"
-                       ref="sellOrderGoodTable" style="min-height: 300px" size="small"
-                       class="margin-top-8"
-                       @on-row-dblclick="handleRowDbClick">
-                    <div slot="footer">
-                        <h3 class="padding-left-20" >
-                            <b>商品合计数量: {{totalQuantity}}</b>  <b class="margin-left-50">商品合计金额:</b> ￥{{ totalAmount }}
-                            <span class="margin-left-50"> 提示: 金额 = (数量 - 赠送) x 实价 x 折扣% </span>
-                        </h3>
-                    </div>
+      <Row :gutter="10">
+          <i-col :span="showSider ? '4' : '0'">
+            <Card>
+                <p slot="title">
+                    未审核销售单
+                    <Tooltip transfer placement="right-start">
+                        <Icon type="ios-help-outline"></Icon>
+                        <div slot="content" >
+                            <p>展现销售单录入后未审核通过的列表, 可以提取修改和删除操作</p>
+                        </div>
+                    </Tooltip>
+                </p>
+                <div slot="extra">
+                    <a href="javascript:void(0)" @click="reloadUncheckData" style="margin-right: 5px;" >
+                        <Icon type="refresh"></Icon>
+                    </a>
+                </div>
+                
+                <Table stripe highlight-row :loading="uncheckTabLoading" 
+                        :columns="uncheckColumns" :data="uncheckData" ref="uncheckTable" 
+                        style="width: 100%;" class="uncheck-table" 
+                        size="small">
                 </Table>
+            </Card>
+        </i-col>
+        <i-col :span="showSider ? '20' : '24'">
+          <Card>
+              <p slot="title">
+                  <a href="javascript:void(0)" @click="changeSiderShow" style="margin-right: 5px;" >
+                      <Icon v-if="showSider" type="chevron-left"></Icon>
+                      <Icon v-else type="chevron-right"></Icon>
+                  </a>
+                  <Icon type="ios-cart"></Icon> 销售订单制单
+              </p>
+              <Row slot="extra" style="min-width: 600px;">
+                <i-col span="18">
+                  <Row type="flex" justify="start">
+                    <Steps :current="0">
+                        <Step title="销售制单" ></Step>
+                        <Step v-if="haveQAFlow" title="质量审核" ></Step>
+                        <Step title="销售审核" ></Step>
+                      </Steps>
+                  </Row>
+                </i-col>
+                <i-col span="6">
+                  <Row type="flex" justify="end">
+                    <ButtonGroup >
+                      <Button type="success" icon="ios-checkmark" :loading="sellOrderSaveLoading" @click="sellOrderSaveBtnClick"> 保存 </Button>
+                      <Button icon="bookmark" :loading="sellOrderSaveLoading" @click="tempStorageOrderBtnClick"> 暂存 </Button>
+                    </ButtonGroup>
+                  </Row>
+                </i-col>
+              </Row>
 
-                <h3 class="margin-top-10">配送和交货</h3>
-                <Row type="flex" justify="start">
-                    <i-col span="6">
-                        <FormItem label="温控方式" >
-                            <option-select optionType="TEMPER_CONTROL" v-model="sellOrderFormData.temperControlId"></option-select>
-                        </FormItem>
-                    </i-col>
-                    <i-col span="6">
-                        <FormItem label="运输方式" >
-                            <option-select optionType="SHIP_METHOD" v-model="sellOrderFormData.shipMethod"></option-select>
-                        </FormItem>
-                    </i-col>
-                    <i-col span="6">
-                        <FormItem label="运输工具" >
-                            <option-select optionType="SHIP_TOOL" v-model="sellOrderFormData.shipTool"></option-select>
-                        </FormItem>
-                    </i-col>
-                    <i-col span="6">
-                        <FormItem label="承运公司" >
-                            <ship-company-select v-model="sellOrderFormData.shipCompanyId"></ship-company-select>
-                        </FormItem>
-                    </i-col>
-                </Row>
-                <Row type="flex" justify="start">
-                    <i-col span="20">
-                        <FormItem label="送货地址" prop="customerRepId">
+              <Form ref="sellOrderForm" :model="sellOrderFormData" :label-width="100" :rules="sellOrderFormValidate">
+                  <Row type="flex" justify="start">
+                      <i-col span="8">
+                          <FormItem label="客户" prop="customerId">
+                              <customer-select :disabled="editMode" v-model="sellOrderFormData.customerId" @on-change="customerChange">
+                                  <div slot="helpContent">
+                                      <span>同一个商品可能对于不同的客户既定的报价不同，所以请先选择客户，再选择商品，自动匹配既定的报价。</span>
+                                  </div>
+                              </customer-select>
+                          </FormItem>
+                      </i-col>
 
-                            <RadioGroup v-model="sellOrderFormData.customerRepId"
-                                        vertical class="address-selection width-100"
-                                        @on-change="onChangeAddr">
-                                <Radio v-for="item in customerRepList" :label="item.id" :key="item.id">
-                                    <span>{{ item.name }} {{ item.contactPhone }} {{ item.repertoryAddress }} </span>
-                                    <Tag type="border" v-if="item.isDefault">默认地址</Tag>
-                                    <Button type="text" class="set-default-addrbtn invisible" @click="setDefaultRep(item.id)" v-if="!item.isDefault">设成默认地址</Button>
-                                    <Button type="text" class="edit-address-btn invisible fr" @click="editCustomerRep(item)">修改</Button>
-                                </Radio>
-                            </RadioGroup>
-                            <Button type="ghost" icon="plus" @click="addNewRep">新增配送地址</Button>
-                        </FormItem>
+                      <i-col span="8">
+                          <FormItem label="收款期限" >
+                              <DatePicker v-model="sellOrderFormData.payOrderDate" type="date" placeholder="请选择收款期限" ></DatePicker>
+                          </FormItem>
+                      </i-col>
+                  </Row>
 
-                        <customer-rep ref="repModal" @on-closed="refreshCustomerRepList"></customer-rep>
-                    </i-col>
-                </Row>
-            </Form>
-        </Card>
+                  <Row type="flex" justify="start">
+                    <i-col span="8">
+                          <FormItem label="仓库点" prop="warehouseId">
+                              <warehouse-select v-model="sellOrderFormData.warehouseId" :disabled="warehouseDisable" @on-change="warehouseChange"></warehouse-select>
+                          </FormItem>
+                      </i-col>
+                      <i-col span="8">
+                          <FormItem label="销售人员" prop="saleId">
+                              <sale-select v-model="sellOrderFormData.saleId" ></sale-select>
+                          </FormItem>
+                      </i-col>
+                  </Row>
 
-        <sell-order-search 
-            :showModal="sellOrderSearchModal" 
-            status="TEMP_STORAGE" 
-            @modal-close="orderSearchModalClose"
-            @choosed="orderSearchChoosed">
-        </sell-order-search>
+                  <Row type="flex" justify="start" v-if="salePriceOpen">
+                      <i-col span="8">
+                          <FormItem label="免零金额" prop="freeAmount">
+                              <Input number v-model="sellOrderFormData.freeAmount" @on-blur="resetTotalAmount"/>
+                          </FormItem>
+                      </i-col>
+                      <i-col span="8">
+                          <FormItem label="整单折扣率" >
+                              <Input number v-model="sellOrderFormData.disRate" @on-blur="resetTotalAmount"/>
+                          </FormItem>
+                      </i-col>
+                      <i-col span="8">
+                          <FormItem label="订单总金额" >
+                              <Input number v-model="sellOrderFormData.totalAmount" style="width: 95%" />
+                              <Tooltip transfer placement="left-start">
+                                <Icon type="ios-help-outline"></Icon>
+                                <div slot="content" >
+                                    <p>订单总金额 = (商品总金额 * 整单折扣率/100) - 免零金额</p>
+                                </div>
+                            </Tooltip>
+                          </FormItem>
+                      </i-col>
+                  </Row>
 
-        <Modal v-model="selectRepertoryModal" width="60" :footerHide="true" :mask-closable="false" title="选择库存商品" >
-          <repertory-info-select ref="repertorySelect" :warehouse="chooseWarehouse" @on-choosed="repertoryInfoChoonsed" ></repertory-info-select>
-        </Modal>
+                  <h3 class="margin-top-10">
+                      商品信息
+                      <ButtonGroup size="small">
+                          <Button type="primary" :disabled="!sellOrderFormData.warehouseId || !sellOrderFormData.customerId"  @click="addGoodBtnClick">添加商品</Button>
+                      </ButtonGroup>
+                  </h3>
+                  <Table border highlight-row :loading="saveGoodBtnLoading"
+                        :columns="detailsColumns" :data="detailsData"
+                        no-data-text="在保存订单信息后点击添加商品按钮添加"
+                        ref="sellOrderGoodTable" style="min-height: 300px" size="small"
+                        class="margin-top-8"
+                        @on-row-dblclick="handleRowDbClick">
+                      <div slot="footer">
+                          <h3 class="padding-left-20" >
+                              <b>商品合计数量: {{totalQuantity}}</b>  <b class="margin-left-50">商品合计金额:</b> ￥{{ totalAmount }}
+                              <span class="margin-left-50"> 提示: 金额 = (数量 - 赠送) x 实价 x 折扣% </span>
+                          </h3>
+                      </div>
+                  </Table>
 
-        <Modal v-model="goodHistoryModal" width="75" :mask-closable="false" title="客户商品销售历史价格" :footerHide="true">
-            <sell-good-history :excludedOrderId="historyExcludeId" :customerId="historyCustomerId" :goodsId="historyGoodsId"></sell-good-history>
-        </Modal>
+                  <h3 class="margin-top-10">配送和交货</h3>
+                  <Row v-if="isMedicine" type="flex" justify="start">
+                      <i-col span="6">
+                          <FormItem label="温控方式" >
+                              <option-select optionType="TEMPER_CONTROL" v-model="sellOrderFormData.temperControlId"></option-select>
+                          </FormItem>
+                      </i-col>
+                      <i-col span="6">
+                          <FormItem label="运输方式" >
+                              <option-select optionType="SHIP_METHOD" v-model="sellOrderFormData.shipMethod"></option-select>
+                          </FormItem>
+                      </i-col>
+                      <i-col span="6">
+                          <FormItem label="运输工具" >
+                              <option-select optionType="SHIP_TOOL" v-model="sellOrderFormData.shipTool"></option-select>
+                          </FormItem>
+                      </i-col>
+                      <i-col span="6">
+                          <FormItem label="承运公司" >
+                              <ship-company-select v-model="sellOrderFormData.shipCompanyId"></ship-company-select>
+                          </FormItem>
+                      </i-col>
+                  </Row>
+                  <Row type="flex" justify="start">
+                      <i-col span="20">
+                          <FormItem label="送货地址" prop="customerRepId">
 
-        <Modal v-model="errorListModal" width="40" :mask-closable="false" title="销售限制提示" ok-text="继续提交" @on-ok="saveContinue">
-          <h4 style="margin-bottom: 5px;" v-for="(item, index) in errorList" :key="index" >{{index+1}}. {{item}}</h4>
-        </Modal>
+                              <RadioGroup v-model="sellOrderFormData.customerRepId"
+                                          vertical class="address-selection width-100"
+                                          @on-change="onChangeAddr">
+                                  <Radio v-for="item in customerRepList" :label="item.id" :key="item.id">
+                                      <span>{{ item.name }} {{ item.contactPhone }} {{ item.repertoryAddress }} </span>
+                                      <Tag type="border" v-if="item.isDefault">默认地址</Tag>
+                                      <Button type="text" class="set-default-addrbtn invisible" @click="setDefaultRep(item.id)" v-if="!item.isDefault">设成默认地址</Button>
+                                      <Button type="text" class="edit-address-btn invisible fr" @click="editCustomerRep(item)">修改</Button>
+                                  </Radio>
+                              </RadioGroup>
+                              <Button type="ghost" icon="plus" @click="addNewRep">新增配送地址</Button>
+                          </FormItem>
 
-        <Modal v-model="goodsExpandModal" width="60" :mask-closable="false" title="商品详情信息" :footerHide="true">
-          <goods-expand ref="goodsExpand" :goodsSpecs="expandGoodsSpecs" :productDate="expandProductDate" :expDate="expandExpDate"></goods-expand>
-        </Modal>
+                          <customer-rep ref="repModal" @on-closed="refreshCustomerRepList"></customer-rep>
+                      </i-col>
+                  </Row>
+
+                  <h3 class="margin-top-10">备注信息</h3>
+                  <div class="margin-top-10">
+                      <Input type="textarea" v-model="sellOrderFormData.comment" :rows="2" placeholder="暂无备注信息"/>
+                  </div>
+              </Form>
+          </Card>
+        </i-col>
+      </Row>
+
+      <Modal v-model="selectRepertoryModal" width="60" :footerHide="true" :mask-closable="false" title="选择库存商品" >
+        <repertory-info-select ref="repertorySelect" :warehouse="chooseWarehouse" @on-choosed="repertoryInfoChoonsed" ></repertory-info-select>
+      </Modal>
+
+      <Modal v-model="goodHistoryModal" width="75" :mask-closable="false" title="客户商品销售历史价格" :footerHide="true">
+          <sell-good-history :excludedOrderId="historyExcludeId" :customerId="historyCustomerId" :goodsId="historyGoodsId"></sell-good-history>
+      </Modal>
+
+      <Modal v-model="errorListModal" width="40" :mask-closable="false" title="销售限制提示" ok-text="继续提交" @on-ok="saveContinue">
+        <h4 style="margin-bottom: 5px;" v-for="(item, index) in errorList" :key="index" >{{index+1}}. {{item}}</h4>
+      </Modal>
+
+      <Modal v-model="goodsExpandModal" width="60" :mask-closable="false" title="商品详情信息" :footerHide="true">
+        <goods-expand ref="goodsExpand" :goodsSpecs="expandGoodsSpecs" :productDate="expandProductDate" :expDate="expandExpDate"></goods-expand>
+      </Modal>
 
     </div>
 </template>
@@ -183,7 +212,6 @@ import util from "@/libs/util.js";
 import moment from "moment";
 import dataConver from "@/libs/data-conver.js";
 import customerSelect from "@/views/selector/customer-select.vue";
-import sellOrderSearch from "@/views/sell/sell-order-search.vue";
 import goodsExpand from "@/views/goods/goods-expand.vue";
 import sellGoodHistory from "./sell-good-history.vue";
 import warehouseSelect from "@/views/selector/warehouse-select.vue";
@@ -192,7 +220,7 @@ import optionSelect from "@/views/selector/option-select.vue";
 import shipCompanySelect from "@/views/selector/ship-company-select.vue";
 import repertoryInfoSelect from "@/views/selector/repertory-info-select.vue";
 import customerRep from "../customer/customer-rep.vue";
-import goodsSpecTags from '../goods/goods-spec-tabs.vue';
+import goodsSpecTags from "../goods/goods-spec-tabs.vue";
 
 export default {
   name: "sell_order_make",
@@ -200,7 +228,6 @@ export default {
     goodsSpecTags,
     customerSelect,
     customerRep,
-    sellOrderSearch,
     repertoryInfoSelect,
     goodsExpand,
     sellGoodHistory,
@@ -211,6 +238,7 @@ export default {
   },
   data() {
     return {
+      isMedicine: false,
       editMode: false,
       categoryModal: false,
       sellOrderFormData: {
@@ -268,7 +296,6 @@ export default {
       },
       sellOrderSaveLoading: false,
       removeSellOrderLoading: false,
-      sellOrderSearchModal: false,
       chooseWarehouse: {},
       selectRepertoryModal: false,
       saveGoodBtnLoading: false,
@@ -278,74 +305,87 @@ export default {
         {
           title: "商品名称",
           key: "goodsName",
-          align: "center",
           sortable: true,
           width: 180,
           render: (h, params) => {
             let self = this;
-            return h('Button', {
-              props:{
-                  type: 'text',
-                  icon: 'eye'
-              },
-              on: {
-                click: () => {
-                  self.expandProductDate = params.row.productDate ? moment(params.row.productDate).format("YYYY-MM-DD") : "";
-                  self.expandExpDate = params.row.expDate ? moment(params.row.expDate).format("YYYY-MM-DD") : "";
-                  self.expandGoodsSpecs = params.row.goods.goodsSpecs ? params.row.goods.goodsSpecs : [];
-                  let goodsId = params.row.goods.id;
-                  self.$refs.goodsExpand.loadGoodsData(goodsId);
-                  self.goodsExpandModal = true;
+            return h(
+              "Button",
+              {
+                props: {
+                  type: "text",
+                  icon: "eye"
+                },
+                on: {
+                  click: () => {
+                    self.expandProductDate = params.row.productDate
+                      ? moment(params.row.productDate).format("YYYY-MM-DD")
+                      : "";
+                    self.expandExpDate = params.row.expDate
+                      ? moment(params.row.expDate).format("YYYY-MM-DD")
+                      : "";
+                    self.expandGoodsSpecs = params.row.goods.goodsSpecs
+                      ? params.row.goods.goodsSpecs
+                      : [];
+                    let goodsId = params.row.goods.id;
+                    self.$refs.goodsExpand.loadGoodsData(goodsId);
+                    self.goodsExpandModal = true;
+                  }
                 }
-              }
-            }, params.row.goodsName);
+              },
+              params.row.goodsName
+            );
           }
         },
         {
           title: "生产企业",
           key: "factoryName",
-          align: "center",
           width: 180,
           render: (h, params) => {
-              return h('span', {}, params.row.factoryName);
+            return h("span", {}, params.row.goods.factoryName);
           }
         },
         {
           title: "产地",
           key: "origin",
-          align: "center",
-          width: 120
+          width: 120,
+          render: (h, params) => {
+            return h("span", {}, params.row.goods.origin);
+          }
         },
         {
           title: "批次号",
           key: "batchCode",
-          align: "center",
           width: 160
         },
         {
           title: "规格",
           key: "spec",
-          align: "center",
           width: 120,
-          render: (h, params) =>　{
-              return h(goodsSpecTags, {
-                  props: {
-                      tags: params.row.goods.goodsSpecs,
-                      color: 'blue'
-                  }
-              });
+          render: (h, params) => {
+            return h(goodsSpecTags, {
+              props: {
+                tags: params.row.goods.goodsSpecs
+                  ? params.row.goods.goodsSpecs
+                  : [],
+                color: "blue"
+              }
+            });
           }
         },
         {
           title: "库存量",
           key: "repertoryQuantity",
-          width: 100,
-          align: "center"
+          width: 100
+        },
+        {
+          title: "销售在单数量",
+          key: "onWayQuantity",
+          width: 100
         },
         {
           title: "销售数量",
           key: "quantity",
-          align: "center",
           width: 120,
           render: (h, params) => {
             let self = this;
@@ -365,15 +405,13 @@ export default {
           }
         },
         {
-          title: "定价",
+          title: "商品定价",
           key: "fixPrice",
-          width: 100,
-          align: "center"
+          width: 100
         },
         {
           title: "折扣 %",
           key: "disPrice",
-          align: "center",
           width: 120,
           render: (h, params) => {
             let self = this;
@@ -395,7 +433,6 @@ export default {
         {
           title: "赠送",
           key: "free",
-          align: "center",
           width: 120,
           render: (h, params) => {
             let self = this;
@@ -417,7 +454,6 @@ export default {
         {
           title: "实价",
           key: "realPrice",
-          align: "center",
           width: 150,
           render: (h, params) => {
             let self = this;
@@ -431,7 +467,6 @@ export default {
                 "on-blur"(event) {
                   let row = self.detailsData[params.index];
                   row[params.column.key] = event.target.value;
-                  row["singlePrice"] = event.target.value;
                   self.resetGoodSDataAmount(params.index);
                 },
                 "on-click"(event) {
@@ -446,21 +481,13 @@ export default {
           }
         },
         {
-          title: "件单价",
-          key: "singlePrice",
-          width: 100,
-          align: "center"
-        },
-        {
           title: "金额",
           key: "amount",
-          width: 120,
-          align: "center"
+          width: 120
         },
         {
           title: "税率",
           key: "taxRate",
-          align: "center",
           width: 120,
           render: (h, params) => {
             let self = this;
@@ -492,9 +519,138 @@ export default {
       errorList: [],
       goodsExpandModal: false,
       expandGoodsSpecs: [],
-      expandProductDate: '',
-      expandExpDate: '',
-      salePriceOpen: false
+      expandProductDate: "",
+      expandExpDate: "",
+      salePriceOpen: false,
+      showSider: true,
+      uncheckTabLoading: false,
+      uncheckData: [],
+      uncheckColumns: [
+        {
+          title: "销售单",
+          key: "id",
+          render: (h, params) => {
+            let orderNumnber = params.row.orderNumber;
+            let customerName =
+              params.row.customer && params.row.customer.name
+                ? params.row.customer.name
+                : "";
+            let createTime = moment(params.row.createTime).format(
+              "YYYY-MM-DD HH:mm"
+            );
+            let createBy = params.row.createBy;
+            let warehouseName = params.row.warehouseName;
+            return h(
+              "div",
+              {
+                style: {
+                  margin: "0.5em"
+                }
+              },
+              [
+                h(
+                  "h5",
+                  {
+                    style: {
+                      color: "#9ea7b4",
+                      fontSize: "12px"
+                    }
+                  },
+                  orderNumnber
+                ),
+                h("h4", customerName + "[" + warehouseName + "]"),
+                h(
+                  "h5",
+                  {
+                    style: {
+                      color: "#9ea7b4",
+                      fontSize: "12px"
+                    }
+                  },
+                  createTime + "[" + createBy + "]"
+                )
+              ]
+            );
+          }
+        },
+        {
+          title: " ",
+          key: "action",
+          align: "right",
+          maxWidth: 80,
+          render: (h, params) => {
+            let self = this;
+            let status = params.row.status;
+            let statusLabel = "";
+            let statusColor = "";
+            if (status === "TEMP_STORAGE") {
+              statusLabel = "暂存";
+              statusColor = "#5cadff";
+            } else if (status === "INIT") {
+              statusLabel = "待质审";
+              statusColor = "#ff9900";
+            } else if (status === "QUALITY_CHECKED") {
+              statusLabel = "待终审";
+              statusColor = "#19be6b";
+            }
+            let statusH = h(
+              "span",
+              {
+                class: {
+                  statusClass: true
+                },
+                style: {
+                  color: statusColor
+                }
+              },
+              statusLabel
+            );
+            let buttonH = h(
+              "ButtonGroup",
+              {
+                props: {
+                  vertical: true,
+                  size: "small"
+                }
+              },
+              [
+                h(
+                  "Button",
+                  {
+                    props: {
+                      type: "info"
+                    },
+                    on: {
+                      click: () => {
+                        self.editBuyOrder(params.row);
+                      }
+                    }
+                  },
+                  "修改"
+                ),
+                h(
+                  "Button",
+                  {
+                    props: {
+                      type: "error"
+                    },
+                    on: {
+                      click: () => {
+                        self.removeBuyOrder(params.row.id);
+                      }
+                    }
+                  },
+                  "删除"
+                )
+              ]
+            );
+            return h("div", [statusH, buttonH]);
+          }
+        }
+      ],
+      haveQAFlow: true,
+      customerSpecialManage: false,
+      customerColdManage: false
     };
   },
   watch: {
@@ -520,39 +676,61 @@ export default {
     }
   },
   mounted() {
-    this.init();
+    this.systemConfig();
+    this.reloadUncheckData();
   },
   methods: {
-    init() {
+    systemConfig() {
       // 获取系统配置中的是否允许特批价的配置
-      util.ajax.get('/config/list')
-          .then((response) => {
-              let data = response.data;
-              let valueInfo = data['SALE_PRICE'];
-              if (valueInfo.keyValue === 'open') {
-                  this.salePriceOpen = true;
-              }else {
-                  this.salePriceOpen = false;
-              }
-          })
-          .catch((error) => {
-              util.errorProcessor(this, error);
-          });
+      util.ajax
+        .get("/config/list")
+        .then(response => {
+          let data = response.data;
+          let valueInfo = data["SALE_PRICE"];
+          if (valueInfo.keyValue === "open") {
+            this.salePriceOpen = true;
+          } else {
+            this.salePriceOpen = false;
+          }
+          let config1 = data["COMPANY_TYPE"];
+          if ("medicine" === config1.keyValue) {
+            this.isMedicine = true;
+          } else {
+            this.isMedicine = false;
+          }
+          let config2 = data["SALE_CHECK"];
+          if ("open" === config2.keyValue) {
+            this.haveQAFlow = true;
+          } else {
+            this.haveQAFlow = false;
+          }
+        })
+        .catch(error => {
+          util.errorProcessor(this, error);
+        });
     },
     resetTotalAmount() {
-      let freeAmount = this.sellOrderFormData.freeAmount ? parseFloat(this.sellOrderFormData.freeAmount) : 0;
-      let disRate = this.sellOrderFormData.disRate ? parseFloat(this.sellOrderFormData.disRate) : 100;
+      let freeAmount = this.sellOrderFormData.freeAmount
+        ? parseFloat(this.sellOrderFormData.freeAmount)
+        : 0;
+      let disRate = this.sellOrderFormData.disRate
+        ? parseFloat(this.sellOrderFormData.disRate)
+        : 100;
       let goodsTotalAmount = this.totalAmount ? this.totalAmount : 0;
-      
+
       //订单的总金额 = 商品总金额 * disRate/100) - freeAmount;
-      let totalAmount = (goodsTotalAmount * disRate/100 - freeAmount).toFixed(2);
-      this.sellOrderFormData.totalAmount = totalAmount; 
+      let totalAmount = (goodsTotalAmount * disRate / 100 - freeAmount).toFixed(
+        2
+      );
+      this.sellOrderFormData.totalAmount = totalAmount;
     },
 
     customerChange(customerId, customer) {
       this.currChooseCustomer = customer;
       if (customer && customer.id) {
         this.sellOrderFormData.customerId = customer.id;
+        this.customerSpecialManage = customer.canSaleSpecial ? true : false;
+        this.customerColdManage = customer.coldBusiness ? true : false;
         this.sellOrderFormData.customerRepId = -1;
         this.customerRepList = [];
         this.refreshCustomerRepList();
@@ -575,10 +753,15 @@ export default {
         .then(response => {
           this.customerRepList = response.data;
           if (this.customerRepList && this.customerRepList.length > 0) {
-            if (!self.sellOrderFormData.customerRepId || self.sellOrderFormData.customerRepId <= 0) {
+            if (
+              !self.sellOrderFormData.customerRepId ||
+              self.sellOrderFormData.customerRepId <= 0
+            ) {
               for (var i = 0; i < this.customerRepList.length; i++) {
                 if (this.customerRepList[i].isDefault) {
-                  self.sellOrderFormData.customerRepId = this.customerRepList[i].id;
+                  self.sellOrderFormData.customerRepId = this.customerRepList[
+                    i
+                  ].id;
                   break;
                 }
               }
@@ -655,6 +838,7 @@ export default {
           this.sellOrderSaveLoading = false;
           this.$Message.success("操作成功");
           this.orderFormChangeToAddModel(); //转化到初始状态
+          this.reloadUncheckData();
         })
         .catch(error => {
           this.sellOrderSaveLoading = false;
@@ -662,17 +846,99 @@ export default {
         });
     },
 
+    validateSpecialManage() {
+      let result = {
+        code: 1,
+        message: ""
+      };
+      //先查询下是否有特殊管制商品，如果有，需要验证客户的资质
+      let haveSpecial = false;
+      let goodsName = "";
+      for (let i = 0; i < this.detailsData.length; i++) {
+        let goods = this.detailsData[i].goods;
+        if (goods && goods.specialManage) {
+          haveSpecial = true;
+          goodsName = goods.name;
+          break;
+        }
+      }
+      if (haveSpecial && !this.customerSpecialManage) {
+        result.code = -1;
+        result.message =
+          "商品：" +
+          goodsName +
+          "有“特殊管制药品”标识，而客户没有“经营特殊管制药品”资质";
+      }
+      return result;
+    },
+
+    validateColdManage() {
+      let result = {
+        code: 1,
+        message: ""
+      };
+      //先查询下是否有特殊管制商品，如果有，需要验证客户的资质
+      let haveCold = false;
+      let goodsName = "";
+      for (let i = 0; i < this.detailsData.length; i++) {
+        let goods = this.detailsData[i].goods;
+        if (goods && goods.specialManage) {
+          haveCold = true;
+          goodsName = goods.name;
+          break;
+        }
+      }
+
+      //验证客户是否有冷链资质
+      if (haveCold && !this.customerColdManage) {
+        result.code = -1;
+        result.message =
+          "商品：" + goodsName + "有“冷链经营”标识, 而客户没有该资质.";
+        return result;
+      }
+      //冷链需要验证输入的温控方式和运输方式
+      if (
+        haveCold &&
+        (!this.sellOrderFormData.temperControlId ||
+          !this.sellOrderFormData.shipMethod)
+      ) {
+        result.code = -2;
+        result.message =
+          "商品：" + goodsName + "属于“冷链经营”商品, 温控方式和运输方式必输";
+      }
+      return result;
+    },
+
     sellOrderSaveBtnClick() {
       //保存订单信息
       this.$refs.sellOrderForm.validate(valid => {
         if (!valid) {
-          this.$Message.warning("必输信息需要输入");
+          this.$Message.info("必输信息需要输入");
           return;
         }
         if (!this.detailsData || this.detailsData.length <= 0) {
-          this.$$Message.warning("需要添加商品");
+          this.$Message.info("需要添加商品");
           return;
         }
+        console.log("save request.");
+        //验证商品的冷链、特殊监管药品和客户资质
+        let specialValdate = this.validateSpecialManage();
+        if (specialValdate.code < 0) {
+          this.$Modal.warning({
+            title: "商品有特殊管制提示",
+            content: specialValdate.message
+          });
+          return;
+        }
+        let coldValidate = this.validateColdManage();
+        if (coldValidate.code < 0) {
+          this.$Modal.warning({
+            title: "商品冷链经营提示",
+            content: coldValidate.message
+          });
+          return;
+        }
+
         //查询是否存在小于等于0的销售数量
         for (let i = 0; i < this.detailsData.length; i++) {
           let item = this.detailsData[i];
@@ -700,15 +966,15 @@ export default {
         //看看免零金额和订单总金额是否小于0
         if (this.sellOrderFormData.freeAmount < 0) {
           this.$Modal.warning({
-            title: '免零金额错误提示',
-            content: '免零金额必须大于等于0',
+            title: "免零金额错误提示",
+            content: "免零金额必须大于等于0"
           });
           return;
         }
         if (this.sellOrderFormData.totalAmount < 0) {
           this.$Modal.warning({
-            title: '整单总金额错误提示',
-            content: '整单总金额必须大于等于0',
+            title: "整单总金额错误提示",
+            content: "整单总金额必须大于等于0"
           });
           return;
         }
@@ -716,27 +982,30 @@ export default {
         let self = this;
         //后台校验一步客户是否可以购买选择的商品列表
         this.sellOrderFormData.details = this.detailsData;
-        util.ajax.post('/sell/order/validate', this.sellOrderFormData)
-          .then((response) => {
-              //返回的验证结果是限制列表，如果存在有值，提示，如果没有，直接跳过
-              let data = response.data;
-              if (!data || data.length <= 0) {
-                  self.$Modal.confirm({
-                      title: "保存提交确认",
-                      content: "请确认数据是否正确，提交后不能修改.",
-                      onOk: () => {
-                        self.saveSellOrder("INIT");
-                      },
-                      onCancel: () => {}
-                    });
-              }else {
-                  //有限制条件，提示是否继续
-                  self.errorList = data;
-                  self.errorListModal = true;
-              }
+        util.ajax
+          .post("/sell/order/validate", this.sellOrderFormData)
+          .then(response => {
+            //返回的验证结果是限制列表，如果存在有值，提示，如果没有，直接跳过
+            let data = response.data;
+            if (!data || data.length <= 0) {
+              self.$Modal.confirm({
+                title: "保存提交确认",
+                content:
+                  "请确认数据是否正确，提交到下一步流程:" +
+                  (self.haveQAFlow ? "“销售出库质量审核”" : "“销售审核”"),
+                onOk: () => {
+                  self.saveSellOrder("INIT");
+                },
+                onCancel: () => {}
+              });
+            } else {
+              //有限制条件，提示是否继续
+              self.errorList = data;
+              self.errorListModal = true;
+            }
           })
-          .catch((error) => {
-                util.errorProcessor(self, error);
+          .catch(error => {
+            util.errorProcessor(self, error);
           });
       });
     },
@@ -744,39 +1013,34 @@ export default {
     saveContinue() {
       let self = this;
       this.$Modal.confirm({
-          title: "保存提交确认",
-          content: "请确认数据是否正确，提交后不能修改.",
-          onOk: () => {
-            self.saveSellOrder("INIT");
-          },
-          onCancel: () => {}
-        });
+        title: "保存提交确认",
+        content:
+          "请确认数据是否正确，提交到下一步流程:" +
+          (self.haveQAFlow ? "“销售出库质量审核”" : "“销售审核”"),
+        onOk: () => {
+          self.saveSellOrder("INIT");
+        },
+        onCancel: () => {}
+      });
     },
+    orderFormChangeToEditModel(row) {
+      console.log(row);
+      let data = JSON.parse(JSON.stringify(row));
+      data.payOrderDate = data.payOrderDate
+        ? moment(data.payOrderDate).format("YYYY-MM-DD")
+        : "";
+      data.createOrderDate = data.createOrderDate
+        ? moment(data.createOrderDate).format("YYYY-MM-DD")
+        : "";
 
-    orderSearchModalClose() {
-      this.sellOrderSearchModal = false;
-    },
-    orderSearchChoosed(data) {
-      if (data && data.id && data.id > 0) {
-        this.currChooseCustomer = data.customer;
-        this.orderFormChangeToEditModel(data);
+      //冷链和特殊经营标识
+      if (data.customer && data.customer.id) {
+        this.customerSpecialManage = data.customer.canSaleSpecial
+          ? true
+          : false;
+        this.customerColdManage = data.customer.coldBusiness ? true : false;
       }
-    },
-    getOldSellOrderBtnClick() {
-      this.sellOrderSearchModal = true;
-    },
-
-    orderFormChangeToEditModel(data) {
-      data.payOrderDate = data.payOrderDate ? moment(data.payOrderDate).format('YYYY-MM-DD') : '';
-      data.createOrderDate = data.createOrderDate ? moment(data.createOrderDate).format('YYYY-MM-DD') : '';
       this.sellOrderFormData = data;
-      if (data.customerId !== this.currChooseCustomer.id) {
-        this.$Notice.error({
-          title: "系统异常",
-          desc: "获取客户信息错误, 请确认选择的客户正确"
-        });
-      }
-      this.sellOrderFormData.customerName = this.currChooseCustomer.name;
       this.editMode = true; //编辑模式下的客户信息不能修改
       this.warehouseDisable = true;
       this.refreshCustomerRepList();
@@ -847,9 +1111,80 @@ export default {
       if (!chooseList || chooseList.length <= 0) {
         return;
       }
-      let addList = chooseList.map(item => {
+      //检查下选择的商品中是否有冷链和特殊经营药品，如果有，需要对应客户也存在有这这个资质
+      let coldManage = "";
+      let specialManage = "";
+      let canAddChooseList = [];
+      let canAddGoodsIds = [];
+      for (let i = 0; i < chooseList.length; i++) {
+        let goods = chooseList[i].goods;
+        let canAdd = true;
+        if (goods && goods.specialManage && !this.customerSpecialManage) {
+          specialManage = specialManage + goods.name + "; ";
+          canAdd = false;
+        }
+        if (goods && goods.coldManage && !this.customerColdManage) {
+          coldManage = coldManage + goods.name + "; ";
+          canAdd = false;
+        }
+        if (canAdd) {
+          canAddChooseList.push(chooseList[i]);
+          canAddGoodsIds.push(goods.id);
+        }
+      }
+      if (coldManage !== "" || specialManage !== "") {
+        //存在有特殊经营药品或者冷链标识的商品，而客户缺少对应的资质
+        let content = "";
+        if (coldManage !== "") {
+          content = "商品：“" + coldManage + "”需要客户有冷链经营资质; ";
+        }
+        if (specialManage !== "") {
+          content =
+            content +
+            "商品: “" +
+            specialManage +
+            "”需要客户有经营特殊监管药品的资质;";
+        }
+        this.$Modal.warning({
+          title: "商品经营限制提示",
+          content: content
+        });
+      }
+      if (!canAddChooseList || canAddChooseList.length <= 0) {
+        return;
+      }
+      // 查询商品针对不同客户的定价
+      let priceReq = {
+        customerId: this.sellOrderFormData.customerId,
+        goodsDetailIds: canAddGoodsIds
+      };
+      util.ajax
+        .post("/goods/price/customer/price", priceReq)
+        .then(response => {
+          console.log(response.data);
+          this.detailsAddGoods(canAddChooseList, response.data);
+        })
+        .catch(error => {
+          util.errorProcessor(this, error);
+          this.detailsAddGoods(canAddChooseList);
+        });
+    },
+
+    detailsAddGoods(canAddChooseList, goodsPriceMap) {
+      let self = this;
+      let addList = canAddChooseList.map(item => {
         let goods = item.goods;
         console.log(goods);
+        let realPrice = 0;
+        if (
+          goodsPriceMap &&
+          goodsPriceMap[goods.id] &&
+          goodsPriceMap[goods.id].batchPrice
+        ) {
+          realPrice = goodsPriceMap[goods.id].batchPrice;
+        } else {
+          realPrice = goods ? goods.batchPrice : 0;
+        }
         let temp = {
           sellOrderId: self.sellOrderFormData.id,
           repertoryId: item.id,
@@ -861,25 +1196,18 @@ export default {
           fixPrice: goods ? goods.batchPrice : 0,
           disPrice: 100,
           free: 0,
-          realPrice: goods ? goods.batchPrice : 0,
-          singlePrice: goods ? goods.batchPrice : 0,
+          realPrice: realPrice,
           amount: 0,
           taxRate: goods ? goods.outTax : 0,
           batchCode: item.batchCode,
           productDate: item.productDate,
           expDate: item.expDate,
           location: item.location,
-          factoryName: goods.factoryName,
-          origin: goods.origin,
-          jx: goods.jxName,
-          spec: goods.spec,
-          unitName: goods.unitName,
-          permitNo: goods.permitNo,
           goods: goods
         };
         return temp;
       });
-      addList.map(item => this.detailsData.push(item));
+      addList.forEach(item => this.detailsData.push(item));
     },
 
     openRealPriceHistory(customerId, goodsId) {
@@ -895,10 +1223,13 @@ export default {
 
     resetGoodSDataAmount(index) {
       let row = this.detailsData[index];
-      let realPrice = row["realPrice"] && !isNaN(row["realPrice"]) ? row["realPrice"] : 0;
-      let disPrice = row["disPrice"] && !isNaN(row["disPrice"]) ? row["disPrice"] : 100;
+      let realPrice =
+        row["realPrice"] && !isNaN(row["realPrice"]) ? row["realPrice"] : 0;
+      let disPrice =
+        row["disPrice"] && !isNaN(row["disPrice"]) ? row["disPrice"] : 100;
       let free = row["free"] && !isNaN(row["free"]) ? row["free"] : 0;
-      let quantity = row["quantity"] && !isNaN(row["quantity"]) ? row["quantity"] : 0;
+      let quantity =
+        row["quantity"] && !isNaN(row["quantity"]) ? row["quantity"] : 0;
       let num = quantity - free > 0 ? quantity - free : 0;
       row.amount = (num * realPrice * disPrice / 100).toFixed(2);
       this.$set(this.detailsData, index, row);
@@ -955,11 +1286,66 @@ export default {
       } else {
         this.$Message.warning("请先选择客户");
       }
+    },
+
+    changeSiderShow() {
+      this.showSider = !this.showSider;
+    },
+
+    reloadUncheckData() {
+      let reqData = {
+        statusList: ["TEMP_STORAGE", "INIT", "QUALITY_CHECKED"]
+      };
+      this.uncheckTabLoading = true;
+      util.ajax
+        .post("/sell/order/review/list", reqData)
+        .then(response => {
+          this.uncheckTabLoading = false;
+          this.uncheckData = response.data;
+        })
+        .catch(error => {
+          this.uncheckTabLoading = false;
+          util.errorProcessor(this, error);
+        });
+    },
+
+    editBuyOrder(row) {
+      this.orderFormChangeToEditModel(row);
+    },
+
+    removeBuyOrder(orderId) {
+      this.uncheckTabLoading = true;
+      util.ajax
+        .delete("/sell/order/remove/" + orderId)
+        .then(response => {
+          this.uncheckTabLoading = false;
+          this.reloadUncheckData();
+          this.$Message.success("删除成功");
+        })
+        .catch(error => {
+          this.uncheckTabLoading = false;
+          util.errorProcessor(this, error);
+        });
     }
   }
 };
 </script>
 
 <style >
+.uncheck-table .statusClass {
+  display: block;
+}
+
+.uncheck-table .ivu-table-row-hover .statusClass {
+  display: none;
+}
+
+.uncheck-table .ivu-btn-group {
+  display: none;
+}
+
+.uncheck-table .ivu-table-row-hover .ivu-btn-group {
+  display: block;
+}
 </style>
 

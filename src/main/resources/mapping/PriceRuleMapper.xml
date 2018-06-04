@@ -92,6 +92,19 @@
     where goods_id = #{goodsId}
   </select>
 
+  <select id="getByGoodsIdAndCustomer" parameterType="map" resultMap="BaseResultMap">
+    select
+      distinct p.*
+    from price_rule p
+    where p.goods_id in
+      <foreach collection="goodsIds" item="item" separator=", " open="(" close=")">
+        #{item}
+      </foreach>
+    <if test="customerId != null or customerCategoryId != null">
+      and (p.customer_id = #{customerId} or p.customer_category_id = #{customerCategoryId})
+    </if>
+  </select>
+
   <select id="getByCustomer" parameterType="map" resultMap="BaseResultMap" >
     select <include refid="Base_Column_List" />
     from price_rule

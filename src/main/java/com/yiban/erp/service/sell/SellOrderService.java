@@ -13,6 +13,7 @@ import com.yiban.erp.exception.BizException;
 import com.yiban.erp.exception.BizRuntimeException;
 import com.yiban.erp.exception.ErrorCode;
 import com.yiban.erp.service.goods.GoodsService;
+import com.yiban.erp.service.util.SystemConfigService;
 import com.yiban.erp.util.UtilTool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,9 +53,11 @@ public class SellOrderService {
     private CustomerMapper customerMapper;
     @Autowired
     private GoodsBlackListMapper goodsBlackListMapper;
-
     @Autowired
     private SellOrderPaymentMapper sellOrderPaymentMapper;
+    @Autowired
+    private SystemConfigService systemConfigService;
+
 
 
     /**
@@ -119,8 +122,50 @@ public class SellOrderService {
         return errorList;
     }
 
+    private void validateSpecialManage(Customer customer, SellOrder sellOrder) throws BizException {
+        //如果存在空的数据，需要验证是否存在有冷链经营性商品，如果有，返回验证不通过
+        List<Long> goodsIds = new ArrayList<>();
+        for (SellOrderDetail detail : sellOrder.getDetails()) {
+            goodsIds.add(detail.getGoodsId());
+        }
+        //查询是否存在这些商品ID中是否存在冷链经营类型的商品
+        boolean haveSpecial = goodsService.haveSpecialManageGoods(goodsIds);
+        if (!haveSpecial) {
+            return;
+        }
+        //验证供应商是否有改资质
+        if (customer.getCanSaleSpecial() == null || !customer.getCanSaleSpecial()) {
+            logger.warn("customer can not cold manage. customer:{}", customer.getId());
+            throw new BizException(ErrorCode.SELL_ORDER_SPECIAL_VALIDATE);
+        }
+    }
+
+    private void validateColdManage(Customer customer, SellOrder sellOrder) throws BizException {
+        //如果存在空的数据，需要验证是否存在有冷链经营性商品，如果有，返回验证不通过
+        List<Long> goodsIds = new ArrayList<>();
+        for (SellOrderDetail detail : sellOrder.getDetails()) {
+            goodsIds.add(detail.getGoodsId());
+        }
+        //查询是否存在这些商品ID中是否存在冷链经营类型的商品
+        boolean haveCold = goodsService.haveColdManageGoods(goodsIds);
+        if (!haveCold) {
+            return;
+        }
+        //验证客户是否有改资质
+        if (customer.getColdBusiness() == null || !customer.getColdBusiness()) {
+            logger.warn("customer can not cold manage. supplier:{}", customer.getId());
+            throw new BizException(ErrorCode.SELL_ORDER_COLD_VALIDATE);
+        }
+
+        //先看下订单的温控方式和运输方式是否都已经输入了，如果都输入了，没必要再验证
+        if (sellOrder.getTemperControlId() == null || sellOrder.getTemperControlId() <= 0
+                || sellOrder.getShipMethod() == null || sellOrder.getShipMethod() <= 0) {
+            throw new BizException(ErrorCode.SELL_ORDER_COLD_VALIDATE);
+        }
+    }
+
     @Transactional
-    public SellOrder orderSave(User user, SellOrder sellOrder) throws BizException {
+    public void orderSave(User user, SellOrder sellOrder) throws BizException {
         if (!validateSellOrder(sellOrder)) {
             logger.warn("user:{} save order but order validate is error.", user.getId());
             throw new BizException(ErrorCode.SELL_ORDER_PARAM_ERROR);
@@ -132,13 +177,30 @@ public class SellOrderService {
         if (sellOrder.getFreeAmount() != null && BigDecimal.ZERO.compareTo(sellOrder.getFreeAmount()) > 0) {
             throw new BizException(ErrorCode.SELL_FREE_AMOUNT_ERROR);
         }
+        Customer customer = customerMapper.selectByPrimaryKey(sellOrder.getCustomerId());
+        if (customer == null) {
+            logger.warn("get customer fail by customerId: {}", sellOrder.getCustomerId());
+            throw new BizException(ErrorCode.CUSTOMER_GET_FAIL);
+        }
+        if (!SellOrderStatus.TEMP_STORAGE.name().equalsIgnoreCase(sellOrder.getStatus())) {
+            // 不是暂存操作，验证客户是否允许经营特殊管理药品 同时统计总销售数量和总金额
+            validateSpecialManage(customer, sellOrder);
+            validateColdManage(customer, sellOrder);
+
+            //根据系统配置的流程，设置对应的状态
+            boolean haveQAFlow = systemConfigService.haveOrderFlow(user.getCompanyId(), ConfigKey.SALE_CHECK);
+            if (haveQAFlow) {
+                logger.info("have QA flow, status update to INIT");
+                sellOrder.setStatus(SellOrderStatus.INIT.name());
+            }else {
+                logger.info("have not QA flow, status update to QUALITY_CHECKED");
+                sellOrder.setStatus(SellOrderStatus.QUALITY_CHECKED.name());
+            }
+        }
 
         List<SellOrderDetail> details = sellOrder.getDetails();
-        //验证客户是否允许经营特殊管理药品 同时统计总销售数量和总金额
         BigDecimal totalQuantity = BigDecimal.ZERO;
-        List<Long> goodIdList = new ArrayList<>();
         for (SellOrderDetail item : details) {
-            goodIdList.add(item.getGoodsId());
             totalQuantity = totalQuantity.add(item.getQuantity() == null ? BigDecimal.ZERO : item.getQuantity());
         }
 
@@ -186,17 +248,15 @@ public class SellOrderService {
             sellOrderDetailMapper.replaceBatch(details);
         }
         logger.info("user:{} save order info success.", user.getId());
-        SellOrder afterOrder = sellOrderMapper.selectByPrimaryKey(sellOrder.getId());
         List<SellOrderDetail> resultDetails = getDetailList(sellOrder.getId());
 
         //如果保存的状态为INIT状态，把库存的在单数加上
-        if (SellOrderStatus.INIT.name().equalsIgnoreCase(afterOrder.getStatus())) {
+        if (!SellOrderStatus.TEMP_STORAGE.name().equalsIgnoreCase(sellOrder.getStatus())) {
+            //TODO 计算错误，当再次修改的时候，直接在原来的基础上加入数量了，导致会超出
             for (SellOrderDetail detail : resultDetails) {
                 repertoryInfoMapper.updateOnWayQuantity(detail.getRepertoryId(), detail.getQuantity());
             }
         }
-        afterOrder.setDetails(resultDetails);
-        return afterOrder;
     }
 
 

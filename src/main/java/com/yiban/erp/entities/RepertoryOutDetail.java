@@ -67,8 +67,6 @@ public class RepertoryOutDetail {
 
     private String goodsName;
     private String origin;
-    private String jx;
-    private String spec;
     private String factoryName;
     private String unitName;
     private String packUnitName;
@@ -90,11 +88,9 @@ public class RepertoryOutDetail {
             this.goodsName = goods.getName();
             this.factoryName = goods.getFactoryName();
             this.origin = goods.getOrigin();
-            this.jx = goods.getJxName();
             this.unitName = goods.getUnitName();
             this.packUnitName = goods.getPackUnitName();
             this.brandName=goods.getBrandName();
-          //  this.baseMedName = goods.getBaseMedName();
             this.storageCondition = goods.getStorageConditionName();
             this.taxRate = goods.getOutTax();
         }
@@ -116,7 +112,6 @@ public class RepertoryOutDetail {
             this.goodsName = repertoryInfo.getGoodsName();
             this.factoryName = repertoryInfo.getFactoryName();
             this.origin = repertoryInfo.getOrigin();
-            this.jx = repertoryInfo.getJx();
             this.unitName = repertoryInfo.getUnitName();
             this.storageCondition = repertoryInfo.getStorageConditionName();
             this.taxRate = repertoryInfo.getTaxRate();
@@ -365,22 +360,6 @@ public class RepertoryOutDetail {
 
     public void setOrigin(String origin) {
         this.origin = origin;
-    }
-
-    public String getJx() {
-        return jx;
-    }
-
-    public void setJx(String jx) {
-        this.jx = jx;
-    }
-
-    public String getSpec() {
-        return spec;
-    }
-
-    public void setSpec(String spec) {
-        this.spec = spec;
     }
 
     public String getFactoryName() {

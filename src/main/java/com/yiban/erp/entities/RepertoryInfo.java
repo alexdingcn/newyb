@@ -81,8 +81,6 @@ public class RepertoryInfo {
     private String goodsName;
     private String factoryName;
     private String origin;
-    private String jx;
-    private String spec;
     private String unitName;
     private String baseMedName;
     private String storageConditionName;
@@ -95,8 +93,6 @@ public class RepertoryInfo {
             this.goodsName = goods.getName();
             this.factoryName=goods.getFactoryName();
             this.origin = goods.getOrigin();
-            this.jx = goods.getJxName();
-            this.spec=goods.getSpecDesc();
             this.unitName = goods.getUnitName();
             this.baseMedName = goods.getBaseMedName();
             this.storageConditionName = goods.getStorageConditionName();
@@ -370,22 +366,6 @@ public class RepertoryInfo {
 
     public void setOrigin(String origin) {
         this.origin = origin;
-    }
-
-    public String getJx() {
-        return jx;
-    }
-
-    public void setJx(String jx) {
-        this.jx = jx;
-    }
-
-    public String getSpec() {
-        return spec;
-    }
-
-    public void setSpec(String spec) {
-        this.spec = spec;
     }
 
     public String getUnitName() {

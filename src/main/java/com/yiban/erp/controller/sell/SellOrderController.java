@@ -63,9 +63,9 @@ public class SellOrderController {
     public ResponseEntity<String> orderSave(@RequestBody SellOrder sellOrder,
                                             @AuthenticationPrincipal User user) throws Exception {
         logger.info("user:{} save sell order info.", user.getId());
-        SellOrder result = sellOrderService.orderSave(user, sellOrder);
+        sellOrderService.orderSave(user, sellOrder);
         logger.info("user:{} success save sell order info.", user.getId());
-        return ResponseEntity.ok().body(JSON.toJSONString(result, SerializerFeature.DisableCircularReferenceDetect));
+        return ResponseEntity.ok().build();
     }
 
     @RequestMapping(value = "/order/remove/{id}", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)

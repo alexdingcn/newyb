@@ -251,7 +251,7 @@
           set
               r.on_way_quantity = (r.on_way_quantity - s.quantity)
         where
-          b.repertory_info_id = r.id and s.sell_order_id = #{sellOrderId}
+          s.repertory_id = r.id and s.sell_order_id = #{sellOrderId}
     </update>
 
     <update id="updateOnWayQuantity" parameterType="map" >

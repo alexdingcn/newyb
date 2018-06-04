@@ -1,10 +1,8 @@
 package com.yiban.erp.service.goods;
 
-import com.yiban.erp.dao.CustomerCategoryMapper;
-import com.yiban.erp.dao.GoodsDetailMapper;
-import com.yiban.erp.dao.GoodsInfoMapper;
-import com.yiban.erp.dao.PriceRuleMapper;
+import com.yiban.erp.dao.*;
 import com.yiban.erp.dto.CustomerCategoryPrice;
+import com.yiban.erp.dto.PriceQuery;
 import com.yiban.erp.dto.PriceUpdateReq;
 import com.yiban.erp.dto.SavePriceReq;
 import com.yiban.erp.entities.*;
@@ -35,6 +33,9 @@ public class GoodsPriceService {
     private PriceRuleMapper priceRuleMapper;
     @Autowired
     private CustomerCategoryMapper customerCategoryMapper;
+    @Autowired
+    private CustomerMapper customerMapper;
+
 
     @Transactional
     public List<GoodsDetail> updateBasePrice(PriceUpdateReq updateReq, User user) throws BizException {
@@ -193,6 +194,84 @@ public class GoodsPriceService {
         for (Long goodsId : goodsIds) {
             if (goodsId != null) {
                 saveCategoryByGoodsId(goodsId, priceReq.getCustomerCategoryPrices(), user);
+            }
+        }
+    }
+
+    /**
+     * 获取一个客户的特定价格，优先级为: 指定价 > 客户类型价 > 商品配置价，key为商品ID
+     * @param query
+     * @param user
+     * @return
+     * @throws BizException
+     */
+    public Map<Long, PriceRule> getCustomerPriceByGoodsList(PriceQuery query, User user) throws BizException {
+        final Map<Long, PriceRule> result = new HashMap<>();
+        if (query == null || query.getGoodsDetailIds() == null || query.getGoodsDetailIds().isEmpty()) {
+            return result;
+        }
+        //先获取商品的配置价格信息
+        List<GoodsDetail> goodsDetails = goodsDetailMapper.getByDetailIdList(query.getGoodsDetailIds());
+        //根据ID，制作一个基础的结果集
+        goodsDetails.stream().forEach(item -> {
+            PriceRule priceItem = new PriceRule();
+            priceItem.setGoodsId(item.getId());
+            priceItem.setBatchPrice(item.getBatchPrice() == null ? BigDecimal.ZERO : item.getBatchPrice());
+            priceItem.setRetailPrice(item.getRetailPrice() == null ? BigDecimal.ZERO : item.getRetailPrice());
+            result.put(item.getId(), priceItem);
+        });
+
+        //如果客户ID存在，获取客户信息
+        if (query.getCustomerId() != null) {
+            Customer customer = customerMapper.selectByPrimaryKey(query.getCustomerId());
+            if (customer != null) {
+                setPriceMapByCustomer(result, customer, query.getGoodsDetailIds());
+            }
+        }
+        return result;
+    }
+
+    /**
+     * 根据客户ID或者客户类型，设置对应商品的指定价
+     * @param result key:goodsId, value: batchPrice(商品批发价), retailPrice(商品零售价)
+     * @param customer
+     * @param goodsDetailIds
+     */
+    private void setPriceMapByCustomer(final Map<Long, PriceRule> result, Customer customer, List<Long> goodsDetailIds) {
+        //根据客户ID和客户的类别，获取对应商品的配置价格信息
+        List<PriceRule> priceRules = priceRuleMapper.getByGoodsIdAndCustomer(goodsDetailIds, customer.getId(), customer.getCategoryId());
+
+        for (Map.Entry<Long, PriceRule> entry : result.entrySet()) {
+            Long goodsId = entry.getKey();
+            PriceRule priceRule = entry.getValue();
+
+            //查询priceRules中对应的客户类型的价格, 类型价格如果存在，覆盖商品价格
+            Optional<PriceRule> cateO = priceRules.stream()
+                    .filter(item -> item.getGoodsId().equals(goodsId) && item.getCustomerCategoryId() != null && item.getCustomerCategoryId().equals(customer.getCategoryId()))
+                    .findFirst();
+            if (cateO.isPresent()) {
+                //客户类型的价格如果存在，覆盖原来商品的价格
+                PriceRule itemPrice = cateO.get();
+                if (itemPrice != null && itemPrice.getBatchPrice() != null) {
+                    priceRule.setBatchPrice(itemPrice.getBatchPrice());
+                }
+                if (itemPrice != null && itemPrice.getRetailPrice() != null) {
+                    priceRule.setRetailPrice(itemPrice.getRetailPrice());
+                }
+            }
+            //查询priceRules中对应的客户价格, 客户价格存在，覆盖原来的
+            Optional<PriceRule> itemPriceO = priceRules.stream()
+                    .filter(item -> item.getGoodsId().equals(goodsId) && customer.getId().equals(item.getCustomerId()))
+                    .findFirst();
+            if (itemPriceO.isPresent()) {
+                //如果存在，相当于能获取到这个客户针对这个商品的指定价个,
+                PriceRule itemPrice = itemPriceO.get();
+                if (itemPrice != null && itemPrice.getBatchPrice() != null) {
+                    priceRule.setBatchPrice(itemPrice.getBatchPrice());
+                }
+                if (itemPrice != null && itemPrice.getRetailPrice() != null) {
+                    priceRule.setRetailPrice(itemPrice.getRetailPrice());
+                }
             }
         }
     }

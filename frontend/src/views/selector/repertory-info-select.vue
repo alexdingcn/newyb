@@ -19,13 +19,13 @@
             <Form ref="searchForm" :model="formItem" :label-width="100">
                 <Row type="flex" justify="center">
                     <i-col span="8">
-                        <FormItem label="商品">
-                            <good-select v-model="formItem.goodsId"></good-select>
+                        <FormItem label="批次号">
+                            <Input v-model="formItem.batchCode" />
                         </FormItem>
                     </i-col>
                     <i-col span="8">
-                        <FormItem label="批次号">
-                            <Input v-model="formItem.batchCode" />
+                        <FormItem label="商品">
+                            <good-select v-model="formItem.goodsId"></good-select>
                         </FormItem>
                     </i-col>
                     <i-col span="8">
@@ -40,7 +40,7 @@
             </Row>
 
             <Table border highlight-row :columns="tabColumns" :data="tabData" 
-                :loading="tableLoading" height="350" 
+                :loading="tableLoading" height="400" 
                 @on-selection-change="tabSelectChange" 
                 no-data-text="点击上方查询按钮查询对应数据"
                 ref="repertoryTable" style="width: 100%;" size="small">
@@ -56,203 +56,226 @@
 
 <script>
 import util from "@/libs/util.js";
-import moment from 'moment';
+import moment from "moment";
 import goodSelect from "@/views/selector/good-select.vue";
-import supplierSelect from '@/views/selector/supplier-select.vue';
-import goodsSpecTags from '../goods/goods-spec-tabs.vue';
+import supplierSelect from "@/views/selector/supplier-select.vue";
+import goodsSpecTags from "../goods/goods-spec-tabs.vue";
 
 export default {
-  name: 'repertory-info-select',
+  name: "repertory-info-select",
   components: {
-      goodSelect,
-      goodsSpecTags,
-      supplierSelect
+    goodSelect,
+    goodsSpecTags,
+    supplierSelect
   },
   props: {
-        warehouse: {
-            type: Object,
-            required: true
-        }
-   },
+    warehouse: {
+      type: Object,
+      required: true
+    }
+  },
   data() {
-      return {
-          showTitle: '',
-          formItem: {
-              goodsId: '',
-              batchCode: '',
-              supplierId: ''
-          },
-          tabData: [],
-          tableLoading: false,
-          tabColumns: [
-              {
-                  type: "selection",
-                  width: 60,
-                  fixed: "left"
-              },
-              {
-                  title: '货号',
-                  key: 'goodsId',
-                  width: 120,
-                  sortable: true
-              },
-              {
-                  title: '商品名称',
-                  key: 'goodsName',
-                  width: 200,
-                  sortable: true
-              },
-              {
-                  title: '批次号',
-                  key: 'batchCode',
-                  width: 140
-              },
-              {
-                  title: '产地',
-                  key: 'origin',
-                  width: 120
-              },
-                {
-                    title: '规格',
-                    key: 'goodsSpecs',
-                    width: 120,
-                    render: (h, params) =>　{
-                        return h(goodsSpecTags, {
-                            props: {
-                                tags: params.row.goods.goodsSpecs ? params.row.goods.goodsSpecs : [],
-                                color: 'blue'
-                            }
-                        });
-                    }
-                },
-                {
-                    title: '生产企业',
-                    key: 'factoryName',
-                    align: 'center',
-                    width: 120,
-                    render: (h, params) => {
-                        return h('span', params.row.goods.factoryName ? params.row.goods.factoryName : '');
-                    }
-                },
-              {
-                  title: '供应商',
-                  key: 'supplierName',
-                  width: 200
-              },
-              {
-                  title: '单位',
-                  key: 'unitName',
-                  width: 100
-              },
-              {
-                  title: '库存数量',
-                  key: 'quantity',
-                  width: 120
-              },
-              {
-                  title: '当前在单数',
-                  key: 'onWayQuantity',
-                  width: 120,
-              },
-              {
-                  title: '有效期至',
-                  key: 'expDate',
-                  width: 120, 
-                  render: (h, params) => {
-                    return h('span', params.row.expDate ? moment(params.row.expDate).format('YYYY-MM-DD') : '');
-                  }
-              },
-              {
-                  title: '生产日期',
-                  key: 'productDate',
-                  width: 120, 
-                  render: (h, params) => {
-                    return h('span', params.row.productDate ? moment(params.row.productDate).format('YYYY-MM-DD') : '');
-                  }
-              },
-              {
-                  title: '批准文号',
-                  key: 'permitNo',
-                  width: 140
-              },
-              {
-                  title: '存储条件',
-                  key: 'storageConditionName',
-                  width: 120
+    return {
+      showTitle: "",
+      formItem: {
+        goodsId: "",
+        batchCode: "",
+        supplierId: ""
+      },
+      tabData: [],
+      tableLoading: false,
+      tabColumns: [
+        {
+          type: "selection",
+          width: 60,
+          fixed: "left"
+        },
+        {
+          title: "商品名称",
+          key: "goodsName",
+          width: 200,
+          sortable: true
+        },
+        {
+          title: "品牌",
+          key: "brandName",
+          width: 150,
+          sortable: true,
+          render: (h, params) => {
+            return h(
+              "span",
+              params.row.goods.brandName ? params.row.goods.brandName : ""
+            );
+          }
+        },
+        {
+          title: "批次号",
+          key: "batchCode",
+          width: 140
+        },
+        {
+          title: "产地",
+          key: "origin",
+          width: 120,
+          render: (h, params) => {
+            return h(
+              "span",
+              params.row.goods.origin ? params.row.goods.origin : ""
+            );
+          }
+        },
+        {
+          title: "规格",
+          key: "goodsSpecs",
+          width: 120,
+          render: (h, params) => {
+            return h(goodsSpecTags, {
+              props: {
+                tags: params.row.goods.goodsSpecs
+                  ? params.row.goods.goodsSpecs
+                  : [],
+                color: "blue"
               }
-          ],
-          totalCount: 0,
-          currentPage: 1,
-          tableCurrPageSize: 50,
-          tabCurrChooseList: [],
-          currAttributes: [],
-      }
+            });
+          }
+        },
+        {
+          title: "生产企业",
+          key: "factoryName",
+          align: "center",
+          width: 120,
+          render: (h, params) => {
+            return h(
+              "span",
+              params.row.goods.factoryName ? params.row.goods.factoryName : ""
+            );
+          }
+        },
+        {
+          title: "供应商",
+          key: "supplierName",
+          width: 200
+        },
+        {
+          title: "单位",
+          key: "unitName",
+          width: 100,
+          render: (h, params) => {
+            return h(
+              "span",
+              params.row.goods.unitName ? params.row.goods.unitName : ""
+            );
+          }
+        },
+        {
+          title: "库存数量",
+          key: "quantity",
+          width: 120
+        },
+        {
+          title: "当前在单数",
+          key: "onWayQuantity",
+          width: 120
+        },
+        {
+          title: "有效期至",
+          key: "expDate",
+          width: 120,
+          render: (h, params) => {
+            return h(
+              "span",
+              params.row.expDate
+                ? moment(params.row.expDate).format("YYYY-MM-DD")
+                : ""
+            );
+          }
+        },
+        {
+          title: "生产日期",
+          key: "productDate",
+          width: 120,
+          render: (h, params) => {
+            return h(
+              "span",
+              params.row.productDate
+                ? moment(params.row.productDate).format("YYYY-MM-DD")
+                : ""
+            );
+          }
+        }
+      ],
+      totalCount: 0,
+      currentPage: 1,
+      tableCurrPageSize: 50,
+      tabCurrChooseList: []
+    };
   },
   watch: {
-        warehouse(data) {
-            if(data) {
-                 this.showTitle = data.name;
-                 this.totalCount = 0;
-                 this.tabData = [];
-                 this.tabCurrChooseList = [];
-            }
-        }
+    warehouse(data) {
+      if (data) {
+        this.showTitle = data.name;
+        this.totalCount = 0;
+        this.tabData = [];
+        this.tabCurrChooseList = [];
+      }
+    }
   },
   computed: {
-      chooseGoods() {
-          if (!this.tabCurrChooseList || this.tabCurrChooseList.length <= 0) {
-              return "";
-          }else {
-              let label = "";
-              for (let i=0; i<this.tabCurrChooseList.length; i++) {
-                  let item = this.tabCurrChooseList[i];
-                  label = label + item.goodsName + '[' + item.batchCode + ']; ';
-              }
-              return label;
-          }
+    chooseGoods() {
+      if (!this.tabCurrChooseList || this.tabCurrChooseList.length <= 0) {
+        return "";
+      } else {
+        let label = "";
+        for (let i = 0; i < this.tabCurrChooseList.length; i++) {
+          let item = this.tabCurrChooseList[i];
+          label = label + item.goodsName + "[" + item.batchCode + "]; ";
+        }
+        return label;
       }
+    }
   },
   methods: {
-      searchBtnClicked() {
-          let reqData = {
-              warehouseId: this.warehouse.id,
-              goodsId: this.formItem.goodsId,
-              batchCode: this.formItem.batchCode,
-              supplierId: this.formItem.supplierId,
-              minQuantity: 0,
-              page: this.currentPage,
-              size: this.tableCurrPageSize,
-              currAttributes:this.currAttributes,
-          };
-          util.ajax.post("/repertory/select", reqData)
-            .then((response) => {
-                this.totalCount = response.data.count;
-                this.tabData = response.data.data;
-            })
-            .catch((error) => {
-                util.errorProcessor(this, error);
-            });
-      },
-      pageChange(data) {
-          this.currentPage = data;
-          this.searchBtnClicked();
-      },
-      tabSelectChange(data) {
-          this.tabCurrChooseList = data;
-      },
+    searchBtnClicked() {
+      let reqData = {
+        warehouseId: this.warehouse.id,
+        goodsId: this.formItem.goodsId,
+        batchCode: this.formItem.batchCode,
+        supplierId: this.formItem.supplierId,
+        minQuantity: 0,
+        page: this.currentPage,
+        size: this.tableCurrPageSize
+      };
+      this.tableLoading = true;
+      util.ajax
+        .post("/repertory/select", reqData)
+        .then(response => {
+          this.tableLoading = false;
+          this.totalCount = response.data.count;
+          this.tabData = response.data.data;
+        })
+        .catch(error => {
+          this.tableLoading = false;
+          util.errorProcessor(this, error);
+        });
+    },
+    pageChange(data) {
+      this.currentPage = data;
+      this.searchBtnClicked();
+    },
+    tabSelectChange(data) {
+      this.tabCurrChooseList = data;
+    },
 
-      ok() {
-          this.$emit('on-choosed', this.tabCurrChooseList);
-      }
-      
+    ok() {
+      this.$emit("on-choosed", this.tabCurrChooseList);
+    }
   }
-}
+};
 </script>
 
 <style >
 .ivu-form-item {
-    margin-bottom: 5px;
+  margin-bottom: 5px;
 }
-
 </style>
 

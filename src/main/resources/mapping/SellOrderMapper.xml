@@ -215,6 +215,8 @@
     <association property="customer" javaType="com.yiban.erp.entities.Customer">
       <id column="customer_id" property="id" jdbcType="INTEGER" />
       <result column="cust_name" property="name" jdbcType="VARCHAR"/>
+      <result column="can_sale_special" property="canSaleSpecial" jdbcType="BIT" />
+      <result column="is_cold_business" property="isColdBusiness" jdbcType="BIT" />
     </association>
     <association property="customerRep" javaType="com.yiban.erp.entities.CustomerRep">
       <id column="rep_id" property="id" jdbcType="INTEGER"/>
@@ -230,7 +232,8 @@
     s.ship_method, s.ship_tool, s.ship_company_id, s.comment, s.create_by, s.create_time,
     s.update_by, s.update_time, s.warehouse_id, s.total_quantity, s.total_amount,
     s.free_amount, s.dis_rate, s.paid_amount,
-    w.name as warehouse_name, c.name as cust_name,
+    w.name as warehouse_name,
+    c.name as cust_name, c.can_sale_special, c.is_cold_business,
     r.id as rep_id, r.name as rep_name, r.contact_phone as rep_contact_phone,
     r.repertory_address as rep_repertory_address,
     u.nickname as sale_nick_name, u.realname as sale_real_name

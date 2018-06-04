@@ -29,6 +29,8 @@ public interface GoodsDetailMapper {
 
     List<GoodsDetail> getByGoodsInfoIds(@Param("infoIds") List<Long> infoIds);
 
+    List<GoodsDetail> getByDetailIdList(@Param("detailIds") List<Long> detailIds);
+
     /**
      * 修改商品的最后使用时间和次数
      * @param ids

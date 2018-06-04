@@ -19,6 +19,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/goods/price")
@@ -50,6 +51,15 @@ public class GoodsPriceController {
                                                 @RequestParam("customerId") Long customerId) {
         PriceRule priceRule = goodsPriceService.getCustomerPrice(goodsId, customerId);
         return ResponseEntity.ok().body(JSON.toJSONString(priceRule));
+    }
+
+    @RequestMapping(value = "/customer/price", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<JSON> customerPriceByGoodsList(@RequestBody PriceQuery query,
+                                                         @AuthenticationPrincipal User user) throws Exception {
+        //根据商品ID，和客户ID，类型，获取客户的配置价格，如果客户不存在，返回的是商品的配置价格
+        logger.info("request params: {}", JSON.toJSONString(query));
+        Map<Long, PriceRule> priceRuleMap = goodsPriceService.getCustomerPriceByGoodsList(query, user);
+        return ResponseEntity.ok().body((JSON) JSON.toJSON(priceRuleMap));
     }
 
     @RequestMapping(value = "/category/save", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)

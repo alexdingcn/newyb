@@ -139,6 +139,8 @@ public enum ErrorCode {
     SELL_ORDER_ALREADY_PAID(2236, "订单已付清"),
     SELL_ORDER_COMPANY_NOT_MATCH(2237, "订单信息错误"),
     SELL_ORDER_UPDATE_PAYMENT_FAIL(2238, "更新支付信息错误"),
+    SELL_ORDER_SPECIAL_VALIDATE(2239, "商品存在有“特殊药品经营”标识, 而客户没有该资质"),
+    SELL_ORDER_COLD_VALIDATE(2240, "商品存在有“冷链经营”标识, 需要客户有该资质且订单的温控方式和运输方式必输"),
 
 
     // 23xx -承运公司

@@ -11,7 +11,7 @@
                     <Tooltip transfer placement="right-start">
                         <Icon type="ios-help-outline"></Icon>
                         <div slot="content" >
-                            <p>展现采购单录入后未审核通过的列表</p>
+                            <p>展现采购单录入后未审核通过的列表, 可以提取修改和删除操作</p>
                         </div>
                     </Tooltip>
                 </p>

@@ -1,5 +1,6 @@
 package com.yiban.erp.dao;
 
+import com.yiban.erp.entities.Customer;
 import com.yiban.erp.entities.PriceRule;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -28,4 +29,8 @@ public interface PriceRuleMapper {
 
     int removeCustomer(@Param("goodsId") Long goodsId,
                        @Param("customerIds") List<Long> customerIds);
+
+    List<PriceRule> getByGoodsIdAndCustomer(@Param("goodsIds") List<Long> goodsDetailIds,
+                                            @Param("customerId") Long customerId,
+                                            @Param("customerCategoryId") Integer categoryId);
 }

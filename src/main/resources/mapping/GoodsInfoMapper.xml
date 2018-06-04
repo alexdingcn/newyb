@@ -465,6 +465,7 @@
     gi.new_type_id as newTypeId, gi.created_by as createdBy, gi.updated_by as updatedBy, gi.created_time as createdTime,
     gi.updated_time as updatedTime, gi.tags as tags, gi.use_spec as useSpec,
     gi.normal_limit as normalLimit, gi.low_limit as lowLimit, gi.high_limit as highLimit, gi.spec_desc as specDesc,
+    br.brand_name as brandName,
     gc.name as categoryName,
     f.name as factoryName,
     s.name as supplierName
@@ -474,6 +475,7 @@
     select
       <include refid="Goods_Column_List"/>
     from goods_info gi
+      left join goods_brand br on gi.brand_id = br.id
       left join good_category gc on gc.id = gi.category_id
       left join factory f on f.id = gi.factory_id
       left join supplier s on s.id = gi.supplier_id
@@ -497,6 +499,7 @@
     select
     <include refid="Goods_Column_List"/>
     from goods_info gi
+    left join goods_brand br on gi.brand_id = br.id
     left join good_category gc on gc.id = gi.category_id
     left join factory f on f.id = gi.factory_id
     left join supplier s on s.id = gi.supplier_id
