@@ -19,10 +19,6 @@ export default {
         {
           img:
             "https://shopstatic.vivo.com.cn/vivoshop/commodity/20180418/20180418104131830678_original.jpg"
-        },
-        {
-          img:
-            "https://shopstatic.vivo.com.cn/vivoshop/commodity/20180430/20180430232146894398_original.jpg"
         }
       ]
     };
@@ -34,7 +30,13 @@ export default {
     };
     var self = this;
     util.ajax.post("/home/banner/list", reqData).then(function(res) {
-      console.log(res);
+      if (res.status === 200 && res.data && res.data.data.length > 0) {
+        var bannerList = [];
+        for (var i = 0; i < res.data.data.length; i++) {
+          bannerList.push({ img: res.data.data[i].imageUrl });
+        }
+        self.swiper = bannerList;
+      }
     });
   }
 };

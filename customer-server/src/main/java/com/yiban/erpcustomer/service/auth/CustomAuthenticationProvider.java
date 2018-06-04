@@ -1,12 +1,16 @@
 package com.yiban.erpcustomer.service.auth;
 
+import com.yiban.erpcustomer.constant.IdentifierType;
 import com.yiban.erpcustomer.constant.OperationLogType;
 import com.yiban.erpcustomer.dao.OperationLogMapper;
+import com.yiban.erpcustomer.dao.UserAuthMapper;
 import com.yiban.erpcustomer.dao.UserMapper;
 import com.yiban.erpcustomer.entities.OperationLog;
 import com.yiban.erpcustomer.entities.User;
+import com.yiban.erpcustomer.entities.UserAuth;
 import com.yiban.erpcustomer.exception.BizRuntimeException;
 import com.yiban.erpcustomer.exception.ErrorCode;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.AuthenticationProvider;
@@ -15,22 +19,24 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.util.StringUtils;
 
 import javax.inject.Inject;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 public class CustomAuthenticationProvider implements AuthenticationProvider {
     private static final Logger logger = LoggerFactory.getLogger(TokenService.class);
 
     private UserMapper userMapper;
+    private UserAuthMapper userAuthMapper;
     private OperationLogMapper operationLogMapper;
 
     @Inject
-    public CustomAuthenticationProvider(UserMapper userMapper, OperationLogMapper operationLogMapper) {
+    public CustomAuthenticationProvider(UserMapper userMapper, UserAuthMapper userAuthMapper, OperationLogMapper operationLogMapper) {
         this.userMapper = userMapper;
+        this.userAuthMapper = userAuthMapper;
         this.operationLogMapper = operationLogMapper;
     }
 
@@ -38,11 +44,16 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
         // 获取认证的用户名 & 密码
         String username = authentication.getName();
-        String password = authentication.getCredentials().toString();
+        List<String> credentials = (List<String>) authentication.getCredentials();
         if (StringUtils.isEmpty(username)) {
             logger.warn("username missing");
             throw new BizRuntimeException(ErrorCode.LOGIN_USERNAME_MISSING);
         }
+        if (credentials == null || credentials.size() != 2) {
+            logger.warn("Missing credentials");
+            throw new BizRuntimeException(ErrorCode.LOGIN_PASSWORD_INVALID);
+        }
+        String password = credentials.get(0);
         if (StringUtils.isEmpty(password)) {
             logger.warn("password missing");
             throw new BizRuntimeException(ErrorCode.LOGIN_PASSWORD_INVALID);
@@ -61,12 +72,33 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
 
             saveLoginLog(user);
 
+            // save wx openid
+            saveWxOpenid(credentials.get(1), user);
+
+
             Authentication auth = new UsernamePasswordAuthenticationToken(user.getCompactUser(), password, grantedAuthorities);
             return auth;
         } else {
             logger.warn("Login password not match, username={}", username);
             throw new BizRuntimeException(ErrorCode.LOGIN_PASSWORD_INVALID);
         }
+    }
+
+    private void saveWxOpenid(String openId, User user) {
+        if (StringUtils.isNotEmpty(openId)) {
+            UserAuth userAuth = userAuthMapper.findByIdentifier(openId, IdentifierType.WEIXIN.name());
+            if (userAuth == null) {
+                userAuth = new UserAuth();
+                userAuth.setUserId(user.getId());
+                userAuth.setIdentifierType(IdentifierType.WEIXIN.name());
+                userAuth.setIdentifier(openId);
+                userAuth.setVerified(true);
+                userAuth.setCreatedBy(String.valueOf(user.getId()));
+                userAuth.setCreatedTime(new Date());
+                userAuthMapper.insert(userAuth);
+            }
+        }
+
     }
 
     private void saveLoginLog(User user) {

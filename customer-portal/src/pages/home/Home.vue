@@ -7,8 +7,6 @@
       <Home-Container :todos="todos"></Home-Container>
       <Home-Footer></Home-Footer>
   </div>
-
-    
 </template>
 
 <script>

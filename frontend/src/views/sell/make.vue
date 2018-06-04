@@ -162,6 +162,7 @@
                       <i-col span="20">
                           <FormItem label="送货地址" prop="customerRepId">
 
+<<<<<<< HEAD
                               <RadioGroup v-model="sellOrderFormData.customerRepId"
                                           vertical class="address-selection width-100"
                                           @on-change="onChangeAddr">
@@ -178,6 +179,64 @@
                           <customer-rep ref="repModal" @on-closed="refreshCustomerRepList"></customer-rep>
                       </i-col>
                   </Row>
+=======
+                <Row type="flex" justify="start" v-if="salePriceOpen">
+                    <i-col span="8">
+                        <FormItem label="免零金额" prop="freeAmount">
+                            <Input number v-model="sellOrderFormData.freeAmount" @on-blur="resetTotalAmount"/>
+                        </FormItem>
+                    </i-col>
+                    <i-col span="8">
+                        <FormItem label="整单折扣率" >
+                            <Input number v-model="sellOrderFormData.disRate" @on-blur="resetTotalAmount"/>
+                        </FormItem>
+                    </i-col>
+                    <i-col span="8">
+                        <FormItem label="订单总金额" >
+                            <Input number v-model="sellOrderFormData.totalAmount" style="width: 95%" />
+                            <Tooltip transfer placement="left-start">
+                              <Icon type="ios-help-outline"></Icon>
+                              <div slot="content" >
+                                  <p>订单总金额 = (商品总金额 * 整单折扣率/100) - 免零金额</p>
+                              </div>
+                          </Tooltip>
+                        </FormItem>
+                    </i-col>
+                </Row>
+
+                <Row type="flex" justify="start">
+                    <i-col span="8">
+                        <FormItem label="仓库点" prop="warehouseId">
+                            <warehouse-select v-model="sellOrderFormData.warehouseId" :disabled="warehouseDisable" @on-change="warehouseChange"></warehouse-select>
+                        </FormItem>
+                    </i-col>
+                    <i-col span="16">
+                        <FormItem label="备注" >
+                            <Input type="text" v-model="sellOrderFormData.comment" placeholder="请输入备注" />
+                        </FormItem>
+                    </i-col>
+                </Row>
+
+                <h3 class="margin-top-10">
+                    商品信息
+                    <ButtonGroup size="small">
+                        <Button type="primary" :disabled="!sellOrderFormData.warehouseId"  @click="addGoodBtnClick">添加商品</Button>
+                    </ButtonGroup>
+                </h3>
+                <Table border highlight-row :loading="saveGoodBtnLoading"
+                       :columns="detailsColumns" :data="detailsData"
+                       no-data-text="在保存订单信息后点击添加商品按钮添加"
+                       ref="sellOrderGoodTable" style="min-height: 300px" size="small"
+                       class="margin-top-8 goods-tbl"
+                       @on-row-dblclick="handleRowDbClick">
+                    <div slot="footer">
+                        <h3 class="padding-left-20" >
+                            <b>商品合计数量: {{totalQuantity}}</b>  <b class="margin-left-50">商品合计金额:</b> ￥{{ totalAmount }}
+                            <span class="margin-left-50"> 提示: 金额 = (数量 - 赠送) x 实价 x 折扣% </span>
+                        </h3>
+                    </div>
+                </Table>
+>>>>>>> master
 
                   <h3 class="margin-top-10">备注信息</h3>
                   <div class="margin-top-10">
@@ -342,7 +401,11 @@ export default {
           key: "factoryName",
           width: 180,
           render: (h, params) => {
+<<<<<<< HEAD
             return h("span", {}, params.row.goods.factoryName);
+=======
+            return h("span", {}, params.row.factoryName);
+>>>>>>> master
           }
         },
         {
@@ -365,9 +428,13 @@ export default {
           render: (h, params) => {
             return h(goodsSpecTags, {
               props: {
+<<<<<<< HEAD
                 tags: params.row.goods.goodsSpecs
                   ? params.row.goods.goodsSpecs
                   : [],
+=======
+                tags: params.row.goods.goodsSpecs,
+>>>>>>> master
                 color: "blue"
               }
             });
@@ -521,6 +588,7 @@ export default {
       expandGoodsSpecs: [],
       expandProductDate: "",
       expandExpDate: "",
+<<<<<<< HEAD
       salePriceOpen: false,
       showSider: true,
       uncheckTabLoading: false,
@@ -651,6 +719,9 @@ export default {
       haveQAFlow: true,
       customerSpecialManage: false,
       customerColdManage: false
+=======
+      salePriceOpen: false
+>>>>>>> master
     };
   },
   watch: {
@@ -692,6 +763,7 @@ export default {
           } else {
             this.salePriceOpen = false;
           }
+<<<<<<< HEAD
           let config1 = data["COMPANY_TYPE"];
           if ("medicine" === config1.keyValue) {
             this.isMedicine = true;
@@ -704,6 +776,8 @@ export default {
           } else {
             this.haveQAFlow = false;
           }
+=======
+>>>>>>> master
         })
         .catch(error => {
           util.errorProcessor(this, error);
@@ -990,9 +1064,13 @@ export default {
             if (!data || data.length <= 0) {
               self.$Modal.confirm({
                 title: "保存提交确认",
+<<<<<<< HEAD
                 content:
                   "请确认数据是否正确，提交到下一步流程:" +
                   (self.haveQAFlow ? "“销售出库质量审核”" : "“销售审核”"),
+=======
+                content: "请确认数据是否正确，提交后不能修改.",
+>>>>>>> master
                 onOk: () => {
                   self.saveSellOrder("INIT");
                 },
@@ -1014,9 +1092,13 @@ export default {
       let self = this;
       this.$Modal.confirm({
         title: "保存提交确认",
+<<<<<<< HEAD
         content:
           "请确认数据是否正确，提交到下一步流程:" +
           (self.haveQAFlow ? "“销售出库质量审核”" : "“销售审核”"),
+=======
+        content: "请确认数据是否正确，提交后不能修改.",
+>>>>>>> master
         onOk: () => {
           self.saveSellOrder("INIT");
         },
@@ -1040,6 +1122,21 @@ export default {
           : false;
         this.customerColdManage = data.customer.coldBusiness ? true : false;
       }
+<<<<<<< HEAD
+=======
+    },
+    getOldSellOrderBtnClick() {
+      this.sellOrderSearchModal = true;
+    },
+
+    orderFormChangeToEditModel(data) {
+      data.payOrderDate = data.payOrderDate
+        ? moment(data.payOrderDate).format("YYYY-MM-DD")
+        : "";
+      data.createOrderDate = data.createOrderDate
+        ? moment(data.createOrderDate).format("YYYY-MM-DD")
+        : "";
+>>>>>>> master
       this.sellOrderFormData = data;
       this.editMode = true; //编辑模式下的客户信息不能修改
       this.warehouseDisable = true;
@@ -1331,7 +1428,13 @@ export default {
 };
 </script>
 
-<style >
+<style lang="less">
+.goods-tbl {
+  .ivu-table-cell {
+    padding-left: 2px;
+    padding-right: 2px;
+  }
+
 .uncheck-table .statusClass {
   display: block;
 }

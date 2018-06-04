@@ -32,7 +32,10 @@
         select
         <include refid="Base_Column_List" />
         from banner b
-        where company_id = #{companyId, jdbcType=INTEGER}
+        where 1=1
+        <if test="companyId != null and companyId > 0">
+          and company_id = #{companyId, jdbcType=INTEGER}
+        </if>
         order by b.id desc
         <if test="offset != null and limit != null">
             limit #{offset}, #{limit}
@@ -44,7 +47,10 @@
         select
         count(1)
         from banner b
-        where company_id = #{companyId, jdbcType=INTEGER}
+        where 1=1
+        <if test="companyId != null and companyId > 0">
+          and company_id = #{companyId, jdbcType=INTEGER}
+        </if>
     </select>
 
     <select id="selectByCompanyId" resultMap="BaseResultMap" parameterType="map" >

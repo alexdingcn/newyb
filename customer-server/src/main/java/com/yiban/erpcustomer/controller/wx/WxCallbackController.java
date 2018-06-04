@@ -17,7 +17,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -27,15 +26,16 @@ import org.springframework.web.client.RestTemplate;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.Date;
 
 @Controller
-@RequestMapping("/wx")
 public class WxCallbackController {
     private static final Logger logger = LoggerFactory.getLogger(WxCallbackController.class);
 
-    private static final long EXPIRATION_TIME = 30 * 24 * 60 * 60000;     // 30天
-    private static final String SECRET = "yiban#2018";            // JWT密码
+    private static final long EXPIRATION_TIME = 30 * 24 * 60 * 60000L;     // 30天
+    private static final String SECRET = "YiBaN#2018";            // JWT密码
 
     @Autowired
     private RestTemplate restTemplate;
@@ -50,7 +50,7 @@ public class WxCallbackController {
     @Autowired
     private UserAuthMapper userAuthMapper;
 
-    @RequestMapping(value = "/callback", produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/wx/callback")
     private String getCallback(HttpServletRequest request, HttpServletResponse response) {
         String code = request.getParameter("code");
         String state = request.getParameter("state");
@@ -79,30 +79,46 @@ public class WxCallbackController {
                         UserAuth userAuth = userAuthMapper.findByIdentifier(wxUserInfo.getOpenid(), IdentifierType.WEIXIN.name());
                         User user = null;
                         if (userAuth == null) {
-                            user = register(wxUserInfo);
+                            // generate cookie
+                            Cookie cookie = new Cookie("openid", wxUserInfo.getOpenid());
+                            cookie.setMaxAge(3600*24*1); // expiry
+                            cookie.setPath("/"); // this is the magic
+                            response.addCookie(cookie);
+
+                            // jump to login page and bind wx account
+                            String redirectUrl = request.getScheme() + "://localhost:8080/#/login";
+                            response.sendRedirect(redirectUrl);
+
+                            return "";
                         } else {
-                            user = userMapper.selectByPrimaryKey(userAuth.getId());
+                            updateNickName(userAuth.getUserId(), wxUserInfo);
+                            user = userMapper.selectByPrimaryKey(userAuth.getUserId());
                         }
                         if (user != null) {
                             // generate cookie
                             Cookie cookie = new Cookie("userId", user.getId().toString());
                             cookie.setMaxAge(3600*24*30); // expiry
-                            cookie.setSecure(true);
+                            //cookie.setSecure(true);
                             cookie.setPath("/"); // this is the magic
                             response.addCookie(cookie);
                             cookie = new Cookie("token", generateJwtToken(user));
                             cookie.setMaxAge(3600*24*30); // expiry
-                            cookie.setSecure(true);
+                            //cookie.setSecure(true);
                             cookie.setPath("/"); // this is the magic
+                            response.addCookie(cookie);
 
-                            String redirectUrl = request.getScheme() + "://erp.yibanjf.com/cp/";
-                            return "redirect:" + redirectUrl;
+//                            String redirectUrl = request.getScheme() + "://erp.yibanjf.com/cp/";
+                            String redirectUrl = request.getScheme() + "://localhost:8080/";
+                            response.sendRedirect(redirectUrl);
+                            return "";
                         }
                     }
                 }
             }
         } catch (RestClientException ex) {
             logger.error("Failed to get wx access_token, {}", ex.getMessage());
+        } catch (IOException ex) {
+            logger.error("IO exception, {}", ex.getMessage());
         }
         return "";
     }
@@ -124,6 +140,19 @@ public class WxCallbackController {
                 .compact();
 
         return JWT;
+    }
+
+    private int updateNickName(Long userId, WxUserInfo wxUserInfo) {
+        if (userId != null) {
+            User user = new User();
+            user.setId(userId);
+            user.setAvatarUrl(wxUserInfo.getHeadimgurl());
+            user.setNickname(wxUserInfo.getNickname());
+            user.setUpdatedBy("weixin");
+            user.setUpdatedTime(new Date());
+            return userMapper.updateByPrimaryKeySelective(user);
+        }
+        return 0;
     }
 
     private User register(WxUserInfo wxUserInfo) {
@@ -167,7 +196,9 @@ public class WxCallbackController {
             if (resp != null) {
                 if (resp.getStatusCode() == HttpStatus.OK) {
                     String respBody = resp.getBody();
+
                     if (StringUtils.isNotEmpty(respBody)) {
+                        respBody = new String(respBody.getBytes("ISO-8859-1"), "UTF-8");
                         logger.info("response body:" + respBody);
                         WxUserInfo wxUserInfo = JSON.parseObject(respBody, WxUserInfo.class);
                         return wxUserInfo;
@@ -176,6 +207,8 @@ public class WxCallbackController {
             }
         } catch (RestClientException ex) {
             logger.error("Failed to parse wx user info, {}", ex.getMessage());
+        } catch (UnsupportedEncodingException ex) {
+            logger.error("Encoding error, {}", ex.getMessage());
         }
         return null;
     }

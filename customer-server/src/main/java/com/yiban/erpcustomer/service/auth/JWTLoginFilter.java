@@ -13,10 +13,10 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class JWTLoginFilter extends AbstractAuthenticationProcessingFilter {
-
-    private static final String BEARER = "Bearer ";
 
     public JWTLoginFilter(String url, AuthenticationManager authManager) {
         super(new AntPathRequestMatcher(url));
@@ -29,8 +29,13 @@ public class JWTLoginFilter extends AbstractAuthenticationProcessingFilter {
                                                 HttpServletResponse resp) throws AuthenticationException, IOException, ServletException {
         String username = req.getParameter("username");
         String password = req.getParameter("password");
+        String openId = req.getHeader("openid");
+
+        List<String> credentials = new ArrayList<>();
+        credentials.add(password);
+        credentials.add(openId);
         // 返回一个验证令牌
-        return getAuthenticationManager().authenticate(new UsernamePasswordAuthenticationToken(username, password));
+        return getAuthenticationManager().authenticate(new UsernamePasswordAuthenticationToken(username, credentials));
     }
 
     @Override
@@ -38,7 +43,6 @@ public class JWTLoginFilter extends AbstractAuthenticationProcessingFilter {
             HttpServletRequest req,
             HttpServletResponse res, FilterChain chain,
             Authentication auth) throws IOException, ServletException {
-
         TokenService.addAuthentication(res, auth);
     }
 

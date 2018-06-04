@@ -1,14 +1,13 @@
 import axios from "axios";
+import Cookies from "js-cookie";
 
 let util = {};
 let env = "development";
 
 const ajaxUrl =
   env === "development"
-    ? "http://localhost:8000"
-    : env === "production"
-      ? "http://erp.yibanjf.com"
-      : "https://debug.yibanjf.com";
+    ? "http://localhost:8001/customer"
+    : "http://erp.yibanjf.com/customer";
 
 util.baseUrl = ajaxUrl;
 
@@ -16,23 +15,26 @@ util.ajax = axios.create({
   baseURL: ajaxUrl,
   timeout: 30000
 });
-
+//axios.defaults.withCredentials = true;
 util.ajax.defaults.headers["Content-Type"] = "application/json";
 
-/*
 // http request 拦截器
 util.ajax.interceptors.request.use(
-    config => {
-        // 判断是否存在token，如果存在的话，则每个http header都加上token
-        if (store.state.user.token) {
-            config.headers.Authorization = `Bearer ${store.state.user.token}`;
-        }
-        return config;
-    },
-    err => {
-        return Promise.reject(err);
+  config => {
+    var token = Cookies.get("token");
+    var openid = Cookies.get("openid");
+    // 判断是否存在token，如果存在的话，则每个http header都加上token
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+      config.headers.openid = `${openid}`;
     }
+    return config;
+  },
+  err => {
+    return Promise.reject(err);
+  }
 );
+/*
 
 // http response 拦截器
 util.ajax.interceptors.response.use(

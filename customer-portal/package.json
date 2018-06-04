@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "axios": "^0.17.1",
+    "js-cookie": "^2.2.0",
     "mint-ui": "^2.2.10",
     "stylus": "^0.54.5",
     "stylus-loader": "^3.0.2",
