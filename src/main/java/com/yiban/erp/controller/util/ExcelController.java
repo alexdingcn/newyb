@@ -6,16 +6,17 @@ import com.yiban.erp.entities.User;
 import com.yiban.erp.service.sell.SellOrderService;
 import com.yiban.erp.service.util.ExcelService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 
-@Controller
+@RestController
 @RequestMapping("/export")
 public class ExcelController {
     @Autowired
@@ -24,7 +25,7 @@ public class ExcelController {
     @Autowired
     private SellOrderService sellOrderService;
 
-    @RequestMapping(value = "/sell/order", method = RequestMethod.POST)
+    @RequestMapping(value = "/sell/order", method = RequestMethod.POST, produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
     public void exportSellList(@RequestBody SellOrderAllAction allAction,
                                HttpServletResponse response,
                                @AuthenticationPrincipal User user) throws Exception {

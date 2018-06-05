@@ -180,30 +180,29 @@ export default {
       tabData: [],
       tabColumns: [
         {
-          title: "查看",
-          width: 70,
-          fixed: "left",
-          render: (h, params) => {
-            return h("Button", {
-              props: {
-                type: "text",
-                size: "small",
-                icon: "eye"
-              },
-              on: {
-                click: () => {
-                  this.showReviewDetail(params.row.id);
-                }
-              }
-            });
-          }
-        },
-        {
           title: "订单编号",
           width: 180,
           key: "orderNumber",
           align: "center",
-          sortable: true
+          sortable: true,
+          render: (h, params) => {
+            return h(
+              "Button",
+              {
+                props: {
+                  type: "text",
+                  size: "small",
+                  icon: "eye"
+                },
+                on: {
+                  click: () => {
+                    this.showReviewDetail(params.row.id);
+                  }
+                }
+              },
+              params.row.orderNumber
+            );
+          }
         },
         {
           title: "制单日",
@@ -477,6 +476,7 @@ export default {
           responseType: "blob"
         })
         .then(response => {
+          console.log(response);
           if (response.status === 200 && response.data) {
             var headers = response.headers;
             var blob = new Blob([response.data], {

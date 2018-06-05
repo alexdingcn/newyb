@@ -116,6 +116,8 @@ public class ExcelService {
         response.setHeader("Pragma", "public");
         response.setContentType("application/vnd.ms-excel");
 //        response.setContentType("application/octet-stream;charset=UTF-8;");
+        response.setHeader("Access-Control-Allow-Origin", "*");
+        response.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
         response.setHeader("Accept-Ranges", "bytes");
 
         try {
@@ -161,6 +163,8 @@ public class ExcelService {
             return "销售审核完成";
         } else if (SellOrderStatus.TEMP_STORAGE.name().equalsIgnoreCase(status)) {
             return "暂挂";
+        } else if (SellOrderStatus.QUALITY_REJECT.name().equalsIgnoreCase(status)) {
+            return "质审拒绝";
         }
         return status;
     }
