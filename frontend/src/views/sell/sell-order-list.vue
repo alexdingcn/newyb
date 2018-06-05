@@ -3,40 +3,40 @@
 </style>
 
 <template>
-    <Card>
+    <Card class="sell-list">
         <p slot="title">
+            <Icon type="navicon"></Icon>
             销售订单列表
         </p>
+        <div slot="extra">
+            <Button icon="ios-search" type="success" :loading="searching" @click="searchBtnClick">查询</Button>
+            <Button icon="ios-cloud-download-outline" type="ghost" :loading="searching" @click="exportToExcel">导出</Button>
+        </div>
         <Row >
-            <Form ref="searchForm" :model="searchFormItem" :label-width="90" class="sellOrderQueryForm">
-                <Row type="flex" justify="center">
-                    <i-col span="8" >
+            <Form ref="searchForm" :model="searchFormItem" :label-width="65" class="sellOrderQueryForm">
+                <Row type="flex">
+                    <i-col span="6" >
                         <FormItem label="客户">
                             <customer-select v-model="searchFormItem.customerId" ></customer-select>
                         </FormItem>
                     </i-col>
-                    <i-col span="12" >
+                    <i-col span="6" >
                         <FormItem label="制单日期">
                             <DatePicker v-model="dateRange" type="daterange" placement="bottom-start" placeholder="制单日期" style="width:200px"></DatePicker>
                         </FormItem>
                     </i-col>
-                    <i-col span="4"></i-col>
-                </Row>
-                <Row type="flex" justify="center">
-                    <i-col span="8" >
+
+                    <i-col span="5" >
                         <FormItem label="销售单号">
                             <Input type="text" v-model="searchFormItem.orderNumber" />
                         </FormItem>
                     </i-col>
-                    <i-col span="8" >
+                    <i-col span="5" >
                         <FormItem label="销售员" >
                             <sale-select v-model="searchFormItem.saleId"></sale-select>
                         </FormItem>
                     </i-col>
-                    <i-col span="3" offset="1" >
-                        <Button icon="ios-search" type="primary" :loading="searching" @click="searchBtnClick">查询</Button>
-                    </i-col>
-                    <i-col span="4"></i-col>
+
                 </Row>
             </Form>
         </Row>
@@ -459,20 +459,73 @@ export default {
     },
     onPaymentUpdated(data) {
       this.refreshTableData();
+    },
+    exportToExcel() {
+      let reqData = {
+        customerId: this.searchFormItem.customerId,
+        orderNumber: this.searchFormItem.orderNumber,
+        saleId: this.searchFormItem.saleId
+      };
+      var self = this;
+
+      util.ajax
+        .post("/export/sell/order", reqData, {
+          responseType: "blob"
+        })
+        .then(response => {
+          if (response.status === 200 && response.data) {
+            var headers = response.headers;
+            var blob = new Blob([response.data], {
+              type: headers["content-type"]
+            });
+            var link = document.createElement("a");
+            link.href = (window.URL || window.webkitURL).createObjectURL(blob);
+            link.download =
+              "销售订单导出" + moment().format("YYYYMMDDHHmm") + ".xlsx";
+
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+          }
+        })
+        .catch(error => {
+          util.errorProcessor(self, error);
+        });
     }
   }
 };
 </script>
 
-<style >
+<style lang="less">
+.sell-list {
+  .ivu-card-head {
+    background-color: #3d74ad;
+    border-radius: 4px 4px 0 0;
+    p {
+      color: white;
+    }
+  }
+  .ivu-card-extra {
+    top: 10px;
+    .ivu-btn-ghost {
+      background-color: white;
+    }
+  }
+}
 .sellOrderQueryForm .ivu-form-item {
   margin-bottom: 5px;
 }
-.sellOrderTbl .ivu-btn-group {
-  display: none;
-}
-.sellOrderTbl .ivu-table-row-hover .ivu-btn-group {
-  display: block;
+.sellOrderTbl {
+  .ivu-table-cell {
+    padding-left: 2px;
+    padding-right: 2px;
+  }
+  .ivu-btn-group {
+    display: none;
+  }
+  .ivu-table-row-hover .ivu-btn-group {
+    display: inline-block;
+  }
 }
 </style>
 

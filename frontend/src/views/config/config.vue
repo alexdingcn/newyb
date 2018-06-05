@@ -25,7 +25,7 @@
                     </i-col>
                 </Row>
             </Row>
-            <Row>
+            <div>
                 <h2 class="nav-title">订单相关</h2>
                 <Row>
                     <i-col :xs="12" :sm="8" :md="6" :lg="5">
@@ -51,7 +51,7 @@
                     <i-col :xs="12" :sm="8" :md="6" :lg="5">
                     </i-col>
                 </Row>
-            </Row>
+            </div>
         </div> 
         <div v-if="!showNav">
             <config-company-type ref="companyType" v-if="currActive === 'companyType'" @back="back"></config-company-type>
@@ -62,41 +62,41 @@
 </template>
 
 <script>
-import util from '@/libs/util.js';
-import configSiderTag from './config-sider-tag.vue';
-import configCompanyType from './components/config-company-type.vue';
-import configOrderFlow from './components/config-order-flow.vue';
-import configSalePrice from './components/config-sale-price.vue';
+import util from "@/libs/util.js";
+import configSiderTag from "./config-sider-tag.vue";
+import configCompanyType from "./components/config-company-type.vue";
+import configOrderFlow from "./components/config-order-flow.vue";
+import configSalePrice from "./components/config-sale-price.vue";
 
 export default {
-    name: 'config',
-    components:{
-        configSiderTag,
-        configCompanyType,
-        configOrderFlow,
-        configSalePrice
+  name: "config",
+  components: {
+    configSiderTag,
+    configCompanyType,
+    configOrderFlow,
+    configSalePrice
+  },
+  data() {
+    return {
+      currActive: "",
+      showNav: true
+    };
+  },
+  mounted() {},
+  methods: {
+    configNavClick(key) {
+      console.log("config nav click, key:" + key);
+      this.currActive = key;
+      this.showNav = false;
+      let self = this;
+      this.$nextTick(() => {
+        self.$refs[key].init();
+      });
     },
-    data() {
-        return {
-            currActive: '',
-            showNav: true,
-        }
-    },
-    mounted() {},
-    methods: {
-        configNavClick(key) {
-            console.log('config nav click, key:' + key);
-            this.currActive = key;
-            this.showNav = false;
-            let self = this;
-            this.$nextTick(() => {
-                self.$refs[key].init();
-            });
-        },
-        back() {
-            this.showNav = true;
-        }
+    back() {
+      this.showNav = true;
     }
-}
+  }
+};
 </script>
 
