@@ -91,6 +91,10 @@ export default {
       let label = "";
       let color = "";
       switch (status) {
+        case "TEMP_STORAGE":
+          label = "制单暂存";
+          color = "#80848f";
+          break;
         case "INIT":
           label = "制单初始";
           color = "#2d8cf0";
