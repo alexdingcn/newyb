@@ -393,7 +393,7 @@ public class SellOrder {
     }
 
     public BigDecimal getTotalAmount() {
-        return totalAmount;
+        return totalAmount != null ? totalAmount : BigDecimal.ZERO;
     }
 
     public void setTotalAmount(BigDecimal totalAmount) {
@@ -417,7 +417,7 @@ public class SellOrder {
     }
 
     public BigDecimal getPaidAmount() {
-        return paidAmount;
+        return paidAmount != null ? paidAmount : BigDecimal.ZERO;
     }
 
     public void setPaidAmount(BigDecimal paidAmount) {

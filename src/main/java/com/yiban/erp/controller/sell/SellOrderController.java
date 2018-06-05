@@ -34,6 +34,7 @@ public class SellOrderController {
     @Autowired
     private SellOrderMapper sellOrderMapper;
 
+
     @RequestMapping(value = "/order/list", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> getOrderList(@RequestBody SellOrderQuery query,
                                                @AuthenticationPrincipal User user) throws Exception {
@@ -178,6 +179,13 @@ public class SellOrderController {
         return ResponseEntity.ok().build();
     }
 
+    /**
+     * 获得销售列表
+     * @param allAction
+     * @param user
+     * @return
+     * @throws Exception
+     */
     @RequestMapping(value = "/order/all/list", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> allList(@RequestBody SellOrderAllAction allAction,
                                           @AuthenticationPrincipal User user) throws Exception {
