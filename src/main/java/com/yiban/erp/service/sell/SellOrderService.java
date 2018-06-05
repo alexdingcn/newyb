@@ -372,7 +372,7 @@ public class SellOrderService {
         }
         //验证是否初始状态，如果审批过了，不能进行删除
         SellOrder sellOrder = sellOrderMapper.selectByPrimaryKey(detail.getSellOrderId());
-        if (sellOrder == null || !SellOrderStatus.TEMP_STORAGE.name().equalsIgnoreCase(sellOrder.getStatus())) {
+        if (sellOrder == null || SellOrderStatus.SALE_CHECKED.name().equalsIgnoreCase(sellOrder.getStatus())) {
             logger.warn("user:{} remove sell order detail but sell order is null or status is not init. id:{}", user.getId(), detailId);
             throw new BizException(ErrorCode.SELL_ORDER_DETAIL_CAN_NOT_REMOVE);
         }
@@ -482,7 +482,6 @@ public class SellOrderService {
             logger.warn("user:{} check sell order but order status is not QUALITY_CHECKED, order id:{}", user.getId(), sellOrderId);
             throw new BizException(ErrorCode.SELL_ORDER_SALE_CHECK_STATUS_ERROR);
         }
-        //验证订单的质量检查是否都已经全部通过，只有全部通过，才能进行审核通过
         List<SellOrderDetail> details = getDetailList(order.getId());
         if (details == null || details.isEmpty()) {
             logger.warn("get sell order detail fail.");

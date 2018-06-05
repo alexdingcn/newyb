@@ -379,7 +379,36 @@ export default {
           width: 100
         },
         {
-          title: "销售在单数量",
+          renderHeader: (h, params) => {
+            return h(
+              "Tooltip",
+              {
+                props: {
+                  transfer: true,
+                  placement: "top"
+                }
+              },
+              [
+                h("span", "销售在单数量"),
+                h("Icon", {
+                  props: { type: "ios-help-outline", size: "15" },
+                  style: { marginLeft: "5px" }
+                }),
+                h(
+                  "div",
+                  {
+                    slot: "content"
+                  },
+                  [
+                    h(
+                      "h4",
+                      "销售在单数排除“暂存”状态的订单,其他未终审通过的状态的订单数量都会计算到在单数量中"
+                    )
+                  ]
+                )
+              ]
+            );
+          },
           key: "onWayQuantity",
           width: 100
         },
@@ -395,7 +424,10 @@ export default {
               },
               [
                 h("span", "销售数量"),
-                h("Icon", { props: { type: "ios-help-outline" } }),
+                h("Icon", {
+                  props: { type: "ios-help-outline", size: "15" },
+                  style: { marginLeft: "5px" }
+                }),
                 h(
                   "div",
                   {
@@ -988,21 +1020,6 @@ export default {
             });
             return;
           }
-          //库存量减去在单数 >= 销售数量
-          let repertoryQuantity = item.repertoryQuantity
-            ? item.repertoryQuantity
-            : 0;
-          let onWayQuantity = item.onWayQuantity ? item.onWayQuantity : 0;
-          if (repertoryQuantity - onWayQuantity < quantity) {
-            this.$Modal.warning({
-              title: "销售数量提示",
-              content:
-                "商品:" +
-                item.goodsName +
-                "的销售数量不能大于库存量减去在单数量."
-            });
-            return;
-          }
         }
 
         //看看免零金额和订单总金额是否小于0
@@ -1280,7 +1297,7 @@ export default {
     handleRowDbClick(data, index) {
       this.$Modal.confirm({
         title: "确认删除商品？",
-        content: "<p>确认删除商品 " + data.goodsName + "?</p>",
+        content: "确认删除商品 " + data.goodsName + "?",
         onOk: () => {
           if (data.id) {
             this.detailRemoveItem(data.id);

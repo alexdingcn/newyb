@@ -30,11 +30,11 @@ public class UtilTool {
             throw new BizRuntimeException(ErrorCode.MAKE_ORDER_NUMBER_PARAMS);
         }
         StringBuilder sb = new StringBuilder();
-        String timeStr = dateFormat(new Date(), "yyyyMMddHHmm");
-        sb.append(timeStr);
-        sb.append("-");
         sb.append(numberType.getCode());
         sb.append(companyId);
+        sb.append("-");
+        String timeStr = dateFormat(new Date(), "yyMMddHHmm");
+        sb.append(timeStr);
         sb.append("-");
         sb.append(RandomStringUtils.randomNumeric(4));
         return sb.toString();

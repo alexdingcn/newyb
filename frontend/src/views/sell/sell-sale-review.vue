@@ -584,29 +584,6 @@ export default {
           });
           return false;
         }
-
-        for (let i = 0; i < this.sellDetailList.length; i++) {
-          let item = this.sellDetailList[i];
-          if (item.checkStatus !== "OK") {
-            this.$Modal.warning({
-              title: "信息验证提示",
-              content:
-                "商品: " + item.goodsName + "质量审核未通过，不能审核通过"
-            });
-            return false;
-          }
-          let repertoryQuantity = item.repertoryQuantity
-            ? item.repertoryQuantity
-            : 0;
-          let onWayQuantity = item.onWayQuantity ? item.onWayQuantity : 0;
-          if (repertoryQuantity - onWayQuantity < item.quantity) {
-            this.$Modal.warning({
-              title: "信息验证提示",
-              content: "商品: " + item.goodsName + "库存量不足，不能审核通过"
-            });
-            return false;
-          }
-        }
       }
       return true;
     },
