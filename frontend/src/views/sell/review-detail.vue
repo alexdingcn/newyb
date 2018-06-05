@@ -110,213 +110,234 @@
 
 <script>
 import util from "@/libs/util.js";
-import moment from 'moment';
-import goodsSpecTags from '@/views/goods/goods-spec-tabs.vue';
+import moment from "moment";
+import goodsSpecTags from "@/views/goods/goods-spec-tabs.vue";
 
 export default {
-  name: 'review-detail',
+  name: "review-detail",
   props: {
-      sellOrderId: Number
+    sellOrderId: Number
   },
   components: {
-      goodsSpecTags
+    goodsSpecTags
   },
   data() {
-      return {
-          orderDetail: '',
-          detailsData: [],
-          tabColumns: [
-            {
-                title: '货号',
-                key: 'goodsId',
-                width: 100
-            },
-            {
-                title: "商品名称",
-                key: "goodsName",
-                sortable: true,
-                width: 180
-            },
-            {
-                title: "生产企业",
-                key: "factoryName",
-                width: 180
-            },
-            {
-                title: "产地",
-                key: "origin",
-                width: 120
-            },
-            {
-                title: '批次号',
-                key: 'batchCode',
-                width: 160
-            },
-            {
-                title: "规格",
-                key: "spec",
-                width: 120,
-                render: (h, params) => {
-                    return h(goodsSpecTags, {
-                        props: {
-                            tags: params.row.goods.goodsSpecs ? params.row.goods.goodsSpecs : [],
-                            color: 'blue'
-                        }
-                    });
+    return {
+      orderDetail: "",
+      detailsData: [],
+      tabColumns: [
+        {
+          title: "商品名称",
+          key: "goodsName",
+          sortable: true,
+          width: 180
+        },
+        {
+          title: "生产企业",
+          key: "factoryName",
+          width: 180
+        },
+        {
+          title: "产地",
+          key: "origin",
+          width: 120
+        },
+        {
+          title: "批次号",
+          key: "batchCode",
+          width: 160
+        },
+        {
+          title: "规格",
+          key: "spec",
+          width: 120,
+          render: (h, params) => {
+            return h(goodsSpecTags, {
+              props: {
+                tags: params.row.goods.goodsSpecs
+                  ? params.row.goods.goodsSpecs
+                  : [],
+                color: "blue"
+              }
+            });
+          }
+        },
+        {
+          title: "单位",
+          key: "unitName",
+          width: 120
+        },
+        {
+          title: "生产日期",
+          width: 120,
+          key: "productData",
+          render: (h, params) => {
+            return h(
+              "span",
+              params.row.productDate
+                ? moment(params.row.productDate).format("YYYY-MM-DD")
+                : ""
+            );
+          }
+        },
+        {
+          title: "有效期至",
+          key: "expDate",
+          width: 120,
+          render: (h, params) => {
+            return h(
+              "span",
+              params.row.expDate
+                ? moment(params.row.expDate).format("YYYY-MM-DD")
+                : ""
+            );
+          }
+        },
+        {
+          title: "库存量",
+          key: "repertoryQuantity",
+          width: 120
+        },
+        {
+          title: "销售数量",
+          width: 120,
+          key: "quantity"
+        },
+        {
+          title: "价格",
+          width: 100,
+          key: "realPrice"
+        },
+        {
+          title: "折扣",
+          key: "disPrice",
+          width: 100
+        },
+        {
+          title: "赠送",
+          key: "free",
+          width: 100
+        },
+        {
+          title: "金额",
+          width: 120,
+          key: "amount"
+        },
+        {
+          title: "税率",
+          key: "taxRate",
+          width: 100
+        },
+        {
+          title: "质量审核状态",
+          width: 120,
+          key: "checkStatus",
+          render: (h, params) => {
+            const checkStatus = params.row.checkStatus;
+            const color = !checkStatus
+              ? "blue"
+              : checkStatus === "OK" ? "green" : "red";
+            const text = !checkStatus
+              ? "待审"
+              : checkStatus === "OK" ? "通过" : "拒绝";
+            return h(
+              "Tag",
+              {
+                props: {
+                  type: "dot",
+                  color: color
                 }
-            },
-            {
-                title: '单位',
-                key: 'unitName',
-                width: 120
-            },
-            {
-                title: '生产日期',
-                width: 120,
-                key: 'productData',
-                render: (h, params) => {
-                    return h('span', params.row.productDate ? moment(params.row.productDate).format('YYYY-MM-DD') : '');
-                }
-            },
-            {
-                title: '有效期至',
-                key: 'expDate',
-                width: 120,
-                render: (h, params) => {
-                    return h('span', params.row.expDate ? moment(params.row.expDate).format('YYYY-MM-DD') : '');
-                }
-            },
-            {
-                title: "库存量",
-                key: "repertoryQuantity",
-                width: 120,
-            },
-            {
-                title: '销售数量',
-                width: 120,
-                key: 'quantity'
-            },
-            {
-                title: '价格',
-                width: 100,
-                key: 'realPrice'
-            },
-            {
-                title: "折扣",
-                key: "disPrice",
-                width: 100
-            },
-            {
-                title: "赠送",
-                key: "free",
-                width: 100
-            },
-            {
-                title: '金额',
-                width: 120,
-                key: 'amount'
-            },
-            {
-                title: "税率",
-                key: "taxRate",
-                width: 100
-            },
-            {
-                title: '质量审核状态',
-                width: 120,
-                key: 'checkStatus',
-                render: (h, params) => {
-                    const checkStatus = params.row.checkStatus;
-                    const color = !checkStatus ? 'blue' : (checkStatus === 'OK' ? 'green' : 'red');
-                    const text = !checkStatus ? '待审' : (checkStatus === 'OK' ? '通过' : '拒绝');
-                    return h('Tag', {
-                        props: {
-                            type: 'dot',
-                            color: color
-                        }
-                    }, text);
-                }
-            },
-            {
-                title: '质量审核人',
-                width: 100,
-                key: 'checkUser',
-                render: (h, params) => {
-                    const checkUser = params.row.checkUser ? params.row.checkUser : '';
-                    return h('span', checkUser);
-                }
-            },
-            {
-                title: '质量审核日期',
-                width: 120,
-                key: 'checkDate',
-                render: (h, params) => {
-                    let checkDate = params.row.checkDate;
-                    return h('span', checkDate ? moment(checkDate).format('YYYY-MM-DD HH:mm') : '');
-                }
-            },
-            {
-                title: '质量审核结论',
-                width: 180,
-                key: 'checkResult',
-                render: (h, params) => {
-                    const checkResult = params.row.checkResult ? params.row.checkResult : '';
-                    return h('span', checkResult);
-                }
-            }
-          ]
-      }
+              },
+              text
+            );
+          }
+        },
+        {
+          title: "质量审核人",
+          width: 100,
+          key: "checkUser",
+          render: (h, params) => {
+            const checkUser = params.row.checkUser ? params.row.checkUser : "";
+            return h("span", checkUser);
+          }
+        },
+        {
+          title: "质量审核日期",
+          width: 120,
+          key: "checkDate",
+          render: (h, params) => {
+            let checkDate = params.row.checkDate;
+            return h(
+              "span",
+              checkDate ? moment(checkDate).format("YYYY-MM-DD HH:mm") : ""
+            );
+          }
+        },
+        {
+          title: "质量审核结论",
+          width: 180,
+          key: "checkResult",
+          render: (h, params) => {
+            const checkResult = params.row.checkResult
+              ? params.row.checkResult
+              : "";
+            return h("span", checkResult);
+          }
+        }
+      ]
+    };
   },
   watch: {
-      sellOrderId(id) {
-          this.initData(id);
-      }
+    sellOrderId(id) {
+      this.initData(id);
+    }
   },
   filters: {
-      dateFormat(data) {
-          if (!data && isNaN(data)) {
-              return '';
-          }
-          return moment(data).format('YYYY-MM-DD');
+    dateFormat(data) {
+      if (!data && isNaN(data)) {
+        return "";
       }
+      return moment(data).format("YYYY-MM-DD");
+    }
   },
   methods: {
-      initData(id) {
-          util.ajax.get("/sell/order/review/detail", {params: {orderId: id}})
-            .then((response) => {
-                this.orderDetail = response.data;
-                if (this.orderDetail && this.orderDetail.details) {
-                    this.detailsData = this.orderDetail.details;
-                }
-            })
-            .catch(error => {
-                util.errorProcessor(this, error);
-            });
-      }
+    initData(id) {
+      util.ajax
+        .get("/sell/order/review/detail", { params: { orderId: id } })
+        .then(response => {
+          this.orderDetail = response.data;
+          if (this.orderDetail && this.orderDetail.details) {
+            this.detailsData = this.orderDetail.details;
+          }
+        })
+        .catch(error => {
+          util.errorProcessor(this, error);
+        });
+    }
   }
-}
+};
 </script>
 
 <style >
 .title-show > span {
-    font-size: 1.25em;
-    font-weight: bold;
-    color: #80848f;
+  font-size: 1.25em;
+  font-weight: bold;
+  color: #80848f;
 }
 
 .title-show > hr {
-    width: 100%;
-    height: 2px;
-    color: #5cadff;
-    margin-bottom: 10px;
+  width: 100%;
+  height: 2px;
+  color: #5cadff;
+  margin-bottom: 10px;
 }
 
 .label-key {
-    width: 110px;
-    text-align: right;
+  width: 110px;
+  text-align: right;
 }
 .label-value {
-    font-weight:bold;
+  font-weight: bold;
 }
 </style>
 

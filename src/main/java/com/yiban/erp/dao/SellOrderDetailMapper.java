@@ -26,10 +26,7 @@ public interface SellOrderDetailMapper {
                                            @Param("offset") Integer offset,
                                            @Param("limit") Integer limit);
 
-    int updateCheckResult(@Param("detailIdList") List<Long> detailIdList,
-                          @Param("reviewAction")SellReviewAction action,
-                          @Param("updateTime")Date updateTime,
-                          @Param("updateBy") String updateBy);
+    int updateCheckResult(SellReviewAction action);
 
     List<Long> getUnCheckDetailIdList(Long sellOrderId);
 

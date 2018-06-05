@@ -118,20 +118,17 @@ public class SellOrderController {
             throw new BizException(ErrorCode.SELL_ORDER_DETAIL_GET_FAIL);
         }
         sellOrderService.qualityCheck(user, reviewAction);
-        //如果没有报错，则重新根据sellOrderId 获取详情列表
-        SellOrder order = sellOrderService.reviewDetail(sellOrderId);
-        return ResponseEntity.ok().body(JSON.toJSONString(order, SerializerFeature.DisableCircularReferenceDetect));
+        return ResponseEntity.ok().build();
     }
 
-    @RequestMapping(value = "/order/review/quality/cancel", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> reviewCancel(@RequestBody SellReviewAction reviewAction,
+    @RequestMapping(value = "/order/review/quality/cancel/{sellOrderId}", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> reviewCancel(@PathVariable Long sellOrderId,
                                                @AuthenticationPrincipal User user) throws Exception {
-        logger.info("user:{} request cancel review options.", user.getId());
-        Long sellOrderId = reviewAction.getSellOrderId();
+        logger.info("user:{} request cancel review sellOrderId:{}", user.getId(), sellOrderId);
         if (sellOrderId == null) {
             throw new BizException(ErrorCode.SELL_ORDER_DETAIL_GET_FAIL);
         }
-        sellOrderService.qualityCheckCancel(user, reviewAction);
+        sellOrderService.qualityCheckCancel(user, sellOrderId);
         return ResponseEntity.ok().build();
     }
 

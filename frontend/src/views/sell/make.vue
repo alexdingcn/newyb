@@ -25,7 +25,7 @@
                 
                 <Table stripe highlight-row :loading="uncheckTabLoading" 
                         :columns="uncheckColumns" :data="uncheckData" ref="uncheckTable" 
-                        style="width: 100%;" class="uncheck-table" 
+                        style="width: 100%;" class="uncheck-table" height="750" 
                         size="small">
                 </Table>
             </Card>
@@ -384,7 +384,31 @@ export default {
           width: 100
         },
         {
-          title: "销售数量",
+          renderHeader: (h, params) => {
+            return h(
+              "Tooltip",
+              {
+                props: {
+                  transfer: true,
+                  placement: "top"
+                }
+              },
+              [
+                h("span", "销售数量"),
+                h("Icon", { props: { type: "ios-help-outline" } }),
+                h(
+                  "div",
+                  {
+                    slot: "content"
+                  },
+                  [
+                    h("h4", "销售数量包含赠送数量"),
+                    h("h4", "销售数量<=库存量-销售在单数量")
+                  ]
+                )
+              ]
+            );
+          },
           key: "quantity",
           width: 120,
           render: (h, params) => {
@@ -589,6 +613,9 @@ export default {
             } else if (status === "INIT") {
               statusLabel = "待质审";
               statusColor = "#ff9900";
+            } else if (status === "QUALITY_REJECT") {
+              statusLabel = "质审拒绝";
+              statusColor = "#ed3f14";
             } else if (status === "QUALITY_CHECKED") {
               statusLabel = "待终审";
               statusColor = "#19be6b";
@@ -946,7 +973,7 @@ export default {
           if (!quantity || isNaN(quantity) || quantity <= 0) {
             this.$Modal.warning({
               title: "销售数量提示",
-              content: "产品:" + item.goodsName + "销售数量需要大于0"
+              content: "商品:" + item.goodsName + "销售数量需要大于0"
             });
             return;
           }
@@ -955,9 +982,24 @@ export default {
             this.$Modal.warning({
               title: "销售数量提示",
               content:
-                "产品:" +
+                "商品:" +
                 item.goodsName +
                 "销售数量需要大于赠送数量, 销售数包含赠送数量."
+            });
+            return;
+          }
+          //库存量减去在单数 >= 销售数量
+          let repertoryQuantity = item.repertoryQuantity
+            ? item.repertoryQuantity
+            : 0;
+          let onWayQuantity = item.onWayQuantity ? item.onWayQuantity : 0;
+          if (repertoryQuantity - onWayQuantity < quantity) {
+            this.$Modal.warning({
+              title: "销售数量提示",
+              content:
+                "商品:" +
+                item.goodsName +
+                "的销售数量不能大于库存量减去在单数量."
             });
             return;
           }
@@ -1294,7 +1336,12 @@ export default {
 
     reloadUncheckData() {
       let reqData = {
-        statusList: ["TEMP_STORAGE", "INIT", "QUALITY_CHECKED"]
+        statusList: [
+          "TEMP_STORAGE",
+          "INIT",
+          "QUALITY_REJECT",
+          "QUALITY_CHECKED"
+        ]
       };
       this.uncheckTabLoading = true;
       util.ajax

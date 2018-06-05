@@ -110,7 +110,7 @@ public enum ErrorCode {
     SELL_ORDER_DETAIL_CAN_NOT_REMOVE(2205, "订单详情在订单审批过后不能删除"),
     SELL_ORDER_REVIEW_SUBMIT_PARAMS(2206, "获取审核参数失败"),
     SELL_ORDER_REVIEW_SUBMIT_ID_ERROR(2207, "存在获取不到需要审核的订单信息"),
-    SELL_ORDER_REVIEW_STATUS_ERROR(2208, "已销售审核的订单状态不能取消质量审核", ErrorDisplay.NOTICE),
+    SELL_ORDER_REVIEW_STATUS_ERROR(2208, "订单状态不能取消质量审核", ErrorDisplay.NOTICE),
     SELL_ORDER_SHIP_PARAMS(2209, "运输记录必输项信息缺失"),
     SELL_ORDER_SHIP_NOT_FUND(2210, "获取运输记录失败"),
     SELL_ORDER_CUSTOMER_CANNOT_SELL_GOOD(2211, "客户不允许经营特殊管控商品, 而列表中存在特殊管控商品", ErrorDisplay.NOTICE),
@@ -141,6 +141,7 @@ public enum ErrorCode {
     SELL_ORDER_UPDATE_PAYMENT_FAIL(2238, "更新支付信息错误"),
     SELL_ORDER_SPECIAL_VALIDATE(2239, "商品存在有“特殊药品经营”标识, 而客户没有该资质"),
     SELL_ORDER_COLD_VALIDATE(2240, "商品存在有“冷链经营”标识, 需要客户有该资质且订单的温控方式和运输方式必输"),
+    SELL_STATUS_QUALITY_ERROR(2241, "销售单当前状态不能做质量审核"),
 
 
     // 23xx -承运公司

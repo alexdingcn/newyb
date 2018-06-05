@@ -214,18 +214,15 @@
     and d.check_status = 'OK';
   </select>
 
-  <update id="updateCheckResult" parameterType="map" >
+  <update id="updateCheckResult" parameterType="com.yiban.erp.dto.SellReviewAction" >
     update sell_order_detail
-      set check_status = #{reviewAction.checkStatus},
-          check_result = #{reviewAction.checkResult},
-          check_user = #{reviewAction.checkUser},
-          check_date = #{reviewAction.checkDate},
+      set check_status = #{checkStatus},
+          check_result = #{checkResult},
+          check_user = #{checkUser},
+          check_date = #{checkDate},
           update_time = #{updateTime},
           update_by = #{updateBy}
-    where id in
-    <foreach collection="detailIdList" item="item" open="(" close=")" separator="," >
-      #{item}
-    </foreach>
+    where sell_order_id = #{sellOrderId}
   </update>
 
 </mapper>

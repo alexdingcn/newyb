@@ -254,10 +254,14 @@
           s.repertory_id = r.id and s.sell_order_id = #{sellOrderId}
     </update>
 
-    <update id="updateOnWayQuantity" parameterType="map" >
-        update repertory_info
-          set on_way_quantity = IFNULL(on_way_quantity, 0) + #{onWayQuantity}
-        where id = #{id}
+    <update id="updateOnWayQuantity" parameterType="java.lang.Long" >
+        update repertory_info i set i.on_way_quantity =
+                (select IFNULL(sum(s2.quantity), 0) as sellOnWay from sell_order s1, sell_order_detail s2
+                    where s1.id = s2.sell_order_id and s1.`status` in ('INIT', 'QUALITY_REJECT', 'QUALITY_CHECKED') and s2.repertory_id = #{id})
+                +
+                (select IFNULL(sum(r2.back_quantity), 0) as backOnWay from repertory_in_back r1, repertory_in_back_detail r2
+                    where r1.id = r2.in_back_id and r1.`status` in ('BACK_INIT', 'BACK_BUY_CHECK', 'BACK_QUALITY_CHECK', 'BACK_QUALITY_RECHECK') and r2.repertory_info_id = #{id})
+            where i.id = #{id};
     </update>
 
   <select id="getBalance" parameterType="map" resultType="com.yiban.erp.dto.CurrentBalanceResp">

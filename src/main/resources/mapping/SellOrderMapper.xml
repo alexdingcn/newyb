@@ -243,10 +243,11 @@
     select
       <include refid="ListColumn" />
     from sell_order s
-    left join users u on s.sale_id=u.id,
-    customer c, customer_rep r, warehouse w
-    where s.customer_id = c.id and s.customer_rep_id = r.id and s.warehouse_id = w.id
-      and s.company_id = #{companyId} and s.status != 'DELETE'
+    left join users u on s.sale_id=u.id
+    left join customer c on s.customer_id = c.id
+    left join customer_rep r on s.customer_rep_id = r.id
+    left join warehouse w on s.warehouse_id = w.id
+    where s.company_id = #{companyId} and s.status != 'DELETE'
     <if test="customerId != null" >
       and s.customer_id = #{customerId}
     </if>
@@ -261,10 +262,10 @@
       and s.ref_no like #{refNoVal}
     </if>
     <if test="formCreateOrderDate != null">
-      and create_order_date >= #{formCreateOrderDate}
+      and s.create_order_date >= #{formCreateOrderDate}
     </if>
     <if test="toCreateOrderDate != null">
-      and #{toCreateOrderDate} > create_order_date
+      and #{toCreateOrderDate} > s.create_order_date
     </if>
     order by id desc
     limit #{offset}, #{limit};
@@ -297,9 +298,12 @@
 
   <select id="getAllList" parameterType="com.yiban.erp.dto.SellOrderAllAction" resultMap="ListMap">
     select <include refid="ListColumn" />
-    from sell_order s left join users u on s.sale_id=u.id, customer c, customer_rep r, warehouse w
-    where s.customer_id = c.id and s.customer_rep_id = r.id and s.warehouse_id = w.id
-      and s.company_id = #{companyId} and s.status != 'DELETE'
+    from sell_order s
+    left join users u on s.sale_id=u.id
+    left join customer c on s.customer_id = c.id
+    left join customer_rep r on s.customer_rep_id = r.id
+    left join warehouse w on s.warehouse_id = w.id
+    where s.company_id = #{companyId} and s.status != 'DELETE'
       <if test="status != null" >
         and s.status = #{status}
       </if>
@@ -337,9 +341,12 @@
 
   <select id="getReviewOrderList" parameterType="com.yiban.erp.dto.SellReviewOrderQuery" resultMap="ListMap">
     select <include refid="ListColumn"/>
-    from sell_order s left join users u on s.sale_id=u.id, customer c, customer_rep r, warehouse w
-    where s.customer_id = c.id and s.customer_rep_id = r.id and s.warehouse_id = w.id
-    and s.company_id = #{companyId} and s.status != 'DELETE'
+    from sell_order s
+    left join users u on s.sale_id=u.id
+    left join customer c on s.customer_id = c.id
+    left join customer_rep r on s.customer_rep_id = r.id
+    left join warehouse w on s.warehouse_id = w.id
+    where s.company_id = #{companyId} and s.status != 'DELETE'
     <if test="customerId != null">
       and s.customer_id = #{customerId}
     </if>
@@ -358,13 +365,17 @@
         #{item}
       </foreach>
     </if>
+    order by s.id desc;
   </select>
 
   <select id="getReviewDetailById" parameterType="java.lang.Long" resultMap="ListMap">
     select <include refid="ListColumn" />
-    from sell_order s left join users u on s.sale_id=u.id, customer c, customer_rep r, warehouse w
-    where s.customer_id = c.id and s.customer_rep_id = r.id and s.warehouse_id = w.id
-    and s.id = #{id} and s.status != 'DELETE'
+    from sell_order s
+    left join users u on s.sale_id=u.id
+    left join customer c on s.customer_id = c.id
+    left join customer_rep r on s.customer_rep_id = r.id
+    left join warehouse w on s.warehouse_id = w.id
+    where s.id = #{id} and s.status != 'DELETE'
   </select>
 
 

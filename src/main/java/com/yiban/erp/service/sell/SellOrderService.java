@@ -250,12 +250,8 @@ public class SellOrderService {
         logger.info("user:{} save order info success.", user.getId());
         List<SellOrderDetail> resultDetails = getDetailList(sellOrder.getId());
 
-        //如果保存的状态为INIT状态，把库存的在单数加上
-        if (!SellOrderStatus.TEMP_STORAGE.name().equalsIgnoreCase(sellOrder.getStatus())) {
-            //TODO 计算错误，当再次修改的时候，直接在原来的基础上加入数量了，导致会超出
-            for (SellOrderDetail detail : resultDetails) {
-                repertoryInfoMapper.updateOnWayQuantity(detail.getRepertoryId(), detail.getQuantity());
-            }
+        for (SellOrderDetail detail : resultDetails) {
+            repertoryInfoMapper.updateOnWayQuantity(detail.getRepertoryId());
         }
     }
 
@@ -365,7 +361,6 @@ public class SellOrderService {
         details.stream().forEach(item -> item.setGoods(goodsMap.get(item.getGoodsId())));
     }
 
-
     public int removeSellOrderDetail(User user, Long detailId) throws BizException {
         if (detailId == null || detailId <= 0) {
             return 0;
@@ -408,68 +403,67 @@ public class SellOrderService {
 
     @Transactional
     public void qualityCheck(User user, SellReviewAction reviewAction) throws BizException {
-        if (reviewAction == null) {
+        if (reviewAction == null || reviewAction.getCheckStatus() == null) {
             logger.warn("submit order review info but params is null.");
             throw new BizException(ErrorCode.SELL_ORDER_REVIEW_SUBMIT_PARAMS);
         }
         Long sellOrderId = reviewAction.getSellOrderId();
-        List<Long> detailIdList = reviewAction.getDetailIdList();
-        if (sellOrderId == null || detailIdList.isEmpty()) {
-            logger.warn("review order details but id is empty.");
-            throw new BizException(ErrorCode.SELL_ORDER_REVIEW_SUBMIT_PARAMS);
-        }
         SellOrder sellOrder = sellOrderMapper.selectByPrimaryKey(sellOrderId);
         if (sellOrder == null) {
             logger.warn("review order but can not get order by id:{}", sellOrderId);
             throw new BizException(ErrorCode.SELL_ORDER_DETAIL_GET_FAIL);
         }
-        reviewAction.setCheckUser(user.getNickname());
-        reviewAction.setCheckDate(new Date());
-        sellOrderDetailMapper.updateCheckResult(detailIdList, reviewAction, new Date(), user.getNickname());
-
-        List<Long> uncheckIds = sellOrderDetailMapper.getUnCheckDetailIdList(sellOrderId);
-        if (!uncheckIds.isEmpty()) {
-            logger.debug("have uncheck detail: {}", JSON.toJSONString(uncheckIds));
-            return;
+        if (!SellOrderStatus.INIT.name().equalsIgnoreCase(sellOrder.getStatus())) {
+            logger.warn("sell order status is not INIT, can not do quality check.");
+            throw new BizException(ErrorCode.SELL_STATUS_QUALITY_ERROR);
         }
-        //如果完成了，相应修改订单的状态, 出库质量审核
+        reviewAction.setCheckDate(new Date());
+        reviewAction.setUpdateBy(user.getNickname());
+        reviewAction.setUpdateTime(new Date());
+        sellOrderDetailMapper.updateCheckResult(reviewAction);
+
+        String status = SellOrderDetailCheckStatus.OK.name().equalsIgnoreCase(reviewAction.getCheckStatus())
+                ? SellOrderStatus.QUALITY_CHECKED.name() : SellOrderStatus.QUALITY_REJECT.name();
+
+        //相应修改订单的状态, 出库质量审核
         logger.info("sell order:{} have check quality review ok", sellOrderId);
-        sellOrder.setStatus(SellOrderStatus.QUALITY_CHECKED.name());
+        sellOrder.setStatus(status);
         sellOrder.setUpdateBy(user.getNickname());
         sellOrder.setUpdateTime(new Date());
         sellOrderMapper.updateByPrimaryKeySelective(sellOrder);
     }
 
     @Transactional
-    public int qualityCheckCancel(User user, SellReviewAction action) throws BizException {
-        if (action == null || action.getDetailList() == null) {
-            logger.warn("user:{} review cancel but params error.", user.getId());
-            throw new BizException(ErrorCode.SELL_ORDER_REVIEW_SUBMIT_PARAMS);
-        }
-        Long sellOrderId = action.getSellOrderId();
+    public void qualityCheckCancel(User user, Long sellOrderId) throws BizException {
         SellOrder sellOrder = sellOrderMapper.selectByPrimaryKey(sellOrderId);
         if (sellOrder == null) {
             logger.warn("user:{} review cancel but sell order not found by id:{}", user.getId(), sellOrderId);
             throw new BizException(ErrorCode.SELL_ORDER_DETAIL_GET_FAIL);
         }
-        if (!SellOrderStatus.INIT.name().equalsIgnoreCase(sellOrder.getStatus())
-                && !SellOrderStatus.QUALITY_CHECKED.name().equalsIgnoreCase(sellOrder.getStatus())) {
+        if (!SellOrderStatus.QUALITY_CHECKED.name().equalsIgnoreCase(sellOrder.getStatus())
+                && !SellOrderStatus.QUALITY_REJECT.name().equalsIgnoreCase(sellOrder.getStatus())) {
             logger.warn("current order status is can not cancel check order id:{}", sellOrderId);
             throw new BizException(ErrorCode.SELL_ORDER_REVIEW_STATUS_ERROR);
         }
         //直接根据detailId和type进行删除审批记录信息
-        List<Long> detailIdList = action.getDetailIdList();
+        SellReviewAction action = new SellReviewAction();
+        action.setSellOrderId(sellOrderId);
         action.setCheckStatus(null);
         action.setCheckResult(null);
         action.setCheckDate(null);
         action.setCheckUser(null);
-        int count = sellOrderDetailMapper.updateCheckResult(detailIdList, action, new Date(), user.getNickname());
-        //如果order的状态是已经审批完成的，改回上一级状态
-        if (SellOrderStatus.QUALITY_CHECKED.name().equalsIgnoreCase(sellOrder.getStatus())) {
-            sellOrder.setStatus(SellOrderStatus.INIT.name());
-            sellOrderMapper.updateByPrimaryKeySelective(sellOrder);
+        action.setUpdateTime(new Date());
+        action.setUpdateBy(user.getNickname());
+        int count = sellOrderDetailMapper.updateCheckResult(action);
+        if (count <= 0) {
+            logger.warn("update sell order detail fail.");
+            throw new BizRuntimeException(ErrorCode.FAILED_UPDATE_FROM_DB);
         }
-        return count;
+        //修改回待质审的状态
+        sellOrder.setStatus(SellOrderStatus.INIT.name());
+        sellOrder.setUpdateBy(user.getNickname());
+        sellOrder.setUpdateTime(new Date());
+        sellOrderMapper.updateByPrimaryKeySelective(sellOrder);
     }
 
     @Transactional
@@ -493,13 +487,6 @@ public class SellOrderService {
         if (details == null || details.isEmpty()) {
             logger.warn("get sell order detail fail.");
             throw new BizException(ErrorCode.SELL_ORDER_DETAIL_GET_FAIL);
-        }
-        //验证是否都已经质量检查通过
-        for (SellOrderDetail detail : details) {
-            if (!SellOrderDetailCheckStatus.OK.name().equalsIgnoreCase(detail.getCheckStatus())) {
-                logger.warn("user:{} check sell order but have quality check un ok.", user.getId());
-                throw new BizException(ErrorCode.SELL_ORDER_CHECK_SALE_HAVE_UNOK_DETAIL);
-            }
         }
 
         //验证当前仓库是否在正常状态，如果不在正常状态不能提交

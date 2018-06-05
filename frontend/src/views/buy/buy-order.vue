@@ -23,7 +23,7 @@
                 
                 <Table stripe highlight-row :loading="uncheckTabLoading" 
                         :columns="uncheckColumns" :data="uncheckData" ref="uncheckTable" 
-                        style="width: 100%;" class="uncheck-table" 
+                        style="width: 100%;" class="uncheck-table" height="750" 
                         size="small">
                 </Table>
             </Card>

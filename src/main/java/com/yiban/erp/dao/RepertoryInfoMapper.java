@@ -32,10 +32,7 @@ public interface RepertoryInfoMapper {
 
     List<RepertoryInfo> queryRepertoryPage(RepertoryQuery repertoryQuery);
 
-    //减库存
-    int sellOrderConsumeQuantity(@Param("sellOrderId") Long sellOrderId,
-                                 @Param("updateBy") String updateBy,
-                                 @Param("updateTime") Date updateTime);
+
 
     //获取当前仓库中某一类商品的存量
     List<CurrentBalanceResp> getBalance(@Param("warehouseId") Integer warehouseId, @Param("goodsIdList") List<Long> goodsIdList);
@@ -46,7 +43,13 @@ public interface RepertoryInfoMapper {
 
     List<RepertoryInfo> querySelectList(RepertorySelectQuery query);
 
-    int updateOnWayQuantity(@Param("id") Long id, @Param("onWayQuantity") BigDecimal backQuantity);
+    //一次性统计当前在单数量
+    int updateOnWayQuantity(@Param("id") Long id);
+
+    //减库存
+    int sellOrderConsumeQuantity(@Param("sellOrderId") Long sellOrderId,
+                                 @Param("updateBy") String updateBy,
+                                 @Param("updateTime") Date updateTime);
 
     int buyBackConsumeQuantity(@Param("inBackId") Long inBackId,
                                @Param("updateBy") String updateBy,

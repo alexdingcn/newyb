@@ -94,7 +94,7 @@ public class BuyBackService {
         }
         logger.info("insert repertoryIn details success.");
         for (RepertoryInBackDetail item : details) {
-            repertoryInfoMapper.updateOnWayQuantity(item.getRepertoryInfoId(), item.getBackQuantity());
+            repertoryInfoMapper.updateOnWayQuantity(item.getRepertoryInfoId());
         }
     }
 
