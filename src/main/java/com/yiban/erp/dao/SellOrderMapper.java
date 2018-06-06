@@ -52,4 +52,6 @@ public interface SellOrderMapper {
                                       @Param("endDate") Date endDate);
 
     int updatePayment(@Param("orderId") Long orderId, @Param("payAmount") BigDecimal payAmount);
+
+    SellOrder selectOrderDetailById(Long id);
 }

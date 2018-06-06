@@ -67,7 +67,7 @@ public class ExcelService {
             cell = row.createCell(colNum++);
             cell.setCellValue(String.valueOf(sellOrder.getTotalAmount()));
             style = workbook.createCellStyle();
-            style.setDataFormat(format.getFormat("#,##0.0000"));
+            style.setDataFormat(format.getFormat("#,##0.00"));
             cell.setCellStyle(style);
 
             cell = row.createCell(colNum++);

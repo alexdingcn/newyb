@@ -1,5 +1,6 @@
 package com.yiban.erp.entities;
 
+import java.text.DecimalFormat;
 import java.util.Date;
 
 public class StatusCount {
@@ -14,6 +15,11 @@ public class StatusCount {
     private Long customerId;
     private String customerName;
     private Double customerReceivable;
+
+    private Double avgOrderPrice;
+
+    private Date earliestOrderDate;
+    private Date latestOrderDate;
 
     public String getStatus() {
         return status;
@@ -101,5 +107,40 @@ public class StatusCount {
 
     public void setCustomerReceivable(Double customerReceivable) {
         this.customerReceivable = customerReceivable;
+    }
+
+    public Date getEarliestOrderDate() {
+        return earliestOrderDate;
+    }
+
+    public void setEarliestOrderDate(Date earliestOrderDate) {
+        this.earliestOrderDate = earliestOrderDate;
+    }
+
+    public Date getLatestOrderDate() {
+        return latestOrderDate;
+    }
+
+    public void setLatestOrderDate(Date latestOrderDate) {
+        this.latestOrderDate = latestOrderDate;
+    }
+
+    public String getAvgOrderAmount() {
+        if (orderCount != null && orderCount > 0 && amount != null) {
+            DecimalFormat formatter = new DecimalFormat("#0.00");
+            return formatter.format(amount / orderCount);
+        }
+        return "0.00";
+    }
+
+    public int getAvgOrderGap() {
+        if (earliestOrderDate != null) {
+            double diffInDays = (new Date().getTime() - earliestOrderDate.getTime()) / (1000 * 60 * 60 * 24);
+            if (diffInDays > 0 && orderCount > 0) {
+                return (int)(diffInDays / orderCount);
+            }
+        }
+
+        return 0;
     }
 }

@@ -362,7 +362,8 @@ export default {
                   {
                     props: {
                       type: "primary",
-                      icon: "edit"
+                      icon: "edit",
+                      disabled: params.row.status !== "SALE_CHECKED"
                     },
                     on: {
                       click: () => {

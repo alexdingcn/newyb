@@ -81,7 +81,7 @@
                 <Row type="flex" justify="center">
                   <i-col span="8">
                     <FormItem label="所在城市" >
-                      <al-cascader v-model="placeCodeLsit" level="2" />
+                      <al-cascader v-model="placeCodeList" level="2" />
                     </FormItem>
                   </i-col>
                   <i-col span="16">
@@ -194,7 +194,7 @@
                 </Row>
 
                 <Tabs type="card" @on-click="changeTabs">
-                  <TabPane label="账户信息" name="accountInfo">
+                  <TabPane label="账户信息" name="accountInfo" icon="android-folder-open">
                     <Row type="flex" justify="start">
                       <i-col span="8">
                         <FormItem label="账户名称" >
@@ -237,7 +237,7 @@
                       </i-col>
                     </Row>
                   </TabPane>
-                  <TabPane label="地址信息" name="repInfo" :disabled="!formItem.id">
+                  <TabPane label="地址信息" name="repInfo" :disabled="!formItem.id" icon="android-pin">
                     <Row type="flex" justify="start">
                         <ButtonGroup v-if="!isReadOnly" size="small" >
                           <Button type="primary" @click="addRepModal" icon="plus-round">
@@ -252,6 +252,25 @@
                         </Table>
                     </Row>
                   </TabPane>
+                  <TabPane label="客户分析" name="analyze" :disabled="!formItem.id" icon="pie-graph">
+                    <Row :gutter="16">
+                        <i-col span="12">
+                            <table class="stat-tbl">
+                              <tr><td>订货频率：</td><td class="num">{{ customerStat.avgOrderGap || 0 }}天/次</td></tr>
+                              <tr><td>客单价：</td><td class="num">平均{{ customerStat.avgOrderAmount || 0 }}元/笔</td></tr>
+                              <tr><td>本月成交额：</td><td class="num">{{ customerStat.monthOrderAmount || 0 }}元</td></tr>
+                              <tr><td>最近一次下单时间：</td><td class="num">{{ customerStat.latestOrderDate | formatTime }}</td></tr>
+                            </table>
+                        </i-col>
+                        <i-col span="12">
+                            <table class="stat-tbl">
+                              <tr><td>本月新增应收款：</td><td class="num">{{ customerStat.monthReceivable || 0 }}元</td></tr>
+                              <tr><td>历史累计应收款：</td><td class="num">{{ -customerStat.totalReceivable || 0 }}元</td></tr>
+                              <tr><td>本月已回款：</td><td class="num">{{ customerStat.monthReceived || 0 }}元</td></tr>
+                            </table>
+                        </i-col>
+                    </Row>
+                  </TabPane>
                 </Tabs>
               </Form>
           </Card>
@@ -261,7 +280,7 @@
         @on-closed="onRepUpdated">
       </customer-rep>
 
-      <Modal v-model="fileUploadModal" title="客户档案上传" :mask-closable="false" width="50" >
+        <Modal v-model="fileUploadModal" title="客户档案上传" :mask-closable="false" width="50" >
             <file-detail :fileNo="formItem.fileNo" @add-file-success="addFileSuccess" ></file-detail>
             <div slot="footer"></div>
         </Modal>
@@ -274,12 +293,17 @@ import util from "@/libs/util.js";
 import dataConver from "@/libs/data-conver.js";
 import Vue from "vue";
 import iviewArea from "iview-area";
+import moment from "moment";
 import optionSelect from "@/views/selector/option-select.vue";
 import fileDetail from "@/views/basic-data/file-detail.vue";
 import customerRep from "./customer-rep.vue";
 
 Vue.use(iviewArea);
-
+Vue.filter("formatTime", function(value) {
+  if (value) {
+    return moment(value).format("YYYY/MM/DD HH:mm");
+  }
+});
 export default {
   name: "customer-info",
   props: {
@@ -314,7 +338,8 @@ export default {
         placeCodes: [],
         pinyin: ""
       },
-      placeCodeLsit: [],
+      customerStat: {},
+      placeCodeList: [],
       fileUploadModal: false,
       repTabLoading: false,
       repTabData: [],
@@ -468,21 +493,27 @@ export default {
     reload() {
       if (this.customerId) {
         util.ajax
-          .get("/customer/" + this.customerId)
+          .get("/customer/" + this.customerId, { params: { stat: true } })
           .then(response => {
-            this.formItem = response.data;
-            var placeCodes = [];
-            var rawCodes = response.data.placeCodes;
-            if (rawCodes) {
-              for (var i = 0; i < rawCodes.length; i++) {
-                placeCodes.push(rawCodes[i].code);
+            if (response.status === 200 && response.data) {
+              console.log(response);
+              this.formItem = response.data.customer;
+              this.customerStat = response.data.stat;
+              var placeCodes = [];
+              var rawCodes = this.formItem
+                ? response.data.customer.placeCodes
+                : [];
+              if (rawCodes) {
+                for (var i = 0; i < rawCodes.length; i++) {
+                  placeCodes.push(rawCodes[i].code);
+                }
               }
+              this.placeCodeList = placeCodes;
+              this.businessScopeChooseList = this.formItem.businessScopeIdList
+                ? this.formItem.businessScopeIdList
+                : [];
+              this.refreshRepData();
             }
-            this.placeCodeLsit = placeCodes;
-            this.businessScopeChooseList = this.formItem.businessScopeIdList
-              ? this.formItem.businessScopeIdList
-              : [];
-            this.refreshRepData();
           })
           .catch(error => {
             util.errorProcessor(this, error);
@@ -504,7 +535,7 @@ export default {
 
     doAddCustomer() {
       this.submitBtnLoading = true;
-      this.formItem.placeCodes = this.placeCodeLsit;
+      this.formItem.placeCodes = this.placeCodeList;
       util.ajax
         .post("/customer/add", this.formItem)
         .then(response => {
@@ -520,7 +551,7 @@ export default {
     },
 
     doUpdateCustomer() {
-      this.formItem.placeCodes = this.placeCodeLsit;
+      this.formItem.placeCodes = this.placeCodeList;
       let reqData = this.formItem;
       if (!this.formItem.id) {
         this.$Notice.error({
@@ -610,6 +641,17 @@ export default {
 </script>
 
 
-<style >
+<style lang="less">
+.stat-tbl {
+  width: 100%;
+  border: 1px solid #cce1f7;
+  padding: 10px 12px 10px 12px;
+  line-height: 50px;
+  .num {
+    color: #2d8cf0;
+    font-size: 18px;
+    text-align: right;
+  }
+}
 </style>
 
