@@ -12,6 +12,7 @@ import com.yiban.erp.entities.RepertoryInfo;
 import com.yiban.erp.entities.User;
 import com.yiban.erp.service.goods.GoodsService;
 import com.yiban.erp.util.DateUtil;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -96,6 +97,17 @@ public class RepertoryService {
         final Map<Long, RepertoryInfo> map = new HashMap<>();
         infos.stream().forEach(item -> map.put(item.getId(), item));
         return map;
+    }
+
+    public List<RepertoryInfo> getListByRefOrder(RepertorySelectQuery query) {
+        if (query == null || query.getCompanyId() == null ||
+                StringUtils.isEmpty(query.getRefType()) || query.getRefOrderId() == null) {
+            logger.warn("request params is error.");
+            return Collections.emptyList();
+        }
+        List<RepertoryInfo> infos = repertoryInfoMapper.getListByRefOrder(query);
+        infos = setGoodsToList(infos);
+        return infos;
     }
 
 }

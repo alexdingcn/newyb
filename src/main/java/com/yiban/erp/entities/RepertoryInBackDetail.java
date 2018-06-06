@@ -44,7 +44,9 @@ public class RepertoryInBackDetail {
 
     private Date updatedTime;
 
-    private Long supplierId; //用户创建时验证是否为同一个供应商
+    private BigDecimal inQuantity; //采购数量
+    private BigDecimal quantity; //当前库存量
+    private BigDecimal onWayQuantity; //当前出库在单数
 
 
     private Goods goods;
@@ -54,8 +56,6 @@ public class RepertoryInBackDetail {
     private String goodsName;
     private String factoryName;
     private String origin;
-    private String jx;
-    private String spec;
     private String unitName;
     private String baseMedName;
     private String storageConditionName;
@@ -66,7 +66,6 @@ public class RepertoryInBackDetail {
             this.goodsName = goods.getName();
 //            this.factoryName = goods.getFactory();
             this.origin = goods.getOrigin();
-            this.jx = goods.getJxName();
             this.unitName = goods.getUnitName();
             this.baseMedName = goods.getBaseMedName();
             this.storageConditionName = goods.getStorageConditionName();
@@ -234,14 +233,6 @@ public class RepertoryInBackDetail {
         this.updatedTime = updatedTime;
     }
 
-    public Long getSupplierId() {
-        return supplierId;
-    }
-
-    public void setSupplierId(Long supplierId) {
-        this.supplierId = supplierId;
-    }
-
     public Goods getGoods() {
         return goods;
     }
@@ -278,22 +269,6 @@ public class RepertoryInBackDetail {
         this.origin = origin;
     }
 
-    public String getJx() {
-        return jx;
-    }
-
-    public void setJx(String jx) {
-        this.jx = jx;
-    }
-
-    public String getSpec() {
-        return spec;
-    }
-
-    public void setSpec(String spec) {
-        this.spec = spec;
-    }
-
     public String getUnitName() {
         return unitName;
     }
@@ -316,5 +291,29 @@ public class RepertoryInBackDetail {
 
     public void setStorageConditionName(String storageConditionName) {
         this.storageConditionName = storageConditionName;
+    }
+
+    public BigDecimal getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(BigDecimal quantity) {
+        this.quantity = quantity;
+    }
+
+    public BigDecimal getOnWayQuantity() {
+        return onWayQuantity;
+    }
+
+    public void setOnWayQuantity(BigDecimal onWayQuantity) {
+        this.onWayQuantity = onWayQuantity;
+    }
+
+    public BigDecimal getInQuantity() {
+        return inQuantity;
+    }
+
+    public void setInQuantity(BigDecimal inQuantity) {
+        this.inQuantity = inQuantity;
     }
 }

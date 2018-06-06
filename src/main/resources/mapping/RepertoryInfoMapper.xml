@@ -415,6 +415,20 @@
         </if>
     </select>
 
+    <select id="getListByRefOrder" parameterType="com.yiban.erp.dto.RepertorySelectQuery" resultMap="BaseResultMap" >
+        select
+          r.*,
+          s.name as supplierName, sc.name as supplierContactName,
+          w.name as warehouseName
+        from repertory_info r
+        left join supplier s on r.supplier_id = s.id
+        left join supplier_contact sc on r.supplier_contact_id = sc.id
+        left join warehouse w on r.warehouse_id = w.id
+        where r.company_id = #{companyId}
+        and ref_type = #{refType}
+        and ref_order_id = #{refOrderId}
+    </select>
+
 
 
 </mapper>

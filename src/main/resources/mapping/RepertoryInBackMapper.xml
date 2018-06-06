@@ -6,6 +6,9 @@
     <result column="company_id" property="companyId" jdbcType="INTEGER" />
     <result column="ref_type" property="refType" jdbcType="VARCHAR" />
     <result column="order_number" property="orderNumber" jdbcType="VARCHAR" />
+    <result column="in_order_id" property="inOrderId" jdbcType="BIGINT" />
+    <result column="in_order_number" property="inOrderNumber" jdbcType="VARCHAR" />
+    <result column="in_receive_time" property="inReceiveTime" jdbcType="TIMESTAMP"/>
     <result column="supplier_id" property="supplierId" jdbcType="BIGINT" />
     <result column="supplier_contact_id" property="supplierContactId" jdbcType="BIGINT" />
     <result column="buyer_id" property="buyerId" jdbcType="BIGINT" />
@@ -31,7 +34,7 @@
     <result column="updated_time" property="updatedTime" jdbcType="TIMESTAMP" />
   </resultMap>
   <sql id="Base_Column_List" >
-    id, company_id, ref_type, order_number, supplier_id, supplier_contact_id, buyer_id, 
+    id, company_id, ref_type, order_number, in_order_id, in_order_number, in_receive_time, supplier_id, supplier_contact_id, buyer_id,
     status, back_time, key_word, warehouse_id, back_buy_user, back_buy_time, back_buy_result, back_quality_user,
     back_quality_time, back_quality_result, quality_check_time, quality_check_user, final_check_time, 
     final_check_user, total_quantity, total_amount, created_by, updated_by, created_time, 
@@ -49,7 +52,7 @@
   </delete>
   <insert id="insert" parameterType="com.yiban.erp.entities.RepertoryInBack" keyProperty="id" useGeneratedKeys="true" >
     insert into repertory_in_back (company_id, ref_type,
-      order_number, supplier_id, supplier_contact_id, 
+      order_number, in_order_id, in_order_number, in_receive_time, supplier_id, supplier_contact_id,
       buyer_id, status, back_time, key_word,
       warehouse_id, back_buy_user, back_buy_time, 
       back_buy_result, back_quality_user, back_quality_time, 
@@ -59,7 +62,8 @@
       updated_by, created_time, updated_time
       )
     values (#{companyId,jdbcType=INTEGER}, #{refType,jdbcType=VARCHAR},
-      #{orderNumber,jdbcType=VARCHAR}, #{supplierId,jdbcType=BIGINT}, #{supplierContactId,jdbcType=BIGINT}, 
+      #{orderNumber,jdbcType=VARCHAR}, #{inOrderId,jdbcType=BIGINT}, #{inOrderNumber,jdbcType=VARCHAR}, #{inReceiveTime,jdbcType=TIMESTAMP},
+      #{supplierId,jdbcType=BIGINT}, #{supplierContactId,jdbcType=BIGINT},
       #{buyerId,jdbcType=BIGINT}, #{status,jdbcType=VARCHAR}, #{backTime,jdbcType=TIMESTAMP}, #{keyWord,jdbcType=VARCHAR},
       #{warehouseId,jdbcType=INTEGER}, #{backBuyUser,jdbcType=VARCHAR}, #{backBuyTime,jdbcType=TIMESTAMP}, 
       #{backBuyResult,jdbcType=VARCHAR}, #{backQualityUser,jdbcType=VARCHAR}, #{backQualityTime,jdbcType=TIMESTAMP}, 
@@ -73,14 +77,20 @@
   <update id="updateByPrimaryKeySelective" parameterType="com.yiban.erp.entities.RepertoryInBack" >
     update repertory_in_back
     <set >
-      <if test="companyId != null" >
-        company_id = #{companyId,jdbcType=INTEGER},
-      </if>
       <if test="refType != null" >
         ref_type = #{refType,jdbcType=VARCHAR},
       </if>
       <if test="orderNumber != null" >
         order_number = #{orderNumber,jdbcType=VARCHAR},
+      </if>
+      <if test="inOrderId != null" >
+        in_order_id = #{inOrderId,jdbcType=BIGINT},
+      </if>
+      <if test="inOrderNumber != null" >
+        in_order_number = #{inOrderNumber,jdbcType=VARCHAR},
+      </if>
+      <if test="inReceiveTime != null" >
+        in_receive_time = #{inReceiveTime,jdbcType=TIMESTAMP},
       </if>
       <if test="supplierId != null" >
         supplier_id = #{supplierId,jdbcType=BIGINT},

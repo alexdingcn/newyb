@@ -59,4 +59,10 @@ public interface RepertoryInfoMapper {
 
     int sellOrderReleaseOnWayQuantity(@Param("sellOrderId") Long sellOrderId); //释放锁定的销售在单数量
 
+    /**
+     * 根据关联类型和关联单号，查询对应关联订单的明细
+     * @param query
+     * @return
+     */
+    List<RepertoryInfo> getListByRefOrder(RepertorySelectQuery query);
 }

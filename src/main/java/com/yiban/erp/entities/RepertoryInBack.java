@@ -2,6 +2,7 @@ package com.yiban.erp.entities;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
 public class RepertoryInBack {
     private Long id;
@@ -11,6 +12,10 @@ public class RepertoryInBack {
     private String refType;
 
     private String orderNumber;
+
+    private Long inOrderId;
+    private String inOrderNumber;
+    private Date inReceiveTime;
 
     private Long supplierId;
     private String supplierName;
@@ -62,6 +67,8 @@ public class RepertoryInBack {
     private Date createdTime;
 
     private Date updatedTime;
+
+    private List<RepertoryInBackDetail> details;
 
     public Long getId() {
         return id;
@@ -309,5 +316,37 @@ public class RepertoryInBack {
 
     public void setBuyerName(String buyerName) {
         this.buyerName = buyerName;
+    }
+
+    public Long getInOrderId() {
+        return inOrderId;
+    }
+
+    public void setInOrderId(Long inOrderId) {
+        this.inOrderId = inOrderId;
+    }
+
+    public String getInOrderNumber() {
+        return inOrderNumber;
+    }
+
+    public void setInOrderNumber(String inOrderNumber) {
+        this.inOrderNumber = inOrderNumber;
+    }
+
+    public Date getInReceiveTime() {
+        return inReceiveTime;
+    }
+
+    public void setInReceiveTime(Date inReceiveTime) {
+        this.inReceiveTime = inReceiveTime;
+    }
+
+    public List<RepertoryInBackDetail> getDetails() {
+        return details;
+    }
+
+    public void setDetails(List<RepertoryInBackDetail> details) {
+        this.details = details;
     }
 }

@@ -12,6 +12,8 @@ import java.util.List;
 public interface RepertoryInBackDetailMapper {
     int deleteByPrimaryKey(Long id);
 
+    int deleteByInBackId(Long inBackId);
+
     int insert(RepertoryInBackDetail record);
 
     RepertoryInBackDetail selectByPrimaryKey(Long id);

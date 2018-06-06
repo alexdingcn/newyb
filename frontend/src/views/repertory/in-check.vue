@@ -2,14 +2,15 @@
 <template>
   <div>
       <Card>
-          <div slot="title" style="width:50%">
+          <div v-if="viewMethod === 'CHECK'" slot="title" style="width:50%">
               <Alert show-icon>入库审核，这是入库前的最后一步，审核通过后库存会发生相应变化</Alert>
           </div>
           <div slot="extra">
               <ButtonGroup>
                 <Button type="primary" icon="ios-search" :loading="orderLoading" @click="refreshOrder">查询</Button>
-                <Button type="success" icon="ios-checkmark" @click="checkOk" >入库审核通过</Button>
-                <Button type="info" icon="images" @click="showCheckFile">检验档案</Button>
+                <Button v-if="viewMethod === 'CHECK'" type="success" icon="ios-checkmark" @click="checkOk" >入库审核通过</Button>
+                <Button v-if="viewMethod === 'CHECK'" type="info" icon="images" @click="showCheckFile">检验档案</Button>
+                <Button v-if="viewMethod === 'SELECT'" type="success" icon="checkmark" @click="selectOrder">选择</Button>
               </ButtonGroup>
           </div>
           
@@ -24,7 +25,7 @@
                     <FormItem label="供应商">
                         <supplier-select v-model="query.supplierId" @on-change="refreshOrder" ></supplier-select>
                     </FormItem>
-                    <FormItem label="状态">
+                    <FormItem label="状态" v-if="viewMethod === 'CHECK'">
                         <Select v-model="query.status" placeholder="状态" @on-change="refreshOrder" >
                                 <Option v-for="option in statusOptions" :value="option.key" :label="option.name" :key="option.key">{{option.name}}</Option>
                         </Select>
@@ -75,6 +76,15 @@ export default {
     warehouseSelect,
     supplierSelect,
     fileDetail
+  },
+  props: {
+    viewMethod: {
+      type: String,
+      default: "CHECK",
+      validator: function(value) {
+        return value === "CHECK" || value === "SELECT";
+      }
+    }
   },
   data() {
     return {
@@ -472,6 +482,9 @@ export default {
       } else {
         statusList = ["INIT", "CHECKED", "IN_CHECKED"];
       }
+      if (this.viewMethod === "SELECT") {
+        statusList = ["IN_CHECKED"]; //采购单选择查询时，只查询已经审核通过的
+      }
       let reqData = {
         statusList: statusList,
         warehouseId: this.query.warehouseId,
@@ -598,6 +611,26 @@ export default {
             desc: "添加档案成功后绑定档案信息失败, 请联系技术人员查询原因."
           });
         });
+    },
+
+    selectOrder() {
+      if (
+        !this.currentChooseOrder.id ||
+        !this.currentChooseOrder.details ||
+        this.currentChooseOrder.details.length <= 0
+      ) {
+        this.$Message.info("请先选择存在详情的采购入库单.");
+        return;
+      }
+      //出发事件，事件返回订单和订单详情信息
+      this.$emit(
+        "on-choose",
+        this.currentChooseOrder,
+        this.currentChooseOrder.details
+      );
+      this.$nextTick(() => {
+        this.currentChooseOrder = {};
+      });
     }
   }
 };

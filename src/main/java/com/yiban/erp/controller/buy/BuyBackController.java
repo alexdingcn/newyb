@@ -3,9 +3,7 @@ package com.yiban.erp.controller.buy;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.serializer.SerializerFeature;
-import com.sun.org.apache.regexp.internal.RE;
 import com.yiban.erp.dto.BuyBackReq;
-import com.yiban.erp.dto.BuyBackAddRequest;
 import com.yiban.erp.entities.RepertoryInBack;
 import com.yiban.erp.entities.RepertoryInBackDetail;
 import com.yiban.erp.entities.User;
@@ -31,11 +29,11 @@ public class BuyBackController {
     private BuyBackService buyBackService;
 
 
-    @RequestMapping(value = "/add", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> add(@RequestBody BuyBackAddRequest addRequest,
+    @RequestMapping(value = "/save", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> add(@RequestBody RepertoryInBack inBack,
                                       @AuthenticationPrincipal User user) throws Exception {
-        logger.info("user:{} request add buy back apply, request params:{}", user.getId(), JSON.toJSONString(addRequest));
-        buyBackService.add(addRequest, user);
+        logger.info("user:{} request add buy back apply, request params:{}", user.getId(), JSON.toJSONString(inBack));
+        buyBackService.save(inBack, user);
         return ResponseEntity.ok().build();
     }
 
