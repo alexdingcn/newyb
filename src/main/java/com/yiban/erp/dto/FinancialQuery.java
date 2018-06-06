@@ -9,6 +9,7 @@ public class FinancialQuery {
 
     private Integer companyId;
 
+
     private Date logStartDate;
     private Date logEndDate;
     private Date createdStartTime;

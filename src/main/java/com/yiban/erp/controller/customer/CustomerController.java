@@ -6,7 +6,8 @@ import com.yiban.erp.dao.CustomerMapper;
 import com.yiban.erp.entities.Customer;
 import com.yiban.erp.entities.CustomerRep;
 import com.yiban.erp.entities.User;
-import com.yiban.erp.exception.*;
+import com.yiban.erp.exception.BizException;
+import com.yiban.erp.exception.ErrorCode;
 import com.yiban.erp.service.customer.CustomerService;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -64,9 +65,15 @@ public class CustomerController {
     }
 
     @RequestMapping(value = "/{customerId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> getById(@PathVariable Long customerId) {
+    public ResponseEntity<String> getById(@PathVariable Long customerId, @RequestParam(value="stat", required = false) boolean needStat, @AuthenticationPrincipal User user) {
         Customer customer = customerMapper.selectByPrimaryKey(customerId);
-        return ResponseEntity.ok().body(JSON.toJSONString(customer));
+        JSONObject result = new JSONObject();
+        result.put("customer", customer);
+        // Get Stats Data
+        if (needStat) {
+            result.put("stat", customerService.getCustomerStats(user.getCompanyId(), customerId));
+        }
+        return ResponseEntity.ok().body(JSON.toJSONString(result));
     }
 
     @RequestMapping(value = "/delete", method = RequestMethod.POST)

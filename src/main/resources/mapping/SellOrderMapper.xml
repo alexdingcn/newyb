@@ -212,6 +212,7 @@
     <result column="paid_amount" property="paidAmount" jdbcType="DECIMAL" />
     <result column="sale_nick_name" property="saleNickName" jdbcType="VARCHAR" />
     <result column="sale_real_name" property="saleRealName" jdbcType="VARCHAR" />
+    <result column="cust_name" property="customerName" jdbcType="VARCHAR"/>
     <association property="customer" javaType="com.yiban.erp.entities.Customer">
       <id column="customer_id" property="id" jdbcType="INTEGER" />
       <result column="cust_name" property="name" jdbcType="VARCHAR"/>
@@ -238,6 +239,19 @@
     r.repertory_address as rep_repertory_address,
     u.nickname as sale_nick_name, u.realname as sale_real_name
   </sql>
+
+
+    <select id="selectOrderDetailById" resultMap="ListMap" parameterType="java.lang.Long" >
+        select
+        <include refid="ListColumn" />
+        from sell_order s
+        left join users u on s.sale_id=u.id
+        left join customer c on s.customer_id = c.id
+        left join customer_rep r on s.customer_rep_id = r.id
+        left join warehouse w on s.warehouse_id = w.id
+        where s.id = #{id,jdbcType=BIGINT}
+        and s.status != 'DELETE'
+    </select>
 
   <select id="getList" parameterType="map" resultMap="ListMap">
     select
@@ -430,7 +444,9 @@
               c.account_amount as customerReceivable,
               count(distinct sod.sell_order_id) as orderCount,
               count(distinct sod.goods_id) as goodsCount,
-              sum(sod.amount) as amount
+              sum(sod.amount) as amount,
+              min(so.create_time) as earliestOrderDate,
+              max(so.create_time) as latestOrderDate
         from sell_order so, sell_order_detail sod, customer c
         where sod.sell_order_id = so.id and so.status='SALE_CHECKED'
         and so.customer_id = c.id

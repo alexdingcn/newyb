@@ -3,12 +3,19 @@ package com.yiban.erp.controller.sell;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.serializer.SerializerFeature;
+import com.yiban.erp.constant.FinancialBizType;
+import com.yiban.erp.dao.SellOrderMapper;
 import com.yiban.erp.dao.SellOrderPaymentMapper;
+import com.yiban.erp.dto.FinancialReq;
 import com.yiban.erp.dto.SellOrderQuery;
+import com.yiban.erp.entities.SellOrder;
 import com.yiban.erp.entities.SellOrderPayment;
 import com.yiban.erp.entities.User;
 import com.yiban.erp.exception.ErrorCode;
+import com.yiban.erp.service.financial.FinancialService;
 import com.yiban.erp.service.sell.SellOrderService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -20,15 +27,22 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @RestController
 @RequestMapping("/sell/payment")
 public class SellOrderPaymentController {
+    private static final Logger logger = LoggerFactory.getLogger(SellOrderPaymentController.class);
+    @Autowired
+    private SellOrderMapper sellOrderMapper;
     @Autowired
     private SellOrderService sellOrderService;
     @Autowired
     private SellOrderPaymentMapper sellOrderPaymentMapper;
+
+    @Autowired
+    private FinancialService financialService;
 
     @RequestMapping(value = "/list", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> getOrderList(@RequestBody SellOrderQuery query,
@@ -54,10 +68,30 @@ public class SellOrderPaymentController {
         if (payment.getOrderId() == null || BigDecimal.ZERO.equals(payment.getPayAmount())) {
             return ResponseEntity.badRequest().body(ErrorCode.PARAMETER_MISSING.toString());
         }
+        SellOrder sellOrder = sellOrderMapper.selectOrderDetailById(payment.getOrderId());
+        if (sellOrder == null) {
+            return ResponseEntity.badRequest().body(ErrorCode.SELL_ORDER_DETAIL_GET_FAIL.toString());
+        }
+
         boolean result = sellOrderService.addPayment(payment.getOrderId(), payment, user);
         if (result) {
             int insertResult = sellOrderPaymentMapper.insertSelective(payment);
             if (insertResult > 0) {
+                // 添加财务流水
+                FinancialReq financialReq = new FinancialReq();
+                financialReq.setBizRefId(payment.getOrderId());
+                financialReq.setBizRefNo(sellOrder.getOrderNumber());
+                financialReq.setBizType(FinancialBizType.RECEIVE.name());
+                financialReq.setCustId(sellOrder.getCustomerId());
+                financialReq.setCustType(FinancialReq.CUST_CUSTOMER);
+                financialReq.setCompanyId(user.getCompanyId());
+                financialReq.setLogUserName(user.getNickname());
+                financialReq.setLogAmount(payment.getPayAmount());
+                financialReq.setLogAccount(sellOrder.getCustomerName());
+                financialReq.setLogDate(new Date());
+                logger.info("user:{} add financial flow by:{}", user.getId(), JSON.toJSONString(financialReq));
+                financialService.payAndReceiveFinancialRecord(financialReq);
+
                 return ResponseEntity.ok().build();
             }
             return ResponseEntity.badRequest().body(ErrorCode.FAILED_INSERT_FROM_DB.toString());

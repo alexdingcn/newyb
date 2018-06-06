@@ -1,24 +1,31 @@
 package com.yiban.erp.service.customer;
 
+import com.alibaba.fastjson.JSONObject;
 import com.yiban.erp.constant.CustomerStatus;
+import com.yiban.erp.constant.FinancialBizType;
 import com.yiban.erp.constant.OrderNumberType;
 import com.yiban.erp.dao.CustomerMapper;
 import com.yiban.erp.dao.CustomerRepMapper;
+import com.yiban.erp.dao.FinancialFlowMapper;
+import com.yiban.erp.dao.SellOrderMapper;
+import com.yiban.erp.dto.FinancialQuery;
 import com.yiban.erp.entities.Customer;
 import com.yiban.erp.entities.CustomerRep;
+import com.yiban.erp.entities.FinancialFlow;
+import com.yiban.erp.entities.StatusCount;
 import com.yiban.erp.exception.BizException;
 import com.yiban.erp.exception.BizRuntimeException;
 import com.yiban.erp.exception.ErrorCode;
 import com.yiban.erp.util.UtilTool;
+import org.apache.commons.lang3.time.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.math.BigDecimal;
+import java.text.DecimalFormat;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -31,6 +38,12 @@ public class CustomerService {
     @Autowired
     private CustomerRepMapper customerRepMapper;
 
+    @Autowired
+    private SellOrderMapper sellOrderMapper;
+
+    @Autowired
+    private FinancialFlowMapper financialFlowMapper;
+
     public Customer getDetail(Integer companyId, Long id) {
         Customer customer = customerMapper.getCustomerDetailById(companyId, id);
         if (customer != null) {
@@ -38,6 +51,65 @@ public class CustomerService {
             setRepDefaultFlag(customer.getCustomerReps());
         }
         return customer;
+    }
+
+    public JSONObject getCustomerStats(Integer companyId, Long customerId) {
+        List<StatusCount> totalStats = sellOrderMapper.getCustomerStat(companyId, customerId, null, null);
+        Date firstDay = DateUtils.truncate(new Date(), Calendar.MONTH);
+        List<StatusCount> thisMonthStats = sellOrderMapper.getCustomerStat(companyId, customerId, firstDay, new Date());
+
+
+        JSONObject result = new JSONObject();
+        if ( totalStats != null && totalStats.size() > 0) {
+            StatusCount totalStat = totalStats.get(0);
+            result.put("totalOrderCount", totalStat.getOrderCount());
+            result.put("totalOrderAmount", totalStat.getAmount());
+            // 订货频率
+            result.put("avgOrderGap", totalStat.getAvgOrderGap());
+            // 客单价
+            result.put("avgOrderAmount", totalStat.getAvgOrderAmount());
+            result.put("totalReceivable", totalStat.getCustomerReceivable());
+            result.put("latestOrderDate", totalStat.getLatestOrderDate());
+        }
+        if ( thisMonthStats != null && thisMonthStats.size() > 0) {
+            StatusCount monthStat = thisMonthStats.get(0);
+            //本月成交额
+            result.put("monthOrderAmount", monthStat.getAmount());
+
+            FinancialQuery query = new FinancialQuery();
+            query.setCustId(customerId);
+            query.setCompanyId(companyId);
+            query.setLogStartDate(firstDay);
+            List<FinancialFlow> flows = financialFlowMapper.getFlowList(query);
+            BigDecimal received = BigDecimal.ZERO;
+            BigDecimal receivable = BigDecimal.ZERO;
+            if (flows != null) {
+                for (FinancialFlow flow: flows) {
+                    // 本月收款= 收款+预收-收款取消-预收取消
+                    if (FinancialBizType.RECEIVE.name().equals(flow.getBizType()) || FinancialBizType.PRE_RECEIVE.name().equals(flow.getBizType())) {
+                        received = received.add(flow.getLogAmount());
+                    }
+                    else if (FinancialBizType.RECEIVE_CANCEL.name().equals(flow.getBizType()) || FinancialBizType.PRE_RECEIVE_CANCEL.name().equals(flow.getBizType())) {
+                        received = received.subtract(flow.getLogAmount());
+                    }
+
+                    // 本月应收= 销售应收+手工应收 - 应收取消
+                    if (FinancialBizType.RECORD_RECEIVE.name().equals(flow.getBizType()) || FinancialBizType.SELL_BATCH.name().equals(flow.getBizType())) {
+                        receivable = receivable.add(flow.getLogAmount());
+                    }
+                    else if (FinancialBizType.RECORD_RECEIVE_CANCEL.name().equals(flow.getBizType())) {
+                        receivable = receivable.subtract(flow.getLogAmount());
+                    }
+                }
+            }
+            DecimalFormat formatter = new DecimalFormat("#0.00");
+            //  本月新增应收款：
+            result.put("monthReceivable", formatter.format(receivable));
+            //  本月已回款：
+            result.put("monthReceived", formatter.format(received));
+        }
+
+        return result;
     }
 
     public Customer addCustomer(Customer reqCustomer) throws BizException {
@@ -52,7 +124,7 @@ public class CustomerService {
         int count = customerMapper.insert(addCustomer);
         if (count > 0 && addCustomer.getId() > 0) {
             return addCustomer;
-        }else {
+        } else {
             throw new BizRuntimeException(ErrorCode.FAILED_INSERT_FROM_DB);
         }
     }
@@ -67,7 +139,7 @@ public class CustomerService {
         int count = customerMapper.updateByPrimaryKeySelective(updCustomer);
         if (count > 0) {
             return updCustomer;
-        }else {
+        } else {
             throw new BizRuntimeException(ErrorCode.FAILED_UPDATE_FROM_DB);
         }
     }
@@ -105,7 +177,7 @@ public class CustomerService {
                 customerRepMapper.setDefault(rep.getId(), rep.getDefaultTime());
             }
             return rep;
-        }else {
+        } else {
             logger.info("get customer default rep fail. customerId:{}", customerId);
             return null;
         }
@@ -132,7 +204,7 @@ public class CustomerService {
             for (CustomerRep rep : list) {
                 if (defaultValue.getId().equals(rep.getId())) {
                     rep.setIsDefault(true);
-                }else {
+                } else {
                     rep.setIsDefault(false);
                 }
             }
@@ -157,7 +229,7 @@ public class CustomerService {
         }
         if (reqRep.getIsDefault() != null && reqRep.getIsDefault()) {
             reqRep.setDefaultTime(new Date()); //设置为默认使用
-        }else {
+        } else {
             reqRep.setDefaultTime(null);
         }
         reqRep.setCreateTime(new Date());
@@ -166,7 +238,7 @@ public class CustomerService {
         int count = customerRepMapper.insert(reqRep);
         if (count > 0) {
             return reqRep;
-        }else {
+        } else {
             logger.warn("add customer rep but insert database fail.");
             throw new BizRuntimeException(ErrorCode.FAILED_INSERT_FROM_DB);
         }
@@ -189,7 +261,7 @@ public class CustomerService {
         int count = customerRepMapper.updateByPrimaryKeySelective(reqRep);
         if (count > 0) {
             return reqRep;
-        }else {
+        } else {
             logger.warn("update customer rep but update database fail.");
             throw new BizRuntimeException(ErrorCode.FAILED_UPDATE_FROM_DB);
         }
