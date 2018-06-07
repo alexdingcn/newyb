@@ -16,12 +16,16 @@ public class RepertorySelectQuery {
     private Integer page;
     private Integer size;
 
-
     private BigDecimal minQuantity; //最低库存
 
     private boolean byPage; // 是否分页，只有当true的时候才考虑分页，否则不考虑
     private int offset;
     private int limit;
+
+
+    //根据关联类型和管理单号，获取关联单的所有存库明细
+    private String refType;
+    private Long refOrderId;
 
     public int getOffset() {
         return (this.page == null || this.page <= 0 ? 0 : this.page - 1) * this.getLimit();
@@ -103,5 +107,19 @@ public class RepertorySelectQuery {
         this.minQuantity = minQuantity;
     }
 
+    public String getRefType() {
+        return refType;
+    }
 
+    public void setRefType(String refType) {
+        this.refType = refType;
+    }
+
+    public Long getRefOrderId() {
+        return refOrderId;
+    }
+
+    public void setRefOrderId(Long refOrderId) {
+        this.refOrderId = refOrderId;
+    }
 }

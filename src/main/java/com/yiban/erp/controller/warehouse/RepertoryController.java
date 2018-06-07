@@ -64,4 +64,12 @@ public class RepertoryController {
         return ResponseEntity.ok().body(JSON.toJSONString(response, SerializerFeature.DisableCircularReferenceDetect));
     }
 
+    @RequestMapping(value = "/refOrder/list", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> getListByRefOrder(@RequestBody RepertorySelectQuery query,
+                                                    @AuthenticationPrincipal User user) {
+        query.setCompanyId(user.getCompanyId());
+        List<RepertoryInfo> result = repertoryService.getListByRefOrder(query);
+        return ResponseEntity.ok().body(JSON.toJSONString(result, SerializerFeature.DisableCircularReferenceDetect));
+    }
+
 }

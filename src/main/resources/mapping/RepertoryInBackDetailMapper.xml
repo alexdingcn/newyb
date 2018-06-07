@@ -38,6 +38,9 @@
     delete from repertory_in_back_detail
     where id = #{id,jdbcType=BIGINT}
   </delete>
+  <delete id="deleteByInBackId" parameterType="java.lang.Long">
+    delete from repertory_in_back_detail where in_back_id = #{inBackId}
+  </delete>
   <insert id="insert" parameterType="com.yiban.erp.entities.RepertoryInBackDetail" keyProperty="id" useGeneratedKeys="true" >
     insert into repertory_in_back_detail (in_back_id, repertory_info_id,
       goods_id, back_quantity, buy_price, 
@@ -142,9 +145,12 @@
 
   <select id="getDetailByBackId" parameterType="java.lang.Long" resultMap="BaseResultMap">
     select
-      <include refid="Base_Column_List" />
-    from repertory_in_back_detail
-    where in_back_id = #{inBackId,jdbcType=BIGINT}
+      b.*,
+      r.in_quantity as inQuantity,
+      r.quantity as quantity,
+      r.on_way_quantity as onWayQuantity
+    from repertory_in_back_detail b, repertory_info r
+    where b.repertory_info_id = r.id and in_back_id = #{inBackId,jdbcType=BIGINT}
   </select>
 
   <update id="updateCheckStatus" parameterType="com.yiban.erp.dto.BuyBackReq" >

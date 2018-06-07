@@ -47,6 +47,8 @@ public class RepertoryInfo {
 
     private Long supplierContactId;
 
+    private String supplierContactName;
+
     private Long buyerId;
 
     private Long orderId;
@@ -99,6 +101,7 @@ public class RepertoryInfo {
             this.taxRate = goods.getOutTax();
         }
     }
+
 
     public Long getId() {
         return id;
@@ -446,5 +449,13 @@ public class RepertoryInfo {
 
     public void setGoodsNo(String goodsNo) {
         this.goodsNo = goodsNo;
+    }
+
+    public String getSupplierContactName() {
+        return supplierContactName;
+    }
+
+    public void setSupplierContactName(String supplierContactName) {
+        this.supplierContactName = supplierContactName;
     }
 }

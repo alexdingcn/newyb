@@ -104,647 +104,675 @@
 
         <warehouse-location-modal :openModal="locationModal" :warehouseId="applyForm.warehouseId" @on-ok="chooseLocation" @on-close="locationModalClose"></warehouse-location-modal>
 
-        <Modal v-model="selectSellOrderModal" width="75" :mask-closable="false" title="销售单提取" >
+        <Modal v-model="selectSellOrderModal" width="75" footerHide :mask-closable="false" title="销售单提取" >
             <sell-sale-revivew view-method="SELECT" @on-choose="saleOrderChoose"></sell-sale-revivew>
-            <div slot="footer"></div>
         </Modal>
 
     </div>
 </template>
 
 <script>
-import util from '@/libs/util.js';
-import moment from 'moment';
-import customerSelect from '@/views/selector/customer-select.vue';
-import saleSelect from '@/views/selector/sale-select.vue';
-import warehouseSelect from '@/views/selector/warehouse-select.vue';
-import goodSelect from '@/views/selector/good-select.vue';
+import util from "@/libs/util.js";
+import moment from "moment";
+import customerSelect from "@/views/selector/customer-select.vue";
+import saleSelect from "@/views/selector/sale-select.vue";
+import warehouseSelect from "@/views/selector/warehouse-select.vue";
+import goodSelect from "@/views/selector/good-select.vue";
 import warehouseLocationModal from "@/views/selector/warehouse-location-modal.vue";
-import optionSelect from '@/views/selector/option-select.vue';
-import inTempVue from '../repertory/in-temp.vue';
-import sellSaleRevivew from './sell-sale-review.vue';
-import goodsSpecTags from '@/views/goods/goods-spec-tabs.vue';
+import optionSelect from "@/views/selector/option-select.vue";
+import inTempVue from "../repertory/in-temp.vue";
+import sellSaleRevivew from "./sell-sale-review.vue";
+import goodsSpecTags from "@/views/goods/goods-spec-tabs.vue";
 
 export default {
-    name: 'sell-back-apply',
-    components: {
-        customerSelect,
-        saleSelect,
-        warehouseSelect,
-        goodSelect,
-        warehouseLocationModal,
-        optionSelect,
-        sellSaleRevivew,
-        goodsSpecTags
-    },
-    data() {
-        const addWarehouseLocation = (h, location, rowData, index) => {
-            let label = location ? location : '';
-            return h('div', [
-                h('span', label),
-                h('Button', {
-                    props: {
-                        type: 'text',
-                        size: 'small',
-                        icon: 'edit'
-                    },
-                    on: {
-                        'click': () => {
-                            this.openChooseLocation(rowData, index);
-                        }
-                    }
-                })
-            ]);
-        }
-        return {
-            customerRepList: [],
-            loading: false,
-            applyForm: {
-                customerId: '',
-                saleId: '',
-                haveSellOrder: false,
-                warehouseId: '',
-                freeAmount: 0,
-                details: []
-            },
-            goodsId: '',
-            customerError: '',
-            saleError: '',
-            warehouseError: '',
-            goodsError: '',
-            freeAmountError: '',
-            details: [],
-            detailsColumns: [
-                {
-                    title: '序号',
-                    type: 'index',
-                    width: 80
-                },
-                {
-                    title: "商品名称",
-                    key: "goodsName",
-                    width: 180
-                },
-                {
-                    title: "生产企业",
-                    key: "factoryName",
-                    width: 180,
-                },
-                {
-                    title: "产地",
-                    key: "origin",
-                    width: 120
-                },
-                {
-                    title: "规格",
-                    key: "spec",
-                    width: 120,
-                    render: (h, params) =>　{
-                        return h(goodsSpecTags, {
-                            props: {
-                                tags: params.row.goods.goodsSpecs,
-                                color: 'blue'
-                            }
-                        });
-                    }
-                },
-                {
-                    title: '单位',
-                    key: 'unitName',
-                    width: 100
-                },
-                {
-                    title: '批次号',
-                    key: 'batchCode',
-                    width: 180,
-                    render: (h, params) => {
-                        let self = this;
-                        if (self.applyForm.haveSellOrder) {
-                            return params.row.batchCode;
-                        }else {
-                            return h("Input", {
-                                props: {
-                                    value: self.details[params.index][params.column.key]
-                                },
-                                on: {
-                                    "on-blur"(event) {
-                                        let row = self.details[params.index];
-                                        row[params.column.key] = event.target.value;
-                                    }
-                                }
-                            });
-                        }
-                    }
-                },
-                {
-                    title: '生产日期',
-                    key: 'productDate',
-                    align: 'center',
-                    width: 180,
-                    render: (h, params) => {
-                        let self = this;
-                        return h('DatePicker', {
-                            props: {
-                                type: 'date',
-                                placement: 'top',
-                                transfer: true,
-                                value: params.row.productDate
-                            },
-                            on: {
-                                'on-change': (date) =>{
-                                    let row = self.details[params.index];
-                                    row[params.column.key] = date; 
-                                }
-                            }
-                        });
-                    }
-                },
-                {
-                    title: '有效期至',
-                    key: 'expDate',
-                    align: 'center',
-                    width: 180,
-                    render: (h, params) => {
-                        let self = this;
-                        return h('DatePicker', {
-                            props: {
-                                type: 'date',
-                                placement: 'top',
-                                transfer: true,
-                                value: params.row.expDate
-                            },
-                            on: {
-                                'on-change': (date) =>{
-                                    let row = self.details[params.index];
-                                    row[params.column.key] = date; 
-                                }
-                            }
-                        });
-                    }
-                },
-                {
-                    title: '销售数量',
-                    key: 'saleQuantity',
-                    width: 120
-                },
-                {
-                    title: '已退数量',
-                    key: 'alreadyBackQuantity',
-                    width: 120,
-                },
-                {
-                    title: '退货数量',
-                    key: 'backQuantity',
-                    width: 140,
-                    render: (h, params) => {
-                        var self = this;
-                        return h('Input', {
-                            props: {
-                                number: true,
-                                value: self.details[params.index][params.column.key]
-                            },
-                            on: {
-                                'on-blur' (event) {
-                                    let row = self.details[params.index];
-                                    row[params.column.key] = event.target.value;
-                                    self.resetAmount(params.index);
-                                }
-                            }
-                        });
-                    }
-                },
-                {
-                    title: '单价',
-                    key: 'backPrice',
-                    width: 140,
-                    render: (h, params) => {
-                        var self = this;
-                        return h('Input', {
-                            props: {
-                                number: true,
-                                value: self.details[params.index][params.column.key]
-                            },
-                            on: {
-                                'on-blur' (event) {
-                                    let row = self.details[params.index];
-                                    row[params.column.key] = event.target.value;
-                                    self.resetAmount(params.index);
-                                }
-                            }
-                        });
-                    }
-                },
-                {
-                    title: '金额',
-                    key: 'amount',
-                    width: 140
-                },
-                {
-                    title: '退货成本',
-                    key: 'costAmount',
-                    width: 140,
-                    render: (h, params) => {
-                        var self = this;
-                        return h('Input', {
-                            props: {
-                                number: true,
-                                value: self.details[params.index][params.column.key]
-                            },
-                            on: {
-                                'on-blur' (event) {
-                                    let row = self.details[params.index];
-                                    row[params.column.key] = event.target.value;
-                                }
-                            }
-                        });
-                    }
-                },
-                {
-                    title: "税率",
-                    key: "taxRate",
-                    align: "center",
-                    width: 120,
-                    render: (h, params) => {
-                        let self = this;
-                        return h("Input", {
-                            props: {
-                                number: true,
-                                value: self.details[params.index][params.column.key]
-                            },
-                            on: {
-                                "on-blur"(event) {
-                                    let row = self.details[params.index];
-                                    row[params.column.key] = event.target.value;
-                                }
-                            }
-                        });
-                    }
-                },
-                {
-                    title: '货位',
-                    key: 'location',
-                    width: 150,
-                    render: (h, params) => {
-                        return addWarehouseLocation(h, params.row.location, params.row, params.index);
-                    }
-                },
-                {
-                    title: '存储条件',
-                    key: 'storageConditionName',
-                    width: 120
-                },
-                {
-                    title: '药基',
-                    key: 'baseMedName',
-                    width: 120
-                },
-                {
-                    title: '批准文号',
-                    key: 'permitNo',
-                    width: 200
-                }
-            ],
-            locationModal: false,
-            currEditLocationRow: '',
-            currEditLocationIndex: '',
-            currCustomer: {},
-            selectSellOrderModal: false
-        }
-    },
-    computed: {
-        totalBackQuantity: function() {
-            return this.details.reduce((total, item) => {
-                let backQuantity = item.backQuantity ? item.backQuantity : 0;
-                return total + parseFloat(backQuantity);
-            }, 0);
+  name: "sell-back-apply",
+  components: {
+    customerSelect,
+    saleSelect,
+    warehouseSelect,
+    goodSelect,
+    warehouseLocationModal,
+    optionSelect,
+    sellSaleRevivew,
+    goodsSpecTags
+  },
+  data() {
+    const addWarehouseLocation = (h, location, rowData, index) => {
+      let label = location ? location : "";
+      return h("div", [
+        h("span", label),
+        h("Button", {
+          props: {
+            type: "text",
+            size: "small",
+            icon: "edit"
+          },
+          on: {
+            click: () => {
+              this.openChooseLocation(rowData, index);
+            }
+          }
+        })
+      ]);
+    };
+    return {
+      customerRepList: [],
+      loading: false,
+      applyForm: {
+        customerId: "",
+        saleId: "",
+        haveSellOrder: false,
+        warehouseId: "",
+        freeAmount: 0,
+        details: []
+      },
+      goodsId: "",
+      customerError: "",
+      saleError: "",
+      warehouseError: "",
+      goodsError: "",
+      freeAmountError: "",
+      details: [],
+      detailsColumns: [
+        {
+          title: "序号",
+          type: "index",
+          width: 80
         },
-        totalAmount: function() {
-            return this.details.reduce((total, item) => {
-                let amount = item.amount ? item.amount : 0;
-                return total + parseFloat(amount);
-            }, 0);
+        {
+          title: "商品名称",
+          key: "goodsName",
+          width: 180
         },
-        totalCostAmount: function() {
-            return this.details.reduce((total, item) => {
-                let costAmount = item.costAmount ? item.costAmount : 0;
-                return total + parseFloat(costAmount);
-            }, 0);
-        }
-    },
-    watch: {
-        applyForm: function (data) {
-            if (data.customerId) {
-                this.customerError = '';
-            }
-            if (data.saleId) {
-                this.saleError = '';
-            }
-            if (data.warehouseId) {
-                this.warehouseError = '';
-            }
-            if (data.freeAmount <= 0) {
-                this.freeAmountError = '';
-            }
+        {
+          title: "生产企业",
+          key: "factoryName",
+          width: 180
         },
-        details: function (data) {
-            if (data && data.length > 0) {
-                this.goodsError = '';
-            }
+        {
+          title: "产地",
+          key: "origin",
+          width: 120
         },
-        totalBackQuantity: function (data) {
-            if (data && data > 0) {
-                this.goodsError = '';
-            }
-        },
-        
-    },
-    methods: {
-        openChooseLocation(rowData, index) {
-            if (!rowData || index === undefined || index < 0) {
-                this.$Message.error('获取编辑位置失败');
-                return;
-            }
-            this.currEditLocationRow = rowData;
-            this.currEditLocationIndex = index;
-            this.locationModal = true;
-        },
-        chooseLocation(data) {
-            this.locationModal = false;
-            this.currEditLocationRow.location = data.location;
-            this.$set(this.details, this.currEditLocationIndex, this.currEditLocationRow);
-        },
-        locationModalClose() {
-            this.locationModal = false;
-            this.currEditLocationIndex = '';
-            this.currEditLocationRow = {};
-        },
-        refreshCustomerRepList(customerId, customerRepId) {
-            let reqData = {
-                customerId: customerId
-            };
-            let self = this;
-            util.ajax
-                .get("/customer/rep/list", { params: reqData })
-                .then(response => {
-                    self.customerRepList = response.data;
-                    if (customerRepId) {
-                        self.$nextTick(() => {
-                            self.applyForm.customerRepId = customerRepId;
-                        })
-                    }
-                })
-                .catch(error => {
-                    util.errorProcessor(self, error);
-                });
-        },
-        customerChange(customerId, customer) {
-            this.currCustomer = customer;
-            if (customer && customer.id) {
-                this.applyForm.customerId = customer.id;
-                this.applyForm.customerName = customer.name;
-                this.applyForm.customerRepId = '';
-                this.customerRepList = [];
-                this.refreshCustomerRepList(customer.id);
-            }
-        },
-        customerRepChange(customerRepId) {
-            if(!customerRepId) {
-                return;
-            }
-            let customerRep = {};
-            for(let i=0;i<this.customerRepList.length; i++) {
-                let item = this.customerRepList[i];
-                if (customerRepId === item.id) {
-                    customerRep = item;
-                    break;
-                }
-            }
-            if (customerRep && customerRep.id) {
-                this.applyForm.customerRepName = customerRep.name;
-            }
-        },
-        warehouseChanage(id, warehouse) {
-            this.applyForm.warehouseName = warehouse.name;
-        },
-        saleChange(saleId, saleUser) {
-            console.log(saleUser);
-            if (saleUser.id) {
-                this.applyForm.saleName = saleUser.nickname;
-            }
-        },
-        goodsSelectChange(goodsId, goods) {
-            if (!this.applyForm.customerId || !this.applyForm.warehouseId) {
-                this.$refs.goodsSelect.clearSingleSelect();
-                this.$Message.info('请先选择客户和仓库点!');
-                return;
-            }
-            //商品选择时，添加商品信息
-            if (!goods || !goods.id) {
-                this.$refs.goodsSelect.clearSingleSelect();
-                return;
-            }
-            let item = {
-                goodsId: goods.id,
-                goodsName: goods.name,
-                factoryName: goods.factoryName,
-                origin: goods.origin,
-                spec: goods.spec,
-                jx: goods.jxName,
-                unitName: goods.unitName,
-                batchCode: '',
-                productDate: '',
-                expDate: '',
-                saleQuantity: '',
-                alreadyBackQuantity: '',
-                backQuantity: 0,
-                backPrice: 0,
-                amount: 0,
-                costAmount: 0,
-                location: '',
-                taxRate: goods.outRate,
-                storageConditionName: goods.storageConditionName,
-                baseMedName: goods.baseMedName,
-                permitNo: goods.permitNo,
-                goods: goods
-            };
-            this.details.push(item);
-            this.$refs.goodsSelect.clearSingleSelect();
-        },
-        resetAmount(index) {
-            let row = this.details[index];
-            if (!row) {
-                return;
-            }
-            let backQuantity = row.backQuantity && !isNaN(row.backPrice) ? row.backQuantity : 0;
-            let backPrice = row.backPrice && !isNaN(row.backPrice) ? row.backPrice : 0;
-            row.amount = (backQuantity * backPrice).toFixed(2);
-            this.$set(this.details, index, row);
-        },
-
-        saveSubmit() {
-            this.customerError = '';
-            this.saleError = '';
-            this.warehouseError = '';
-            this.goodsError = '';
-            if (!this.applyForm.customerId) {
-                this.customerError = '请先选择对应的客户!';
-                return;
-            }
-            if (!this.applyForm.saleId) {
-                this.saleError = '请选择销售员';
-                return;
-            }
-            if (!this.applyForm.warehouseId) {
-                this.warehouseError = '请选择对应仓库点';
-                return;
-            }
-            if (this.totalBackQuantity <= 0) {
-                this.goodsError = '选择的退货商品数量需要大于0';
-                return;
-            }
-            if (this.applyForm.freeAmount > 0) {
-                this.freeAmountError = '免零金额不能大于0';
-                return;
-            }
-            if (this.applyForm.haveSellOrder) {
-                if (!this.applyForm.refOrderId) {
-                    this.$$Message.error('系统异常，获取关联订单失败, 请刷新页面重新操作.');
-                    return;
-                }
-                for (let i=0; i < this.details.length; i++) {
-                    let item = this.details[i];
-                    let backQuantity = item.backQuantity ? item.backQuantity : 0;
-                    let saleQuantity = item.saleQuantity ? item.saleQuantity : 0;
-                    let alreadyBackQuantity = item.alreadyBackQuantity ? item.alreadyBackQuantity : 0;
-                    if ((saleQuantity-alreadyBackQuantity) < backQuantity) {
-                        this.$Modal.warning({
-                            title: '退货数量错误提示',
-                            content: '商品：' + item.goodsName + '的退货数不能超出销售单销售数量.'
-                        });
-                        return;
-                    }
-                }
-            }
-            let self = this;
-            this.applyForm.details = this.details;
-            this.$Modal.confirm({
-                title: '保存确认',
-                content: '是否已经确认需要退货的商品信息输入完整并且正确? 提交保存后不可再修改!',
-                onCancel: () => {},
-                onOk: () => {
-                    self.loading = true;
-                    util.ajax
-                        .post('/sell/back/add', self.applyForm)
-                        .then((response) => {
-                            self.loading = false;
-                            self.$Message.success('退货单提交保存成功.');
-                            self.clearForm();
-                        })
-                        .catch((error) => {
-                            self.loading = false;
-                            util.errorProcessor(self, error);
-                        })
-                }
+        {
+          title: "规格",
+          key: "spec",
+          width: 120,
+          render: (h, params) => {
+            return h(goodsSpecTags, {
+              props: {
+                tags: params.row.goods.goodsSpecs,
+                color: "blue"
+              }
             });
+          }
         },
-
-        clearForm() {
-            this.applyForm = {
-                customerId: '',
-                saleId: '',
-                haveSellOrder: false,
-                warehouseId: '',
-                freeAmount: 0,
-                details: []
-            };
-            this.details = [];
-            this.customerError = '';
-            this.saleError = '';
-            this.warehouseError = '';
-            this.goodsError = '';
-            this.$refs.applyForm.resetFields();
+        {
+          title: "单位",
+          key: "unitName",
+          width: 100
         },
-
-        getSaleOrderShow() {
-            this.selectSellOrderModal = true;
-        },
-
-        saleOrderChoose(saleOrder, orderDetails) {
-            this.selectSellOrderModal = false;
-            if (!saleOrder.id || !orderDetails || orderDetails.length <= 0) {
-                return;
-            }
-            this.applyForm = {
-                refOrderId: saleOrder.id,
-                refOrderNo: saleOrder.orderNumber,
-                customerId: saleOrder.customerId,
-                customerName: saleOrder.customerName,
-                customerRepId: saleOrder.customerRepId,
-                customerRepName: saleOrder.customerRepName,
-                saleId: saleOrder.saleId,
-                haveSellOrder: true,
-                warehouseId: saleOrder.warehouseId,
-                temperControlId: saleOrder.temperControlId,
-                freeAmount: 0
-            };
-            this.refreshCustomerRepList(saleOrder.customerId, saleOrder.customerRepId);
-            //详情
-            this.details = []; //清除原有的
-            for (let i=0; i<orderDetails.length; i++) {
-                let detail = orderDetails[i];
-                let goods = detail.goods;
-                console.log(goods);
-                let item = {
-                    sellDetailId: detail.id,
-                    goodsId: goods.id,
-                    goodsName: goods.name,
-                    factoryName: goods.factoryName,
-                    origin: goods.origin,
-                    spec: goods.spec,
-                    jx: goods.jxName,
-                    unitName: goods.unitName,
-                    batchCode: detail.batchCode,
-                    productDate: detail.productDate ? moment(detail.productDate).format('YYYY-MM-DD') : '',
-                    expDate: detail.expDate ? moment(detail.expDate).format('YYYY-MM-DD') : '',
-                    saleQuantity: detail.quantity,
-                    alreadyBackQuantity: detail.backQuantity,
-                    backQuantity: 0,
-                    backPrice: detail.realPrice,
-                    amount: 0,
-                    costAmount: 0,
-                    taxRate: detail.taxRate,
-                    location: detail.location,
-                    storageConditionName: goods.storageConditionName,
-                    baseMedName: goods.baseMedName,
-                    permitNo: goods.permitNo,
-                    goods: goods
-                };
-                this.details.push(item);
-            }
-        },
-
-        backAllQuantity() {
-            for(let i=0; i<this.details.length; i++) {
-                let row = this.details[i];
-                let saleQuantity = row.saleQuantity ? row.saleQuantity : 0;
-                let alreadyBackQuantity = row.alreadyBackQuantity ? row.alreadyBackQuantity : 0;
-                row.backQuantity = saleQuantity - alreadyBackQuantity
-                this.resetAmount(i);
-            }
-        },
-
-        removeDetail(row, index) {
+        {
+          title: "批次号",
+          key: "batchCode",
+          width: 180,
+          render: (h, params) => {
             let self = this;
-            this.$Modal.confirm({
-                title: '删除确认',
-                content: '是否确认去除批次号: ' + row.batchCode + ', 商品: ' + row.goodsName + '？',
-                onCancel: () => {},
-                onOk: () => {
-                    self.details.splice(index, 1);
+            if (self.applyForm.haveSellOrder) {
+              return params.row.batchCode;
+            } else {
+              return h("Input", {
+                props: {
+                  value: self.details[params.index][params.column.key]
+                },
+                on: {
+                  "on-blur"(event) {
+                    let row = self.details[params.index];
+                    row[params.column.key] = event.target.value;
+                  }
                 }
+              });
+            }
+          }
+        },
+        {
+          title: "生产日期",
+          key: "productDate",
+          align: "center",
+          width: 180,
+          render: (h, params) => {
+            let self = this;
+            return h("DatePicker", {
+              props: {
+                type: "date",
+                placement: "top",
+                transfer: true,
+                value: params.row.productDate
+              },
+              on: {
+                "on-change": date => {
+                  let row = self.details[params.index];
+                  row[params.column.key] = date;
+                }
+              }
             });
+          }
+        },
+        {
+          title: "有效期至",
+          key: "expDate",
+          align: "center",
+          width: 180,
+          render: (h, params) => {
+            let self = this;
+            return h("DatePicker", {
+              props: {
+                type: "date",
+                placement: "top",
+                transfer: true,
+                value: params.row.expDate
+              },
+              on: {
+                "on-change": date => {
+                  let row = self.details[params.index];
+                  row[params.column.key] = date;
+                }
+              }
+            });
+          }
+        },
+        {
+          title: "销售数量",
+          key: "saleQuantity",
+          width: 120
+        },
+        {
+          title: "已退数量",
+          key: "alreadyBackQuantity",
+          width: 120
+        },
+        {
+          title: "退货数量",
+          key: "backQuantity",
+          width: 140,
+          render: (h, params) => {
+            var self = this;
+            return h("Input", {
+              props: {
+                number: true,
+                value: self.details[params.index][params.column.key]
+              },
+              on: {
+                "on-blur"(event) {
+                  let row = self.details[params.index];
+                  row[params.column.key] = event.target.value;
+                  self.resetAmount(params.index);
+                }
+              }
+            });
+          }
+        },
+        {
+          title: "单价",
+          key: "backPrice",
+          width: 140,
+          render: (h, params) => {
+            var self = this;
+            return h("Input", {
+              props: {
+                number: true,
+                value: self.details[params.index][params.column.key]
+              },
+              on: {
+                "on-blur"(event) {
+                  let row = self.details[params.index];
+                  row[params.column.key] = event.target.value;
+                  self.resetAmount(params.index);
+                }
+              }
+            });
+          }
+        },
+        {
+          title: "金额",
+          key: "amount",
+          width: 140
+        },
+        {
+          title: "退货成本",
+          key: "costAmount",
+          width: 140,
+          render: (h, params) => {
+            var self = this;
+            return h("Input", {
+              props: {
+                number: true,
+                value: self.details[params.index][params.column.key]
+              },
+              on: {
+                "on-blur"(event) {
+                  let row = self.details[params.index];
+                  row[params.column.key] = event.target.value;
+                }
+              }
+            });
+          }
+        },
+        {
+          title: "税率",
+          key: "taxRate",
+          align: "center",
+          width: 120,
+          render: (h, params) => {
+            let self = this;
+            return h("Input", {
+              props: {
+                number: true,
+                value: self.details[params.index][params.column.key]
+              },
+              on: {
+                "on-blur"(event) {
+                  let row = self.details[params.index];
+                  row[params.column.key] = event.target.value;
+                }
+              }
+            });
+          }
+        },
+        {
+          title: "货位",
+          key: "location",
+          width: 150,
+          render: (h, params) => {
+            return addWarehouseLocation(
+              h,
+              params.row.location,
+              params.row,
+              params.index
+            );
+          }
+        },
+        {
+          title: "存储条件",
+          key: "storageConditionName",
+          width: 120
+        },
+        {
+          title: "药基",
+          key: "baseMedName",
+          width: 120
+        },
+        {
+          title: "批准文号",
+          key: "permitNo",
+          width: 200
         }
+      ],
+      locationModal: false,
+      currEditLocationRow: "",
+      currEditLocationIndex: "",
+      currCustomer: {},
+      selectSellOrderModal: false
+    };
+  },
+  computed: {
+    totalBackQuantity: function() {
+      return this.details.reduce((total, item) => {
+        let backQuantity = item.backQuantity ? item.backQuantity : 0;
+        return total + parseFloat(backQuantity);
+      }, 0);
+    },
+    totalAmount: function() {
+      return this.details.reduce((total, item) => {
+        let amount = item.amount ? item.amount : 0;
+        return total + parseFloat(amount);
+      }, 0);
+    },
+    totalCostAmount: function() {
+      return this.details.reduce((total, item) => {
+        let costAmount = item.costAmount ? item.costAmount : 0;
+        return total + parseFloat(costAmount);
+      }, 0);
     }
-  
-}
+  },
+  watch: {
+    applyForm: function(data) {
+      if (data.customerId) {
+        this.customerError = "";
+      }
+      if (data.saleId) {
+        this.saleError = "";
+      }
+      if (data.warehouseId) {
+        this.warehouseError = "";
+      }
+      if (data.freeAmount <= 0) {
+        this.freeAmountError = "";
+      }
+    },
+    details: function(data) {
+      if (data && data.length > 0) {
+        this.goodsError = "";
+      }
+    },
+    totalBackQuantity: function(data) {
+      if (data && data > 0) {
+        this.goodsError = "";
+      }
+    }
+  },
+  methods: {
+    openChooseLocation(rowData, index) {
+      if (!rowData || index === undefined || index < 0) {
+        this.$Message.error("获取编辑位置失败");
+        return;
+      }
+      this.currEditLocationRow = rowData;
+      this.currEditLocationIndex = index;
+      this.locationModal = true;
+    },
+    chooseLocation(data) {
+      this.locationModal = false;
+      this.currEditLocationRow.location = data.location;
+      this.$set(
+        this.details,
+        this.currEditLocationIndex,
+        this.currEditLocationRow
+      );
+    },
+    locationModalClose() {
+      this.locationModal = false;
+      this.currEditLocationIndex = "";
+      this.currEditLocationRow = {};
+    },
+    refreshCustomerRepList(customerId, customerRepId) {
+      let reqData = {
+        customerId: customerId
+      };
+      let self = this;
+      util.ajax
+        .get("/customer/rep/list", { params: reqData })
+        .then(response => {
+          self.customerRepList = response.data;
+          if (customerRepId) {
+            self.$nextTick(() => {
+              self.applyForm.customerRepId = customerRepId;
+            });
+          }
+        })
+        .catch(error => {
+          util.errorProcessor(self, error);
+        });
+    },
+    customerChange(customerId, customer) {
+      this.currCustomer = customer;
+      if (customer && customer.id) {
+        this.applyForm.customerId = customer.id;
+        this.applyForm.customerName = customer.name;
+        this.applyForm.customerRepId = "";
+        this.customerRepList = [];
+        this.refreshCustomerRepList(customer.id);
+      }
+    },
+    customerRepChange(customerRepId) {
+      if (!customerRepId) {
+        return;
+      }
+      let customerRep = {};
+      for (let i = 0; i < this.customerRepList.length; i++) {
+        let item = this.customerRepList[i];
+        if (customerRepId === item.id) {
+          customerRep = item;
+          break;
+        }
+      }
+      if (customerRep && customerRep.id) {
+        this.applyForm.customerRepName = customerRep.name;
+      }
+    },
+    warehouseChanage(id, warehouse) {
+      this.applyForm.warehouseName = warehouse.name;
+    },
+    saleChange(saleId, saleUser) {
+      console.log(saleUser);
+      if (saleUser.id) {
+        this.applyForm.saleName = saleUser.nickname;
+      }
+    },
+    goodsSelectChange(goodsId, goods) {
+      if (!this.applyForm.customerId || !this.applyForm.warehouseId) {
+        this.$refs.goodsSelect.clearSingleSelect();
+        this.$Message.info("请先选择客户和仓库点!");
+        return;
+      }
+      //商品选择时，添加商品信息
+      if (!goods || !goods.id) {
+        this.$refs.goodsSelect.clearSingleSelect();
+        return;
+      }
+      let item = {
+        goodsId: goods.id,
+        goodsName: goods.name,
+        factoryName: goods.factoryName,
+        origin: goods.origin,
+        spec: goods.spec,
+        jx: goods.jxName,
+        unitName: goods.unitName,
+        batchCode: "",
+        productDate: "",
+        expDate: "",
+        saleQuantity: "",
+        alreadyBackQuantity: "",
+        backQuantity: 0,
+        backPrice: 0,
+        amount: 0,
+        costAmount: 0,
+        location: "",
+        taxRate: goods.outRate,
+        storageConditionName: goods.storageConditionName,
+        baseMedName: goods.baseMedName,
+        permitNo: goods.permitNo,
+        goods: goods
+      };
+      this.details.push(item);
+      this.$refs.goodsSelect.clearSingleSelect();
+    },
+    resetAmount(index) {
+      let row = this.details[index];
+      if (!row) {
+        return;
+      }
+      let backQuantity =
+        row.backQuantity && !isNaN(row.backPrice) ? row.backQuantity : 0;
+      let backPrice =
+        row.backPrice && !isNaN(row.backPrice) ? row.backPrice : 0;
+      row.amount = (backQuantity * backPrice).toFixed(2);
+      this.$set(this.details, index, row);
+    },
+
+    saveSubmit() {
+      this.customerError = "";
+      this.saleError = "";
+      this.warehouseError = "";
+      this.goodsError = "";
+      if (!this.applyForm.customerId) {
+        this.customerError = "请先选择对应的客户!";
+        return;
+      }
+      if (!this.applyForm.saleId) {
+        this.saleError = "请选择销售员";
+        return;
+      }
+      if (!this.applyForm.warehouseId) {
+        this.warehouseError = "请选择对应仓库点";
+        return;
+      }
+      if (this.totalBackQuantity <= 0) {
+        this.goodsError = "选择的退货商品数量需要大于0";
+        return;
+      }
+      if (this.applyForm.freeAmount > 0) {
+        this.freeAmountError = "免零金额不能大于0";
+        return;
+      }
+      if (this.applyForm.haveSellOrder) {
+        if (!this.applyForm.refOrderId) {
+          this.$$Message.error(
+            "系统异常，获取关联订单失败, 请刷新页面重新操作."
+          );
+          return;
+        }
+        for (let i = 0; i < this.details.length; i++) {
+          let item = this.details[i];
+          let backQuantity = item.backQuantity ? item.backQuantity : 0;
+          let saleQuantity = item.saleQuantity ? item.saleQuantity : 0;
+          let alreadyBackQuantity = item.alreadyBackQuantity
+            ? item.alreadyBackQuantity
+            : 0;
+          if (saleQuantity - alreadyBackQuantity < backQuantity) {
+            this.$Modal.warning({
+              title: "退货数量错误提示",
+              content:
+                "商品：" + item.goodsName + "的退货数不能超出销售单销售数量."
+            });
+            return;
+          }
+        }
+      }
+      let self = this;
+      this.applyForm.details = this.details;
+      this.$Modal.confirm({
+        title: "保存确认",
+        content:
+          "是否已经确认需要退货的商品信息输入完整并且正确? 提交保存后不可再修改!",
+        onCancel: () => {},
+        onOk: () => {
+          self.loading = true;
+          util.ajax
+            .post("/sell/back/add", self.applyForm)
+            .then(response => {
+              self.loading = false;
+              self.$Message.success("退货单提交保存成功.");
+              self.clearForm();
+            })
+            .catch(error => {
+              self.loading = false;
+              util.errorProcessor(self, error);
+            });
+        }
+      });
+    },
+
+    clearForm() {
+      this.applyForm = {
+        customerId: "",
+        saleId: "",
+        haveSellOrder: false,
+        warehouseId: "",
+        freeAmount: 0,
+        details: []
+      };
+      this.details = [];
+      this.customerError = "";
+      this.saleError = "";
+      this.warehouseError = "";
+      this.goodsError = "";
+      this.$refs.applyForm.resetFields();
+    },
+
+    getSaleOrderShow() {
+      this.selectSellOrderModal = true;
+    },
+
+    saleOrderChoose(saleOrder, orderDetails) {
+      this.selectSellOrderModal = false;
+      if (!saleOrder.id || !orderDetails || orderDetails.length <= 0) {
+        return;
+      }
+      this.applyForm = {
+        refOrderId: saleOrder.id,
+        refOrderNo: saleOrder.orderNumber,
+        customerId: saleOrder.customerId,
+        customerName: saleOrder.customerName,
+        customerRepId: saleOrder.customerRepId,
+        customerRepName: saleOrder.customerRepName,
+        saleId: saleOrder.saleId,
+        haveSellOrder: true,
+        warehouseId: saleOrder.warehouseId,
+        temperControlId: saleOrder.temperControlId,
+        freeAmount: 0
+      };
+      this.refreshCustomerRepList(
+        saleOrder.customerId,
+        saleOrder.customerRepId
+      );
+      //详情
+      this.details = []; //清除原有的
+      for (let i = 0; i < orderDetails.length; i++) {
+        let detail = orderDetails[i];
+        let goods = detail.goods;
+        console.log(goods);
+        let item = {
+          sellDetailId: detail.id,
+          goodsId: goods.id,
+          goodsName: goods.name,
+          factoryName: goods.factoryName,
+          origin: goods.origin,
+          spec: goods.spec,
+          jx: goods.jxName,
+          unitName: goods.unitName,
+          batchCode: detail.batchCode,
+          productDate: detail.productDate
+            ? moment(detail.productDate).format("YYYY-MM-DD")
+            : "",
+          expDate: detail.expDate
+            ? moment(detail.expDate).format("YYYY-MM-DD")
+            : "",
+          saleQuantity: detail.quantity,
+          alreadyBackQuantity: detail.backQuantity,
+          backQuantity: 0,
+          backPrice: detail.realPrice,
+          amount: 0,
+          costAmount: 0,
+          taxRate: detail.taxRate,
+          location: detail.location,
+          storageConditionName: goods.storageConditionName,
+          baseMedName: goods.baseMedName,
+          permitNo: goods.permitNo,
+          goods: goods
+        };
+        this.details.push(item);
+      }
+    },
+
+    backAllQuantity() {
+      for (let i = 0; i < this.details.length; i++) {
+        let row = this.details[i];
+        let saleQuantity = row.saleQuantity ? row.saleQuantity : 0;
+        let alreadyBackQuantity = row.alreadyBackQuantity
+          ? row.alreadyBackQuantity
+          : 0;
+        row.backQuantity = saleQuantity - alreadyBackQuantity;
+        this.resetAmount(i);
+      }
+    },
+
+    removeDetail(row, index) {
+      let self = this;
+      this.$Modal.confirm({
+        title: "删除确认",
+        content:
+          "是否确认去除批次号: " +
+          row.batchCode +
+          ", 商品: " +
+          row.goodsName +
+          "？",
+        onCancel: () => {},
+        onOk: () => {
+          self.details.splice(index, 1);
+        }
+      });
+    }
+  }
+};
 </script>

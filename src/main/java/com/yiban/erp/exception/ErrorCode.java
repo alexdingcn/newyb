@@ -62,6 +62,8 @@ public enum ErrorCode {
     BUY_BACK_CHECK_CANCEL_ERROR(1308, "退出单状态不是质量复核通过，不能进行取消复核操作"),
     BUY_ORDER_COLD_MANAGE_ERROR(1309, "存在有冷链经营类型产品，采购单的温控方式和运输方式必输"),
     BUY_ORDER_STATUS_CANNOT_REMOVE(1310, "采购订单当前状态下不能删除"),
+    BUY_BACK_STATUS_CANNOT_REMOVE(1311, "采购退货单当前状态下不能删除"),
+    BUY_BACK_NEED_BUY_CHECK(1312, "采购退出单需要先经过采购经理审核"),
 
 
     // 15xx - 盘点
