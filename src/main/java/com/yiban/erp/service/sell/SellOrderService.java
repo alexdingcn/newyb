@@ -122,22 +122,57 @@ public class SellOrderService {
         return errorList;
     }
 
-    private void validateSpecialManage(Customer customer, SellOrder sellOrder) throws BizException {
+    private void validateGoodsRequirement(Customer customer, SellOrder sellOrder) throws BizException {
         //如果存在空的数据，需要验证是否存在有冷链经营性商品，如果有，返回验证不通过
-        List<Long> goodsIds = new ArrayList<>();
+        Set<Long> goodsInfoIds = new HashSet<>();
+        Map<Long, BigDecimal> goodsQuantityMap = new HashMap<>();
         for (SellOrderDetail detail : sellOrder.getDetails()) {
-            goodsIds.add(detail.getGoodsId());
+            goodsInfoIds.add(detail.getGoodsId());
+            if (detail.getGoods() != null) {
+                goodsQuantityMap.put(detail.getGoods().getGoodsInfoId(), detail.getQuantity());
+            }
         }
         //查询是否存在这些商品ID中是否存在冷链经营类型的商品
-        boolean haveSpecial = goodsService.haveSpecialManageGoods(goodsIds);
-        if (!haveSpecial) {
-            return;
+        List<GoodsInfo> goodsInfos = goodsService.getGoodsInfoListByIds(goodsInfoIds);
+        boolean haveSpecial = false;
+        boolean haveCold = false;
+        for (GoodsInfo goodsInfo: goodsInfos) {
+            if (Boolean.TRUE.equals(goodsInfo.getSpecialManage())) {
+                haveSpecial = true;
+            }
+
+            if (Boolean.TRUE.equals(goodsInfo.getColdManage())) {
+                haveCold = true;
+            }
+
+            if (goodsQuantityMap.containsKey(goodsInfo.getId()) && goodsInfo.getMinOrderLimit() != null) {
+                if (goodsQuantityMap.get(goodsInfo.getId()).intValue() < goodsInfo.getMinOrderLimit()) {
+                    logger.warn("not meet min order limit requirement, min={}, goodsInfoId={}", goodsInfo.getMinOrderLimit(), goodsInfo.getId());
+                    throw new BizException(ErrorCode.SELL_ORDER_MIN_LIMIT_ERROR, goodsInfo.getName());
+                }
+            }
         }
-        //验证供应商是否有改资质
-        if (customer.getCanSaleSpecial() == null || !customer.getCanSaleSpecial()) {
+
+        //验证供应商是否有特殊药品资质
+        if (haveSpecial && (customer.getCanSaleSpecial() == null || !customer.getCanSaleSpecial())) {
             logger.warn("customer can not cold manage. customer:{}", customer.getId());
             throw new BizException(ErrorCode.SELL_ORDER_SPECIAL_VALIDATE);
         }
+
+        //验证客户是否有改资质
+        if (haveCold) {
+            if (customer.getColdBusiness() == null || !customer.getColdBusiness()) {
+                logger.warn("customer can not cold manage. supplier:{}", customer.getId());
+                throw new BizException(ErrorCode.SELL_ORDER_COLD_VALIDATE);
+            }
+
+            //先看下订单的温控方式和运输方式是否都已经输入了，如果都输入了，没必要再验证
+            if (sellOrder.getTemperControlId() == null || sellOrder.getTemperControlId() <= 0
+                    || sellOrder.getShipMethod() == null || sellOrder.getShipMethod() <= 0) {
+                throw new BizException(ErrorCode.SELL_ORDER_COLD_VALIDATE);
+            }
+        }
+
     }
 
     private void validateColdManage(Customer customer, SellOrder sellOrder) throws BizException {
@@ -184,8 +219,8 @@ public class SellOrderService {
         }
         if (!SellOrderStatus.TEMP_STORAGE.name().equalsIgnoreCase(sellOrder.getStatus())) {
             // 不是暂存操作，验证客户是否允许经营特殊管理药品 同时统计总销售数量和总金额
-            validateSpecialManage(customer, sellOrder);
-            validateColdManage(customer, sellOrder);
+
+            validateGoodsRequirement(customer, sellOrder);
 
             //根据系统配置的流程，设置对应的状态
             boolean haveQAFlow = systemConfigService.haveOrderFlow(user.getCompanyId(), ConfigKey.SALE_CHECK);

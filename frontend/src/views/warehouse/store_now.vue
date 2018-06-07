@@ -15,105 +15,106 @@
                 <Button type="primary" icon="android-search" @click="queryRepertoryList" :loading="saving">查询</Button>
             </ButtonGroup>
         </div>
-        <Form :label-width="85" :model="storeNow" ref="storeNowForm">
-         <Row>
+
+        <Form :label-width="80" :model="storeNow" ref="storeNowForm">
+          <Row>
             <i-col span="6">
-                <FormItem label="仓库点" prop="warehouseId">
-                    <warehouse-select v-model="storeNow.warehouseId"></warehouse-select>
-                </FormItem>
+              <FormItem label="仓库点" prop="warehouseId">
+                <warehouse-select v-model="storeNow.warehouseId"></warehouse-select>
+              </FormItem>
             </i-col>
 
-             <i-col span="4">
-                <FormItem label="库区" >
-                    <Select v-model="storeNow.store_state" prop="store_state">
-                        <Option v-for="option in storeOptions" :value="option.id" :label="option.name" :key="option.id">
-                            {{option.name}}
-                        </Option>
-                    </Select>
-                </FormItem>
-             </i-col>
-             <i-col span="4">
-                <FormItem label="库存状态" >
-                    <Select v-model="storeNow.counter_state" prop="counter_state">
-                        <Option v-for="option in counterOptions" :value="option.id" :label="option.name" :key="option.id">
-                            {{option.name}}
-                        </Option>
-                    </Select>
-                </FormItem>
-             </i-col>
-             <i-col span="4">
-                <FormItem label="可售状态" >
-                    <Select v-model="storeNow.sale_state" prop="sale_state">
-                        <Option v-for="option in saleOptions" :value="option.id" :label="option.name" :key="option.id">
-                            {{option.name}}
-                        </Option>
-                    </Select>
-                </FormItem>
-             </i-col>
-             <i-col span="4">
-                <FormItem label="零库存品种" >
-                    <checkbox v-model="storeNow.is_zero_store"/>显示
-                </FormItem>
-             </i-col>
-
-        </Row>
-        <Row>
-            <i-col span="6">
-                <FormItem label="供应商" prop="supplierId">
-                    <supplier-select v-model="storeNow.supplierId" ></supplier-select>
-                </FormItem>
+            <i-col span="4">
+              <FormItem label="库区" >
+                <Select v-model="storeNow.store_state" prop="store_state">
+                  <Option v-for="option in storeOptions" :value="option.id" :label="option.name" :key="option.id">
+                  {{option.name}}
+                  </Option>
+                </Select>
+              </FormItem>
             </i-col>
-            <i-col span="6">
-                <FormItem label="厂商" prop="factoryId">
-                    <factory-select v-model="storeNow.factoryId" ></factory-select>
-                </FormItem>
+            <i-col span="4">
+              <FormItem label="库存状态" >
+                <Select v-model="storeNow.counter_state" prop="counter_state">
+                  <Option v-for="option in counterOptions" :value="option.id" :label="option.name" :key="option.id">
+                  {{option.name}}
+                  </Option>
+                </Select>
+              </FormItem>
             </i-col>
-
-
-            <i-col span="5">
-                <FormItem label="采购员" prop="buyerId">
-                    <buyer-select v-model="storeNow.in_user_id"></buyer-select>
-                </FormItem>
+            <i-col span="4">
+              <FormItem label="可售状态" >
+                <Select v-model="storeNow.sale_state" prop="sale_state">
+                  <Option v-for="option in saleOptions" :value="option.id" :label="option.name" :key="option.id">
+                  {{option.name}}
+                  </Option>
+                </Select>
+              </FormItem>
             </i-col>
-            <i-col span="3">
-                <FormItem label="库龄大于" >
-                    <Input v-model="storeNow.keedays" placeholder="天"/>
-                </FormItem>
+            <i-col span="4">
+              <FormItem label="零库存品种" >
+                <checkbox v-model="storeNow.is_zero_store"/>显示
+              </FormItem>
             </i-col>
-            <!--
-            <i-col span="3">
-                <FormItem label="商品属性" >
-                    <Input  size="small"/>
-                </FormItem>
+            <i-col span="1">
+              <Button type="text" :icon="showExpandedFilter ? 'android-arrow-dropup-circle' : 'android-arrow-dropdown-circle'" @click="showExpandedFilter = !showExpandedFilter"></Button>
             </i-col>
-             <i-col span="3">
-                <FormItem label="采购属性" >
-                    <Input  size="small"/>
-                </FormItem>
-                </i-col>-->
-            </Row>
+          </Row>
 
-            <Row>
-                <i-col span="6">
-                <FormItem label="商品速查" prop="goodsId">
-                    <good-select v-model="storeNow.goodsId"></good-select>
-                </FormItem>
-                </i-col>
-            </Row>
+          <Row class="margin-top-8" v-show="showExpandedFilter">
+              <i-col span="6">
+                  <FormItem label="供应商" prop="supplierId">
+                      <supplier-select v-model="storeNow.supplierId" ></supplier-select>
+                  </FormItem>
+              </i-col>
+              <i-col span="6">
+                  <FormItem label="厂商" prop="factoryId">
+                      <factory-select v-model="storeNow.factoryId" ></factory-select>
+                  </FormItem>
+              </i-col>
+              <i-col span="5">
+                  <FormItem label="采购员" prop="buyerId">
+                      <buyer-select v-model="storeNow.in_user_id"></buyer-select>
+                  </FormItem>
+              </i-col>
+              <i-col span="3">
+                  <FormItem label="库龄大于" >
+                      <Input v-model="storeNow.keedays" placeholder="天"/>
+                  </FormItem>
+              </i-col>
+              <!--
+              <i-col span="3">
+                  <FormItem label="商品属性" >
+                      <Input  size="small"/>
+                  </FormItem>
+              </i-col>
+              <i-col span="3">
+                  <FormItem label="采购属性" >
+                      <Input  size="small"/>
+                  </FormItem>
+                  </i-col>-->
+          </Row>
 
-            <Table border highlight-row
-                class="margin-top-8"
-                :columns="repertoryColumns" :data="repertoryItems"
-                ref="storeNowTable" style="width: 100%;"
-                no-data-text="当前条件下查询，无库存数据！">
+          <Row class="margin-top-8" v-show="showExpandedFilter">
+              <i-col span="6">
+              <FormItem label="商品速查" prop="goodsId">
+                  <good-select v-model="storeNow.goodsId"></good-select>
+              </FormItem>
+              </i-col>
+          </Row>
 
-            </Table>
+          <Table border highlight-row size="small"
+              class="margin-top-8"
+              :columns="repertoryColumns" :data="repertoryItems"
+              ref="storeNowTable"
+              no-data-text="当前查询条件下无库存数据！">
+          </Table>
 
-            <Row class="margin-top-8">
-                <div style="float: right;">
-                    <Page :total="totalAmount" :current="currentPage" @on-change="changePage" show-total></Page>
-                </div>
-            </Row>
+          <Row class="margin-top-8">
+              <div style="float: right;">
+                  <Page :total="totalAmount" :current="currentPage" @on-change="changePage" show-total></Page>
+              </div>
+          </Row>
         </Form>
     </Card>
     </Row>
@@ -127,7 +128,7 @@ import factorySelect from "@/views/selector/factory-select.vue";
 import supplierSelect from "@/views/selector/supplier-select.vue";
 import goodSelect from "@/views/selector/good-select.vue";
 import buyerSelect from "@/views/selector/buyer-select.vue";
-import goodsSpecTags from '../goods/goods-spec-tabs.vue';
+import goodsSpecTags from "../goods/goods-spec-tabs.vue";
 
 export default {
   name: "store_now",
@@ -142,6 +143,7 @@ export default {
   data() {
     return {
       saving: false,
+      showExpandedFilter: false,
       totalAmount: 0,
       currentPage: 1,
       repertoryItems: [],
@@ -177,26 +179,26 @@ export default {
           width: 60
         },
         {
-            title: '规格',
-            key: 'goodsSpecs',
-            width: 120,
-            render: (h, params) =>　{
-                return h(goodsSpecTags, {
-                    props: {
-                        tags: params.row.goods ? params.row.goods.goodsSpecs : "",
-                        color: 'blue'
-                    }
-                });
-            }
+          title: "规格",
+          key: "goodsSpecs",
+          width: 120,
+          render: (h, params) => {
+            return h(goodsSpecTags, {
+              props: {
+                tags: params.row.goods ? params.row.goods.goodsSpecs : "",
+                color: "blue"
+              }
+            });
+          }
         },
         {
-            title: '生产企业',
-            key: 'factoryName',
-            align: 'center',
-            width: 120,
-            render: (h, params) => {
-                return params.row.goods ? params.row.goods.factoryName : "";
-            }
+          title: "生产企业",
+          key: "factoryName",
+          align: "center",
+          width: 120,
+          render: (h, params) => {
+            return params.row.goods ? params.row.goods.factoryName : "";
+          }
         },
         {
           title: "批次号",
@@ -355,7 +357,7 @@ export default {
     changePage(pageNumber) {
       this.currentPage = pageNumber;
       this.queryRepertoryList();
-    },
+    }
   }
 };
 </script>

@@ -144,7 +144,7 @@ public enum ErrorCode {
     SELL_ORDER_SPECIAL_VALIDATE(2239, "商品存在有“特殊药品经营”标识, 而客户没有该资质"),
     SELL_ORDER_COLD_VALIDATE(2240, "商品存在有“冷链经营”标识, 需要客户有该资质且订单的温控方式和运输方式必输"),
     SELL_STATUS_QUALITY_ERROR(2241, "销售单当前状态不能做质量审核"),
-
+    SELL_ORDER_MIN_LIMIT_ERROR(2242, "商品不满足最小起订量限制", ErrorDisplay.MODAL),
 
     // 23xx -承运公司
     SHIP_SAVE_PARAMS_ERROR(2301, "必输参数校验失败"),
