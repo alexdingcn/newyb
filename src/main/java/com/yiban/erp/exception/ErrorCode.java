@@ -122,10 +122,10 @@ public enum ErrorCode {
     SELL_ORDER_SALE_CHECK_STATUS_ERROR(2215, "订单状态不是质检通过状态，不能进行审核通过", ErrorDisplay.NOTICE),
     SELL_ORDER_WAREHOUSE_FROZEN(2215, "当前仓库正在盘库冻结，不能做出库操作"),
     SELL_ORDER_REMOVE_STATUS_ERROR(2216, "当前销售订单已经审核通过, 不能删除"),
-    SELL_BACK_COST_AMOUNT_ERROR(2220, "销售退单的免零金额必须小于等于0"),
+    SELL_BACK_COST_AMOUNT_ERROR(2220, "销售退单的免零金额必须大于等于0"),
     SELL_BACK_ADD_DETAIL_EMPTY(2221, "销售退单产品详情不能为空"),
     SELL_BACK_ADD_DETAIL_QUANTITY_ERROR(2222, "销售退单详情的退货数量需要存在大于0的数量"),
-    SELL_BACK_GET_OUT_RECORD_FAIL(2223, "销售退货单获取关联销售出库单失败"),
+    SELL_BACK_GET_OUT_RECORD_FAIL(2223, "销售退货单获取关联销售单失败"),
     SELL_BACK_ORDER_GET_FAIL(2224, "销售退货单信息获取失败"),
     SELL_BACK_CHECK_STATUS_ERROR(2225, "销售退货审核状态错误, 请联系运营方排查原因.", ErrorDisplay.MODAL),
     SELL_BACK_INIT_SALE_CHECK_ERROR(2226, "销售退货单当前状态不可操作销售经理审核"),
@@ -144,6 +144,7 @@ public enum ErrorCode {
     SELL_ORDER_SPECIAL_VALIDATE(2239, "商品存在有“特殊药品经营”标识, 而客户没有该资质"),
     SELL_ORDER_COLD_VALIDATE(2240, "商品存在有“冷链经营”标识, 需要客户有该资质且订单的温控方式和运输方式必输"),
     SELL_STATUS_QUALITY_ERROR(2241, "销售单当前状态不能做质量审核"),
+    SELL_BACK_ORDER_CANNOT_UPDATE(2242, "销售退货单当前状态下不能做修改操作"),
 
 
     // 23xx -承运公司

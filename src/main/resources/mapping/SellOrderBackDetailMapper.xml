@@ -5,6 +5,7 @@
     <id column="id" property="id" jdbcType="BIGINT" />
     <result column="back_order_id" property="backOrderId" jdbcType="BIGINT" />
     <result column="sell_detail_id" property="sellDetailId" jdbcType="BIGINT" />
+    <result column="repertory_id" property="repertoryId" jdbcType="BIGINT" />
     <result column="goods_id" property="goodsId" jdbcType="BIGINT" />
     <result column="back_quantity" property="backQuantity" jdbcType="DECIMAL" />
     <result column="right_quantity" property="rightQuantity" jdbcType="DECIMAL" />
@@ -30,7 +31,7 @@
     <result column="updated_time" property="updatedTime" jdbcType="TIMESTAMP" />
   </resultMap>
   <sql id="Base_Column_List" >
-    id, back_order_id, sell_detail_id, goods_id, back_quantity, right_quantity, bad_quantity,
+    id, back_order_id, sell_detail_id, repertory_id, goods_id, back_quantity, right_quantity, bad_quantity,
     back_price, amount, cost_amount, batch_code, location, exp_date, product_date, tax_rate,
     bad_plan, bad_reason, check_status, check_temp_method, check_time, check_user, check_result,
     created_by, updated_by, created_time, updated_time
@@ -45,8 +46,13 @@
     delete from sell_order_back_detail
     where id = #{id,jdbcType=BIGINT}
   </delete>
+
+  <delete id="deleteByBackOrderId" parameterType="java.lang.Long">
+    delete from sell_order_back_detail where back_order_id = #{backOrderId}
+  </delete>
+
   <insert id="insert" parameterType="com.yiban.erp.entities.SellOrderBackDetail" keyProperty="id" useGeneratedKeys="true">
-    insert into sell_order_back_detail (back_order_id, sell_detail_id,
+    insert into sell_order_back_detail (back_order_id, sell_detail_id, repertory_id,
       goods_id, back_quantity, right_quantity, 
       bad_quantity, back_price, amount, 
       cost_amount, batch_code, location, 
@@ -55,7 +61,7 @@
       check_status, check_temp_method, check_time, check_user, check_result,
       created_by, updated_by, created_time, 
       updated_time)
-    values (#{backOrderId,jdbcType=BIGINT}, #{sellDetailId,jdbcType=BIGINT},
+    values (#{backOrderId,jdbcType=BIGINT}, #{sellDetailId,jdbcType=BIGINT}, #{repertoryId,jdbcType=BIGINT},
       #{goodsId,jdbcType=BIGINT}, #{backQuantity,jdbcType=DECIMAL}, #{rightQuantity,jdbcType=DECIMAL}, 
       #{badQuantity,jdbcType=DECIMAL}, #{backPrice,jdbcType=DECIMAL}, #{amount,jdbcType=DECIMAL}, 
       #{costAmount,jdbcType=DECIMAL}, #{batchCode,jdbcType=VARCHAR}, #{location,jdbcType=VARCHAR}, 
@@ -68,7 +74,7 @@
   </insert>
 
   <insert id="insertBatch" parameterType="map" keyProperty="id" useGeneratedKeys="true">
-    insert into sell_order_back_detail (back_order_id, sell_detail_id,
+    insert into sell_order_back_detail (back_order_id, sell_detail_id, repertory_id,
       goods_id, back_quantity, right_quantity,
       bad_quantity, back_price, amount,
       cost_amount, batch_code, location,
@@ -79,7 +85,7 @@
       updated_time)
     values
     <foreach collection="details" item="item" separator="), (" open="(" close=")">
-      #{item.backOrderId,jdbcType=BIGINT}, #{item.sellDetailId,jdbcType=BIGINT},
+      #{item.backOrderId,jdbcType=BIGINT}, #{item.sellDetailId,jdbcType=BIGINT}, #{item.repertoryId,jdbcType=BIGINT},
       #{item.goodsId,jdbcType=BIGINT}, #{item.backQuantity,jdbcType=DECIMAL}, #{item.rightQuantity,jdbcType=DECIMAL},
       #{item.badQuantity,jdbcType=DECIMAL}, #{item.backPrice,jdbcType=DECIMAL}, #{item.amount,jdbcType=DECIMAL},
       #{item.costAmount,jdbcType=DECIMAL}, #{item.batchCode,jdbcType=VARCHAR}, #{item.location,jdbcType=VARCHAR},
@@ -100,6 +106,9 @@
       </if>
       <if test="sellDetailId != null" >
         sell_detail_id = #{sellDetailId,jdbcType=BIGINT},
+      </if>
+      <if test="repertoryId != null">
+        repertory_id = #{repertoryId,jdbcType=BIGINT},
       </if>
       <if test="goodsId != null" >
         goods_id = #{goodsId,jdbcType=BIGINT},
@@ -175,21 +184,22 @@
   </update>
 
   <update id="updateAlreadyBackQuantity" parameterType="java.lang.Long" >
-    update sell_order_back_detail b, sell_order_detail s
-      set s.back_quantity = IFNULL(s.back_quantity, 0) + b.back_quantity
-    where b.sell_detail_id = s.id and b.back_order_id = #{backOrderId}
-  </update>
-
-  <update id="releaseAlreadyBackQuantity" parameterType="java.lang.Long">
-    update sell_order_back_detail b, sell_order_detail s
-      set s.back_quantity = s.back_quantity - b.back_quantity
-    where b.sell_detail_id = s.id and b.back_order_id = #{backOrderId}
+    update sell_order_detail d
+	  set d.back_quantity = (
+	    select IFNULL(sum(b.back_quantity), 0)
+	    from sell_order_back_detail b, sell_order_back s
+	    where b.back_order_id = s.id and s.status != 'DELETE' and b.sell_detail_id = d.id)
+    where d.sell_order_id = #{sellOrderId}
   </update>
 
   <select id="getByBackOrderId" parameterType="java.lang.Long" resultMap="BaseResultMap">
     select
-      s.*, o.value as checkTempMethodName
+      s.*,
+      d.quantity as saleQuantity,
+      d.back_quantity as alreadyBackQuantity,
+      o.value as checkTempMethodName
     from sell_order_back_detail s
+    left join sell_order_detail d on s.sell_detail_id = d.id
     left join options o on s.check_temp_method = o.id
     where back_order_id = #{backOrderId,jdbcType=BIGINT}
   </select>

@@ -11,6 +11,8 @@ import java.util.List;
 public interface SellOrderBackDetailMapper {
     int deleteByPrimaryKey(Long id);
 
+    int deleteByBackOrderId(Long id);
+
     int insert(SellOrderBackDetail record);
 
     int insertBatch(@Param("details") List<SellOrderBackDetail> details);
@@ -19,13 +21,13 @@ public interface SellOrderBackDetailMapper {
 
     int updateByPrimaryKeySelective(SellOrderBackDetail record);
 
-    int updateAlreadyBackQuantity(Long backOrderId);
-
-    int releaseAlreadyBackQuantity(Long backOrderId);
+    int updateAlreadyBackQuantity(Long sellOrderId);
 
     List<SellOrderBackDetail> getByBackOrderId(Long backOrderId);
 
     int updateCheckStatus(SellBackCheck check);
 
     int updateCheckStatusByBackOrderId(SellBackCheck check);
+
+
 }

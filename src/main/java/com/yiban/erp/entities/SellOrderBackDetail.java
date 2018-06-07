@@ -10,6 +10,8 @@ public class SellOrderBackDetail {
 
     private Long sellDetailId;
 
+    private Long repertoryId; //销售单明细关联的库存ID
+
     private Long goodsId;
 
     private BigDecimal backQuantity;
@@ -111,6 +113,14 @@ public class SellOrderBackDetail {
 
     public void setSellDetailId(Long sellDetailId) {
         this.sellDetailId = sellDetailId;
+    }
+
+    public Long getRepertoryId() {
+        return repertoryId;
+    }
+
+    public void setRepertoryId(Long repertoryId) {
+        this.repertoryId = repertoryId;
     }
 
     public Long getGoodsId() {

@@ -30,12 +30,11 @@ public class SellOrderBackController {
     private SellOrderBackService sellOrderBackService;
 
 
-    @RequestMapping(value = "/add", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> add(@RequestBody SellOrderBack orderBack,
+    @RequestMapping(value = "/save", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> applySave(@RequestBody SellOrderBack orderBack,
                                       @AuthenticationPrincipal User user) throws Exception {
-
         logger.info("user:{} request add sell order back by:{}", user.getId(), JSON.toJSONString(orderBack));
-        sellOrderBackService.add(orderBack, user);
+        sellOrderBackService.applySave(orderBack, user);
         return ResponseEntity.ok().build();
     }
 
@@ -56,7 +55,7 @@ public class SellOrderBackController {
     @RequestMapping(value = "/check", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> check(@RequestBody SellBackCheck backCheck,
                                         @AuthenticationPrincipal User user) throws Exception {
-        logger.info("user:{} request save sell order back check result by params:{}", user.getId(), backCheck);
+        logger.info("user:{} request save sell order back check result by params:{}", user.getId(), JSON.toJSONString(backCheck));
         sellOrderBackService.checkBackOrder(backCheck, user);
         return ResponseEntity.ok().build();
     }

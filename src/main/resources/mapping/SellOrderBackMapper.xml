@@ -14,9 +14,7 @@
     <result column="customer_rep_id" property="customerRepId" jdbcType="BIGINT" />
     <result column="customer_rep_name" property="customerRepName" jdbcType="VARCHAR" />
     <result column="sale_id" property="saleId" jdbcType="BIGINT" />
-    <result column="sale_name" property="saleName" jdbcType="VARCHAR" />
     <result column="warehouse_id" property="warehouseId" jdbcType="INTEGER" />
-    <result column="warehouse_name" property="warehouseName" jdbcType="VARCHAR" />
     <result column="temper_control_id" property="temperControlId" jdbcType="BIGINT" />
     <result column="back_reason" property="backReason" jdbcType="VARCHAR" />
     <result column="ship_company_id" property="shipCompanyId" jdbcType="INTEGER" />
@@ -51,8 +49,8 @@
   </resultMap>
   <sql id="Base_Column_List" >
     id, company_id, have_sell_order, ref_order_id, ref_order_no, order_number, status, customer_id,
-    customer_name, customer_rep_id, customer_rep_name, sale_id, sale_name, warehouse_id, 
-    warehouse_name, temper_control_id, back_reason, ship_company_id, ship_no, ship_date, 
+    customer_name, customer_rep_id, customer_rep_name, sale_id, warehouse_id,
+    temper_control_id, back_reason, ship_company_id, ship_no, ship_date,
     receive_date, ship_method, ship_tool, ship_car_no, ship_driver_name, ship_start_address, 
     receive_temper, receive_quantity, total_quantity, total_amount, total_cost_amount, free_amount,
     back_sale_user, back_sale_time, back_sale_result, back_quality_user, back_quality_time, 
@@ -70,8 +68,8 @@
     insert into sell_order_back (company_id, have_sell_order,
       ref_order_id, ref_order_no, order_number, status,
       customer_id, customer_name, customer_rep_id, 
-      customer_rep_name, sale_id, sale_name, 
-      warehouse_id, warehouse_name, temper_control_id, 
+      customer_rep_name, sale_id,
+      warehouse_id, temper_control_id,
       back_reason, ship_company_id, ship_no, 
       ship_date, receive_date, ship_method, 
       ship_tool, ship_car_no, ship_driver_name, 
@@ -85,8 +83,8 @@
     values (#{companyId,jdbcType=INTEGER}, #{haveSellOrder,jdbcType=BIT},
       #{refOrderId,jdbcType=BIGINT}, #{refOrderNo,jdbcType=VARCHAR}, #{orderNumber,jdbcType=VARCHAR}, #{status,jdbcType=VARCHAR},
       #{customerId,jdbcType=BIGINT}, #{customerName,jdbcType=VARCHAR}, #{customerRepId,jdbcType=BIGINT}, 
-      #{customerRepName,jdbcType=VARCHAR}, #{saleId,jdbcType=BIGINT}, #{saleName,jdbcType=VARCHAR}, 
-      #{warehouseId,jdbcType=INTEGER}, #{warehouseName,jdbcType=VARCHAR}, #{temperControlId,jdbcType=BIGINT}, 
+      #{customerRepName,jdbcType=VARCHAR}, #{saleId,jdbcType=BIGINT},
+      #{warehouseId,jdbcType=INTEGER}, #{temperControlId,jdbcType=BIGINT},
       #{backReason,jdbcType=VARCHAR}, #{shipCompanyId,jdbcType=INTEGER}, #{shipNo,jdbcType=VARCHAR}, 
       #{shipDate,jdbcType=DATE}, #{receiveDate,jdbcType=DATE}, #{shipMethod,jdbcType=BIGINT}, 
       #{shipTool,jdbcType=BIGINT}, #{shipCarNo,jdbcType=VARCHAR}, #{shipDriverName,jdbcType=VARCHAR}, 
@@ -132,14 +130,8 @@
       <if test="saleId != null" >
         sale_id = #{saleId,jdbcType=BIGINT},
       </if>
-      <if test="saleName != null" >
-        sale_name = #{saleName,jdbcType=VARCHAR},
-      </if>
       <if test="warehouseId != null" >
         warehouse_id = #{warehouseId,jdbcType=INTEGER},
-      </if>
-      <if test="warehouseName != null" >
-        warehouse_name = #{warehouseName,jdbcType=VARCHAR},
       </if>
       <if test="temperControlId != null" >
         temper_control_id = #{temperControlId,jdbcType=BIGINT},
@@ -240,26 +232,30 @@
 
   <select id="getOrderList" parameterType="com.yiban.erp.dto.SellBackQuery" resultMap="BaseResultMap">
     select
-      <include refid="Base_Column_List" />
-    from sell_order_back
-    where company_id = #{companyId} and status != 'DELETE'
+      s.*,
+      u.nickname as saleName,
+      w.name as warehouseName
+    from sell_order_back s
+    left join users u on s.sale_id=u.id
+    left join warehouse w on s.warehouse_id = w.id
+    where s.company_id = #{companyId} and s.status != 'DELETE'
     <if test="warehouseId != null" >
-      and warehouse_id = #{warehouseId}
+      and s.warehouse_id = #{warehouseId}
     </if>
     <if test="customerId != null" >
-      and customer_id = #{customerId}
+      and s.customer_id = #{customerId}
     </if>
     <if test="saleId != null" >
-      and sale_id = #{saleId}
+      and s.sale_id = #{saleId}
     </if>
     <if test="createdStartTime != null" >
-      and created_time >= #{createdStartTime}
+      and s.created_time >= #{createdStartTime}
     </if>
     <if test="createdEndTime != null" >
-      and #{createdEndTime} > created_time
+      and #{createdEndTime} > s.created_time
     </if>
     <if test="statusList != null" >
-      and status in
+      and s.status in
         <foreach collection="statusList" item="item" open="(" close=")" separator=", ">
           #{item}
         </foreach>
