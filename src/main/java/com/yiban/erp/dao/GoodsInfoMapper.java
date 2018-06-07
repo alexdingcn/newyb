@@ -6,6 +6,7 @@ import com.yiban.erp.entities.GoodsInfo;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.Collection;
 import java.util.List;
 
 @Mapper
@@ -58,5 +59,12 @@ public interface GoodsInfoMapper {
      * @param detailIds
      * @return
      */
-    List<GoodsInfo> getSpecialManageByDetailIds(@Param("detailIds") List<Long> detailIds);
+    List<GoodsInfo> getSpecialManageByDetailIds(@Param("detailIds") Collection<Long> detailIds);
+
+    /**
+     * 根据详情ID查询商品详情
+     * @param detailIds
+     * @return
+     */
+    List<GoodsInfo> getGoodsInfoListByIds(@Param("ids") Collection<Long> detailIds);
 }

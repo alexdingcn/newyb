@@ -19,7 +19,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -688,10 +687,15 @@ public class GoodsService {
         return goodsInfos != null && !goodsInfos.isEmpty();
     }
 
-    public boolean haveSpecialManageGoods(List<Long> detailIds) {
+    public boolean haveSpecialManageGoods(Collection<Long> detailIds) {
         //查询是否存在有冷链经营性商品
         List<GoodsInfo> goodsInfos = goodsInfoMapper.getSpecialManageByDetailIds(detailIds);
         return goodsInfos != null && !goodsInfos.isEmpty();
+    }
+
+    public List<GoodsInfo> getGoodsInfoListByIds(Collection<Long> detailIds) {
+        List<GoodsInfo> goodsInfos = goodsInfoMapper.getGoodsInfoListByIds(detailIds);
+        return goodsInfos;
     }
 
 

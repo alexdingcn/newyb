@@ -1,5 +1,5 @@
 <style lang="less">
-    @import '../../styles/common.less';
+@import "../../styles/common.less";
 </style>
 
 <template>
@@ -9,7 +9,6 @@
                 <p slot="title">
                     <Icon type="compose"></Icon>
                      {{ formItem.name || '生产企业' }}
-                     
                 </p>
 
                 <div slot="extra">
@@ -19,8 +18,11 @@
                 </div>
 
                 <Form :model="formItem" :rules="ruleValidate" :label-width="80">
-                    <h3>基本信息</h3>
-                    <Alert show-icon>修改企业名称或者生产许可证自动补全信息</Alert>
+                    <Row>
+                        <i-col span="8"><h3>基本信息</h3></i-col>
+                        <i-col span="16"><Alert show-icon>修改企业名称或者生产许可证自动补全信息</Alert></i-col>
+                    </Row>
+
                     <hr style="width: 50%; margin-bottom:15px;" size="1"/>
                     <Row>
                         <i-col span="8">
@@ -168,221 +170,232 @@
 </template>
 
 <script>
-import Vue from 'vue';
-import moment from 'moment';
-import iviewArea from 'iview-area';
-import util from '@/libs/util.js';
-import fileDetail from '@/views/basic-data/file-detail.vue';
-import factoryVue from './factory.vue';
+import Vue from "vue";
+import moment from "moment";
+import iviewArea from "iview-area";
+import util from "@/libs/util.js";
+import fileDetail from "@/views/basic-data/file-detail.vue";
+import factoryVue from "./factory.vue";
 
 Vue.use(iviewArea);
 
 export default {
-    name: 'factory-info',
-    props: {
-        factoryId: {
-            type: String|Number,
-            default: ''
-        }
-    },
-    components: {
-        fileDetail
-    },
-    data () {
-        return {
-            spinShow: false,
-            loading: false,
-            formItem: {
-                placeCodes: []
-            },
-            placeCodeList: [],
-            categoryList: [],
-            ruleValidate: {
-                name: [
-                    {required: true, message: '名称不能为空', trigger: 'blur'}
-                ]
-            },
-            fileUploadModal: false,
-        };
-    },
-    watch: {
-        factoryId: function(data) {
-            this.init();
-        }
-    },
-    methods: {
-        clearss(){
-            this.formItem.name="";
-            this.formItem.origin="";
-            this.formItem.pinyin="";
-            this.formItem.placeCodes="";
-            this.formItem.address="";
-            this.formItem.postcode="";
-            this.formItem.contact="";
-            this.formItem.employee="";
-            this.formItem.phone="";
-            this.formItem.fax="";
-            this.formItem.email="";
-            this.formItem.comment="";
-            this.formItem.fileNo="";
-            this.formItem.permit="";
-            this.formItem.permitExp="";
-            this.formItem.license="";
-            this.formItem.licenseExp="";
-            this.formItem.bankName="";
-            this.formItem.bankAccount="";
-            this.formItem.taxNumber="";
-            
-        },
-        init () {
-            var self = this;
-            self.spinShow = true;
-            if (this.factoryId && this.factoryId > 0) {
-                util.ajax.get('/factory/' + this.factoryId)
-                    .then(function (response) {
-                        self.spinShow = false;
-                        let data = response.data;
-                        data.permitExp = data.permitExp ? moment(data.permitExp).format('YYYY-MM-DD') : '';
-                        data.licenseExp = data.licenseExp ? moment(data.licenseExp).format('YYYY-MM-DD') : '';
-                        self.formItem = data;
-                        var placeCodes = [];
-                        var rawCodes = response.data.placeCodes;
-                        if (rawCodes) {
-                            for (var i = 0; i < rawCodes.length; i++) {
-                                placeCodes.push(rawCodes[i].code);
-                            }
-                        }
-                        self.placeCodeList = placeCodes;
-                    })
-                    .catch(function (error) {
-                        self.spinShow = false;
-                        util.errorProcessor(self, error);
-                    });
-            } else {
-                self.spinShow = false;
-                self.formItem = {
-                    pinyin: ''
-                };
-            }
-        },
-        submitFactory (action) {
-            var self = this;
-           
-            this.spinShow = true;
-            self.loading = true;
-            this.formItem.placeCodes = this.placeCodeList;
-            util.ajax.post('/factory/save', this.formItem)
-                .then(function (response) {
-                    self.spinShow = false;
-                    self.loading = false;
-                    let data = response.data;
-                    data.permitExp = data.permitExp ? moment(data.permitExp).format('YYYY-MM-DD') : '';
-                    data.licenseExp = data.licenseExp ? moment(data.licenseExp).format('YYYY-MM-DD') : '';
-                    self.formItem = data;
-                    self.$Message.success('生产企业' + self.formItem.name + '保存成功');                 
-                    self.$emit('save-ok', self.formItem, action); 
-                    
-                })
-                .catch(function (error) {
-                    self.spinShow = false;
-                    self.loading = false;
-                    util.errorProcessor(self, error);
-                });
-        },
-        onChangeName () {
-            if (this.formItem.name && this.formItem.name.length > 0) {
-                var self = this;
-                util.ajax.post('/util/pinyinAbbr', { name: this.formItem.name })
-                    .then(function (response) {
-                        self.formItem.pinyin = response.data;
-                    })
-                    .catch(function (error) {
-                        util.errorProcessor(self, error);
-                    });
-                
-                util.ajax.post('/factory/database/search', { companyName: this.formItem.name })
-                    .then(function (response) {
-                        if (response.status === 200 && response.data.length > 0) {
-                            self.$Modal.confirm({
-                                title: '是否补全数据',
-                                content: '基础数据库检测到企业:' + response.data[0].companyName + ',是否补全数据',
-                                onOk: () => {
-                                    self.fulfillData(response.data[0])
-                                }
-                            });
-                        }
-                    })
-                    .catch(function (error) {
-                        util.errorProcessor(self, error);
-                    });
-            }
-        },
-        fulfillData(factoryInfo) {
-            // TODO add selector for more results
-            this.formItem.name = factoryInfo.companyName;
-            this.formItem.origin = factoryInfo.city;
-            this.formItem.address = factoryInfo.address;
-            this.formItem.contact = factoryInfo.legalPerson;
-            this.formItem.phone = factoryInfo.phone;
-            this.formItem.fax = factoryInfo.fax;
-            this.formItem.email = factoryInfo.email;
-            this.formItem.permit = factoryInfo.permit;
-            this.formItem.permitExp = factoryInfo.expiredDate;
-            this.formItem.license = factoryInfo.license;
-            this.formItem.comment = factoryInfo.scope;
-            this.formItem.employee = factoryInfo.responsiblePerson;
-        },
-        onChangePermit(val) {
-            if (this.formItem.permit) {
-                var self = this;
-                util.ajax.post('/factory/database/search', { permit: this.formItem.permit })
-                    .then(function (response) {
-                        if (response.status === 200 && response.data.length > 0) {
-                            self.$Modal.confirm({
-                                title: '是否补全数据',
-                                content: '基础数据库检测到企业:' + response.data[0].companyName,
-                                onOk: () => {
-                                    self.fulfillData(response.data[0])
-                                }
-                            });
-                        }
-                    })
-                    .catch(function (error) {
-                        util.errorProcessor(self, error);
-                    });
-            }
-        },
-        searchRelatedGoods () {
-            let argu = { factory_id: this.$route.params.factory_id };
-            this.$router.push({
-                name: 'basic_data_good',
-                params: argu
-            });
-        },
-        uploadFile() {
-            this.fileUploadModal = true;
-        },
-        addFileSuccess(data) {
-            this.formItem.fileNo = data.fileNo;
-        }
-
-    },
-    mounted () {
-        this.init();
-    },
-    activated () {
-        this.init();
+  name: "factory-info",
+  props: {
+    factoryId: {
+      type: String | Number,
+      default: ""
     }
+  },
+  components: {
+    fileDetail
+  },
+  data() {
+    return {
+      spinShow: false,
+      loading: false,
+      formItem: {
+        placeCodes: []
+      },
+      placeCodeList: [],
+      categoryList: [],
+      ruleValidate: {
+        name: [{ required: true, message: "名称不能为空", trigger: "blur" }]
+      },
+      fileUploadModal: false
+    };
+  },
+  watch: {
+    factoryId: function(data) {
+      this.init();
+    }
+  },
+  methods: {
+    clearss() {
+      this.formItem.name = "";
+      this.formItem.origin = "";
+      this.formItem.pinyin = "";
+      this.formItem.placeCodes = "";
+      this.formItem.address = "";
+      this.formItem.postcode = "";
+      this.formItem.contact = "";
+      this.formItem.employee = "";
+      this.formItem.phone = "";
+      this.formItem.fax = "";
+      this.formItem.email = "";
+      this.formItem.comment = "";
+      this.formItem.fileNo = "";
+      this.formItem.permit = "";
+      this.formItem.permitExp = "";
+      this.formItem.license = "";
+      this.formItem.licenseExp = "";
+      this.formItem.bankName = "";
+      this.formItem.bankAccount = "";
+      this.formItem.taxNumber = "";
+    },
+    init() {
+      var self = this;
+      self.spinShow = true;
+      if (this.factoryId && this.factoryId > 0) {
+        util.ajax
+          .get("/factory/" + this.factoryId)
+          .then(function(response) {
+            self.spinShow = false;
+            let data = response.data;
+            data.permitExp = data.permitExp
+              ? moment(data.permitExp).format("YYYY-MM-DD")
+              : "";
+            data.licenseExp = data.licenseExp
+              ? moment(data.licenseExp).format("YYYY-MM-DD")
+              : "";
+            self.formItem = data;
+            var placeCodes = [];
+            var rawCodes = response.data.placeCodes;
+            if (rawCodes) {
+              for (var i = 0; i < rawCodes.length; i++) {
+                placeCodes.push(rawCodes[i].code);
+              }
+            }
+            self.placeCodeList = placeCodes;
+          })
+          .catch(function(error) {
+            self.spinShow = false;
+            util.errorProcessor(self, error);
+          });
+      } else {
+        self.spinShow = false;
+        self.formItem = {
+          pinyin: ""
+        };
+      }
+    },
+    submitFactory(action) {
+      var self = this;
+
+      this.spinShow = true;
+      self.loading = true;
+      this.formItem.placeCodes = this.placeCodeList;
+      util.ajax
+        .post("/factory/save", this.formItem)
+        .then(function(response) {
+          self.spinShow = false;
+          self.loading = false;
+          let data = response.data;
+          data.permitExp = data.permitExp
+            ? moment(data.permitExp).format("YYYY-MM-DD")
+            : "";
+          data.licenseExp = data.licenseExp
+            ? moment(data.licenseExp).format("YYYY-MM-DD")
+            : "";
+          self.formItem = data;
+          self.$Message.success("生产企业" + self.formItem.name + "保存成功");
+          self.$emit("save-ok", self.formItem, action);
+        })
+        .catch(function(error) {
+          self.spinShow = false;
+          self.loading = false;
+          util.errorProcessor(self, error);
+        });
+    },
+    onChangeName() {
+      if (this.formItem.name && this.formItem.name.length > 0) {
+        var self = this;
+        util.ajax
+          .post("/util/pinyinAbbr", { name: this.formItem.name })
+          .then(function(response) {
+            self.formItem.pinyin = response.data;
+          })
+          .catch(function(error) {
+            util.errorProcessor(self, error);
+          });
+
+        util.ajax
+          .post("/factory/database/search", { companyName: this.formItem.name })
+          .then(function(response) {
+            if (response.status === 200 && response.data.length > 0) {
+              self.$Modal.confirm({
+                title: "是否补全数据",
+                content:
+                  "基础数据库检测到企业:" +
+                  response.data[0].companyName +
+                  ",是否补全数据",
+                onOk: () => {
+                  self.fulfillData(response.data[0]);
+                }
+              });
+            }
+          })
+          .catch(function(error) {
+            util.errorProcessor(self, error);
+          });
+      }
+    },
+    fulfillData(factoryInfo) {
+      // TODO add selector for more results
+      this.formItem.name = factoryInfo.companyName;
+      this.formItem.origin = factoryInfo.city;
+      this.formItem.address = factoryInfo.address;
+      this.formItem.contact = factoryInfo.legalPerson;
+      this.formItem.phone = factoryInfo.phone;
+      this.formItem.fax = factoryInfo.fax;
+      this.formItem.email = factoryInfo.email;
+      this.formItem.permit = factoryInfo.permit;
+      this.formItem.permitExp = factoryInfo.expiredDate;
+      this.formItem.license = factoryInfo.license;
+      this.formItem.comment = factoryInfo.scope;
+      this.formItem.employee = factoryInfo.responsiblePerson;
+    },
+    onChangePermit(val) {
+      if (this.formItem.permit) {
+        var self = this;
+        util.ajax
+          .post("/factory/database/search", { permit: this.formItem.permit })
+          .then(function(response) {
+            if (response.status === 200 && response.data.length > 0) {
+              self.$Modal.confirm({
+                title: "是否补全数据",
+                content: "基础数据库检测到企业:" + response.data[0].companyName,
+                onOk: () => {
+                  self.fulfillData(response.data[0]);
+                }
+              });
+            }
+          })
+          .catch(function(error) {
+            util.errorProcessor(self, error);
+          });
+      }
+    },
+    searchRelatedGoods() {
+      let argu = { factory_id: this.$route.params.factory_id };
+      this.$router.push({
+        name: "basic_data_good",
+        params: argu
+      });
+    },
+    uploadFile() {
+      this.fileUploadModal = true;
+    },
+    addFileSuccess(data) {
+      this.formItem.fileNo = data.fileNo;
+    }
+  },
+  mounted() {
+    this.init();
+  },
+  activated() {
+    this.init();
+  }
 };
 </script>
 
 <style >
 .ivu-form-item {
-    margin-bottom: 20px;
+  margin-bottom: 20px;
 }
 .file-upload-modal {
-    position: fixed;
-    z-index: 1000;
+  position: fixed;
+  z-index: 1000;
 }
 </style>
 

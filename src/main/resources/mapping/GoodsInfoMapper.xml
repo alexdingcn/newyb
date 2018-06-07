@@ -73,6 +73,7 @@
     <result column="low_limit" property="lowLimit" jdbcType="DECIMAL"/>
     <result column="high_limit" property="highLimit" jdbcType="DECIMAL"/>
     <result column="spec_desc" property="specDesc" jdbcType="VARCHAR" />
+    <result column="min_order_limit" property="minOrderLimit" jdbcType="INTEGER" />
   </resultMap>
   <sql id="Base_Column_List" >
     id, company_id, category_id, goods_no, brand_id, supplier_id, status, name, full_name, 
@@ -84,7 +85,7 @@
     is_shebao, specific_med_id, jx_id, base_med_id, func_cat_id, medication_id, care_time_id, 
     gmp_type_id, abc_type_id, scope_id, new_type_id, created_by, updated_by, created_time, 
     updated_time, tags, use_spec, bar_code, retail_price, batch_price, in_price,
-    normal_limit, low_limit, high_limit, spec_desc
+    normal_limit, low_limit, high_limit, spec_desc, min_order_limit
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
     select 
@@ -118,7 +119,7 @@
       new_type_id, created_by, updated_by, 
       created_time, updated_time, tags,
       use_spec, bar_code, retail_price, batch_price, in_price,
-      normal_limit, low_limit, high_limit, spec_desc)
+      normal_limit, low_limit, high_limit, spec_desc, min_order_limit)
     values (#{companyId,jdbcType=INTEGER}, #{categoryId,jdbcType=INTEGER},
       #{goodsNo,jdbcType=VARCHAR}, #{brandId,jdbcType=BIGINT}, #{supplierId,jdbcType=BIGINT}, 
       #{status,jdbcType=VARCHAR}, #{name,jdbcType=VARCHAR}, #{fullName,jdbcType=VARCHAR}, 
@@ -142,7 +143,7 @@
       #{useSpec,jdbcType=BIT}, #{barCode,jdbcType=VARCHAR}, #{retailPrice,jdbcType=DECIMAL},
       #{batchPrice,jdbcType=DECIMAL}, #{inPrice,jdbcType=DECIMAL},
       #{normalLimit,jdbcType=DECIMAL}, #{lowLimit,jdbcType=DECIMAL}, #{highLimit,jdbcType=DECIMAL},
-      #{specDesc,jdbcType=VARCHAR})
+      #{specDesc,jdbcType=VARCHAR}, #{minOrderLimit,jdbcType=INTEGER})
   </insert>
 
   <update id="updateByPrimaryKeySelective" parameterType="com.yiban.erp.entities.GoodsInfo" >
@@ -358,6 +359,10 @@
       <if test="specDesc != null">
         spec_desc = #{specDesc,jdbcType=VARCHAR},
       </if>
+        <if test="minOrderLimit != null">
+            min_order_limit = #{minOrderLimit,jdbcType=INTEGER},
+        </if>
+
     </set>
     where id = #{id,jdbcType=BIGINT}
   </update>
@@ -374,6 +379,9 @@
       </if>
       <if test="supplierId != null" >
         and supplier_id = #{supplierId}
+      </if>
+      <if test="factoryId != null" >
+          and factory_id = #{factoryId}
       </if>
       <if test="status != null">
         and status = #{status}
@@ -404,6 +412,9 @@
     </if>
     <if test="supplierId != null" >
       and g.supplier_id = #{supplierId}
+    </if>
+    <if test="factoryId != null" >
+      and g.factory_id = #{factoryId}
     </if>
     <if test="status != null">
       and g.status = #{status}
@@ -464,7 +475,7 @@
     gi.gmp_type_id as gmpTypeId, gi.abc_type_id as abcTypeId, gi.scope_id as scopeId,
     gi.new_type_id as newTypeId, gi.created_by as createdBy, gi.updated_by as updatedBy, gi.created_time as createdTime,
     gi.updated_time as updatedTime, gi.tags as tags, gi.use_spec as useSpec,
-    gi.normal_limit as normalLimit, gi.low_limit as lowLimit, gi.high_limit as highLimit, gi.spec_desc as specDesc,
+    gi.normal_limit as normalLimit, gi.low_limit as lowLimit, gi.high_limit as highLimit, gi.spec_desc as specDesc, gi.min_order_limit as minOrderLimit,
     br.brand_name as brandName,
     gc.name as categoryName,
     f.name as factoryName,
@@ -543,5 +554,17 @@
       #{item}
     </foreach>
   </select>
+
+
+    <select id="getGoodsInfoListByIds" parameterType="map" resultMap="BaseResultMap">
+        select
+        g.*
+        from goods_info g, goods_detail d
+        where d.goods_info_id = g.id
+        and d.id in
+        <foreach collection="ids" item="item" open="(" close=")" separator=", ">
+            #{item}
+        </foreach>
+    </select>
 
 </mapper>

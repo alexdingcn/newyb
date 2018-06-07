@@ -1,6 +1,5 @@
 .address-selection {
   .ivu-radio-group-item:hover {
-
     background-color: #fff0e8;
     .set-default-addrbtn {
       visibility: visible;
@@ -15,6 +14,18 @@
 
     .edit-address-btn {
       visibility: visible;
+    }
+  }
+}
+.goods-tbl {
+  .ivu-table-body,
+  .ivu-table-tip {
+    min-height: 300px;
+  }
+  @media (max-height: 800px) {
+    .ivu-table-body,
+    .ivu-table-tip {
+      min-height: 120px;
     }
   }
 }

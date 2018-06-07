@@ -16,6 +16,7 @@ public class GoodsQuery {
     private Integer categoryId;
     private Long brandId;
     private Long supplierId;
+    private Long factoryId;
     private Boolean enable;
     private String status;
     private String search; //名称、拼音、编号模糊匹配
@@ -175,5 +176,13 @@ public class GoodsQuery {
             defaultGoodId=defaultAttr.get(0).getGoodsInfoId();
         }
         this.defaultGoodId = defaultGoodId;
+    }
+
+    public Long getFactoryId() {
+        return factoryId;
+    }
+
+    public void setFactoryId(Long factoryId) {
+        this.factoryId = factoryId;
     }
 }

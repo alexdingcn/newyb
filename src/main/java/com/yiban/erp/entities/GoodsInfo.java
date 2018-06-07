@@ -144,6 +144,8 @@ public class GoodsInfo {
 
     private String barCode;
 
+    private Integer minOrderLimit;
+
     private List<GoodsDetail> goodsDetails;
 
     private BigDecimal batchPrice;
@@ -868,4 +870,11 @@ public class GoodsInfo {
         this.specDesc = specDesc;
     }
 
+    public Integer getMinOrderLimit() {
+        return minOrderLimit;
+    }
+
+    public void setMinOrderLimit(Integer minOrderLimit) {
+        this.minOrderLimit = minOrderLimit;
+    }
 }
