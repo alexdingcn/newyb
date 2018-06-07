@@ -5,8 +5,8 @@
 
 <template>
     <div class="access">
-        <Row>
-            <i-col span="9">
+        <Row :gutter="10">
+            <i-col span="10">
                 <Card>
                     <p slot="title">
                         <Icon type="ios-flask-outline"></Icon> 生产企业
@@ -18,9 +18,9 @@
                         </ButtonGroup>
                     </div>
                     <Row type="flex" justify="end">
-                        <i-input size="small" v-model="searchFactoryVal" placeholder="企业名称/联系人/拼音简称" clearable 
+                        <i-input v-model="searchFactoryVal" placeholder="企业名称/联系人/拼音简称" clearable 
                             @on-enter="validateSearch">
-                            <Button slot="append" size="small" type="primary" shape="circle" icon="ios-search" @click="searchFactory"></Button>
+                            <Button slot="append" type="primary" shape="circle" icon="ios-search" @click="searchFactory"></Button>
                         </i-input>
                     </Row>
                     <Row type="flex" justify="center" align="middle" class="advanced-router margin-top-8">
@@ -30,8 +30,8 @@
                     </Row>
                 </Card>
             </i-col>
-            <i-col span="14" style="margin-left: 5px;">
-                <factoty-info ref="ssss" :factoryId="currFactoryId" @save-ok="factorySaveOk" ></factoty-info>
+            <i-col span="14">
+                <factory-info ref="facinfo" :factoryId="currFactoryId" @save-ok="factorySaveOk" ></factory-info>
             </i-col>
         </Row>
     </div>
@@ -39,12 +39,12 @@
 
 <script>
 import util from "@/libs/util.js";
-import factotyInfo from "./factory-info.vue";
+import factoryInfo from "./factory-info.vue";
 
 export default {
   name: "factory",
   components: {
-    factotyInfo
+    factoryInfo
   },
   data() {
     return {
@@ -158,7 +158,7 @@ export default {
       this.currFactoryId = row.id;
     },
     factorySaveOk(data, action) {
-      this.$refs.ssss.clearss();
+      this.$refs.facinfo.clearss();
       if (action === "edit") {
         if (data && data.id) {
           let self = this;
