@@ -9,37 +9,30 @@
                 <Icon type="map"></Icon>
                商品溯源
             </p>
-        <Form :label-width="85" :model="source"  ref="sourceForm" >
+            <div slot="extra">
+                <ButtonGroup class="padding-left-20">
+                <Button type="primary" icon="ios-search" @click="searchInfo">查询</Button>
+                <Button  type="error" >销毁</Button>
+                </ButtonGroup>
+            </div>
+        <Form :label-width="85" :model="sourceForm"  ref="sourceForm" >
             <Row>
                 <i-col  span="6">
                     <FormItem label="商品速查" props="goodsId">
-                      <good-select v-model="source.goodsId"  @on-change="searchBlur"></good-select>
+                        <Select ref="warehouseSelect" v-model="sourceForm.goodsId" @on-change="searchBlur" filterable clearable  style="width:260px"
+                                placeholder="商品名称">
+                            <Option v-for="item in goodList" :value="item.id" :key="item.id">{{ item.name }}</Option>
+                        </Select>
                     </FormItem>
                 </i-col>
+
                 <i-col span="6">
-                    <FormItem label="批次号" >
-                      <Select v-model="source.batch" :goodsId="source.goodsId" :disabled="!source.goodsId" placeholder="商品批次号" style="width:260px">
-                          <Option v-for="item in batchList" :value="item.value" :key="item.value">{{ item.label }}</Option>
+                    <FormItem label="批次号" props="batch" >
+                      <Select v-model="sourceForm.batch" :goodsId="sourceForm.goodsId" :disabled="!sourceForm.goodsId" clearable placeholder="商品批次号" style="width:260px">
+                          <Option v-for="item in batchList" :value="item" :key="item">{{ item }}</Option>
                       </Select>
                     </FormItem>
-                  </i-col>
-                <i-col span="6">
-                    <FormItem >
-                      <Button type="primary" icon="ios-search">查询</Button>
-                    </FormItem>
-                </i-col>
-            </Row>
-            <Row>
-                <i-col  span="6">
-                    <FormItem label="库存" props="goodsId">
-                      <input v-model="source.good" disabled size="small" style="width: 260px"/>
-                    </FormItem>
-                </i-col>
-                <i-col span="6">
-                    <FormItem label="在单数" >
-                      <input v-model="source.good" disabled size="small" style="width: 260px"/>
-                    </FormItem>
-                  </i-col>
+                  </i-col> 
             </Row>
         </Form>
         <div>
@@ -50,7 +43,13 @@
                         采购历史
                     </h3>
 
-                    <Table stripe :columns="buyHistoryCol" :data="buyHistoryData"></Table>
+                    <Table stripe :columns="buyHistoryCol" :data="buyHistoryData" :height="700">
+                        <div slot="footer">
+                            <h3 class="padding-left-20" >
+                                <b>总库存: </b>{{repertory}} 
+                            </h3>
+                        </div>
+                    </Table>
 
                 </i-col>
                 <i-col span="12" class="padding-left-20">
@@ -58,82 +57,160 @@
                       <Icon type="ios-pulse-strong"></Icon>
                         销售情况
                     </h3>
-                    <Table stripe :columns="sellCol" :data="sellData"></Table>
+                    <Table stripe :columns="sellCol" :data="sellData" :height="700">
+                        <div slot="footer">
+                            <h3 class="padding-left-20" >
+                                <b>在単数: </b>{{onWayQuantity}}
+                            </h3>
+                        </div>
+                    </Table>
                 </i-col>
             </Row>
-        </div>
-        
+        </div>  
         </card>
         
     </div>
 </template>
 <script>
-import goodSelect from "@/views/selector/good-select.vue";
+//import goodSelect from "@/views/selector/good-select.vue";
 import util from "@/libs/util.js";
 
 export default {
   name: "goodsSource",
   components: {
-    goodSelect
+    //goodSelect
   },
   data() {
     return {
       buyHistoryData: [],
-      source: {},
+      sourceForm: {},
       sellData: [],
       batchList: {},
+      goodId:"",
+      repertory:"",
+      onWayQuantity:"",
+      goodList: [],
       buyHistoryCol: [
-        {
-          title: "收货数量"
+          {
+          title: "批次号",
+          key:'batchCode',
+          align:'center',
         },
         {
-          title: "赠送数量"
+          title: "采购数量",
+          key:'buyOrderQuality',
+          align:'center',
         },
         {
-          title: "金额"
+          title: "入库数量",
+          key:'inCount',
+          align:'center',
         },
         {
-          title: "入库数量"
+          title: "库存量",
+          key:'quantity',
+          align:'center',
         },
         {
-          title: "采购数量"
+          title: "金额",
+          key:'totalAmount',
+          align:'center',
         },
         {
-          title: "采购时间"
+          title: "入库时间",
+          key:'createTime',
+          align:'center',
+        },
+        {
+          title: "供应商",
+          key:'shipName',
+          align:'center',
+        },
+        {
+          title: "采购员",
+          key:'realName',
+          align:'center',
         }
       ],
       sellCol: [
-        {
-          title: "销售时间"
+          {
+          title: "批次号",
+          key:'batchCode',
+          align:'center',
         },
         {
-          title: "销售总数量"
+          title: "客户",
+          key: 'customerName',
+          align:'center',
         },
         {
-          title: "销售总金额"
+          title: "承运公司",
+          key:'shipCompanyName',
+          align:'center',
+        },
+        {
+          title: "销售数量",
+          key:'totalQuantity',
+          align:'center',
+        },
+        {
+          title: "销售金额",
+          key:'totalAmount',
+          align:'center',
+        },
+        {
+          title: "已付金额",
+          key:'paidAmount',
+          align:'center',
+        },
+        {
+          title: "销售员",
+          key:'realName',
+          align:'center',
         }
       ]
     };
   },
+  mounted(){
+      this.queryGood();
+  },
   methods: {
-    /**supplierChange(supplierId, supplier) {
-      //赋值特殊管理标识
-      console.log(supplier);
-      if (supplier && supplier.id) {
-        this.supplierColdManage = supplier.coldBusiness ? true : false;
-        this.supplierSpecialManage = supplier.canSpecial ? true : false;
-      }
-    },**/
+    queryGood(){
+        util.ajax
+        .get("/goods/source/goodsList")
+        .then((response) =>{
+            this.goodList = response.data.goodsList;
+        })
+        .catch(function(error){
+            util.errorProcessor(this, error);
+        });
+    },
+    searchInfo(){
+        let requestData = {
+            goodId : this.sourceForm.goodsId,
+            batchCode : this.sourceForm.batch
+        };
+        util.ajax
+        .get("/goods/source/searchInfo",{params : requestData })
+        .then((response) => {
+            this.repertory = response.data.repertory;
+            this.onWayQuantity = response.data.onWayQuantity;
+            this.buyHistoryData = response.data.Buy;
+            this.sellData = response.data.sell;
+        })
+        .catch(function(error){
+            util.errorProcessor(this, error);
+        });
+    },
     searchBlur(data) {
-      //console.log("source.goodsId---" + data);
       let requestData = {
         goodId: data
       };
-      console.log("requestData---" + requestData);
       util.ajax
         .get("/goods/source/getBatch", { params: requestData })
-        .then(function(response) {
-          this.batchList = response.data;
+        .then((response) => {
+          this.batchList = response.data.data;
+          this.goodId = response.data.goodId;
         })
         .catch(function(error) {
           util.errorProcessor(this, error);
