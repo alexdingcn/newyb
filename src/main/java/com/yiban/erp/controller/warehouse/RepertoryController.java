@@ -16,10 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,9 +33,13 @@ public class RepertoryController {
     private RepertoryInfoMapper repertoryInfoMapper;
 
 
-    @RequestMapping(value = "/list", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/list", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> list(@AuthenticationPrincipal User user,
-                                       @RequestBody RepertoryQuery repertoryQuery) {
+                                       @RequestParam(value = "warehouseId", required = false ) Integer warehouseId,
+                                       @RequestParam(value = "goodsId", required = false ) Long goodsId) {
+        RepertoryQuery repertoryQuery = new RepertoryQuery();
+        repertoryQuery.setWarehouseId(warehouseId);
+        repertoryQuery.setGoodsId(goodsId);
         JSONObject result = repertoryService.getCurrentRepertory(user, repertoryQuery);
         return ResponseEntity.ok().body(JSON.toJSONString(result, SerializerFeature.DisableCircularReferenceDetect));
     }
