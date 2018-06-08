@@ -12,7 +12,7 @@
             <div slot="extra">
                 <ButtonGroup class="padding-left-20">
                 <Button type="primary" icon="ios-search" @click="searchInfo">查询</Button>
-                <Button  type="error" >销毁</Button>
+                <Button  type="error" @click="destory">销毁</Button>
                 </ButtonGroup>
             </div>
         <Form :label-width="85" :model="sourceForm"  ref="sourceForm" >
@@ -90,6 +90,15 @@ export default {
       repertory:"",
       onWayQuantity:"",
       goodList: [],
+      RepertoryOut: {
+        id: "",
+        warehouseId: "",
+        outDate: "",
+        refOrderNumber: "",
+        customerName: "",
+        comment: "",
+        detail: []
+      },
       buyHistoryCol: [
           {
           title: "批次号",
@@ -214,6 +223,21 @@ export default {
         })
         .catch(function(error) {
           util.errorProcessor(this, error);
+        });
+    },
+    destory(){
+        let RepertoryOutDetail = {};
+          RepertoryOutDetail["repertoryInfoId"] = this.changeStoreItems[i].id;
+          RepertoryOutDetail["quantity"] = this.changeStoreItems[i].outAmount;
+          RepertoryOutDetail["price"] = this.changeStoreItems[i].buyPrice;
+          this.RepertoryOut.outDetailList.push(RepertoryOutDetail);
+        util.ajax
+        .POST("/repertory/out/loseRepertoryOut",this.RepertoryOut)
+        .then((response) => {
+
+        })
+        .catch((error) =>{
+
         });
     }
   }
