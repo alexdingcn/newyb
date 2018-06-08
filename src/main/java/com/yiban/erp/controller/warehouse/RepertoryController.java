@@ -36,7 +36,7 @@ public class RepertoryController {
     private RepertoryInfoMapper repertoryInfoMapper;
 
 
-    @RequestMapping(value = "/list", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/list", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> list(@AuthenticationPrincipal User user,
                                        @RequestBody RepertoryQuery repertoryQuery) {
         JSONObject result = repertoryService.getCurrentRepertory(user, repertoryQuery);
