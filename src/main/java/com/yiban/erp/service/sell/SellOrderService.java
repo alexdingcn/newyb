@@ -540,6 +540,10 @@ public class SellOrderService {
         logger.info("user:{} check sell order and repertory enough quantity. orderId: {}", user.getId(), sellOrderId);
         //减库存
         int count = repertoryInfoMapper.sellOrderConsumeQuantity(sellOrderId, user.getNickname(), new Date());
+        if (count <= 0) {
+            logger.warn("update repertory fail .");
+            throw new BizRuntimeException(ErrorCode.SELL_ORDER_QUANTITY_NOT_ENOUGH, goodNameList);
+        }
         logger.info("user:{} consume repertory quantity update record success count:{}, orderId:{}", user.getId(), count, sellOrderId);
         //变更状态
         order.setStatus(SellOrderStatus.SALE_CHECKED.name());

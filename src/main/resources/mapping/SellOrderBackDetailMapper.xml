@@ -207,8 +207,18 @@
   <update id="updateCheckStatus" parameterType="com.yiban.erp.dto.SellBackCheck" >
     update sell_order_back_detail
       set
-          right_quantity = #{rightQuantity,jdbcType=DECIMAL},
-          bad_quantity = #{badQuantity,jdbcType=DECIMAL},
+          <if test="rightQuantity != null">
+            right_quantity = #{rightQuantity,jdbcType=DECIMAL},
+          </if>
+          <if test="rightQuantity == null">
+            right_quantity = back_quantity,
+          </if>
+          <if test="badQuantity != null">
+            bad_quantity = #{badQuantity,jdbcType=DECIMAL},
+          </if>
+          <if test="badQuantity == null">
+            bad_quantity = 0,
+          </if>
           bad_plan = #{badPlan,jdbcType=VARCHAR},
           bad_reason = #{badReason,jdbcType=VARCHAR},
           check_status = #{checkStatus,jdbcType=BIT},

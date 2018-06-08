@@ -51,9 +51,13 @@ public interface RepertoryInfoMapper {
                                  @Param("updateBy") String updateBy,
                                  @Param("updateTime") Date updateTime);
 
+    //采购退货减去库存
     int buyBackConsumeQuantity(@Param("inBackId") Long inBackId,
                                @Param("updateBy") String updateBy,
                                @Param("updateTime") Date updateTime);
+
+    //销售退货，需要把库存加上
+    int sellBackOrderAddQuantity(Long sellBackOrderId);
 
     int buyBackReleaseOnWayQuantity(@Param("inBackId") Long inBackId); //释放锁定的在单数量
 
