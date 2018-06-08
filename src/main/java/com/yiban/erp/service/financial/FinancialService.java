@@ -78,6 +78,7 @@ public class FinancialService {
         req.setLogAccount(order.getCustomerName());
         req.setKeyWord("销售单生成的往来账流水"); //入库方式的描述信息
 
+        logger.info("create sell order financial flow params:{}", JSON.toJSONString(req));
         doFinancialRecord(req);  //登记往来账逻辑
     }
 
@@ -98,6 +99,11 @@ public class FinancialService {
             logger.warn("sell back order:{} financial flow is already exist, can not add on this sell order. ", orderBack.getId());
             throw new BizException(ErrorCode.FINANCIAL_SELL_BACK_ORDER_EXIST);
         }
+        BigDecimal amount = BigDecimal.ZERO;
+        BigDecimal orderAmount = orderBack.getTotalAmount() == null ? BigDecimal.ZERO : orderBack.getTotalAmount();
+        BigDecimal cosAmount = orderBack.getTotalCostAmount() == null ? BigDecimal.ZERO : orderBack.getTotalCostAmount();
+        amount = orderAmount.add(cosAmount);
+
         FinancialReq req = new FinancialReq();
         req.setCompanyId(orderBack.getCompanyId());
         req.setLogUserName(orderBack.getFinalCheckUser());
@@ -106,15 +112,18 @@ public class FinancialService {
         req.setBizType(FinancialBizType.SELL_BACK.name());
         req.setBizRefId(orderBack.getId()); //关联单ID取采购订单的ID
         req.setBizRefNo(orderBack.getOrderNumber());
-        req.setLogAmount(orderBack.getTotalAmount());
+        req.setLogAmount(amount);
         req.setLogDate(new Date());
         req.setLogAccount(orderBack.getCustomerName());
         req.setKeyWord("销售退货"); //入库方式的描述信息
 
+        logger.info("create sell back order financial flow params:{}", JSON.toJSONString(req));
+
         doFinancialRecord(req);
 
         //如果存在有免零金额，对免零金额生产一笔流水账
-        if (orderBack.getFreeAmount() != null && BigDecimal.ZERO.compareTo(orderBack.getFreeAmount()) > 0) {
+        if (orderBack.getFreeAmount() != null && BigDecimal.ZERO.compareTo(orderBack.getFreeAmount()) < 0) {
+            logger.info("have free amount {} from sell back order:{}", orderBack.getFreeAmount(), orderBack.getId());
             // 有免零金额，生产一笔免零金额的往来账流水
             FinancialReq freeReq = new FinancialReq();
             freeReq.setCompanyId(orderBack.getCompanyId());
@@ -124,10 +133,12 @@ public class FinancialService {
             freeReq.setBizType(FinancialBizType.SELL_BACK_FREE.name());
             freeReq.setBizRefId(orderBack.getId()); //关联单ID取采购订单的ID
             freeReq.setBizRefNo(orderBack.getOrderNumber());
-            freeReq.setLogAmount(orderBack.getFreeAmount().negate()); //发生金额先取反
+            freeReq.setLogAmount(orderBack.getFreeAmount()); //发生金额先取反
             freeReq.setLogDate(new Date());
             freeReq.setLogAccount(orderBack.getCustomerName());
             freeReq.setKeyWord("销售退货免零"); //入库方式的描述信息
+
+            logger.info("create sell back order free amount financial flow params:{}", JSON.toJSONString(freeReq));
             doFinancialRecord(freeReq);
         }
 
@@ -150,7 +161,7 @@ public class FinancialService {
             logger.warn("sell back order:{} financial flow is already exist, can not add on this sell back order. ", inBack.getId());
             throw new BizException(ErrorCode.FINANCIAL_SELL_ORDER_EXIST);
         }
-
+        logger.info("create buy back order {} financial flow amount {}", inBack.getId(), inBack.getTotalAmount());
         FinancialReq financialReq = new FinancialReq();
         financialReq.setCompanyId(inBack.getCompanyId());
         financialReq.setLogUserName(inBack.getFinalCheckUser());
@@ -164,6 +175,7 @@ public class FinancialService {
         financialReq.setLogAccount(inBack.getSupplierName());
         financialReq.setKeyWord("采购退货单生成的往来账流水");
 
+        logger.info("create buy back order financial flow params {}", JSON.toJSONString(financialReq));
         doFinancialRecord(financialReq);
     }
 
@@ -203,6 +215,7 @@ public class FinancialService {
         req.setLogAccount(repertoryIn.getSupplierName());
         req.setKeyWord(repertoryIn.getRefTypeName()); //入库方式的描述信息
 
+        logger.info("create buy order financial flow params:{}", JSON.toJSONString(req));
         doFinancialRecord(req);  //登记往来账逻辑
     }
 

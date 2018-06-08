@@ -227,6 +227,7 @@
           r.update_time = #{updateTime},
           r.update_by = #{updateBy}
     where d.repertory_id = r.id and d.sell_order_id = #{sellOrderId}
+      and (r.quantity - d.quantity) >= 0
   </update>
 
     <update id="buyBackConsumeQuantity" parameterType="map" >
@@ -236,6 +237,13 @@
               r.update_time = #{updateTime},
               r.update_by = #{updateBy}
         where b.repertory_info_id = r.id and b.in_back_id = #{inBackId}
+          and (r.quantity - b.back_quantity) >= 0
+    </update>
+
+    <update id="sellBackOrderAddQuantity" parameterType="java.lang.Long">
+        update repertory_info r, sell_order_back_detail d
+          set r.quantity = (r.quantity + d.right_quantity)
+        where r.id = d.repertory_id and d.back_order_id = #{sellBackOrderId}
     </update>
 
     <update id="buyBackReleaseOnWayQuantity" parameterType="java.lang.Long">

@@ -1,6 +1,7 @@
 package com.yiban.erp.controller.sell;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.yiban.erp.dao.SellOrderBackDetailMapper;
 import com.yiban.erp.dao.SellOrderBackMapper;
@@ -56,8 +57,10 @@ public class SellOrderBackController {
     public ResponseEntity<String> check(@RequestBody SellBackCheck backCheck,
                                         @AuthenticationPrincipal User user) throws Exception {
         logger.info("user:{} request save sell order back check result by params:{}", user.getId(), JSON.toJSONString(backCheck));
-        sellOrderBackService.checkBackOrder(backCheck, user);
-        return ResponseEntity.ok().build();
+        int refresh = sellOrderBackService.checkBackOrder(backCheck, user);
+        JSONObject response = new JSONObject();
+        response.put("refresh", refresh);
+        return ResponseEntity.ok().body(response.toJSONString());
     }
 
     @RequestMapping(value = "/quality/check/cancel", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)

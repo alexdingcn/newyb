@@ -64,6 +64,7 @@ public enum ErrorCode {
     BUY_ORDER_STATUS_CANNOT_REMOVE(1310, "采购订单当前状态下不能删除"),
     BUY_BACK_STATUS_CANNOT_REMOVE(1311, "采购退货单当前状态下不能删除"),
     BUY_BACK_NEED_BUY_CHECK(1312, "采购退出单需要先经过采购经理审核"),
+    BUY_BACK_UPDATE_REPERTORY_FAIL(1313, "采购退出修改库存失败，请确认是否库存是否满足退出数量"),
 
 
     // 15xx - 盘点
@@ -146,6 +147,11 @@ public enum ErrorCode {
     SELL_STATUS_QUALITY_ERROR(2241, "销售单当前状态不能做质量审核"),
     SELL_BACK_ORDER_CANNOT_UPDATE(2242, "销售退货单当前状态下不能做修改操作"),
     SELL_ORDER_MIN_LIMIT_ERROR(2243, "商品不满足最小起订量限制", ErrorDisplay.MODAL),
+    SELL_BACK_NEED_SALE_MANAGE_CHECK(2244, "销售单需要先经过销售经理审核"),
+    SELL_BACK_NEED_QA_MANAGE_CHECK(2244, "销售单需要先经过质管经理审核"),
+    SELL_BACK_IS_FINAL_CHECKED(2244, "销售退货单的状态已经是终审通过，不能做其他交易"),
+    SELL_BACK_NEED_QUALITY_CHECK(2245, "销售退货单需要经过质量复核后才能做终审操作"),
+    SELL_BACK_NEED_RECEIVE_STATUS(2246, "销售退货单需要先收货才能做后续流程"),
 
     // 23xx -承运公司
     SHIP_SAVE_PARAMS_ERROR(2301, "必输参数校验失败"),

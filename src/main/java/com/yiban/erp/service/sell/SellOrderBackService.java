@@ -15,6 +15,8 @@ import com.yiban.erp.exception.ErrorCode;
 import com.yiban.erp.service.goods.GoodsService;
 import com.yiban.erp.service.util.SystemConfigService;
 import com.yiban.erp.util.UtilTool;
+import org.apache.commons.lang3.StringUtils;
+import org.omg.CORBA.ORB;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -195,7 +197,14 @@ public class SellOrderBackService {
         return details;
     }
 
-    public void checkBackOrder(SellBackCheck backCheck, User user) throws BizException {
+    /**
+     * 各种流程审核入口审核
+     * @param backCheck
+     * @param user
+     * @return 1: 需要刷新订单列表，0: 只需要刷新详情列表
+     * @throws BizException
+     */
+    public int checkBackOrder(SellBackCheck backCheck, User user) throws BizException {
         //检查验请求的状态是否正确
         SellBackStatus requestStatus = SellBackStatus.getByName(backCheck.getStatus());
         if (requestStatus == null) {
@@ -205,16 +214,15 @@ public class SellOrderBackService {
         switch (requestStatus) {
             case INIT_SALE_CHECKED:
                 initSaleCheck(backCheck, user);//初始销售经理审核
-                return;
+                return 1;
             case INIT_QUALITY_CHECKED:
                 initQualityCheck(backCheck, user);//初始质量经理审核
-                return;
+                return 1;
             case QUALITY_CHECKED:
-                qualityCheck(backCheck, user);
-                return;
+                return qualityCheck(backCheck, user);
             case FINAL_CHECKED:
                 finalCheck(backCheck, user);
-                return;
+                return 1;
         }
         logger.warn("get request status error. requestStatus:{}", requestStatus.name());
         throw new BizException(ErrorCode.SELL_BACK_CHECK_STATUS_ERROR);
@@ -294,9 +302,10 @@ public class SellOrderBackService {
      * 质量复核
      * @param check
      * @param user
+     * @return 1 前端页面需要刷新订单列表，0：只有刷新详情
      * @throws BizException
      */
-    public void qualityCheck(SellBackCheck check, User user) throws BizException {
+    public int qualityCheck(SellBackCheck check, User user) throws BizException {
         SellOrderBack order = sellOrderBackMapper.selectByPrimaryKey(check.getBackOrderId());
         if (order == null || !user.getCompanyId().equals(order.getCompanyId())) {
             logger.warn("get sell order back fail or user company and order company is not match. orderId:{}", check.getBackOrderId());
@@ -309,14 +318,14 @@ public class SellOrderBackService {
         }
         //看是否存在有detailId, 如果存在，认为是验收一条详情的数据
         if (check.getDetailId() != null) {
-            qualityCheckDetail(order, check, user);
+            return qualityCheckDetail(order, check, user);
         }else {
-            qualityCheckOrder(order, check, user);
+            return qualityCheckOrder(order, check, user, false);
         }
     }
 
     @Transactional
-    public void qualityCheckDetail(SellOrderBack order, SellBackCheck check, User user) throws BizException {
+    public int qualityCheckDetail(SellOrderBack order, SellBackCheck check, User user) throws BizException {
         if (check.getRightQuantity() == null || check.getRightQuantity().compareTo(BigDecimal.ZERO) < 0) {
             throw new BizException(ErrorCode.SELL_BACK_RIGHT_QUANTITY_ERROR);
         }
@@ -347,33 +356,55 @@ public class SellOrderBackService {
         }
         if (result) {
             logger.info("detail is check all success");
-            order.setStatus(SellBackStatus.QUALITY_CHECKED.name());
-            order.setQualityCheckUser(user.getNickname());
-            order.setQualityCheckTime(new Date());
-            order.setUpdatedTime(new Date());
-            order.setUpdatedBy(user.getNickname());
-            sellOrderBackMapper.updateByPrimaryKeySelective(order);
+            return qualityCheckOrder(order, check, user, true);
+        }else {
+            return 0; //单笔处理时，前端页面不需要全部刷新订单，只刷新详情
         }
     }
 
     @Transactional
-    public void qualityCheckOrder(SellOrderBack order, SellBackCheck check, User user) {
-        //直接修改所有的详情验收结果和订单状态
-        check.setUpdatedTime(new Date());
-        check.setUpdatedBy(user.getNickname());
-        check.setCheckUser(user.getNickname());
-        check.setCheckStatus(true);
-        int detailCount = sellOrderBackDetailMapper.updateCheckStatusByBackOrderId(check);
-        if (detailCount <= 0) {
-            throw new BizRuntimeException(ErrorCode.FAILED_UPDATE_FROM_DB);
+    public int qualityCheckOrder(SellOrderBack order, SellBackCheck check, User user, boolean isDetailCheck) {
+        //看看是否有终审流程，如果有，当前状态变更为质检复核通过，如果没有，设置为终审通过
+        boolean haveFnFlow = systemConfigService.haveOrderFlow(user.getCompanyId(), ConfigKey.SALE_BACK_FINAL_CHECK);
+        String status = SellBackStatus.QUALITY_CHECKED.name();
+        if (!haveFnFlow) {
+            status = SellBackStatus.FINAL_CHECKED.name();
+            order.setFinalCheckUser(user.getNickname());
+            order.setFinalCheckTime(new Date());
+        }
+        if (!isDetailCheck) {
+            //如果不是单独明细的审核，需要直接修改所有的详情验收结果和订单状态
+            check.setUpdatedTime(new Date());
+            check.setUpdatedBy(user.getNickname());
+            check.setCheckUser(user.getNickname());
+            check.setCheckStatus(true);
+            int detailCount = sellOrderBackDetailMapper.updateCheckStatusByBackOrderId(check);
+            if (detailCount <= 0) {
+                throw new BizRuntimeException(ErrorCode.FAILED_UPDATE_FROM_DB);
+            }
         }
         logger.info("update detail check success by orderId:{}", check.getBackOrderId());
-        order.setStatus(SellBackStatus.QUALITY_CHECKED.name());
+        order.setStatus(status);
         order.setQualityCheckUser(user.getNickname());
         order.setQualityCheckTime(new Date());
         order.setUpdatedTime(new Date());
         order.setUpdatedBy(user.getNickname());
-        sellOrderBackMapper.updateByPrimaryKeySelective(order);
+        int count = sellOrderBackMapper.updateByPrimaryKeySelective(order);
+        if (count <= 0) {
+            throw new BizRuntimeException(ErrorCode.FAILED_UPDATE_FROM_DB);
+        }
+
+        //如果是终审通过的流程，需要变更库存信息，并且生产对应的事件
+        if (SellBackStatus.FINAL_CHECKED.name().equalsIgnoreCase(order.getStatus())) {
+            logger.info("sell back order quality check and flow is end, then update repertory info. sell back order id:{}", order.getId());
+            int repertoryCount = repertoryInfoMapper.sellBackOrderAddQuantity(order.getId());
+            if (repertoryCount <= 0) {
+                throw new BizRuntimeException(ErrorCode.FAILED_UPDATE_FROM_DB);
+            }
+            // 生产一个销售退货的事件
+            rabbitmqQueueConfig.sendMessage("SellOrderBackService", RabbitmqQueueConfig.ORDER_SELL_BACK, order);
+        }
+        return 1; //成功处理，前端页面需要全部刷新订单
     }
 
 
@@ -390,8 +421,8 @@ public class SellOrderBackService {
             logger.warn("get sell order back fail or user company and order company is not match. orderId:{}", check.getBackOrderId());
             throw new BizException(ErrorCode.SELL_BACK_ORDER_GET_FAIL);
         }
-        if (!SellBackStatus.QUALITY_CHECKED.name().equalsIgnoreCase(order.getStatus()) &&
-                !SellBackStatus.BACK_RECEIVE.name().equalsIgnoreCase(order.getStatus())) {
+        if (!SellBackStatus.QUALITY_CHECKED.name().equalsIgnoreCase(order.getStatus())
+                && !SellBackStatus.BACK_RECEIVE.name().equalsIgnoreCase(order.getStatus())) {
             logger.warn("order:{} is not in QUALITY_CHECKED status, check cannot do. user:{}", order.getId(), user.getId());
             throw new BizException(ErrorCode.SELL_BACK_QUALITY_CHECK_CANCEL_ERROR);
         }
@@ -448,23 +479,22 @@ public class SellOrderBackService {
             logger.warn("get sell order back fail or user company and order company is not match. orderId:{}", check.getBackOrderId());
             throw new BizException(ErrorCode.SELL_BACK_ORDER_GET_FAIL);
         }
-        if (!SellBackStatus.QUALITY_CHECKED.name().equalsIgnoreCase(order.getStatus())) {
-            logger.warn("order:{} is not in QUALITY_CHECKED status, check cannot do. user:{}", order.getId(), user.getId());
-            throw new BizException(ErrorCode.SELL_BACK_QUALITY_CHECK_CANCEL_ERROR);
-        }
-        List<SellOrderBackDetail> details = sellOrderBackDetailMapper.getByBackOrderId(order.getId());
-        if (details.isEmpty()) {
-            logger.warn("order:{} get detail list is empty.", order.getId());
-            throw new BizException(ErrorCode.SELL_BACK_DETAIL_GET_FAIL);
+        if (SellBackStatus.FINAL_CHECKED.name().equalsIgnoreCase(order.getStatus())) {
+            throw new BizException(ErrorCode.SELL_BACK_IS_FINAL_CHECKED);
         }
 
-        //添加入库流水信息
-        List<RepertoryInfo> infos = createRepertoryInfos(user, order, details);
-        int inCount = repertoryInfoMapper.insertBatch(infos);
-        if (inCount <= 0) {
-            logger.warn("repertoryInfo insert batch fail.");
-            throw new BizRuntimeException(ErrorCode.FAILED_INSERT_FROM_DB);
+        //如果存在有质检复核流程，需要是质检复核通过的状态
+        boolean haveQCFlow = systemConfigService.haveOrderFlow(user.getCompanyId(), ConfigKey.SALE_BACK_QUALITY_CHECK);
+        if (haveQCFlow && !SellBackStatus.QUALITY_CHECKED.name().equalsIgnoreCase(order.getStatus())) {
+            logger.warn("have quality check flow but status is not QUALITY_CHECKED, ID:{}", order.getId());
+            throw new BizException(ErrorCode.SELL_BACK_NEED_QUALITY_CHECK);
+        }else {
+            //没有质量复核流程，至少需要是收货状态
+            if (!SellBackStatus.BACK_RECEIVE.name().equalsIgnoreCase(order.getStatus())) {
+                throw new BizException(ErrorCode.SELL_BACK_NEED_RECEIVE_STATUS);
+            }
         }
+        logger.info("sell back order do FINAL_CHECKED id:{}", order.getId());
         // 修改状态为终审通过
         order.setStatus(SellBackStatus.FINAL_CHECKED.name());
         order.setFinalCheckTime(new Date());
@@ -477,50 +507,13 @@ public class SellOrderBackService {
             throw new BizRuntimeException(ErrorCode.FAILED_UPDATE_FROM_DB);
         }
 
+        //如果是终审通过的流程，需要变更库存信息，并且生产对应的事件
+        int repertoryCount = repertoryInfoMapper.sellBackOrderAddQuantity(order.getId());
+        if (repertoryCount <= 0) {
+            throw new BizRuntimeException(ErrorCode.FAILED_UPDATE_FROM_DB);
+        }
         // 生产一个销售退货的事件
         rabbitmqQueueConfig.sendMessage("SellOrderBackService", RabbitmqQueueConfig.ORDER_SELL_BACK, order);
-    }
-
-    private List<RepertoryInfo> createRepertoryInfos(User user, SellOrderBack order, List<SellOrderBackDetail> detailList) {
-        List<RepertoryInfo> infos = new ArrayList<>();
-        for (SellOrderBackDetail detail : detailList) {
-            RepertoryInfo item = new RepertoryInfo();
-            item.setCompanyId(order.getCompanyId());
-            item.setWarehouseId(order.getWarehouseId());
-            item.setLocation(detail.getLocation());
-            item.setInUserId(user.getId());
-            item.setGoodsId(detail.getGoodsId());
-            item.setBatchCode(detail.getBatchCode());
-            item.setFactoryId(detail.getGoods() == null ? null : detail.getGoods().getFactoryId());
-            item.setInQuantity(detail.getRightQuantity()); //取的是合格的数量
-            item.setQuantity(detail.getRightQuantity());
-            item.setOnWayQuantity(BigDecimal.ZERO); //初始在单数全部设置为0
-//            item.setBuyPrice(detail.getPrice());
-            item.setExp(false);
-            item.setSaleEnable(true);
-            item.setProductDate(detail.getProductDate());
-            item.setExpDate(detail.getExpDate());
-            item.setInDate(new Date());
-//            item.setSupplierId(order.getSupplierId());
-//            item.setSupplierContactId(order.getSupplierContactId());
-//            item.setBuyerId(order.getBuyerId());
-            item.setOrderId(order.getId());
-            item.setOrderDetailId(detail.getId());
-//            item.setSaleSate(detail.getSaleState());
-            item.setCreateBy(user.getNickname());
-            item.setCreateTime(new Date());
-            item.setUpdateBy(user.getNickname());
-            item.setUpdateTime(new Date());
-            item.setCustomerId(order.getCustomerId());
-            item.setCustomerRepId(order.getCustomerRepId());
-            item.setSaleId(order.getSaleId());
-            item.setBackPrice(detail.getBackPrice());
-            item.setRefType(RepertoryRefType.SELL_BACK.name());
-            item.setRefOrderId(order.getId());
-
-            infos.add(item);
-        }
-        return infos;
     }
 
     /**
@@ -562,21 +555,74 @@ public class SellOrderBackService {
      * @param back
      * @param user
      */
+    @Transactional
     public void receive(SellOrderBack back, User user) throws BizException {
         SellOrderBack order = sellOrderBackMapper.selectByPrimaryKey(back.getId());
         if (order == null || !order.getCompanyId().equals(user.getCompanyId())) {
             logger.warn("get back order fail by id:{}", back.getId());
             throw new BizException(ErrorCode.SELL_BACK_ORDER_GET_FAIL);
         }
-        if (!SellBackStatus.INIT_QUALITY_CHECKED.name().equalsIgnoreCase(order.getStatus()) &&
-                !SellBackStatus.BACK_RECEIVE.name().equalsIgnoreCase(order.getStatus())) {
-            logger.warn("order status can not do receive action. order status:{}", order.getStatus());
+        if (SellBackStatus.FINAL_CHECKED.name().equalsIgnoreCase(order.getStatus())) {
+            logger.info("sale back order status is FINAL_CHECKED, can not do receive action.");
             throw new BizException(ErrorCode.SELL_BACK_RECEIVE_STATUS_ERROR);
         }
+        //获取系统配置流程
+        Map<String, SystemConfig> configMap = systemConfigService.getConfigMap(user.getCompanyId());
+        SystemConfig smFlow = configMap.get(ConfigKey.SALE_BACK_SM_CHECK.name());
+        SystemConfig qaFlow = configMap.get(ConfigKey.SALE_BACK_QA_CHECK.name());
+        SystemConfig qcFlow = configMap.get(ConfigKey.SALE_BACK_QUALITY_CHECK.name());
+        SystemConfig fnFlow = configMap.get(ConfigKey.SALE_BACK_FINAL_CHECK.name());
+
+        //如果存在销售经理验证流程，需要销售经理验收信息存在
+        if (smFlow != null && "open".equalsIgnoreCase(smFlow.getKeyValue())
+                && StringUtils.isEmpty(order.getBackSaleUser())) {
+            logger.warn("sale back order need sale manage check id:{}", order.getId());
+            throw new BizException(ErrorCode.SELL_BACK_NEED_SALE_MANAGE_CHECK);
+        }
+        //如果存在质管经理验收流程，需要先经过质管经理验收信息存在
+        if (qaFlow != null && "open".equalsIgnoreCase(qaFlow.getKeyValue())
+                && StringUtils.isEmpty(order.getBackQualityUser())) {
+            logger.warn("sale back order need quality manage check id:{}", order.getId());
+            throw new BizException(ErrorCode.SELL_BACK_NEED_QA_MANAGE_CHECK);
+        }
+        //根据配置的流程，看看质检复核和终审是否存在，来确认保存的状态
+        boolean haveQCFlow = false;
+        boolean haveFnFlow = false;
+        if (qcFlow != null && "open".equalsIgnoreCase(qcFlow.getKeyValue())) {
+            haveQCFlow = true;
+        }
+        if (fnFlow != null && "open".equalsIgnoreCase(fnFlow.getKeyValue())) {
+            haveFnFlow = true;
+        }
+        String status = SellBackStatus.BACK_RECEIVE.name();
+        if (!haveQCFlow && !haveFnFlow) {
+            //如果两个流程都没有了，那直接就是收货入库操作,直接赋值到终审通过状态
+            status = SellBackStatus.FINAL_CHECKED.name();
+        }else {
+            //只要有下一步的流程，直接设置为收货状态
+            status = SellBackStatus.BACK_RECEIVE.name();
+        }
         //如果存在了，直接调用修改逻辑
-        back.setStatus(SellBackStatus.BACK_RECEIVE.name());
+        back.setStatus(status);
+        if (SellBackStatus.FINAL_CHECKED.name().equalsIgnoreCase(status)) {
+            back.setFinalCheckTime(new Date());
+            back.setFinalCheckUser(user.getNickname());
+        }
         back.setUpdatedBy(user.getNickname());
         back.setUpdatedTime(new Date());
-        sellOrderBackMapper.updateByPrimaryKeySelective(back);
+        int count = sellOrderBackMapper.updateByPrimaryKeySelective(back);
+        if (count <= 0) {
+            throw new BizRuntimeException(ErrorCode.FAILED_UPDATE_FROM_DB);
+        }
+        //如果是终审通过的流程，需要变更库存信息，并且生产对应的事件
+        if (SellBackStatus.FINAL_CHECKED.name().equalsIgnoreCase(back.getStatus())) {
+            logger.info("sell back order receive and flow is end, then update repertory info. sell back order id:{}", back.getId());
+            int repertoryCount = repertoryInfoMapper.sellBackOrderAddQuantity(back.getId());
+            if (repertoryCount <= 0) {
+                throw new BizRuntimeException(ErrorCode.FAILED_UPDATE_FROM_DB);
+            }
+            // 生产一个销售退货的事件
+            rabbitmqQueueConfig.sendMessage("SellOrderBackService", RabbitmqQueueConfig.ORDER_SELL_BACK, back);
+        }
     }
 }

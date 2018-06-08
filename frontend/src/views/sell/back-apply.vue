@@ -414,6 +414,9 @@ export default {
               statusColor = "#ed3f14";
             } else if (status === "BACK_RECEIVE") {
               statusLabel = "已收货";
+              statusColor = "rgb(107, 175, 158)";
+            } else if (status === "QUALITY_CHECKED") {
+              statusLabel = "待终审";
               statusColor = "#19be6b";
             }
             let statusH = h(
@@ -590,7 +593,8 @@ export default {
           "INIT",
           "INIT_SALE_CHECKED",
           "INIT_QUALITY_CHECKED",
-          "BACK_RECEIVE"
+          "BACK_RECEIVE",
+          "QUALITY_CHECKED"
         ]
       };
       util.ajax

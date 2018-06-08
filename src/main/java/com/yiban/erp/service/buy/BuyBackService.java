@@ -330,7 +330,7 @@ public class BuyBackService {
         int count = repertoryInfoMapper.buyBackConsumeQuantity(inBack.getId(), user.getNickname(), new Date());
         if (count <= 0) {
             logger.warn("update repertory info quantity fail by inBackId:{}", inBack.getId());
-            throw new BizRuntimeException(ErrorCode.FAILED_UPDATE_FROM_DB);
+            throw new BizRuntimeException(ErrorCode.BUY_BACK_UPDATE_REPERTORY_FAIL);
         }
         logger.info("update repertory info quantity success by inBackId:{}", inBack.getId());
 
