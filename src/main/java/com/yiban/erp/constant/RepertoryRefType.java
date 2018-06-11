@@ -18,7 +18,8 @@ public enum RepertoryRefType {
     MOVE_IN("转库入库"),
     DIRECT_IN("直调入库"),
     DIRECT_OUT("直调出库"),
-    DAMAGE_OUT("破损出库")
+    DAMAGE_OUT("破损出库"),
+    DESTORY_OUT("销毁出库")/** add by wk   增加销毁类型*/
     ;
 
     private String desc;

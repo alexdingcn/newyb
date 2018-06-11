@@ -20,8 +20,8 @@ public class GoodsSourceBuy {
     private BigDecimal inCount;
     /**库存量*/
     private BigDecimal quantity;
-    /**金额*/
-    private BigDecimal totalAmount;
+    /**采购单价*/
+    private BigDecimal buyPrice;
     /**入库时间*/
     private Date createTime;
     /**供应商*/
@@ -45,9 +45,9 @@ public class GoodsSourceBuy {
 
     public void setQuantity(BigDecimal quantity) { this.quantity = quantity; }
 
-    public BigDecimal getTotalAmount() { return totalAmount; }
+    public BigDecimal getBuyPrice() { return buyPrice; }
 
-    public void setTotalAmount(BigDecimal totalAmount) { this.totalAmount = totalAmount; }
+    public void setBuyPrice(BigDecimal buyPrice) { this.buyPrice = buyPrice; }
 
     public Date getCreateTime() {
         return createTime;
