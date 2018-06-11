@@ -411,6 +411,61 @@ export default {
           title: "采购单",
           key: "id",
           render: (h, params) => {
+            let self = this;
+            let status = params.row.status;
+            let statusLabel = status === "REJECTED" ? "审核拒绝" : "待审核";
+            let statusColor = status === "REJECTED" ? "#ed3f14" : "#2b85e4";
+            let statusH = h(
+              "span",
+              {
+                class: {
+                  statusClass: true
+                },
+                style: {
+                  color: statusColor
+                }
+              },
+              statusLabel
+            );
+            let buttonH = h(
+              "ButtonGroup",
+              {
+                props: {
+                  size: "small"
+                }
+              },
+              [
+                h(
+                  "Button",
+                  {
+                    props: {
+                      type: "info"
+                    },
+                    on: {
+                      click: () => {
+                        self.editBuyOrder(params.row);
+                      }
+                    }
+                  },
+                  "修改"
+                ),
+                h(
+                  "Button",
+                  {
+                    props: {
+                      type: "error"
+                    },
+                    on: {
+                      click: () => {
+                        self.removeBuyOrder(params.row.id);
+                      }
+                    }
+                  },
+                  "删除"
+                )
+              ]
+            );
+
             let orderNumnber = params.row.orderNumber;
             let supplier = params.row.supplier;
             let createdTime = moment(params.row.createdTime).format(
@@ -446,73 +501,11 @@ export default {
                     }
                   },
                   createdTime + "[" + createdBy + "]"
-                )
-              ]
-            );
-          }
-        },
-        {
-          title: " ",
-          key: "action",
-          align: "right",
-          maxWidth: 60,
-          render: (h, params) => {
-            let self = this;
-            let status = params.row.status;
-            let statusLabel = status === "REJECTED" ? "审核拒绝" : "待审核";
-            let statusColor = status === "REJECTED" ? "#ed3f14" : "#2b85e4";
-            let statusH = h(
-              "span",
-              {
-                class: {
-                  statusClass: true
-                },
-                style: {
-                  color: statusColor
-                }
-              },
-              statusLabel
-            );
-            let buttonH = h(
-              "ButtonGroup",
-              {
-                props: {
-                  vertical: true,
-                  size: "small"
-                }
-              },
-              [
-                h(
-                  "Button",
-                  {
-                    props: {
-                      type: "info"
-                    },
-                    on: {
-                      click: () => {
-                        self.editBuyOrder(params.row);
-                      }
-                    }
-                  },
-                  "修改"
                 ),
-                h(
-                  "Button",
-                  {
-                    props: {
-                      type: "error"
-                    },
-                    on: {
-                      click: () => {
-                        self.removeBuyOrder(params.row.id);
-                      }
-                    }
-                  },
-                  "删除"
-                )
+                h("hr", { size: "1", style: { color: "#e9eaec" } }),
+                h("div", [statusH, buttonH])
               ]
             );
-            return h("div", [statusH, buttonH]);
           }
         }
       ],

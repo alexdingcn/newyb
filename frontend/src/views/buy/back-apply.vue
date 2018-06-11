@@ -376,6 +376,74 @@ export default {
           title: "采购退出单",
           key: "id",
           render: (h, params) => {
+            let self = this;
+            let status = params.row.status;
+            let statusLabel = "";
+            let statusColor = "";
+            if (status === "BACK_INIT") {
+              statusLabel = "初建待审";
+              statusColor = "#5cadff";
+            } else if (status === "BACK_BUY_CHECK") {
+              statusLabel = "采购员已审";
+              statusColor = "#ff9900";
+            } else if (status === "BACK_QUALITY_CHECK") {
+              statusLabel = "质管已审";
+              statusColor = "#ed3f14";
+            } else if (status === "BACK_QUALITY_RECHECK") {
+              statusLabel = "待终审";
+              statusColor = "#19be6b";
+            }
+            let statusH = h(
+              "span",
+              {
+                class: {
+                  statusClass: true
+                },
+                style: {
+                  color: statusColor
+                }
+              },
+              statusLabel
+            );
+            let buttonH = h(
+              "ButtonGroup",
+              {
+                props: {
+                  size: "small"
+                }
+              },
+              [
+                h(
+                  "Button",
+                  {
+                    props: {
+                      type: "info"
+                    },
+                    on: {
+                      click: () => {
+                        self.editOrder(params.row);
+                      }
+                    }
+                  },
+                  "修改"
+                ),
+                h(
+                  "Button",
+                  {
+                    props: {
+                      type: "error"
+                    },
+                    on: {
+                      click: () => {
+                        self.removeOrder(params.row.id);
+                      }
+                    }
+                  },
+                  "删除"
+                )
+              ]
+            );
+
             let orderNumnber = params.row.orderNumber;
             let supplierName =
               params.row.customer && params.row.supplierName
@@ -414,86 +482,11 @@ export default {
                     }
                   },
                   createdTime + "[" + createdBy + "]"
-                )
-              ]
-            );
-          }
-        },
-        {
-          title: " ",
-          key: "action",
-          align: "right",
-          maxWidth: 80,
-          render: (h, params) => {
-            let self = this;
-            let status = params.row.status;
-            let statusLabel = "";
-            let statusColor = "";
-            if (status === "BACK_INIT") {
-              statusLabel = "初建待审";
-              statusColor = "#5cadff";
-            } else if (status === "BACK_BUY_CHECK") {
-              statusLabel = "采购员已审";
-              statusColor = "#ff9900";
-            } else if (status === "BACK_QUALITY_CHECK") {
-              statusLabel = "质管已审";
-              statusColor = "#ed3f14";
-            } else if (status === "BACK_QUALITY_RECHECK") {
-              statusLabel = "待终审";
-              statusColor = "#19be6b";
-            }
-            let statusH = h(
-              "span",
-              {
-                class: {
-                  statusClass: true
-                },
-                style: {
-                  color: statusColor
-                }
-              },
-              statusLabel
-            );
-            let buttonH = h(
-              "ButtonGroup",
-              {
-                props: {
-                  vertical: true,
-                  size: "small"
-                }
-              },
-              [
-                h(
-                  "Button",
-                  {
-                    props: {
-                      type: "info"
-                    },
-                    on: {
-                      click: () => {
-                        self.editOrder(params.row);
-                      }
-                    }
-                  },
-                  "修改"
                 ),
-                h(
-                  "Button",
-                  {
-                    props: {
-                      type: "error"
-                    },
-                    on: {
-                      click: () => {
-                        self.removeOrder(params.row.id);
-                      }
-                    }
-                  },
-                  "删除"
-                )
+                h("hr", { size: "1", style: { color: "#e9eaec" } }),
+                h("div", [statusH, buttonH])
               ]
             );
-            return h("div", [statusH, buttonH]);
           }
         }
       ],

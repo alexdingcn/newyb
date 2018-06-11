@@ -737,52 +737,7 @@ export default {
         {
           title: "收货入库单",
           key: "id",
-          render: (h, params) => {
-            let orderNumnber = params.row.orderNumber;
-            let supplierName = params.row.supplierName;
-            let createTime = moment(params.row.createTime).format(
-              "YYYY-MM-DD HH:mm"
-            );
-            let saleNickName = params.row.saleNickName;
-            let warehouseName = params.row.warehouseName;
-            return h(
-              "div",
-              {
-                style: {
-                  margin: "0.5em"
-                }
-              },
-              [
-                h(
-                  "h5",
-                  {
-                    style: {
-                      color: "#9ea7b4",
-                      fontSize: "12px"
-                    }
-                  },
-                  orderNumnber
-                ),
-                h("h4", supplierName + "[" + warehouseName + "]"),
-                h(
-                  "h5",
-                  {
-                    style: {
-                      color: "#9ea7b4",
-                      fontSize: "12px"
-                    }
-                  },
-                  createTime + "[" + saleNickName + "]"
-                )
-              ]
-            );
-          }
-        },
-        {
-          title: " ",
-          key: "action",
-          align: "right",
-          maxWidth: 80,
+          minWihth: 250,
           render: (h, params) => {
             let self = this;
             let status = params.row.status;
@@ -814,7 +769,6 @@ export default {
               "ButtonGroup",
               {
                 props: {
-                  vertical: true,
                   size: "small"
                 }
               },
@@ -850,7 +804,47 @@ export default {
                 )
               ]
             );
-            return h("div", [statusH, buttonH]);
+
+            let orderNumnber = params.row.orderNumber;
+            let supplierName = params.row.supplierName;
+            let createTime = moment(params.row.createTime).format(
+              "YYYY-MM-DD HH:mm"
+            );
+            let saleNickName = params.row.saleNickName;
+            let warehouseName = params.row.warehouseName;
+            return h(
+              "div",
+              {
+                style: {
+                  margin: "0.5em"
+                }
+              },
+              [
+                h(
+                  "h5",
+                  {
+                    style: {
+                      color: "#9ea7b4",
+                      fontSize: "12px"
+                    }
+                  },
+                  orderNumnber
+                ),
+                h("h4", supplierName + "[" + warehouseName + "]"),
+                h(
+                  "h5",
+                  {
+                    style: {
+                      color: "#9ea7b4",
+                      fontSize: "12px"
+                    }
+                  },
+                  createTime + "[" + saleNickName + "]"
+                ),
+                h("hr", { size: "1", style: { color: "#e9eaec" } }),
+                h("div", [statusH, buttonH])
+              ]
+            );
           }
         }
       ],

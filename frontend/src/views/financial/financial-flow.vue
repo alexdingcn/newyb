@@ -434,7 +434,7 @@ export default {
       flowsColumns: [
         {
           type: "index",
-          width: 30
+          width: 50
         },
         {
           title: "流水号",
