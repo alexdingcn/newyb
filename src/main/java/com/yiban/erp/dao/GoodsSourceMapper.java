@@ -1,11 +1,10 @@
 package com.yiban.erp.dao;
 
-import com.yiban.erp.entities.Goods;
-import com.yiban.erp.entities.RepertoryInDetail;
-import com.yiban.erp.entities.SellOrderDetail;
+import com.yiban.erp.entities.*;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Mapper
@@ -18,4 +17,10 @@ public interface GoodsSourceMapper {
     Integer countStock(@Param("goodId")Long goodId,@Param("batchCode")String batchCode);
     List<SellOrderDetail> getSell(@Param("goodId")Long goodId, @Param("batchCode")String batchCode);
     List<RepertoryInDetail> getBuy(@Param("goodId")Long goodId, @Param("batchCode")String batchCode);
+    RepertoryOut getRepertoryOuts(@Param("Id") Long Id);
+    RepertoryOutDetail getRepertoryOutDetail(@Param("Id") Long Id);
+    int destory(RepertoryOut repertoryOut);
+    int destoryDetail(RepertoryOutDetail repertoryOutDetail);
+    List<Long> getRepertoryId(@Param("goodId")Long goodId, @Param("batchCode")String batchCode);
+
 }
