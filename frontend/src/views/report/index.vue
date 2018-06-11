@@ -121,8 +121,8 @@ export default {
           align:'center',
         },
         {
-          title: "金额",
-          key:'totalAmount',
+          title: "采购价",
+          key:'buyPrice',
           align:'center',
         },
         {
@@ -226,18 +226,20 @@ export default {
         });
     },
     destory(){
-        let RepertoryOutDetail = {};
-          RepertoryOutDetail["repertoryInfoId"] = this.changeStoreItems[i].id;
-          RepertoryOutDetail["quantity"] = this.changeStoreItems[i].outAmount;
-          RepertoryOutDetail["price"] = this.changeStoreItems[i].buyPrice;
-          this.RepertoryOut.outDetailList.push(RepertoryOutDetail);
+        let putData = {
+            goodId : this.sourceForm.goodsId,
+            batchCode : this.sourceForm.batch
+        };
+        console.log("requestData---"+putData.goodId);
         util.ajax
-        .POST("/repertory/out/loseRepertoryOut",this.RepertoryOut)
+        .get("/goods/source/destory", {params:putData})
         .then((response) => {
-
+            if(response.status === 200 ){
+                this.$Message.success('销毁成功!');
+            }
         })
         .catch((error) =>{
-
+            util.errorProcessor(this, error);
         });
     }
   }
