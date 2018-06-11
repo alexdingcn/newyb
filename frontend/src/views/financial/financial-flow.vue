@@ -1,3 +1,6 @@
+<style lang="less">
+@import "../../styles/common.less";
+</style>
 
 <template>
   <div>
@@ -12,10 +15,10 @@
                 <ButtonGroup size="small">
                     <Button type="primary" icon="search" :loading="loading" @click="refreshFlowsData">查询</Button>
                     <Button type="info" icon="bookmark" :loading="loading" @click="recordAction" >记账</Button>
-                    <Button type="success" icon="arrow-right-c" :loading="loading" @click="receiveAction" >收款</Button>
-                    <Button type="warning" icon="arrow-left-c" :loading="loading" @click="payAction" >付款</Button>
-                    <Button type="error" icon="android-close" :loading="loading" @click="cancelAction" >取消操作</Button>
-                    <Button type="ghost" icon="edit" :loading="loading" @click="editAction" >修改资料</Button>
+                    <!-- <Button type="success" icon="arrow-right-c" :loading="loading" @click="receiveAction" >收款</Button> -->
+                    <!-- <Button type="warning" icon="arrow-left-c" :loading="loading" @click="payAction" >付款</Button> -->
+                    <!-- <Button type="error" icon="android-close" :loading="loading" @click="cancelAction" >取消操作</Button> -->
+                    <!-- <Button type="ghost" icon="edit" :loading="loading" @click="editAction" >修改资料</Button> -->
                 </ButtonGroup>
           </div>
           <Row type="flex" justify="start" style="margin-bottom: 20px;">
@@ -34,7 +37,7 @@
            </Row>
         
             <Table ref="flowTable" highlight-row size="small" border :row-class-name="flowRowClass" :loading="loading" 
-                :columns="flowsColumns" :data="flowsData" @on-row-click="chooseFlowRow">
+                :columns="flowsColumns" :data="flowsData" @on-row-click="chooseFlowRow"  class="table-action">
             </Table>
             <Row type="flex" justify="end">
                 <Page size="small" :total="totalCount" :current="currentPage" :page-size="pageSize" show-total
@@ -365,6 +368,7 @@ import customerSelect from "@/views/selector/customer-select.vue";
 import supplierSelect from "@/views/selector/supplier-select.vue";
 import optionSelect from "@/views/selector/option-select.vue";
 import fileDetail from "@/views/basic-data/file-detail.vue";
+import actionButton from "@/views/my-components/action-button.vue";
 
 export default {
   name: "financial-pre-paid",
@@ -372,7 +376,8 @@ export default {
     customerSelect,
     supplierSelect,
     optionSelect,
-    fileDetail
+    fileDetail,
+    actionButton
   },
   data() {
     return {
@@ -434,12 +439,65 @@ export default {
       flowsColumns: [
         {
           type: "index",
-          width: 50
+          width: 60
         },
         {
           title: "流水号",
           key: "bizNo",
-          width: 200
+          width: 200,
+          render: (h, params) => {
+            let buttonArr = [
+              {
+                type: "primary",
+                icon: "eye",
+                label: "详情",
+                data: params.row,
+                action: ""
+              },
+              {
+                type: "success",
+                icon: "arrow-right-c",
+                label: "收款",
+                data: params.row,
+                action: this.receiveAction,
+                param: params.row
+              },
+              {
+                type: "warning",
+                icon: "arrow-left-c",
+                label: "付款",
+                data: params.row,
+                action: this.payAction,
+                param: params.row
+              },
+              {
+                type: "ghost",
+                icon: "edit",
+                label: "修改",
+                data: params.row,
+                action: this.editAction,
+                param: params.row
+              },
+              {
+                type: "error",
+                icon: "android-close",
+                label: "取消",
+                disabled: !this.isCanDoCancelAction(params.row),
+                data: params.row,
+                action: this.cancelAction,
+                param: params.row
+              }
+            ];
+            return h("div", [
+              h("span", params.row.bizNo),
+              h(actionButton, {
+                class: { rowAction: true },
+                props: {
+                  data: buttonArr
+                }
+              })
+            ]);
+          }
         },
         {
           title: "发生日期",
@@ -506,7 +564,6 @@ export default {
           width: 160
         },
         {
-          // 大于0代表客户欠公司的钱，小于0代表公司欠客户钱
           title: "往来账户余额",
           key: "custAmount",
           width: 150
@@ -718,14 +775,23 @@ export default {
       this.actionModal = true;
       this.actionType = "RECORD";
     },
-    receiveAction() {
+    receiveAction(rowData) {
+      console.log(rowData);
+      if (!rowData || !rowData.id) {
+        this.$$Modal.warning({
+          title: "错误提示",
+          content: "获取流水信息失败"
+        });
+        return;
+      }
       this.actionFormItem = {
-        bizRefId: this.currChooseFlow.id,
-        bizRefNo: this.currChooseFlow.bizNo,
-        custId: "",
-        logAccount: "",
-        custAccount: "",
-        custAmount: "",
+        bizRefId: rowData.id,
+        bizRefNo: rowData.bizNo,
+        custType: rowData.custType,
+        custId: rowData.custId,
+        logAccount: rowData.logAccount,
+        custAccount: rowData.custAccount,
+        custAmount: rowData.custAmount,
         logDate: moment().format("YYYY-MM-DD"),
         bizType: "RECEIVE"
       };
@@ -733,14 +799,23 @@ export default {
       this.actionModal = true;
       this.actionType = "RECEIVE";
     },
-    payAction() {
+    payAction(rowData) {
+      console.log(rowData);
+      if (!rowData || !rowData.id) {
+        this.$$Modal.warning({
+          title: "错误提示",
+          content: "获取流水信息失败"
+        });
+        return;
+      }
       this.actionFormItem = {
-        bizRefId: this.currChooseFlow.id,
-        bizRefNo: this.currChooseFlow.bizNo,
-        custId: "",
-        logAccount: "",
-        custAccount: "",
-        custAmount: "",
+        bizRefId: rowData.id,
+        bizRefNo: rowData.bizNo,
+        custType: rowData.custType,
+        custId: rowData.custId,
+        logAccount: rowData.logAccount,
+        custAccount: rowData.custAccount,
+        custAmount: rowData.custAmount,
         logDate: moment().format("YYYY-MM-DD"),
         bizType: "PAY"
       };
@@ -757,16 +832,25 @@ export default {
       }
       return null;
     },
-    cancelAction() {
-      if (!this.currChooseFlow || !this.currChooseFlow.id) {
+    isCanDoCancelAction(rowData) {
+      let bizTypeItem = this.findOneOnBizTypes(rowData.bizType);
+      if (bizTypeItem && bizTypeItem.cancel) {
+        return true;
+      } else {
+        return false;
+      }
+    },
+    cancelAction(rowData) {
+      console.log(rowData);
+      if (!rowData || !rowData.id) {
         this.$Modal.warning({
-          title: "操作提示",
-          content: "请先选中需要取消的流水信息！"
+          title: "错误提示",
+          content: "获取流水信息失败"
         });
         return;
       }
       //判断当前流水是否可以做取消操作
-      let bizTypeItem = this.findOneOnBizTypes(this.currChooseFlow.bizType);
+      let bizTypeItem = this.findOneOnBizTypes(rowData.bizType);
       if (!bizTypeItem || !bizTypeItem.cancel) {
         this.$Modal.warning({
           title: "操作提示",
@@ -776,19 +860,20 @@ export default {
       }
       //打开显示流水信息模板
       this.cancelModalTitle =
-        "取消->" + bizTypeItem.label + ", 流水号:" + this.currChooseFlow.bizNo;
+        "取消->" + bizTypeItem.label + ", 流水号:" + rowData.bizNo;
       this.cancelModal = true;
-      this.cancelFormItem = this.currChooseFlow;
+      this.cancelFormItem = JSON.parse(JSON.stringify(rowData));
     },
-    editAction() {
-      if (!this.currChooseFlow || !this.currChooseFlow.id) {
+    editAction(rowData) {
+      console.log(rowData);
+      if (!rowData || !rowData.id) {
         this.$Modal.warning({
           title: "操作提示",
           content: "请先选中需要修改的流水信息！"
         });
         return;
       }
-      this.updateFormItem = this.currChooseFlow;
+      this.updateFormItem = JSON.parse(JSON.stringify(rowData));
       this.updateModal = true;
     },
     updateActionCancel() {

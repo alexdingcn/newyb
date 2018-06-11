@@ -43,7 +43,7 @@
 
                     <Table stripe highlight-row :loading="tableLoading" 
                             :columns="tableCulumns" :data="tableData" ref="goodsTable" 
-                            size="small">
+                            size="small" class="table-action">
                     </Table>
                     <Row type="flex" justify="end" class="margin-top-10">
                         <Page :total="totalCount" :current="currentPage" :page-size="pageSize" @on-change="changePage" size="small" show-total></Page>
@@ -68,6 +68,7 @@ import supplierSelect from "@/views/selector/supplier-select.vue";
 import factorySelect from "@/views/selector/factory-select.vue";
 import goodsInfo from "./goods-info.vue";
 import factoryVue from "../basic-data/factory.vue";
+import actionButton from "@/views/my-components/action-button.vue";
 
 export default {
   name: "goods-list",
@@ -76,7 +77,8 @@ export default {
     goodsBrandSelect,
     supplierSelect,
     factorySelect,
-    goodsInfo
+    goodsInfo,
+    actionButton
   },
   data() {
     return {
@@ -103,68 +105,36 @@ export default {
           width: 60
         },
         {
-          title: "操作",
-          key: "action",
-          width: 120,
-          render: (h, params) => {
-            let self = this;
-            return h("div", [
-              h(
-                "Button",
-                {
-                  props: {
-                    type: "text",
-                    size: "small",
-                    icon: "edit"
-                  },
-                  on: {
-                    click: data => {
-                      self.updateGoods(params.row.id);
-                    }
-                  }
-                },
-                ""
-              ),
-              h(
-                "Button",
-                {
-                  props: {
-                    type: "text",
-                    size: "small",
-                    icon: "ios-copy"
-                  },
-                  on: {
-                    click: data => {
-                      self.copyGoods(params.row);
-                    }
-                  }
-                },
-                ""
-              ),
-              h(
-                "Button",
-                {
-                  props: {
-                    type: "text",
-                    size: "small",
-                    icon: "ios-trash"
-                  },
-                  on: {
-                    click: data => {
-                      self.removeGoods(params.row);
-                    }
-                  }
-                },
-                ""
-              )
-            ]);
-          }
-        },
-        {
           title: "商品编码/名称",
           type: "name",
           width: 250,
           render: (h, params) => {
+            let actions = [
+              {
+                type: "primary",
+                icon: "edit",
+                label: "修改",
+                data: params.row,
+                action: this.updateGoods,
+                param: params.row.id
+              },
+              {
+                type: "success",
+                icon: "ios-copy",
+                label: "复制",
+                data: params.row,
+                action: this.copyGoods,
+                param: params.row
+              },
+              {
+                type: "error",
+                icon: "ios-trash",
+                label: "删除",
+                data: params.row,
+                action: this.removeGoods,
+                param: params.row
+              }
+            ];
             return h("div", [
               h(
                 "h5",
@@ -176,7 +146,13 @@ export default {
                 },
                 params.row.goodsNo
               ),
-              h("h4", params.row.name)
+              h("h4", params.row.name),
+              h(actionButton, {
+                class: { rowAction: true },
+                props: {
+                  data: actions
+                }
+              })
             ]);
           }
         },
