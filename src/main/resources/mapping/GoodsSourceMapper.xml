@@ -17,7 +17,7 @@
         <result column="in_count" property="inCount" jdbcType="DECIMAL" />
         <result column="quantity" property="quantity" jdbcType="DECIMAL" />
         <result column="buy_price" property="buyPrice" jdbcType="DECIMAL" />
-        <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
         <result column="ship_name" property="shipName" jdbcType="VARCHAR" />
         <result column="realname" property="realName" jdbcType="VARCHAR" />
     </resultMap>
