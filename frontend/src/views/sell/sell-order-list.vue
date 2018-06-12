@@ -42,9 +42,9 @@
         </Row>
 
         <Table border highlight-row :columns="tabColumns" :data="tabData" 
-                :loading="searching"  
+                :loading="searching" 
                 no-data-text="点击上方查询按钮获取数据"
-                ref="table" class="margin-top-10 sellOrderTbl" size="small">
+                ref="table" class="margin-top-10 sellOrderTbl table-action" size="small">
         </Table>
 
         <Row type="flex" justify="end" class="margin-top-10">
@@ -75,6 +75,7 @@ import sellOrderShip from "./sell-order-ship.vue";
 import sellOrderPayment from "./sell-order-payment.vue";
 import customerSelect from "@/views/selector/customer-select.vue";
 import saleSelect from "@/views/selector/sale-select.vue";
+import actionButton from "@/views/my-components/action-button.vue";
 
 export default {
   name: "sell-order-all",
@@ -83,7 +84,8 @@ export default {
     sellOrderShip,
     sellOrderPayment,
     customerSelect,
-    saleSelect
+    saleSelect,
+    actionButton
   },
 
   data() {
@@ -186,7 +188,26 @@ export default {
           align: "center",
           sortable: true,
           render: (h, params) => {
-            return h(
+            let actions = [
+              {
+                type: "primary",
+                icon: "social-yen",
+                label: "收款",
+                disabled: params.row.status !== "SALE_CHECKED",
+                data: params.row,
+                action: this.showPayment,
+                param: params.row
+              },
+              {
+                type: "ghost",
+                icon: "model-s",
+                label: "运输记录",
+                data: params.row,
+                action: this.openShowShipDetailView,
+                param: params.row
+              }
+            ];
+            let orderNumberBtn = h(
               "Button",
               {
                 props: {
@@ -201,6 +222,18 @@ export default {
                 }
               },
               params.row.orderNumber
+            );
+            return (
+              "div",
+              [
+                orderNumberBtn,
+                h(actionButton, {
+                  class: { rowAction: true },
+                  props: {
+                    data: actions
+                  }
+                })
+              ]
             );
           }
         },
@@ -341,56 +374,6 @@ export default {
           key: "shipToolName",
           align: "center",
           width: 110
-        },
-        {
-          title: "操作",
-          align: "center",
-          class: "yy",
-          width: 180,
-          fixed: "right",
-          render: (h, params) => {
-            return h(
-              "ButtonGroup",
-              {
-                props: {
-                  size: "small"
-                }
-              },
-              [
-                h(
-                  "Button",
-                  {
-                    props: {
-                      type: "primary",
-                      icon: "edit",
-                      disabled: params.row.status !== "SALE_CHECKED"
-                    },
-                    on: {
-                      click: () => {
-                        this.showPayment(params.row);
-                      }
-                    }
-                  },
-                  "收款"
-                ),
-                h(
-                  "Button",
-                  {
-                    props: {
-                      type: "ghost",
-                      icon: "model-s"
-                    },
-                    on: {
-                      click: () => {
-                        this.openShowShipDetailView(params.row);
-                      }
-                    }
-                  },
-                  "运输记录"
-                )
-              ]
-            );
-          }
         }
       ],
       showOrderDetailView: false,

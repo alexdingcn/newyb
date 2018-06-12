@@ -586,6 +586,74 @@ export default {
           title: "销售单",
           key: "id",
           render: (h, params) => {
+            let self = this;
+            let status = params.row.status;
+            let statusLabel = "";
+            let statusColor = "";
+            if (status === "TEMP_STORAGE") {
+              statusLabel = "暂存";
+              statusColor = "#5cadff";
+            } else if (status === "INIT") {
+              statusLabel = "待质审";
+              statusColor = "#ff9900";
+            } else if (status === "QUALITY_REJECT") {
+              statusLabel = "质审拒绝";
+              statusColor = "#ed3f14";
+            } else if (status === "QUALITY_CHECKED") {
+              statusLabel = "待终审";
+              statusColor = "#19be6b";
+            }
+            let statusH = h(
+              "span",
+              {
+                class: {
+                  statusClass: true
+                },
+                style: {
+                  color: statusColor
+                }
+              },
+              statusLabel
+            );
+            let buttonH = h(
+              "ButtonGroup",
+              {
+                props: {
+                  size: "small"
+                }
+              },
+              [
+                h(
+                  "Button",
+                  {
+                    props: {
+                      type: "info"
+                    },
+                    on: {
+                      click: () => {
+                        self.editBuyOrder(params.row);
+                      }
+                    }
+                  },
+                  "修改"
+                ),
+                h(
+                  "Button",
+                  {
+                    props: {
+                      type: "error"
+                    },
+                    on: {
+                      click: () => {
+                        self.removeBuyOrder(params.row.id);
+                      }
+                    }
+                  },
+                  "删除"
+                )
+              ]
+            );
+
             let orderNumnber = params.row.orderNumber;
             let customerName =
               params.row.customer && params.row.customer.name
@@ -624,86 +692,11 @@ export default {
                     }
                   },
                   createTime + "[" + createBy + "]"
-                )
-              ]
-            );
-          }
-        },
-        {
-          title: " ",
-          key: "action",
-          align: "right",
-          maxWidth: 80,
-          render: (h, params) => {
-            let self = this;
-            let status = params.row.status;
-            let statusLabel = "";
-            let statusColor = "";
-            if (status === "TEMP_STORAGE") {
-              statusLabel = "暂存";
-              statusColor = "#5cadff";
-            } else if (status === "INIT") {
-              statusLabel = "待质审";
-              statusColor = "#ff9900";
-            } else if (status === "QUALITY_REJECT") {
-              statusLabel = "质审拒绝";
-              statusColor = "#ed3f14";
-            } else if (status === "QUALITY_CHECKED") {
-              statusLabel = "待终审";
-              statusColor = "#19be6b";
-            }
-            let statusH = h(
-              "span",
-              {
-                class: {
-                  statusClass: true
-                },
-                style: {
-                  color: statusColor
-                }
-              },
-              statusLabel
-            );
-            let buttonH = h(
-              "ButtonGroup",
-              {
-                props: {
-                  vertical: true,
-                  size: "small"
-                }
-              },
-              [
-                h(
-                  "Button",
-                  {
-                    props: {
-                      type: "info"
-                    },
-                    on: {
-                      click: () => {
-                        self.editBuyOrder(params.row);
-                      }
-                    }
-                  },
-                  "修改"
                 ),
-                h(
-                  "Button",
-                  {
-                    props: {
-                      type: "error"
-                    },
-                    on: {
-                      click: () => {
-                        self.removeBuyOrder(params.row.id);
-                      }
-                    }
-                  },
-                  "删除"
-                )
+                h("hr", { size: "1", style: { color: "#e9eaec" } }),
+                h("div", [statusH, buttonH])
               ]
             );
-            return h("div", [statusH, buttonH]);
           }
         }
       ],

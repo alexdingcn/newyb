@@ -82,4 +82,20 @@ public class GoodsSourceController {
         result.put("Buy",Buy);
         return ResponseEntity.ok().body(result.toJSONString());
     }
+
+    /**
+     * 商品销毁
+     * @param user
+     * @param goodId
+     * @param batchCode
+     * @return
+     */
+    @RequestMapping(value = "/destory", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> destory(@AuthenticationPrincipal User user,
+                                          @RequestParam(value="goodId",required = true ) Long goodId,
+                                          @RequestParam(value="batchCode",required = false) String batchCode){
+        String userName = user.getNickname();
+        goodsSourceService.destory(goodId,batchCode, userName);
+        return ResponseEntity.ok().build();
+    }
 }

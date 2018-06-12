@@ -230,7 +230,6 @@ export default {
             });
           }
         },
-
         {
           title: "单价",
           key: "buyPrice",
@@ -439,13 +438,13 @@ export default {
     queryRepertoryList() {
       var self = this;
       /**this.repertoryItems = [];
-      this.queryStore.page = this.currentPage;*/
+       this.queryStore.page = this.currentPage;*/
       let requestData = {
-          warehouseId : this.selectStore.warehouseId,
-          goodsId : this.queryStore.goodsId, 
-      }
+        warehouseId: this.selectStore.warehouseId,
+        goodsId: this.queryStore.goodsId
+      };
       util.ajax
-        .get("/repertory/list", {params: requestData })
+        .post("/repertory/list", requestData)
         .then(function(response) {
           if (response.status === 200 && response.data) {
             self.queryStoreItems = response.data.data;
@@ -816,7 +815,6 @@ export default {
             });
           }
         },
-
         {
           title: "单价",
           key: "buyPrice",
@@ -1025,13 +1023,13 @@ export default {
     queryRepertoryList() {
       var self = this;
       /**this.repertoryItems = [];
-      this.queryStore.page = this.currentPage;*/
+       this.queryStore.page = this.currentPage;*/
       let requestData = {
-          warehouseId : this.selectStore.warehouseId,
-          goodsId : this.queryStore.goodsId, 
-      }
+        warehouseId: this.selectStore.warehouseId,
+        goodsId: this.queryStore.goodsId
+      };
       util.ajax
-        .get("/repertory/list", {params: requestData })
+        .post("/repertory/list", requestData)
         .then(function(response) {
           if (response.status === 200 && response.data) {
             self.queryStoreItems = response.data.data;
