@@ -408,7 +408,7 @@
         <if test="goodsId != null" >
             and r.goods_id = #{goodsId}
         </if>
-        <if test="supplierId != null">in
+        <if test="supplierId != null">
             and r.supplier_id = #{supplierId}
         </if>
         <if test="batchCode != null">
@@ -418,7 +418,75 @@
         <if test="minQuantity != null" >
             and r.quantity > #{minQuantity}
         </if>
-        <if test="byPage != null  and offset != null and limit != null">
+        <if test="byPage != null and offset != null and limit != null">
+            limit #{offset}, #{limit}
+        </if>
+    </select>
+
+
+    <select id="queryCountGroupByGoods" resultMap="java.lang.Integer" parameterType="com.yiban.erp.dto.RepertorySelectQuery">
+        select count(1)
+        from repertory_info r
+            left join supplier s on r.supplier_id = s.id
+            left join warehouse w on r.warehouse_id = w.id
+            , goods_detail gd, goods_info gi
+        where gd.id = r.goods_id and gi.id = gd.goods_info_id
+        <if test="warehouseId != null" >
+            and r.warehouse_id = #{warehouseId}
+        </if>
+        <if test="goodsId != null" >
+            and r.goods_id = #{goodsId}
+        </if>
+        <if test="supplierId != null">
+            and r.supplier_id = #{supplierId}
+        </if>
+        <if test="batchCode != null">
+            <bind name="pattern" value="'%' + batchCode + '%'"/>
+            and r.batch_code like #{pattern}
+        </if>
+        <if test="minQuantity != null" >
+            and r.quantity > #{minQuantity}
+        </if>
+        group by r.warehouse_id, gi.id, r.supplier_id, r.factory_id
+        order by gi.id
+        <if test="byPage != null and offset != null and limit != null">
+            limit #{offset}, #{limit}
+        </if>
+    </select>
+
+    <select id="queryListGroupByGoods" resultMap="BaseResultMap" parameterType="com.yiban.erp.dto.RepertorySelectQuery">
+        select
+            gi.name as goods_name, gi.id as goods_info_id,
+            r.company_id, r.warehouse_id, r.factory_id,
+            s.name as supplierName, w.name as warehouseName,
+            r.warehouse_id, r.supplier_id, r.goods_id,
+            sum(r.quantity) as quantity,
+            sum(r.on_way_quantity) as on_way_quantity,
+            avg(buy_price) as buy_price
+        from repertory_info r
+            left join supplier s on r.supplier_id = s.id
+            left join warehouse w on r.warehouse_id = w.id
+        , goods_detail gd, goods_info gi
+        where gd.id = r.goods_id and gi.id = gd.goods_info_id
+        <if test="warehouseId != null" >
+            and r.warehouse_id = #{warehouseId}
+        </if>
+        <if test="goodsId != null" >
+            and r.goods_id = #{goodsId}
+        </if>
+        <if test="supplierId != null">
+            and r.supplier_id = #{supplierId}
+        </if>
+        <if test="batchCode != null">
+            <bind name="pattern" value="'%' + batchCode + '%'"/>
+            and r.batch_code like #{pattern}
+        </if>
+        <if test="minQuantity != null" >
+            and r.quantity > #{minQuantity}
+        </if>
+        group by r.warehouse_id, gi.id, r.supplier_id, r.factory_id
+        order by gi.id
+        <if test="byPage != null and offset != null and limit != null">
             limit #{offset}, #{limit}
         </if>
     </select>

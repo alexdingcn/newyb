@@ -188,8 +188,8 @@
         </i-col>
       </Row>
 
-      <Modal v-model="selectRepertoryModal" width="60" :footerHide="true" :mask-closable="false" title="选择库存商品" >
-        <repertory-info-select ref="repertorySelect" :warehouse="chooseWarehouse" @on-choosed="repertoryInfoChoonsed" ></repertory-info-select>
+      <Modal v-model="selectRepertoryModal" width="80" :footerHide="true" :mask-closable="false" title="选择库存商品" >
+        <repertory-info-select ref="repertorySelect" :warehouse="chooseWarehouse" @on-choosed="onGoodsInfoChoosed" ></repertory-info-select>
       </Modal>
 
       <Modal v-model="goodHistoryModal" width="75" :mask-closable="false" title="客户商品销售历史价格" :footerHide="true">
@@ -1150,7 +1150,7 @@ export default {
       this.$refs.repertorySelect.searchBtnClicked();
       this.selectRepertoryModal = true;
     },
-    repertoryInfoChoonsed(repertoryList) {
+    onGoodsInfoChoosed(repertoryList) {
       this.selectRepertoryModal = false;
       if (!repertoryList || repertoryList.length <= 0) {
         return;
