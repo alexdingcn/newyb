@@ -142,6 +142,12 @@ export const appRouter = [
       },
       {
         path: "factory",
+        title: "系统公告",
+        name: "basic_data_billboard",
+        component: () => import("@/views/basic-data/billboard.vue")
+      },
+      {
+        path: "factory",
         title: "生产企业",
         name: "basic_data_factory",
         component: () => import("@/views/basic-data/factory.vue")

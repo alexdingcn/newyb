@@ -9,11 +9,26 @@
                 <Icon type="map"></Icon>
                商品溯源
             </p>
-            <div slot="extra">
-                <ButtonGroup class="padding-left-20">
-                <Button type="primary" icon="ios-search" @click="searchInfo">查询</Button>
-                <Button  type="error" @click="destory">销毁</Button>
-                </ButtonGroup>
+            <div slot="extra" style="min-width: 750px;">
+                <Row>
+                    <i-col span="12">
+                        <Row type="flex" justify="start">
+                            <Steps :current="0">
+                                <Step title="商品销毁" ></Step>
+                                <Step title="出库审核" ></Step>
+                            </Steps>
+                        </Row>
+                    </i-col>
+                    <i-col span="12">
+                        <Row type="flex" justify="end">
+                            <ButtonGroup class="padding-left-20">
+                                <Button type="primary" icon="ios-search" @click="searchInfo">查询</Button>
+                                <Button  type="error" @click="destory">销毁</Button>
+                            </ButtonGroup>
+                        </Row>
+                    </i-col>
+                </Row>
+                
             </div>
         <Form :label-width="85" :model="sourceForm"  ref="sourceForm" >
             <Row>
@@ -43,7 +58,7 @@
                         采购历史
                     </h3>
 
-                    <Table stripe :columns="buyHistoryCol" :data="buyHistoryData" :height="700">
+                    <Table stripe :columns="buyHistoryCol" :width="650" :data="buyHistoryData" :height="600">
                         <div slot="footer">
                             <h3 class="padding-left-20" >
                                 <b>总库存: </b>{{repertory}} 
@@ -57,7 +72,7 @@
                       <Icon type="ios-pulse-strong"></Icon>
                         销售情况
                     </h3>
-                    <Table stripe :columns="sellCol" :data="sellData" :height="700">
+                    <Table stripe :columns="sellCol" :data="sellData" :height="600">
                         <div slot="footer">
                             <h3 class="padding-left-20" >
                                 <b>在単数: </b>{{onWayQuantity}}
@@ -74,6 +89,7 @@
 <script>
 //import goodSelect from "@/views/selector/good-select.vue";
 import util from "@/libs/util.js";
+import moment from "moment";
 
 export default {
   name: "goodsSource",
@@ -86,9 +102,9 @@ export default {
       sourceForm: {},
       sellData: [],
       batchList: {},
-      goodId:"",
-      repertory:"",
-      onWayQuantity:"",
+      goodId: "",
+      repertory: "",
+      onWayQuantity: "",
       goodList: [],
       RepertoryOut: {
         id: "",
@@ -100,115 +116,131 @@ export default {
         detail: []
       },
       buyHistoryCol: [
-          {
+        {
           title: "批次号",
-          key:'batchCode',
-          align:'center',
+          key: "batchCode",
+          align: "center",
+          fixed: 'left',
+          width:140,
         },
         {
           title: "采购数量",
-          key:'buyOrderQuality',
-          align:'center',
+          key: "buyOrderQuality",
+          align: "center",
+          width:100,
         },
         {
           title: "入库数量",
-          key:'inCount',
-          align:'center',
+          key: "inCount",
+          align: "center",
+          width:100,
         },
         {
           title: "库存量",
-          key:'quantity',
-          align:'center',
+          key: "quantity",
+          align: "center",
+          width:80,
         },
         {
           title: "采购价",
-          key:'buyPrice',
-          align:'center',
+          key: "buyPrice",
+          align: "center",
+          width:80,
         },
         {
           title: "入库时间",
-          key:'createTime',
-          align:'center',
+          key: "createTime",
+          align: "center",
+          width:140,
+          render: (h, params) => {
+            let createTime = params.row.createTime;
+            return h(
+              "span",
+              createTime ? moment(createTime).format("YYYY-MM-DD HH:mm") : ""
+            );
+          }
         },
         {
           title: "供应商",
-          key:'shipName',
-          align:'center',
+          key: "shipName",
+          align: "center",
+          width:100,
         },
         {
           title: "采购员",
-          key:'realName',
-          align:'center',
+          key: "realName",
+          align: "center",
+          width:80,
         }
       ],
       sellCol: [
-          {
+        {
           title: "批次号",
-          key:'batchCode',
-          align:'center',
+          key: "batchCode",
+          align: "center"
         },
         {
           title: "客户",
-          key: 'customerName',
-          align:'center',
+          key: "customerName",
+          align: "center"
         },
         {
           title: "承运公司",
-          key:'shipCompanyName',
-          align:'center',
+          key: "shipCompanyName",
+          align: "center"
         },
         {
           title: "销售数量",
-          key:'totalQuantity',
-          align:'center',
+          key: "totalQuantity",
+          align: "center"
         },
         {
           title: "销售金额",
-          key:'totalAmount',
-          align:'center',
+          key: "totalAmount",
+          align: "center"
         },
         {
           title: "已付金额",
-          key:'paidAmount',
-          align:'center',
+          key: "paidAmount",
+          align: "center"
         },
         {
           title: "销售员",
-          key:'realName',
-          align:'center',
+          key: "realName",
+          align: "center"
         }
       ]
     };
   },
-  mounted(){
-      this.queryGood();
+  mounted() {
+    this.queryGood();
   },
   methods: {
-    queryGood(){
-        util.ajax
+    queryGood() {
+      util.ajax
         .get("/goods/source/goodsList")
-        .then((response) =>{
-            this.goodList = response.data.goodsList;
+        .then(response => {
+          this.goodList = response.data.goodsList;
         })
-        .catch(function(error){
-            util.errorProcessor(this, error);
+        .catch(function(error) {
+          util.errorProcessor(this, error);
         });
     },
-    searchInfo(){
-        let requestData = {
-            goodId : this.sourceForm.goodsId,
-            batchCode : this.sourceForm.batch
-        };
-        util.ajax
-        .get("/goods/source/searchInfo",{params : requestData })
-        .then((response) => {
-            this.repertory = response.data.repertory;
-            this.onWayQuantity = response.data.onWayQuantity;
-            this.buyHistoryData = response.data.Buy;
-            this.sellData = response.data.sell;
+    searchInfo() {
+      let requestData = {
+        goodId: this.sourceForm.goodsId,
+        batchCode: this.sourceForm.batch
+      };
+      util.ajax
+        .get("/goods/source/searchInfo", { params: requestData })
+        .then(response => {
+          this.repertory = response.data.repertory;
+          this.onWayQuantity = response.data.onWayQuantity;
+          this.buyHistoryData = response.data.Buy;
+          this.sellData = response.data.sell;
         })
-        .catch(function(error){
-            util.errorProcessor(this, error);
+        .catch(function(error) {
+          util.errorProcessor(this, error);
         });
     },
     searchBlur(data) {
@@ -217,7 +249,7 @@ export default {
       };
       util.ajax
         .get("/goods/source/getBatch", { params: requestData })
-        .then((response) => {
+        .then(response => {
           this.batchList = response.data.data;
           this.goodId = response.data.goodId;
         })
@@ -225,22 +257,28 @@ export default {
           util.errorProcessor(this, error);
         });
     },
-    destory(){
-        let putData = {
-            goodId : this.sourceForm.goodsId,
-            batchCode : this.sourceForm.batch
-        };
-        console.log("requestData---"+putData.goodId);
-        util.ajax
-        .get("/goods/source/destory", {params:putData})
-        .then((response) => {
-            if(response.status === 200 ){
-                this.$Message.success('销毁成功!');
-            }
-        })
-        .catch((error) =>{
-            util.errorProcessor(this, error);
-        });
+    destory() {
+      this.$Modal.confirm({
+        title: "商品销毁确认",
+        content: "是否确认进行商品销毁，销毁后不能撤回",
+        onOk: () => {
+          let putData = {
+            goodId: this.sourceForm.goodsId,
+            batchCode: this.sourceForm.batch
+          };
+          util.ajax
+            .get("/goods/source/destory", { params: putData })
+            .then(response => {
+              if (response.status === 200) {
+                this.$Message.success("销毁成功!");
+              }
+            })
+            .catch(error => {
+              util.errorProcessor(this, error);
+            });
+        },
+        onCancel: () => {}
+      });
     }
   }
 };
