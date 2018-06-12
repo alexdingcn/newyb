@@ -33,13 +33,9 @@ public class RepertoryController {
     private RepertoryInfoMapper repertoryInfoMapper;
 
 
-    @RequestMapping(value = "/list", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/list", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> list(@AuthenticationPrincipal User user,
-                                       @RequestParam(value = "warehouseId", required = false ) Integer warehouseId,
-                                       @RequestParam(value = "goodsId", required = false ) Long goodsId) {
-        RepertoryQuery repertoryQuery = new RepertoryQuery();
-        repertoryQuery.setWarehouseId(warehouseId);
-        repertoryQuery.setGoodsId(goodsId);
+                                       @RequestBody RepertoryQuery repertoryQuery) {
         JSONObject result = repertoryService.getCurrentRepertory(user, repertoryQuery);
         return ResponseEntity.ok().body(JSON.toJSONString(result, SerializerFeature.DisableCircularReferenceDetect));
     }

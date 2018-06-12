@@ -16,7 +16,7 @@
       </Row>
         <hr size='1' style="width:100%; margin-top:5px; margin-bottom:20px;" />
         <Row>
-            <Form ref="searchForm" :model="formItem" :label-width="100">
+            <Form ref="searchForm" :model="formItem" :label-width="80">
                 <Row type="flex" justify="center">
                     <i-col span="8">
                         <FormItem label="批次号">
@@ -87,8 +87,7 @@ export default {
       tabColumns: [
         {
           type: "selection",
-          width: 60,
-          fixed: "left"
+          width: 56
         },
         {
           title: "商品名称",
@@ -228,7 +227,11 @@ export default {
         let label = "";
         for (let i = 0; i < this.tabCurrChooseList.length; i++) {
           let item = this.tabCurrChooseList[i];
-          label = label + item.goodsName + "[" + item.batchCode + "]; ";
+          if (item.batchCode) {
+            label = label + item.goodsName + "[" + item.batchCode + "]; ";
+          } else {
+            label = label + item.goodsName + "; ";
+          }
         }
         return label;
       }

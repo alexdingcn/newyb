@@ -188,8 +188,8 @@
         </i-col>
       </Row>
 
-      <Modal v-model="selectRepertoryModal" width="60" :footerHide="true" :mask-closable="false" title="选择库存商品" >
-        <repertory-info-select ref="repertorySelect" :warehouse="chooseWarehouse" @on-choosed="repertoryInfoChoonsed" ></repertory-info-select>
+      <Modal v-model="selectRepertoryModal" width="80" :footerHide="true" :mask-closable="false" title="选择库存商品" >
+        <repertory-info-select ref="repertorySelect" :warehouse="chooseWarehouse" @on-choosed="onGoodsInfoChoosed" ></repertory-info-select>
       </Modal>
 
       <Modal v-model="goodHistoryModal" width="75" :mask-closable="false" title="客户商品销售历史价格" :footerHide="true">
@@ -586,6 +586,74 @@ export default {
           title: "销售单",
           key: "id",
           render: (h, params) => {
+            let self = this;
+            let status = params.row.status;
+            let statusLabel = "";
+            let statusColor = "";
+            if (status === "TEMP_STORAGE") {
+              statusLabel = "暂存";
+              statusColor = "#5cadff";
+            } else if (status === "INIT") {
+              statusLabel = "待质审";
+              statusColor = "#ff9900";
+            } else if (status === "QUALITY_REJECT") {
+              statusLabel = "质审拒绝";
+              statusColor = "#ed3f14";
+            } else if (status === "QUALITY_CHECKED") {
+              statusLabel = "待终审";
+              statusColor = "#19be6b";
+            }
+            let statusH = h(
+              "span",
+              {
+                class: {
+                  statusClass: true
+                },
+                style: {
+                  color: statusColor
+                }
+              },
+              statusLabel
+            );
+            let buttonH = h(
+              "ButtonGroup",
+              {
+                props: {
+                  size: "small"
+                }
+              },
+              [
+                h(
+                  "Button",
+                  {
+                    props: {
+                      type: "info"
+                    },
+                    on: {
+                      click: () => {
+                        self.editBuyOrder(params.row);
+                      }
+                    }
+                  },
+                  "修改"
+                ),
+                h(
+                  "Button",
+                  {
+                    props: {
+                      type: "error"
+                    },
+                    on: {
+                      click: () => {
+                        self.removeBuyOrder(params.row.id);
+                      }
+                    }
+                  },
+                  "删除"
+                )
+              ]
+            );
+
             let orderNumnber = params.row.orderNumber;
             let customerName =
               params.row.customer && params.row.customer.name
@@ -624,86 +692,11 @@ export default {
                     }
                   },
                   createTime + "[" + createBy + "]"
-                )
-              ]
-            );
-          }
-        },
-        {
-          title: " ",
-          key: "action",
-          align: "right",
-          maxWidth: 80,
-          render: (h, params) => {
-            let self = this;
-            let status = params.row.status;
-            let statusLabel = "";
-            let statusColor = "";
-            if (status === "TEMP_STORAGE") {
-              statusLabel = "暂存";
-              statusColor = "#5cadff";
-            } else if (status === "INIT") {
-              statusLabel = "待质审";
-              statusColor = "#ff9900";
-            } else if (status === "QUALITY_REJECT") {
-              statusLabel = "质审拒绝";
-              statusColor = "#ed3f14";
-            } else if (status === "QUALITY_CHECKED") {
-              statusLabel = "待终审";
-              statusColor = "#19be6b";
-            }
-            let statusH = h(
-              "span",
-              {
-                class: {
-                  statusClass: true
-                },
-                style: {
-                  color: statusColor
-                }
-              },
-              statusLabel
-            );
-            let buttonH = h(
-              "ButtonGroup",
-              {
-                props: {
-                  vertical: true,
-                  size: "small"
-                }
-              },
-              [
-                h(
-                  "Button",
-                  {
-                    props: {
-                      type: "info"
-                    },
-                    on: {
-                      click: () => {
-                        self.editBuyOrder(params.row);
-                      }
-                    }
-                  },
-                  "修改"
                 ),
-                h(
-                  "Button",
-                  {
-                    props: {
-                      type: "error"
-                    },
-                    on: {
-                      click: () => {
-                        self.removeBuyOrder(params.row.id);
-                      }
-                    }
-                  },
-                  "删除"
-                )
+                h("hr", { size: "1", style: { color: "#e9eaec" } }),
+                h("div", [statusH, buttonH])
               ]
             );
-            return h("div", [statusH, buttonH]);
           }
         }
       ],
@@ -1150,7 +1143,7 @@ export default {
       this.$refs.repertorySelect.searchBtnClicked();
       this.selectRepertoryModal = true;
     },
-    repertoryInfoChoonsed(repertoryList) {
+    onGoodsInfoChoosed(repertoryList) {
       this.selectRepertoryModal = false;
       if (!repertoryList || repertoryList.length <= 0) {
         return;
