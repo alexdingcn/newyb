@@ -262,4 +262,17 @@
     </if>
   </select>
 
+  <select id="getViewBackOrderById" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select
+      s.*,
+      u.nickname as saleName,
+      w.name as warehouseName,
+      ship.name as shipCompanyName
+    from sell_order_back s
+    left join users u on s.sale_id=u.id
+    left join warehouse w on s.warehouse_id = w.id
+    left join ship_company ship on s.ship_company_id = ship.id
+    where s.id = #{backId} and s.status != 'DELETE'
+  </select>
+
 </mapper>

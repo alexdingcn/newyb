@@ -625,4 +625,14 @@ public class SellOrderBackService {
             rabbitmqQueueConfig.sendMessage("SellOrderBackService", RabbitmqQueueConfig.ORDER_SELL_BACK, back);
         }
     }
+
+    public SellOrderBack backOrderView(Long backId, User user) throws BizException {
+        SellOrderBack orderBack = sellOrderBackMapper.getViewBackOrderById(backId);
+        if (orderBack == null || !user.getCompanyId().equals(orderBack.getCompanyId())) {
+            throw new BizException(ErrorCode.SELL_BACK_ORDER_GET_FAIL);
+        }
+        List<SellOrderBackDetail> details = getDetails(orderBack.getId());
+        orderBack.setDetails(details);
+        return orderBack;
+    }
 }

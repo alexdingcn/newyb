@@ -214,6 +214,23 @@
     where id = #{id,jdbcType=BIGINT}
   </update>
 
+  <select id="getOrderView" resultMap="BaseResultMap" parameterType="java.lang.Long">
+    select
+      r.*,
+      s.name as supplierName,
+      sc.name as supplierContactName,
+      w.name as warehouseName,
+      u.nickname as saleNickName,
+      sh.name as shipCompanyName
+    from repertory_in r
+    left join supplier s on r.supplier_id = s.id
+    left join supplier_contact sc on r.supplier_contact_id = sc.id
+    left join warehouse w on r.warehouse_id = w.id
+    left join users u on r.buyer_id = u.id
+    left join ship_company sh on r.ship_company_id = sh.id
+    where r.status != 'DELETE' and  r.id = #{id}
+  </select>
+
 
   <sql id="listSql" >
       o.*,

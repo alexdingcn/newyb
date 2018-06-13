@@ -23,8 +23,11 @@ public interface FinancialFlowMapper {
     List<FinancialFlow> getByRefId(@Param("bizRefId") Long bizRefId,
                                    @Param("bizType") String bizType);
 
+    List<FinancialFlow> getByRefNo(String bizRefNo);
+
     List<FinancialFlow> getFlowList(FinancialQuery query);
 
     Integer getFlowListCount(FinancialQuery query);
+
 
 }

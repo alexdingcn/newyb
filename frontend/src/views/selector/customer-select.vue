@@ -110,6 +110,7 @@ export default {
       this.selectCustModal = false;
     },
     searchByName(name) {
+      console.log(name);
       this.customerList = [];
       this.searchLoading = true;
       if (name && name.trim() !== "") {
@@ -131,9 +132,16 @@ export default {
           .then(function(response) {
             if (response.status === 200) {
               self.searchLoading = false;
-              if (response.data) {
-                self.customerList = [response.data];
-                self.$refs.custSelect.setQuery(response.data.name);
+              if (response.data && response.data.customer) {
+                self.customerList = [response.data.customer];
+                self.$refs.custSelect.setQuery(response.data.customer.name);
+                console.log(self.customerList);
+                self.$emit("input", response.data.customer.id);
+                self.$emit(
+                  "on-change",
+                  response.data.id,
+                  response.data.customer
+                );
               }
             }
           })

@@ -9,8 +9,6 @@ public enum OrderNumberType {
     BUY_BACK("BB", "采购退货"),
     BACK_R("BR", "退库"),
     SELL_BACK("SG", "销售退货"),
-    IN_R("IR", "入库"),
-    OUT_R("OR", "出库"),
     DAMAGED("DA", "报损"),
     INVENTORY("IY", "盘点"),
     MOVE_R("MR", "移库"),

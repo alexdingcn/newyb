@@ -157,10 +157,19 @@
 
   <select id="getByRefId" parameterType="map" resultMap="BaseResultMap">
     select
-      <include refid="Base_Column_List" />
-    from financial_flow
-    where biz_ref_id = #{bizRefId}
-    and biz_type = #{bizType}
+      f.*, o.value as payMethodName
+    from financial_flow f
+    left join options o on f.pay_method = o.id
+    where f.biz_ref_id = #{bizRefId}
+      and biz_type = #{bizType}
+  </select>
+
+  <select id="getByRefNo" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select
+      f.*, o.value as payMethodName
+    from financial_flow f
+    left join options o on f.pay_method = o.id
+    where f.biz_ref_no = #{bizRefNo}
   </select>
 
   <select id="getFlowListCount" parameterType="com.yiban.erp.dto.FinancialQuery" resultType="java.lang.Integer">
