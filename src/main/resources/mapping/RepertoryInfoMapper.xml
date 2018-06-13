@@ -424,7 +424,7 @@
     </select>
 
 
-    <select id="queryCountGroupByGoods" resultMap="java.lang.Integer" parameterType="com.yiban.erp.dto.RepertorySelectQuery">
+    <select id="queryCountGroupByGoods" resultType="java.lang.Integer" parameterType="com.yiban.erp.dto.RepertorySelectQuery">
         select count(1)
         from repertory_info r
             left join supplier s on r.supplier_id = s.id
