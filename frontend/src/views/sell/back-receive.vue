@@ -27,7 +27,7 @@
               <Row type="flex" justify="start">
                   <i-col span="6">
                       <FormItem label="制单日期">
-                          <DatePicker v-model="dateRange" type="daterange" placement="bottom-end" placeholder="制单日期" style="width:180px"></DatePicker>
+                          <DatePicker v-model="dateRange" type="daterange" placement="bottom-start" placeholder="制单日期" style="width:180px"></DatePicker>
                       </FormItem>
                   </i-col>
                   <i-col span="5">

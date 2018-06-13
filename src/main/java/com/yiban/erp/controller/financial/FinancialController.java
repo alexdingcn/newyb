@@ -2,10 +2,12 @@ package com.yiban.erp.controller.financial;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.yiban.erp.constant.FinancialBizType;
 import com.yiban.erp.dao.FinancialFlowMapper;
 import com.yiban.erp.dao.FinancialPrePaidMapper;
 import com.yiban.erp.dao.FinancialPreReceiveMapper;
+import com.yiban.erp.dto.FinancialDetailResult;
 import com.yiban.erp.dto.FinancialOffsetReq;
 import com.yiban.erp.dto.FinancialQuery;
 import com.yiban.erp.dto.FinancialReq;
@@ -19,10 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -130,6 +129,21 @@ public class FinancialController {
         logger.warn("user:{} request offset pre record by:{}", user.getId(), JSON.toJSONString(offsetReq));
         financialService.preOffset(offsetReq, user);
         return ResponseEntity.ok().build();
+    }
+
+    @RequestMapping(value = "/flow/{flowId}/detail", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> flowDetailInfo(@PathVariable Long flowId,
+                                             @AuthenticationPrincipal User user) throws Exception {
+
+        logger.debug("get financial flow detail info by flowId:{} user:{}", flowId, user.getId());
+        FinancialDetailResult result = financialService.flowDetailInfo(flowId, user);
+        return ResponseEntity.ok().body(JSON.toJSONString(result, SerializerFeature.DisableCircularReferenceDetect));
+    }
+
+    @RequestMapping(value = "/flow/{flowId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> getFlowById(@PathVariable Long flowId, @AuthenticationPrincipal User user) {
+        FinancialFlow flow = financialFlowMapper.getIncludeOptionById(flowId);
+        return ResponseEntity.ok().body(JSON.toJSONString(flow));
     }
 
 }

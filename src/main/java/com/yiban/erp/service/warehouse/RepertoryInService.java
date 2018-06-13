@@ -866,4 +866,14 @@ public class RepertoryInService {
         List<RepertoryIn> repertoryInList = repertoryInMapper.getInListById(ids);
         return repertoryInList;
     }
+
+    public RepertoryIn getOrderView(Long orderId, User user) throws BizException {
+        RepertoryIn repertoryIn = repertoryInMapper.getOrderView(orderId);
+        if (repertoryIn == null || !user.getCompanyId().equals(repertoryIn.getCompanyId())) {
+            throw new BizException(ErrorCode.RECEIVE_ORDER_GET_FAIL);
+        }
+        List<RepertoryInDetail> details = getDetailList(repertoryIn);
+        repertoryIn.setDetails(details);
+        return repertoryIn;
+    }
 }

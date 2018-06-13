@@ -3,6 +3,7 @@ package com.yiban.erp.service.financial;
 import com.alibaba.fastjson.JSON;
 import com.yiban.erp.constant.*;
 import com.yiban.erp.dao.*;
+import com.yiban.erp.dto.FinancialDetailResult;
 import com.yiban.erp.dto.FinancialOffsetReq;
 import com.yiban.erp.dto.FinancialReq;
 import com.yiban.erp.entities.*;
@@ -19,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -806,6 +808,35 @@ public class FinancialService {
             financialPreReceiveMapper.updateByPrimaryKeySelective(preRecord);
         }
         return preRecord;
+    }
+
+    public FinancialDetailResult flowDetailInfo(final Long flowId, User user) throws BizException {
+        FinancialFlow flow = financialFlowMapper.getIncludeOptionById(flowId);
+        if (flow == null || !user.getCompanyId().equals(flow.getCompanyId())) {
+            throw new BizException(ErrorCode.FINANCIAL_GET_FAIL);
+        }
+        FinancialDetailResult result = new FinancialDetailResult();
+        result.setSelfFlow(flow);
+
+        //查询拥有相同关联号的流水列表
+        List<FinancialFlow> sameRefNoFlows = new ArrayList<>();
+        if (flow.getBizRefId() != null && flow.getBizRefId() > 0) {
+            List<FinancialFlow> flows = financialFlowMapper.getByRefNo(flow.getBizRefNo());
+            //排除调自身
+            flows.stream().forEach(item -> {
+                if (!item.getId().equals(flowId)) {
+                    sameRefNoFlows.add(item);
+                }
+            });
+        }
+        result.setSameRefNoFlows(sameRefNoFlows);
+
+
+        //查询以当前流水号为关联流水的交易流水
+        List<FinancialFlow> sameBizNoFlows = financialFlowMapper.getByRefNo(flow.getBizNo());
+        result.setSameBizNoFlows(sameBizNoFlows);
+
+        return result;
     }
 
 }

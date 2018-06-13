@@ -87,6 +87,14 @@ public class SellOrderBackController {
         return ResponseEntity.ok().build();
     }
 
+    @RequestMapping(value = "/view/{backId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> backOrderView(@PathVariable Long backId,
+                                                @AuthenticationPrincipal User user) throws Exception {
+        logger.debug("user:{} request back order view by id:{}", user.getId(), backId);
+        SellOrderBack orderBack = sellOrderBackService.backOrderView(backId, user);
+        return ResponseEntity.ok(JSON.toJSONString(orderBack, SerializerFeature.DisableCircularReferenceDetect));
+    }
+
 
 
 }

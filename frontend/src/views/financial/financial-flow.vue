@@ -15,10 +15,6 @@
                 <ButtonGroup size="small">
                     <Button type="primary" icon="search" :loading="loading" @click="refreshFlowsData">查询</Button>
                     <Button type="info" icon="bookmark" :loading="loading" @click="recordAction" >记账</Button>
-                    <!-- <Button type="success" icon="arrow-right-c" :loading="loading" @click="receiveAction" >收款</Button> -->
-                    <!-- <Button type="warning" icon="arrow-left-c" :loading="loading" @click="payAction" >付款</Button> -->
-                    <!-- <Button type="error" icon="android-close" :loading="loading" @click="cancelAction" >取消操作</Button> -->
-                    <!-- <Button type="ghost" icon="edit" :loading="loading" @click="editAction" >修改资料</Button> -->
                 </ButtonGroup>
           </div>
           <Row type="flex" justify="start" style="margin-bottom: 20px;">
@@ -63,23 +59,28 @@
             <Row v-if="actionType != 'RECORD'">
                 <i-col span="24">
                     <FormItem label="关联的往来账流水号" :label-width="150" prrop="bizRefNo">
-                        <Input type="text" readonly v-model="actionFormItem.bizRefNo" icon="close-circled" @on-click="clearBizRefNo"/><br/>
-                        <strong style="color:red;">提示:如需要关联具体的某一笔流水进行收/付款操作, 请先选中对应流水记录后再操作, 如不需要关联，请清除关联的流水号!</strong>
+                        <Input type="text" disabled v-model="actionFormItem.bizRefNo" icon="close-circled" @on-click="clearBizRefNo" style="width: 90%" />
+                        <Tooltip transfer placement="right-start">
+                          <Icon type="ios-help-outline"></Icon>
+                          <div slot="content" >
+                              <strong style="color:red;">提示:管理往来账流水号是用于把多笔流水关联起来，能表明当前流水的处理原因.</strong>
+                          </div>
+                        </Tooltip>
                     </FormItem>
                 </i-col>
             </Row> 
             <Row>
                 <i-col span="12">
                     <FormItem label="账户类型" prrop="custType" :error="actionCustTypeError">
-                        <Select v-model="actionFormItem.custType" filterable clearable placeholder="请选择客户类型" @on-change="custTypeChange">
+                        <Select :disabled="actionType != 'RECORD'" v-model="actionFormItem.custType" filterable clearable placeholder="请选择客户类型" @on-change="custTypeChange">
                             <Option v-for="custTypeItem in allCustType" :key="custTypeItem.custType" :value="custTypeItem.custType">{{custTypeItem.label}}</Option>
                         </Select>
                     </FormItem>
                 </i-col>
                 <i-col span="12">
                     <FormItem label="往来账户" prop="custId" v-if="actionFormItem.custType" :error="actionCustIdError">
-                        <customer-select v-model="actionFormItem.custId" v-if="actionFormItem.custType==='CUSTOMER'" @on-change="actionCustomerChange"></customer-select>
-                        <supplier-select  v-model="actionFormItem.custId" v-if="actionFormItem.custType==='SUPPLIER'" @on-change="actionSupplierChange"></supplier-select>
+                        <customer-select :disabled="actionType != 'RECORD'" v-model="actionFormItem.custId" v-if="actionFormItem.custType==='CUSTOMER'" @on-change="actionCustomerChange"></customer-select>
+                        <supplier-select :disabled="actionType != 'RECORD'" v-model="actionFormItem.custId" v-if="actionFormItem.custType==='SUPPLIER'" @on-change="actionSupplierChange"></supplier-select>
                     </FormItem>
                 </i-col>
             </Row>
@@ -91,7 +92,7 @@
                 </i-col>
                 <i-col span="12">
                     <FormItem label="账户余额" prop="custAmount">
-                        <Input v-model="actionFormItem.custAmount" readonly />
+                        <Input v-model="actionFormItem.custAmount" disabled />
                     </FormItem>
                 </i-col>
             </Row>
@@ -353,9 +354,12 @@
             </Row>
       </Modal>
 
-      <Modal v-model="fileUploadModal" title="档案上传" :mask-closable="false" width="50" class="file-upload-modal">
+      <Modal v-model="fileUploadModal" title="档案上传" :footerHide="true" :mask-closable="false" width="50" class="file-upload-modal">
             <file-detail :fileNo="uploadfileNo" @add-file-success="addFileSuccess" ></file-detail>
-            <div slot="footer"></div>
+        </Modal>
+
+        <Modal v-model="financialDetailModal" title="交易流水详情" :footerHide="true" :mask-closable="false" width="80">
+          <financial-detail :detail="flowDetail"></financial-detail>
         </Modal>
 
   </div>
@@ -369,6 +373,7 @@ import supplierSelect from "@/views/selector/supplier-select.vue";
 import optionSelect from "@/views/selector/option-select.vue";
 import fileDetail from "@/views/basic-data/file-detail.vue";
 import actionButton from "@/views/my-components/action-button.vue";
+import financialDetail from "./financial-detail.vue";
 
 export default {
   name: "financial-pre-paid",
@@ -377,33 +382,138 @@ export default {
     supplierSelect,
     optionSelect,
     fileDetail,
-    actionButton
+    actionButton,
+    financialDetail
   },
   data() {
     return {
       allBizType: [
-        { bizType: "BUY_IN", label: "采购入库", cancel: false },
-        { bizType: "BUY_BACK", label: "采购退货", cancel: false },
-        { bizType: "SELL_BACK", label: "销售退货", cancel: false },
-        { bizType: "SELL_BATCH", label: "批发销售", cancel: false },
-        { bizType: "SELL_BACK_FREE", label: "销售退货免零", cancel: false },
-        { bizType: "RECEIVE", label: "收款", cancel: true },
-        { bizType: "PAY", label: "付款", cancel: true },
-        { bizType: "PRE_PAID", label: "预付款", cancel: true },
-        { bizType: "PRE_RECEIVE", label: "预收款", cancel: true },
-        { bizType: "RECORD_RECEIVE", label: "记账应收", cancel: true },
-        { bizType: "RECORD_PAY", label: "记账应付", cancel: true },
-        { bizType: "OFFSET", label: "冲销", cancel: false },
-        { bizType: "RECEIVE_CANCEL", label: "收款取消", cancel: false },
-        { bizType: "PAY_CANCEL", label: "付款取消", cancel: false },
-        { bizType: "PRE_PAID_CANCEL", label: "预付款取消", cancel: false },
-        { bizType: "PRE_RECEIVE_CANCEL", label: "预收款取消", cancel: false },
+        {
+          bizType: "BUY_IN",
+          label: "采购入库",
+          cancel: false,
+          canReceive: true,
+          canPay: true
+        },
+        {
+          bizType: "BUY_BACK",
+          label: "采购退货",
+          cancel: false,
+          canReceive: true,
+          canPay: true
+        },
+        {
+          bizType: "SELL_BACK",
+          label: "销售退货",
+          cancel: false,
+          canReceive: true,
+          canPay: true
+        },
+        {
+          bizType: "SELL_BATCH",
+          label: "批发销售",
+          cancel: false,
+          canReceive: true,
+          canPay: true
+        },
+        {
+          bizType: "SELL_BACK_FREE",
+          label: "销售退货免零",
+          cancel: false,
+          canReceive: true,
+          canPay: true
+        },
+        {
+          bizType: "RECEIVE",
+          label: "收款",
+          cancel: true,
+          canReceive: false,
+          canPay: false
+        },
+        {
+          bizType: "PAY",
+          label: "付款",
+          cancel: true,
+          canReceive: false,
+          canPay: false
+        },
+        {
+          bizType: "PRE_PAID",
+          label: "预付款",
+          cancel: true,
+          canReceive: false,
+          canPay: false
+        },
+        {
+          bizType: "PRE_RECEIVE",
+          label: "预收款",
+          cancel: true,
+          canReceive: false,
+          canPay: false
+        },
+        {
+          bizType: "RECORD_RECEIVE",
+          label: "记账应收",
+          cancel: true,
+          canReceive: true,
+          canPay: false
+        },
+        {
+          bizType: "RECORD_PAY",
+          label: "记账应付",
+          cancel: true,
+          canReceive: false,
+          canPay: true
+        },
+        {
+          bizType: "OFFSET",
+          label: "冲销",
+          cancel: false,
+          canReceive: false,
+          canPay: false
+        },
+        {
+          bizType: "RECEIVE_CANCEL",
+          label: "收款取消",
+          cancel: false,
+          canReceive: false,
+          canPay: false
+        },
+        {
+          bizType: "PAY_CANCEL",
+          label: "付款取消",
+          cancel: false,
+          canReceive: false,
+          canPay: false
+        },
+        {
+          bizType: "PRE_PAID_CANCEL",
+          label: "预付款取消",
+          cancel: false,
+          canReceive: false,
+          canPay: false
+        },
+        {
+          bizType: "PRE_RECEIVE_CANCEL",
+          label: "预收款取消",
+          cancel: false,
+          canReceive: false,
+          canPay: false
+        },
         {
           bizType: "RECORD_RECEIVE_CANCEL",
           label: "记账应收取消",
-          cancel: false
+          cancel: false,
+          canReceive: false,
+          canPay: false
         },
-        { bizType: "RECORD_PAID_CANCEL", label: "记账应付取消", cancel: false }
+        {
+          bizType: "RECORD_PAID_CANCEL",
+          label: "记账应付取消",
+          cancel: false,
+          canReceive: false,
+          canPay: false
+        }
       ],
       allCustType: [
         { custType: "CUSTOMER", label: "客户" },
@@ -446,19 +556,22 @@ export default {
           key: "bizNo",
           width: 200,
           render: (h, params) => {
+            let typeItem = this.findOneOnBizTypes(params.row.bizType);
             let buttonArr = [
               {
                 type: "primary",
                 icon: "eye",
                 label: "详情",
                 data: params.row,
-                action: ""
+                action: this.showDetail,
+                param: params.row
               },
               {
                 type: "success",
                 icon: "arrow-right-c",
                 label: "收款",
                 data: params.row,
+                disabled: !(typeItem && typeItem.canReceive),
                 action: this.receiveAction,
                 param: params.row
               },
@@ -467,6 +580,7 @@ export default {
                 icon: "arrow-left-c",
                 label: "付款",
                 data: params.row,
+                disabled: !(typeItem && typeItem.canPay),
                 action: this.payAction,
                 param: params.row
               },
@@ -482,7 +596,7 @@ export default {
                 type: "error",
                 icon: "android-close",
                 label: "取消",
-                disabled: !this.isCanDoCancelAction(params.row),
+                disabled: !(typeItem && typeItem.cancel),
                 data: params.row,
                 action: this.cancelAction,
                 param: params.row
@@ -529,7 +643,36 @@ export default {
           }
         },
         {
-          title: "关联流水号",
+          renderHeader: (h, params) => {
+            return h(
+              "Tooltip",
+              {
+                props: {
+                  transfer: true,
+                  placement: "top"
+                }
+              },
+              [
+                h("span", "关联流水号"),
+                h("Icon", {
+                  props: { type: "ios-help-outline", size: "15" },
+                  style: { marginLeft: "5px" }
+                }),
+                h(
+                  "div",
+                  {
+                    slot: "content"
+                  },
+                  [
+                    h(
+                      "h4",
+                      "本次交易的关联到的交易流水号，主要为系统订单流水号或可以为往来账流水号.主要用于做关联信息"
+                    )
+                  ]
+                )
+              ]
+            );
+          },
           key: "bizRefNo",
           width: 200
         },
@@ -539,32 +682,193 @@ export default {
           width: 170
         },
         {
-          title: "发生金额",
+          renderHeader: (h, params) => {
+            return h(
+              "Tooltip",
+              {
+                props: {
+                  transfer: true,
+                  placement: "top"
+                }
+              },
+              [
+                h("span", "发生金额"),
+                h("Icon", {
+                  props: { type: "ios-help-outline", size: "15" },
+                  style: { marginLeft: "5px" }
+                }),
+                h(
+                  "div",
+                  {
+                    slot: "content"
+                  },
+                  [h("h4", "本次流水发生的交易金额,体现为大于0.")]
+                )
+              ]
+            );
+          },
           key: "logAmount",
           width: 120
         },
         {
-          title: "应收",
+          renderHeader: (h, params) => {
+            return h(
+              "Tooltip",
+              {
+                props: {
+                  transfer: true,
+                  placement: "top"
+                }
+              },
+              [
+                h("span", "应收"),
+                h("Icon", {
+                  props: { type: "ios-help-outline", size: "15" },
+                  style: { marginLeft: "5px" }
+                }),
+                h(
+                  "div",
+                  {
+                    slot: "content"
+                  },
+                  [h("h4", "本次流水交易的应收账款金额.")]
+                )
+              ]
+            );
+          },
           key: "inAmount",
           width: 120
         },
         {
-          title: "应付",
+          renderHeader: (h, params) => {
+            return h(
+              "Tooltip",
+              {
+                props: {
+                  transfer: true,
+                  placement: "top"
+                }
+              },
+              [
+                h("span", "应付"),
+                h("Icon", {
+                  props: { type: "ios-help-outline", size: "15" },
+                  style: { marginLeft: "5px" }
+                }),
+                h(
+                  "div",
+                  {
+                    slot: "content"
+                  },
+                  [h("h4", "本次流水交易的应付账款金额.")]
+                )
+              ]
+            );
+          },
           key: "outAmount",
           width: 120
         },
         {
-          title: "应收账款余额",
+          renderHeader: (h, params) => {
+            return h(
+              "Tooltip",
+              {
+                props: {
+                  transfer: true,
+                  placement: "top"
+                }
+              },
+              [
+                h("span", "应收账款余额"),
+                h("Icon", {
+                  props: { type: "ios-help-outline", size: "15" },
+                  style: { marginLeft: "5px" }
+                }),
+                h(
+                  "div",
+                  {
+                    slot: "content"
+                  },
+                  [h("h4", "公司当前累计总应收账款.")]
+                )
+              ]
+            );
+          },
           key: "surplusInAmount",
           width: 160
         },
         {
-          title: "应付账款余额",
+          renderHeader: (h, params) => {
+            return h(
+              "Tooltip",
+              {
+                props: {
+                  transfer: true,
+                  placement: "top"
+                }
+              },
+              [
+                h("span", "应付账款余额"),
+                h("Icon", {
+                  props: { type: "ios-help-outline", size: "15" },
+                  style: { marginLeft: "5px" }
+                }),
+                h(
+                  "div",
+                  {
+                    slot: "content"
+                  },
+                  [h("h4", "公司当前累计总应付账款.")]
+                )
+              ]
+            );
+          },
           key: "surplusOutAmount",
           width: 160
         },
         {
-          title: "往来账户余额",
+          renderHeader: (h, params) => {
+            return h(
+              "Tooltip",
+              {
+                props: {
+                  transfer: true,
+                  placement: "top"
+                }
+              },
+              [
+                h("span", "往来账户余额"),
+                h("Icon", {
+                  props: { type: "ios-help-outline", size: "15" },
+                  style: { marginLeft: "5px" }
+                }),
+                h(
+                  "div",
+                  {
+                    slot: "content"
+                  },
+                  [
+                    h(
+                      "h4",
+                      { style: { color: "#ed3f14" } },
+                      "往来账户余额，代表了当前往来账客户与公司账目关系,主要看最新一条记录的余额."
+                    ),
+                    h("p", { style: { color: "#ed3f14" } }, "提示信息: "),
+                    h(
+                      "p",
+                      { style: { color: "#ed3f14" } },
+                      "大于0代表公司对往来账户存在应付账款;"
+                    ),
+                    h(
+                      "p",
+                      { style: { color: "#ed3f14" } },
+                      "小于0代表公司对往来账户存在应收账款;"
+                    )
+                  ]
+                )
+              ]
+            );
+          },
           key: "custAmount",
           width: 150
         },
@@ -572,35 +876,6 @@ export default {
           title: "收/付款方式",
           key: "payMethodName",
           width: 110
-        },
-        {
-          title: "结算账号",
-          key: "companyAccount",
-          width: 170
-        },
-        {
-          title: "往来账户账号",
-          key: "custAccount",
-          width: 170
-        },
-        {
-          title: "操作员",
-          key: "createdBy",
-          width: 120
-        },
-        {
-          title: "记账时间",
-          sortable: true,
-          key: "createdTime",
-          width: 140,
-          render: (h, params) => {
-            return h(
-              "span",
-              params.row.createdTime
-                ? moment(params.row.createdTime).format("YYYY-MM-DD HH:mm")
-                : ""
-            );
-          }
         },
         {
           title: "记账凭证号",
@@ -631,6 +906,35 @@ export default {
                 fileNo
               );
             }
+          }
+        },
+        {
+          title: "结算账号",
+          key: "companyAccount",
+          width: 170
+        },
+        {
+          title: "往来账户账号",
+          key: "custAccount",
+          width: 170
+        },
+        {
+          title: "操作员",
+          key: "createdBy",
+          width: 120
+        },
+        {
+          title: "记账时间",
+          sortable: true,
+          key: "createdTime",
+          width: 140,
+          render: (h, params) => {
+            return h(
+              "span",
+              params.row.createdTime
+                ? moment(params.row.createdTime).format("YYYY-MM-DD HH:mm")
+                : ""
+            );
           }
         }
       ],
@@ -663,7 +967,9 @@ export default {
       cancelModalTitle: "",
       updateModal: false,
       updateFormItem: {},
-      updateLoading: false
+      updateLoading: false,
+      flowDetail: {},
+      financialDetailModal: false
     };
   },
   mounted() {
@@ -722,6 +1028,7 @@ export default {
           this.loading = false;
           this.totalCount = response.data.count;
           this.flowsData = response.data.data;
+          this.flowDetail = {};
           this.currChooseFlow = {};
           this.$refs.flowTable.clearCurrentRow();
         })
@@ -761,6 +1068,9 @@ export default {
       }
     },
     recordAction() {
+      this.actionTitle = "记账";
+      this.actionModal = true;
+      this.actionType = "RECORD";
       this.actionFormItem = {
         bizRefId: "",
         bizRefNo: "",
@@ -771,19 +1081,17 @@ export default {
         logDate: moment().format("YYYY-MM-DD"),
         bizType: ""
       };
-      this.actionTitle = "记账";
-      this.actionModal = true;
-      this.actionType = "RECORD";
     },
     receiveAction(rowData) {
-      console.log(rowData);
       if (!rowData || !rowData.id) {
-        this.$$Modal.warning({
+        this.$Modal.warning({
           title: "错误提示",
           content: "获取流水信息失败"
         });
         return;
       }
+      this.actionTitle = "收款";
+      this.actionType = "RECEIVE";
       this.actionFormItem = {
         bizRefId: rowData.id,
         bizRefNo: rowData.bizNo,
@@ -795,19 +1103,20 @@ export default {
         logDate: moment().format("YYYY-MM-DD"),
         bizType: "RECEIVE"
       };
-      this.actionTitle = "收款";
+      console.log(this.actionFormItem);
       this.actionModal = true;
-      this.actionType = "RECEIVE";
     },
     payAction(rowData) {
-      console.log(rowData);
       if (!rowData || !rowData.id) {
-        this.$$Modal.warning({
+        this.$Modal.warning({
           title: "错误提示",
           content: "获取流水信息失败"
         });
         return;
       }
+      this.actionTitle = "付款";
+      this.actionType = "PAY";
+      console.log(rowData);
       this.actionFormItem = {
         bizRefId: rowData.id,
         bizRefNo: rowData.bizNo,
@@ -819,9 +1128,9 @@ export default {
         logDate: moment().format("YYYY-MM-DD"),
         bizType: "PAY"
       };
-      this.actionTitle = "付款";
+      let self = this;
+      console.log(this.actionFormItem);
       this.actionModal = true;
-      this.actionType = "PAY";
     },
     findOneOnBizTypes(bizType) {
       for (let i = 0; i < this.allBizType.length; i++) {
@@ -831,14 +1140,6 @@ export default {
         }
       }
       return null;
-    },
-    isCanDoCancelAction(rowData) {
-      let bizTypeItem = this.findOneOnBizTypes(rowData.bizType);
-      if (bizTypeItem && bizTypeItem.cancel) {
-        return true;
-      } else {
-        return false;
-      }
     },
     cancelAction(rowData) {
       console.log(rowData);
@@ -903,10 +1204,12 @@ export default {
       this.cancelModal = false;
     },
     custTypeChange(data) {
-      this.actionFormItem.custId = "";
-      this.actionFormItem.logAccount = "";
-      this.actionFormItem.custAccount = "";
-      this.actionFormItem.custAmount = "";
+      if (this.actionType === "RECORD") {
+        this.actionFormItem.custId = "";
+        this.actionFormItem.logAccount = "";
+        this.actionFormItem.custAccount = "";
+        this.actionFormItem.custAmount = "";
+      }
     },
     actionCustomerChange(customerId, customer) {
       if (customer.id) {
@@ -924,6 +1227,8 @@ export default {
       }
     },
     actionSupplierChange(supplierId, supplier) {
+      console.log("actionSupplierChange ");
+      console.log(supplier);
       if (supplier.id) {
         this.actionFormItem.custId = supplier.id;
         this.actionFormItem.logAccount = supplier.name;
@@ -1114,6 +1419,13 @@ export default {
             });
         }
       });
+    },
+
+    showDetail(row) {
+      if (row && row.id) {
+        this.flowDetail = row;
+        this.financialDetailModal = true;
+      }
     }
   }
 };

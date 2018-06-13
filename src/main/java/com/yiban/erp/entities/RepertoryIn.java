@@ -97,6 +97,7 @@ public class RepertoryIn {
     private String warehouseName;
     private String saleNickName;
     private String saleRealName;
+    private String shipCompanyName;
 
     private String tempControlMethodName;
     private String tempControlStatusName;

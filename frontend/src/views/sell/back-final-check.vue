@@ -17,7 +17,7 @@
               <Row type="flex" justify="start">
                   <i-col span="6">
                       <FormItem label="制单日期">
-                          <DatePicker v-model="dateRange" type="daterange" placement="bottom-end" placeholder="制单日期" style="width:180px"></DatePicker>
+                          <DatePicker v-model="dateRange" type="daterange" placement="bottom-start" placeholder="制单日期" style="width:180px"></DatePicker>
                       </FormItem>
                   </i-col>
                   <i-col span="6">
@@ -39,17 +39,17 @@
             </Form>
 
             <Table border highlight-row disabled-hover height="300" style="margin-bottom: 2em;"
-                   :columns="orderColumns" :data="orderList" :loading="loading" 
-				   ref="orderTable" size="small"
-                   @on-row-click="handleSelectOrder" 
-				   no-data-text="使用右上方输入搜索条件">
-			</Table>
+                        :columns="orderColumns" :data="orderList" :loading="loading" 
+                ref="orderTable" size="small"
+                        @on-row-click="handleSelectOrder" 
+                no-data-text="使用右上方输入搜索条件">
+            </Table>
 
             <Table border highlight-row disabled-hover height="350"
                    :columns="detailColumns" :data="details" :loading="detailLoading" 
-				   ref="detailTable" size="small"
-				   no-data-text="点击上方订单后查看明细">
-			</Table>
+                ref="detailTable" size="small"
+                no-data-text="点击上方订单后查看明细">
+            </Table>
         </Card>
 
         <Modal v-model="goodsExpandModal" width="60" :mask-closable="false" title="商品详情信息" :footerHide="true">

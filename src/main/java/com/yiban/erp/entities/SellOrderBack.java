@@ -41,6 +41,8 @@ public class SellOrderBack {
 
     private Integer shipCompanyId;
 
+    private String shipCompanyName;
+
     private String shipNo;
 
     private Date shipDate;
@@ -244,6 +246,14 @@ public class SellOrderBack {
 
     public void setShipCompanyId(Integer shipCompanyId) {
         this.shipCompanyId = shipCompanyId;
+    }
+
+    public String getShipCompanyName() {
+        return shipCompanyName;
+    }
+
+    public void setShipCompanyName(String shipCompanyName) {
+        this.shipCompanyName = shipCompanyName;
     }
 
     public String getShipNo() {
