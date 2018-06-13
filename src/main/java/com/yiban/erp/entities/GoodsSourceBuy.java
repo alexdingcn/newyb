@@ -1,10 +1,7 @@
 package com.yiban.erp.entities;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import org.springframework.format.annotation.DateTimeFormat;
 
 import java.math.BigDecimal;
-import java.sql.Timestamp;
 import java.util.Date;
 
 /**
@@ -49,13 +46,9 @@ public class GoodsSourceBuy {
 
     public void setBuyPrice(BigDecimal buyPrice) { this.buyPrice = buyPrice; }
 
-    public Date getCreateTime() {
-        return createTime;
-    }
+    public Date getCreateTime() { return createTime; }
 
-    public void setCreateTime(Date createTime) {
-        this.createTime = createTime;
-    }
+    public void setCreateTime(Date createTime) { this.createTime = createTime; }
 
     public String getShipName() { return shipName; }
 
