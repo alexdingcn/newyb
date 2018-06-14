@@ -36,7 +36,7 @@
             </if>
             create_by = #{createBy}, create_time = now()
         </set>
-        where company_id = #{companyId}
+        where company_id = #{companyId} and id = #{id}
     </update>
 
 </mapper>

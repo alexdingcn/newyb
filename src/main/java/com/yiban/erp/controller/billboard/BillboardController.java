@@ -51,7 +51,7 @@ public class BillboardController {
         return ResponseEntity.badRequest().body(ErrorCode.FAILED_INSERT_FROM_DB.toString());
     }
 
-    @RequestMapping(value = "/update", method = RequestMethod.POST,produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/update", method = RequestMethod.PUT,produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> update(@AuthenticationPrincipal User user,
                                          @RequestBody Billboard billboard){
         String userName = user.getNickname();
