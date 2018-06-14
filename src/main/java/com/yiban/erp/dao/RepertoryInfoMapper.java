@@ -1,16 +1,14 @@
 package com.yiban.erp.dao;
 
 import com.yiban.erp.dto.CurrentBalanceResp;
+import com.yiban.erp.dto.RepertoryQuery;
 import com.yiban.erp.dto.RepertorySelectQuery;
 import com.yiban.erp.entities.RepertoryInfo;
-import com.yiban.erp.dto.RepertoryQuery;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
-import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 @Mapper
 public interface RepertoryInfoMapper {
@@ -42,6 +40,12 @@ public interface RepertoryInfoMapper {
     Integer querySelectCount( RepertorySelectQuery query); //选择存库商品列表的查询项
 
     List<RepertoryInfo> querySelectList(RepertorySelectQuery query);
+
+
+    //选择存库商品列表的查询项(无批次)
+    Integer queryCountGroupByGoods(RepertorySelectQuery query);
+
+    List<RepertoryInfo> queryListGroupByGoods(RepertorySelectQuery query);
 
     //一次性统计当前在单数量
     int updateOnWayQuantity(@Param("id") Long id);
