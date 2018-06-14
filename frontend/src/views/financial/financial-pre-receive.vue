@@ -39,7 +39,7 @@
           </Form>
 
            <Table ref="preTable" highlight-row size="small" border :loading="loading" 
-                :columns="tableColumns" :data="tableData" @on-row-click="chooseRow" class="table-action">
+                :columns="tableColumns" :data="tableData" class="table-action">
             </Table>
             <Row type="flex" justify="end">
                 <Page size="small" :total="totalCount" :current="currentPage" :page-size="pageSize" show-total
@@ -107,7 +107,7 @@
                 </Form>
 
                 <Row slot="footer" type="flex" justify="end">
-                    <ButtonGroup shape="circle" size="small">
+                    <ButtonGroup shape="circle" >
                         <Button type="success" icon="checkmark" @click="actionSave" :loading="addSubmitLoading" >确认保存</Button>
                         <Button type="ghost" icon="reply" @click="addCancel">取消</Button>
                     </ButtonGroup>
@@ -116,7 +116,7 @@
 
             <Modal v-model="offsetModal" title="预收款冲销" :mask-closeable="false" width="40">
                 <Form ref="offsetForm" :model="offsetFormItem" :label-width="150">
-                    <Row>
+                    <Row class="row-margin-bottom">
                         <i-col span="12">
                             <FormItem label="做冲销的预收款流水">
                                 <Input v-model="offsetFormItem.bizNo" readonly />
@@ -128,7 +128,7 @@
                             </FormItem>
                         </i-col>
                     </Row>
-                    <Row>
+                    <Row class="row-margin-bottom">
                         <i-col span="12">
                             <FormItem label="冲销金额">
                                 <Input v-model="offsetFormItem.logAmount" readonly />
@@ -140,30 +140,18 @@
                             </FormItem>
                         </i-col>
                     </Row>
-                    <h3 style="margin-top:20px;">冲销关联信息</h3>
-                    <hr size="1" style="width:90%;margin-bottom:10px;" />
-                    <Row class="row-margin-bottom">
-                        <i-col span="24">
-                            <FormItem label="冲销的往来账流水号" :label-width="150">
-                                <Input v-model="offsetFormItem.refBizNo" /><br/>
-                            </FormItem>
-                        </i-col>
-                    </Row>
-                    <Row class="row-margin-bottom">
-                        <i-col span="24">
-                            <FormItem label="冲销流水的摘要信息" :label-width="150">
-                                <Input v-model="offsetFormItem.keyWord" />
-                            </FormItem>
-                        </i-col>
-                    </Row>
+                    <h4>冲销流水的摘要信息</h4>
+                    <div class="row-margin-bottom">
+                        <Input type="textarea" v-model="offsetFormItem.keyWord" :rows="2" placeholder="请输入冲销流水的摘要信息"/>
+                    </div>
                     <Alert type="error">
-                      <h4 style="color:red;">提示:建议关联往来账流水，比如销售出库的往来账流水号, 也可以没有关联, 直接对账户做冲销交易.</h4>
-                      <p style="margin-top:0.5em; margin-bottom: 0.5em">如下图获取关联往来账流水号</p>
+                      <h4 style="color:red;">提示: 冲销流水的摘要信息，建议记录一下冲销金额针对的是那些交易流水, 或者记录订单的系统编号, 用于记录当前冲销流水涉及的的交易。</h4>
+                      <p style="margin-top:0.5em; margin-bottom: 0.5em">如下图获取往来账交易流水号</p>
                       <img src="@/images/financial-pre-eg.png" style="width: 99%;" />
                     </Alert>
                 </Form>
                 <Row slot="footer" type="flex" justify="end">
-                    <ButtonGroup shape="circle" size="small">
+                    <ButtonGroup shape="circle" >
                         <Button type="success" icon="checkmark" @click="offsetSubmit" :loading="offsetSubmitLoading" >确认保存</Button>
                         <Button type="ghost" icon="reply" @click="offsetModalCancel">取消</Button>
                     </ButtonGroup>
@@ -211,7 +199,6 @@ export default {
       searchCustId: "",
       searchStatus: "INIT",
       loading: false,
-      currChooseRow: {},
       tableData: [],
       tableColumns: [
         {
@@ -438,16 +425,12 @@ export default {
           this.loading = false;
           this.tableData = response.data.data;
           this.totalCount = response.data.count;
-          this.currChooseRow = {};
           this.$refs.preTable.clearCurrentRow();
         })
         .catch(error => {
           this.loading = false;
           util.errorProcessor(this, error);
         });
-    },
-    chooseRow(row) {
-      this.currChooseRow = row;
     },
     openUploadFile(type, fileNo) {
       this.uploadFileType = type;
@@ -539,12 +522,12 @@ export default {
       });
     },
 
-    cancelBtnClick() {
-      if (!this.currChooseRow.id) {
-        this.$Message.warning("请先选择需要取消的预收款记录");
+    cancelBtnClick(rowData) {
+      if (!rowData.id) {
+        this.$Message.warning("获取取消的预收款记录信息失败");
         return;
       }
-      if (this.currChooseRow.status !== "INIT") {
+      if (rowData.status !== "INIT") {
         this.$Modal.warning({
           title: "取消操作提醒",
           content: "只有处于未使用状态的预收款才能进行取消操作!"
@@ -556,14 +539,13 @@ export default {
         title: "取消操作确认",
         content:
           "是否确认取消:" +
-          self.currChooseRow.bizNo +
+          rowData.bizNo +
           "这笔预收款，取消后不能再做其他操作！",
-        onCancel: () => {},
         onOk: () => {
           self.loading = true;
-          self.currChooseRow.preBizType = "PRE_RECEIVE";
+          rowData.preBizType = "PRE_RECEIVE";
           util.ajax
-            .post("/financial/pre/cancel", self.currChooseRow)
+            .post("/financial/pre/cancel", rowData)
             .then(response => {
               self.loading = false;
               self.$Message.success("取消操作保存成功");
@@ -596,12 +578,11 @@ export default {
             //获取到客户信息打开冲销的面板
             self.offsetFormItem = {
               bizType: "PRE_RECEIVE",
-              preRecordId: self.currChooseRow.id,
-              refBizNo: "",
+              preRecordId: rowData.id,
               keyWord: "",
-              bizNo: self.currChooseRow.bizNo,
+              bizNo: rowData.bizNo,
               custName: customer.name,
-              logAmount: self.currChooseRow.logAmount,
+              logAmount: rowData.logAmount,
               custAmount: customer.accountAmount
             };
             self.offsetModal = true;
@@ -616,7 +597,6 @@ export default {
       this.offsetFormItem = {
         bizType: "PRE_RECEIVE",
         preRecordId: "",
-        refBizNo: "",
         keyWord: "",
         bizNo: "",
         custName: "",
@@ -637,14 +617,6 @@ export default {
         });
         return;
       }
-      //判断下当前流水是否处于未使用状态
-      if (this.currChooseRow.status !== "INIT") {
-        this.$Modal.warning({
-          title: "冲销交易提示",
-          content: "只有处于未使用状态的预收款才能进行冲销操作."
-        });
-        return;
-      }
       let self = this;
       this.$Modal.confirm({
         title: "冲销数据确认",
@@ -654,7 +626,6 @@ export default {
           "冲销" +
           self.offsetFormItem.logAmount +
           "元预收款, 冲销后不可取消",
-        onCancel: () => {},
         onOk: () => {
           self.offsetSubmitLoading = true;
           util.ajax

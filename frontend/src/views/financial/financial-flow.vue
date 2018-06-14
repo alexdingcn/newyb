@@ -10,9 +10,7 @@
               往来账记账
           </p>
           <div slot="extra" >
-              <Row type="flex" justify="end">
-              </Row>
-                <ButtonGroup size="small">
+                <ButtonGroup >
                     <Button type="primary" icon="search" :loading="loading" @click="refreshFlowsData">查询</Button>
                     <Button type="info" icon="bookmark" :loading="loading" @click="recordAction" >记账</Button>
                 </ButtonGroup>
