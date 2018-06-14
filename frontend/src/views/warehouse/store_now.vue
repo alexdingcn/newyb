@@ -115,6 +115,24 @@
                   <Page :total="totalAmount" :current="currentPage" @on-change="changePage" show-total></Page>
               </div>
           </Row>
+            <Table border highlight-row
+                class="margin-top-8"
+                :columns="repertoryColumns" :data="repertoryItems"
+                ref="storeNowTable" style="width: 100%;"
+                no-data-text="当前条件下查询，无库存数据！">
+
+            </Table>
+            <Row>
+                <i-col span="6">实时库存数量： {{storeAmount}}</i-col>
+                <i-col span="6">库存商品总金额: {{storeMoney}}</i-col>
+                <i-col span="6">含税价格: {{storeTaxMoney}}</i-col>
+                <i-col span="6">毛利: {{storeProfitMoney}}</i-col>
+            </Row>
+            <Row class="margin-top-8">
+                <div style="float: right;">
+                    <Page :total="totalAmount" :current="currentPage" @on-change="changePage" show-total></Page>
+                </div>
+            </Row>
         </Form>
     </Card>
     </Row>
@@ -143,6 +161,10 @@ export default {
   data() {
     return {
       saving: false,
+        storeAmount:0,
+        storeMoney:0,
+        storeTaxMoney:0,
+        storeProfitMoney:0,
       showExpandedFilter: false,
       totalAmount: 0,
       currentPage: 1,
@@ -338,6 +360,9 @@ export default {
     moment: function() {
       return moment();
     },
+    getStoreSunInfo(){
+
+      },
     queryRepertoryList() {
       var self = this;
       this.repertoryItems = [];
@@ -348,6 +373,8 @@ export default {
           if (response.status === 200 && response.data) {
             self.repertoryItems = response.data.data;
             self.totalAmount = response.data.total;
+            self.storeAmount=response.data.storeAmount;
+            self.storeMoney=response.data.storeMoney;
           }
         })
         .catch(function(error) {
