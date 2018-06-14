@@ -34,4 +34,5 @@ public interface RepertoryInMapper {
 
     RepertoryIn getByIdWithSupplierInfo(Long id);
 
+    RepertoryIn getOrderView(Long orderId);
 }

@@ -1,7 +1,6 @@
 package com.yiban.erp.service.warehouse;
 
 import com.alibaba.fastjson.JSON;
-import com.sun.org.apache.bcel.internal.generic.IF_ACMPEQ;
 import com.yiban.erp.config.RabbitmqQueueConfig;
 import com.yiban.erp.constant.*;
 import com.yiban.erp.dao.*;
@@ -47,8 +46,6 @@ public class RepertoryInService {
     private BuyOrderDetailMapper buyOrderDetailMapper;
     @Autowired
     private GoodsService goodsService;
-    @Autowired
-    private RepertoryInService repertoryInService;
     @Autowired
     private FileInfoMapper fileInfoMapper;
     @Autowired
@@ -865,5 +862,15 @@ public class RepertoryInService {
         }
         List<RepertoryIn> repertoryInList = repertoryInMapper.getInListById(ids);
         return repertoryInList;
+    }
+
+    public RepertoryIn getOrderView(Long orderId, User user) throws BizException {
+        RepertoryIn repertoryIn = repertoryInMapper.getOrderView(orderId);
+        if (repertoryIn == null || !user.getCompanyId().equals(repertoryIn.getCompanyId())) {
+            throw new BizException(ErrorCode.RECEIVE_ORDER_GET_FAIL);
+        }
+        List<RepertoryInDetail> details = getDetailList(repertoryIn);
+        repertoryIn.setDetails(details);
+        return repertoryIn;
     }
 }

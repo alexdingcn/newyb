@@ -67,5 +67,6 @@
         <mapper resource="mapping/UpdateHistoryMapper.xml"/>
         <mapper resource="mapping/SellOrderPaymentMapper.xml"/>
         <mapper resource="mapping/BannerMapper.xml"/>
+        <mapper resource="mapping/BillboardMapper.xml"/>
     </mappers>
 </configuration>

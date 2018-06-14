@@ -17,4 +17,5 @@ public interface SellOrderBackMapper {
 
     List<SellOrderBack> getOrderList(SellBackQuery query);
 
+    SellOrderBack getViewBackOrderById(Long backId);
 }

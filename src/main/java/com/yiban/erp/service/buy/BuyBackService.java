@@ -400,4 +400,14 @@ public class BuyBackService {
         inBack.setUpdatedTime(new Date());
         repertoryInBackMapper.updateByPrimaryKeySelective(inBack);
     }
+
+    public RepertoryInBack getViewOrder(Long id, User user) throws BizException {
+        RepertoryInBack back = repertoryInBackMapper.getById(id);
+        if (back == null || !user.getCompanyId().equals(back.getCompanyId())) {
+            throw new BizException(ErrorCode.BUY_BACK_ORDER_GET_FAIL);
+        }
+        List<RepertoryInBackDetail> details = getDetailByBackId(id);
+        back.setDetails(details);
+        return back;
+    }
 }

@@ -2,6 +2,7 @@ package com.yiban.erp.controller.warehouse;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.yiban.erp.dao.RepertoryInMapper;
 import com.yiban.erp.dto.CurrentBalanceResp;
 import com.yiban.erp.dto.ReceiveListReq;
@@ -173,7 +174,6 @@ public class RepertoryInController {
         return ResponseEntity.ok().build();
     }
 
-
     @RequestMapping(value = "/detaillist", method = RequestMethod.POST, name = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> detaillist(@RequestBody RepertoryInListReq listReq,
                                              @AuthenticationPrincipal User user) throws Exception {
@@ -190,6 +190,14 @@ public class RepertoryInController {
         listReq.setInStatus("IN_CHECKED");
         List<RepertoryInDetail> result = repertoryInService.getInDetailList(listReq);
         return ResponseEntity.ok().body(JSON.toJSONString(result));
+    }
+
+    @RequestMapping(value = "/order/view/{orderId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> orderView(@PathVariable Long orderId,
+                                            @AuthenticationPrincipal User user) throws Exception {
+        logger.debug("user:{} get repertory in order view by id:{}", user.getId(), orderId);
+        RepertoryIn result = repertoryInService.getOrderView(orderId, user);
+        return ResponseEntity.ok().body(JSON.toJSONString(result, SerializerFeature.DisableCircularReferenceDetect));
     }
 
 }

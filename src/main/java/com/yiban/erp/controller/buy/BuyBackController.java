@@ -78,8 +78,13 @@ public class BuyBackController {
         return ResponseEntity.ok().build();
     }
 
-
-
+    @RequestMapping(value = "/view/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> viewOrder(@PathVariable Long id,
+                                            @AuthenticationPrincipal User user) throws Exception {
+        logger.debug("user:{} get buy back order view by id:{}", user.getId(), id);
+        RepertoryInBack inBack = buyBackService.getViewOrder(id, user);
+        return ResponseEntity.ok().body(JSON.toJSONString(inBack, SerializerFeature.DisableCircularReferenceDetect));
+    }
 
 
 }
