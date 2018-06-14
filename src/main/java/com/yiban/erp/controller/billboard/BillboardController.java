@@ -12,10 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.xml.ws.Response;
 import java.util.List;
@@ -51,7 +48,7 @@ public class BillboardController {
         return ResponseEntity.badRequest().body(ErrorCode.FAILED_INSERT_FROM_DB.toString());
     }
 
-    @RequestMapping(value = "/update", method = RequestMethod.POST,produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/update", method = RequestMethod.PUT,produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> update(@AuthenticationPrincipal User user,
                                          @RequestBody Billboard billboard){
         String userName = user.getNickname();
@@ -62,5 +59,23 @@ public class BillboardController {
         }
         return ResponseEntity.badRequest().body(ErrorCode.FAILED_UPDATE_FROM_DB.toString());
 
+    }
+
+    @RequestMapping(value = "/delete/{id}", method = RequestMethod.DELETE,produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> update(@PathVariable(value = "id") int id){
+        int result = billboardService.delete(id);
+        if (result > 0) {
+            return ResponseEntity.ok().build();
+        }
+        return ResponseEntity.badRequest().body(ErrorCode.FAILED_DELETE_FROM_DB.toString());
+    }
+
+    @RequestMapping(value = "/sort", method = RequestMethod.PUT,produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> sort(@RequestBody Billboard billboard){
+        int result = billboardService.sort(billboard);
+        if (result > 0) {
+            return ResponseEntity.ok().build();
+        }
+        return ResponseEntity.badRequest().body(ErrorCode.FAILED_DELETE_FROM_DB.toString());
     }
 }

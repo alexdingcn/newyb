@@ -12,4 +12,6 @@ public interface BillboardMapper {
     int insert(Billboard billboard);
     List<Billboard> getList(@Param("companyId") Integer companyId);
     int update(Billboard billboard);
+    int delete(@Param("id") int id);
+    int sort(Billboard billboard);
 }

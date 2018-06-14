@@ -15,6 +15,7 @@
         select id, number, title, content, status, create_by, create_time,company_id
         from billboard
         where  company_id = #{companyId}
+        order by number asc
     </select>
   <insert id="insert" parameterType="com.yiban.erp.entities.Billboard" useGeneratedKeys="true" keyProperty="id">
       insert into billboard
@@ -36,7 +37,17 @@
             </if>
             create_by = #{createBy}, create_time = now()
         </set>
-        where company_id = #{companyId}
+        where company_id = #{companyId} and id = #{id}
     </update>
 
+    <delete id="delete">
+      delete  from billboard where id = #{id}
+    </delete>
+
+    <update id="sort" parameterType="com.yiban.erp.entities.Billboard">
+        update billboard
+        set
+            number = #{number}
+        where company_id = #{companyId} and id = #{id}
+    </update>
 </mapper>
