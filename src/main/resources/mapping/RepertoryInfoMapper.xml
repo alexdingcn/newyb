@@ -428,7 +428,7 @@
         (
         select r.warehouse_id, gi.id, r.supplier_id, r.factory_id
         from repertory_info r
-        left join supplier s on r.supplier_id = s.idl
+        left join supplier s on r.supplier_id = s.id
         left join warehouse w on r.warehouse_id = w.id
         , goods_detail gd, goods_info gi
         where gd.id = r.goods_id and gi.id = gd.goods_info_id
