@@ -25,7 +25,7 @@ public class BillboardService {
     public int delete(int id){
         return billboardMapper.delete(id);
     }
-    public int sort(Billboard billboard){
-        return billboardMapper.sort(billboard);
+    public int sort(int id,int number){
+            return billboardMapper.sort(id, number);
     }
 }

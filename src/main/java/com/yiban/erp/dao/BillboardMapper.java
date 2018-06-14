@@ -13,5 +13,6 @@ public interface BillboardMapper {
     List<Billboard> getList(@Param("companyId") Integer companyId);
     int update(Billboard billboard);
     int delete(@Param("id") int id);
-    int sort(Billboard billboard);
+    int sort(@Param("id") int id,
+             @Param("number") int number);
 }

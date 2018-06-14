@@ -44,10 +44,10 @@
       delete  from billboard where id = #{id}
     </delete>
 
-    <update id="sort" parameterType="com.yiban.erp.entities.Billboard">
+    <update id="sort">
         update billboard
         set
             number = #{number}
-        where company_id = #{companyId} and id = #{id}
+        where id = #{id}
     </update>
 </mapper>
