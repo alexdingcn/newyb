@@ -39,8 +39,8 @@
                 <span>已选中的商品: <strong style="color: red;">{{chooseGoods}} </strong></span> 
             </Row>
 
-            <Table border highlight-row :columns="tabColumns" :data="tabData" 
-                :loading="tableLoading" height="400" 
+            <Table border stripe highlight-row :columns="tabColumns" :data="tabData" 
+                :loading="tableLoading"
                 @on-selection-change="tabSelectChange" 
                 no-data-text="点击上方查询按钮查询对应数据"
                 ref="repertoryTable" style="width: 100%;" size="small">
@@ -82,127 +82,9 @@ export default {
         batchCode: "",
         supplierId: ""
       },
+      useBatchCode: true,
       tabData: [],
       tableLoading: false,
-      tabColumns: [
-        {
-          type: "selection",
-          width: 56
-        },
-        {
-          title: "商品名称",
-          key: "goodsName",
-          width: 200,
-          sortable: true
-        },
-        {
-          title: "品牌",
-          key: "brandName",
-          width: 150,
-          sortable: true,
-          render: (h, params) => {
-            return h(
-              "span",
-              params.row.goods.brandName ? params.row.goods.brandName : ""
-            );
-          }
-        },
-        {
-          title: "批次号",
-          key: "batchCode",
-          width: 140
-        },
-        {
-          title: "产地",
-          key: "origin",
-          width: 120,
-          render: (h, params) => {
-            return h(
-              "span",
-              params.row.goods.origin ? params.row.goods.origin : ""
-            );
-          }
-        },
-        {
-          title: "规格",
-          key: "goodsSpecs",
-          width: 120,
-          render: (h, params) => {
-            return h(goodsSpecTags, {
-              props: {
-                tags: params.row.goods.goodsSpecs
-                  ? params.row.goods.goodsSpecs
-                  : [],
-                color: "blue"
-              }
-            });
-          }
-        },
-        {
-          title: "生产企业",
-          key: "factoryName",
-          align: "center",
-          width: 120,
-          render: (h, params) => {
-            return h(
-              "span",
-              params.row.goods.factoryName ? params.row.goods.factoryName : ""
-            );
-          }
-        },
-        {
-          title: "供应商",
-          key: "supplierName",
-          width: 200
-        },
-        {
-          title: "单位",
-          key: "unitName",
-          width: 100,
-          render: (h, params) => {
-            return h(
-              "span",
-              params.row.goods.unitName ? params.row.goods.unitName : ""
-            );
-          }
-        },
-        {
-          title: "库存数量",
-          key: "quantity",
-          width: 120
-        },
-        {
-          title: "当前在单数",
-          key: "onWayQuantity",
-          width: 120
-        },
-        {
-          title: "有效期至",
-          key: "expDate",
-          width: 120,
-          render: (h, params) => {
-            return h(
-              "span",
-              params.row.expDate
-                ? moment(params.row.expDate).format("YYYY-MM-DD")
-                : ""
-            );
-          }
-        },
-        {
-          title: "生产日期",
-          key: "productDate",
-          width: 120,
-          render: (h, params) => {
-            return h(
-              "span",
-              params.row.productDate
-                ? moment(params.row.productDate).format("YYYY-MM-DD")
-                : ""
-            );
-          }
-        }
-      ],
       totalCount: 0,
       currentPage: 1,
       tableCurrPageSize: 50,
@@ -220,6 +102,132 @@ export default {
     }
   },
   computed: {
+    tabColumns() {
+      let tabColumns = [];
+      tabColumns.push({
+        type: "selection",
+        width: 60
+      });
+      tabColumns.push({
+        title: "商品名称",
+        key: "goodsName",
+        width: 200,
+        sortable: true
+      });
+      tabColumns.push({
+        title: "品牌",
+        key: "brandName",
+        width: 150,
+        sortable: true,
+        render: (h, params) => {
+          return h(
+            "span",
+            params.row.goods.brandName ? params.row.goods.brandName : ""
+          );
+        }
+      });
+      if (this.useBatchCode) {
+        tabColumns.push({
+          title: "批次号",
+          key: "batchCode",
+          width: 140
+        });
+      }
+      tabColumns.push({
+        title: "产地",
+        key: "origin",
+        width: 120,
+        render: (h, params) => {
+          return h(
+            "span",
+            params.row.goods.origin ? params.row.goods.origin : ""
+          );
+        }
+      });
+      tabColumns.push({
+        title: "规格",
+        key: "goodsSpecs",
+        width: 120,
+        render: (h, params) => {
+          return h(goodsSpecTags, {
+            props: {
+              tags: params.row.goods.goodsSpecs
+                ? params.row.goods.goodsSpecs
+                : [],
+              color: "blue"
+            }
+          });
+        }
+      });
+      tabColumns.push({
+        title: "生产企业",
+        key: "factoryName",
+        align: "center",
+        width: 120,
+        render: (h, params) => {
+          return h(
+            "span",
+            params.row.goods.factoryName ? params.row.goods.factoryName : ""
+          );
+        }
+      });
+      tabColumns.push({
+        title: "供应商",
+        key: "supplierName",
+        width: 200
+      });
+      tabColumns.push({
+        title: "单位",
+        key: "unitName",
+        width: 100,
+        render: (h, params) => {
+          return h(
+            "span",
+            params.row.goods.unitName ? params.row.goods.unitName : ""
+          );
+        }
+      });
+      tabColumns.push({
+        title: "库存数量",
+        key: "quantity",
+        width: 120
+      });
+      tabColumns.push({
+        title: "当前在单数",
+        key: "onWayQuantity",
+        width: 120
+      });
+      if (this.useBatchCode) {
+        tabColumns.push({
+          title: "有效期至",
+          key: "expDate",
+          width: 120,
+          render: (h, params) => {
+            return h(
+              "span",
+              params.row.expDate
+                ? moment(params.row.expDate).format("YYYY-MM-DD")
+                : ""
+            );
+          }
+        });
+        tabColumns.push({
+          title: "生产日期",
+          key: "productDate",
+          width: 120,
+          render: (h, params) => {
+            return h(
+              "span",
+              params.row.productDate
+                ? moment(params.row.productDate).format("YYYY-MM-DD")
+                : ""
+            );
+          }
+        });
+        return tabColumns;
+      }
+    },
+
     chooseGoods() {
       if (!this.tabCurrChooseList || this.tabCurrChooseList.length <= 0) {
         return "";
@@ -238,16 +246,23 @@ export default {
     }
   },
   methods: {
-    searchBtnClicked() {
+    searchBtnClicked(ubc) {
+      if (ubc != undefined) {
+        this.useBatchCode = ubc;
+      } else {
+        this.useBatchCode = true;
+      }
       let reqData = {
         warehouseId: this.warehouse.id,
         goodsId: this.formItem.goodsId,
         batchCode: this.formItem.batchCode,
         supplierId: this.formItem.supplierId,
         minQuantity: 0,
+        useBatchCode: this.useBatchCode,
         page: this.currentPage,
         size: this.tableCurrPageSize
       };
+
       this.tableLoading = true;
       util.ajax
         .post("/repertory/select", reqData)
@@ -276,9 +291,4 @@ export default {
 };
 </script>
 
-<style >
-.ivu-form-item {
-  margin-bottom: 5px;
-}
-</style>
 

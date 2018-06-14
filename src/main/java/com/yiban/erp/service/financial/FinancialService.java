@@ -737,31 +737,6 @@ public class FinancialService {
                     offsetReq.getPreRecordId(), offsetReq.getBizType());
             throw new BizException(ErrorCode.FINANCIAL_PRE_STATUS_CANNOT_OFFSET);
         }
-        FinancialFlow refFlow = null;
-        if (StringUtils.isNotBlank(offsetReq.getRefBizNo())) {
-            //如果关联的流水号存在，需要验证对应流水是否存在，如果不存在，不能继续
-            refFlow = financialFlowMapper.getByFinancialBizNo(offsetReq.getRefBizNo());
-            if (refFlow == null) {
-                logger.warn("get financial flow fail by bizNo:{}", offsetReq.getRefBizNo());
-                throw new BizException(ErrorCode.FINANCIAL_OFFSET_REF_BIZNO_ERROR);
-            }
-            //如果关联的流水对应用户不是预收款的用户，不能做冲销交易
-            if (isPrePaidType) {
-                if (!FinancialReq.CUST_SUPPLIER.equalsIgnoreCase(refFlow.getCustType()) ||
-                        !refFlow.getCustId().equals(preRecord.getCustId())) {
-                    logger.warn("pre paid custId and refFlow custId must be equals. refFlowId:{}, preRecordId:{}",
-                            refFlow.getId(), preRecord.getId());
-                    throw new BizException(ErrorCode.FINANCIAL_CUST_MUST_SAME);
-                }
-            } else {
-                if (!FinancialReq.CUST_CUSTOMER.equalsIgnoreCase(refFlow.getCustType()) ||
-                        !refFlow.getCustId().equals(preRecord.getCustId())) {
-                    logger.warn("pre paid custId and refFlow custId must be equals. refFlowId:{}, preRecordId:{}",
-                            refFlow.getId(), preRecord.getId());
-                    throw new BizException(ErrorCode.FINANCIAL_CUST_MUST_SAME);
-                }
-            }
-        }
         //造一个请求新建冲销流水的请求体
         FinancialReq financialReq = new FinancialReq();
         financialReq.setCompanyId(preRecord.getCompanyId());
@@ -775,22 +750,20 @@ public class FinancialService {
             financialReq.setCustId(preRecord.getCustId());
             financialReq.setLogAccount(preRecord.getCustName());
             financialReq.setCustAccount(preRecord.getCustAccount());
-            keyWord = "预付款" + preRecord.getBizNo() + "冲销";
+            keyWord = "预付款冲销";
         } else {
             financialReq.setCustType(FinancialReq.CUST_CUSTOMER);
             financialReq.setCustId(preRecord.getCustId());
             financialReq.setLogAccount(preRecord.getCustName());
             financialReq.setCustAccount(preRecord.getCustAccount());
-            keyWord = "预付款" + preRecord.getBizNo() + "冲销";
+            keyWord = "预付款冲销";
         }
         if (StringUtils.isNotBlank(offsetReq.getKeyWord())) {
-            keyWord = keyWord + ", " + offsetReq.getKeyWord();
+            keyWord = keyWord + ", " + offsetReq.getKeyWord(); //如果上传的记录中存在, 串接在一起
         }
         financialReq.setKeyWord(keyWord);
-        if (refFlow != null) {
-            financialReq.setBizRefId(refFlow.getId());
-            financialReq.setBizRefNo(refFlow.getBizNo());
-        }
+        financialReq.setBizRefId(preRecord.getFlowId());//记录预收款/预付款流水作为关联流水
+        financialReq.setBizRefNo(preRecord.getBizNo());
         logger.info("request add offset flow record by:{}", JSON.toJSONString(financialReq));
         FinancialFlow offsetFlow = doFinancialRecord(financialReq);
         if (offsetFlow == null || offsetFlow.getId() == null) {

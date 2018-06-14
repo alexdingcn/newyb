@@ -119,6 +119,7 @@
                       商品信息
                       <ButtonGroup size="small">
                           <Button type="primary" :disabled="!sellOrderFormData.warehouseId || !sellOrderFormData.customerId"  @click="addGoodBtnClick">添加商品</Button>
+                          <Button type="ghost" :disabled="!sellOrderFormData.warehouseId || !sellOrderFormData.customerId"  @click="addGoodInfoBtnClick">添加商品(没有批号)</Button>
                       </ButtonGroup>
                   </h3>
                   <Table border highlight-row :loading="saveGoodBtnLoading"
@@ -1143,6 +1144,19 @@ export default {
       this.$refs.repertorySelect.searchBtnClicked();
       this.selectRepertoryModal = true;
     },
+
+    addGoodInfoBtnClick() {
+      if (
+        !this.sellOrderFormData.warehouseId ||
+        this.sellOrderFormData.warehouseId <= 0
+      ) {
+        this.$Message.warning("请先选择对应仓库点");
+        return;
+      }
+      this.$refs.repertorySelect.searchBtnClicked(false);
+      this.selectRepertoryModal = true;
+    },
+
     onGoodsInfoChoosed(repertoryList) {
       this.selectRepertoryModal = false;
       if (!repertoryList || repertoryList.length <= 0) {

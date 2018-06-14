@@ -423,18 +423,20 @@
         </if>
     </select>
 
-
     <select id="queryCountGroupByGoods" resultType="java.lang.Integer" parameterType="com.yiban.erp.dto.RepertorySelectQuery">
-        select count(1)
+        select count(1) from
+        (
+        select r.warehouse_id, gi.id, r.supplier_id, r.factory_id
         from repertory_info r
-            left join supplier s on r.supplier_id = s.id
-            left join warehouse w on r.warehouse_id = w.id
-            , goods_detail gd, goods_info gi
+        left join supplier s on r.supplier_id = s.idl
+        left join warehouse w on r.warehouse_id = w.id
+        , goods_detail gd, goods_info gi
         where gd.id = r.goods_id and gi.id = gd.goods_info_id
-        <if test="warehouseId != null" >
+        and r.company_id = #{companyId}
+        <if test="warehouseId != null">
             and r.warehouse_id = #{warehouseId}
         </if>
-        <if test="goodsId != null" >
+        <if test="goodsId != null">a
             and r.goods_id = #{goodsId}
         </if>
         <if test="supplierId != null">
@@ -444,14 +446,11 @@
             <bind name="pattern" value="'%' + batchCode + '%'"/>
             and r.batch_code like #{pattern}
         </if>
-        <if test="minQuantity != null" >
+        <if test="minQuantity != null">
             and r.quantity > #{minQuantity}
         </if>
         group by r.warehouse_id, gi.id, r.supplier_id, r.factory_id
-        order by gi.id
-        <if test="byPage != null and offset != null and limit != null">
-            limit #{offset}, #{limit}
-        </if>
+        ) a
     </select>
 
     <select id="queryListGroupByGoods" resultMap="BaseResultMap" parameterType="com.yiban.erp.dto.RepertorySelectQuery">
@@ -468,6 +467,7 @@
             left join warehouse w on r.warehouse_id = w.id
         , goods_detail gd, goods_info gi
         where gd.id = r.goods_id and gi.id = gd.goods_info_id
+        and r.company_id = #{companyId}
         <if test="warehouseId != null" >
             and r.warehouse_id = #{warehouseId}
         </if>

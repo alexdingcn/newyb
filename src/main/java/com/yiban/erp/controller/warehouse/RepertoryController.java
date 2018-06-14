@@ -6,7 +6,6 @@ import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.yiban.erp.dao.RepertoryInfoMapper;
 import com.yiban.erp.dto.RepertoryQuery;
 import com.yiban.erp.dto.RepertorySelectQuery;
-import com.yiban.erp.entities.GoodsAttributeRef;
 import com.yiban.erp.entities.RepertoryInfo;
 import com.yiban.erp.entities.User;
 import com.yiban.erp.service.warehouse.RepertoryService;
@@ -16,7 +15,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -48,12 +50,22 @@ public class RepertoryController {
 
         query.setCompanyId(user.getCompanyId());
         query.setByPage(true);
-        Integer count = repertoryInfoMapper.querySelectCount(query);
+        Integer count = 0;
+        if (query.isUseBatchCode()) {
+            count = repertoryInfoMapper.querySelectCount(query);
+        } else {
+            count = repertoryInfoMapper.queryCountGroupByGoods(query);
+        }
+
         List<RepertoryInfo> infos = new ArrayList<>();
         if (count == null || count <= 0) {
             count = 0;
         } else {
-            infos = repertoryService.querySelectList(query);
+            if (query.isUseBatchCode()) {
+                infos = repertoryService.querySelectList(query);
+            } else {
+                infos = repertoryService.queryListGroupByGoods(query);
+            }
         }
         JSONObject response = new JSONObject();
         response.put("count", count);
