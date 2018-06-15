@@ -15,28 +15,48 @@
         <Row >
             <Form ref="searchForm" :model="searchFormItem" :label-width="65" class="sellOrderQueryForm">
                 <Row type="flex">
-                    <i-col span="6" >
+                    <i-col span="5" >
                         <FormItem label="客户">
                             <customer-select v-model="searchFormItem.customerId" ></customer-select>
                         </FormItem>
                     </i-col>
-                    <i-col span="6" >
+
+
+                    <i-col span="5" >
                         <FormItem label="制单日期">
                             <DatePicker v-model="dateRange" type="daterange" placement="bottom-start" placeholder="制单日期" style="width:200px"></DatePicker>
                         </FormItem>
                     </i-col>
-
                     <i-col span="5" >
                         <FormItem label="销售单号">
                             <Input type="text" v-model="searchFormItem.orderNumber" />
                         </FormItem>
                     </i-col>
-                    <i-col span="5" >
+
+                    <i-col span="4" >
                         <FormItem label="销售员" >
                             <sale-select v-model="searchFormItem.saleId"></sale-select>
                         </FormItem>
                     </i-col>
-
+                    <i-col span="4" >
+                        <FormItem label="来源" >
+                            <warehouse-select v-model="searchFormItem.warehouseId"></warehouse-select>
+                        </FormItem>
+                    </i-col>
+                    <i-col span="5" >
+                        <FormItem label="状态" >
+                            <Select v-model="searchFormItem.status" placeholder="销售订单状态" filterable clearable :disabled="disabled">
+                                <Option v-for="option in statusOptions" :value="option.key" :label="option.name" :key="option.key">{{option.name}}</Option>
+                            </Select>
+                        </FormItem>
+                    </i-col>
+                    <i-col span="5" >
+                        <FormItem label="是否开票" >
+                            <Select v-model="searchFormItem.billStatus" placeholder="是否开票" filterable clearable :disabled="disabled">
+                                <Option v-for="option in BillOptions" :value="option.key" :label="option.name" :key="option.key">{{option.name}}</Option>
+                            </Select>
+                        </FormItem>
+                    </i-col>
                 </Row>
             </Form>
         </Row>
@@ -76,6 +96,7 @@ import sellOrderPayment from "./sell-order-payment.vue";
 import customerSelect from "@/views/selector/customer-select.vue";
 import saleSelect from "@/views/selector/sale-select.vue";
 import actionButton from "@/views/my-components/action-button.vue";
+import warehouseSelect from "@/views/selector/warehouse-select.vue";
 
 export default {
   name: "sell-order-all",
@@ -85,6 +106,7 @@ export default {
     sellOrderPayment,
     customerSelect,
     saleSelect,
+    warehouseSelect,
     actionButton
   },
 
@@ -159,8 +181,34 @@ export default {
         label
       );
     };
-
+      const stautsInvoice = function(h, status) {
+          let label = "";
+          let color = "";
+          switch (status) {
+              case "FINISH":
+                  label = "已开票";
+                  color = "#19be6b";
+                  break;
+              default:
+                  label = "未开票";
+                  color = "#ff9900";
+                  break;
+          }
+          return h(
+              "Tag",
+              {
+                  props: {
+                      color: color
+                  }
+              },
+              label
+          );
+      };
     return {
+        statusOptions: [{key: 'TEMP_STORAGE', name: '制单暂存'}, {key: 'INIT', name: '制单初始'}, {key: 'QUALITY_CHECKED', name: '质量审核完成'},
+            {key: 'QUALITY_REJECT', name: '质审拒绝'},{key: 'SALE_CHECKED', name: '销售审核完成'}
+        ],
+        BillOptions:[{key: 'hasBill', name: '已开票'}, {key: 'noBill', name: '未开票'}],
       searchFormItem: {
         customerId: this.$route.query.customer_id
           ? this.$route.query.customer_id.toString()
@@ -287,6 +335,14 @@ export default {
             );
           }
         },
+          {
+              title: "是否开票",
+              key: "billStatus",
+              width: 150,
+              render: (h, params) => {
+                  return stautsInvoice(h, params.row.billStatus);
+              }
+          },
         {
           title: "总计金额",
           key: "totalAmount",
@@ -401,6 +457,9 @@ export default {
         customerId: this.searchFormItem.customerId,
         orderNumber: this.searchFormItem.orderNumber,
         saleId: this.searchFormItem.saleId,
+        warehouseId:this.searchFormItem.warehouseId,
+        status:this.searchFormItem.status,
+        billStatus:this.searchFormItem.billStatus,
         page: this.currentPage,
         size: this.pageSize
       };

@@ -7,6 +7,10 @@
     <result column="order_number" property="orderNumber" jdbcType="VARCHAR" />
     <result column="ref_no" property="refNo" jdbcType="VARCHAR" />
     <result column="status" property="status" jdbcType="VARCHAR" />
+    <result column="bill_status" property="billStatus" jdbcType="VARCHAR" />
+    <result column="bill_type" property="billType" jdbcType="INTEGER" />
+    <result column="tax_rate" property="taxRate" jdbcType="DECIMAL" />
+    <result column="invoice_title" property="invoiceTitle" jdbcType="VARCHAR" />
     <result column="customer_id" property="customerId" jdbcType="BIGINT" />
     <result column="customer_rep_id" property="customerRepId" jdbcType="INTEGER" />
     <result column="sale_id" property="saleId" jdbcType="BIGINT" />
@@ -31,7 +35,7 @@
     <result column="paid_amount" property="paidAmount" jdbcType="DECIMAL" />
   </resultMap>
   <sql id="Base_Column_List" >
-    id, company_id, order_number, ref_no, status, customer_id, customer_rep_id, sale_id,
+    id, company_id, order_number, ref_no, status, bill_status,bill_type,tax_rate,invoice_title,customer_id, customer_rep_id, sale_id,
     temper_control_id, create_order_date, take_goods_user, pay_order_date, mark_up_rate,
     ship_method, ship_tool, ship_company_id, comment, create_by, create_time,
     update_by, update_time, warehouse_id, total_quantity, total_amount, free_amount, dis_rate, paid_amount
@@ -50,7 +54,7 @@
   </delete>
   <insert id="insert" parameterType="com.yiban.erp.entities.SellOrder" keyProperty="id" useGeneratedKeys="true" >
     insert into sell_order (company_id, order_number,
-      ref_no, status, customer_id, 
+      ref_no, status,bill_status,bill_type,tax_rate,invoice_title, customer_id,
       customer_rep_id, sale_id, temper_control_id,
       create_order_date, take_goods_user, pay_order_date,
       mark_up_rate, ship_method, ship_tool, ship_company_id,
@@ -58,7 +62,9 @@
       update_by, update_time, warehouse_id, total_quantity, total_amount,
       free_amount, dis_rate, paid_amount)
     values (#{companyId,jdbcType=INTEGER}, #{orderNumber,jdbcType=VARCHAR},
-      #{refNo,jdbcType=VARCHAR}, #{status,jdbcType=VARCHAR}, #{customerId,jdbcType=BIGINT},
+      #{refNo,jdbcType=VARCHAR}, #{status,jdbcType=VARCHAR},   #{billStatus,jdbcType=VARCHAR},
+      #{billType,jdbcType=INTEGER},#{taxRate,jdbcType=DECIMAL},#{invoiceTitle,jdbcType=VARCHAR},
+       #{customerId,jdbcType=BIGINT},
       #{customerRepId,jdbcType=INTEGER}, #{saleId,jdbcType=BIGINT}, #{temperControlId,jdbcType=BIGINT},
       #{createOrderDate,jdbcType=DATE}, #{takeGoodsUser,jdbcType=VARCHAR}, #{payOrderDate,jdbcType=DATE},
       #{markUpRate,jdbcType=DECIMAL}, #{shipMethod,jdbcType=BIGINT},
@@ -86,6 +92,20 @@
       <if test="status != null" >
         status = #{status,jdbcType=VARCHAR},
       </if>
+
+      <if test="billStatus != null" >
+        bill_status = #{billStatus,jdbcType=VARCHAR},
+      </if>
+      <if test="billType != null" >
+        bill_type = #{billType,jdbcType=INTEGER},
+      </if>
+      <if test="taxRate != null" >
+        tax_rate = #{taxRate,jdbcType=DECIMAL},
+      </if>
+      <if test="invoiceTitle != null" >
+        invoice_title = #{invoiceTitle,jdbcType=VARCHAR},
+      </if>
+
       <if test="customerId != null" >
         customer_id = #{customerId,jdbcType=BIGINT},
       </if>
@@ -187,6 +207,11 @@
     <result column="order_number" property="orderNumber" jdbcType="VARCHAR" />
     <result column="ref_no" property="refNo" jdbcType="VARCHAR" />
     <result column="status" property="status" jdbcType="VARCHAR" />
+    <result column="bill_status" property="billStatus" jdbcType="VARCHAR" />
+    <result column="bill_type" property="billType" jdbcType="INTEGER" />
+    <result column="tax_rate" property="taxRate" jdbcType="DECIMAL" />
+    <result column="invoice_title" property="invoiceTitle" jdbcType="VARCHAR" />
+
     <result column="customer_id" property="customerId" jdbcType="BIGINT" />
     <result column="customer_rep_id" property="customerRepId" jdbcType="INTEGER" />
     <result column="sale_id" property="saleId" jdbcType="BIGINT" />
@@ -228,7 +253,7 @@
   </resultMap>
 
   <sql id="ListColumn" >
-    s.id, s.company_id, s.order_number, s.ref_no, s.status, s.customer_id, s.customer_rep_id, s.sale_id,
+    s.id, s.company_id, s.order_number, s.ref_no, s.status,s.bill_status,s.bill_type,s.tax_rate,s.invoice_title, s.customer_id, s.customer_rep_id, s.sale_id,
     s.temper_control_id, s.create_order_date, s.take_goods_user, s.pay_order_date, s.mark_up_rate,
     s.ship_method, s.ship_tool, s.ship_company_id, s.comment, s.create_by, s.create_time,
     s.update_by, s.update_time, s.warehouse_id, s.total_quantity, s.total_amount,
@@ -271,6 +296,12 @@
     <if test="status != null" >
       and s.status = #{status}
     </if>
+    <if test="billStatus != null" >
+      and s.bill_status = #{billStatus}
+    </if>
+    <if test="warehouseId != null" >
+      and s.warehouse_id = #{warehouseId}
+    </if>
     <if test="refNo != null">
       <bind name="refNoVal" value="refNo + '%'"/>
       and s.ref_no like #{refNoVal}
@@ -291,6 +322,12 @@
     where s.company_id = #{companyId} and s.status != 'DELETE'
     <if test="status != null" >
       and s.status = #{status}
+    </if>
+    <if test="billStatus != null" >
+      and s.bill_status = #{billStatus}
+    </if>
+    <if test="warehouseId != null" >
+      and s.warehouse_id = #{warehouseId}
     </if>
     <if test="customerId != null" >
       and s.customer_id = #{customerId}
@@ -321,6 +358,13 @@
       <if test="status != null" >
         and s.status = #{status}
       </if>
+    <if test="billStatus != null" >
+      and s.bill_status = #{billStatus}
+    </if>
+    <if test="warehouseId != null" >
+      and s.warehouse_id = #{warehouseId}
+    </if>
+
       <if test="customerId != null" >
         and s.customer_id = #{customerId}
       </if>
