@@ -237,6 +237,35 @@
                       </i-col>
                     </Row>
                   </TabPane>
+                  <TabPane label="开票信息" name="taxInfo" :disabled="!formItem.id">
+                    <Row type="flex" justify="start">
+                      <i-col span="8">
+                        <FormItem label="是否开票" >
+                            <Checkbox v-model="formItem.invoice"></Checkbox>
+                        </FormItem>
+                      </i-col>
+                        <i-col span="8">
+                            <FormItem label="发票类型" >
+                              <option-select optionType="BILL_TYPE" v-model="formItem.billType" ></option-select>
+                            </FormItem>
+                        </i-col>
+
+                    </Row>
+                    <Row type="flex" justify="start">
+                        <i-col span="8">
+                            <FormItem label="开票税率" >
+                                <Input type="text" v-model="formItem.taxRate" />
+                            </FormItem>
+                        </i-col>
+
+                        <i-col span="8">
+                        <FormItem label="发票抬头" >
+                          <Input type="text"  v-model="formItem.invoiceTitle" />
+                        </FormItem>
+                      </i-col>
+                    </Row>
+
+                  </TabPane>
                   <TabPane label="地址信息" name="repInfo" :disabled="!formItem.id" icon="android-pin">
                     <Row type="flex" justify="start">
                         <ButtonGroup v-if="!isReadOnly" size="small" >

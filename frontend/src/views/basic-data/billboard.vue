@@ -6,11 +6,6 @@
                     <p slot="title">
                         <Icon type="person-stalker"></Icon> 公告列表
                     </p>
-                    <div slot="extra">
-                        <ButtonGroup size="small" >
-                            <Button type="primary" icon="levels" @click="modal2 = true">自定义排序</Button>
-                        </ButtonGroup>
-                    </div>
                     <Modal :visible.sync="modal2" width="360">
                         <p slot="header" style="color:#f60;text-align:center">
                             <Icon type="information-circled"></Icon>
@@ -59,11 +54,6 @@
                 </Card>
             </i-col>
         </Row>
-        <Modal v-model="modal2" width="400" okText= '保存' on-ok="sort" on-cancel="cancel" cancelText='取消'>
-            <Table ref="modal2Tab"  size="small" highlight-row height="300"
-                :columns="modal2Columns" :data="modal2List">
-            </Table>
-        </Modal>
     </div>   
 </template>
 
@@ -76,15 +66,11 @@ export default {
   data() {
     return {
       billboardList: [],
-      modal2List:[],
       billboardForm: {},
       enable: true,
       currData: [],
-      modal2: false,
       billboardFormRule: {
-        title: [
-          { required: true, message: "请输入标题", trigger: "blur" }
-        ],
+        title: [{ required: true, message: "请输入标题", trigger: "blur" }],
         content: [
           { required: true, message: "请输入公告内容", trigger: "blur" }
         ]
@@ -93,7 +79,33 @@ export default {
         {
           title: "序号",
           key: "number",
-          align: "center"
+          align: "center",
+          render: (h, params) => {
+            let self = this;
+            let number = params.row.number;
+            return h("Input", {
+              props: {
+                value: number
+              },
+              style: {
+                width: "100%"
+              },
+              on: {
+                "on-blur"(event) {
+                  let row = self.billboardList[params.index];
+                  let oldValue = row.number;
+                  let newValue = event.target.value;
+                  row[params.column.key] = event.target.value;
+                  if (newValue < 0 || isNaN(newValue)) {
+                    row[params.column.key] = 0;
+                  }
+                  if (oldValue !== newValue && !isNaN(newValue)) {
+                    self.sort(row.id, newValue);
+                  }
+                }
+              }
+            });
+          }
         },
         {
           title: "标题",
@@ -132,31 +144,6 @@ export default {
           }
         }
       ],
-      modal2Columns:[
-          {
-          title: "序号",
-          key: "number",
-          align: "center",
-          render: (h,params) => {
-              let number = params.row.number;
-              return h(
-                  "Input",
-                  {
-                      props: {
-                            value: number,
-                        }
-                  }
-              )
-              
-          },
-          
-        },
-        {
-          title: "标题",
-          key: "title",
-          align: "center"
-        },
-      ]
     };
   },
   mounted() {
@@ -197,17 +184,16 @@ export default {
       });
     },
     save() {
-        if(!this.billboardForm.title){
-            this.$Message.warning("请输入标题后再进行保存！");
-            return;
-            
-        }else if(!this.billboardForm.status){
-            this.$Message.warning("请选择状态后再进行保存！");
-            return ;
-        }else if(!this.billboardForm.content){
-            this.$Message.warning("请输入公告内容后再进行保存！");
-            return ;
-        }
+      if (!this.billboardForm.title) {
+        this.$Message.warning("请输入标题后再进行保存！");
+        return;
+      } else if (this.billboardForm.status == null) {
+        this.$Message.warning("请选择状态后再进行保存！");
+        return;
+      } else if (!this.billboardForm.content) {
+        this.$Message.warning("请输入公告内容后再进行保存！");
+        return;
+      }
       if (this.billboardForm.id == null) {
         this.insert();
       } else {
@@ -219,7 +205,7 @@ export default {
         .get("/billboard/getList")
         .then(response => {
           this.billboardList = response.data.data;
-          this.modal2List = response.data.data;
+
         })
         .catch(error => {
           util.errorProcessor(self, error);
@@ -257,24 +243,24 @@ export default {
           util.errorProcessor(this, error);
         });
     },
-    sort(){
-        console.log("dianjileok");
-        util.ajax
-        .put("/billboard/sort", this.modal2List)
+    sort(id,number) {
+      let reqData = {
+        Id: id,
+        Number:number
+      };
+      util.ajax
+        .get("/billboard/sort", {params: reqData})
         .then(response => {
-            if(response.status == 200){
-                this.$Message.success("公告排序完成！");
-            }
-            this.getList();
-            this.init();
+          if (response.status == 200) {
+            this.$Message.success("公告序号修改完成！");
+          }
+          this.getList();
+          this.init();
         })
         .catch(error => {
-            util.errorProcessor(this, error);
-        })
+          util.errorProcessor(this, error);
+        });
     },
-    cancel(){
-        this.modal2List = this.billboardList;
-    }
   }
 };
 </script>

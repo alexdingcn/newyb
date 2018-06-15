@@ -101,6 +101,14 @@ public class Customer {
 
     private BigDecimal accountAmount;
 
+    private Boolean  isInvoice;
+
+    private BigDecimal  taxRate;
+
+    private Integer  billType;
+
+    private String  invoiceTitle;
+
     private CustomerCategory customerCategory; //客户分类信息
 
     private List<CustomerRep> customerReps; //客户代表人信息列表
@@ -498,5 +506,37 @@ public class Customer {
 
     public void setCategoryName(String categoryName) {
         this.categoryName = categoryName;
+    }
+
+    public Boolean getInvoice() {
+        return isInvoice;
+    }
+
+    public void setInvoice(Boolean invoice) {
+        isInvoice = invoice;
+    }
+
+    public BigDecimal getTaxRate() {
+        return taxRate;
+    }
+
+    public void setTaxRate(BigDecimal taxRate) {
+        this.taxRate = taxRate;
+    }
+
+    public Integer getBillType() {
+        return billType;
+    }
+
+    public void setBillType(Integer billType) {
+        this.billType = billType;
+    }
+
+    public String getInvoiceTitle() {
+        return invoiceTitle;
+    }
+
+    public void setInvoiceTitle(String invoiceTitle) {
+        this.invoiceTitle = invoiceTitle;
     }
 }

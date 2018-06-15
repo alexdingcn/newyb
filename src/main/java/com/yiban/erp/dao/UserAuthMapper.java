@@ -5,6 +5,7 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.Date;
+import java.util.List;
 
 @Mapper
 public interface UserAuthMapper {
@@ -35,4 +36,6 @@ public interface UserAuthMapper {
                        @Param("updatedTime")Date updatedTime);
 
     int deleteByUserId(Long userId);
+
+    List<UserAuth> findByUserId(Long userId);
 }

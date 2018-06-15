@@ -70,9 +70,10 @@ public class BillboardController {
         return ResponseEntity.badRequest().body(ErrorCode.FAILED_DELETE_FROM_DB.toString());
     }
 
-    @RequestMapping(value = "/sort", method = RequestMethod.PUT,produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> sort(@RequestBody Billboard billboard){
-        int result = billboardService.sort(billboard);
+    @RequestMapping(value = "/sort", method = RequestMethod.GET,produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> sort(@RequestParam (value = "Id") int id,
+                                       @RequestParam (value = "Number") int number){
+        int result = billboardService.sort(id,number);
         if (result > 0) {
             return ResponseEntity.ok().build();
         }
