@@ -45,6 +45,10 @@
     <result column="create_by" property="createBy" jdbcType="VARCHAR" />
     <result column="update_by" property="updateBy" jdbcType="VARCHAR" />
     <result column="account_amount" property="accountAmount" jdbcType="DECIMAL" />
+    <result column="is_invoice" property="isInvoice" jdbcType="BIT" />
+    <result column="tax_rate" property="taxRate" jdbcType="DECIMAL" />
+    <result column="bill_type" property="billType" jdbcType="INTEGER" />
+    <result column="invoice_title" property="invoiceTitle" jdbcType="VARCHAR" />
   </resultMap>
   <sql id="Base_Column_List" >
     id, company_id, customer_no, category_id, name, pinyin, status, enabled, can_sale_special,
@@ -52,7 +56,7 @@
     contact_phone, contact_fax, email, is_direction, sale_area, sale_man, member_level,
     class_att_one, class_att_two, stamp_template, bill_template,is_cold_business, is_two_ticket, business_scope, account_term,
     account_name, bank_account, bank_name, tax_account, qua_check, file_no, supervise_no, comment, create_time,
-    update_time, create_by, update_by, account_amount
+    update_time, create_by, update_by, account_amount,is_invoice,tax_rate,bill_type,invoice_title
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
     select 
@@ -77,7 +81,7 @@
       account_term, account_name, bank_account,
       bank_name, tax_account, qua_check, file_no, supervise_no,
       comment, create_time, update_time, 
-      create_by, update_by, account_amount)
+      create_by, update_by, account_amount,is_invoice,tax_rate,bill_type,invoice_title)
     values (#{companyId,jdbcType=INTEGER}, #{customerNo,jdbcType=VARCHAR}, #{categoryId,jdbcType=INTEGER},
       #{name,jdbcType=VARCHAR}, #{pinyin,jdbcType=VARCHAR}, #{status,jdbcType=VARCHAR},
       #{enabled,jdbcType=BIT}, #{canSaleSpecial,jdbcType=BIT}, #{isLimitSpecial,jdbcType=BIT},
@@ -92,7 +96,9 @@
       #{bankName,jdbcType=VARCHAR}, #{taxAccount,jdbcType=VARCHAR},
       #{quaCheck,jdbcType=VARCHAR}, #{fileNo,jdbcType=VARCHAR}, #{superviseNo,jdbcType=VARCHAR},
       #{comment,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, 
-      #{createBy,jdbcType=VARCHAR}, #{updateBy,jdbcType=VARCHAR}, #{accountAmount,jdbcType=DECIMAL})
+      #{createBy,jdbcType=VARCHAR}, #{updateBy,jdbcType=VARCHAR}, #{accountAmount,jdbcType=DECIMAL},
+      #{isInvoice,jdbcType=BIT}, #{taxRate,jdbcType=DECIMAL}, #{billType,jdbcType=INTEGER}, #{invoiceTitle,jdbcType=VARCHAR}
+      )
   </insert>
 
   <update id="updateByPrimaryKeySelective" parameterType="com.yiban.erp.entities.Customer" >
@@ -218,6 +224,19 @@
       <if test="updateBy != null" >
         update_by = #{updateBy,jdbcType=VARCHAR},
       </if>
+
+      <if test="isInvoice != null" >
+        is_invoice = #{isInvoice,jdbcType=BIT},
+      </if>
+      <if test="taxRate != null" >
+        tax_rate = #{taxRate,jdbcType=DECIMAL},
+      </if>
+      <if test="billType != null" >
+        bill_type = #{billType,jdbcType=INTEGER},
+      </if>
+      <if test="invoiceTitle != null" >
+        invoice_title = #{invoiceTitle,jdbcType=VARCHAR},
+      </if>
     </set>
     where id = #{id,jdbcType=BIGINT}
   </update>
@@ -267,6 +286,12 @@
     <result column="create_by" property="createBy" jdbcType="VARCHAR" />
     <result column="update_by" property="updateBy" jdbcType="VARCHAR" />
     <result column="account_amount" property="accountAmount" jdbcType="DECIMAL"/>
+
+    <result column="is_invoice" property="isInvoice" jdbcType="BIT" />
+    <result column="tax_rate" property="taxRate" jdbcType="DECIMAL" />
+    <result column="bill_type" property="billType" jdbcType="INTEGER" />
+    <result column="invoice_title" property="invoiceTitle" jdbcType="VARCHAR" />
+
     <association property="customerCategory" javaType="com.yiban.erp.entities.CustomerCategory">
       <id column="category_id" property="id" jdbcType="INTEGER" />
       <result column="company_id" property="companyId" jdbcType="INTEGER" />
@@ -301,6 +326,7 @@
     t1.account_name, t1.bank_account, t1.bank_name, t1.tax_account,
     t1.qua_check, t1.file_no, t1.supervise_no, t1.comment, t1.create_time,
     t1.update_time, t1.create_by, t1.update_by, t1.account_amount,
+    t1.is_invoice,t1.tax_rate,t1.bill_type,t1.invoice_title,
     t2.name as cat_name, t2.parent_id, t2.sequence_no, t2.comment as cat_comment,
     t4.id as rep_id, t4.customer_id as rep_customer_id, t4.name as rep_name,
     t4.contact_phone as rep_contact_phone, t4.repertory_address as rep_repertory_address,

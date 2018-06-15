@@ -17,6 +17,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.*;
 
 @Service
@@ -62,6 +63,21 @@ public class RepertoryService {
             repertoryQuery.setSaleState(null);
         }
         List<RepertoryInfo> rlist = repertoryInfoMapper.queryRepertoryPage(repertoryQuery);
+        //计算汇总信息
+        BigDecimal storeAmount=new BigDecimal(0);
+        BigDecimal storeMoney=new BigDecimal(0);
+        BigDecimal storeTaxMoney=new BigDecimal(0);
+        BigDecimal storeProfitMoney=new BigDecimal(0);
+
+            for(RepertoryInfo rinfo:rlist){
+                if(rinfo.getQuantity()!=null ){
+                    storeAmount=storeAmount.add(rinfo.getQuantity());
+                    if(rinfo.getBuyPrice()!=null){
+                        storeMoney=storeMoney.add(rinfo.getQuantity().multiply(rinfo.getBuyPrice()));
+                    }
+                }
+            }
+
         int count = 0;
         if (!rlist.isEmpty()) {
             count = repertoryInfoMapper.queryRepertoryCount(repertoryQuery);
@@ -69,6 +85,8 @@ public class RepertoryService {
         rlist = setGoodsToList(rlist);
         result.put("data", rlist);
         result.put("total", count);
+        result.put("storeAmount",storeAmount);
+        result.put("storeMoney",storeMoney);
         return result;
 
     }
