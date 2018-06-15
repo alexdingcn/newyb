@@ -59,9 +59,9 @@ public class SellOrderService {
     private SystemConfigService systemConfigService;
 
 
-
     /**
      * 主要验证销售客户是否配置了地域限制和销售限制，如果有，返回
+     *
      * @param order
      * @throws BizException
      */
@@ -113,7 +113,7 @@ public class SellOrderService {
             //地域限制
             if (customer.getPlaceCodes() != null && black.isInRegionsBlack(customer.getPlaceCodes())) {
                 //存在地域限制
-                String error = "商品“" + black.getGoodsName() + "”配置有对客户“"+ customer.getName() + "”的地域限制条件";
+                String error = "商品“" + black.getGoodsName() + "”配置有对客户“" + customer.getName() + "”的地域限制条件";
                 errorList.add(error);
             }
 
@@ -136,7 +136,7 @@ public class SellOrderService {
         List<GoodsInfo> goodsInfos = goodsService.getGoodsInfoListByIds(goodsInfoIds);
         boolean haveSpecial = false;
         boolean haveCold = false;
-        for (GoodsInfo goodsInfo: goodsInfos) {
+        for (GoodsInfo goodsInfo : goodsInfos) {
             if (Boolean.TRUE.equals(goodsInfo.getSpecialManage())) {
                 haveSpecial = true;
             }
@@ -227,7 +227,7 @@ public class SellOrderService {
             if (haveQAFlow) {
                 logger.info("have QA flow, status update to INIT");
                 sellOrder.setStatus(SellOrderStatus.INIT.name());
-            }else {
+            } else {
                 logger.info("have not QA flow, status update to QUALITY_CHECKED");
                 sellOrder.setStatus(SellOrderStatus.QUALITY_CHECKED.name());
             }
@@ -237,6 +237,10 @@ public class SellOrderService {
         BigDecimal totalQuantity = BigDecimal.ZERO;
         for (SellOrderDetail item : details) {
             totalQuantity = totalQuantity.add(item.getQuantity() == null ? BigDecimal.ZERO : item.getQuantity());
+
+            if (item.getRepertoryId() == null) {
+                // TODO:展开,先进先出
+            }
         }
 
         if (sellOrder.getId() == null) {
@@ -250,8 +254,10 @@ public class SellOrderService {
             sellOrder.setTotalQuantity(totalQuantity);
             sellOrder.setTotalAmount(sellOrder.getTotalAmount() == null ? BigDecimal.ZERO : sellOrder.getTotalAmount());
             sellOrder.setFreeAmount(sellOrder.getFreeAmount() == null ? BigDecimal.ZERO : sellOrder.getFreeAmount());
-            sellOrder.setDisRate(sellOrder.getDisRate() == null ? BigDecimal.valueOf(100.0): sellOrder.getDisRate());
+            sellOrder.setDisRate(sellOrder.getDisRate() == null ? BigDecimal.valueOf(100.0) : sellOrder.getDisRate());
+            // 保存销售订单
             int count = sellOrderMapper.insert(sellOrder);
+            // 保存销售订单详情
             if (count > 0 && sellOrder.getId() > 0) {
                 //保存详情信息
                 details.stream().forEach(item -> {
@@ -267,7 +273,7 @@ public class SellOrderService {
             sellOrder.setTotalQuantity(totalQuantity);
             sellOrder.setTotalAmount(sellOrder.getTotalAmount() == null ? BigDecimal.ZERO : sellOrder.getTotalAmount());
             sellOrder.setFreeAmount(sellOrder.getFreeAmount() == null ? BigDecimal.ZERO : sellOrder.getFreeAmount());
-            sellOrder.setDisRate(sellOrder.getDisRate() == null ? BigDecimal.valueOf(100.0): sellOrder.getDisRate());
+            sellOrder.setDisRate(sellOrder.getDisRate() == null ? BigDecimal.valueOf(100.0) : sellOrder.getDisRate());
             sellOrder.setUpdateTime(new Date());
             sellOrder.setUpdateBy(user.getNickname());
             int count = sellOrderMapper.updateByPrimaryKeySelective(sellOrder);
