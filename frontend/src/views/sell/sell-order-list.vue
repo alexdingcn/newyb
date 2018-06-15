@@ -45,14 +45,14 @@
                     </i-col>
                     <i-col span="5" >
                         <FormItem label="状态" >
-                            <Select v-model="searchFormItem.status" placeholder="销售订单状态" filterable clearable :disabled="disabled">
+                            <Select v-model="searchFormItem.status" placeholder="销售订单状态" filterable clearable>
                                 <Option v-for="option in statusOptions" :value="option.key" :label="option.name" :key="option.key">{{option.name}}</Option>
                             </Select>
                         </FormItem>
                     </i-col>
                     <i-col span="5" >
                         <FormItem label="是否开票" >
-                            <Select v-model="searchFormItem.billStatus" placeholder="是否开票" filterable clearable :disabled="disabled">
+                            <Select v-model="searchFormItem.billStatus" placeholder="是否开票" filterable clearable>
                                 <Option v-for="option in BillOptions" :value="option.key" :label="option.name" :key="option.key">{{option.name}}</Option>
                             </Select>
                         </FormItem>
@@ -208,7 +208,7 @@ export default {
         statusOptions: [{key: 'TEMP_STORAGE', name: '制单暂存'}, {key: 'INIT', name: '制单初始'}, {key: 'QUALITY_CHECKED', name: '质量审核完成'},
             {key: 'QUALITY_REJECT', name: '质审拒绝'},{key: 'SALE_CHECKED', name: '销售审核完成'}
         ],
-        BillOptions:[{key: 'hasBill', name: '已开票'}, {key: 'noBill', name: '未开票'}],
+        BillOptions:[{key: 'FINISH', name: '已开票'}, {key: 'INIT', name: '未开票'}],
       searchFormItem: {
         customerId: this.$route.query.customer_id
           ? this.$route.query.customer_id.toString()
@@ -458,11 +458,17 @@ export default {
         orderNumber: this.searchFormItem.orderNumber,
         saleId: this.searchFormItem.saleId,
         warehouseId:this.searchFormItem.warehouseId,
-        status:this.searchFormItem.status,
-        billStatus:this.searchFormItem.billStatus,
         page: this.currentPage,
         size: this.pageSize
       };
+
+        if(this.searchFormItem.billStatus!=null && this.searchFormItem.billStatus!=""){
+            reqData["billStatus"]=this.searchFormItem.billStatus;
+        }
+        if(this.searchFormItem.status!=null && this.searchFormItem.status!=""){
+            reqData["status"]=this.searchFormItem.status;
+        }
+
       reqData["startDate"] = this.dateRange[0];
       reqData["endDate"] = this.dateRange[1];
       this.searching = true;
