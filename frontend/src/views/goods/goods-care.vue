@@ -1,51 +1,29 @@
 
 <template>
-  <div>
-        <Row>
-            <i-col span="11">
-                <goodscarelist  ref="goodscarelist"  @choose-good="chooseGood"></goodscarelist >
-            </i-col>
-            <i-col span="11" style="margin-left: 50px;">
-                <Card>
-                    <p slot="title">
-                        <Icon type="person"></Icon>
-                        {{'商品养护'}}
-                    </p>
-                    <div slot="extra">
-                        <ButtonGroup size="small" >
-                            <Button type="success" icon="checkmark"  @click="save">保存</Button>
-                        </ButtonGroup>
-                    </div>
-                    <div>
-                        <Form ref="goodForm" :model="goodForm" :label-width="100">
-                            <FormItem label="商品名称：" prop="name" >
-                                <Input v-model="goodForm.name"  />
-                            </FormItem>
-                            <FormItem label="养护员：" prop="carePerson" >
-                                <Input  v-model="goodForm.carePerson" />
-                            </FormItem>
-                            <FormItem label="养护记录：" prop="careResult" >
-                                <Input  v-model="goodForm.careResult"/>
-                            </FormItem>
-                            <FormItem label="温度记录：" prop="temperature">
-                                <Input v-model="goodForm.temperature" />
-                            </FormItem>
-                            <FormItem  label="下次养护：" prop="xiayici" >
-                                <DatePicker type="date" placeholder="Select date" style="width: 200px"></DatePicker>
-                            </FormItem>
-                            <FormItem  prop="goodsId" v-show="false">
-                                <Input v-model="goodForm.goodsId" />
-                            </FormItem>
-                        </Form>
-                    </div>
-                </Card>
-                <card style="margin-top: 20px;">
-                    <div>
-                        <goodsCareRecord ref="carelist" ></goodsCareRecord>
-                    </div>
-                </card>
-            </i-col>
-        </Row>
+  <div>  
+        <Form ref="goodForm" :model="goodForm" :label-width="100">
+            <FormItem label="商品名称：" prop="name" >
+                <Input v-model="goodForm.name"  />
+            </FormItem>
+            <FormItem label="养护员：" prop="carePerson" >
+                <Input  v-model="goodForm.carePerson" />
+            </FormItem>
+            <FormItem label="养护记录：" prop="careResult" >
+                <Input  v-model="goodForm.careResult"/>
+            </FormItem>
+            <FormItem label="温度记录：" prop="temperature">
+                <Input v-model="goodForm.temperature" />
+            </FormItem>
+            <FormItem  label="下次养护：" prop="xiayici" >
+                <DatePicker type="date" placeholder="Select date" style="width: 200px"></DatePicker>
+            </FormItem>
+            <FormItem  prop="goodsId" v-show="false">
+                <Input v-model="goodForm.goodsId" />
+            </FormItem>
+        </Form>
+        <div slot="extra">
+            <Button  type="success" icon="checkmark"  @click="save">保存</Button>
+        </div>            
   </div>
 </template>
 
@@ -61,6 +39,7 @@ export default {
             currGood:{},
             goodForm: {},
             goodsId:'',
+            name:'',
         }
     },
     components: {
@@ -93,8 +72,7 @@ export default {
         }
     } ,
     watch:{
-        currGood(data) {
-            
+        currGood(data) {           
             if (data && data.id > 0) {
                 this.goodForm = {
                     name: data.name,
@@ -105,10 +83,3 @@ export default {
     }
 }
 </script>
-
-<style >
-.ivu-form-item {
-    margin-bottom: 20px;
-}
-
-</style>
