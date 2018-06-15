@@ -2,6 +2,7 @@ package com.yiban.erp.entities;
 
 import com.alibaba.fastjson.annotation.JSONField;
 import com.yiban.erp.constant.IdentifierType;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.Date;
 
@@ -83,7 +84,12 @@ public class User {
     }
 
     public String getNickname() {
-        return nickname;
+        //当用户名没有设置时，返回手机号
+        if (StringUtils.isNotBlank(nickname)) {
+            return nickname;
+        }else {
+            return mobile;
+        }
     }
 
     public void setNickname(String nickname) {

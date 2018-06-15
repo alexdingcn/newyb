@@ -132,7 +132,30 @@ export default {
         label
       );
     };
-
+      const stautsInvoice = function(h, status) {
+          let label = "";
+          let color = "";
+          switch (status) {
+              case "FINISH":
+                  label = "已开票";
+                  color = "#19be6b";
+                  break;
+              default:
+                  label = "未开票";
+                  color = "#ff9900";
+                  break;
+          }
+          return h(
+              "Tag",
+              {
+                  props: {
+                      type: "dot",
+                      color: color
+                  }
+              },
+              label
+          );
+      };
     return {
       statusOptions: [
         { key: "ALL", name: "所有" },
@@ -209,6 +232,14 @@ export default {
             return stautsShow(h, params.row.status);
           }
         },
+          {
+              title: "是否开票",
+              key: "billStatus",
+              width: 150,
+              render: (h, params) => {
+                  return stautsInvoice(h, params.row.billStatus);
+              }
+          },
         {
           title: "制单人",
           key: "createBy",

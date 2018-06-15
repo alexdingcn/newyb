@@ -14,6 +14,14 @@ public class SellOrder {
 
     private String status;
 
+    private String billStatus;
+
+    private Integer billType;
+
+    private BigDecimal taxRate;
+
+    private String  invoiceTitle;
+
     private Long customerId;
 
     private Integer customerRepId;
@@ -422,5 +430,37 @@ public class SellOrder {
 
     public void setPaidAmount(BigDecimal paidAmount) {
         this.paidAmount = paidAmount;
+    }
+
+    public String getBillStatus() {
+        return billStatus;
+    }
+
+    public void setBillStatus(String billStatus) {
+        this.billStatus = billStatus;
+    }
+
+    public Integer getBillType() {
+        return billType;
+    }
+
+    public void setBillType(Integer billType) {
+        this.billType = billType;
+    }
+
+    public BigDecimal getTaxRate() {
+        return taxRate;
+    }
+
+    public void setTaxRate(BigDecimal taxRate) {
+        this.taxRate = taxRate;
+    }
+
+    public String getInvoiceTitle() {
+        return invoiceTitle;
+    }
+
+    public void setInvoiceTitle(String invoiceTitle) {
+        this.invoiceTitle = invoiceTitle;
     }
 }

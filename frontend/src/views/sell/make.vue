@@ -59,9 +59,9 @@
                 </i-col>
               </Row>
 
-              <Form ref="sellOrderForm" :model="sellOrderFormData" :label-width="100" :rules="sellOrderFormValidate">
+              <Form ref="sellOrderForm" :model="sellOrderFormData" :label-width="90" :rules="sellOrderFormValidate">
                   <Row type="flex" justify="start">
-                      <i-col span="8">
+                      <i-col span="12">
                           <FormItem label="客户" prop="customerId">
                               <customer-select :disabled="editMode" v-model="sellOrderFormData.customerId" @on-change="customerChange">
                                   <div slot="helpContent">
@@ -71,20 +71,13 @@
                           </FormItem>
                       </i-col>
 
-                      <i-col span="8">
-                          <FormItem label="收款期限" >
-                              <DatePicker v-model="sellOrderFormData.payOrderDate" type="date" placeholder="请选择收款期限" ></DatePicker>
-                          </FormItem>
-                      </i-col>
-                  </Row>
-
-                  <Row type="flex" justify="start">
-                    <i-col span="8">
+                      <i-col span="6">
                           <FormItem label="仓库点" prop="warehouseId">
                               <warehouse-select v-model="sellOrderFormData.warehouseId" :disabled="warehouseDisable" @on-change="warehouseChange"></warehouse-select>
                           </FormItem>
                       </i-col>
-                      <i-col span="8">
+
+                      <i-col span="6">
                           <FormItem label="销售人员" prop="saleId">
                               <sale-select v-model="sellOrderFormData.saleId" ></sale-select>
                           </FormItem>
@@ -92,20 +85,26 @@
                   </Row>
 
                   <Row type="flex" justify="start" v-if="salePriceOpen">
-                      <i-col span="8">
+                      <i-col span="6">
+                          <FormItem label="收款期限" >
+                              <DatePicker v-model="sellOrderFormData.payOrderDate" type="date" placeholder="请选择收款期限" ></DatePicker>
+                          </FormItem>
+                      </i-col>
+
+                      <i-col span="6">
                           <FormItem label="免零金额" prop="freeAmount">
                               <Input number v-model="sellOrderFormData.freeAmount" @on-blur="resetTotalAmount"/>
                           </FormItem>
                       </i-col>
-                      <i-col span="8">
+                      <i-col span="6">
                           <FormItem label="整单折扣率" >
                               <Input number v-model="sellOrderFormData.disRate" @on-blur="resetTotalAmount"/>
                           </FormItem>
                       </i-col>
-                      <i-col span="8">
+                      <i-col span="6">
                           <FormItem label="订单总金额" >
-                              <Input number v-model="sellOrderFormData.totalAmount" style="width: 95%" />
-                              <Tooltip transfer placement="left-start">
+                              <Input number v-model="sellOrderFormData.totalAmount" style="width:90%" />
+                              <Tooltip transfer placement="top-start">
                                 <Icon type="ios-help-outline"></Icon>
                                 <div slot="content" >
                                     <p>订单总金额 = (商品总金额 * 整单折扣率/100) - 免零金额</p>
@@ -119,15 +118,14 @@
                       商品信息
                       <ButtonGroup size="small">
                           <Button type="primary" :disabled="!sellOrderFormData.warehouseId || !sellOrderFormData.customerId"  @click="addGoodBtnClick">添加商品</Button>
-                          <Button type="ghost" :disabled="!sellOrderFormData.warehouseId || !sellOrderFormData.customerId"  @click="addGoodInfoBtnClick">添加商品(没有批号)</Button>
+                          <Button type="ghost" :disabled="!sellOrderFormData.warehouseId || !sellOrderFormData.customerId"  @click="addGoodInfoBtnClick">添加商品(无批号)</Button>
                       </ButtonGroup>
                   </h3>
                   <Table border highlight-row :loading="saveGoodBtnLoading"
                         :columns="detailsColumns" :data="detailsData"
                         no-data-text="在保存订单信息后点击添加商品按钮添加"
                         ref="sellOrderGoodTable" size="small"
-                        class="margin-top-8 goods-tbl"
-                        @on-row-dblclick="handleRowDbClick">
+                        class="margin-top-8 goods-tbl">
                       <div slot="footer">
                           <h3 class="padding-left-20" >
                               <b>商品合计数量: {{totalQuantity}}</b>  <b class="margin-left-50">商品合计金额:</b> ￥{{ totalAmount }}
@@ -453,6 +451,7 @@ export default {
               },
               on: {
                 "on-blur"(event) {
+                  console.log("blur");
                   let row = self.detailsData[params.index];
                   row[params.column.key] = event.target.value;
                   self.resetGoodSDataAmount(params.index);
@@ -733,6 +732,9 @@ export default {
     this.reloadUncheckData();
   },
   methods: {
+    handleDbClick() {
+      console.log("sss");
+    },
     systemConfig() {
       // 获取系统配置中的是否允许特批价的配置
       util.ajax
@@ -1163,11 +1165,12 @@ export default {
         return;
       }
       let self = this;
+      // 过滤重复的
       let chooseList = repertoryList.filter(item => {
         if (self.detailsData) {
           for (let i = 0; i < self.detailsData.length; i++) {
             let temp = self.detailsData[i];
-            if (temp.repertoryId === item.id) {
+            if (temp.repertoryId && temp.repertoryId === item.id) {
               return false;
             }
           }

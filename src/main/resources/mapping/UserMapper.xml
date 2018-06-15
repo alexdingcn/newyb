@@ -304,6 +304,14 @@
         updated_time = #{updatedTime,jdbcType=TIMESTAMP}
     where id = #{id,jdbcType=BIGINT}
   </update>
+  <update id="updateNickName" parameterType="com.yiban.erp.entities.User">
+    update users
+      set
+        nickname = #{nickname},
+        updated_by = #{updatedBy,jdbcType=VARCHAR},
+        updated_time = #{updatedTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
 
   <update id="updateUserStatusToDelete" parameterType="com.yiban.erp.entities.User">
     update users

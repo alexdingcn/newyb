@@ -103,7 +103,6 @@ export default {
   },
   computed: {
     tabColumns() {
-      console.log(this.useBatchCode);
       let tabColumns = [];
       tabColumns.push({
         type: "selection",

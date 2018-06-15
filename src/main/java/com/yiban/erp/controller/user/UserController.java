@@ -207,6 +207,70 @@ public class UserController {
     }
 
     @Transactional
+    @RequestMapping(value = "/update/nickname", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> updateNickName(@RequestBody Map requestMap,
+                                                 @AuthenticationPrincipal User doUser) throws Exception {
+        logger.info("user:{} request to do update nickname, params:{}", doUser.getId(), JSON.toJSONString(requestMap));
+        Object userIdObj = requestMap.get("userId");
+        String nickname = ((String) requestMap.getOrDefault("nickname", "")).trim();
+        if (userIdObj == null || StringUtils.isEmpty(nickname.trim())) {
+            throw new BizException(ErrorCode.PARAMETER_MISSING);
+        }
+        Long userId = Long.valueOf(String.valueOf(userIdObj));
+        User validateUser = userMapper.findUserByNickName(nickname);
+        if (validateUser != null) {
+            throw new BizException(ErrorCode.USER_REGISTER_NICKNAME_EXIST);
+        }
+        User oldUser = userMapper.getDetailById(userId);
+        if (oldUser == null || !oldUser.getCompanyId().equals(doUser.getCompanyId())) {
+            logger.warn("get user fail or userId is error.");
+            throw new BizException(ErrorCode.USER_GET_FAIL);
+        }
+        if (!UserStatus.NORMAL.getCode().equals(oldUser.getStatus())) {
+            throw new BizException(ErrorCode.USER_LOGIN_UN_ACTIVATE);
+        }
+        List<UserAuth> userAuths = userAuthMapper.findByUserId(oldUser.getId());
+        if (userAuths == null || userAuths.isEmpty()) {
+            throw new BizException(ErrorCode.USER_MOBILE_PASSWORD_MISS);
+        }
+        String password = "";
+        UserAuth userNameAuth = null;
+        for (UserAuth auth : userAuths) {
+            if (IdentifierType.USERNAME.name().equalsIgnoreCase(auth.getIdentifierType())) {
+                userNameAuth = auth;
+            }
+            if (IdentifierType.MOBILE.name().equalsIgnoreCase(auth.getIdentifierType())) {
+                password = auth.getCredential();
+            }
+        }
+
+        //修改用户手机号和验证手机号号
+        oldUser.setNickname(nickname);
+        oldUser.setUpdatedBy(doUser.getNickname());
+        oldUser.setUpdatedTime(new Date());
+        int count = userMapper.updateNickName(oldUser);
+        if (count > 0) {
+            if (userNameAuth == null) {
+                // insert user auths of USERNAME
+                UserAuth userAuth = new UserAuth();
+                userAuth.setUserId(oldUser.getId());
+                userAuth.setIdentifierType(IdentifierType.USERNAME.name());
+                userAuth.setIdentifier(oldUser.getNickname());
+                userAuth.setCredential(password);
+                userAuth.setVerified(true);
+                userAuth.setCreatedBy(doUser.getNickname());
+                userAuth.setCreatedTime(new Date());
+                userAuthMapper.insert(userAuth);
+            }else {
+                //update user auths of USERNAME
+                userAuthMapper.updateAuthIdentifier(oldUser.getId(), IdentifierType.USERNAME.name(), nickname, doUser.getNickname(), new Date());
+            }
+            return ResponseEntity.ok().build();
+        }
+        throw new BizRuntimeException(ErrorCode.FAILED_UPDATE_FROM_DB);
+    }
+
+    @Transactional
     @RequestMapping(value = "/update/mobile", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> updateMobile(@RequestBody Map requestMap,
                                                @AuthenticationPrincipal User doUser) throws Exception {

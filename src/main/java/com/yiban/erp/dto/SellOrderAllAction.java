@@ -10,6 +10,8 @@ public class SellOrderAllAction {
     private Long saleId;
     private Date startDate;
     private Date endDate;
+    private Long warehouseId;
+    private String billStatus;
     private Integer page;
     private Integer size;
 
@@ -104,5 +106,21 @@ public class SellOrderAllAction {
 
     public void setLimit(Integer limit) {
         this.limit = limit;
+    }
+
+    public Long getWarehouseId() {
+        return warehouseId;
+    }
+
+    public void setWarehouseId(Long warehouseId) {
+        this.warehouseId = warehouseId;
+    }
+
+    public String getBillStatus() {
+        return billStatus;
+    }
+
+    public void setBillStatus(String billStatus) {
+        this.billStatus = billStatus;
     }
 }
