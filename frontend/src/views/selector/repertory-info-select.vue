@@ -103,6 +103,7 @@ export default {
   },
   computed: {
     tabColumns() {
+      console.log(this.useBatchCode);
       let tabColumns = [];
       tabColumns.push({
         type: "selection",
@@ -144,21 +145,23 @@ export default {
           );
         }
       });
-      tabColumns.push({
-        title: "规格",
-        key: "goodsSpecs",
-        width: 120,
-        render: (h, params) => {
-          return h(goodsSpecTags, {
-            props: {
-              tags: params.row.goods.goodsSpecs
-                ? params.row.goods.goodsSpecs
-                : [],
-              color: "blue"
-            }
-          });
-        }
-      });
+      if (this.useBatchCode) {
+        tabColumns.push({
+          title: "规格",
+          key: "goodsSpecs",
+          width: 120,
+          render: (h, params) => {
+            return h(goodsSpecTags, {
+              props: {
+                tags: params.row.goods.goodsSpecs
+                  ? params.row.goods.goodsSpecs
+                  : [],
+                color: "blue"
+              }
+            });
+          }
+        });
+      }
       tabColumns.push({
         title: "生产企业",
         key: "factoryName",
@@ -224,8 +227,8 @@ export default {
             );
           }
         });
-        return tabColumns;
       }
+      return tabColumns;
     },
 
     chooseGoods() {

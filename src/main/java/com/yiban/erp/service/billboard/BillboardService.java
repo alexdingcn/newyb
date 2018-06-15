@@ -22,4 +22,10 @@ public class BillboardService {
     public int update(Billboard billboard){
         return billboardMapper.update(billboard);
     }
+    public int delete(int id){
+        return billboardMapper.delete(id);
+    }
+    public int sort(int id,int number){
+            return billboardMapper.sort(id, number);
+    }
 }

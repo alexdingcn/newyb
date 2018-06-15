@@ -125,7 +125,7 @@
                   <Table border highlight-row :loading="saveGoodBtnLoading"
                         :columns="detailsColumns" :data="detailsData"
                         no-data-text="在保存订单信息后点击添加商品按钮添加"
-                        ref="sellOrderGoodTable" style="min-height: 300px" size="small"
+                        ref="sellOrderGoodTable" size="small"
                         class="margin-top-8 goods-tbl"
                         @on-row-dblclick="handleRowDbClick">
                       <div slot="footer">
