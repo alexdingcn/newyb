@@ -133,7 +133,17 @@ export const appRouter = [
     name: "basic-data",
     title: "系统",
     component: Main,
+    menuGroup: [
+      { title: "公司配置", icon: "icon-shezhi", start: 0, end: 2 },
+      { title: "档案管理", icon: "icon-ziliaoshouce", start: 3, end: 7 }
+    ],
     children: [
+      {
+        path: "company",
+        title: "公司设置",
+        name: "company",
+        component: () => import("@/views/basic-data/company.vue")
+      },
       {
         path: "config",
         title: "系统配置",
@@ -165,29 +175,16 @@ export const appRouter = [
         component: () => import("@/views/basic-data/customer.vue")
       },
       {
-        path: "buyer",
-        title: "采购员",
-        name: "basic_data_buyer",
-        divided: true,
-        component: () => import("@/views/basic-data/buyer.vue")
-      },
-      {
-        path: "sale",
-        title: "销售员",
-        name: "basic_data_sale",
-        component: () => import("@/views/basic-data/sale.vue")
+        path: "ship",
+        title: "运输公司档案",
+        name: "basic_data_ship",
+        component: () => import("@/views/basic-data/ship.vue")
       },
       {
         path: "file",
         title: "档案管理",
         name: "basic_data_file",
         component: () => import("@/views/basic-data/file.vue")
-      },
-      {
-        path: "ship",
-        title: "运输公司档案",
-        name: "basic_data_ship",
-        component: () => import("@/views/basic-data/ship.vue")
       }
     ]
   },
@@ -590,10 +587,17 @@ export const appRouter = [
         component: () => import("@/views/access/add-user.vue")
       },
       {
-        path: "company",
-        title: "公司设置",
-        name: "company",
-        component: () => import("@/views/access/company.vue")
+        path: "buyer",
+        title: "采购员",
+        name: "basic_data_buyer",
+        divided: true,
+        component: () => import("@/views/access/buyer.vue")
+      },
+      {
+        path: "sale",
+        title: "销售员",
+        name: "basic_data_sale",
+        component: () => import("@/views/access/sale.vue")
       }
     ]
   },
