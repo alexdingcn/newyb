@@ -29,6 +29,7 @@ public enum ErrorCode {
     COMPANY_DISABLED(1115, "公司处于未激活状态，请联系运营方"),
     USER_MOBILE_EXIST(1116, "手机号已经存在, 不可再次注册"),
     USER_MOBILE_MISSING(1117, "手机号缺失"),
+    USER_MOBILE_PASSWORD_MISS(1118, "用户手机号绑定的登录密码缺失, 需先设置手机号登录密码"),
 
     // 12xx - 商品
     GOODS_CATEGORY_ID_MISSING(1201, "缺失商品分类ID"),

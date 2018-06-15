@@ -32,5 +32,7 @@ public interface UserMapper {
 
     int updateMobile(User oldUser);
 
+    int updateNickName(User oldUser);
+
     int updateUserStatusToDelete(User updateUser);
 }

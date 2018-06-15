@@ -10,8 +10,6 @@
                 个人信息
             </p>
             <div slot="extra">
-                <Button type="text" @click="cancelEditUserInfor">取消</Button>
-                <Button type="primary" :loading="save_loading" @click="saveEdit">保存</Button>
             </div>
             <div>
                 <Form 
@@ -52,7 +50,7 @@
 
                     <FormItem label="用户名：" prop="nickname">
                         <strong> {{ userDetail.nickname }} </strong>
-
+                        <Button type="text" icon="edit" @click="editNicknameBtnClick"></Button>
                         <Button type="text" size="small" @click="showEditPassword" style="color:#2d8cf0; margin-left:10px;">修改密码</Button>
                     </FormItem>
                     <FormItem label="公司：">
@@ -87,10 +85,28 @@
                             <Input v-model="userDetail.address" />
                         </div>
                     </FormItem>
-
                 </Form>
+                <hr size="1" style="margin-top:0.5em; margin-bottom:1em; width: 40%;" />
+                <ButtonGroup>
+                  <Button type="text" icon="reply" @click="cancelEditUserInfor">取消</Button>
+                  <Button type="success" icon="checkmark" :loading="save_loading" @click="saveEdit">保存</Button>
+                </ButtonGroup>
             </div>
         </Card>
+
+        <Modal v-model="editNickNameModal" :closable='false' :mask-closable=false :width="500">
+          <h3 slot="header" style="color:#2D8CF0">修改用户名</h3>
+          <Form ref="editNicknameForm" :model="editNicknameForm" :label-width="100" label-position="right">
+            <FormItem label="新用户名" :error="nicknameError">
+                <Input v-model="editNicknameForm.nickname" placeholder="请输入新的用户名称" @on-blur="validateNickname" />
+            </FormItem>
+          </Form>
+          <div slot="footer">
+                <Button type="text" icon="reply" @click="cancelEditNickname">取消</Button>
+                <Button type="success" icon="checkmark" :loading="saveNicknameLoading" @click="saveEditNickname">保存</Button>
+            </div>
+        </Modal>
+
         <Modal v-model="editPasswordModal" :closable='false' :mask-closable=false :width="500">
             <h3 slot="header" style="color:#2D8CF0">修改密码</h3>
             <Form ref="editPasswordForm" :model="editPasswordForm" :label-width="100" label-position="right" :rules="passwordValidate">
@@ -105,8 +121,8 @@
                 </FormItem>
             </Form>
             <div slot="footer">
-                <Button type="text" @click="cancelEditPass">取消</Button>
-                <Button type="primary" :loading="savePassLoading" @click="saveEditPass">保存</Button>
+                <Button type="text" icon="reply" @click="cancelEditPass">取消</Button>
+                <Button type="success" icon="checkmark" :loading="savePassLoading" @click="saveEditPass">保存</Button>
             </div>
         </Modal>
 
@@ -124,8 +140,8 @@
             </Form>
             <Alert type="error" v-show="validMessage" show-icon>{{ validMessage }}</Alert>
             <div slot="footer">
-                <Button type="text" @click="cancelEditMobile">取消</Button>
-                <Button type="primary" :loading="saveMobileLoading" @click="saveEditMobile" >保存</Button>
+                <Button type="text" icon="reply" @click="cancelEditMobile">取消</Button>
+                <Button type="success" icon="checkmark" :loading="saveMobileLoading" @click="saveEditMobile" >保存</Button>
             </div>
         </Modal>
 
@@ -198,6 +214,12 @@ export default {
           { validator: valideMobile, trigger: "blur" }
         ],
         verifyCode: [{ required: true, message: "验证码必输", trigger: "blur" }]
+      },
+      editNickNameModal: false,
+      nicknameError: "",
+      saveNicknameLoading: false,
+      editNicknameForm: {
+        nickname: ""
       }
     };
   },
@@ -253,6 +275,67 @@ export default {
         desc: "文件 " + file.name + " 太大,请勿超过2M."
       });
     },
+
+    editNicknameBtnClick() {
+      this.editNickNameModal = true;
+    },
+
+    cancelEditNickname() {
+      this.editNicknameForm.nickname = "";
+      this.nicknameError = "";
+      this.editNickNameModal = false;
+    },
+
+    saveEditNickname() {
+      this.nicknameError = "";
+      if (
+        !this.editNicknameForm.nickname ||
+        this.editNicknameForm.nickname.trim() == ""
+      ) {
+        this.nicknameError = "用户名不能为空";
+        return;
+      }
+      let reqData = {
+        userId: this.userDetail.id,
+        nickname: this.editNicknameForm.nickname
+      };
+      this.saveNicknameLoading = true;
+      util.ajax
+        .post("/user/update/nickname", reqData)
+        .then(response => {
+          this.saveNicknameLoading = false;
+          this.userDetail.nickname = reqData.nickname;
+          this.cancelEditNickname();
+          this.$Message.success("用户名更新成功, 可以使用用户名登录.");
+        })
+        .catch(error => {
+          this.saveNicknameLoading = false;
+          util.errorProcessor(this, error);
+        });
+    },
+
+    validateNickname() {
+      let value = this.editNicknameForm.nickname;
+      this.nicknameError = "";
+      if (!value || value.trim() == "") {
+        this.nicknameError = "用户名必输";
+        return;
+      }
+      util.ajax
+        .get("/user/valid/nickname", { params: { nickname: value } })
+        .then(response => {
+          //TO NOTHING
+        })
+        .catch(error => {
+          let result = error.response ? error.response.data : "";
+          if (result && result.message) {
+            this.nicknameError = result.message;
+          } else {
+            this.nicknameError = "用户名检验失败";
+          }
+        });
+    },
+
     showEditPassword() {
       this.editPasswordModal = true;
     },
@@ -320,6 +403,7 @@ export default {
             "setAvator",
             this.userDetail.avatarUrl + "?x-oss-process=style/resize200"
           );
+          this.$store.commit("setUserDetail", this.userDetail);
         })
         .catch(error => {
           util.errorProcessor(this, error);

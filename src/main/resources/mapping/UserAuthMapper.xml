@@ -179,4 +179,10 @@
       and (identifier_type = 'USERNAME' or identifier_type = 'MOBILE')
   </update>
 
+  <select id="findByUserId" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select <include refid="Base_Column_List"/>
+    from user_auths
+    where user_id = #{userId}
+  </select>
+
 </mapper>
