@@ -153,6 +153,7 @@ public enum ErrorCode {
     SELL_BACK_IS_FINAL_CHECKED(2244, "销售退货单的状态已经是终审通过，不能做其他交易"),
     SELL_BACK_NEED_QUALITY_CHECK(2245, "销售退货单需要经过质量复核后才能做终审操作"),
     SELL_BACK_NEED_RECEIVE_STATUS(2246, "销售退货单需要先收货才能做后续流程"),
+    SELL_REPERTORY_NOT_ENOUGH(2247, "商品库存不足"),
 
     // 23xx -承运公司
     SHIP_SAVE_PARAMS_ERROR(2301, "必输参数校验失败"),
