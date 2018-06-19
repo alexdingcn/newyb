@@ -4,10 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.yiban.erp.config.RabbitmqQueueConfig;
 import com.yiban.erp.constant.*;
 import com.yiban.erp.dao.*;
-import com.yiban.erp.dto.SellOrderAllAction;
-import com.yiban.erp.dto.SellOrderQuery;
-import com.yiban.erp.dto.SellReviewAction;
-import com.yiban.erp.dto.SellReviewOrderQuery;
+import com.yiban.erp.dto.*;
 import com.yiban.erp.entities.*;
 import com.yiban.erp.exception.BizException;
 import com.yiban.erp.exception.BizRuntimeException;
@@ -235,11 +232,55 @@ public class SellOrderService {
 
         List<SellOrderDetail> details = sellOrder.getDetails();
         BigDecimal totalQuantity = BigDecimal.ZERO;
+
+        List<SellOrderDetail> realDetails = new ArrayList<>();
+
         for (SellOrderDetail item : details) {
-            totalQuantity = totalQuantity.add(item.getQuantity() == null ? BigDecimal.ZERO : item.getQuantity());
+            totalQuantity = totalQuantity.add(item.getQuantity  () == null ? BigDecimal.ZERO : item.getQuantity());
 
             if (item.getRepertoryId() == null) {
-                // TODO:展开,先进先出
+                // 展开,先进先出
+                RepertorySelectQuery query = new RepertorySelectQuery();
+                query.setCompanyId(user.getCompanyId());
+                query.setGoodsId(item.getGoodsId());
+                query.setMinQuantity(BigDecimal.ZERO);
+                List<RepertoryInfo> repertoryInfos = repertoryInfoMapper.querySelectList(query);
+
+                BigDecimal itemQuantity = item.getQuantity();
+                for (RepertoryInfo ri : repertoryInfos) {
+                    BigDecimal quantity = itemQuantity.compareTo(ri.getQuantity()) > 0 ? ri.getQuantity() : itemQuantity;
+
+                    SellOrderDetail detail = null;
+                    try {
+                        detail = item.clone();
+                    } catch (CloneNotSupportedException e) {
+                        logger.error("Cannot clone sell order detail", e);
+                        throw new BizException(ErrorCode.SELL_REPERTORY_NOT_ENOUGH);
+                    }
+                    detail.setRepertoryId(ri.getId());
+                    detail.setQuantity(quantity);
+                    detail.setBatchCode(ri.getBatchCode());
+                    detail.setProductDate(ri.getProductDate());
+                    detail.setExpDate(ri.getExpDate());
+                    detail.setLocation(ri.getLocation());
+                    realDetails.add(detail);
+
+                    if (itemQuantity.compareTo(ri.getQuantity()) <= 0) {
+                        // stop here
+                        itemQuantity = BigDecimal.ZERO;
+                        break;
+                    } else {
+                        // continue next loop
+                        itemQuantity = itemQuantity.subtract(ri.getQuantity());
+                    }
+
+                }
+                if (itemQuantity.compareTo(BigDecimal.ZERO) > 0) {
+                    logger.warn("item quantity not enough: {}", sellOrder.getTotalQuantity());
+                    throw new BizException(ErrorCode.SELL_REPERTORY_NOT_ENOUGH);
+                }
+            } else {
+                realDetails.add(item);
             }
         }
 
@@ -260,14 +301,14 @@ public class SellOrderService {
             // 保存销售订单详情
             if (count > 0 && sellOrder.getId() > 0) {
                 //保存详情信息
-                details.stream().forEach(item -> {
+                realDetails.stream().forEach(item -> {
                     item.setSellOrderId(sellOrder.getId());
                     item.setCreateBy(user.getNickname());
                     item.setCreateTime(new Date());
                     item.setUpdateBy(user.getNickname());
                     item.setUpdateTime(new Date());
                 });
-                sellOrderDetailMapper.replaceBatch(details);
+                sellOrderDetailMapper.replaceBatch(realDetails);
             }
         } else {
             sellOrder.setTotalQuantity(totalQuantity);
@@ -277,7 +318,7 @@ public class SellOrderService {
             sellOrder.setUpdateTime(new Date());
             sellOrder.setUpdateBy(user.getNickname());
             int count = sellOrderMapper.updateByPrimaryKeySelective(sellOrder);
-            details.stream().forEach(item -> {
+            realDetails.stream().forEach(item -> {
                 item.setUpdateBy(user.getNickname());
                 item.setUpdateTime(new Date());
                 item.setSellOrderId(sellOrder.getId());
@@ -286,7 +327,7 @@ public class SellOrderService {
                     item.setCreateTime(new Date());
                 }
             });
-            sellOrderDetailMapper.replaceBatch(details);
+            sellOrderDetailMapper.replaceBatch(realDetails);
         }
         logger.info("user:{} save order info success.", user.getId());
         List<SellOrderDetail> resultDetails = getDetailList(sellOrder.getId());
