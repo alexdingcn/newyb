@@ -40,7 +40,7 @@
             </Row>
 
             <Table border stripe highlight-row :columns="tabColumns" :data="tabData" 
-                :loading="tableLoading"
+                :loading="tableLoading" height="590"
                 @on-selection-change="tabSelectChange" 
                 no-data-text="点击上方查询按钮查询对应数据"
                 ref="repertoryTable" style="width: 100%;" size="small">
@@ -200,6 +200,11 @@ export default {
         width: 120
       });
       if (this.useBatchCode) {
+        tabColumns.push({
+          title: "库位",
+          key: "location",
+          width: 120
+        });
         tabColumns.push({
           title: "有效期至",
           key: "expDate",

@@ -418,6 +418,7 @@
         <if test="minQuantity != null" >
             and r.quantity > #{minQuantity}
         </if>
+        order by r.id
         <if test="byPage != null and offset != null and limit != null">
             limit #{offset}, #{limit}
         </if>

@@ -217,4 +217,13 @@ public class SellOrderController {
         List<StatusCount> result = sellOrderService.getStatByCustomer(allAction);
         return ResponseEntity.ok().body(JSON.toJSONString(result));
     }
+
+
+    @RequestMapping(value = "/order/invoice/save", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> invoice(@RequestBody SellOrderInvoice sellOrderInvoice, @AuthenticationPrincipal User user) throws Exception {
+        logger.info("user:{} request save ship record.", user.getId());
+        SellOrder result = sellOrderService.saveOrderInvoice(user, sellOrderInvoice);
+        return ResponseEntity.ok().body(JSON.toJSONString(result, SerializerFeature.DisableCircularReferenceDetect));
+    }
+
 }

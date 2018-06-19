@@ -17,7 +17,7 @@
         </div>
 
         <Form :label-width="80" :model="storeNow" ref="storeNowForm">
-          <Row>
+          <Row class="row-margin-bottom">
             <i-col span="6">
               <FormItem label="仓库点" prop="warehouseId">
                 <warehouse-select v-model="storeNow.warehouseId"></warehouse-select>
@@ -61,7 +61,7 @@
             </i-col>
           </Row>
 
-          <Row class="margin-top-8" v-show="showExpandedFilter">
+          <Row class="row-margin-bottom" v-show="showExpandedFilter">
               <i-col span="6">
                   <FormItem label="供应商" prop="supplierId">
                       <supplier-select v-model="storeNow.supplierId" ></supplier-select>
@@ -82,20 +82,9 @@
                       <Input v-model="storeNow.keedays" placeholder="天"/>
                   </FormItem>
               </i-col>
-              <!--
-              <i-col span="3">
-                  <FormItem label="商品属性" >
-                      <Input  size="small"/>
-                  </FormItem>
-              </i-col>
-              <i-col span="3">
-                  <FormItem label="采购属性" >
-                      <Input  size="small"/>
-                  </FormItem>
-                  </i-col>-->
           </Row>
 
-          <Row class="margin-top-8" v-show="showExpandedFilter">
+          <Row class="row-margin-bottom" v-show="showExpandedFilter">
               <i-col span="6">
               <FormItem label="商品速查" prop="goodsId">
                   <good-select v-model="storeNow.goodsId"></good-select>
@@ -103,36 +92,24 @@
               </i-col>
           </Row>
 
-          <Table border highlight-row size="small"
+          <Table border highlight-row
               class="margin-top-8"
               :columns="repertoryColumns" :data="repertoryItems"
-              ref="storeNowTable"
+              ref="storeNowTable" style="width: 100%;"
               no-data-text="当前查询条件下无库存数据！">
-          </Table>
 
+          </Table>
+          <Row class="table-footer-label">
+              <i-col span="6">实时库存数量： {{storeAmount}}</i-col>
+              <i-col span="6">库存商品总金额: {{storeMoney}}</i-col>
+              <i-col span="6">含税价格: {{storeTaxMoney}}</i-col>
+              <i-col span="6">毛利: {{storeProfitMoney}}</i-col>
+          </Row>
           <Row class="margin-top-8">
               <div style="float: right;">
                   <Page :total="totalAmount" :current="currentPage" @on-change="changePage" show-total></Page>
               </div>
           </Row>
-            <Table border highlight-row
-                class="margin-top-8"
-                :columns="repertoryColumns" :data="repertoryItems"
-                ref="storeNowTable" style="width: 100%;"
-                no-data-text="当前条件下查询，无库存数据！">
-
-            </Table>
-            <Row>
-                <i-col span="6">实时库存数量： {{storeAmount}}</i-col>
-                <i-col span="6">库存商品总金额: {{storeMoney}}</i-col>
-                <i-col span="6">含税价格: {{storeTaxMoney}}</i-col>
-                <i-col span="6">毛利: {{storeProfitMoney}}</i-col>
-            </Row>
-            <Row class="margin-top-8">
-                <div style="float: right;">
-                    <Page :total="totalAmount" :current="currentPage" @on-change="changePage" show-total></Page>
-                </div>
-            </Row>
         </Form>
     </Card>
     </Row>
@@ -161,10 +138,10 @@ export default {
   data() {
     return {
       saving: false,
-        storeAmount:0,
-        storeMoney:0,
-        storeTaxMoney:0,
-        storeProfitMoney:0,
+      storeAmount: 0,
+      storeMoney: 0,
+      storeTaxMoney: 0,
+      storeProfitMoney: 0,
       showExpandedFilter: false,
       totalAmount: 0,
       currentPage: 1,
@@ -360,9 +337,7 @@ export default {
     moment: function() {
       return moment();
     },
-    getStoreSunInfo(){
-
-      },
+    getStoreSunInfo() {},
     queryRepertoryList() {
       var self = this;
       this.repertoryItems = [];
@@ -373,8 +348,8 @@ export default {
           if (response.status === 200 && response.data) {
             self.repertoryItems = response.data.data;
             self.totalAmount = response.data.total;
-            self.storeAmount=response.data.storeAmount;
-            self.storeMoney=response.data.storeMoney;
+            self.storeAmount = response.data.storeAmount;
+            self.storeMoney = response.data.storeMoney;
           }
         })
         .catch(function(error) {

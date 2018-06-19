@@ -2,9 +2,8 @@ package com.yiban.erp.entities;
 
 import java.math.BigDecimal;
 import java.util.Date;
-import java.util.List;
 
-public class SellOrderDetail {
+public class SellOrderDetail implements Cloneable {
     private Long id;
 
     private Long sellOrderId;
@@ -404,5 +403,9 @@ public class SellOrderDetail {
 
     public void setStorageConditionName(String storageConditionName) {
         this.storageConditionName = storageConditionName;
+    }
+
+    public SellOrderDetail clone() throws CloneNotSupportedException {
+        return (SellOrderDetail) super.clone();
     }
 }

@@ -53,7 +53,7 @@
 
             <Row type="flex" justify="start" style="margin-bottom: 5px; margin-top: 20px;">
                 <h3 class="padding-left-20" >
-                    <b>合计数量:</b> ￥{{ totalCount }} <b style="margin-left: 30px;">合计金额:</b> ￥{{ totalAmount }}
+                    <b>合计数量:</b> {{ totalCount }} <b style="margin-left: 30px;">合计金额:</b> ￥{{ totalAmount }}
                 </h3>
             </Row>
             <Table border highlight-row height="300" :loading="detailLoading" 

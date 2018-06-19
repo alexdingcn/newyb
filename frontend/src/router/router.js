@@ -480,11 +480,23 @@ export const appRouter = [
         component: () => import("@/views/out-store/out-order-list.vue")
       },
 
+      // {
+      //   path: "store_check_index",
+      //   title: "盘点单列表",
+      //   name: "store_check_index",
+      //   component: () => import("@/views/checkplan/store_check_index.vue")
+      // },
       {
-        path: "store_check_index",
+        path: "inventory-list",
         title: "盘点单列表",
-        name: "store_check_index",
-        component: () => import("@/views/checkplan/store_check_index.vue")
+        name: "inventory-list",
+        component: () => import("@/views/inventory/inventory-list.vue")
+      },
+      {
+        path: "inventory-add",
+        title: "新增盘点单",
+        name: "inventory-add",
+        component: () => import("@/views/inventory/inventory-add.vue")
       },
       {
         path: "store_check_add",

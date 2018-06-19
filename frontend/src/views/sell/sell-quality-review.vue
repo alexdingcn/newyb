@@ -66,7 +66,7 @@
 
             <Row type="flex" justify="start" class="margin-top-20 margin-bottom-5">
                 <h3 class="padding-left-20" >
-                    <b>合计数量:</b> ￥{{ totalCount }} <b class="margin-left-30">合计金额:</b> ￥{{ totalAmount }}
+                    <b>合计数量:</b> {{ totalCount }} <b class="margin-left-30">合计金额:</b> ￥{{ totalAmount }}
                 </h3>
             </Row>
             <Table border highlight-row height="300" :loading="detailLoading" 
