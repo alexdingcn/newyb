@@ -6,7 +6,7 @@
                     <p slot="title">
                         <Icon type="person-stalker"></Icon> 公告列表
                     </p>
-                    <Modal :visible.sync="modal2" width="360">
+                    <Modal  width="360">
                         <p slot="header" style="color:#f60;text-align:center">
                             <Icon type="information-circled"></Icon>
                             <span>删除确认</span>

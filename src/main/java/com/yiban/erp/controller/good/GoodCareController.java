@@ -17,6 +17,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -71,6 +74,22 @@ public class GoodCareController  {
         return ResponseEntity.ok().body(response.toJSONString());
     }
 
+    @RequestMapping(value= "/careList", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> careList(@AuthenticationPrincipal User user,
+                                           @RequestParam(value = "nextDate", required = false) String nextDate) throws ParseException {
+        DateFormat format1 = new SimpleDateFormat("yyyy-MM-dd");
+        Date date = null;
+        if(nextDate !=""){
+            date = format1.parse(nextDate);
+        }
+        int companyId = user.getCompanyId();
+        List<GoodsCare> result = new ArrayList<>();
+        result = goodsCareService.careList(companyId, date);
+        JSONObject response = new JSONObject();
+        response.put("data", JSON.toJSON(result));
+        return ResponseEntity.ok().body(response.toJSONString());
+    }
+
     /**
      * 添加养护记录
      * @param goodsCare
@@ -80,12 +99,17 @@ public class GoodCareController  {
     public ResponseEntity<String>  save(@AuthenticationPrincipal User user,
                                         @RequestBody GoodsCare goodsCare){
         logger.info("save care   goodscare:"+JSON.toJSONString(goodsCare));
-        messageService.create("商品养护通知",queryGoods(goodsCare)+"需要养护", UserRoleType.ROLE_REPERTORY,user);
+       // messageService.create("商品养护通知",queryGoods(goodsCare)+"需要养护", UserRoleType.ROLE_REPERTORY,user);
 
         goodsCareService.save(goodsCare);
         return ResponseEntity.ok().build();
     }
 
+    /**
+     * 获取指定商品的养护记录
+     * @param goodsId
+     * @return
+     */
     @RequestMapping(value="/recordList", method = RequestMethod.GET,produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> searchRecord(@RequestParam(value="goodsId", required = false) Long goodsId){
         logger.info("search goodsCare list     goodsId="+goodsId);

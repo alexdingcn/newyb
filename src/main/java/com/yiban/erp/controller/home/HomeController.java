@@ -60,4 +60,10 @@ public class HomeController {
 
         return ResponseEntity.ok().body(JSON.toJSONString(counts));
     }
+
+
+    private ResponseEntity<String> getTodoItems(@AuthenticationPrincipal User user){
+
+        return null;
+    }
 }
