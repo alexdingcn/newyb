@@ -201,6 +201,11 @@ export default {
       });
       if (this.useBatchCode) {
         tabColumns.push({
+          title: "库位",
+          key: "location",
+          width: 120
+        });
+        tabColumns.push({
           title: "有效期至",
           key: "expDate",
           width: 120,
