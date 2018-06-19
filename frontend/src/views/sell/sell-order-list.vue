@@ -84,6 +84,31 @@
         <Modal v-model="paymentModal" :width="60" :mask-closable="false" :title="paymentModalTitle" :footerHide="true">
             <sell-order-payment :order="selectedOrder" @payment-updated="onPaymentUpdated" ></sell-order-payment>
         </Modal>
+        <Modal v-model="invoiceModal" title="发票信息" :mask-closable="false" width="40">
+            <Form ref="form" :model="formData" :label-width="90" >
+                <Row class="row-margin-bottom">
+                    <FormItem label="发票抬头">
+                        <Input type="text" placeholder="发票抬头" v-model="formData.invoiceTitle" style="width: 75%;"/>
+                    </FormItem>
+                </Row>
+                <Row class="row-margin-bottom">
+                    <FormItem label="发票类型">
+                        <option-select optionType="BILL_TYPE" v-model="formData.billType" ></option-select>
+                    </FormItem>
+                </Row>
+                <Row class="row-margin-bottom">
+                    <FormItem label="税率">
+                        <Input type="text" placeholder="税率" v-model="formData.taxRate" style="width: 75%" />
+                    </FormItem>
+                </Row>
+            </Form>
+            <Row type="flex" justify="end" slot="footer" >
+                <ButtonGroup size="small">
+                    <Button type="success" icon="checkmark" :loading="saveLoading" @click="saveInvoice" >保存开票信息</Button>
+                    <Button type="ghost" icon="reply" @click="modalCancel" >取消</Button>
+                </ButtonGroup>
+            </Row>
+        </Modal>
     </Card>
 </template>
 
@@ -97,7 +122,7 @@ import customerSelect from "@/views/selector/customer-select.vue";
 import saleSelect from "@/views/selector/sale-select.vue";
 import actionButton from "@/views/my-components/action-button.vue";
 import warehouseSelect from "@/views/selector/warehouse-select.vue";
-
+import optionSelect from "@/views/selector/option-select.vue";
 export default {
   name: "sell-order-all",
   components: {
@@ -107,6 +132,7 @@ export default {
     customerSelect,
     saleSelect,
     warehouseSelect,
+      optionSelect,
     actionButton
   },
 
@@ -227,6 +253,7 @@ export default {
           : moment().format("YYYY-MM-DD")
       ],
       searching: false,
+        invoiceModal:false,
       tabData: [],
       tabColumns: [
         {
@@ -340,7 +367,31 @@ export default {
               key: "billStatus",
               width: 150,
               render: (h, params) => {
-                  return stautsInvoice(h, params.row.billStatus);
+                  //return stautsInvoice(h, params.row.billStatus);
+                  if(params.row.billStatus=="FINISH"){
+                      return h('Button', {
+                          props: {
+                              type: 'primary',
+                          },
+                          on: {
+                              click: () => {
+                                  this.queryInvoice(params.row);
+                              }
+                          }
+                      }, '已开票');
+                  }else{
+                      return h('Button', {
+                          props: {
+                              type: 'error',
+                          },
+                          on: {
+                              click: () => {
+                                  this.addInvoice(params.row);
+                              }
+                          }
+                      }, '未开票');
+                  }
+
               }
           },
         {
@@ -432,6 +483,14 @@ export default {
           width: 110
         }
       ],
+
+        formData: {
+            id: '',
+            invoiceTitle: '',
+            billType: '',
+            taxRate: ''
+        },
+        saveLoading: false,
       showOrderDetailView: false,
       showDetailViewId: -1,
       totalCount: 0,
@@ -544,7 +603,65 @@ export default {
         .catch(error => {
           util.errorProcessor(self, error);
         });
-    }
+    },queryInvoice(row){
+          this.selectedOrder=row;
+          this.formData = row;
+          this.invoiceModal = true;
+
+      },addInvoice(row){
+          this.selectedOrder=row;
+          let customer_id = row.customerId;
+          util.ajax
+              .get("/customer/" +customer_id, { params: { stat: true } })
+              .then(response => {
+                  if (response.status === 200 && response.data) {
+                      console.log(response);
+
+                      this.formData = response.data.customer;
+                  }
+              })
+              .catch(error => {
+                 // util.errorProcessor(this, error);
+      });
+          this.invoiceModal = true;
+
+
+
+
+
+      },saveInvoice(){
+          var self = this;
+          this.saveLoading = true;
+          let tempData=this.formData;
+
+          this.formData = {
+              sellOrderId: this.selectedOrder.id,
+              invoiceTitle: tempData.invoiceTitle,
+              billType: tempData.billType,
+              taxRate: tempData.taxRate
+          };
+          util.ajax.post('sell/order/invoice/save', this.formData )
+              .then((response) => {
+                  self.saveLoading = false;
+                  if (response.status === 200 && response.data) {
+                      this.invoiceModal = false;
+                      self.refreshTableData();
+                  }
+              })
+              .catch((error) => {
+                  self.saveLoading = false;
+                  util.errorProcessor(self, error);
+              });
+      }, modalCancel() {
+          this.formData = {
+              id: '',
+              invoiceTitle: '',
+              billType: '',
+              taxRate: ''
+          };
+          this.$refs.form.resetFields();
+          this.brandModal = false;
+      },
   }
 };
 </script>

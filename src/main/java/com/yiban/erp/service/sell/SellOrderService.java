@@ -728,4 +728,26 @@ public class SellOrderService {
         }
         return false;
     }
+
+
+    public SellOrder saveOrderInvoice(User user,SellOrderInvoice sellOrderInvoice) throws BizException {
+        SellOrderInvoice reqInvoice = sellOrderInvoice;
+        if (reqInvoice == null || reqInvoice.getSellOrderId() == null) {
+            logger.warn("user:{} save ship info but sell order id or ship company id is null", user.getId());
+            throw new BizException(ErrorCode.SELL_ORDER_SHIP_PARAMS);
+        }
+        SellOrder order = sellOrderMapper.selectByPrimaryKey(reqInvoice.getSellOrderId());
+        if (order == null) {
+            logger.warn("user:{} save ship record info but sell order get fail by id:{}", user.getId(), reqInvoice.getSellOrderId());
+            throw new BizException(ErrorCode.SELL_ORDER_SHIP_PARAMS);
+        }
+        order.setBillStatus("FINISH");
+        order.setBillType(reqInvoice.getBillType());
+        order.setInvoiceTitle(reqInvoice.getInvoiceTitle());
+        order.setTaxRate(reqInvoice.getTaxRate());
+        sellOrderMapper.updateByPrimaryKeySelective(order);
+        return order;
+
+    }
+
 }
