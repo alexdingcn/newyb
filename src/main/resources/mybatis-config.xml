@@ -70,5 +70,6 @@
         <mapper resource="mapping/BillboardMapper.xml"/>
         <mapper resource="mapping/RepertoryInventoryMapper.xml"/>
         <mapper resource="mapping/RepertoryInventoryDetailMapper.xml"/>
+        <mapper resource="mapping/TodoItemsMapper.xml"/>
     </mappers>
 </configuration>
