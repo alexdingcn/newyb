@@ -160,6 +160,9 @@
                                 <Icon type="android-checkbox-outline"></Icon>
                                 待办事项
                             </p>
+                            <a type="text" slot="extra" @click.prevent="getTodoItems" :style="{marginRight: '10px'}">
+                                <Icon type="refresh"></Icon>
+                            </a>
                             <a type="text" slot="extra" @click.prevent="addNewToDoItem">
                                 <Icon type="plus-round"></Icon>
                             </a>
