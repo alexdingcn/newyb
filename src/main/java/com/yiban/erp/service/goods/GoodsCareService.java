@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -41,4 +42,6 @@ public class GoodsCareService {
     public GoodsCare queryGoods(Long id){
         return goodsCareMapper.queryGoods(id);
     }
+
+    public List<GoodsCare> careList(int id, Date nextDate){return goodsCareMapper.careList(id, nextDate);}
 }

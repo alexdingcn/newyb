@@ -1,6 +1,5 @@
 package com.yiban.erp.entities;
 
-import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class GoodsCare {
@@ -32,7 +31,9 @@ public class GoodsCare {
 
     private Integer limit;
 
-    private String careTime;
+    private Date createDate;
+
+    private Date nextDate;
 
     public Integer getOffset() {
         return (this.page == null || this.page <= 0 ? 0 : this.page - 1) * this.getLimit();
@@ -83,14 +84,6 @@ public class GoodsCare {
 
     public void setFname(String fname) { this.fname = fname; }
 
-    public String getCareTime() {
-        return careTime;
-    }
-
-    public void setCareTime(String careTime) {
-        this.careTime = careTime;
-    }
-
     public Integer getPage() {
         return page;
     }
@@ -107,15 +100,30 @@ public class GoodsCare {
         this.pageSize = pageSize;
     }
 
+    public Date getCreateDate() { return createDate; }
+
+    public void setCreateDate(Date createDate) { this.createDate = createDate; }
+
+    public Date getNextDate() { return nextDate; }
+
+    public void setNextDate(Date nextDate) { this.nextDate = nextDate; }
+
     @Override
     public String toString() {
         return "GoodsCare{" +
-                "name='" + name + '\'' +
+                "id=" + id +
+                ", name='" + name + '\'' +
                 ", goodsNo='" + goodsNo + '\'' +
                 ", goodsId=" + goodsId +
                 ", careResult='" + careResult + '\'' +
                 ", carePerson='" + carePerson + '\'' +
                 ", temperature=" + temperature +
+                ", page=" + page +
+                ", pageSize=" + pageSize +
+                ", offset=" + offset +
+                ", limit=" + limit +
+                ", createDate=" + createDate +
+                ", nextDate=" + nextDate +
                 ", fname='" + fname + '\'' +
                 '}';
     }

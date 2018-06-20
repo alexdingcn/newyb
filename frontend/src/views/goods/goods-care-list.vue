@@ -22,15 +22,27 @@
             </Row>
         </Card>
         </i-col>
-        <i-col span="12">
-                
-    </i-col>
+        <i-col span="11" style="padding-left: 30px;">
+            <Card>
+            <p slot="title">
+                <Icon type="person-stalker"></Icon> 待养护商品
+            </p>
+            <div slot="extra">
+                <Row type="flex" justify="end">
+                  <Date-picker type="date" placeholder="选择日期" style="width: 200px" v-model= "endNextDate" @on-change = "refreshCareList"></Date-picker>
+                </Row>
+            </div>
+            <Table ref="careTab" size="small" highlight-row height="800" :loading="careTabLoading"
+                :columns="needCareColumns" :data="needCareList" >
+            </Table>
+        </Card>    
+        </i-col>
         </Row>
         <Modal v-model="goodsModal" title="商品养护记录" :footerHide="true" :mask-closable="false" width="800">
-                <goodsCareRecord ref="carelist" ></goodsCareRecord>
+                <goodsCareRecord ref="carelist" :goodsId="searchId"></goodsCareRecord>
         </Modal>
         <Modal v-model="careModal" title="商品养护" :footerHide="true" :mask-closable="false" width="400">
-                <goodsCare ref="carelist" ></goodsCare>
+                <goodsCare ref="carelist" :goodId="editId" :name="deitName" @save-ok="careSaveOk"></goodsCare>
         </Modal>
 </div>
 </template>
@@ -41,6 +53,7 @@ import bus from "@/libs/bus";
 import goodsCareRecord from "./goods-care-record.vue";
 import goodsCare from "./goods-care.vue";
 import actionButton from "@/views/my-components/action-button.vue";
+import moment from "moment";
 
 export default {
   name: "goodscarelist",
@@ -49,24 +62,47 @@ export default {
     goodsCare,
     actionButton
   },
-  props: {
-    goodId: {
-      type: String | Number,
-      default: ""
-    },
-    name: {
-        type: String, 
-        default: ""
-    }
-  },
   data() {
     return {
       searchValue: "",
       currGood: {},
       tabLoading: false,
+      careTabLoading: true,
       goodsList: [],
+      needCareList: [],
       goodsModal: false,
       careModal: false,
+      needCareColumns: [
+        {
+          title: "商品名称",
+          key: "name",
+          align: "center"
+        },
+        {
+          title: "上次养护",
+          key: "createDate",
+          align: "center",
+          render: (h, params) => {
+            let createDate = params.row.createDate;
+            return h(
+              "span",
+              createDate ? moment(createDate).format("YYYY-MM-DD") : ""
+            );
+          }
+        },
+        {
+          title: "下次养护",
+          key: "nextDate",
+          align: "center",
+          render: (h, params) => {
+            let nextDate = params.row.nextDate;
+            return h(
+              "span",
+              nextDate ? moment(nextDate).format("YYYY-MM-DD") : ""
+            );
+          }
+        }
+      ],
       goodColumns: [
         {
           title: "商品名称",
@@ -115,13 +151,16 @@ export default {
       lastTime: 0,
       totalCount: 0,
       currentPage: 1,
-      pageSize: 30
+      pageSize: 30,
+      editId: "",
+      deitName: "",
+      searchId: ""
     };
   },
   watch: {
-    goodId: function(id) {
+    /**goodId: function(id) {
       console.log("idididididid"+id);
-    }
+    }*/
   },
   mounted() {
     this.init();
@@ -129,16 +168,50 @@ export default {
   methods: {
     init() {
       this.refreshGoodList();
+      this.refreshCareList();
     },
     changePage(data) {
       this.currentPage = data;
       this.refreshGoodList();
     },
-    queryCareRecord() {
+    careSaveOk() {
+      this.careModal = false;
+      init();
+    },
+    queryCareRecord(id) {
+      this.searchId = "";
+      if (!id) {
+        return;
+      }
+      this.searchId = id;
       this.goodsModal = true;
     },
-    addCare() {
+    addCare(id, name) {
+      this.editName = "";
+      this.editId = ""; //重置，可以导致再次点击时能刷新数据
+      if (!id || !name) {
+        return;
+      }
+      this.editId = id;
+      this.editName = name;
       this.careModal = true;
+    },
+    refreshCareList() {
+      let req = {
+          nextDate : this.endNextDate,
+      }
+      util.ajax
+        .get("/goods_care/careList",{params: req})
+        .then(response => {
+          if (response.status == 200) {
+            this.careTabLoading = false;
+            this.needCareList = response.data.data;
+          }
+        })
+        .catch(error => {
+          this.careTabLoading = false;
+          util.errorProcessor(this, error);
+        });
     },
     refreshGoodList() {
       let reqData = {

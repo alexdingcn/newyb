@@ -1,10 +1,9 @@
 
 <template>
 <div>
-
-            <Table size="small" highlight-row height="400" :loading="tabLoading"
-                :columns="goodColumns" :data="careList"  >
-            </Table>
+  <Table size="small" highlight-row height="400" :loading="tabLoading"
+    :columns="goodColumns" :data="careList"  >
+  </Table>
     
     </div>
     
@@ -13,14 +12,20 @@
 <script>
 import util from "@/libs/util.js";
 import bus from "@/libs/bus";
+import moment from "moment";
 
 export default {
   name: "goodsCareRecord",
+  props:{
+    goodsId: {
+      type: String | Number,
+      default: ""
+    },
+  },
   data() {
     return {
       tabLoading: false,
       careList: [],
-      goodsId: "",
       goodColumns: [
         {
           title: "商品名称",
@@ -40,12 +45,26 @@ export default {
         {
           title: "养护日期",
           key: "createDate",
-          align: "center"
+          align: "center",
+          render: (h, params) => {
+            let createDate = params.row.createDate;
+            return h(
+              "span",
+              createDate ? moment(createDate).format("YYYY-MM-DD") : ""
+            );
+          }
         },
         {
           title: "下次养护日期",
           key: "nextDate",
-          align: "center"
+          align: "center",
+          render: (h, params) => {
+            let nextDate = params.row.nextDate;
+            return h(
+              "span",
+              nextDate ? moment(nextDate).format("YYYY-MM-DD") : ""
+            );
+          }
         },
         {
           title: "养护人",
@@ -68,7 +87,6 @@ export default {
         .then(response => {
           self.tabLoading = false;
           self.careList = response.data.data;
-          console.log("later---" + self.careList);
         })
         .catch(error => {
           this.tabLoading = false;
