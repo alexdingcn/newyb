@@ -6,7 +6,7 @@
     <result column="content" property="content" jdbcType="VARCHAR" />
     <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
     <result column="create_by" property="createBy" jdbcType="VARCHAR" />
-    <result column="deal_time" property="dealTime" jdbcType="TIMESTAMP" />
+    <result column="deal_time" property="dealTime" jdbcType="DATE" />
     <result column="status" property="status" jdbcType="BIT" />
     <result column="company_id" property="companyId" jdbcType="INTEGER" />
   </resultMap>
@@ -14,7 +14,8 @@
   <select id="getTodoItems" resultMap="BaseResultMap">
       select *
       from todo_items
-      where company_id =#{companyId} and status = 0
+      where if(deal_time is not null, deal_time = curdate(), 1=1 )
+        and company_id =#{companyId} and status = 0
   </select>
   <insert id="addTodoItems" parameterType="com.yiban.erp.entities.TodoItems">
       insert into todo_items
@@ -27,4 +28,21 @@
     set status = 1
     where id = #{id}
   </update>
+
+  <select id="getTodoByGoodId" resultType="Integer">
+    select count(*)
+    from todo_items
+    where ref_id = #{refId}
+  </select>
+  <update id="updTodoByGoodId" parameterType="com.yiban.erp.entities.TodoItems">
+    update todo_items
+    set create_time = now(), status = 0, deal_time = #{dealTime}, content = #{content}, create_by = #{createBy}
+    where ref_id =#{refId}
+  </update>
+  <insert id="addTodoByGoodId" parameterType="com.yiban.erp.entities.TodoItems">
+    insert into todo_items
+    (content,create_time,create_by,deal_time, status,company_id,ref_id)
+    values
+    (#{content},now() , #{createBy},#{dealTime}, 0, #{companyId}, #{refId})
+  </insert>
 </mapper>

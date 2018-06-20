@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.yiban.erp.constant.UserRoleType;
 import com.yiban.erp.dto.GoodsQuery;
 import com.yiban.erp.entities.GoodsCare;
+import com.yiban.erp.exception.BizException;
 import com.yiban.erp.service.goods.GoodsCareService;
 import com.yiban.erp.service.message.MessageService;
 import org.apache.commons.lang3.StringUtils;
@@ -97,7 +98,7 @@ public class GoodCareController  {
      */
     @RequestMapping(value="/save", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String>  save(@AuthenticationPrincipal User user,
-                                        @RequestBody GoodsCare goodsCare){
+                                        @RequestBody GoodsCare goodsCare) throws BizException {
         logger.info("save care   goodscare:"+JSON.toJSONString(goodsCare));
        // messageService.create("商品养护通知",queryGoods(goodsCare)+"需要养护", UserRoleType.ROLE_REPERTORY,user);
 

@@ -11,11 +11,13 @@ public class TodoItems {
 
     private String createBy;
 
-    private Date dealWith;
+    private Date dealTime;
 
     private Boolean status;
 
     private int companyId;
+
+    private long refId;
 
     public int getId() {
         return id;
@@ -49,12 +51,14 @@ public class TodoItems {
         this.createBy = createBy;
     }
 
-    public Date getDealWith() {
-        return dealWith;
+
+
+    public Date getDealTime() {
+        return dealTime;
     }
 
-    public void setDealWith(Date dealWith) {
-        this.dealWith = dealWith;
+    public void setDealTime(Date dealTime) {
+        this.dealTime = dealTime;
     }
 
     public Boolean getStatus() {
@@ -73,6 +77,14 @@ public class TodoItems {
         this.companyId = companyId;
     }
 
+    public long getRefId() {
+        return refId;
+    }
+
+    public void setRefId(long refId) {
+        this.refId = refId;
+    }
+
     @Override
     public String toString() {
         return "TodoItems{" +
@@ -80,9 +92,11 @@ public class TodoItems {
                 ", content='" + content + '\'' +
                 ", createTime=" + createTime +
                 ", createBy='" + createBy + '\'' +
-                ", dealWith=" + dealWith +
+                ", dealTime=" + dealTime +
                 ", status=" + status +
                 ", companyId=" + companyId +
+                ", refId=" + refId +
                 '}';
     }
+
 }
