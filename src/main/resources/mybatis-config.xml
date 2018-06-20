@@ -68,5 +68,6 @@
         <mapper resource="mapping/SellOrderPaymentMapper.xml"/>
         <mapper resource="mapping/BannerMapper.xml"/>
         <mapper resource="mapping/BillboardMapper.xml"/>
+        <mapper resource="mapping/TodoItemsMapper.xml"/>
     </mappers>
 </configuration>

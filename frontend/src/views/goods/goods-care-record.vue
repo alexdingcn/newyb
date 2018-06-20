@@ -3,9 +3,8 @@
 <div>
   <Table size="small" highlight-row height="400" :loading="tabLoading"
     :columns="goodColumns" :data="careList"  >
-  </Table>
-    
-    </div>
+  </Table>   
+  </div>
     
 </template>
 

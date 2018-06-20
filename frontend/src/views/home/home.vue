@@ -176,10 +176,32 @@
                                     <Button type="primary" @click="addNew">确定</Button>
                                 </Row>
                             </Modal>
+                            <Modal
+                                v-model="showTodoDeal"
+                                title="待办事项">
+                                <Row type="flex" justify="center">
+                                    <Form ref="dealForm" :model="dealForm" :label-width="100">
+                                        <FormItem label="事项内容：" prop="content" >
+                                            {{dealForm.content}}
+                                        </FormItem>
+                                        <FormItem label="创建人：" prop="createBy" >
+                                            {{dealForm.createBy}}
+                                        </FormItem>
+                                        <FormItem label="创建时间：" prop="createTime" >
+                                            {{dealForm.createTime}}
+                                        </FormItem>
+                                    </Form>
+                                </Row>
+                                <Row slot="footer">
+                                    <Button type="text" @click="showTodoDeal = false">取消</Button>
+                                    <Button type="primary" @click="Deal">已处理</Button>
+                                </Row>
+                            </Modal>
                             <div class="to-do-list-con">
-                                <div v-for="(item, index) in toDoList" :key="'todo-item' + (toDoList.length - index)" class="to-do-item">
+                                <!--<div v-for="(item, index) in toDoList" :key="'todo-item' + (toDoList.length - index)" class="to-do-item">
                                     <to-do-list-item :content="item.title"></to-do-list-item>
-                                </div>
+                                </div>-->
+                                <i-table :show-header="false" :border="true" @on-row-click="chooseTodo" :data="todoData" :columns="todoColumns" no-data-text="" :height="250"></i-table>
                             </div>
                         </Card>
                     </i-col>
@@ -277,6 +299,21 @@ export default {
             showTrialWarning: true,
             loggedUser: JSON.parse(localStorage.getItem('userDetail')),
             toDoList: [],
+            todoData:[],
+            dealForm:[],
+            showTodoDeal:false,
+            todoColumns:[
+                {
+                    type:'index',
+                    align:'center',
+                    width:40
+                },
+                {
+                    title:'事项内容',
+                    key:'content',
+                    align:'center',
+                }
+            ],
             count: {
                 init: 0,
                 sale_checked: 0,
@@ -301,6 +338,7 @@ export default {
         this.loadOrderStats();
         this.loadAmountStats();
         this.loadGoodsStats();
+        this.getTodoItems();
     },
     computed: {
         avatorPath () {
@@ -376,7 +414,7 @@ export default {
             this.showAddNewTodo = true;
         },
         addNew () {
-            if (this.newToDoItemValue.length !== 0) {
+            /**if (this.newToDoItemValue.length !== 0) {
                 this.toDoList.unshift({
                     title: this.newToDoItemValue
                 });
@@ -384,13 +422,61 @@ export default {
                     this.newToDoItemValue = '';
                 }, 200);
                 this.showAddNewTodo = false;
-            } else {
+            } else */if(this.newToDoItemValue.length == 0){
                 this.$Message.error('请输入待办事项内容');
+                return;
             }
+            let req={
+                    content : this.newToDoItemValue,
+            }
+            util.ajax
+            .post('/home/addTodoItems',req)
+            .then(response =>{
+                if(response.status == 200){
+                    this.$Message.success("待办事项添加成功！");
+                    this.showAddNewTodo = false;
+                    this.getTodoItems();
+                }
+            })
+            .catch(error => {
+                util.errorProcessor(this, error);
+            })
         },
         cancelAdd () {
             this.showAddNewTodo = false;
             this.newToDoItemValue = '';
+        },
+        getTodoItems () {
+            util.ajax
+            .get('/home/getTodoItems')
+            .then(response => {
+                if(response.status == 200){
+                    this.todoData = response.data;
+                }
+            })
+            .catch(error => {
+                util.errorProcessor(this, error);
+            })
+        },
+        chooseTodo (data) {
+            data.createTime = moment(data.createTime).format('YYYY-MM-DD HH:mm:ss');
+            this.dealForm = data;
+            this.showTodoDeal = true;
+        },
+        Deal(){
+           console.log("id------"+this.dealForm.id);
+           util.ajax
+           .put('/home/updateTodoItems/'+this.dealForm.id)
+           .then(response => {
+               if(response.status == 200){
+                   this.$Message.success("待办事项处理成功！");
+                   this.showTodoDeal = false;
+                   this.getTodoItems();
+               }
+           })
+           .catch(error => {
+                util.errorProcessor(this, error);
+           })
         }
     }
 };
