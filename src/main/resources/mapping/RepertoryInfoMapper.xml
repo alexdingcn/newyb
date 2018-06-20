@@ -272,6 +272,14 @@
             where i.id = #{id};
     </update>
 
+    <update id="inventoryChangeQuantity" parameterType="java.lang.Long" >
+        update repertory_info r, repertory_inventory_detail d, repertory_inventory i
+            set r.quantity = d.inventory_quantity
+        where r.id = d.repertory_id and d.inventory_id = i.id
+        and d.change_quantity != 0
+        and i.status = 'CHECKED' and i.id = #{inventoryId}
+    </update>
+
   <select id="getBalance" parameterType="map" resultType="com.yiban.erp.dto.CurrentBalanceResp">
     select goods_id as goodsId, sum(quantity) as balance
     from repertory_info

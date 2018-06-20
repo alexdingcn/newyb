@@ -73,4 +73,11 @@ public interface RepertoryInfoMapper {
      * @return
      */
     List<RepertoryInfo> getListByRefOrder(RepertorySelectQuery query);
+
+    /**
+     * 根据盘库单的明细，修改库存记录的数量
+     * @param inventoryId
+     * @return
+     */
+    int inventoryChangeQuantity(Long inventoryId);
 }

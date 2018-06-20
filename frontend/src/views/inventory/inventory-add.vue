@@ -62,8 +62,8 @@
                     </p>
                     <div slot="extra">
                         <ButtonGroup>
-                            <Button type="success" icon="checkmark">确认保存</Button>
-                            <Button type="ghost" icon="reply" @click="resetForm">重置</Button>
+                            <Button type="success" icon="checkmark" :loading="saveLoading" @click="saveHaddle">确认保存</Button>
+                            <Button type="ghost" icon="reply" :loading="saveLoading" @click="resetForm">重置</Button>
                         </ButtonGroup>
                     </div>
 
@@ -136,6 +136,7 @@ export default {
   },
   data() {
     return {
+      saveLoading: false,
       addForm: {
         warehouseId: "",
         orderName: "",
@@ -478,6 +479,9 @@ export default {
       }
     }
   },
+  mounted() {
+    this.reloadUncheckData();
+  },
   methods: {
     changeSiderShow() {
       this.showSider = !this.showSider;
@@ -485,6 +489,69 @@ export default {
 
     reloadUncheckData() {
       console.log("reloadUncheckData");
+      let reqData = {
+        statusList: ["UNCHECK"]
+      };
+      this.uncheckTabLoading = true;
+      util.ajax
+        .post("/inventory/list", reqData)
+        .then(response => {
+          this.uncheckTabLoading = false;
+          console.log(response);
+          this.uncheckData = response.data.data;
+        })
+        .catch(error => {
+          this.uncheckTabLoading = false;
+          util.errorProcessor(this, error);
+        });
+    },
+
+    cancelOrder(orderId) {
+      console.log("request cancel action by orderId " + orderId);
+      let self = this;
+      this.$Modal.confirm({
+        title: "取消确认",
+        content: "是否确认取消该笔盘点单，取消后不能修改?",
+        onOk: () => {
+          util.ajax
+            .delete("/inventory/cancel/" + orderId)
+            .then(response => {
+              self.$Message.success("取消成功");
+              self.reloadUncheckData();
+            })
+            .catch(error => {
+              util.errorProcessor(self, error);
+            });
+        }
+      });
+    },
+
+    editOrder(row) {
+      console.log(row);
+      this.resetForm(); //先清空后在赋值
+      let data = JSON.parse(JSON.stringify(row));
+      this.addForm = data;
+      //获取详情
+      this.reloadDetails(data.id);
+    },
+
+    reloadDetails(orderId) {
+      util.ajax
+        .get("/inventory/" + orderId + "/details")
+        .then(response => {
+          console.log(response.data);
+          let dataList = response.data;
+          if (!dataList || dataList.length <= 0) {
+            return;
+          }
+          for (let i = 0; i < dataList.length; i++) {
+            this.haveChooseRepertoryIds.push(dataList[i].repertoryId);
+          }
+          this.tableData = dataList;
+        })
+        .catch(error => {
+          util.errorProcessor(this, error);
+        });
     },
 
     warehouseChange(warehouseId, warehouse) {
@@ -551,6 +618,44 @@ export default {
       this.totalAmount = 0;
       this.totalInventoryQuantity = 0;
       this.$refs.addForm.resetFields();
+    },
+
+    saveHaddle() {
+      let self = this;
+      this.$refs.addForm.validate(valid => {
+        if (!valid) {
+          return;
+        } else {
+          if (!self.tableData || self.tableData.length <= 0) {
+            self.$Modal.info({
+              title: "保存提示",
+              content: "请先添加对应的盘点商品明细"
+            });
+            return;
+          }
+          self.$Modal.confirm({
+            title: "保存确认",
+            content: "是否确认输入的数据正确，提交并保存?",
+            onOk: () => {
+              self.addForm.details = self.tableData;
+              console.log(self.addForm);
+              self.saveLoading = true;
+              util.ajax
+                .post("/inventory/save", self.addForm)
+                .then(response => {
+                  self.saveLoading = false;
+                  self.$Message.success("保存成功");
+                  self.reloadUncheckData();
+                  self.resetForm();
+                })
+                .catch(error => {
+                  self.saveLoading = false;
+                  util.errorProcessor(self, error);
+                });
+            }
+          });
+        }
+      });
     }
   }
 };

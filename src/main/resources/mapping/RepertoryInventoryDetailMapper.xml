@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.yiban.erp.dao.RepertoryInventoryDetailMapper" >
+  <resultMap id="BaseResultMap" type="com.yiban.erp.entities.RepertoryInventoryDetail" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="inventory_id" property="inventoryId" jdbcType="BIGINT" />
+    <result column="repertory_id" property="repertoryId" jdbcType="BIGINT" />
+    <result column="goods_id" property="goodsId" jdbcType="BIGINT" />
+    <result column="supplier_id" property="supplierId" jdbcType="BIGINT" />
+    <result column="supplier_name" property="supplierName" jdbcType="VARCHAR" />
+    <result column="batch_code" property="batchCode" jdbcType="VARCHAR" />
+    <result column="location" property="location" jdbcType="VARCHAR" />
+    <result column="repertory_quantity" property="repertoryQuantity" jdbcType="DECIMAL" />
+    <result column="inventory_quantity" property="inventoryQuantity" jdbcType="DECIMAL" />
+    <result column="change_quantity" property="changeQuantity" jdbcType="DECIMAL" />
+    <result column="buy_price" property="buyPrice" jdbcType="DECIMAL" />
+    <result column="product_date" property="productDate" jdbcType="DATE" />
+    <result column="exp_date" property="expDate" jdbcType="DATE" />
+    <result column="created_by" property="createdBy" jdbcType="VARCHAR" />
+    <result column="created_time" property="createdTime" jdbcType="TIMESTAMP" />
+    <result column="updated_by" property="updatedBy" jdbcType="VARCHAR" />
+    <result column="updated_time" property="updatedTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, inventory_id, repertory_id, goods_id, supplier_id, supplier_name, batch_code,
+    location, repertory_quantity, inventory_quantity, change_quantity, buy_price, product_date, 
+    exp_date, created_by, created_time, updated_by, updated_time
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select 
+    <include refid="Base_Column_List" />
+    from repertory_inventory_detail
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
+    delete from repertory_inventory_detail
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+
+  <delete id="deleteByInventoryId" parameterType="java.lang.Long" >
+    delete from repertory_inventory_detail
+    where inventory_id = #{inventoryId,jdbcType=BIGINT}
+  </delete>
+
+  <insert id="insert" parameterType="com.yiban.erp.entities.RepertoryInventoryDetail" keyProperty="id" useGeneratedKeys="true" >
+    insert into repertory_inventory_detail (inventory_id, repertory_id,
+      goods_id, supplier_id, supplier_name, 
+      batch_code, location, repertory_quantity, 
+      inventory_quantity, change_quantity, buy_price, 
+      product_date, exp_date, created_by, 
+      created_time, updated_by, updated_time
+      )
+    values (#{inventoryId,jdbcType=BIGINT}, #{repertoryId,jdbcType=BIGINT},
+      #{goodsId,jdbcType=BIGINT}, #{supplierId,jdbcType=BIGINT}, #{supplierName,jdbcType=VARCHAR}, 
+      #{batchCode,jdbcType=VARCHAR}, #{location,jdbcType=VARCHAR}, #{repertoryQuantity,jdbcType=DECIMAL}, 
+      #{inventoryQuantity,jdbcType=DECIMAL}, #{changeQuantity,jdbcType=DECIMAL}, #{buyPrice,jdbcType=DECIMAL}, 
+      #{productDate,jdbcType=DATE}, #{expDate,jdbcType=DATE}, #{createdBy,jdbcType=VARCHAR}, 
+      #{createdTime,jdbcType=TIMESTAMP}, #{updatedBy,jdbcType=VARCHAR}, #{updatedTime,jdbcType=TIMESTAMP}
+      )
+  </insert>
+
+  <insert id="insertBatch" parameterType="map" keyProperty="id" useGeneratedKeys="true">
+    insert into repertory_inventory_detail (inventory_id, repertory_id,
+      goods_id, supplier_id, supplier_name,
+      batch_code, location, repertory_quantity,
+      inventory_quantity, change_quantity, buy_price,
+      product_date, exp_date, created_by,
+      created_time, updated_by, updated_time
+      )
+    values
+     <foreach collection="details" item="item" open="(" close=")" separator="), (" >
+       #{item.inventoryId,jdbcType=BIGINT}, #{item.repertoryId,jdbcType=BIGINT},
+       #{item.goodsId,jdbcType=BIGINT}, #{item.supplierId,jdbcType=BIGINT}, #{item.supplierName,jdbcType=VARCHAR},
+       #{item.batchCode,jdbcType=VARCHAR}, #{item.location,jdbcType=VARCHAR}, #{item.repertoryQuantity,jdbcType=DECIMAL},
+       #{item.inventoryQuantity,jdbcType=DECIMAL}, #{item.changeQuantity,jdbcType=DECIMAL}, #{item.buyPrice,jdbcType=DECIMAL},
+       #{item.productDate,jdbcType=DATE}, #{item.expDate,jdbcType=DATE}, #{item.createdBy,jdbcType=VARCHAR},
+       #{item.createdTime,jdbcType=TIMESTAMP}, #{item.updatedBy,jdbcType=VARCHAR}, #{item.updatedTime,jdbcType=TIMESTAMP}
+     </foreach>
+  </insert>
+
+  <update id="updateByPrimaryKeySelective" parameterType="com.yiban.erp.entities.RepertoryInventoryDetail" >
+    update repertory_inventory_detail
+    <set >
+      <if test="inventoryId != null" >
+        inventory_id = #{inventoryId,jdbcType=BIGINT},
+      </if>
+      <if test="repertoryId != null" >
+        repertory_id = #{repertoryId,jdbcType=BIGINT},
+      </if>
+      <if test="goodsId != null" >
+        goods_id = #{goodsId,jdbcType=BIGINT},
+      </if>
+      <if test="supplierId != null" >
+        supplier_id = #{supplierId,jdbcType=BIGINT},
+      </if>
+      <if test="supplierName != null" >
+        supplier_name = #{supplierName,jdbcType=VARCHAR},
+      </if>
+      <if test="batchCode != null" >
+        batch_code = #{batchCode,jdbcType=VARCHAR},
+      </if>
+      <if test="location != null" >
+        location = #{location,jdbcType=VARCHAR},
+      </if>
+      <if test="repertoryQuantity != null" >
+        repertory_quantity = #{repertoryQuantity,jdbcType=DECIMAL},
+      </if>
+      <if test="inventoryQuantity != null" >
+        inventory_quantity = #{inventoryQuantity,jdbcType=DECIMAL},
+      </if>
+      <if test="changeQuantity != null" >
+        change_quantity = #{changeQuantity,jdbcType=DECIMAL},
+      </if>
+      <if test="buyPrice != null" >
+        buy_price = #{buyPrice,jdbcType=DECIMAL},
+      </if>
+      <if test="productDate != null" >
+        product_date = #{productDate,jdbcType=DATE},
+      </if>
+      <if test="expDate != null" >
+        exp_date = #{expDate,jdbcType=DATE},
+      </if>
+      <if test="createdBy != null" >
+        created_by = #{createdBy,jdbcType=VARCHAR},
+      </if>
+      <if test="createdTime != null" >
+        created_time = #{createdTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updatedBy != null" >
+        updated_by = #{updatedBy,jdbcType=VARCHAR},
+      </if>
+      <if test="updatedTime != null" >
+        updated_time = #{updatedTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+
+  <select id="getDetails" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select <include refid="Base_Column_List"/>
+    from repertory_inventory_detail
+    where inventory_id = #{inventoryId,jdbcType=BIGINT}
+  </select>
+
+</mapper>

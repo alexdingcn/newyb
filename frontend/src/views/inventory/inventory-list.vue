@@ -18,10 +18,11 @@
             <Row class="row-margin-bottom margin-left-10">
               <i-input v-model="searchValue" style="width:250px;" placeholder="盘点单号/盘点名称" icon="search" @on-click="refreshTables"></i-input>
               <warehouse-select v-model="searchWarehouseId" style="width:200px; margin-left:15px;" @on-change="refreshTables"></warehouse-select>
-              <Select v-model="searchStatus" placeholder="状态" @on-change="refreshTables" style="width:150px;; margin-left:15px;">
+              <Select v-model="searchStatus" placeholder="状态" @on-change="refreshTables" style="width:150px; margin-left:15px;">
                   <Option v-for="item in statusList" :key="item.value" :value="item.value">{{item.label}}</Option>
               </Select>
-              <DatePicker type="daterange" v-model="searchDate" placement="bottom-start" placeholder="制单时间" style="width:180px;; margin-left:15px;" @on-change="refreshTables"></DatePicker>
+              <DatePicker type="daterange" v-model="searchDate" placement="bottom-start" placeholder="制单时间" style="width:180px; margin-left:15px;" @on-change="refreshTables"></DatePicker>
+              <Button type="info" icon="search" @click="refreshTables" style="margin-left:15px;"></Button>
             </Row>
 
             <Table ref="inventorysTable" highlight-row :loading="tableLoading" 
@@ -51,7 +52,7 @@ export default {
   data() {
     return {
       statusList: [
-        { value: "All", label: "全部" },
+        { value: "ALL", label: "全部" },
         { value: "UNCHECK", label: "待审核" },
         { value: "CHECKED", label: "已审核" },
         { value: "CANCEL", label: "已取消" }
@@ -77,19 +78,19 @@ export default {
           key: "orderNumber",
           width: 200,
           render: (h, params) => {
-            let checkCode = params.row.checkCode;
+            let orderNumber = params.row.orderNumber;
             let buttonArr = [
               {
                 type: "primary",
                 icon: "eye",
-                label: "详情",
+                label: "详情/审核",
                 data: params.row,
                 action: this.showDetail,
                 param: params.row
               }
             ];
             return h("div", [
-              h("span", checkCode),
+              h("span", orderNumber),
               h(actionButton, {
                 class: { rowAction: true },
                 props: {
@@ -117,7 +118,7 @@ export default {
         {
           title: "状态",
           key: "status",
-          width: 120,
+          width: 150,
           render: (h, params) => {
             let status = params.row.status;
             let label = "";
@@ -145,6 +146,22 @@ export default {
           }
         },
         {
+          title: "审核人",
+          key: "checkUserName",
+          width: 120
+        },
+        {
+          title: "审核时间",
+          key: "checkTime",
+          width: 150,
+          render: (h, params) => {
+            let result = params.row.checkTime
+              ? moment(params.row.checkTime).format("YYYY-MM-DD HH:mm")
+              : "";
+            return h("span", result);
+          }
+        },
+        {
           title: "备注",
           key: "comment"
         }
@@ -154,19 +171,26 @@ export default {
       pageSize: 30
     };
   },
+  activated() {
+    this.refreshTables();
+  },
+  mounted() {
+    this.refreshTables();
+  },
   methods: {
     pageChange(data) {
       this.currentPage = data;
       this.refreshTables();
     },
     refreshTables() {
+      let statuses = ["UNCHECK", "CHECKED", "CANCEL"];
+      if (this.searchStatus && this.searchStatus != "ALL") {
+        statuses = [this.searchStatus];
+      }
       let reqData = {
         searchValue: this.searchValue,
         warehouseId: this.searchWarehouseId,
-        statusList:
-          !this.searchStatus || this.searchStatus === "ALL"
-            ? ["UNCHECK", "CHECKED", "CANCEL"]
-            : [this.searchStatus],
+        statusList: statuses,
         startDate: this.searchDate[0],
         endDate: this.searchDate[1],
         page: this.currentPage,
@@ -180,15 +204,22 @@ export default {
           this.tableLoading = false;
           console.log(response);
           this.tableData = response.data.data;
-          this.totalCount = response.data.totals;
+          this.totalCount = response.data.totalCount;
         })
-        .cathc(error => {
+        .catch(error => {
           this.tableLoading = false;
           util.errorProcessor(this, error);
         });
     },
     showDetail(row) {
       console.log(row);
+      let params = {
+        inventoryId: row.id
+      };
+      this.$router.push({
+        name: "inventory-detail",
+        params: params
+      });
     },
 
     gotoAddPage() {
