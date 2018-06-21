@@ -113,21 +113,7 @@ export const otherRouter = {
       title: "盘点单详情",
       name: "inventory-detail",
       component: () => import("@/views/inventory/inventory-detail.vue")
-    },
-    {
-      path: "order/:order_id",
-      title: "订单详情",
-      name: "order-info",
-      component: () =>
-        import("@/views/advanced-router/component/order-info.vue")
-    }, // 用于展示动态路由
-    {
-      path: "shopping",
-      title: "购物详情",
-      name: "shopping",
-      component: () =>
-        import("@/views/advanced-router/component/shopping-info.vue")
-    } // 用于展示带参路由
+    }
   ]
 };
 
@@ -497,36 +483,6 @@ export const appRouter = [
         name: "inventory-add",
         component: () => import("@/views/inventory/inventory-add.vue")
       },
-      // {
-      //   path: "store_check_index",
-      //   title: "盘点单列表",
-      //   name: "store_check_index",
-      //   component: () => import("@/views/checkplan/store_check_index.vue")
-      // },
-      // {
-      //   path: "store_check_add",
-      //   title: "盘点制单",
-      //   name: "store_check_add",
-      //   component: () => import("@/views/checkplan/store_check_add.vue")
-      // },
-      // {
-      //   path: "store_check_do_list",
-      //   title: "执行盘点",
-      //   name: "store_check_do_list",
-      //   component: () => import("@/views/checkplan/store_check_do_list.vue")
-      // },
-      // {
-      //   path: "store_check_table_list",
-      //   title: "盘点表确认",
-      //   name: "store_check_table_list",
-      //   component: () => import("@/views/checkplan/store_check_table_list.vue")
-      // },
-      // {
-      //   path: "store_check_pass_list",
-      //   title: "盘点审核",
-      //   name: "store_check_pass_list",
-      //   component: () => import("@/views/checkplan/store_check_pass_list.vue")
-      // },
       {
         path: "goods-care-list",
         title: "养护",
