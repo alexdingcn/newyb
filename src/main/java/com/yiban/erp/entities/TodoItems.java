@@ -19,6 +19,8 @@ public class TodoItems {
 
     private long refId;
 
+    private String refType;
+
     public int getId() {
         return id;
     }
@@ -50,8 +52,6 @@ public class TodoItems {
     public void setCreateBy(String createBy) {
         this.createBy = createBy;
     }
-
-
 
     public Date getDealTime() {
         return dealTime;
@@ -85,6 +85,10 @@ public class TodoItems {
         this.refId = refId;
     }
 
+    public String getRefType() { return refType; }
+
+    public void setRefType(String refType) { this.refType = refType; }
+
     @Override
     public String toString() {
         return "TodoItems{" +
@@ -96,7 +100,7 @@ public class TodoItems {
                 ", status=" + status +
                 ", companyId=" + companyId +
                 ", refId=" + refId +
+                ", refType='" + refType + '\'' +
                 '}';
     }
-
 }

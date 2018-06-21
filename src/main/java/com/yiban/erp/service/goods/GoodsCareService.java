@@ -1,6 +1,7 @@
 package com.yiban.erp.service.goods;
 
 
+import com.yiban.erp.constant.TodoType;
 import com.yiban.erp.dao.GoodsCareMapper;
 import com.yiban.erp.dao.TodoItemMapper;
 import com.yiban.erp.dto.GoodsQuery;
@@ -47,6 +48,7 @@ public class GoodsCareService {
         todoItem.setContent(content);
         todoItem.setDealTime(goodsCare.getNextDate());
         todoItem.setRefId(goodId);
+        todoItem.setRefType(TodoType.GOOD_CARE.toString());
        if(result == 0){
            todoItemMapper.addTodoByGoodId(todoItem);
        }else{

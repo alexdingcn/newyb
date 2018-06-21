@@ -9,6 +9,8 @@
     <result column="deal_time" property="dealTime" jdbcType="DATE" />
     <result column="status" property="status" jdbcType="BIT" />
     <result column="company_id" property="companyId" jdbcType="INTEGER" />
+    <result column="ref_id" property="refId" jdbcType="BIGINT" />
+    <result column="ref_type" property="refType" jdbcType="VARCHAR" />
   </resultMap>
 
   <select id="getTodoItems" resultMap="BaseResultMap">
@@ -32,17 +34,17 @@
   <select id="getTodoByGoodId" resultType="Integer">
     select count(*)
     from todo_items
-    where ref_id = #{refId}
+    where ref_id = #{refId} and ref_type = "GOOD_CARE"
   </select>
   <update id="updTodoByGoodId" parameterType="com.yiban.erp.entities.TodoItems">
     update todo_items
     set create_time = now(), status = 0, deal_time = #{dealTime}, content = #{content}, create_by = #{createBy}
-    where ref_id =#{refId}
+    where ref_id =#{refId} and ref_type = #{refType}
   </update>
   <insert id="addTodoByGoodId" parameterType="com.yiban.erp.entities.TodoItems">
     insert into todo_items
-    (content,create_time,create_by,deal_time, status,company_id,ref_id)
+    (content,create_time,create_by,deal_time, status,company_id,ref_id,ref_type)
     values
-    (#{content},now() , #{createBy},#{dealTime}, 0, #{companyId}, #{refId})
+    (#{content},now() , #{createBy},#{dealTime}, 0, #{companyId}, #{refId}, #{refType})
   </insert>
 </mapper>
