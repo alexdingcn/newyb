@@ -52,7 +52,9 @@
       ]]>
     </if>
     <if test="nextDate == null">
-      and b.next_date = current_date ()
+      <![CDATA[
+      and b.next_date <= current_date ()
+      ]]>
     </if>
   </select>
 

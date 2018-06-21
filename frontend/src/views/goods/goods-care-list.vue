@@ -200,6 +200,7 @@ export default {
       let req = {
           nextDate : this.endNextDate,
       }
+      console.log("req------"+req.nextDate);
       util.ajax
         .get("/goods_care/careList",{params: req})
         .then(response => {

@@ -78,7 +78,8 @@ public class GoodCareController  {
     @RequestMapping(value= "/careList", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> careList(@AuthenticationPrincipal User user,
                                            @RequestParam(value = "nextDate", required = false) String nextDate) throws ParseException {
-        DateFormat format1 = new SimpleDateFormat("yyyy-MM-dd");
+        DateFormat format1 = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS Z");
+        nextDate = nextDate.replace("Z", " UTC");
         Date date = null;
         if(nextDate !=""){
             date = format1.parse(nextDate);
