@@ -53,9 +53,6 @@
         <mapper resource="mapping/RepertoryInBackDetailMapper.xml"/>
         <mapper resource="mapping/MessageInfoMapper.xml"/>
         <mapper resource="mapping/MessageOptionMapper.xml"/>
-        <mapper resource="mapping/RepertoryCheckPlanMapper.xml"/>
-        <mapper resource="mapping/RepertoryCheckPlanDetailMapper.xml"/>
-        <mapper resource="mapping/RepertoryCheckFormMapper.xml"/>
         <mapper resource="mapping/RepertoryOutMapper.xml"/>
         <mapper resource="mapping/RepertoryOutDetailMapper.xml"/>
         <mapper resource="mapping/FinancialFlowMapper.xml"/>
