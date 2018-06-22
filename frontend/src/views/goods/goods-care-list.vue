@@ -176,7 +176,7 @@ export default {
     },
     careSaveOk() {
       this.careModal = false;
-      init();
+      this.init();
     },
     queryCareRecord(id) {
       this.searchId = "";
