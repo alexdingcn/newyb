@@ -28,4 +28,8 @@ public class BillboardService {
     public int sort(int id,int number){
             return billboardMapper.sort(id, number);
     }
+
+    public List<Billboard> display(Integer companyId){
+        return billboardMapper.display(companyId);
+    }
 }

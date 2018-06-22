@@ -41,7 +41,7 @@
                                 </Radio-group>
                             </FormItem>
                             <FormItem label="公告内容：" prop="content">
-                                <Input type="textarea" :rows="4" v-model="billboardForm.content"/>
+                                <Input type="textarea" :rows="4" v-model="billboardForm.content" placeholder="200字以内" maxlength="200"/>
                             </FormItem>
                             <FormItem label="创建人：" prop="createBy" >
                                 <Input  :maxlength="11" :disabled ="enable" v-model="billboardForm.createBy"/>

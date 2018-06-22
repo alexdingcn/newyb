@@ -46,7 +46,7 @@
                         <img class="avator-img" :src="avatorPath" />
                     </Row>
                 </i-col>
-                <i-col span="12">
+                <i-col span="13">
                     <div>
                         <b class="card-user-infor-name">{{loggedUser.realname || loggedUser.mobile}}</b>
                         <p>{{loggedUser.nickname}}</p>
@@ -60,11 +60,21 @@
                     <br/>
                     <p>到期日: {{ loggedUser.companyExpiredTime | formatTime }} </p>
                 </i-col>
-                <i-col span="4">
+                <i-col span="8">
                     <!-- <ButtonGroup>
                         <Button>升级</Button>
                         <Button type="primary">充值</Button>
                     </ButtonGroup> -->
+                    <Carousel autoplay :height="150" :width="448" dots="inside" :autoplay-speed="4500" >
+                        <Carousel-item  v-for="(data,index) in billboards" :key="index" >
+                            <div>
+                                <p slot="title" align='center' style="font-weight: bolder;">
+                                        {{data.title}}
+                                </p>
+                                <Input type="textarea" :rows="6" v-model="data.content" />
+                            </div>
+                        </Carousel-item>
+                    </Carousel>
                 </i-col>
             </Row>
         </Card>
@@ -258,166 +268,190 @@
 </template>
 
 <script>
-import Cookies from 'js-cookie';
-import Vue from 'vue';
-import cityData from './map-data/get-city-value.js';
-import homeMap from './components/map.vue';
-import dataSourcePie from './components/dataSourcePie.vue';
-import saleVolume from './components/saleVolume.vue';
-import serviceRequests from './components/serviceRequests.vue';
-import userFlow from './components/userFlow.vue';
-import countUp from './components/countUp.vue';
-import inforCard from './components/inforCard.vue';
-import mapDataTable from './components/mapDataTable.vue';
-import toDoListItem from './components/toDoListItem.vue';
-import util from '@/libs/util.js';
-import moment from 'moment';
+import Cookies from "js-cookie";
+import Vue from "vue";
+import cityData from "./map-data/get-city-value.js";
+import homeMap from "./components/map.vue";
+import dataSourcePie from "./components/dataSourcePie.vue";
+import saleVolume from "./components/saleVolume.vue";
+import serviceRequests from "./components/serviceRequests.vue";
+import userFlow from "./components/userFlow.vue";
+import countUp from "./components/countUp.vue";
+import inforCard from "./components/inforCard.vue";
+import mapDataTable from "./components/mapDataTable.vue";
+import toDoListItem from "./components/toDoListItem.vue";
+import util from "@/libs/util.js";
+import moment from "moment";
 
-Vue.filter('formatDate', function(value) {
-    if (value) {
-        return moment(value).format('YYYY/MM/DD');
-    }
+Vue.filter("formatDate", function(value) {
+  if (value) {
+    return moment(value).format("YYYY/MM/DD");
+  }
 });
-Vue.filter('formatTime', function(value) {
-    if (value) {
-        return moment(value).format('YYYY/MM/DD HH:mm:ss');
-    }
+Vue.filter("formatTime", function(value) {
+  if (value) {
+    return moment(value).format("YYYY/MM/DD HH:mm:ss");
+  }
 });
 
 export default {
-    name: 'home',
-    components: {
-        homeMap,
-        dataSourcePie,
-        saleVolume,
-        serviceRequests,
-        userFlow,
-        countUp,
-        inforCard,
-        mapDataTable,
-        toDoListItem
-    },
-    data () {
-        return {
-            showTrialWarning: true,
-            loggedUser: JSON.parse(localStorage.getItem('userDetail')),
-            toDoList: [],
-            todoData:[],
-            dealForm:[],
-            showTodoDeal:false,
-            todoColumns:[
-                {
-                    type:'index',
-                    align:'center',
-                    width:40
-                },
-                {
-                    title:'事项内容',
-                    key:'content',
-                    align:'center',
-                }
-            ],
-            count: {
-                init: 0,
-                sale_checked: 0,
-                quality_checked: 0,
-                settled: 0,
-                returning: 0,
-                returned: 0
-            },
-            cityData: cityData,
-            showAddNewTodo: false,
-            newToDoItemValue: '',
-            amountStats: [],
-            goodsStats: [],
-            updateHistories: [],
-            updateHistoryIdx: 0,
-            lastUpdateIdx: 0,
-            showUpdateHistory: false
-        };
-    },
-    mounted() {
-        this.getUpdates();
-        this.loadOrderStats();
-        this.loadAmountStats();
-        this.loadGoodsStats();
-        this.getTodoItems();
-    },
-    computed: {
-        avatorPath () {
-            return localStorage.avatorImgPath;
+  name: "home",
+  components: {
+    homeMap,
+    dataSourcePie,
+    saleVolume,
+    serviceRequests,
+    userFlow,
+    countUp,
+    inforCard,
+    mapDataTable,
+    toDoListItem
+  },
+  data() {
+    return {
+      showTrialWarning: true,
+      loggedUser: JSON.parse(localStorage.getItem("userDetail")),
+      toDoList: [],
+      todoData: [],
+      dealForm: [],
+      showTodoDeal: false,
+      billboards:[],
+      todoColumns: [
+        {
+          type: "index",
+          align: "center",
+          width: 40
+        },
+        {
+          title: "事项内容",
+          key: "content",
+          align: "center"
         }
+      ],
+      count: {
+        init: 0,
+        sale_checked: 0,
+        quality_checked: 0,
+        settled: 0,
+        returning: 0,
+        returned: 0
+      },
+      cityData: cityData,
+      showAddNewTodo: false,
+      newToDoItemValue: "",
+      amountStats: [],
+      goodsStats: [],
+      updateHistories: [],
+      updateHistoryIdx: 0,
+      lastUpdateIdx: 0,
+      showUpdateHistory: false
+    };
+  },
+  mounted() {
+    this.getUpdates();
+    this.loadOrderStats();
+    this.loadAmountStats();
+    this.loadGoodsStats();
+    this.getTodoItems();
+    this.getBillboard();
+  },
+  computed: {
+    avatorPath() {
+      return localStorage.avatorImgPath;
+    }
+  },
+  methods: {
+    getUpdates() {
+      var self = this;
+      var lastViewUpdate = Cookies.get("last-updateid") || "";
+      util.ajax
+        .get("/home/updates?lt=" + lastViewUpdate)
+        .then(function(response) {
+          if (
+            response.status === 200 &&
+            response.data &&
+            response.data.length > 0
+          ) {
+            self.updateHistories = response.data;
+            self.showUpdateHistory = true;
+            self.lastUpdateIdx = response.data[response.data.length - 1].id;
+            self.$nextTick(() => {
+              self.$refs.updateHistoryList.handleResize();
+            });
+          }
+        })
+        .catch(function(error) {
+          console.log(error);
+          //util.errorProcessor(self, error);
+        });
     },
-    methods: {
-        getUpdates() {
-            var self = this;
-            var lastViewUpdate = Cookies.get('last-updateid') || '';
-            util.ajax.get('/home/updates?lt=' + lastViewUpdate)
-                .then(function (response) {
-                    if (response.status === 200 && response.data && response.data.length > 0) {
-                        self.updateHistories = response.data;
-                        self.showUpdateHistory = true;
-                        self.lastUpdateIdx = response.data[response.data.length - 1].id;
-                        self.$nextTick(() => { self.$refs.updateHistoryList.handleResize(); } );
-                    }
-                })
-                .catch(function (error) {
-                    console.log(error);
-                    //util.errorProcessor(self, error);
-                });
-        },
-        onUpdateClose() {
-            Cookies.set('last-updateid', this.lastUpdateIdx);
-        },
-        loadOrderStats() {
-            var self = this;
-            util.ajax.post('/home/orderstats')
-                .then(function (response) {
-                    if (response.status === 200 && response.data) {
-                        for (var i=0; i<response.data.length; i++) {
-                            self.count[response.data[i].status.toLowerCase()] = response.data[i].count;
-                        }
-                    }
-                })
-                .catch(function (error) {
-                    util.errorProcessor(self, error);
-                });
-        },
-        loadAmountStats() {
-            var self = this;
-            util.ajax.post('/home/amountstats', {
-                    startDate: moment().add(-4, 'w').format('YYYY-MM-DD'),
-                    endDate: moment().add(1, 'd').format('YYYY-MM-DD')
-                })
-                .then(function (response) {
-                    if (response.status === 200 && response.data) {
-                        self.amountStats = response.data;
-                    }
-                })
-                .catch(function (error) {
-                    util.errorProcessor(self, error);
-                });
-        },
-        loadGoodsStats() {
-            var self = this;
-            util.ajax.post('/home/goodsstats', {
-                        startDate: moment().add(-4, 'w').format('YYYY-MM-DD'),
-                        endDate: moment().add(1, 'd').format('YYYY-MM-DD')
-                    })
-                    .then(function (response) {
-                        if (response.status === 200 && response.data) {
-                            self.goodsStats = response.data;
-                        }
-                    })
-                    .catch(function (error) {
-                        util.errorProcessor(self, error);
-                    });
-        },
-        addNewToDoItem () {
-            this.showAddNewTodo = true;
-        },
-        addNew () {
-            /**if (this.newToDoItemValue.length !== 0) {
+    onUpdateClose() {
+      Cookies.set("last-updateid", this.lastUpdateIdx);
+    },
+    stay(){
+        this.$Message.success("xuantingchenggong!");
+    },
+    loadOrderStats() {
+      var self = this;
+      util.ajax
+        .post("/home/orderstats")
+        .then(function(response) {
+          if (response.status === 200 && response.data) {
+            for (var i = 0; i < response.data.length; i++) {
+              self.count[response.data[i].status.toLowerCase()] =
+                response.data[i].count;
+            }
+          }
+        })
+        .catch(function(error) {
+          util.errorProcessor(self, error);
+        });
+    },
+    loadAmountStats() {
+      var self = this;
+      util.ajax
+        .post("/home/amountstats", {
+          startDate: moment()
+            .add(-4, "w")
+            .format("YYYY-MM-DD"),
+          endDate: moment()
+            .add(1, "d")
+            .format("YYYY-MM-DD")
+        })
+        .then(function(response) {
+          if (response.status === 200 && response.data) {
+            self.amountStats = response.data;
+          }
+        })
+        .catch(function(error) {
+          util.errorProcessor(self, error);
+        });
+    },
+    loadGoodsStats() {
+      var self = this;
+      util.ajax
+        .post("/home/goodsstats", {
+          startDate: moment()
+            .add(-4, "w")
+            .format("YYYY-MM-DD"),
+          endDate: moment()
+            .add(1, "d")
+            .format("YYYY-MM-DD")
+        })
+        .then(function(response) {
+          if (response.status === 200 && response.data) {
+            self.goodsStats = response.data;
+          }
+        })
+        .catch(function(error) {
+          util.errorProcessor(self, error);
+        });
+    },
+    addNewToDoItem() {
+      this.showAddNewTodo = true;
+    },
+    addNew() {
+      /**if (this.newToDoItemValue.length !== 0) {
                 this.toDoList.unshift({
                     title: this.newToDoItemValue
                 });
@@ -425,62 +459,74 @@ export default {
                     this.newToDoItemValue = '';
                 }, 200);
                 this.showAddNewTodo = false;
-            } else */if(this.newToDoItemValue.length == 0){
-                this.$Message.error('请输入待办事项内容');
-                return;
-            }
-            let req={
-                    content : this.newToDoItemValue,
-            }
-            util.ajax
-            .post('/home/addTodoItems',req)
-            .then(response =>{
-                if(response.status == 200){
-                    this.$Message.success("待办事项添加成功！");
-                    this.showAddNewTodo = false;
-                    this.getTodoItems();
-                }
-            })
-            .catch(error => {
-                util.errorProcessor(this, error);
-            })
-        },
-        cancelAdd () {
+            } else */ if (
+        this.newToDoItemValue.length == 0
+      ) {
+        this.$Message.error("请输入待办事项内容");
+        return;
+      }
+      let req = {
+        content: this.newToDoItemValue
+      };
+      util.ajax
+        .post("/home/addTodoItems", req)
+        .then(response => {
+          if (response.status == 200) {
+            this.$Message.success("待办事项添加成功！");
             this.showAddNewTodo = false;
-            this.newToDoItemValue = '';
-        },
-        getTodoItems () {
-            util.ajax
-            .get('/home/getTodoItems')
-            .then(response => {
-                if(response.status == 200){
-                    this.todoData = response.data;
-                }
-            })
-            .catch(error => {
-                util.errorProcessor(this, error);
-            })
-        },
-        chooseTodo (data) {
-            data.createTime = moment(data.createTime).format('YYYY-MM-DD HH:mm:ss');
-            this.dealForm = data;
-            this.showTodoDeal = true;
-        },
-        Deal(){
-           console.log("id------"+this.dealForm.id);
-           util.ajax
-           .put('/home/updateTodoItems/'+this.dealForm.id)
-           .then(response => {
-               if(response.status == 200){
-                   this.$Message.success("待办事项处理成功！");
-                   this.showTodoDeal = false;
-                   this.getTodoItems();
-               }
-           })
-           .catch(error => {
-                util.errorProcessor(this, error);
-           })
-        }
+            this.getTodoItems();
+          }
+        })
+        .catch(error => {
+          util.errorProcessor(this, error);
+        });
+    },
+    cancelAdd() {
+      this.showAddNewTodo = false;
+      this.newToDoItemValue = "";
+    },
+    getTodoItems() {
+      util.ajax
+        .get("/home/getTodoItems")
+        .then(response => {
+          if (response.status == 200) {
+            this.todoData = response.data;
+          }
+        })
+        .catch(error => {
+          util.errorProcessor(this, error);
+        });
+    },
+    chooseTodo(data) {
+      data.createTime = moment(data.createTime).format("YYYY-MM-DD HH:mm:ss");
+      this.dealForm = data;
+      this.showTodoDeal = true;
+    },
+    Deal() {
+      console.log("id------" + this.dealForm.id);
+      util.ajax
+        .put("/home/updateTodoItems/" + this.dealForm.id)
+        .then(response => {
+          if (response.status == 200) {
+            this.$Message.success("待办事项处理成功！");
+            this.showTodoDeal = false;
+            this.getTodoItems();
+          }
+        })
+        .catch(error => {
+          util.errorProcessor(this, error);
+        });
+    },
+    getBillboard() {
+        util.ajax
+        .get('/billboard/display')
+        .then(response => {
+            this.billboards = response.data.data;
+        })
+        .catch(error => {
+            util.errorProcessor(this, error);
+        })
     }
+  }
 };
 </script>

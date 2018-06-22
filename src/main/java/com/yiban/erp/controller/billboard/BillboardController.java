@@ -79,4 +79,12 @@ public class BillboardController {
         }
         return ResponseEntity.badRequest().body(ErrorCode.FAILED_DELETE_FROM_DB.toString());
     }
+    @RequestMapping(value = "/display", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> display(@AuthenticationPrincipal User user){
+        Integer companyId = user.getCompanyId();
+        List<Billboard> billboards = billboardService.display(companyId);
+        JSONObject result = new JSONObject();
+        result.put("data",billboards);
+        return ResponseEntity.ok().body(JSON.toJSONString(result));
+    }
 }
