@@ -12,10 +12,10 @@
             <div slot="extra">
                 <ButtonGroup >
                     <Button type="primary" icon="android-add-circle" @click="saveOut" >保存</Button>
-                    <Button type="primary" icon="android-add-circle" >单据修改</Button>
+                    <!--<Button type="primary" icon="android-add-circle" >单据修改</Button>
                     <Button type="primary" icon="android-add-circle" >数据引入</Button>
                     <Button type="primary" icon="android-add-circle" >草稿导入</Button>
-                    <Button type="primary" icon="android-add-circle" >打印</Button>
+                    <Button type="primary" icon="android-add-circle" >打印</Button>-->
                 </ButtonGroup>
             </div>
             <Form :label-width="85" :model="changeStore" ref="changeStoreForm">

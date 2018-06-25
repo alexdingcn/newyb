@@ -101,7 +101,8 @@ export default {
             statusOptions: [
                 {key: 'ALL', name: '所有'},
                 {key: 'INIT', name: '待复核'},
-                {key: 'REVIEW', name: '复核中'}
+                {key: 'REVIEW', name: '复核中'},
+                {key: 'REVIEW_NEXT', name: '双人复核'}
             ],
             query: {
                 warehouseId: '',

@@ -5,9 +5,13 @@ import org.apache.commons.lang3.StringUtils;
 public enum RepertoryOutStatus {
 
     TEMP_STORAGE,
+    //待复核
     INIT,
+    //复核中
     REVIEW,
+    //双人复核
     REVIEW_NEXT,
+    //已审核
     CHECKED,
     DELETE,
 
