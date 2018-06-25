@@ -43,6 +43,37 @@
                         <!--<Button type="success" size="small" icon="android-checkbox-outline" @click="saveOroderDetail">保存详情</Button>-->
                     </ButtonGroup>
                 </Row>
+
+                <Modal v-model="reviewOkModal" title="复核意见登记" @on-ok="reviewOpinion">
+                    <Form :label-width="100" :model="checkForm">
+                <Row >
+                    <FormItem label="复核人" >
+                        <Input v-model="checkForm.checkUser" placeholder="张三;李四" style="width: 40%;"/>
+                        <Tooltip transfer >
+                            <Icon type="ios-information-outline" size="20"></Icon>
+                            <div slot="content" >
+                                <strong>用于登记出库复核人员姓名</strong><br/>
+                                <strong>提示:如果是多人验审,请使用“;”号分割多个人的姓名, 例如：张三;李四</strong><br/>
+                                <strong style="color: red;">注意：如果商品列表中存在有“特殊管理药品”标识的商品，至少需要双人验审</strong>
+                            </div>
+                        </Tooltip>
+                    </FormItem>
+                </Row>
+                <Row style="margin-top: 1.5em">
+                    <FormItem label="复核意见" :error="checkStatusError">
+                        <Select v-model="checkForm.checkStatus" placeholder="请选择" @on-change="checkStatusChange" style="width: 40%">
+                            <Option v-for="optinion in OptinionList" :value="optinion.key" :label="optinion.name" :key="optinion.key">{{optinion.name}}</Option>
+                        </Select>
+                    </FormItem>
+                </Row>
+                <Row style="margin-top: 1.5em;">
+                    <FormItem label="复核结果描述">
+                        <Input v-model="checkForm.checkResult" placeholder="复核结果描述" />
+                    </FormItem>
+                </Row>
+                    </Form>
+                </Modal>
+
               <Table border highlight-row height="300" :loading="detailLoading" 
                    :columns="detailColumns" :data="detailList" size="small" 
                    ref="detailTable" style="width: 100%;" 
@@ -64,445 +95,484 @@
 
 <script>
 import util from "@/libs/util.js";
-import moment,{ isMoment } from 'moment';
+import moment, { isMoment } from "moment";
 import warehouseSelect from "@/views/selector/warehouse-select.vue";
 import goodSelect from "@/views/selector/good-select.vue";
 import warehouseLocationModal from "@/views/selector/warehouse-location-modal.vue";
 
 export default {
-    name: 'out-review',
-    components: {
-        warehouseSelect,
-        goodSelect,
-        warehouseLocationModal
-    },
-    data() {
+  name: "out-review",
+  components: {
+    warehouseSelect,
+    goodSelect,
+    warehouseLocationModal
+  },
+  data() {
+    const addWarehouseLocation = (h, location, rowData, index) => {
+      let label = location ? location : "";
+      return h("div", [
+        h("span", label),
+        h("Button", {
+          props: {
+            type: "text",
+            size: "small",
+            icon: "edit"
+          },
+          on: {
+            click: () => {
+              this.openChooseLocation(rowData, index);
+            }
+          }
+        })
+      ]);
+    };
 
-        const addWarehouseLocation = (h, location, rowData, index) => {
-            let label = location ? location : '';
-            return h('div', [
-                h('span', label),
-                h('Button', {
-                    props: {
-                        type: 'text',
-                        size: 'small',
-                        icon: 'edit'
-                    },
-                    on: {
-                        'click': () => {
-                            this.openChooseLocation(rowData, index);
-                        }
-                    }
-                })
-            ]);
-        };
+    return {
+      reviewOkModal: false,
+      checkForm:{},
+      optinionList: [
+        { key: "OK", name: "通过", defaultResult: "出库复核通过" },
+        { key: "REJECT", name: "拒绝", defaultResult: "出库复核未通过" }
+      ],
+      statusOptions: [
+        { key: "ALL", name: "所有" },
+        { key: "INIT", name: "待复核" },
+        { key: "REVIEW", name: "复核中" },
+        { key: "REVIEW_NEXT", name: "双人复核" }
+      ],
+      query: {
+        warehouseId: "",
+        supplierId: "",
+        status: "INIT"
+      },
+      dateRange: [
+        moment()
+          .add(-1, "w")
+          .format("YYYY-MM-DD"),
+        moment().format("YYYY-MM-DD")
+      ],
+      orderLoading: false,
+      currEditLocationRow: {},
+      currDditLocationIndex: "",
+      locationModal: false,
+      orderList: [],
+      orderListColumns: [
+        {
+          title: "序号",
+          type: "index",
+          width: 80
+        },
+        {
+          title: "状态",
+          key: "status",
+          width: 100,
+          render: (h, params) => {
+            let state = params.row.status;
+            if (state == "INIT") {
+              return h("Tag", { props: { color: "red" } }, "待复核");
+            } else if (state == "REVIEW") {
+              return h("Tag", { props: { color: "yellow" } }, "复核中");
+            } else if (state == "REVIEW_NEXT") {
+              return h("Tag", { props: { color: "blue" } }, "双人复核");
+            } else if (state == "CHECKED") {
+              return h("Tag", { props: { color: "green" } }, "已审核");
+            }
+          }
+        },
+        {
+          title: "出库时间",
+          key: "outDate",
+          render: (h, params) => {
+            let receiveDate = params.row.outDate;
+            return receiveDate ? moment(receiveDate).format("YYYY-MM-DD") : "";
+          }
+        },
+        {
+          title: "出库类型",
+          key: "refTypeName"
+        },
+        {
+          title: "出库仓库",
+          key: "warehouseName"
+        },
+        {
+          title: "出库数量",
+          key: "totalQuantity"
+        },
+        {
+          title: "总计金额",
+          key: "totalAmount"
+        },
+        {
+          title: "制单人",
+          key: "createBy"
+        },
 
-        return {
-            statusOptions: [
-                {key: 'ALL', name: '所有'},
-                {key: 'INIT', name: '待复核'},
-                {key: 'REVIEW', name: '复核中'},
-                {key: 'REVIEW_NEXT', name: '双人复核'}
-            ],
-            query: {
-                warehouseId: '',
-                supplierId: '',
-                status: 'INIT'
-            },
-            dateRange: [
-                moment().add(-1,'w').format('YYYY-MM-DD'),
-                moment().format('YYYY-MM-DD')
-            ],
-            orderLoading: false,
-            currEditLocationRow: {},
-            currDditLocationIndex: '',
-            locationModal: false,
-            orderList: [],
-            orderListColumns: [
-                {
-                    title: '序号',
-                    type: 'index',
-                    width: 80
-                },
-                {
-                    title: '状态',
-                    key: 'status',
-                    width: 100,
-                    render: (h, params) => {
-                        let state = params.row.status;
-                        if (state== 'INIT') {
-                            return h('Tag', {props:{ color:'red'}}, '待复核');
-                        }else if(state=='REVIEW'){
-                            return h('Tag', {props:{ color:'yellow'}}, '复核中');
-                        }else if(state=='REVIEW_NEXT'){
-                            return h('Tag', {props:{ color:'blue'}}, '双人复核');
-                        }else if(state=='CHECKED'){
-                            return h('Tag', {props:{ color:'green'}}, '已审核');
-                        }
-                    }
-                },
-                {
-                    title: '出库时间',
-                    key: 'outDate',
-                    render: (h, params) => {
-                        let receiveDate = params.row.outDate;
-                        return receiveDate ? moment(receiveDate).format("YYYY-MM-DD") : '';
-                    }
-                },
-                {
-                    title: '出库类型',
-                    key: 'refTypeName',
-                },
-                {
-                    title: '出库仓库',
-                    key: 'warehouseName',
-                },
-                {
-                    title: '出库数量',
-                    key: 'totalQuantity'
-                },
-                {
-                    title: '总计金额',
-                    key: 'totalAmount'
-                },
-                {
-                    title: '制单人',
-                    key: 'createBy'
-                },
-
-                {
-                    title: '系统单号',
-                    key: 'refOrderNumber',
-                }
-
-            ],
-            currentChooseOrder: {},
-            detailLoading: false,
-            detailList: [],
-            detailColumns: [
-                {
-                    title: "序号",
-                    type: 'index',
-                    width: 80
-                },
-                {
-                    title: '状态',
-                    key: 'status',
-                    align: 'center',
-                    width: 100,
-                    render: (h, params) =>{
-                        let state = params.row.status;
-                        if (state==undefined) {
-                            return h('Tag', {props:{ color:'red'}}, '待复核');
-                        }else if('INIT'==state){
-                            return h('Tag', {props:{ color:'red'}}, '待复核');
-                        }else if('REVIEW'==state){
-                            return h('Tag', {props:{ color:'yellow'}}, '复核中');
-                        }else if('REVIEW_NEXT'==state){
-                            return h('Tag', {props:{ color:'blue'}}, '双人复核');
-                        }else if('CHECKED'==state){
-                            return h('Tag', {props:{ color:'green'}}, '已审核');
-                        }
-                    }
-                },
-                {
-                    title: "商品名称",
-                    key: 'goodsName',
-                    width: 160
-                },
-                {
-                    title: "产地",
-                    key: 'origin',
-                    width: 120
-                },
-                {
-                    title: "剂型",
-                    key: 'jx',
-                    width: 120
-                },
-                {
-                    title: "规格",
-                    key: 'spec',
-                    width: 100
-                },
-                {
-                    title: "生产企业",
-                    key: 'factoryName',
-                    width: 120
-                },
-                {
-                    title: "批准文号",
-                    key: 'permit',
-                    width: 120
-                },
-
-                {
-                    title: "出库数量",
-                    key: 'quantity',
-                    width: 120
-                },
-                {
-                    title: "单位",
-                    key: 'unitName',
-                    width: 120
-                },
-                {
-                    title: '单价',
-                    width: 120,
-                    key: 'price'
-                },
-                {
-                    title: '金额',
-                    width: 120,
-                    key: 'amount'
-                },
-                {
-                    title: "批号",
-                    key: 'batchCode',
-                    width: 140
-                },
-                {
-                    title: "生产日期",
-                    key: 'productDate',
-                    width: 140,
-                    render: (h, params) => {
-                        return params.row.productDate ? moment(params.row.productDate).format('YYYY-MM-DD') : '';
-                    }
-                },
-                {
-                    title: "有效期至",
-                    key: 'expDate',
-                    width: 140,
-                    render: (h, params) => {
-                        return params.row.expDate ? moment(params.row.expDate).format('YYYY-MM-DD') : '';
-                    }
-                },
-                {
-                    title: "存储条件",
-                    key: 'storageCondition',
-                    width: 100
-                },
-                {
-                    title: "特殊药品",
-                    key: 'specialManage',
-                    width: 120,
-                    render (h, params) {
-                        let specialManage = params.row.specialManage;
-                        if (specialManage) {
-                            return h('Tag', {props:{type:'dot', color:'red'}}, '是');
-                        }else{
-                            return h('Tag', {props:{type:'dot', color:'blue'}}, '否');
-                        }
-                    }
-                },
-                {
-                    title: "库区",
-                    key: 'warehouseLocation',
-                    width: 140
-                }
-
-            ],
-            currChooseDetail: {},
-            totalAmount: 0,
-            totalReceiveCount: 0,
-            totalInCount: 0,
-            totalRightCount: 0,
-            totalErrorCount: 0,
-            totalSurveyQuality: 0,
-            surveyModal: false,
-            checkDetail: false,
-            checkFormItem: {},
-            checkModal: false,
-            checkFileNo: '',
-            checkFileModal: false
+        {
+          title: "系统单号",
+          key: "refOrderNumber"
         }
-    },
-    watch: {
-        detailList(data) {
-            if(!data || data.length <= 0) {
-                this.totalAmount = 0;
-                this.totalReceiveCount = 0;
-                this.totalInCount = 0;
-                this.totalRightCount = 0;
-                this.totalErrorCount = 0;
-                this.totalSurveyQuality = 0;
-            }else {
-                this.totalAmount = data.reduce((total, item) => {return item.amount ? total + item.amount : total + 0}, 0);
-                this.totalReceiveCount = data.reduce((total, item) => {return item.receiveQuality ? total + item.receiveQuality : total + 0}, 0);
-                this.totalInCount = data.reduce((total, item) => {return item.inCount ? total + item.inCount : total + 0}, 0);
-                this.totalRightCount = data.reduce((total, item) => {return item.rightCount ? total + item.rightCount : total + 0}, 0);
-                this.totalErrorCount = data.reduce((total, item) => {return item.errorCount ? total + item.errorCount : total + 0}, 0);
-                this.totalSurveyQuality = data.reduce((total, item) => {return item.surveyQuality ? total + item.surveyQuality : total + 0}, 0);
-            }
-        }
-    },
-    methods: {
-        refreshOrder() {
-            let statusList = [];
-            if (this.query.status === 'INIT') {
-                statusList = ['INIT'];
-            }else if(this.query.status === 'REVIEW'){
-                statusList = ['REVIEW'];
-            }else if(this.query.status === 'REVIEW_NEXT'){
-                statusList = ['REVIEW_NEXT'];
-            }else if(this.query.status === 'CHECKED'){
-                statusList = ['CHECKED'];
-            }else{
-                statusList=null;
-            }
-            let reqData = {
-                statusList: statusList,
-                warehouseId: this.query.warehouseId,
-                startReceiveDate: this.dateRange[0],
-                endReceiveDate: this.dateRange[1]
-            };
-            this.orderLoading = true;
-            util.ajax.post("/repertory/out/list", reqData)
-                .then((response) => {
-                    this.orderLoading = false;
-                    this.orderList = response.data;
-                })
-                .catch((error) => {
-                    this.orderLoading = false;
-                    util.errorProcessor(this, error);
-                });
-            this.currentChooseOrder = {};
-            this.currChooseDetail = {};
-            this.detailList = [];
+      ],
+      currentChooseOrder: {},
+      detailLoading: false,
+      detailList: [],
+      detailColumns: [
+        {
+          title: "序号",
+          type: "index",
+          width: 80
         },
-        //点击出库单查询明细
-        handleSelectOrder(rowData) { 
-            if (!rowData || !rowData.id) {
-                this.currentChooseOrder = {};
-                this.detailList = [];
-                return;
+        {
+          title: "状态",
+          key: "status",
+          align: "center",
+          width: 100,
+          render: (h, params) => {
+            let state = params.row.status;
+            if (state == undefined) {
+              return h("Tag", { props: { color: "red" } }, "待复核");
+            } else if ("INIT" == state) {
+              return h("Tag", { props: { color: "red" } }, "待复核");
+            } else if ("REVIEW" == state) {
+              return h("Tag", { props: { color: "yellow" } }, "复核中");
+            } else if ("REVIEW_NEXT" == state) {
+              return h("Tag", { props: { color: "blue" } }, "双人复核");
+            } else if ("CHECKED" == state) {
+              return h("Tag", { props: { color: "green" } }, "已审核");
             }
-            this.currentChooseOrder = rowData;
-            this.reloadOrderDetail();
-            this.checkFileNo = '';
+          }
         },
-        //点击选中出库单明细
-        handleSelectDetail(rowData) {
-            if (!rowData || !rowData.id) {
-                this.currChooseDetail = {};
-            }else {
-                this.currChooseDetail = rowData;
-            }
+        {
+          title: "商品名称",
+          key: "goodsName",
+          width: 160
         },
-        //重载明细--同时重载单据状态信息
-        reloadOrderDetail() {
-            this.detailLoading = true;
-            let self=this;
-            util.ajax.get('/repertory/out/detail/' + self.currentChooseOrder.id)
-                .then((response) => {
-                    this.detailLoading = false;
-                    let data = response.data;
-                    if (data) {
-                        //同时更新单据的状态信息
-                        this.detailList = data.detailList;
-                        if(data.repertoryOut.status!=self.currentChooseOrder.status){
-                            //表单状态发生变化，更新表单
-                            this.$Message.warning('出库单状态发生变化，更新表单');
-                            this.refreshOrder();
-                        }
-
-                        this.currChooseDetail = {};
-                    }
-                })
-                .catch((error) => {
-                    this.detailLoading = false;
-                    util.errorProcessor(this, error);
-                });
+        {
+          title: "产地",
+          key: "origin",
+          width: 120
         },
-        //复核一单
-        checkOneOrderBtn() {
-            if (!this.currentChooseOrder || !this.currentChooseOrder.id) {
-                this.$Message.warning('请先选择一条需要复核的订单信息');
-                return;
-            }
-            this.checkFormItem = {
-                orderId: this.currentChooseOrder.id
-            }
-            //this.checkDetail = false;
-            util.ajax.put('/repertory/out/set/review', this.checkFormItem)
-                .then((response) => {
-                    this.detailLoading = false;
-                    this.$Message.success('复核成功');
-                    this.refreshOrder();
-                })
-                .catch((error) => {
-                    this.detailLoading = false;
-                    util.errorProcessor(this, error);
-                })
+        {
+          title: "剂型",
+          key: "jx",
+          width: 120
         },
-        //复核一条明细
-        checkOneDetailBtn() {
-            if (!this.currChooseDetail || !this.currChooseDetail.id) {
-                this.$Message.warning('请先选择需要复核的商品');
-                return;
-            }
-            this.checkFormItem = {
-                detailId: this.currChooseDetail.id,
-            }
-            util.ajax.put('/repertory/out/set/review', this.checkFormItem)
-                .then((response) => {
-                    this.detailLoading = false;
-                    this.$Message.success('复核成功');
-                    this.reloadOrderDetail();
-                })
-                .catch((error) => {
-                    this.detailLoading = false;
-                    util.errorProcessor(this, error);
-                })
+        {
+          title: "规格",
+          key: "spec",
+          width: 100
+        },
+        {
+          title: "生产企业",
+          key: "factoryName",
+          width: 120
+        },
+        {
+          title: "批准文号",
+          key: "permit",
+          width: 120
         },
 
-        unCheckOneOrderBtn() {
-            if (!this.currentChooseOrder || !this.currentChooseOrder.id) {
-                this.$Message.warning('请先选择需要取消验证的订单');
-                return;
-            }
-            util.ajax.get('/repertory/out/set/unReview/'+ this.currentChooseOrder.id)
-                .then((response) => {
-                    this.$Message.success('取消成功');
-                    this.reloadOrderDetail();
-                })
-                .catch((error) => {
-                    util.errorProcessor(this, error);
-                })
+        {
+          title: "出库数量",
+          key: "quantity",
+          width: 120
         },
-        unReviewOneDetailBtn() {
-            if (!this.currChooseDetail || !this.currChooseDetail.id) {
-                this.$Message.warning('请先选择需要取消验证的订单');
-                return;
+        {
+          title: "单位",
+          key: "unitName",
+          width: 120
+        },
+        {
+          title: "单价",
+          width: 120,
+          key: "price"
+        },
+        {
+          title: "金额",
+          width: 120,
+          key: "amount"
+        },
+        {
+          title: "批号",
+          key: "batchCode",
+          width: 140
+        },
+        {
+          title: "生产日期",
+          key: "productDate",
+          width: 140,
+          render: (h, params) => {
+            return params.row.productDate
+              ? moment(params.row.productDate).format("YYYY-MM-DD")
+              : "";
+          }
+        },
+        {
+          title: "有效期至",
+          key: "expDate",
+          width: 140,
+          render: (h, params) => {
+            return params.row.expDate
+              ? moment(params.row.expDate).format("YYYY-MM-DD")
+              : "";
+          }
+        },
+        {
+          title: "存储条件",
+          key: "storageCondition",
+          width: 100
+        },
+        {
+          title: "特殊药品",
+          key: "specialManage",
+          width: 120,
+          render(h, params) {
+            let specialManage = params.row.specialManage;
+            if (specialManage) {
+              return h("Tag", { props: { type: "dot", color: "red" } }, "是");
+            } else {
+              return h("Tag", { props: { type: "dot", color: "blue" } }, "否");
             }
-            util.ajax.get('/repertory/out/set/unReviewDetail/' + this.currChooseDetail.id)
-                .then((response) => {
-                    this.$Message.success('取消成功');
-                    this.reloadOrderDetail();
-                })
-                .catch((error) => {
-                    util.errorProcessor(this, error);
-                })
+          }
+        },
+        {
+          title: "库区",
+          key: "warehouseLocation",
+          width: 140
+        },
+        {
+          title: "复核人",
+          key: "reviewOrderUser",
+          width: 100
         }
+      ],
+      currChooseDetail: {},
+      totalAmount: 0,
+      totalReceiveCount: 0,
+      totalInCount: 0,
+      totalRightCount: 0,
+      totalErrorCount: 0,
+      totalSurveyQuality: 0,
+      surveyModal: false,
+      checkDetail: false,
+      checkFormItem: {},
+      checkModal: false,
+      checkFileNo: "",
+      checkFileModal: false
+    };
+  },
+  watch: {
+    detailList(data) {
+      if (!data || data.length <= 0) {
+        this.totalAmount = 0;
+        this.totalReceiveCount = 0;
+        this.totalInCount = 0;
+        this.totalRightCount = 0;
+        this.totalErrorCount = 0;
+        this.totalSurveyQuality = 0;
+      } else {
+        this.totalAmount = data.reduce((total, item) => {
+          return item.amount ? total + item.amount : total + 0;
+        }, 0);
+        this.totalReceiveCount = data.reduce((total, item) => {
+          return item.receiveQuality ? total + item.receiveQuality : total + 0;
+        }, 0);
+        this.totalInCount = data.reduce((total, item) => {
+          return item.inCount ? total + item.inCount : total + 0;
+        }, 0);
+        this.totalRightCount = data.reduce((total, item) => {
+          return item.rightCount ? total + item.rightCount : total + 0;
+        }, 0);
+        this.totalErrorCount = data.reduce((total, item) => {
+          return item.errorCount ? total + item.errorCount : total + 0;
+        }, 0);
+        this.totalSurveyQuality = data.reduce((total, item) => {
+          return item.surveyQuality ? total + item.surveyQuality : total + 0;
+        }, 0);
+      }
     }
-}
+  },
+  methods: {
+    refreshOrder() {
+      let statusList = [];
+      if (this.query.status === "INIT") {
+        statusList = ["INIT"];
+      } else if (this.query.status === "REVIEW") {
+        statusList = ["REVIEW"];
+      } else if (this.query.status === "REVIEW_NEXT") {
+        statusList = ["REVIEW_NEXT"];
+      } else if (this.query.status === "CHECKED") {
+        statusList = ["CHECKED"];
+      } else {
+        statusList = null;
+      }
+      let reqData = {
+        statusList: statusList,
+        warehouseId: this.query.warehouseId,
+        startReceiveDate: this.dateRange[0],
+        endReceiveDate: this.dateRange[1]
+      };
+      this.orderLoading = true;
+      util.ajax
+        .post("/repertory/out/list", reqData)
+        .then(response => {
+          this.orderLoading = false;
+          this.orderList = response.data;
+        })
+        .catch(error => {
+          this.orderLoading = false;
+          util.errorProcessor(this, error);
+        });
+      this.currentChooseOrder = {};
+      this.currChooseDetail = {};
+      this.detailList = [];
+    },
+    //点击出库单查询明细
+    handleSelectOrder(rowData) {
+      if (!rowData || !rowData.id) {
+        this.currentChooseOrder = {};
+        this.detailList = [];
+        return;
+      }
+      this.currentChooseOrder = rowData;
+      this.reloadOrderDetail();
+      this.checkFileNo = "";
+    },
+    //点击选中出库单明细
+    handleSelectDetail(rowData) {
+      if (!rowData || !rowData.id) {
+        this.currChooseDetail = {};
+      } else {
+        this.currChooseDetail = rowData;
+      }
+    },
+    //重载明细--同时重载单据状态信息
+    reloadOrderDetail() {
+      this.detailLoading = true;
+      let self = this;
+      util.ajax
+        .get("/repertory/out/detail/" + self.currentChooseOrder.id)
+        .then(response => {
+          this.detailLoading = false;
+          let data = response.data;
+          if (data) {
+            //同时更新单据的状态信息
+            this.detailList = data.detailList;
+            if (data.repertoryOut.status != self.currentChooseOrder.status) {
+              //表单状态发生变化，更新表单
+              this.$Message.warning("出库单状态发生变化，更新表单");
+              this.refreshOrder();
+            }
+
+            this.currChooseDetail = {};
+          }
+        })
+        .catch(error => {
+          this.detailLoading = false;
+          util.errorProcessor(this, error);
+        });
+    },
+    //复核一单
+    checkOneOrderBtn() {
+      if (!this.currentChooseOrder || !this.currentChooseOrder.id) {
+        this.$Message.warning("请先选择一条需要复核的订单信息");
+        return;
+      }
+      this.reviewOkModal = true;
+    },
+    reviewOpinion(){
+         this.checkFormItem = {
+        orderId: this.currentChooseOrder.id,
+        reviewUser:this.checkForm.checkUser,
+        status:this.checkForm.statusOptions,
+        reviewResult:this.checkForm.checkResult
+
+      };
+      //this.checkDetail = false;
+      util.ajax
+        .put("/repertory/out/set/review", this.checkFormItem)
+        .then(response => {
+          this.detailLoading = false;
+          this.$Message.success("复核成功");
+          this.refreshOrder();
+        })
+        .catch(error => {
+          this.detailLoading = false;
+          util.errorProcessor(this, error);
+        });
+    },
+    //复核一条明细
+    /**checkOneDetailBtn() {
+      if (!this.currChooseDetail || !this.currChooseDetail.id) {
+        this.$Message.warning("请先选择需要复核的商品");
+        return;
+      }
+      this.checkFormItem = {
+        detailId: this.currChooseDetail.id
+      };
+      util.ajax
+        .put("/repertory/out/set/review", this.checkFormItem)
+        .then(response => {
+          this.detailLoading = false;
+          this.$Message.success("复核成功");
+          this.reloadOrderDetail();
+        })
+        .catch(error => {
+          this.detailLoading = false;
+          util.errorProcessor(this, error);
+        });
+    },*/
+
+    unCheckOneOrderBtn() {
+      if (!this.currentChooseOrder || !this.currentChooseOrder.id) {
+        this.$Message.warning("请先选择需要取消验证的订单");
+        return;
+      }
+      util.ajax
+        .get("/repertory/out/set/unReview/" + this.currentChooseOrder.id)
+        .then(response => {
+          this.$Message.success("取消成功");
+          this.reloadOrderDetail();
+        })
+        .catch(error => {
+          util.errorProcessor(this, error);
+        });
+    },
+    unReviewOneDetailBtn() {
+      if (!this.currChooseDetail || !this.currChooseDetail.id) {
+        this.$Message.warning("请先选择需要取消验证的订单");
+        return;
+      }
+      util.ajax
+        .get("/repertory/out/set/unReviewDetail/" + this.currChooseDetail.id)
+        .then(response => {
+          this.$Message.success("取消成功");
+          this.reloadOrderDetail();
+        })
+        .catch(error => {
+          util.errorProcessor(this, error);
+        });
+    }
+  }
+};
 </script>
 
 <style >
 .ivu-form-item {
-    margin-bottom: 5px;
+  margin-bottom: 5px;
 }
 .detail-div {
-    margin-top: 10px;
+  margin-top: 10px;
 }
 .detail-count-content {
-    margin-left: 10px;
+  margin-left: 10px;
 }
 .detail-count-content-b {
-    margin-left: 40px;
+  margin-left: 40px;
 }
 .add-goods-class {
-    margin-left: 10px;
-    width: 300px;
+  margin-left: 10px;
+  width: 300px;
 }
 </style>

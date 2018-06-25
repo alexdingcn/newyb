@@ -35,7 +35,7 @@ public class RepertoryOutDetail {
 
     private Boolean checkStatus;
 
-    private Long reviewUserId;
+    private String reviewUser;
 
     private Long reviewNextUserId;
 
@@ -250,13 +250,9 @@ public class RepertoryOutDetail {
         this.checkStatus = checkStatus;
     }
 
-    public Long getReviewUserId() {
-        return reviewUserId;
-    }
+    public String getReviewUser() { return reviewUser; }
 
-    public void setReviewUserId(Long reviewUserId) {
-        this.reviewUserId = reviewUserId;
-    }
+    public void setReviewUser(String reviewUser) { this.reviewUser = reviewUser; }
 
     public Long getReviewNextUserId() {
         return reviewNextUserId;

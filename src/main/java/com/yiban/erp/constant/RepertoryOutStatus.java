@@ -11,8 +11,12 @@ public enum RepertoryOutStatus {
     REVIEW,
     //双人复核
     REVIEW_NEXT,
+    //复核拒绝
+    REVIEW_REJECT,
     //已审核
     CHECKED,
+    //终审拒绝
+    CHECK_REJECT,
     DELETE,
 
     BACK_INIT,

@@ -364,7 +364,7 @@ public class RepertoryOutService {
         for(int i=0;i<rOutList.size();i++){
             RepertoryOutDetail tempOutDetail= rOutList.get(i);
             tempOutDetail.setStatus(RepertoryOutStatus.REVIEW.name());
-            tempOutDetail.setReviewUserId(user.getId());
+            tempOutDetail.setReviewUser(user.getNickname());
             //保存复核结果
             tempOutDetail.setReviewResult(setReq.getCheckResult());
             tempOutDetail.setUpdatedBy(user.getNickname());
@@ -405,7 +405,7 @@ public class RepertoryOutService {
             throw new BizRuntimeException(ErrorCode.OUT_REVIEW_STATE_ERROR);
         }
         detail.setStatus(RepertoryOutStatus.REVIEW.name());
-        detail.setReviewUserId(user.getId());
+        detail.setReviewUser(user.getNickname());
         repertoryOutDetailMapper.updateByPrimaryKeySelective(detail);
 
         List<RepertoryOutDetail> details = repertoryOutDetailMapper.getByOrderId(repertoryOut.getId());
@@ -485,7 +485,7 @@ public class RepertoryOutService {
             throw new BizRuntimeException(ErrorCode.OUT_REVIEW_STATE_ERROR);
         }
         detail.setStatus(RepertoryOutStatus.REVIEW_NEXT.name());
-        detail.setReviewUserId(user.getId());
+        detail.setReviewUser(user.getNickname());
         repertoryOutDetailMapper.updateByPrimaryKeySelective(detail);
 
         List<RepertoryOutDetail> details = repertoryOutDetailMapper.getByOrderId(repertoryOut.getId());
