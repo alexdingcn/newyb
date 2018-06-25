@@ -315,7 +315,7 @@ export default {
       todoData: [],
       dealForm: [],
       showTodoDeal: false,
-      billboards:[],
+      billboards: [],
       todoColumns: [
         {
           type: "index",
@@ -388,8 +388,8 @@ export default {
     onUpdateClose() {
       Cookies.set("last-updateid", this.lastUpdateIdx);
     },
-    stay(){
-        this.$Message.success("xuantingchenggong!");
+    stay() {
+      this.$Message.success("xuantingchenggong!");
     },
     loadOrderStats() {
       var self = this;
@@ -518,14 +518,14 @@ export default {
         });
     },
     getBillboard() {
-        util.ajax
-        .get('/billboard/display')
+      util.ajax
+        .get("/billboard/display")
         .then(response => {
-            this.billboards = response.data.data;
+          this.billboards = response.data.data;
         })
         .catch(error => {
-            util.errorProcessor(this, error);
-        })
+          util.errorProcessor(this, error);
+        });
     }
   }
 };
