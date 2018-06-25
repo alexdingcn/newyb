@@ -17,7 +17,7 @@
     <result column="amount" property="amount" jdbcType="DECIMAL" />
     <result column="tax_rate" property="taxRate" jdbcType="DECIMAL" />
 
-    <result column="review_user_id" property="reviewUserId" jdbcType="BIGINT" />
+    <result column="review_user" property="reviewUser" jdbcType="VARCHAR" />
     <result column="review_next_user_id" property="reviewNextUserId" jdbcType="BIGINT" />
     <result column="review_result" property="reviewResult" jdbcType="VARCHAR"/>
     <result column="status" property="status" jdbcType="VARCHAR"/>
@@ -34,7 +34,7 @@
   </resultMap>
   <sql id="Base_Column_List" >
     id, repertory_out_id, repertory_info_id, goods_id, batch_code, location, product_date, exp_date,
-    quantity, free, price, dis_price, amount, tax_rate, check_status,review_user_id,review_next_user_id,review_result,status,
+    quantity, free, price, dis_price, amount, tax_rate, check_status,review_user,review_next_user_id,review_result,status,
     check_user, check_date, check_result, created_by, updated_by, created_time, updated_time
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
@@ -51,7 +51,7 @@
     insert into repertory_out_detail (repertory_out_id, repertory_info_id, goods_id,
       batch_code, location, product_date, exp_date,
       quantity, free, price, 
-      dis_price, amount, tax_rate,  check_status,review_user_id,review_next_user_id,review_result,status,
+      dis_price, amount, tax_rate,  check_status,review_user,review_next_user_id,review_result,status,
       check_user, check_date, check_result, 
       created_by, updated_by, created_time, 
       updated_time)
@@ -59,7 +59,7 @@
       #{batchCode,jdbcType=VARCHAR}, #{location,jdbcType=VARCHAR},
       #{productDate,jdbcType=DATE}, #{expDate,jdbcType=DATE},
       #{quantity,jdbcType=DECIMAL}, #{free,jdbcType=DECIMAL}, #{price,jdbcType=DECIMAL}, 
-      #{disPrice,jdbcType=DECIMAL}, #{amount,jdbcType=DECIMAL}, #{taxRate,jdbcType=DECIMAL},  #{checkStatus,jdbcType=BIT}, #{reviewUserId,jdbcType=BIGINT}, #{reviewNextUserId,jdbcType=BIGINT}, #{reviewResult,jdbcType=VARCHAR}, #{status,jdbcType=VARCHAR},
+      #{disPrice,jdbcType=DECIMAL}, #{amount,jdbcType=DECIMAL}, #{taxRate,jdbcType=DECIMAL},  #{checkStatus,jdbcType=BIT}, #{reviewUser,jdbcType=VARCHAR}, #{reviewNextUserId,jdbcType=BIGINT}, #{reviewResult,jdbcType=VARCHAR}, #{status,jdbcType=VARCHAR},
       #{checkUser,jdbcType=VARCHAR}, #{checkDate,jdbcType=TIMESTAMP}, #{checkResult,jdbcType=VARCHAR}, 
       #{createdBy,jdbcType=VARCHAR}, #{updatedBy,jdbcType=VARCHAR}, #{createdTime,jdbcType=TIMESTAMP}, 
       #{updatedTime,jdbcType=TIMESTAMP})
@@ -181,7 +181,7 @@
     select
     outDetail.id, outDetail.repertory_out_id, outDetail.repertory_info_id, outDetail.goods_id, outDetail.batch_code, outDetail.location,
     outDetail.product_date, outDetail.exp_date,outDetail.quantity, outDetail.free,outDetail.price, outDetail.dis_price, outDetail.amount,
-    outDetail.tax_rate, outDetail.check_status,outDetail.review_user_id,outDetail.review_next_user_id,outDetail.review_result,outDetail.status,
+    outDetail.tax_rate, outDetail.check_status,outDetail.review_user,outDetail.review_next_user_id,outDetail.review_result,outDetail.status,
     outDetail.check_user, outDetail.check_date, outDetail.check_result, outDetail.created_by, outDetail.updated_by, outDetail.created_time,
     outDetail.updated_time
     from repertory_out_detail outDetail

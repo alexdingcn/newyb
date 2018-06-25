@@ -30,9 +30,9 @@
                 </Row>
           </Form>
           <div>
-              <Table ref="orderTable" border highlight-row disabled-hover height="250" style="width: 100%" 
+              <Table ref="orderTable" border highlight-row disabled-hover height="300" style="width: 100%" 
                     :columns="orderListColumns" :data="orderList" size="small" 
-                    :loading="orderLoading" 
+                    :loading="orderLoading"  
                     @on-row-click="handleSelectOrder" 
 				    no-data-text="输入查询条件, 点击上方查询按钮进行查询">
                 </Table>

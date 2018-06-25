@@ -170,7 +170,7 @@ public class RepertoryOutController {
             List<RepertoryOutDetail>  outDetailList=repertoryOutDetailMapper.getByOrderId(rout.getId());
             for(RepertoryOutDetail outDetail:outDetailList){
 
-                outDetail.setReviewUserId(null);
+                outDetail.setReviewUser("");
                 outDetail.setReviewResult("");
                 outDetail.setStatus( RepertoryOutStatus.INIT.name());
                 repertoryOutDetailMapper.updateByPrimaryKeySelective(outDetail);
@@ -193,7 +193,7 @@ public class RepertoryOutController {
         //待处理的出库单 包含INIT和REVIEW 状态
         if(strStatus==null || RepertoryOutStatus.INIT.name().equals(strStatus)||RepertoryOutStatus.REVIEW.name().equals(strStatus)){
             outDetail.setStatus( RepertoryOutStatus.INIT.name());
-            outDetail.setReviewUserId(null);
+            outDetail.setReviewUser("");
             outDetail.setReviewResult("");
             repertoryOutDetailMapper.updateByPrimaryKeySelective(outDetail);
             RepertoryOut rout=repertoryOutMapper.selectByPrimaryKey(outDetail.getRepertoryOutId());
@@ -245,7 +245,7 @@ public class RepertoryOutController {
         //待处理的出库单 包含INIT和REVIEW 状态
         if(RepertoryOutStatus.REVIEW_NEXT.name().equals(strStatus)){
             outDetail.setStatus( RepertoryOutStatus.REVIEW.name());
-            outDetail.setReviewUserId(null);
+            outDetail.setReviewUser("");
             outDetail.setReviewResult("");
             repertoryOutDetailMapper.updateByPrimaryKeySelective(outDetail);
             RepertoryOut rout=repertoryOutMapper.selectByPrimaryKey(outDetail.getRepertoryOutId());
