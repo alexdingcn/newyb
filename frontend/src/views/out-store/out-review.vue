@@ -36,13 +36,13 @@
           </div>
 
           <div class="detail-div">
-                <Row type="flex" justify="end">
+                <!--<Row type="flex" justify="end">
                     <ButtonGroup>
                         <Button type="success" size="small" icon="checkmark" @click="checkOneDetailBtn">复核一条</Button>
                         <Button type="warning" size="small" icon="close" @click="unReviewOneDetailBtn">取消复核一条</Button>
-                        <!--<Button type="success" size="small" icon="android-checkbox-outline" @click="saveOroderDetail">保存详情</Button>-->
+                        <Button type="success" size="small" icon="android-checkbox-outline" @click="saveOroderDetail">保存详情</Button>
                     </ButtonGroup>
-                </Row>
+                </Row>-->
 
                 <Modal v-model="reviewOkModal" title="复核意见登记" @on-ok="reviewOpinion">
                     <Form :label-width="100" :model="checkForm">
@@ -62,7 +62,7 @@
                 <Row style="margin-top: 1.5em">
                     <FormItem label="复核意见" :error="checkStatusError">
                         <Select v-model="checkForm.checkStatus" placeholder="请选择" @on-change="checkStatusChange" style="width: 40%">
-                            <Option v-for="optinion in OptinionList" :value="optinion.key" :label="optinion.name" :key="optinion.key">{{optinion.name}}</Option>
+                            <Option v-for="optinion in optinionList" :value="optinion.key" :label="optinion.name" :key="optinion.key">{{optinion.name}}</Option>
                         </Select>
                     </FormItem>
                 </Row>
@@ -428,6 +428,14 @@ export default {
       this.currChooseDetail = {};
       this.detailList = [];
     },
+    checkStatusChange(data) {
+      let items = this.optinionList.filter(item => item.key === data);
+      if (items && items[0]) {
+        this.checkForm.checkResult = items[0].defaultResult;
+      } else {
+        this.checkForm.checkResult = "";
+      }
+    },
     //点击出库单查询明细
     handleSelectOrder(rowData) {
       if (!rowData || !rowData.id) {
@@ -539,7 +547,7 @@ export default {
           util.errorProcessor(this, error);
         });
     },
-    unReviewOneDetailBtn() {
+    /**unReviewOneDetailBtn() {
       if (!this.currChooseDetail || !this.currChooseDetail.id) {
         this.$Message.warning("请先选择需要取消验证的订单");
         return;
@@ -553,7 +561,7 @@ export default {
         .catch(error => {
           util.errorProcessor(this, error);
         });
-    }
+    }*/
   }
 };
 </script>
