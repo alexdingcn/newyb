@@ -13,6 +13,10 @@ public class ReceiveSetReq {
     private String updateBy;
     private Date updateTime;
 
+    private String status;
+    private String reviewUser;
+    private String reviewResult;
+
     //设置验收温度
     private BigDecimal checkTemp;
 
@@ -224,5 +228,49 @@ public class ReceiveSetReq {
 
     public void setFileNo(String fileNo) {
         this.fileNo = fileNo;
+    }
+
+    public String getStatus() { return status; }
+
+    public void setStatus(String status) { this.status = status; }
+
+    public String getReviewUser() { return reviewUser; }
+
+    public void setReviewUser(String reviewUser) { this.reviewUser = reviewUser; }
+
+    public String getReviewResult() { return reviewResult; }
+
+    public void setReviewResult(String reviewResult) { this.reviewResult = reviewResult; }
+
+    @Override
+    public String toString() {
+        return "ReceiveSetReq{" +
+                "orderId=" + orderId +
+                ", detailId=" + detailId +
+                ", updateBy='" + updateBy + '\'' +
+                ", updateTime=" + updateTime +
+                ", status=" + status +
+                ", reviewUser='" + reviewUser + '\'' +
+                ", reviewResult='" + reviewResult + '\'' +
+                ", checkTemp=" + checkTemp +
+                ", surveyDate=" + surveyDate +
+                ", surveyQuality=" + surveyQuality +
+                ", surveyUser='" + surveyUser + '\'' +
+                ", surveyAddress='" + surveyAddress + '\'' +
+                ", surveyResult='" + surveyResult + '\'' +
+                ", surveyTarget='" + surveyTarget + '\'' +
+                ", inCount=" + inCount +
+                ", rightCount=" + rightCount +
+                ", errorCount=" + errorCount +
+                ", errorPlan='" + errorPlan + '\'' +
+                ", saleCert='" + saleCert + '\'' +
+                ", errorReason='" + errorReason + '\'' +
+                ", checkTempMethod=" + checkTempMethod +
+                ", checkUser='" + checkUser + '\'' +
+                ", checkTime=" + checkTime +
+                ", checkResult='" + checkResult + '\'' +
+                ", detailList=" + detailList +
+                ", fileNo='" + fileNo + '\'' +
+                '}';
     }
 }

@@ -7,13 +7,13 @@ public enum RepertoryOutStatus {
     TEMP_STORAGE,
     //待复核
     INIT,
-    //复核中
+    //已复核
     REVIEW,
-    //双人复核
+    //双人复核(待废弃)
     REVIEW_NEXT,
     //复核拒绝
     REVIEW_REJECT,
-    //已审核
+    //已终审
     CHECKED,
     //终审拒绝
     CHECK_REJECT,

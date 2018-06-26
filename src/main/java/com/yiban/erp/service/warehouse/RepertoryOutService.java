@@ -363,10 +363,12 @@ public class RepertoryOutService {
 
         for(int i=0;i<rOutList.size();i++){
             RepertoryOutDetail tempOutDetail= rOutList.get(i);
-            tempOutDetail.setStatus(RepertoryOutStatus.REVIEW.name());
-            tempOutDetail.setReviewUser(user.getNickname());
+            //tempOutDetail.setStatus(RepertoryOutStatus.REVIEW.name());
+            //tempOutDetail.setReviewUser(user.getNickname());
             //保存复核结果
-            tempOutDetail.setReviewResult(setReq.getCheckResult());
+            tempOutDetail.setReviewResult(setReq.getReviewResult());
+            tempOutDetail.setReviewUser(setReq.getReviewUser());
+            tempOutDetail.setStatus(setReq.getStatus());
             tempOutDetail.setUpdatedBy(user.getNickname());
             tempOutDetail.setUpdatedTime(new Date());
             repertoryOutDetailMapper.updateByPrimaryKeySelective(tempOutDetail);

@@ -5,7 +5,7 @@
           <div slot="extra">
               <ButtonGroup>
                 <Button size="small" type="primary" icon="ios-search" :loading="orderLoading" @click="refreshOrder">查询</Button>
-                <Button size="small" type="success" icon="ios-checkmark" @click="checkOneOrderBtn">复核一单</Button>
+                <Button size="small" type="success" icon="ios-checkmark" @click="checkOneOrderBtn">复核</Button>
                 <Button size="small" type="warning"  icon="close" @click="unCheckOneOrderBtn">取消复核</Button>
                 <!--<Button size="small" type="info"  icon="images" @click="showCheckFile">药监采集</Button>-->
               </ButtonGroup>
@@ -44,10 +44,10 @@
                     </ButtonGroup>
                 </Row>-->
 
-                <Modal v-model="reviewOkModal" title="复核意见登记" @on-ok="reviewOpinion">
+                <Modal v-model="reviewOkModal" title="复核意见登记" :mask-closable="false">
                     <Form :label-width="100" :model="checkForm">
                 <Row >
-                    <FormItem label="复核人" >
+                    <FormItem label="复核人" :error="checkUserError">
                         <Input v-model="checkForm.checkUser" placeholder="张三;李四" style="width: 40%;"/>
                         <Tooltip transfer >
                             <Icon type="ios-information-outline" size="20"></Icon>
@@ -60,7 +60,7 @@
                     </FormItem>
                 </Row>
                 <Row style="margin-top: 1.5em">
-                    <FormItem label="复核意见" :error="checkStatusError">
+                    <FormItem label="复核意见" >
                         <Select v-model="checkForm.checkStatus" placeholder="请选择" @on-change="checkStatusChange" style="width: 40%">
                             <Option v-for="optinion in optinionList" :value="optinion.key" :label="optinion.name" :key="optinion.key">{{optinion.name}}</Option>
                         </Select>
@@ -72,6 +72,12 @@
                     </FormItem>
                 </Row>
                     </Form>
+                    <Row slot="footer">
+                    <ButtonGroup>
+                        <Button type="success" icon="checkmark" @click="reviewOpinion" >提交</Button>
+                        <Button type="ghost" icon="reply" @click="setCheckedCancel" >取消</Button>
+                    </ButtonGroup>
+                </Row>
                 </Modal>
 
               <Table border highlight-row height="300" :loading="detailLoading" 
@@ -89,7 +95,7 @@
           </div>
       </Card>
 
-      <warehouse-location-modal :openModal="locationModal" :warehouseId="currentChooseOrder.warehouseId" @on-ok="chooseLocation" @on-close="locationModalClose"></warehouse-location-modal>
+      <!--<warehouse-location-modal :openModal="locationModal" :warehouseId="currentChooseOrder.warehouseId" @on-ok="chooseLocation" @on-close="locationModalClose"></warehouse-location-modal>-->
   </div>
 </template>
 
@@ -98,14 +104,14 @@ import util from "@/libs/util.js";
 import moment, { isMoment } from "moment";
 import warehouseSelect from "@/views/selector/warehouse-select.vue";
 import goodSelect from "@/views/selector/good-select.vue";
-import warehouseLocationModal from "@/views/selector/warehouse-location-modal.vue";
+//import warehouseLocationModal from "@/views/selector/warehouse-location-modal.vue";
 
 export default {
   name: "out-review",
   components: {
     warehouseSelect,
     goodSelect,
-    warehouseLocationModal
+    //warehouseLocationModal
   },
   data() {
     const addWarehouseLocation = (h, location, rowData, index) => {
@@ -129,16 +135,15 @@ export default {
 
     return {
       reviewOkModal: false,
-      checkForm:{},
+      checkForm: {},
       optinionList: [
-        { key: "OK", name: "通过", defaultResult: "出库复核通过" },
+        { key: "REVIEW", name: "通过", defaultResult: "出库复核通过" },
         { key: "REJECT", name: "拒绝", defaultResult: "出库复核未通过" }
       ],
       statusOptions: [
         { key: "ALL", name: "所有" },
         { key: "INIT", name: "待复核" },
-        { key: "REVIEW", name: "复核中" },
-        { key: "REVIEW_NEXT", name: "双人复核" }
+        { key: "REVIEW", name: "已复核" }
       ],
       query: {
         warehouseId: "",
@@ -171,9 +176,7 @@ export default {
             if (state == "INIT") {
               return h("Tag", { props: { color: "red" } }, "待复核");
             } else if (state == "REVIEW") {
-              return h("Tag", { props: { color: "yellow" } }, "复核中");
-            } else if (state == "REVIEW_NEXT") {
-              return h("Tag", { props: { color: "blue" } }, "双人复核");
+              return h("Tag", { props: { color: "yellow" } }, "已复核");
             } else if (state == "CHECKED") {
               return h("Tag", { props: { color: "green" } }, "已审核");
             }
@@ -234,9 +237,7 @@ export default {
             } else if ("INIT" == state) {
               return h("Tag", { props: { color: "red" } }, "待复核");
             } else if ("REVIEW" == state) {
-              return h("Tag", { props: { color: "yellow" } }, "复核中");
-            } else if ("REVIEW_NEXT" == state) {
-              return h("Tag", { props: { color: "blue" } }, "双人复核");
+              return h("Tag", { props: { color: "yellow" } }, "已复核");
             } else if ("CHECKED" == state) {
               return h("Tag", { props: { color: "green" } }, "已审核");
             }
@@ -328,7 +329,7 @@ export default {
           key: "specialManage",
           width: 120,
           render(h, params) {
-            let specialManage = params.row.specialManage;
+            let specialManage = params.row.goods.specialManage;
             if (specialManage) {
               return h("Tag", { props: { type: "dot", color: "red" } }, "是");
             } else {
@@ -359,37 +360,38 @@ export default {
       checkFormItem: {},
       checkModal: false,
       checkFileNo: "",
-      checkFileModal: false
+      checkFileModal: false,
+      checkUserError: ""
     };
   },
   watch: {
     detailList(data) {
       if (!data || data.length <= 0) {
         this.totalAmount = 0;
-        this.totalReceiveCount = 0;
+        //this.totalReceiveCount = 0;
         this.totalInCount = 0;
-        this.totalRightCount = 0;
-        this.totalErrorCount = 0;
-        this.totalSurveyQuality = 0;
+        //this.totalRightCount = 0;
+        //this.totalErrorCount = 0;
+        //this.totalSurveyQuality = 0;
       } else {
         this.totalAmount = data.reduce((total, item) => {
           return item.amount ? total + item.amount : total + 0;
         }, 0);
-        this.totalReceiveCount = data.reduce((total, item) => {
+        /**this.totalReceiveCount = data.reduce((total, item) => {
           return item.receiveQuality ? total + item.receiveQuality : total + 0;
-        }, 0);
+        }, 0);*/
         this.totalInCount = data.reduce((total, item) => {
-          return item.inCount ? total + item.inCount : total + 0;
+          return item.quantity ? total + item.quantity : total + 0;
         }, 0);
-        this.totalRightCount = data.reduce((total, item) => {
+        /**this.totalRightCount = data.reduce((total, item) => {
           return item.rightCount ? total + item.rightCount : total + 0;
-        }, 0);
-        this.totalErrorCount = data.reduce((total, item) => {
+        }, 0);*/
+        /**this.totalErrorCount = data.reduce((total, item) => {
           return item.errorCount ? total + item.errorCount : total + 0;
-        }, 0);
-        this.totalSurveyQuality = data.reduce((total, item) => {
+        }, 0);*/
+        /**this.totalSurveyQuality = data.reduce((total, item) => {
           return item.surveyQuality ? total + item.surveyQuality : total + 0;
-        }, 0);
+        }, 0);*/
       }
     }
   },
@@ -400,8 +402,6 @@ export default {
         statusList = ["INIT"];
       } else if (this.query.status === "REVIEW") {
         statusList = ["REVIEW"];
-      } else if (this.query.status === "REVIEW_NEXT") {
-        statusList = ["REVIEW_NEXT"];
       } else if (this.query.status === "CHECKED") {
         statusList = ["CHECKED"];
       } else {
@@ -483,32 +483,58 @@ export default {
     },
     //复核一单
     checkOneOrderBtn() {
+        
       if (!this.currentChooseOrder || !this.currentChooseOrder.id) {
         this.$Message.warning("请先选择一条需要复核的订单信息");
         return;
       }
       this.reviewOkModal = true;
     },
-    reviewOpinion(){
-         this.checkFormItem = {
+    reviewOpinion() {
+        let ifup = true;
+      let checkUser = this.checkForm.checkUser;
+      for (let i = 0; i < this.detailList.length; i++) {
+        if (this.detailList[i].goods.specialManage === true) {
+          if (!checkUser ||(checkUser.indexOf(";") <= 0 && checkUser.indexOf("；") <= 0)) {
+            this.checkUserError = "出库单中存在特殊药品，需要双人审核！";
+            ifup = false;
+          }
+        }
+      }
+      let req = {
         orderId: this.currentChooseOrder.id,
-        reviewUser:this.checkForm.checkUser,
-        status:this.checkForm.statusOptions,
-        reviewResult:this.checkForm.checkResult
-
+        //reviewUser:this.checkForm.checkUser,
+        status: this.checkForm.checkStatus,
+        reviewResult: this.checkForm.checkResult,
+        reviewUser: this.checkForm.checkUser
       };
       //this.checkDetail = false;
-      util.ajax
-        .put("/repertory/out/set/review", this.checkFormItem)
+      console.log(ifup);
+      if(ifup){
+          util.ajax
+        .put("/repertory/out/set/review", req)
         .then(response => {
           this.detailLoading = false;
           this.$Message.success("复核成功");
+          this.setCheckedCancel();
           this.refreshOrder();
         })
         .catch(error => {
           this.detailLoading = false;
           util.errorProcessor(this, error);
         });
+      }
+      
+    },
+    setCheckedCancel() {
+      //this.checkStatusError = "";
+      this.checkUserError = "";
+      this.checkForm = {
+        checkUser: "",
+        checkStatus: "",
+        checkResult: ""
+      };
+      this.reviewOkModal = false;
     },
     //复核一条明细
     /**checkOneDetailBtn() {
@@ -546,7 +572,7 @@ export default {
         .catch(error => {
           util.errorProcessor(this, error);
         });
-    },
+    }
     /**unReviewOneDetailBtn() {
       if (!this.currChooseDetail || !this.currChooseDetail.id) {
         this.$Message.warning("请先选择需要取消验证的订单");

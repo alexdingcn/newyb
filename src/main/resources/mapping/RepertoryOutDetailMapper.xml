@@ -69,7 +69,7 @@
     insert into repertory_out_detail (repertory_out_id, repertory_info_id, goods_id,
       batch_code, location, product_date, exp_date,
       quantity, free, price,
-      dis_price, amount, tax_rate,check_status,review_user_id,review_next_user_id,review_result,status,
+      dis_price, amount, tax_rate,check_status,review_user,review_next_user_id,review_result,status,
       check_user, check_date, check_result,
       created_by, updated_by, created_time,
       updated_time)
@@ -80,7 +80,7 @@
        #{item.productDate,jdbcType=DATE}, #{item.expDate,jdbcType=DATE},
        #{item.quantity,jdbcType=DECIMAL}, #{item.free,jdbcType=DECIMAL}, #{item.price,jdbcType=DECIMAL},
        #{item.disPrice,jdbcType=DECIMAL}, #{item.amount,jdbcType=DECIMAL}, #{item.taxRate,jdbcType=DECIMAL},#{item.checkStatus,jdbcType=BIT},
-       #{item.reviewUserId,jdbcType=BIGINT}, #{item.reviewNextUserId,jdbcType=BIGINT}, #{item.reviewResult,jdbcType=VARCHAR}, #{item.status,jdbcType=VARCHAR},
+       #{item.reviewUser,jdbcType=VARCHAR}, #{item.reviewNextUserId,jdbcType=BIGINT}, #{item.reviewResult,jdbcType=VARCHAR}, #{item.status,jdbcType=VARCHAR},
        #{item.checkUser,jdbcType=VARCHAR}, #{item.checkDate,jdbcType=TIMESTAMP}, #{item.checkResult,jdbcType=VARCHAR},
        #{item.createdBy,jdbcType=VARCHAR}, #{item.updatedBy,jdbcType=VARCHAR}, #{item.createdTime,jdbcType=TIMESTAMP},
        #{item.updatedTime,jdbcType=TIMESTAMP}
@@ -132,9 +132,6 @@
       <if test="checkStatus != null" >
         check_status = #{checkStatus,jdbcType=BIT},
       </if>
-      <if test="reviewUserId != null" >
-        review_user_id = #{reviewUserId,jdbcType=BIGINT},
-      </if>
       <if test="reviewNextUserId != null" >
         review_next_user_id = #{reviewNextUserId,jdbcType=BIGINT},
       </if>
@@ -164,6 +161,15 @@
       </if>
       <if test="updatedTime != null" >
         updated_time = #{updatedTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="reviewUser != null" >
+        review_user = #{reviewUser,jdbcType=VARCHAR},
+      </if>
+      <if test="reviewResult != null" >
+        review_result = #{reviewResult,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null" >
+        status = #{status,jdbcType=VARCHAR},
       </if>
     </set>
     where id = #{id,jdbcType=BIGINT}
