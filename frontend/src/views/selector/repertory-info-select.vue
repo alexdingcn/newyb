@@ -17,8 +17,8 @@
         <hr size='1' style="width:100%; margin-top:5px; margin-bottom:20px;" />
         <Row>
             <Form ref="searchForm" :model="formItem" :label-width="80">
-                <Row type="flex" justify="center">
-                    <i-col span="8">
+                <Row type="flex">
+                    <i-col span="8" v-show="useBatchCode">
                         <FormItem label="批次号">
                             <Input v-model="formItem.batchCode" />
                         </FormItem>

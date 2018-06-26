@@ -64,7 +64,7 @@
         <mapper resource="mapping/UpdateHistoryMapper.xml"/>
         <mapper resource="mapping/SellOrderPaymentMapper.xml"/>
         <mapper resource="mapping/BannerMapper.xml"/>
-        <mapper resource="mapping/BillboardMapper.xml"/>
+        <mapper resource="mapping/BillBoardMapper.xml"/>
         <mapper resource="mapping/RepertoryInventoryMapper.xml"/>
         <mapper resource="mapping/RepertoryInventoryDetailMapper.xml"/>
         <mapper resource="mapping/TodoItemsMapper.xml"/>

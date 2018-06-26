@@ -140,7 +140,8 @@ export default {
               self.loading = false;
               let result = error.response ? error.response.data : "";
               if (result && result.message) {
-                self.loginResponse = result.message;
+                console.log(result);
+                self.loginResponse = "系统异常,请稍候再试";
               } else {
                 self.loginResponse = "登录异常";
               }
