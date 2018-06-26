@@ -465,9 +465,9 @@
     </select>
 
     <select id="getGoodsAmountStat" resultType="com.yiban.erp.entities.StatusCount" >
-        select g.name as goodsName, sod.goods_id as goodsId, sum(sod.amount) as amount
-        from sell_order so, sell_order_detail sod, goods_info g
-        where sod.sell_order_id = so.id and sod.goods_id=g.id and so.status='SALE_CHECKED'
+        select g.name as goodsName, g.id as goodsId, sum(sod.amount) as amount
+        from sell_order so, sell_order_detail sod, goods_info g, goods_detail gd
+        where sod.sell_order_id = so.id and sod.goods_id=gd.id and gd.goods_info_id=g.id and so.status='SALE_CHECKED'
         <if test="companyId != null">
             and so.company_id = #{companyId}
         </if>
@@ -477,7 +477,7 @@
         <if test="endDate != null">
             and #{endDate} > so.create_time
         </if>
-        group by sod.goods_id
+        group by g.id
         order by amount desc
     </select>
 
