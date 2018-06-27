@@ -313,7 +313,7 @@ export default {
       loggedUser: JSON.parse(localStorage.getItem("userDetail")),
       toDoList: [],
       todoData: [],
-      dealForm: [],
+      dealForm: {},
       showTodoDeal: false,
       billboards: [],
       todoColumns: [
