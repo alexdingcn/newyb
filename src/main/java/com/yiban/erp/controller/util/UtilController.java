@@ -53,10 +53,14 @@ public class UtilController {
     public ResponseEntity<String> receiveTradeLog(@RequestBody String body) throws Exception {
         String result = AESUtil.decrypt(body);
         if (StringUtils.isNotEmpty(result)) {
-            BillTradeLog billTradeLog = new BillTradeLog();
-            billTradeLog.setBody(result);
-            billTradeLog.setCreatedTime(new Date());
-            billTradeLogMapper.insert(billTradeLog);
+            try {
+                BillTradeLog billTradeLog = new BillTradeLog();
+                billTradeLog.setBody(result);
+                billTradeLog.setCreatedTime(new Date());
+                billTradeLogMapper.insert(billTradeLog);
+            } catch (Exception ex) {
+                logger.error(ex.getMessage());
+            }
 
             JSONObject returnObj = new JSONObject();
             returnObj.put("responseMessage", "详情推送成功!");
