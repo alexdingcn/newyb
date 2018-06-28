@@ -68,5 +68,6 @@
         <mapper resource="mapping/RepertoryInventoryMapper.xml"/>
         <mapper resource="mapping/RepertoryInventoryDetailMapper.xml"/>
         <mapper resource="mapping/TodoItemsMapper.xml"/>
+        <mapper resource="mapping/BillTradeLogMapper.xml"/>
     </mappers>
 </configuration>
