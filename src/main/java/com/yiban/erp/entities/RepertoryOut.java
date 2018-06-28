@@ -40,6 +40,10 @@ public class RepertoryOut {
 
     private String makeOrderUser;
 
+    private String reviewOrderUser;
+
+    private String reviewOrderResult;
+
     private String checkOrderUser;
 
     private Date checkDate;
@@ -92,6 +96,14 @@ public class RepertoryOut {
     public void setRefType(String refType) {
         this.refType = refType == null ? null : refType.trim();
     }
+
+    public String getReviewOrderUser() { return reviewOrderUser; }
+
+    public void setReviewOrderUser(String reviewOrderUser) { this.reviewOrderUser = reviewOrderUser; }
+
+    public String getReviewOrderResult() { return reviewOrderResult; }
+
+    public void setReviewOrderResult(String reviewOrderResult) { this.reviewOrderResult = reviewOrderResult; }
 
     public Date getOutDate() {
         return outDate;

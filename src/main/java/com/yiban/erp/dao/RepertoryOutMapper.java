@@ -3,6 +3,7 @@ package com.yiban.erp.dao;
 import com.yiban.erp.dto.ReceiveListReq;
 import com.yiban.erp.dto.RepertoryOutListReq;
 import com.yiban.erp.entities.RepertoryOut;
+import com.yiban.erp.entities.RepertoryOutList;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -20,5 +21,6 @@ public interface RepertoryOutMapper {
 
     List<RepertoryOut> getList(ReceiveListReq listReq);
     List<RepertoryOut> getOutListById(@Param("ids") List<Long> listId);
-    List<RepertoryOut> getOutList(RepertoryOutListReq listReq);
+    List<RepertoryOutList> getOutList(@Param("id") Long id);
+    int deleteOrder(@Param("id") Long id);
 }

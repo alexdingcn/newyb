@@ -445,4 +445,53 @@ public class RepertoryOutDetail {
     public void setWarehouseName(String warehouseName) {
         this.warehouseName = warehouseName;
     }
+
+    @Override
+    public String toString() {
+        return "RepertoryOutDetail{" +
+                "id=" + id +
+                ", repertoryOutId=" + repertoryOutId +
+                ", repertoryInfoId=" + repertoryInfoId +
+                ", goodsId=" + goodsId +
+                ", batchCode='" + batchCode + '\'' +
+                ", location='" + location + '\'' +
+                ", productDate=" + productDate +
+                ", expDate=" + expDate +
+                ", quantity=" + quantity +
+                ", free=" + free +
+                ", price=" + price +
+                ", disPrice=" + disPrice +
+                ", amount=" + amount +
+                ", taxRate=" + taxRate +
+                ", checkStatus=" + checkStatus +
+                ", reviewUser='" + reviewUser + '\'' +
+                ", reviewNextUserId=" + reviewNextUserId +
+                ", reviewResult='" + reviewResult + '\'' +
+                ", status='" + status + '\'' +
+                ", checkUser='" + checkUser + '\'' +
+                ", checkDate=" + checkDate +
+                ", checkResult='" + checkResult + '\'' +
+                ", createdBy='" + createdBy + '\'' +
+                ", updatedBy='" + updatedBy + '\'' +
+                ", createdTime=" + createdTime +
+                ", updatedTime=" + updatedTime +
+                ", repertoryOut=" + repertoryOut +
+                ", goods=" + goods +
+                ", repertoryInfo=" + repertoryInfo +
+                ", refTypeName='" + refTypeName + '\'' +
+                ", goodsName='" + goodsName + '\'' +
+                ", origin='" + origin + '\'' +
+                ", factoryName='" + factoryName + '\'' +
+                ", unitName='" + unitName + '\'' +
+                ", packUnitName='" + packUnitName + '\'' +
+                ", bigPack=" + bigPack +
+                ", brandName='" + brandName + '\'' +
+                ", storageCondition='" + storageCondition + '\'' +
+                ", customerName='" + customerName + '\'' +
+                ", customerRepId=" + customerRepId +
+                ", customerRepName='" + customerRepName + '\'' +
+                ", customerTel='" + customerTel + '\'' +
+                ", warehouseName='" + warehouseName + '\'' +
+                '}';
+    }
 }

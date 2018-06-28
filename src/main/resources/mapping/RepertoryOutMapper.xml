@@ -19,6 +19,8 @@
     <result column="total_quantity" property="totalQuantity" jdbcType="DECIMAL" />
     <result column="total_amount" property="totalAmount" jdbcType="DECIMAL" />
     <result column="make_order_user" property="makeOrderUser" jdbcType="VARCHAR" />
+    <result column="review_order_user" property="reviewOrderUser" jdbcType="VARCHAR" />
+    <result column="review_order_result" property="reviewOrderResult" jdbcType="VARCHAR" />
     <result column="check_order_user" property="checkOrderUser" jdbcType="VARCHAR" />
     <result column="check_date" property="checkDate" jdbcType="TIMESTAMP" />
     <result column="file_no" property="fileNo" jdbcType="VARCHAR" />
@@ -125,6 +127,12 @@
       <if test="makeOrderUser != null" >
         make_order_user = #{makeOrderUser,jdbcType=VARCHAR},
       </if>
+      <if test="reviewOrderUser != null" >
+        review_order_user = #{reviewOrderUser,jdbcType=VARCHAR},
+      </if>
+      <if test="reviewOrderResult != null" >
+        review_order_result = #{reviewOrderResult,jdbcType=VARCHAR},
+      </if>
       <if test="checkOrderUser != null" >
         check_order_user = #{checkOrderUser,jdbcType=VARCHAR},
       </if>
@@ -189,4 +197,23 @@
       #{item}
     </foreach>
   </select>
+
+  <select id = "getOutList" resultType="com.yiban.erp.entities.RepertoryOutList">
+    select r.id as id, w.id as warehouseId,w.name as warehouseName,r.location, gi.name as goodsName, gi.origin as origin,gsone.spec_name as specNameOne, gstwo.spec_name as specNameTwo, gsthree.spec_name as specNameThree,
+            gi.unit as unitName, r.quantity as quantity, rod.quantity as outAmount, rod.price as buyPrice, r.batch_code as batchCode, r.exp_date as expDate, ro.ref_order_number as refOrderNumber, ro.out_date as outDate,
+            ro.comment as comment
+    from repertory_info as r
+          left join goods_detail as gd on gd.id = r.goods_id
+          left join goods_spec as gsone on gd.spec_one_id = gsone.id
+          left join goods_spec as gstwo on gd.spec_two_id = gstwo.id
+          left join goods_spec as gsthree on gd.spec_three_id = gsthree.id
+          left join  goods_info as gi on gi.id = gd.goods_info_id
+          left join repertory_out_detail as rod on rod.repertory_info_id = r.id
+          left join warehouse as w on r.warehouse_id = w.id
+          left join repertory_out as ro on rod.repertory_out_id = ro.id
+    where ro.id = #{id}
+  </select>
+  <update id="deleteOrder">
+    update repertory_out set status ="DELETE" where id=#{id}
+  </update>
 </mapper>

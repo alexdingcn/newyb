@@ -459,4 +459,54 @@ public class RepertoryInfo {
         this.supplierContactName = supplierContactName;
     }
 
+    @Override
+    public String toString() {
+        return "RepertoryInfo{" +
+                "id=" + id +
+                ", companyId=" + companyId +
+                ", warehouseId=" + warehouseId +
+                ", location='" + location + '\'' +
+                ", inUserId=" + inUserId +
+                ", goodsNo='" + goodsNo + '\'' +
+                ", goodsId=" + goodsId +
+                ", batchCode='" + batchCode + '\'' +
+                ", factoryId=" + factoryId +
+                ", inQuantity=" + inQuantity +
+                ", quantity=" + quantity +
+                ", onWayQuantity=" + onWayQuantity +
+                ", buyPrice=" + buyPrice +
+                ", isExp=" + isExp +
+                ", saleEnable=" + saleEnable +
+                ", productDate=" + productDate +
+                ", expDate=" + expDate +
+                ", inDate=" + inDate +
+                ", supplierId=" + supplierId +
+                ", supplierName='" + supplierName + '\'' +
+                ", supplierContactId=" + supplierContactId +
+                ", supplierContactName='" + supplierContactName + '\'' +
+                ", buyerId=" + buyerId +
+                ", orderId=" + orderId +
+                ", orderDetailId=" + orderDetailId +
+                ", saleSate=" + saleSate +
+                ", createBy='" + createBy + '\'' +
+                ", createTime=" + createTime +
+                ", updateBy='" + updateBy + '\'' +
+                ", updateTime=" + updateTime +
+                ", customerId=" + customerId +
+                ", customerRepId=" + customerRepId +
+                ", saleId=" + saleId +
+                ", backPrice=" + backPrice +
+                ", refType='" + refType + '\'' +
+                ", refOrderId=" + refOrderId +
+                ", goods=" + goods +
+                ", warehouseName='" + warehouseName + '\'' +
+                ", goodsName='" + goodsName + '\'' +
+                ", factoryName='" + factoryName + '\'' +
+                ", origin='" + origin + '\'' +
+                ", unitName='" + unitName + '\'' +
+                ", baseMedName='" + baseMedName + '\'' +
+                ", storageConditionName='" + storageConditionName + '\'' +
+                ", taxRate=" + taxRate +
+                '}';
+    }
 }

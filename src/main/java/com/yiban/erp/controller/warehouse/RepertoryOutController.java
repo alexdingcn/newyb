@@ -138,12 +138,12 @@ public class RepertoryOutController {
 
         if(setReq.getOrderId()!=null ){
             repertoryOutService.reviewOneOrder(user, setReq);
-        }else if(setReq.getDetailId()!=null ){
+        }/*else if(setReq.getDetailId()!=null ){
             repertoryOutService.reviewOneDetail(user, setReq);
-        }
+        }*/
         return ResponseEntity.ok().build();
     }
-    @Transactional
+    /*@Transactional
     @RequestMapping(value = "/set/reviewNext", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> setReviewNext(@RequestBody ReceiveSetReq setReq,
                                             @AuthenticationPrincipal User user) throws Exception {
@@ -155,7 +155,7 @@ public class RepertoryOutController {
             repertoryOutService.reviewNextOneDetail(user, setReq);
         }
         return ResponseEntity.ok().build();
-    }
+    }*/
     @Transactional
     @RequestMapping(value = "/set/unReview/{orderId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> unReview(@PathVariable Long orderId) throws BizException {
@@ -165,8 +165,8 @@ public class RepertoryOutController {
         //INIT-复核  REVIEW-复核 REVIEW
         String strStatus=rout.getStatus();
         if(strStatus==null || RepertoryOutStatus.INIT.name().equals(strStatus)||RepertoryOutStatus.REVIEW.name().equals(strStatus)){
-            rout.setStatus( RepertoryOutStatus.INIT.name());
-            repertoryOutMapper.updateByPrimaryKeySelective(rout);
+            //rout.setStatus( RepertoryOutStatus.INIT.name());
+           // repertoryOutMapper.updateByPrimaryKeySelective(rout);
             List<RepertoryOutDetail>  outDetailList=repertoryOutDetailMapper.getByOrderId(rout.getId());
             for(RepertoryOutDetail outDetail:outDetailList){
 
@@ -209,7 +209,7 @@ public class RepertoryOutController {
 
 
 
-    @Transactional
+/*    @Transactional
     @RequestMapping(value = "/set/unReviewNext/{orderId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> unReviewNext(@PathVariable Long orderId) throws BizException {
         JSONObject response = new JSONObject();
@@ -232,10 +232,10 @@ public class RepertoryOutController {
             throw new BizException(ErrorCode.OUT_UNREVIEW_STATE_ERROR);
         }
         return ResponseEntity.ok().body(JSON.toJSONString(response));
-    }
+    }*/
 
     //撤销一条复核明细记录：撤销后单据的状态设置为REVIEW之前的状态 INIT
-    @RequestMapping(value = "/set/unReviewNextDetail/{orderId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+   /* @RequestMapping(value = "/set/unReviewNextDetail/{orderId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> unReviewNextDetail(@PathVariable Long orderId) throws BizException {
         JSONObject response = new JSONObject();
 
@@ -257,5 +257,38 @@ public class RepertoryOutController {
             throw new BizException(ErrorCode.OUT_UNREVIEW_STATE_ERROR);
         }
         return ResponseEntity.ok().body(JSON.toJSONString(response));
+    }*/
+
+    /**
+     * 获取未终审的出库单
+     * @param user
+     * @return
+     */
+    @RequestMapping(value = "/getUnchecked", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String > getUnchecked(@AuthenticationPrincipal User user){
+        int companyId = user.getCompanyId();
+        List<RepertoryOutSider> details= repertoryOutService.getUnchecked(companyId);
+        JSONObject response = new JSONObject();
+        response.put("data",details);
+        return ResponseEntity.ok().body(JSON.toJSONString(response));
     }
+
+    @RequestMapping(value = "/getOutOrder", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> getOutOrder(@RequestParam( value = "id")Long id){
+        JSONObject response = new JSONObject();
+        List<RepertoryOutList> lists = repertoryOutService.getOutList(id);
+        response.put("data",lists);
+        return ResponseEntity.ok().body(JSON.toJSONString(response));
+    }
+
+    @RequestMapping(value = "/deleteOrder/{id}", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> deleteOrder(@PathVariable( value = "id")Long id){
+        int result = repertoryOutService.deleteOrder(id);
+        if(result >0){
+            return ResponseEntity.ok().build();
+        }else{
+            return ResponseEntity.badRequest().body(JSON.toJSONString(ErrorCode.FAILED_DELETE_FROM_DB));
+        }
+    }
+
 }

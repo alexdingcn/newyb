@@ -212,7 +212,12 @@
     </if>
   </select>
 
-
+  <select id="getUnchecked" resultType="com.yiban.erp.entities.RepertoryOutSider">
+    select
+     ro.id, ro.status,ro.ref_order_number as orderNumber,ro.created_time as createdTime, ro.created_by as createdBy,ro.review_order_user as reviewOrderUser, ro.review_order_result as reviewOrderResult
+    from repertory_out ro
+    where ro.company_id = #{companyId} and ro.ref_type = 'DAMAGE_OUT' and ro.status in ('INIT','REVIEW','REVIEW_REJECT')
+  </select>
 
 
 

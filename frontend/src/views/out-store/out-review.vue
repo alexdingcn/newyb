@@ -138,12 +138,13 @@ export default {
       checkForm: {},
       optinionList: [
         { key: "REVIEW", name: "通过", defaultResult: "出库复核通过" },
-        { key: "REJECT", name: "拒绝", defaultResult: "出库复核未通过" }
+        { key: "REVIEW_REJECT", name: "拒绝", defaultResult: "出库复核未通过" }
       ],
       statusOptions: [
         { key: "ALL", name: "所有" },
         { key: "INIT", name: "待复核" },
-        { key: "REVIEW", name: "已复核" }
+        { key: "REVIEW", name: "已复核" },
+        { key: "REVIEW_REJECT", name: "复核拒绝" }
       ],
       query: {
         warehouseId: "",
@@ -174,10 +175,12 @@ export default {
           render: (h, params) => {
             let state = params.row.status;
             if (state == "INIT") {
-              return h("Tag", { props: { color: "red" } }, "待复核");
+              return h("Tag", { props: { color: "blue" } }, "待复核");
             } else if (state == "REVIEW") {
               return h("Tag", { props: { color: "yellow" } }, "已复核");
-            } else if (state == "CHECKED") {
+            } else if (state == "REVIEW_REJECT") {
+              return h("Tag", { props: { color: "red" } }, "复核拒绝");
+            }else if (state == "CHECKED") {
               return h("Tag", { props: { color: "green" } }, "已审核");
             }
           }
@@ -232,13 +235,16 @@ export default {
           width: 100,
           render: (h, params) => {
             let state = params.row.status;
+            console.log("state--------"+params.row.status);
             if (state == undefined) {
-              return h("Tag", { props: { color: "red" } }, "待复核");
+              return h("Tag", { props: { color: "blue" } }, "待复核");
             } else if ("INIT" == state) {
-              return h("Tag", { props: { color: "red" } }, "待复核");
+              return h("Tag", { props: { color: "blue" } }, "待复核");
             } else if ("REVIEW" == state) {
               return h("Tag", { props: { color: "yellow" } }, "已复核");
-            } else if ("CHECKED" == state) {
+            }else if ("REVIEW_REJECT" == state) {
+              return h("Tag", { props: { color: "red" } }, "复核拒绝");
+            }  else if ("CHECKED" == state) {
               return h("Tag", { props: { color: "green" } }, "已审核");
             }
           }
@@ -402,6 +408,8 @@ export default {
         statusList = ["INIT"];
       } else if (this.query.status === "REVIEW") {
         statusList = ["REVIEW"];
+      }else if (this.query.status === "REVIEW_REJECT") {
+        statusList = ["REVIEW_REJECT"];
       } else if (this.query.status === "CHECKED") {
         statusList = ["CHECKED"];
       } else {
@@ -441,10 +449,14 @@ export default {
       if (!rowData || !rowData.id) {
         this.currentChooseOrder = {};
         this.detailList = [];
+        console.log("11111111111");
         return;
       }
+      //console.log("222222222");
       this.currentChooseOrder = rowData;
+      //console.log("33333333333");
       this.reloadOrderDetail();
+      //console.log("444444444444");
       this.checkFileNo = "";
     },
     //点击选中出库单明细
@@ -463,10 +475,10 @@ export default {
         .get("/repertory/out/detail/" + self.currentChooseOrder.id)
         .then(response => {
           this.detailLoading = false;
-          let data = response.data;
+          let data = response.data;  
           if (data) {
             //同时更新单据的状态信息
-            this.detailList = data.detailList;
+            this.detailList = data.detailList; 
             if (data.repertoryOut.status != self.currentChooseOrder.status) {
               //表单状态发生变化，更新表单
               this.$Message.warning("出库单状态发生变化，更新表单");
@@ -491,13 +503,12 @@ export default {
       this.reviewOkModal = true;
     },
     reviewOpinion() {
-        let ifup = true;
       let checkUser = this.checkForm.checkUser;
       for (let i = 0; i < this.detailList.length; i++) {
         if (this.detailList[i].goods.specialManage === true) {
           if (!checkUser ||(checkUser.indexOf(";") <= 0 && checkUser.indexOf("；") <= 0)) {
             this.checkUserError = "出库单中存在特殊药品，需要双人审核！";
-            ifup = false;
+            return;
           }
         }
       }
@@ -509,8 +520,6 @@ export default {
         reviewUser: this.checkForm.checkUser
       };
       //this.checkDetail = false;
-      console.log(ifup);
-      if(ifup){
           util.ajax
         .put("/repertory/out/set/review", req)
         .then(response => {
@@ -523,7 +532,6 @@ export default {
           this.detailLoading = false;
           util.errorProcessor(this, error);
         });
-      }
       
     },
     setCheckedCancel() {

@@ -107,7 +107,7 @@ public class RepertoryOutService {
                 logger.warn("save repertoryOut insert fail.");
                 throw new BizRuntimeException(ErrorCode.FAILED_INSERT_FROM_DB);
             }
-        }else {
+        }else {//更新
             RepertoryOut oldOrder = repertoryOutMapper.selectByPrimaryKey(repertoryOut.getId());
             if (oldOrder == null) {
                 logger.warn("get repertoryOut order fail by id:{}", repertoryOut.getId());
@@ -119,6 +119,9 @@ public class RepertoryOutService {
             }
             oldOrder.setUpdatedBy(user.getNickname());
             oldOrder.setUpdatedTime(new Date());
+            oldOrder.setComment(repertoryOut.getComment());
+            oldOrder.setOutDate(repertoryOut.getOutDate());
+            oldOrder.setRefOrderNumber(repertoryOut.getRefOrderNumber());
             int count = repertoryOutMapper.updateByPrimaryKeySelective(oldOrder);
             if (count <= 0) {
                 logger.warn("save order update fail.");
@@ -140,6 +143,7 @@ public class RepertoryOutService {
         details.stream().forEach(item -> {
             Long rInfoId=item.getRepertoryInfoId();
             RepertoryInfo rinfo=repertoryInfoMapper.selectByPrimaryKey(rInfoId);
+            System.out.println("---------------------"+rinfo);
             item.setRepertoryInfoId(rinfo.getId());
             item.setBatchCode(rinfo.getBatchCode());
             item.setProductDate(rinfo.getProductDate());
@@ -333,10 +337,10 @@ public class RepertoryOutService {
         if (setReq.getOrderId() != null) {
             //整单验证通过
             reviewOneOrder(user, setReq);
-        }else if (setReq.getDetailId() != null) {
+        }/*else if (setReq.getDetailId() != null) {
             //单笔详情验证
             reviewOneDetail(user, setReq);
-        }else {
+        }*/else {
             throw new BizException(ErrorCode.PARAMETER_MISSING);
         }
     }
@@ -373,7 +377,9 @@ public class RepertoryOutService {
             tempOutDetail.setUpdatedTime(new Date());
             repertoryOutDetailMapper.updateByPrimaryKeySelective(tempOutDetail);
         }
-        order.setStatus(RepertoryOutStatus.REVIEW.name());
+        order.setStatus(setReq.getStatus());
+        order.setReviewOrderUser(setReq.getReviewUser());
+        order.setReviewOrderResult(setReq.getReviewResult());
         repertoryOutMapper.updateByPrimaryKeySelective(order);
     }
 
@@ -389,7 +395,27 @@ public class RepertoryOutService {
         }
         return isReview;
     }
-    @Transactional
+
+    public List<RepertoryOutSider> getUnchecked(int companyId){
+        return repertoryOutDetailMapper.getUnchecked(companyId);
+    }
+
+    public List<RepertoryOutList> getOutList(Long id){
+
+        return repertoryOutMapper.getOutList(id);
+    }
+
+    public int deleteOrder(Long id){
+        return repertoryOutMapper.deleteOrder(id);
+    }
+
+    /**
+     * 复核一条，暂废
+     * @param user
+     * @param setReq
+     * @throws BizException
+     */
+/*    @Transactional
     public void reviewOneDetail(User user, ReceiveSetReq setReq) throws BizException {
         RepertoryOutDetail detail = repertoryOutDetailMapper.selectByPrimaryKey(setReq.getDetailId());
         if (detail == null) {
@@ -406,8 +432,8 @@ public class RepertoryOutService {
         if(strStatus!=null && !RepertoryOutStatus.INIT.name().equals(strStatus)){
             throw new BizRuntimeException(ErrorCode.OUT_REVIEW_STATE_ERROR);
         }
-        detail.setStatus(RepertoryOutStatus.REVIEW.name());
-        detail.setReviewUser(user.getNickname());
+        detail.setStatus(setReq.getStatus());
+        detail.setReviewUser(setReq.getReviewUser());
         repertoryOutDetailMapper.updateByPrimaryKeySelective(detail);
 
         List<RepertoryOutDetail> details = repertoryOutDetailMapper.getByOrderId(repertoryOut.getId());
@@ -420,14 +446,19 @@ public class RepertoryOutService {
             }
         }
         if (isFinish) {
-            repertoryOut.setStatus(RepertoryOutStatus.REVIEW.name());
+            repertoryOut.setStatus(setReq.getStatus());
             repertoryOutMapper.updateByPrimaryKeySelective(repertoryOut);
         }
-    }
+    }*/
 
-
+    /**
+     * 双人复核，暂废
+     * @param user
+     * @param setReq
+     * @throws BizException
+     */
     //双人复核整张出库单
-    @Transactional
+/*    @Transactional
     public void reviewNextOneOrder(User user, ReceiveSetReq setReq) throws BizException {
         RepertoryOut order = repertoryOutMapper.selectByPrimaryKey(setReq.getOrderId());
         if (order == null) {
@@ -467,9 +498,9 @@ public class RepertoryOutService {
         }
         order.setStatus(RepertoryOutStatus.REVIEW_NEXT.name());
         repertoryOutMapper.updateByPrimaryKeySelective(order);
-    }
+    }*/
 
-    @Transactional
+/*    @Transactional
     public void reviewNextOneDetail(User user, ReceiveSetReq setReq) throws BizException {
         RepertoryOutDetail detail = repertoryOutDetailMapper.selectByPrimaryKey(setReq.getDetailId());
         if (detail == null) {
@@ -503,5 +534,5 @@ public class RepertoryOutService {
             repertoryOut.setStatus(RepertoryOutStatus.REVIEW_NEXT.name());
             repertoryOutMapper.updateByPrimaryKeySelective(repertoryOut);
         }
-    }
+    }*/
 }
