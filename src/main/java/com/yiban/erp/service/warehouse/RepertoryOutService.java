@@ -78,6 +78,11 @@ public class RepertoryOutService {
             oldOrder.setReviewOrderResult("");
             oldOrder.setReviewOrderUser("");
             oldOrder.setStatus("INIT");
+            oldOrder.setOutDate(repertoryOut.getOutDate());
+            oldOrder.setComment(repertoryOut.getComment());
+            oldOrder.setGoToWarehouseId(repertoryOut.getGoToWarehouseId());
+            oldOrder.setGoTo(repertoryOut.getGoTo());
+            oldOrder.setCustomerName(repertoryOut.getCustomerName());
             int count = repertoryOutMapper.updateByPrimaryKeySelective(oldOrder);
             if (count <= 0) {
                 logger.warn("save order update fail.");

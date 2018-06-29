@@ -172,11 +172,13 @@ import moment from "moment";
 import util from "@/libs/util.js";
 import goodSelect from "@/views/selector/good-select.vue";
 import warehouseSelect from "@/views/selector/warehouse-select.vue";
+import goodsSpecTags from "../goods/goods-spec-tabs.vue";
 export default {
   name: "cahneg-repertory-index",
   components: {
     warehouseSelect,
-    goodSelect
+    goodSelect,
+    goodsSpecTags,
   },
   data() {
     return {
@@ -370,7 +372,15 @@ export default {
           title: "规格",
           key: "spec",
           align: "center",
-          width: 100
+           width: 150,
+          render: (h, params) => {
+            return h(goodsSpecTags, {
+              props: {
+                tags: params.row.goods ? params.row.goods.goodsSpecs : "",
+                color: "blue"
+              }
+            });
+          }
         },
         {
           title: "单位",
@@ -470,12 +480,12 @@ export default {
         // }
       ],
       queryStoreColumns: [
-        {
+        /**{
           title: "货号",
           align: "center",
           key: "code",
           width: 100
-        },
+        },*/
         {
           title: "商品名称",
           key: "goodsName",
@@ -493,7 +503,15 @@ export default {
           title: "规格",
           key: "spec",
           align: "center",
-          width: 100
+           width: 150,
+          render: (h, params) => {
+            return h(goodsSpecTags, {
+              props: {
+                tags: params.row.goods ? params.row.goods.goodsSpecs : "",
+                color: "blue"
+              }
+            });
+          }
         },
         {
           title: "生产企业",
@@ -834,6 +852,7 @@ export default {
       this.RepertoryOut.outDetailList = [];
       this.RepertoryOut.goToWarehouseId = this.changeStore.goToWarehouseId;
       this.RepertoryOut.warehouseId = this.changeStoreItems[0].warehouseId;
+      this.RepertoryOut.id = this.changeStoreItems[0].repertoryOutId;
       this.RepertoryOut.refOrderNumber = this.changeStore.refOrderNumber;
       this.RepertoryOut.outDate = this.changeStore.outDate;
       this.RepertoryOut.comment = this.changeStore.comment;
@@ -869,6 +888,7 @@ export default {
           .then(function(response) {
             if (response.status === 200) {
               self.$Message.info("转移出库单创建成功");
+              this.reloadUncheckData();
               self.closeConfirm = true;
             }
             self.saving = false;

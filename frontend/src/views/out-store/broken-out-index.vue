@@ -152,11 +152,13 @@ import moment from "moment";
 import util from "@/libs/util.js";
 import goodSelect from "@/views/selector/good-select.vue";
 import warehouseSelect from "@/views/selector/warehouse-select.vue";
+import goodsSpecTags from "../goods/goods-spec-tabs.vue";
 export default {
   name: "cahneg-repertory-index",
   components: {
     warehouseSelect,
-    goodSelect
+    goodSelect,
+    goodsSpecTags,
   },
   data() {
     return {
@@ -164,7 +166,7 @@ export default {
       saving: false,
       totalAmount: 0,
       currentPage: 1,
-      pageSize:15,
+      pageSize: 15,
       changeStoreItems: [],
       queryStoreItems: [],
       //selectStoreModalShow:false,
@@ -257,7 +259,10 @@ export default {
                     },
                     on: {
                       click: () => {
-                        self.removeOutOrder(params.row.id,params.row.orderNumber);
+                        self.removeOutOrder(
+                          params.row.id,
+                          params.row.orderNumber
+                        );
                       }
                     }
                   },
@@ -338,14 +343,22 @@ export default {
           title: "产地",
           key: "origin",
           align: "center",
-          width: 100
+          width: 100,
         },
 
         {
           title: "规格",
           key: "spec",
           align: "center",
-          width: 100
+          width: 150,
+          render: (h, params) => {
+            return h(goodsSpecTags, {
+              props: {
+                tags: params.row.goods ? params.row.goods.goodsSpecs : "",
+                color: "blue"
+              }
+            });
+          }
         },
         {
           title: "单位",
@@ -419,12 +432,12 @@ export default {
         }
       ],
       queryStoreColumns: [
-        {
+        /**{
           title: "货号",
           align: "center",
           key: "code",
           width: 100
-        },
+        },*/
         {
           title: "商品名称",
           key: "goodsName",
@@ -442,7 +455,15 @@ export default {
           title: "规格",
           key: "spec",
           align: "center",
-          width: 100
+          width: 150,
+          render: (h, params) => {
+            return h(goodsSpecTags, {
+              props: {
+                tags: params.row.goods ? params.row.goods.goodsSpecs : "",
+                color: "blue"
+              }
+            });
+          }
         },
         {
           title: "生产企业",
@@ -615,7 +636,7 @@ export default {
           util.errorProcessor(this, error);
         });
     },
-    removeOutOrder(id,orderNumber){
+    removeOutOrder(id, orderNumber) {
       this.$Modal.confirm({
         title: "确认删除报损单？",
         content: "<p>确认删除报损单 " + orderNumber + "?</p>",
@@ -624,23 +645,22 @@ export default {
         },
         onCancel: () => {}
       });
-
     },
-    removeConfirm(id){
-      let req ={
-        id:id,
-      }
+    removeConfirm(id) {
+      let req = {
+        id: id
+      };
       util.ajax
-      .put("/repertory/out/deleteOrder/"+id)
-      .then(response => {
-        if(response.status == 200){
-          this.$Message.success("删除成功！");
-          this.reloadUncheckData();
-        }
-      })
-      .catch(error => {
-        util.errorProcessor(this, error);
-      })
+        .put("/repertory/out/deleteOrder/" + id)
+        .then(response => {
+          if (response.status == 200) {
+            this.$Message.success("删除成功！");
+            this.reloadUncheckData();
+          }
+        })
+        .catch(error => {
+          util.errorProcessor(this, error);
+        });
     },
     changeSiderShow() {
       this.showSider = !this.showSider;
@@ -648,7 +668,7 @@ export default {
     reloadUncheckData() {
       this.uncheckTabLoading = true;
       util.ajax
-        .get("/repertory/out/getUnchecked/"+"DAMAGE_OUT")
+        .get("/repertory/out/getUnchecked/" + "DAMAGE_OUT")
         .then(response => {
           if (response.status === 200 && response.data) {
             this.uncheckData = response.data.data;
@@ -715,7 +735,6 @@ export default {
     },*/
     handleStoreRowDbClick(row) {
       //库存记录点击
-
       for (var i = 0; i < this.changeStoreItems.length; i++) {
         if (row.id === this.changeStoreItems[i].id) {
           this.$Message.info("报损单已经存在此记录");
@@ -778,7 +797,7 @@ export default {
       this.RepertoryOut.refOrderNumber = this.changeStore.refOrderNumber;
       this.RepertoryOut.outDate = this.changeStore.outDate;
       this.RepertoryOut.comment = this.changeStore.comment;
-      
+
       for (let i = 0; i < this.changeStoreItems.length; i++) {
         if (
           this.changeStoreItems[i].quantity < this.changeStoreItems[i].outAmount
@@ -790,30 +809,31 @@ export default {
           return;
         }
       }
-        for (let i = 0; i < this.changeStoreItems.length; i++) {
-          let RepertoryOutDetail = {};
-          RepertoryOutDetail["repertoryInfoId"] = this.changeStoreItems[i].id;
-          RepertoryOutDetail["quantity"] = this.changeStoreItems[i].outAmount;
-          RepertoryOutDetail["price"] = this.changeStoreItems[i].buyPrice;
-          this.RepertoryOut.outDetailList.push(RepertoryOutDetail);
-          util.ajax
-            .post("/repertory/out/loseRepertoryOut", this.RepertoryOut)
-            .then(function(response) {
-              if (response.status === 200) {
-                self.$Message.info("报损出库单创建成功");
-                self.closeConfirm = true;
-              }
-              self.saving = false;
-            })
-            .catch(function(error) {
-              console.log(error);
-              self.saving = false;
-              self.$Message.error("报损出库单错误");
-            });
-        }
+      for (let i = 0; i < this.changeStoreItems.length; i++) {
+        let RepertoryOutDetail = {};
+        RepertoryOutDetail["repertoryInfoId"] = this.changeStoreItems[i].id;
+        RepertoryOutDetail["quantity"] = this.changeStoreItems[i].outAmount;
+        RepertoryOutDetail["price"] = this.changeStoreItems[i].buyPrice;
+        this.RepertoryOut.outDetailList.push(RepertoryOutDetail);
+        util.ajax
+          .post("/repertory/out/loseRepertoryOut", this.RepertoryOut)
+          .then(function(response) {
+            if (response.status === 200) {
+              self.$Message.info("报损出库单创建成功");
+              this.reloadUncheckData();
+              self.closeConfirm = true;
+            }
+            self.saving = false;
+          })
+          .catch(function(error) {
+            console.log(error);
+            self.saving = false;
+            self.$Message.error("报损出库单错误");
+          });
       }
     }
-  };
+  }
+};
 </script>
 <style lang="less">
 @import "../../styles/common.less";

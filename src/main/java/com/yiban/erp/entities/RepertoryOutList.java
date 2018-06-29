@@ -11,9 +11,6 @@ public class RepertoryOutList {
     private String location;
     private String goodsName;
     private String origin;
-    private String specNameOne;
-    private String specNameTwo;
-    private String specNameThree;
     private String unitName;
     private int quantity;
     private int outAmount;
@@ -26,6 +23,8 @@ public class RepertoryOutList {
     private String customerName;
     private String goToLocation;
     private int goToWarehouseId;
+
+     private Goods goods;
 
     public Long getId() {
         return id;
@@ -61,30 +60,6 @@ public class RepertoryOutList {
 
     public void setOrigin(String origin) {
         this.origin = origin;
-    }
-
-    public String getSpecNameOne() {
-        return specNameOne;
-    }
-
-    public void setSpecNameOne(String specNameOne) {
-        this.specNameOne = specNameOne;
-    }
-
-    public String getSpecNameTwo() {
-        return specNameTwo;
-    }
-
-    public void setSpecNameTwo(String specNameTwo) {
-        this.specNameTwo = specNameTwo;
-    }
-
-    public String getSpecNameThree() {
-        return specNameThree;
-    }
-
-    public void setSpecNameThree(String specNameThree) {
-        this.specNameThree = specNameThree;
     }
 
     public String getUnitName() {
@@ -187,6 +162,10 @@ public class RepertoryOutList {
 
     public void setGoToWarehouseId(int goToWarehouseId) { this.goToWarehouseId = goToWarehouseId; }
 
+    public Goods getGoods() { return goods; }
+
+    public void setGoods(Goods goods) { this.goods = goods; }
+
     @Override
     public String toString() {
         return "RepertoryOutList{" +
@@ -197,9 +176,6 @@ public class RepertoryOutList {
                 ", location='" + location + '\'' +
                 ", goodsName='" + goodsName + '\'' +
                 ", origin='" + origin + '\'' +
-                ", specNameOne='" + specNameOne + '\'' +
-                ", specNameTwo='" + specNameTwo + '\'' +
-                ", specNameThree='" + specNameThree + '\'' +
                 ", unitName='" + unitName + '\'' +
                 ", quantity=" + quantity +
                 ", outAmount=" + outAmount +
@@ -212,6 +188,7 @@ public class RepertoryOutList {
                 ", customerName='" + customerName + '\'' +
                 ", goToLocation='" + goToLocation + '\'' +
                 ", goToWarehouseId=" + goToWarehouseId +
+                ", goods=" + goods +
                 '}';
     }
 }

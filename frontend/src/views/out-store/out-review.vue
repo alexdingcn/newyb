@@ -104,6 +104,7 @@ import util from "@/libs/util.js";
 import moment, { isMoment } from "moment";
 import warehouseSelect from "@/views/selector/warehouse-select.vue";
 import goodSelect from "@/views/selector/good-select.vue";
+import goodsSpecTags from "../goods/goods-spec-tabs.vue";
 //import warehouseLocationModal from "@/views/selector/warehouse-location-modal.vue";
 
 export default {
@@ -111,6 +112,7 @@ export default {
   components: {
     warehouseSelect,
     goodSelect,
+    goodsSpecTags,
     //warehouseLocationModal
   },
   data() {
@@ -165,11 +167,13 @@ export default {
       orderListColumns: [
         {
           title: "序号",
+          align:"center",
           type: "index",
           width: 80
         },
         {
           title: "状态",
+          align:"center",
           key: "status",
           width: 100,
           render: (h, params) => {
@@ -186,36 +190,43 @@ export default {
           }
         },
         {
-          title: "出库时间",
+          title: "出库日期",
+          align:"center",
           key: "outDate",
           render: (h, params) => {
             let receiveDate = params.row.outDate;
-            return receiveDate ? moment(receiveDate).format("YYYY-MM-DD") : "";
+            return h ("span", receiveDate ? moment(receiveDate).format("YYYY-MM-DD") : "");
           }
         },
         {
           title: "出库类型",
+          align:"center",
           key: "refTypeName"
         },
         {
           title: "出库仓库",
+          align:"center",
           key: "warehouseName"
         },
         {
           title: "出库数量",
+          align:"center",
           key: "totalQuantity"
         },
         {
           title: "总计金额",
+          align:"center",
           key: "totalAmount"
         },
         {
           title: "制单人",
-          key: "createBy"
+          align:"center",
+          key: "createdBy"
         },
 
         {
           title: "系统单号",
+          align:"center",
           key: "refOrderNumber"
         }
       ],
@@ -226,6 +237,7 @@ export default {
         {
           title: "序号",
           type: "index",
+          align:"center",
           width: 80
         },
         {
@@ -252,87 +264,109 @@ export default {
         {
           title: "商品名称",
           key: "goodsName",
+          align:"center",
           width: 160
         },
         {
           title: "产地",
           key: "origin",
+          align:"center",
           width: 120
         },
-        {
+        /**{
           title: "剂型",
-          key: "jx",
+          key: "jxName",
           width: 120
-        },
+        },*/
         {
           title: "规格",
           key: "spec",
-          width: 100
+          align:"center",
+          width: 150,
+          render: (h, params) => {
+            return h(goodsSpecTags, {
+              props: {
+                tags: params.row.goods ? params.row.goods.goodsSpecs : "",
+                color: "blue"
+              }
+            });
+          }
         },
         {
           title: "生产企业",
           key: "factoryName",
-          width: 120
+          align:"center",
+          width: 180
         },
         {
           title: "批准文号",
           key: "permit",
+          align:"center",
           width: 120
         },
 
         {
           title: "出库数量",
           key: "quantity",
+          align:"center",
           width: 120
         },
         {
           title: "单位",
           key: "unitName",
+          align:"center",
           width: 120
         },
         {
           title: "单价",
           width: 120,
+          align:"center",
           key: "price"
         },
         {
           title: "金额",
           width: 120,
+          align:"center",
           key: "amount"
         },
         {
           title: "批号",
           key: "batchCode",
+          align:"center",
           width: 140
         },
         {
           title: "生产日期",
           key: "productDate",
+          align:"center",
           width: 140,
           render: (h, params) => {
-            return params.row.productDate
+            return h("span",params.row.productDate
               ? moment(params.row.productDate).format("YYYY-MM-DD")
-              : "";
+              : "");
           }
         },
         {
           title: "有效期至",
           key: "expDate",
+          align:"center",
           width: 140,
           render: (h, params) => {
-            return params.row.expDate
+            return h("span", params.row.expDate
               ? moment(params.row.expDate).format("YYYY-MM-DD")
-              : "";
+              : "");
           }
         },
         {
           title: "存储条件",
           key: "storageCondition",
+          align:"center",
           width: 100
         },
         {
           title: "特殊药品",
           key: "specialManage",
+          align:"center",
           width: 120,
           render(h, params) {
             let specialManage = params.row.goods.specialManage;
@@ -344,14 +378,16 @@ export default {
           }
         },
         {
-          title: "库区",
-          key: "warehouseLocation",
+          title: "转出仓库",
+          key: "warehouseName",
+          align:"center",
           width: 140
         },
         {
           title: "复核人",
-          key: "reviewOrderUser",
-          width: 100
+          key: "reviewUser",
+          align:"center",
+          width: 150
         }
       ],
       currChooseDetail: {},
@@ -449,14 +485,10 @@ export default {
       if (!rowData || !rowData.id) {
         this.currentChooseOrder = {};
         this.detailList = [];
-        console.log("11111111111");
         return;
       }
-      //console.log("222222222");
       this.currentChooseOrder = rowData;
-      //console.log("33333333333");
       this.reloadOrderDetail();
-      //console.log("444444444444");
       this.checkFileNo = "";
     },
     //点击选中出库单明细
