@@ -264,19 +264,38 @@ public class RepertoryOutController {
      * @param user
      * @return
      */
-    @RequestMapping(value = "/getUnchecked", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String > getUnchecked(@AuthenticationPrincipal User user){
+    @RequestMapping(value = "/getUnchecked/{type}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String > getUnchecked(@AuthenticationPrincipal User user,
+                                                @PathVariable(value="type") String type){
         int companyId = user.getCompanyId();
-        List<RepertoryOutSider> details= repertoryOutService.getUnchecked(companyId);
+        List<RepertoryOutSider> details= repertoryOutService.getUnchecked(companyId, type);
         JSONObject response = new JSONObject();
         response.put("data",details);
         return ResponseEntity.ok().body(JSON.toJSONString(response));
     }
 
-    @RequestMapping(value = "/getOutOrder", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> getOutOrder(@RequestParam( value = "id")Long id){
+    /**
+     * 破损出库单详情
+     * @param id
+     * @return
+     */
+    @RequestMapping(value = "/getOutOrderDamage", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> getOutOrderDamage(@RequestParam( value = "id")Long id){
         JSONObject response = new JSONObject();
-        List<RepertoryOutList> lists = repertoryOutService.getOutList(id);
+        List<RepertoryOutList> lists = repertoryOutService.getOutListDamage(id);
+        response.put("data",lists);
+        return ResponseEntity.ok().body(JSON.toJSONString(response));
+    }
+
+    /**
+     * 转库出库单详情
+     * @param id
+     * @return
+     */
+    @RequestMapping(value = "/getOutOrderChange", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> getOutOrderChange(@RequestParam( value = "id")Long id){
+        JSONObject response = new JSONObject();
+        List<RepertoryOutList> lists = repertoryOutService.getOutListChange(id);
         response.put("data",lists);
         return ResponseEntity.ok().body(JSON.toJSONString(response));
     }

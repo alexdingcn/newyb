@@ -75,6 +75,9 @@ public class RepertoryOutService {
             }
             oldOrder.setUpdatedBy(user.getNickname());
             oldOrder.setUpdatedTime(new Date());
+            oldOrder.setReviewOrderResult("");
+            oldOrder.setReviewOrderUser("");
+            oldOrder.setStatus("INIT");
             int count = repertoryOutMapper.updateByPrimaryKeySelective(oldOrder);
             if (count <= 0) {
                 logger.warn("save order update fail.");
@@ -107,7 +110,7 @@ public class RepertoryOutService {
                 logger.warn("save repertoryOut insert fail.");
                 throw new BizRuntimeException(ErrorCode.FAILED_INSERT_FROM_DB);
             }
-        }else {//更新
+        }else {//修改
             RepertoryOut oldOrder = repertoryOutMapper.selectByPrimaryKey(repertoryOut.getId());
             if (oldOrder == null) {
                 logger.warn("get repertoryOut order fail by id:{}", repertoryOut.getId());
@@ -121,6 +124,9 @@ public class RepertoryOutService {
             oldOrder.setUpdatedTime(new Date());
             oldOrder.setComment(repertoryOut.getComment());
             oldOrder.setOutDate(repertoryOut.getOutDate());
+            oldOrder.setStatus("INIT");
+            oldOrder.setReviewOrderUser("");
+            oldOrder.setReviewOrderResult("");
             oldOrder.setRefOrderNumber(repertoryOut.getRefOrderNumber());
             int count = repertoryOutMapper.updateByPrimaryKeySelective(oldOrder);
             if (count <= 0) {
@@ -143,7 +149,6 @@ public class RepertoryOutService {
         details.stream().forEach(item -> {
             Long rInfoId=item.getRepertoryInfoId();
             RepertoryInfo rinfo=repertoryInfoMapper.selectByPrimaryKey(rInfoId);
-            System.out.println("---------------------"+rinfo);
             item.setRepertoryInfoId(rinfo.getId());
             item.setBatchCode(rinfo.getBatchCode());
             item.setProductDate(rinfo.getProductDate());
@@ -396,13 +401,18 @@ public class RepertoryOutService {
         return isReview;
     }
 
-    public List<RepertoryOutSider> getUnchecked(int companyId){
-        return repertoryOutDetailMapper.getUnchecked(companyId);
+    public List<RepertoryOutSider> getUnchecked(int companyId, String type){
+        return repertoryOutDetailMapper.getUnchecked(companyId, type);
     }
 
-    public List<RepertoryOutList> getOutList(Long id){
+    public List<RepertoryOutList> getOutListDamage(Long id){
 
-        return repertoryOutMapper.getOutList(id);
+        return repertoryOutMapper.getOutListDamage(id);
+    }
+
+    public List<RepertoryOutList> getOutListChange(Long id){
+
+        return repertoryOutMapper.getOutListChange(id);
     }
 
     public int deleteOrder(Long id){

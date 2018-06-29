@@ -86,25 +86,25 @@
             <Card>
 
                 <p slot="title" >
-                    <Icon type="document"></Icon>库存明细(选择需要报损的物品，加入移库单)
+                    <Icon type="document"></Icon>库存明细(选择需要报损的物品，加入出库单)
                 </p>
-                <div slot="extra">
+                <!--<div slot="extra">
                     <ButtonGroup >
                         <Button type="primary" icon="android-add-circle" @click="queryRepertoryList">查询</Button>
                     </ButtonGroup>
-                </div>
+                </div>-->
                 <Form :label-width="85" :model="queryStore" ref="queryStoreForm">
                     <Row>
                         <i-col span="5">
                         <FormItem label="仓库：" prop="warehouseId">
-                            <warehouse-select v-model="selectStore.warehouseId"   size="small"></warehouse-select><!--@on-change="onStoreChange"-->
+                            <warehouse-select v-model="selectStore.warehouseId"   @on-change="queryRepertoryList" size="small"></warehouse-select><!--@on-change="onStoreChange"-->
                         </FormItem>
                         </i-col>
-                        <i-col span="10">
+                        <!--<i-col span="10">
                         <FormItem label="商品速查" prop="goodsId">
                             <good-select v-model="queryStore.goodsId" size="small"></good-select>
                         </FormItem>
-                        </i-col>
+                        </i-col>-->
                     </Row>
                     <Table border highlight-row
                            class="margin-top-8"
@@ -116,7 +116,7 @@
 
                     <Row class="margin-top-8">
                         <div style="float: right;">
-                            <Page :total="totalAmount" :current="currentPage" @on-change="changePage" size="small" show-total></Page>
+                            <Page :total="totalAmount" :current="currentPage" :page-size="pageSize" @on-change="changePage" size="small" show-total></Page>
                         </div>
                     </Row>
                 </Form>
@@ -164,6 +164,7 @@ export default {
       saving: false,
       totalAmount: 0,
       currentPage: 1,
+      pageSize:15,
       changeStoreItems: [],
       queryStoreItems: [],
       //selectStoreModalShow:false,
@@ -596,7 +597,7 @@ export default {
         id: id
       };
       util.ajax
-        .get("/repertory/out/getOutOrder", { params: req })
+        .get("/repertory/out/getOutOrderDamage", { params: req })
         .then(response => {
           if (response.status === 200) {
             this.changeStoreItems = response.data.data;
@@ -647,7 +648,7 @@ export default {
     reloadUncheckData() {
       this.uncheckTabLoading = true;
       util.ajax
-        .get("/repertory/out/getUnchecked")
+        .get("/repertory/out/getUnchecked/"+"DAMAGE_OUT")
         .then(response => {
           if (response.status === 200 && response.data) {
             this.uncheckData = response.data.data;
@@ -665,7 +666,9 @@ export default {
        this.queryStore.page = this.currentPage;*/
       let requestData = {
         warehouseId: this.selectStore.warehouseId,
-        goodsId: this.queryStore.goodsId
+        //goodsId: this.queryStore.goodsId,
+        page: this.currentPage,
+        size: this.pageSize
       };
       util.ajax
         .post("/repertory/list", requestData)
@@ -760,13 +763,6 @@ export default {
     },
     saveOut() {
       //前台验证出库信息
-      let self = this;
-      this.RepertoryOut = {};
-      this.RepertoryOut.outDetailList = [];
-      this.RepertoryOut.warehouseId = this.changeStoreItems[0].warehouseId;
-      this.RepertoryOut.refOrderNumber = this.changeStore.refOrderNumber;
-      this.RepertoryOut.outDate = this.changeStore.outDate;
-      this.RepertoryOut.comment = this.changeStore.comment;
       if (
         this.changeStoreItems.length == undefined ||
         this.changeStoreItems.length <= 0
@@ -774,6 +770,15 @@ export default {
         this.$Message.error("报损出库单明细不能为空");
         return;
       }
+      let self = this;
+      this.RepertoryOut = {};
+      this.RepertoryOut.outDetailList = [];
+      this.RepertoryOut.warehouseId = this.changeStoreItems[0].warehouseId;
+      this.RepertoryOut.id = this.changeStoreItems[0].repertoryOutId;
+      this.RepertoryOut.refOrderNumber = this.changeStore.refOrderNumber;
+      this.RepertoryOut.outDate = this.changeStore.outDate;
+      this.RepertoryOut.comment = this.changeStore.comment;
+      
       for (let i = 0; i < this.changeStoreItems.length; i++) {
         if (
           this.changeStoreItems[i].quantity < this.changeStoreItems[i].outAmount

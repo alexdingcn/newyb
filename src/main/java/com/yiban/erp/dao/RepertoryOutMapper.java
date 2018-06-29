@@ -21,6 +21,7 @@ public interface RepertoryOutMapper {
 
     List<RepertoryOut> getList(ReceiveListReq listReq);
     List<RepertoryOut> getOutListById(@Param("ids") List<Long> listId);
-    List<RepertoryOutList> getOutList(@Param("id") Long id);
+    List<RepertoryOutList> getOutListDamage(@Param("id") Long id);
+    List<RepertoryOutList> getOutListChange(@Param("id") Long id);
     int deleteOrder(@Param("id") Long id);
 }

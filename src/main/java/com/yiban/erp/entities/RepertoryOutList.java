@@ -5,6 +5,7 @@ import java.util.Date;
 
 public class RepertoryOutList {
     private Long id;
+    private Long repertoryOutId;
     private int warehouseId;
     private String warehouseName;
     private String location;
@@ -22,6 +23,9 @@ public class RepertoryOutList {
     private  String refOrderNumber;
     private Date outDate;
     private String comment;
+    private String customerName;
+    private String goToLocation;
+    private int goToWarehouseId;
 
     public Long getId() {
         return id;
@@ -30,6 +34,10 @@ public class RepertoryOutList {
     public void setId(Long id) {
         this.id = id;
     }
+
+    public Long getRepertoryOutId() { return repertoryOutId; }
+
+    public void setRepertoryOutId(Long repertoryOutId) { this.repertoryOutId = repertoryOutId; }
 
     public String getLocation() {
         return location;
@@ -167,10 +175,23 @@ public class RepertoryOutList {
         this.comment = comment;
     }
 
+    public String getCustomerName() { return customerName; }
+
+    public void setCustomerName(String customerName) { this.customerName = customerName; }
+
+    public String getGoToLocation() { return goToLocation;}
+
+    public void setGoToLocation(String goToLocation) { this.goToLocation = goToLocation; }
+
+    public int getGoToWarehouseId() { return goToWarehouseId; }
+
+    public void setGoToWarehouseId(int goToWarehouseId) { this.goToWarehouseId = goToWarehouseId; }
+
     @Override
     public String toString() {
         return "RepertoryOutList{" +
                 "id=" + id +
+                ", repertoryOutId=" + repertoryOutId +
                 ", warehouseId=" + warehouseId +
                 ", warehouseName='" + warehouseName + '\'' +
                 ", location='" + location + '\'' +
@@ -188,6 +209,9 @@ public class RepertoryOutList {
                 ", refOrderNumber='" + refOrderNumber + '\'' +
                 ", outDate=" + outDate +
                 ", comment='" + comment + '\'' +
+                ", customerName='" + customerName + '\'' +
+                ", goToLocation='" + goToLocation + '\'' +
+                ", goToWarehouseId=" + goToWarehouseId +
                 '}';
     }
 }

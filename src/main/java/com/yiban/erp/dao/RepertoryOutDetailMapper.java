@@ -12,7 +12,7 @@ import java.util.List;
 @Mapper
 public interface RepertoryOutDetailMapper {
     int deleteByPrimaryKey(Long id);
-    int deleteByRepertoryOutId(Long id);
+    int deleteByRepertoryOutId(@Param(value = "id")Long id);
     int insert(RepertoryOutDetail record);
 
     RepertoryOutDetail selectByPrimaryKey(Long id);
@@ -25,7 +25,8 @@ public interface RepertoryOutDetailMapper {
 
     List<RepertoryOutDetail> getOutDetailList(RepertoryOutListReq reqlist);
 
-    List<RepertoryOutSider> getUnchecked(@Param("companyId") int companyId);
+    List<RepertoryOutSider> getUnchecked(@Param("companyId") int companyId,
+                                         @Param("refType") String type);
 
     /**
      * 获取某一客户商品列表中的最近一次销售价

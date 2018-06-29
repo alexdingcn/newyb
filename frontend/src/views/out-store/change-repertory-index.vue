@@ -5,8 +5,37 @@
 <template>
 <div>
     <Row>
+      <i-col :span="showSider ? '4' : '0'">
+            <Card>
+              <p slot="title">
+                    未审核转库出库单
+                    <Tooltip transfer placement="right-start">
+                        <Icon type="ios-help-outline"></Icon>
+                        <div slot="content" >
+                            <p>展现转库出库后未复核通过的列表, 可以进行修改和删除操作</p>
+                        </div>
+                    </Tooltip>
+                </p>
+                <div slot="extra">
+                    <a href="javascript:void(0)"  style="margin-right: 5px;" @click="reloadUncheckData">
+                        <Icon type="refresh"></Icon>
+                    </a>
+                </div>
+                <Table stripe highlight-row :loading="uncheckTabLoading"  
+                        :columns="uncheckColumns" :data="uncheckData" ref="uncheckTable" 
+                        style="width: 100%;" class="uncheck-table" height="750" 
+                        size="small">
+                </Table>
+
+            </Card>
+          </i-col>
+          <i-col :span="showSider ? '20' : '24'">
         <Card>
             <p slot="title" >
+              <a href="javascript:void(0)" @click="changeSiderShow" style="margin-right: 5px;" >
+                      <Icon v-if="showSider" type="chevron-left"></Icon>
+                      <Icon v-else type="chevron-right"></Icon>
+                  </a>
                 <Icon type="document"></Icon> 转库出库制单
             </p>
             <div slot="extra">
@@ -22,7 +51,7 @@
                 <Row>
                     <i-col span="5">
                     <FormItem label="转入仓库" prop="goToWarehouseId">
-                        <warehouse-select v-model="changeStore.goToWarehouseId"  @on-change="onReceiveStoreChange"  size="small"></warehouse-select>
+                        <warehouse-select v-model="changeStore.goToWarehouseId"    size="small"></warehouse-select><!--@on-change="onReceiveStoreChange"-->
                     </FormItem>
                     </i-col>
 
@@ -38,7 +67,7 @@
                     </i-col>
                     <i-col span="5">
                     <FormItem label="出库日期" prop="outDate">
-                        <DatePicker type="datetime" v-model="changeStore.outDate" format="yyyy-MM-dd HH:mm" size="small"/>
+                        <DatePicker type="datetime" v-model="changeStore.outDate" format="yyyy-MM-dd" size="small"/>
                     </FormItem>
                     </i-col>
 
@@ -65,22 +94,17 @@
 
             </Form>
         </Card>
-
-
-
-    </Row>
-    <br/>
-    <Row>
-        <Card>
+        <br/>
+         <Card>
 
             <p slot="title" >
                 <Icon type="document"></Icon>库存明细(选择需要转库的物品，加入移库单)
             </p>
-            <div slot="extra">
+            <!--<div slot="extra">
                 <ButtonGroup >
                     <Button type="primary" icon="android-add-circle" >查询</Button>
                 </ButtonGroup>
-            </div>
+            </div>-->
             <Form :label-width="85" :model="queryStore" ref="queryStoreForm">
                 <Row>
                     <i-col span="5">
@@ -88,11 +112,11 @@
                       <warehouse-select v-model="selectStore.warehouseId"  @on-change="onStoreChange" size="small"></warehouse-select>
                     </FormItem>
                     </i-col>
-                    <i-col span="10">
+                    <!--<i-col span="10">
                     <FormItem label="商品速查" prop="goodsId">
                         <good-select v-model="queryStore.goodsId" size="small"></good-select>
                     </FormItem>
-                    </i-col>
+                    </i-col>-->
                 </Row>
                 <Table border highlight-row
                        class="margin-top-8"
@@ -109,6 +133,14 @@
                 </Row>
             </Form>
         </Card>
+          </i-col>
+
+
+
+    </Row>
+    
+    <Row>
+       
 
     </Row>
 
@@ -156,6 +188,136 @@ export default {
       //selectStoreModalShow:false,
       closeConfirm: false,
       changeStore: {},
+      showSider: true,
+      uncheckTabLoading: false,
+      uncheckData: [],
+      uncheckColumns: [
+        {
+          title: "出库单",
+          key: "id",
+          render: (h, params) => {
+            let self = this;
+            let status = params.row.status;
+            let statusLabel = "";
+            let statusColor = "";
+            /**if (status === "TEMP_STORAGE") {
+              statusLabel = "暂存";
+              statusColor = "#5cadff";
+            } else*/ if (
+              status === "INIT"
+            ) {
+              statusLabel = "待复核";
+              statusColor = "#ff9900";
+            } else if (status === "REVIEW_REJECT") {
+              statusLabel = "复核拒绝";
+              statusColor = "#ed3f14";
+            } else if (status === "REVIEW") {
+              statusLabel = "待终审";
+              statusColor = "#19be6b";
+            }
+            let statusH = h(
+              "span",
+              {
+                class: {
+                  statusClass: true
+                },
+                style: {
+                  color: statusColor
+                }
+              },
+              statusLabel
+            );
+            let buttonH = h(
+              "ButtonGroup",
+              {
+                props: {
+                  size: "small"
+                }
+              },
+              [
+                h(
+                  "Button",
+                  {
+                    props: {
+                      type: "info"
+                    },
+                    on: {
+                      click: () => {
+                        self.editOutOrder(params.row.id);
+                      }
+                    }
+                  },
+                  "修改"
+                ),
+                h(
+                  "Button",
+                  {
+                    props: {
+                      type: "error"
+                    },
+                    on: {
+                      click: () => {
+                        self.removeOutOrder(
+                          params.row.id,
+                          params.row.orderNumber
+                        );
+                      }
+                    }
+                  },
+                  "删除"
+                )
+              ]
+            );
+
+            let orderNumnber = params.row.orderNumber;
+            let reviewOrderUser = params.row.reviewOrderUser
+              ? params.row.reviewOrderUser + "："
+              : " ";
+            let reviewOrderResult = params.row.reviewOrderResult
+              ? params.row.reviewOrderResult
+              : " ";
+            let review = reviewOrderUser + reviewOrderResult;
+            let createTime = moment(params.row.createdTime).format(
+              "YYYY-MM-DD HH:mm"
+            );
+            let createBy = params.row.createdBy;
+            //let warehouseName = params.row.warehouseName;
+            return h(
+              "div",
+              {
+                style: {
+                  margin: "0.5em"
+                }
+              },
+              [
+                h(
+                  "h5",
+                  {
+                    style: {
+                      color: "#9ea7b4",
+                      fontSize: "12px"
+                    }
+                  },
+                  orderNumnber
+                ),
+                h("h4", review),
+                h(
+                  "h5",
+                  {
+                    style: {
+                      color: "#9ea7b4",
+                      fontSize: "12px"
+                    }
+                  },
+                  createTime + "[" + createBy + "]"
+                ),
+                h("hr", { size: "1", style: { color: "#e9eaec" } }),
+                h("div", [statusH, buttonH])
+              ]
+            );
+          }
+        }
+      ],
       queryStore: {
         warehouseName: ""
       },
@@ -180,9 +342,15 @@ export default {
       },
       changeStoreColumns: [
         {
-          title: "货号",
+          title: "仓库",
           align: "center",
-          key: "code",
+          key: "warehouseName",
+          width: 100
+        },
+        {
+          title: "库位",
+          align: "center",
+          key: "location",
           width: 100
         },
         {
@@ -204,31 +372,12 @@ export default {
           align: "center",
           width: 100
         },
-        // {
-        //     title: '生产企业',
-        //     key: 'factoryName',
-        //     align: 'center',
-        //     width: 120
-        // },
-        // {
-        //     title: '存储条件',
-        //     key: 'storageCondition',
-        //     align: 'center',
-        //     width: 120
-        // },
-        // {
-        //     title: '基药',
-        //     key: 'base_med_id',
-        //     align: 'center',
-        //     width:80
-        // },
         {
           title: "单位",
           key: "unitName",
           align: "center",
           width: 80
         },
-
         {
           title: "数量",
           key: "quantity",
@@ -263,7 +412,7 @@ export default {
         },
         {
           title: "转入货位号",
-          key: "outLocation",
+          key: "goToLocation",
           align: "center",
           width: 120,
           render: (h, params) => {
@@ -289,26 +438,13 @@ export default {
           align: "center",
           width: 80
         },
-
-        // {
-        //     title: '金额',
-        //     key: '',
-        //     align: 'center',
-        //     width: 80
-        // },
-        // {
-        //     title: '税率',
-        //     key: 'out_tax',
-        //     align: 'center',
-        //     width: 80
-        // },
         {
           title: "批次号",
           key: "batchCode",
           align: "center",
           width: 80
         },
-        {
+        /**{
           title: "生产日期",
           key: "productDate",
           align: "center",
@@ -316,7 +452,7 @@ export default {
           render: (h, params) => {
             return moment(params.row.eta).format("YYYY-MM-DD");
           }
-        },
+        },*/
         {
           title: "有效日期",
           key: "expDate",
@@ -415,7 +551,7 @@ export default {
           align: "center",
           width: 80
         },
-        {
+        /**{
           title: "生产日期",
           key: "productDate",
           align: "center",
@@ -423,12 +559,12 @@ export default {
           render: (h, params) => {
             return moment(params.row.eta).format("YYYY-MM-DD");
           }
-        },
+        },*/
         {
           title: "有效日期",
           key: "expDate",
           align: "center",
-          width: 80,
+          width: 120,
           render: (h, params) => {
             return moment(params.row.eta).format("YYYY-MM-DD");
           }
@@ -494,6 +630,7 @@ export default {
   },
   mounted() {
     //this. selectStoreModalShow=true;
+    this.reloadUncheckData();
   },
   activated() {
     this.clearData();
@@ -502,6 +639,78 @@ export default {
   methods: {
     moment: function() {
       return moment();
+    },
+    editOutOrder(id) {
+      let req = {
+        id: id
+      };
+      util.ajax
+        .get("/repertory/out/getOutOrderChange", { params: req })
+        .then(response => {
+          if (response.status === 200) {
+            this.changeStoreItems = response.data.data;
+            if (response.data.data.length > 0) {
+              this.changeStore.refOrderNumber =
+                response.data.data[0].refOrderNumber;
+              this.changeStore.outDate = moment(
+                response.data.data[0].outDate
+              ).format("YYYY-MM-DD");
+              this.changeStore.comment = response.data.data[0].comment;
+              this.changeStore.customerName =
+                response.data.data[0].customerName;
+              this.changeStore.goToWarehouseId =
+                response.data.data[0].goToWarehouseId;
+            }
+          }
+        })
+        .catch(error => {
+          util.errorProcessor(this, error);
+        });
+    },
+    removeOutOrder(id,orderNumber){
+      this.$Modal.confirm({
+        title: "确认删除移库单？",
+        content: "<p>确认删除移库单 " + orderNumber + "?</p>",
+        onOk: () => {
+          this.removeConfirm(id);
+        },
+        onCancel: () => {}
+      });
+
+    },
+    removeConfirm(id){
+      let req ={
+        id:id,
+      }
+      util.ajax
+      .put("/repertory/out/deleteOrder/"+id)
+      .then(response => {
+        if(response.status == 200){
+          this.$Message.success("删除成功！");
+          this.reloadUncheckData();
+        }
+      })
+      .catch(error => {
+        util.errorProcessor(this, error);
+      })
+    },
+    reloadUncheckData() {
+      this.uncheckTabLoading = true;
+      util.ajax
+        .get("/repertory/out/getUnchecked/" + "MOVE_OUT")
+        .then(response => {
+          if (response.status === 200 && response.data) {
+            this.uncheckData = response.data.data;
+            this.uncheckTabLoading = false;
+          }
+        })
+        .catch(error => {
+          this.uncheckTabLoading = false;
+          util.errorProcessor(this, error);
+        });
+    },
+    changeSiderShow() {
+      this.showSider = !this.showSider;
     },
     queryRepertoryList() {
       var self = this;
@@ -527,7 +736,7 @@ export default {
     onStoreChange(data, item) {
       var self = this;
       this.queryStoreItems = [];
-      this.changeStoreItems = [];
+      //this.changeStoreItems = [];
       this.queryStore.warehouseId = item.id;
       this.queryStore.page = this.currentPage;
       util.ajax
@@ -543,16 +752,20 @@ export default {
           console.log(error);
         });
     },
-    onReceiveStoreChange(data, item) {
+    /**onReceiveStoreChange(data, item) {
       if (this.item.id === this.selectStore.warehouseId) {
         this.$Message.error("转入仓库不能与转出仓库相同");
       }
-    },
+    },*/
     handleStoreRowDbClick(row) {
       //库存记录点击
       for (var i = 0; i < this.changeStoreItems.length; i++) {
         if (row.id === this.changeStoreItems[i].id) {
           this.$Message.info("转移单已经存在此记录");
+          return true;
+        }
+        if (row.warehouseId != this.changeStoreItems[i].warehouseId) {
+          this.$Message.info("不同仓库商品不能在同一转库单中");
           return true;
         }
       }
@@ -593,17 +806,17 @@ export default {
       });
     },
     saveOut() {
-      //前台验证出库信息
-      let self = this;
-      this.RepertoryOut = {};
-      this.RepertoryOut.outDetailList = [];
-      this.RepertoryOut.goToWarehouseId = this.changeStore.goToWarehouseId;
-      this.RepertoryOut.warehouseId = this.selectStore.warehouseId;
-      this.RepertoryOut.refOrderNumber = this.changeStore.refOrderNumber;
-      this.RepertoryOut.outDate = this.changeStore.outDate;
-      this.RepertoryOut.comment = this.changeStore.comment;
+      if (
+        this.changeStoreItems.length == undefined ||
+        this.changeStoreItems.length <= 0
+      ) {
+        this.$Message.error("移库单明细不能为空");
+        return;
+      }
 
-      if (this.changeStore.goToWarehouseId == this.selectStore.warehouseId) {
+      if (
+        this.changeStore.goToWarehouseId == this.changeStoreItems[0].warehouseId
+      ) {
         this.$Message.error("转入仓库不能与转出仓库相同");
         return;
       }
@@ -614,13 +827,18 @@ export default {
         this.$Message.error("转入仓库不能为空");
         return;
       }
-      if (
-        this.changeStoreItems.length == undefined ||
-        this.changeStoreItems.length <= 0
-      ) {
-        this.$Message.error("移库单明细不能为空");
-        return;
-      }
+
+      //前台验证出库信息
+      let self = this;
+      this.RepertoryOut = {};
+      this.RepertoryOut.outDetailList = [];
+      this.RepertoryOut.goToWarehouseId = this.changeStore.goToWarehouseId;
+      this.RepertoryOut.warehouseId = this.changeStoreItems[0].warehouseId;
+      this.RepertoryOut.refOrderNumber = this.changeStore.refOrderNumber;
+      this.RepertoryOut.outDate = this.changeStore.outDate;
+      this.RepertoryOut.comment = this.changeStore.comment;
+      this.RepertoryOut.customerName = this.changeStore.customerName;
+
       for (let i = 0; i < this.changeStoreItems.length; i++) {
         if (
           this.RepertoryOut.warehouseId != this.changeStoreItems[i].warehouseId
@@ -640,7 +858,9 @@ export default {
           let RepertoryOutDetail = {};
           RepertoryOutDetail["repertoryInfoId"] = this.changeStoreItems[i].id;
           RepertoryOutDetail["quantity"] = this.changeStoreItems[i].outAmount;
-          RepertoryOutDetail["location"] = this.changeStoreItems[i].outLocation;
+          RepertoryOutDetail["location"] = this.changeStoreItems[
+            i
+          ].goToLocation;
           RepertoryOutDetail["price"] = this.changeStoreItems[i].buyPrice;
           this.RepertoryOut.outDetailList.push(RepertoryOutDetail);
         }
@@ -663,3 +883,21 @@ export default {
   }
 };
 </script>
+<style lang="less">
+@import "../../styles/common.less";
+.uncheck-table .statusClass {
+  display: block;
+}
+
+.uncheck-table .ivu-table-row-hover .statusClass {
+  display: none;
+}
+
+.uncheck-table .ivu-btn-group {
+  display: none;
+}
+
+.uncheck-table .ivu-table-row-hover .ivu-btn-group {
+  display: block;
+}
+</style>

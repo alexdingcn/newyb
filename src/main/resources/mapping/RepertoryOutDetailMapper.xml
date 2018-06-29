@@ -216,11 +216,8 @@
     select
      ro.id, ro.status,ro.ref_order_number as orderNumber,ro.created_time as createdTime, ro.created_by as createdBy,ro.review_order_user as reviewOrderUser, ro.review_order_result as reviewOrderResult
     from repertory_out ro
-    where ro.company_id = #{companyId} and ro.ref_type = 'DAMAGE_OUT' and ro.status in ('INIT','REVIEW','REVIEW_REJECT')
+    where ro.company_id = #{companyId} and ro.ref_type = #{refType} and ro.status in ('INIT','REVIEW','REVIEW_REJECT')
   </select>
-
-
-
 
   <select id="getLastBuyPrice" parameterType="map" resultType="com.yiban.erp.dto.CurrentBalanceResp">
     select
@@ -236,6 +233,11 @@
       group by goods_id ) t2
     where t1.id = t2.detailId
   </select>
+
+  <delete id="deleteByRepertoryOutId">
+    delete from repertory_out_detail
+    where repertory_out_id = #{id}
+  </delete>
 
 
 
