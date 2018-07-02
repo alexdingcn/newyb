@@ -284,7 +284,7 @@ public class RepertoryOutService {
         }
         boolean checkStatus = true;
         for (RepertoryOutDetail detail : details) {
-            if (!RepertoryOutStatus.REVIEW_NEXT.name().equals(detail.getStatus())) {
+            if (!RepertoryOutStatus.REVIEW.name().equals(detail.getStatus())) {
                 checkStatus = false;
                 break;
             }

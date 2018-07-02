@@ -299,4 +299,41 @@ public class RepertoryOut {
     public void setCustomerTel(String customerTel) {
         this.customerTel = customerTel;
     }
+
+    @Override
+    public String toString() {
+        return "RepertoryOut{" +
+                "id=" + id +
+                ", companyId=" + companyId +
+                ", warehouseId=" + warehouseId +
+                ", refType='" + refType + '\'' +
+                ", status='" + status + '\'' +
+                ", outDate=" + outDate +
+                ", refOrderId=" + refOrderId +
+                ", refOrderNumber='" + refOrderNumber + '\'' +
+                ", customerId=" + customerId +
+                ", customerName='" + customerName + '\'' +
+                ", customerRepId=" + customerRepId +
+                ", customerRepName='" + customerRepName + '\'' +
+                ", goTo='" + goTo + '\'' +
+                ", goToWarehouseId=" + goToWarehouseId +
+                ", totalQuantity=" + totalQuantity +
+                ", totalAmount=" + totalAmount +
+                ", makeOrderUser='" + makeOrderUser + '\'' +
+                ", reviewOrderUser='" + reviewOrderUser + '\'' +
+                ", reviewOrderResult='" + reviewOrderResult + '\'' +
+                ", checkOrderUser='" + checkOrderUser + '\'' +
+                ", checkDate=" + checkDate +
+                ", fileNo='" + fileNo + '\'' +
+                ", comment='" + comment + '\'' +
+                ", createdBy='" + createdBy + '\'' +
+                ", updatedBy='" + updatedBy + '\'' +
+                ", createdTime=" + createdTime +
+                ", updatedTime=" + updatedTime +
+                ", warehouseName='" + warehouseName + '\'' +
+                ", refTypeName='" + refTypeName + '\'' +
+                ", customerTel='" + customerTel + '\'' +
+                ", outDetailList=" + outDetailList +
+                '}';
+    }
 }
