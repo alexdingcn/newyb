@@ -1,6 +1,30 @@
 <style lang="less">
 @import "./home.less";
 @import "../../styles/common.less";
+.show-content {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 6;
+  -webkit-box-orient: vertical;
+  line-height: 1.5em;
+  height: 9em;
+}
+
+.show-div {
+  background-color: #ffffff;
+  height: 9em;
+  width: 450px;
+}
+
+.show-div-font {
+  font-family: "Helvetica Neue", Helvetica, "PingFang SC", "Hiragino Sans GB",
+    "Microsoft YaHei", "微软雅黑", Arial, sans-serif;
+  font-size: 1.1em;
+  p {
+    padding-bottom: 0.5em;
+  }
+}
 </style>
 <template>
     <div class="home-main">
@@ -71,13 +95,22 @@
                                 <p slot="title" align='center' style="font-weight: bolder;">
                                         {{data.title}}
                                 </p>
-                                <Input type="textarea" :rows="6" v-model="data.content" />
+                                <div @click="showDetail(data.content)"  class="show-div show-div-font">
+                                    <p  class="show-content" v-text="data.content"></p>
+                                </div>
                             </div>
                         </Carousel-item>
                     </Carousel>
                 </i-col>
             </Row>
         </Card>
+
+                            <Modal v-model="showModal" ref="showHtml" width="80" :footerHide="true" :mask-closable="false" title="公告详细" >
+                                <div class="show-div-font">
+                                    <p v-html="showHtml"></p>
+                                </div>
+                            </Modal>
+
 
         <Row :gutter="10" class="margin-top-10">
             <i-col :md="24" :lg="16">
@@ -314,8 +347,10 @@ export default {
       toDoList: [],
       todoData: [],
       dealForm: {},
+      showHtml:"",
       showTodoDeal: false,
       billboards: [],
+      showModal: false,
       todoColumns: [
         {
           type: "index",
@@ -361,6 +396,10 @@ export default {
     }
   },
   methods: {
+    showDetail(content) {
+        this.showHtml=content; 
+      this.showModal = true;
+    },
     getUpdates() {
       var self = this;
       var lastViewUpdate = Cookies.get("last-updateid") || "";
