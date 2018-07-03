@@ -96,7 +96,7 @@
                                         {{data.title}}
                                 </p>
                                 <div @click="showDetail(data.content)"  class="show-div show-div-font">
-                                    <p  class="show-content" v-text="data.content"></p>
+                                    <p  class="show-content" v-html="data.content"></p>
                                 </div>
                             </div>
                         </Carousel-item>
