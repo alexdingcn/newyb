@@ -56,8 +56,8 @@
                     </i-col>
 
                     <i-col span="5">
-                    <FormItem label="自定义单号" prop="refOrderNumber">
-                        <Input v-model="changeStore.refOrderNumber" />
+                    <FormItem label="单号" prop="refOrderNumber">
+                        <Input v-model="changeStore.refOrderNumber" disabled/>
                     </FormItem>
                     </i-col>
                     <i-col span="5">
@@ -697,6 +697,7 @@ export default {
 
     },
     removeConfirm(id){
+      var self = this;
       let req ={
         id:id,
       }
@@ -704,8 +705,8 @@ export default {
       .put("/repertory/out/deleteOrder/"+id)
       .then(response => {
         if(response.status == 200){
-          this.$Message.success("删除成功！");
-          this.reloadUncheckData();
+          self.$Message.success("删除成功！");
+          self.reloadUncheckData();
         }
       })
       .catch(error => {
@@ -800,7 +801,7 @@ export default {
       //移库出库记录表，双击删除
       this.$Modal.confirm({
         title: "确认删除商品？",
-        content: "<p>确认删除商品 " + row.name + "?</p>",
+        content: "<p>确认删除商品 " + row.goodsName + "?</p>",
         onOk: () => {
           for (let i = 0; i < this.changeStoreItems.length; i++) {
             if (row.id === this.changeStoreItems[i].id) {
@@ -888,7 +889,7 @@ export default {
           .then(function(response) {
             if (response.status === 200) {
               self.$Message.info("转移出库单创建成功");
-              this.reloadUncheckData();
+              self .reloadUncheckData();
               self.closeConfirm = true;
             }
             self.saving = false;
