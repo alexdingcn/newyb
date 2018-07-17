@@ -22,13 +22,12 @@
                         </Button>
                     </i-col>
                     <i-col span="18" class="center">
-                        <h2>融资申请</h2>
+                        <h2>申请金融服务</h2>
                     </i-col>
                 </Row>
             </Header>
-            <Content>
-                <Form ref="formInline" :model="bizLicenseForm" :label-width="80" :rule="ruleValidate" class="padding-10" v-show="formShow">
-                    <h2>公司信息</h2>
+            <Content><!--class="padding-10"-->
+                <Form ref="formInline" :model="bizLicenseForm" :label-width="80" :rule="ruleValidate"  v-bind:style="{padding: paddingPX}" v-show="formShow">
                     <FormItem label="公司名称">
                         <Input type="text" v-model="bizLicenseForm.name" placeholder="公司名称" size="large"/>
                     </FormItem>
@@ -37,7 +36,6 @@
                         <Input type="text" v-model="bizLicenseForm.legalPerson" placeholder="法人" size="large"/>
                     </FormItem>
 
-                    <h2>申请金额</h2>
                     <FormItem label="融资金额">
                         <Input type="tel" v-model="bizLicenseForm.applyAmount" placeholder="申请金额(万)" size="large"/>
                     </FormItem>
@@ -49,7 +47,6 @@
                         </Select>
                     </FormItem>
 
-                    <h2>申请人</h2>
                     <FormItem label="联系人姓名">
                         <Input v-model="bizLicenseForm.contact" placeholder="联系人姓名" size="large"/>
                     </FormItem>
@@ -85,6 +82,9 @@
         name: 'loan-apply-biz',
         data () {
             return {
+                clientWidth:'',
+                paddingPX:'',
+                //paddingPXR:'',
                 formShow: true,
                 submitEnabled: false,
                 uploadAction: `${util.baseUrl}/loan/bizlic/ocr`,
@@ -108,6 +108,11 @@
             }
         },
         mounted () {
+            this.clientWidth = window.screen.width;
+            console.log("---"+this.clientWidth);
+            this.paddingPX = this.clientWidth< 500 ? '10px':'10px 400px';
+            //this.$refs.formInline.style.padding = '300px';
+            //this.paddingPXL = this.clientWidth< 500 ? '30px':'200px';
             this.initFileControl();
             this.getFaceResult();
         },
