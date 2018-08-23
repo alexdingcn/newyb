@@ -1,6 +1,7 @@
 *.iml
 *.ipr
 *.iws
+*.properties
 .idea/
 out/
 build/
