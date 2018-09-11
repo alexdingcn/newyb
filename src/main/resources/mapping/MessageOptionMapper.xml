@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.yiban.erp.dao.MessageOptionMapper" >
+  <resultMap id="BaseResultMap" type="com.yiban.erp.entities.MessageOption" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="user_id" property="userId" jdbcType="BIGINT" />
+    <result column="message_id" property="messageId" jdbcType="BIGINT" />
+    <result column="option_status" property="optionStatus" jdbcType="VARCHAR" />
+    <result column="option_result" property="optionResult" jdbcType="VARCHAR" />
+    <result column="create_by" property="createBy" jdbcType="VARCHAR" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_by" property="updateBy" jdbcType="VARCHAR" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, user_id, message_id, option_status, option_result, create_by, create_time, update_by, 
+    update_time
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select 
+    <include refid="Base_Column_List" />
+    from message_option
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
+    delete from message_option
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="com.yiban.erp.entities.MessageOption" keyProperty="id" useGeneratedKeys="true">
+    insert into message_option (user_id, message_id,
+      option_status, option_result, create_by, 
+      create_time, update_by, update_time
+      )
+    values (#{userId,jdbcType=BIGINT}, #{messageId,jdbcType=BIGINT},
+      #{optionStatus,jdbcType=VARCHAR}, #{optionResult,jdbcType=VARCHAR}, #{createBy,jdbcType=VARCHAR}, 
+      #{createTime,jdbcType=TIMESTAMP}, #{updateBy,jdbcType=VARCHAR}, #{updateTime,jdbcType=TIMESTAMP}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.yiban.erp.entities.MessageOption" keyProperty="id" useGeneratedKeys="true">
+    insert into message_option
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="userId != null" >
+        user_id,
+      </if>
+      <if test="messageId != null" >
+        message_id,
+      </if>
+      <if test="optionStatus != null" >
+        option_status,
+      </if>
+      <if test="optionResult != null" >
+        option_result,
+      </if>
+      <if test="createBy != null" >
+        create_by,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+      <if test="updateBy != null" >
+        update_by,
+      </if>
+      <if test="updateTime != null" >
+        update_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=BIGINT},
+      </if>
+      <if test="userId != null" >
+        #{userId,jdbcType=BIGINT},
+      </if>
+      <if test="messageId != null" >
+        #{messageId,jdbcType=BIGINT},
+      </if>
+      <if test="optionStatus != null" >
+        #{optionStatus,jdbcType=VARCHAR},
+      </if>
+      <if test="optionResult != null" >
+        #{optionResult,jdbcType=VARCHAR},
+      </if>
+      <if test="createBy != null" >
+        #{createBy,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateBy != null" >
+        #{updateBy,jdbcType=VARCHAR},
+      </if>
+      <if test="updateTime != null" >
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.yiban.erp.entities.MessageOption" >
+    update message_option
+    <set >
+      <if test="userId != null" >
+        user_id = #{userId,jdbcType=BIGINT},
+      </if>
+      <if test="messageId != null" >
+        message_id = #{messageId,jdbcType=BIGINT},
+      </if>
+      <if test="optionStatus != null" >
+        option_status = #{optionStatus,jdbcType=VARCHAR},
+      </if>
+      <if test="optionResult != null" >
+        option_result = #{optionResult,jdbcType=VARCHAR},
+      </if>
+      <if test="createBy != null" >
+        create_by = #{createBy,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateBy != null" >
+        update_by = #{updateBy,jdbcType=VARCHAR},
+      </if>
+      <if test="updateTime != null" >
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.yiban.erp.entities.MessageOption" >
+    update message_option
+    set user_id = #{userId,jdbcType=BIGINT},
+      message_id = #{messageId,jdbcType=BIGINT},
+      option_status = #{optionStatus,jdbcType=VARCHAR},
+      option_result = #{optionResult,jdbcType=VARCHAR},
+      create_by = #{createBy,jdbcType=VARCHAR},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_by = #{updateBy,jdbcType=VARCHAR},
+      update_time = #{updateTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+
+  <select id="getByMessageId" parameterType="java.lang.Long" resultType="com.yiban.erp.entities.MessageOption">
+    select
+     m.id as id, m.user_id as userId, m.message_id as messageId, m.option_status as optionStatus, m.option_result optionResult,
+     m.create_by as createBy, m.create_time as createTime, m.update_by as updateBy, m.update_time as updateTime,
+     u.nickname as nickName, u.realname as realName
+    from message_option m, users u
+    where m.user_id = u.id
+    and m.message_id = #{messageId}
+    order by id desc;
+  </select>
+
+</mapper>

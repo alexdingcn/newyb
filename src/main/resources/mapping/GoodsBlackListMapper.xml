@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.yiban.erp.dao.GoodsBlackListMapper" >
+  <resultMap id="BaseResultMap" type="com.yiban.erp.entities.GoodsBlackList" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="goods_id" property="goodsId" jdbcType="BIGINT" />
+    <result column="created_by" property="createdBy" jdbcType="VARCHAR" />
+    <result column="created_time" property="createdTime" jdbcType="TIMESTAMP" />
+    <result column="updated_by" property="updatedBy" jdbcType="VARCHAR" />
+    <result column="updated_time" property="updatedTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <resultMap id="ResultMapWithBLOBs" type="com.yiban.erp.entities.GoodsBlackListWithBLOBs" extends="BaseResultMap" >
+    <result column="regions" property="regions" jdbcType="LONGVARCHAR" />
+    <result column="customer_ids" property="customerIds" jdbcType="LONGVARCHAR" />
+    <result column="customer_category_ids" property="customerCategoryIds" jdbcType="LONGVARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, goods_id, created_by, created_time, updated_by, updated_time
+  </sql>
+  <sql id="Blob_Column_List" >
+    regions, customer_ids, customer_category_ids
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="ResultMapWithBLOBs" parameterType="java.lang.Long" >
+    select 
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from goods_black_list
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+    <select id="selectByGoodsId" resultMap="ResultMapWithBLOBs" parameterType="java.lang.Long" >
+        select
+        <include refid="Base_Column_List" />
+        ,
+        <include refid="Blob_Column_List" />
+        from goods_black_list
+        where goods_id = #{goodsId,jdbcType=BIGINT}
+    </select>
+
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
+    delete from goods_black_list
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="com.yiban.erp.entities.GoodsBlackListWithBLOBs" useGeneratedKeys="true" keyProperty="id">
+    insert into goods_black_list (goods_id, created_by,
+      created_time, updated_by, updated_time, 
+      regions, customer_ids, customer_category_ids
+      )
+    values ( #{goodsId,jdbcType=BIGINT}, #{createdBy,jdbcType=VARCHAR},
+      #{createdTime,jdbcType=TIMESTAMP}, #{updatedBy,jdbcType=VARCHAR}, #{updatedTime,jdbcType=TIMESTAMP}, 
+      #{regions,jdbcType=LONGVARCHAR}, #{customerIds,jdbcType=LONGVARCHAR}, #{customerCategoryIds,jdbcType=LONGVARCHAR}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.yiban.erp.entities.GoodsBlackListWithBLOBs" useGeneratedKeys="true" keyProperty="id">
+    insert into goods_black_list
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+
+      <if test="goodsId != null" >
+        goods_id,
+      </if>
+      <if test="createdBy != null" >
+        created_by,
+      </if>
+      <if test="createdTime != null" >
+        created_time,
+      </if>
+      <if test="updatedBy != null" >
+        updated_by,
+      </if>
+      <if test="updatedTime != null" >
+        updated_time,
+      </if>
+      <if test="regions != null" >
+        regions,
+      </if>
+      <if test="customerIds != null" >
+        customer_ids,
+      </if>
+      <if test="customerCategoryIds != null" >
+        customer_category_ids,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+
+      <if test="goodsId != null" >
+        #{goodsId,jdbcType=BIGINT},
+      </if>
+      <if test="createdBy != null" >
+        #{createdBy,jdbcType=VARCHAR},
+      </if>
+      <if test="createdTime != null" >
+        #{createdTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updatedBy != null" >
+        #{updatedBy,jdbcType=VARCHAR},
+      </if>
+      <if test="updatedTime != null" >
+        #{updatedTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="regions != null" >
+        #{regions,jdbcType=LONGVARCHAR},
+      </if>
+      <if test="customerIds != null" >
+        #{customerIds,jdbcType=LONGVARCHAR},
+      </if>
+      <if test="customerCategoryIds != null" >
+        #{customerCategoryIds,jdbcType=LONGVARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.yiban.erp.entities.GoodsBlackListWithBLOBs" >
+    update goods_black_list
+    <set >
+      <if test="goodsId != null" >
+        goods_id = #{goodsId,jdbcType=BIGINT},
+      </if>
+      <if test="createdBy != null" >
+        created_by = #{createdBy,jdbcType=VARCHAR},
+      </if>
+      <if test="createdTime != null" >
+        created_time = #{createdTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updatedBy != null" >
+        updated_by = #{updatedBy,jdbcType=VARCHAR},
+      </if>
+      <if test="updatedTime != null" >
+        updated_time = #{updatedTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="regions != null" >
+        regions = #{regions,jdbcType=LONGVARCHAR},
+      </if>
+      <if test="customerIds != null" >
+        customer_ids = #{customerIds,jdbcType=LONGVARCHAR},
+      </if>
+      <if test="customerCategoryIds != null" >
+        customer_category_ids = #{customerCategoryIds,jdbcType=LONGVARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.yiban.erp.entities.GoodsBlackListWithBLOBs" >
+    update goods_black_list
+    set goods_id = #{goodsId,jdbcType=BIGINT},
+      created_by = #{createdBy,jdbcType=VARCHAR},
+      created_time = #{createdTime,jdbcType=TIMESTAMP},
+      updated_by = #{updatedBy,jdbcType=VARCHAR},
+      updated_time = #{updatedTime,jdbcType=TIMESTAMP},
+      regions = #{regions,jdbcType=LONGVARCHAR},
+      customer_ids = #{customerIds,jdbcType=LONGVARCHAR},
+      customer_category_ids = #{customerCategoryIds,jdbcType=LONGVARCHAR}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.yiban.erp.entities.GoodsBlackList" >
+    update goods_black_list
+    set goods_id = #{goodsId,jdbcType=BIGINT},
+      created_by = #{createdBy,jdbcType=VARCHAR},
+      created_time = #{createdTime,jdbcType=TIMESTAMP},
+      updated_by = #{updatedBy,jdbcType=VARCHAR},
+      updated_time = #{updatedTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+
+  <select id="getByGoodsDetailIds" parameterType="map" resultMap="ResultMapWithBLOBs">
+    select DISTINCT b.goods_id as goodsId, g.name as goodsName, b.regions, b.customer_ids, customer_category_ids
+    from goods_black_list b, goods_info g, goods_detail d
+    where b.goods_id = g.id and g.id = d.goods_info_id
+    and d.id in
+      <foreach collection="goodsIds" item="item" open="(" close=")" separator=", ">
+        #{item}
+      </foreach>
+  </select>
+
+</mapper>

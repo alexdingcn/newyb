@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.yiban.erp.dao.BillboardMapper" >
+  <resultMap id="BaseResultMap" type="com.yiban.erp.entities.Billboard" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="number" property="number" jdbcType="INTEGER" />
+    <result column="title" property="title" jdbcType="VARCHAR" />
+    <result column="content" property="content" jdbcType="VARCHAR" />
+    <result column="status" property="status" jdbcType="BIT" />
+    <result column="create_by" property="createBy" jdbcType="VARCHAR" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="company_id" property="companyId" jdbcType="INTEGER" />
+  </resultMap>
+    <select id="getList" resultMap="BaseResultMap">
+        select id, number, title, content, status, create_by, create_time,company_id
+        from billboard
+        where  company_id = #{companyId}
+        order by number asc
+    </select>
+    <select id="display" resultMap="BaseResultMap">
+        select id, number, title, content, status, create_by, create_time,company_id
+        from billboard
+        where  company_id = #{companyId} and status = "1"
+        order by number asc
+    </select>
+  <insert id="insert" parameterType="com.yiban.erp.entities.Billboard" useGeneratedKeys="true" keyProperty="id">
+      insert into billboard
+      ( title, content, status, create_by, create_time, company_id)
+      values
+      ( #{title}, #{content}, #{status}, #{createBy}, now(), #{companyId})
+  </insert>
+    <update id="update" parameterType="com.yiban.erp.entities.Billboard">
+        update billboard
+        <set>
+            <if test="title != null" >
+                title = #{title},
+            </if>
+            <if test="content != null" >
+                content = #{content},
+            </if>
+            <if test="status != null" >
+                status = #{status},
+            </if>
+            create_by = #{createBy}, create_time = now()
+        </set>
+        where company_id = #{companyId} and id = #{id}
+    </update>
+
+    <delete id="delete">
+      delete  from billboard where id = #{id}
+    </delete>
+
+    <update id="sort">
+        update billboard
+        set
+            number = #{number}
+        where id = #{id}
+    </update>
+</mapper>

@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.yiban.erp.dao.RepertoryInBackMapper" >
+  <resultMap id="BaseResultMap" type="com.yiban.erp.entities.RepertoryInBack" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="company_id" property="companyId" jdbcType="INTEGER" />
+    <result column="ref_type" property="refType" jdbcType="VARCHAR" />
+    <result column="order_number" property="orderNumber" jdbcType="VARCHAR" />
+    <result column="in_order_id" property="inOrderId" jdbcType="BIGINT" />
+    <result column="in_order_number" property="inOrderNumber" jdbcType="VARCHAR" />
+    <result column="in_receive_time" property="inReceiveTime" jdbcType="TIMESTAMP"/>
+    <result column="supplier_id" property="supplierId" jdbcType="BIGINT" />
+    <result column="supplier_contact_id" property="supplierContactId" jdbcType="BIGINT" />
+    <result column="buyer_id" property="buyerId" jdbcType="BIGINT" />
+    <result column="status" property="status" jdbcType="VARCHAR" />
+    <result column="back_time" property="backTime" jdbcType="TIMESTAMP" />
+    <result column="key_word" property="keyWord" jdbcType="VARCHAR"/>
+    <result column="warehouse_id" property="warehouseId" jdbcType="INTEGER" />
+    <result column="back_buy_user" property="backBuyUser" jdbcType="VARCHAR" />
+    <result column="back_buy_time" property="backBuyTime" jdbcType="TIMESTAMP" />
+    <result column="back_buy_result" property="backBuyResult" jdbcType="VARCHAR" />
+    <result column="back_quality_user" property="backQualityUser" jdbcType="VARCHAR" />
+    <result column="back_quality_time" property="backQualityTime" jdbcType="TIMESTAMP" />
+    <result column="back_quality_result" property="backQualityResult" jdbcType="VARCHAR" />
+    <result column="quality_check_time" property="qualityCheckTime" jdbcType="TIMESTAMP" />
+    <result column="quality_check_user" property="qualityCheckUser" jdbcType="VARCHAR" />
+    <result column="final_check_time" property="finalCheckTime" jdbcType="TIMESTAMP" />
+    <result column="final_check_user" property="finalCheckUser" jdbcType="VARCHAR" />
+    <result column="total_quantity" property="totalQuantity" jdbcType="DECIMAL" />
+    <result column="total_amount" property="totalAmount" jdbcType="DECIMAL" />
+    <result column="created_by" property="createdBy" jdbcType="VARCHAR" />
+    <result column="updated_by" property="updatedBy" jdbcType="VARCHAR" />
+    <result column="created_time" property="createdTime" jdbcType="TIMESTAMP" />
+    <result column="updated_time" property="updatedTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, company_id, ref_type, order_number, in_order_id, in_order_number, in_receive_time, supplier_id, supplier_contact_id, buyer_id,
+    status, back_time, key_word, warehouse_id, back_buy_user, back_buy_time, back_buy_result, back_quality_user,
+    back_quality_time, back_quality_result, quality_check_time, quality_check_user, final_check_time, 
+    final_check_user, total_quantity, total_amount, created_by, updated_by, created_time, 
+    updated_time
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select 
+    <include refid="Base_Column_List" />
+    from repertory_in_back
+    where id = #{id,jdbcType=BIGINT} and status != 'DELETE'
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
+    delete from repertory_in_back
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="com.yiban.erp.entities.RepertoryInBack" keyProperty="id" useGeneratedKeys="true" >
+    insert into repertory_in_back (company_id, ref_type,
+      order_number, in_order_id, in_order_number, in_receive_time, supplier_id, supplier_contact_id,
+      buyer_id, status, back_time, key_word,
+      warehouse_id, back_buy_user, back_buy_time, 
+      back_buy_result, back_quality_user, back_quality_time, 
+      back_quality_result, quality_check_time, 
+      quality_check_user, final_check_time, final_check_user, 
+      total_quantity, total_amount, created_by, 
+      updated_by, created_time, updated_time
+      )
+    values (#{companyId,jdbcType=INTEGER}, #{refType,jdbcType=VARCHAR},
+      #{orderNumber,jdbcType=VARCHAR}, #{inOrderId,jdbcType=BIGINT}, #{inOrderNumber,jdbcType=VARCHAR}, #{inReceiveTime,jdbcType=TIMESTAMP},
+      #{supplierId,jdbcType=BIGINT}, #{supplierContactId,jdbcType=BIGINT},
+      #{buyerId,jdbcType=BIGINT}, #{status,jdbcType=VARCHAR}, #{backTime,jdbcType=TIMESTAMP}, #{keyWord,jdbcType=VARCHAR},
+      #{warehouseId,jdbcType=INTEGER}, #{backBuyUser,jdbcType=VARCHAR}, #{backBuyTime,jdbcType=TIMESTAMP}, 
+      #{backBuyResult,jdbcType=VARCHAR}, #{backQualityUser,jdbcType=VARCHAR}, #{backQualityTime,jdbcType=TIMESTAMP}, 
+      #{backQualityResult,jdbcType=VARCHAR}, #{qualityCheckTime,jdbcType=TIMESTAMP}, 
+      #{qualityCheckUser,jdbcType=VARCHAR}, #{finalCheckTime,jdbcType=TIMESTAMP}, #{finalCheckUser,jdbcType=VARCHAR}, 
+      #{totalQuantity,jdbcType=DECIMAL}, #{totalAmount,jdbcType=DECIMAL}, #{createdBy,jdbcType=VARCHAR}, 
+      #{updatedBy,jdbcType=VARCHAR}, #{createdTime,jdbcType=TIMESTAMP}, #{updatedTime,jdbcType=TIMESTAMP}
+      )
+  </insert>
+
+  <update id="updateByPrimaryKeySelective" parameterType="com.yiban.erp.entities.RepertoryInBack" >
+    update repertory_in_back
+    <set >
+      <if test="refType != null" >
+        ref_type = #{refType,jdbcType=VARCHAR},
+      </if>
+      <if test="orderNumber != null" >
+        order_number = #{orderNumber,jdbcType=VARCHAR},
+      </if>
+      <if test="inOrderId != null" >
+        in_order_id = #{inOrderId,jdbcType=BIGINT},
+      </if>
+      <if test="inOrderNumber != null" >
+        in_order_number = #{inOrderNumber,jdbcType=VARCHAR},
+      </if>
+      <if test="inReceiveTime != null" >
+        in_receive_time = #{inReceiveTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="supplierId != null" >
+        supplier_id = #{supplierId,jdbcType=BIGINT},
+      </if>
+      <if test="supplierContactId != null" >
+        supplier_contact_id = #{supplierContactId,jdbcType=BIGINT},
+      </if>
+      <if test="buyerId != null" >
+        buyer_id = #{buyerId,jdbcType=BIGINT},
+      </if>
+      <if test="status != null" >
+        status = #{status,jdbcType=VARCHAR},
+      </if>
+      <if test="backTime != null" >
+        back_time = #{backTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="keyWord != null">
+        key_word = #{keyWord,jdbcType=VARCHAR},
+      </if>
+      <if test="warehouseId != null" >
+        warehouse_id = #{warehouseId,jdbcType=INTEGER},
+      </if>
+      <if test="backBuyUser != null" >
+        back_buy_user = #{backBuyUser,jdbcType=VARCHAR},
+      </if>
+      <if test="backBuyTime != null" >
+        back_buy_time = #{backBuyTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="backBuyResult != null" >
+        back_buy_result = #{backBuyResult,jdbcType=VARCHAR},
+      </if>
+      <if test="backQualityUser != null" >
+        back_quality_user = #{backQualityUser,jdbcType=VARCHAR},
+      </if>
+      <if test="backQualityTime != null" >
+        back_quality_time = #{backQualityTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="backQualityResult != null" >
+        back_quality_result = #{backQualityResult,jdbcType=VARCHAR},
+      </if>
+      <if test="qualityCheckTime != null" >
+        quality_check_time = #{qualityCheckTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="qualityCheckUser != null" >
+        quality_check_user = #{qualityCheckUser,jdbcType=VARCHAR},
+      </if>
+      <if test="finalCheckTime != null" >
+        final_check_time = #{finalCheckTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="finalCheckUser != null" >
+        final_check_user = #{finalCheckUser,jdbcType=VARCHAR},
+      </if>
+      <if test="totalQuantity != null" >
+        total_quantity = #{totalQuantity,jdbcType=DECIMAL},
+      </if>
+      <if test="totalAmount != null" >
+        total_amount = #{totalAmount,jdbcType=DECIMAL},
+      </if>
+      <if test="createdBy != null" >
+        created_by = #{createdBy,jdbcType=VARCHAR},
+      </if>
+      <if test="updatedBy != null" >
+        updated_by = #{updatedBy,jdbcType=VARCHAR},
+      </if>
+      <if test="createdTime != null" >
+        created_time = #{createdTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updatedTime != null" >
+        updated_time = #{updatedTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+
+  <select id="getList" parameterType="com.yiban.erp.dto.BuyBackReq" resultMap="BaseResultMap">
+    select
+      r.*, u.nickname as buyerName, w.name as warehouseName, s.name as supplierName, su.name as supplierContactName
+    from repertory_in_back r
+    left join users u on r.buyer_id = u.id
+    left join warehouse w on r.warehouse_id = w.id
+    left join supplier s on r.supplier_id = s.id
+    left join supplier_contact su on r.supplier_contact_id = su.id
+    where r.company_id = #{companyId} and r.status != 'DELETE'
+    <if test="warehouseId != null" >
+      and r.warehouse_id = #{warehouseId}
+    </if>
+    <if test="createdStartTime != null" >
+      and r.created_time >= #{createdStartTime}
+    </if>
+    <if test="createdEndTime != null" >
+      and #{createdEndTime} > r.created_time
+    </if>
+    <if test="searchStatus != null">
+      and r.status in
+      <foreach collection="searchStatus" item="item" open="(" close=")" separator=", ">
+        #{item}
+      </foreach>
+    </if>
+  </select>
+
+  <select id="getById" parameterType="java.lang.Long" resultMap="BaseResultMap" >
+    select
+      r.*,
+      u.nickname as buyerName,
+      w.name as warehouseName,
+      s.name as supplierName,
+      su.name as supplierContactName
+    from repertory_in_back r
+    left join users u on r.buyer_id = u.id
+    left join warehouse w on r.warehouse_id = w.id
+    left join supplier s on r.supplier_id = s.id
+    left join supplier_contact su on r.supplier_contact_id = su.id
+    where r.id = #{id,jdbcType=BIGINT} and r.status != 'DELETE'
+  </select>
+
+
+</mapper>

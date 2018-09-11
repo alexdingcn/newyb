@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.yiban.erp.dao.PriceRuleMapper" >
+  <resultMap id="BaseResultMap" type="com.yiban.erp.entities.PriceRule" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="goods_id" property="goodsId" jdbcType="BIGINT" />
+    <result column="customer_id" property="customerId" jdbcType="BIGINT" />
+    <result column="customer_category_id" property="customerCategoryId" jdbcType="INTEGER" />
+    <result column="batch_price" property="batchPrice" jdbcType="DECIMAL" />
+    <result column="retail_price" property="retailPrice" jdbcType="DECIMAL" />
+    <result column="created_by" property="createdBy" jdbcType="VARCHAR" />
+    <result column="updated_by" property="updatedBy" jdbcType="VARCHAR" />
+    <result column="created_time" property="createdTime" jdbcType="TIMESTAMP" />
+    <result column="updated_time" property="updatedTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, goods_id, customer_id, customer_category_id, batch_price, retail_price, created_by, updated_by, created_time,
+    updated_time
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select 
+    <include refid="Base_Column_List" />
+    from price_rule
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
+    delete from price_rule
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="com.yiban.erp.entities.PriceRule" keyProperty="id" useGeneratedKeys="true" >
+    insert into price_rule (goods_id, customer_id,
+      customer_category_id, batch_price, retail_price, created_by,
+      updated_by, created_time, updated_time
+      )
+    values (#{goodsId,jdbcType=BIGINT}, #{customerId,jdbcType=BIGINT},
+      #{customerCategoryId,jdbcType=INTEGER}, #{batchPrice,jdbcType=DECIMAL}, #{retailPrice,jdbcType=DECIMAL},
+      #{createdBy,jdbcType=VARCHAR},
+      #{updatedBy,jdbcType=VARCHAR}, #{createdTime,jdbcType=TIMESTAMP}, #{updatedTime,jdbcType=TIMESTAMP}
+      )
+  </insert>
+  <insert id="insertBatch" parameterType="com.yiban.erp.entities.PriceRule" keyProperty="id" useGeneratedKeys="true" >
+    insert into price_rule (goods_id, customer_id,
+      customer_category_id, batch_price, retail_price, created_by,
+      updated_by, created_time, updated_time
+      )
+    values
+    <foreach collection="rules" item="item" open="(" close=")" separator="), (">
+      #{item.goodsId,jdbcType=BIGINT}, #{item.customerId,jdbcType=BIGINT},
+      #{item.customerCategoryId,jdbcType=INTEGER}, #{item.batchPrice,jdbcType=DECIMAL}, #{item.retailPrice,jdbcType=DECIMAL},
+      #{item.createdBy,jdbcType=VARCHAR},
+      #{item.updatedBy,jdbcType=VARCHAR}, #{item.createdTime,jdbcType=TIMESTAMP}, #{item.updatedTime,jdbcType=TIMESTAMP}
+    </foreach>
+  </insert>
+
+  <update id="updateByPrimaryKeySelective" parameterType="com.yiban.erp.entities.PriceRule" >
+    update price_rule
+    <set >
+      <if test="goodsId != null" >
+        goods_id = #{goodsId,jdbcType=BIGINT},
+      </if>
+      <if test="customerId != null" >
+        customer_id = #{customerId,jdbcType=BIGINT},
+      </if>
+      <if test="customerCategoryId != null" >
+        customer_category_id = #{customerCategoryId,jdbcType=INTEGER},
+      </if>
+      <if test="batchPrice != null" >
+        batch_price = #{batchPrice,jdbcType=DECIMAL},
+      </if>
+      <if test="retailPrice != null" >
+        retail_price = #{retailPrice,jdbcType=DECIMAL},
+      </if>
+      <if test="createdBy != null" >
+        created_by = #{createdBy,jdbcType=VARCHAR},
+      </if>
+      <if test="updatedBy != null" >
+        updated_by = #{updatedBy,jdbcType=VARCHAR},
+      </if>
+      <if test="createdTime != null" >
+        created_time = #{createdTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updatedTime != null" >
+        updated_time = #{updatedTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+
+  <select id="getByGoodsId" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select <include refid="Base_Column_List"/>
+    from price_rule
+    where goods_id = #{goodsId}
+  </select>
+
+  <select id="getByGoodsIdAndCustomer" parameterType="map" resultMap="BaseResultMap">
+    select
+      distinct p.*
+    from price_rule p
+    where p.goods_id in
+      <foreach collection="goodsIds" item="item" separator=", " open="(" close=")">
+        #{item}
+      </foreach>
+    <if test="customerId != null or customerCategoryId != null">
+      and (p.customer_id = #{customerId} or p.customer_category_id = #{customerCategoryId})
+    </if>
+  </select>
+
+  <select id="getByCustomer" parameterType="map" resultMap="BaseResultMap" >
+    select <include refid="Base_Column_List" />
+    from price_rule
+    where goods_id = #{goodsId}
+    and customer_id = #{customerId}
+  </select>
+
+  <delete id="removeCategorys" parameterType="java.lang.Long" >
+    delete from price_rule where goods_id = #{goodsId} and customer_category_id is not null ;
+  </delete>
+
+  <delete id="removeCustomer" parameterType="map" >
+    delete from price_rule where goods_id = #{goodsId} and customer_id in
+    <foreach collection="customerIds" separator=", " close=")" open="(" item="item" >
+      #{item}
+    </foreach>
+  </delete>
+
+</mapper>

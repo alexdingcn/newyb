@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.yiban.erp.dao.CustomerRepMapper" >
+  <resultMap id="BaseResultMap" type="com.yiban.erp.entities.CustomerRep" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="customer_id" property="customerId" jdbcType="BIGINT" />
+    <result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="contact_phone" property="contactPhone" jdbcType="VARCHAR" />
+    <result column="repertory_address" property="repertoryAddress" jdbcType="VARCHAR" />
+    <result column="postcode" property="postcode" jdbcType="VARCHAR" />
+    <result column="enabled" property="enabled" jdbcType="BIT" />
+    <result column="default_time" property="defaultTime" jdbcType="TIMESTAMP" />
+    <result column="comment" property="comment" jdbcType="VARCHAR" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+    <result column="create_by" property="createBy" jdbcType="VARCHAR" />
+    <result column="update_by" property="updateBy" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, customer_id, name, contact_phone, repertory_address, postcode, enabled, default_time,
+    comment, create_time, update_time, create_by, update_by
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from customer_rep
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from customer_rep
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.yiban.erp.entities.CustomerRep" keyProperty="id" useGeneratedKeys="true" >
+    insert into customer_rep (customer_id, name,
+      contact_phone, repertory_address, postcode, 
+      enabled, default_time, comment,
+      create_time, update_time, create_by, 
+      update_by)
+    values (#{customerId,jdbcType=BIGINT}, #{name,jdbcType=VARCHAR},
+      #{contactPhone,jdbcType=VARCHAR}, #{repertoryAddress,jdbcType=VARCHAR}, #{postcode,jdbcType=VARCHAR}, 
+      #{enabled,jdbcType=BIT}, #{defaultTime,jdbcType=TIMESTAMP}, #{comment,jdbcType=VARCHAR},
+      #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, #{createBy,jdbcType=VARCHAR}, 
+      #{updateBy,jdbcType=VARCHAR})
+  </insert>
+
+  <update id="updateByPrimaryKeySelective" parameterType="com.yiban.erp.entities.CustomerRep" >
+    update customer_rep
+    <set >
+      <if test="customerId != null" >
+        customer_id = #{customerId,jdbcType=BIGINT},
+      </if>
+      <if test="name != null" >
+        name = #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="contactPhone != null" >
+        contact_phone = #{contactPhone,jdbcType=VARCHAR},
+      </if>
+      <if test="repertoryAddress != null" >
+        repertory_address = #{repertoryAddress,jdbcType=VARCHAR},
+      </if>
+      <if test="postcode != null" >
+        postcode = #{postcode,jdbcType=VARCHAR},
+      </if>
+      <if test="enabled != null" >
+        enabled = #{enabled,jdbcType=BIT},
+      </if>
+      <if test="defaultTime != null" >
+        default_time = #{defaultTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="comment != null" >
+        comment = #{comment,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createBy != null" >
+        create_by = #{createBy,jdbcType=VARCHAR},
+      </if>
+      <if test="updateBy != null" >
+        update_by = #{updateBy,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+
+  <select id="getDefault" parameterType="java.lang.Long" resultMap="BaseResultMap" >
+    select <include refid="Base_Column_List"/>
+    from customer_rep
+    where customer_id = #{customerId}
+    order by default_time desc, id desc
+    limit 1;
+  </select>
+
+  <update id="setDefault" parameterType="map" >
+    update customer_rep
+      set default_time = #{defaultTime}
+    where id = #{id}
+  </update>
+
+  <select id="getByCustomerId" resultMap="BaseResultMap">
+    select
+      <include refid="Base_Column_List"/>
+    from customer_rep
+    where customer_id = #{customerId}
+      <if test="enabled != null" >
+          and enabled = #{enabled,jdbcType=BIT}
+      </if>
+  </select>
+
+</mapper>

@@ -1,0 +1,228 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.yiban.erp.dao.SellOrderDetailMapper" >
+  <resultMap id="BaseResultMap" type="com.yiban.erp.entities.SellOrderDetail" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="sell_order_id" property="sellOrderId" jdbcType="BIGINT" />
+    <result column="repertory_id" property="repertoryId" jdbcType="BIGINT" />
+    <result column="quantity" property="quantity" jdbcType="DECIMAL" />
+    <result column="fix_price" property="fixPrice" jdbcType="DECIMAL" />
+    <result column="dis_price" property="disPrice" jdbcType="DECIMAL" />
+    <result column="free" property="free" jdbcType="DECIMAL" />
+    <result column="real_price" property="realPrice" jdbcType="DECIMAL" />
+    <result column="single_price" property="singlePrice" jdbcType="DECIMAL" />
+    <result column="amount" property="amount" jdbcType="DECIMAL" />
+    <result column="tax_rate" property="taxRate" jdbcType="DECIMAL" />
+    <result column="create_by" property="createBy" jdbcType="VARCHAR" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_by" property="updateBy" jdbcType="VARCHAR" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+    <result column="check_status" property="checkStatus" jdbcType="VARCHAR" />
+    <result column="check_result" property="checkResult" jdbcType="VARCHAR" />
+    <result column="check_date" property="checkDate" jdbcType="TIMESTAMP" />
+    <result column="check_user" property="checkUser" jdbcType="VARCHAR" />
+    <result column="batch_code" property="batchCode" jdbcType="VARCHAR" />
+    <result column="goods_id" property="goodsId" jdbcType="BIGINT" />
+    <result column="product_date" property="productDate" jdbcType="DATE" />
+    <result column="exp_date" property="expDate" jdbcType="DATE" />
+    <result column="location" property="location" jdbcType="VARCHAR" />
+    <result column="back_quantity" property="backQuantity" jdbcType="DECIMAL" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, sell_order_id, repertory_id, quantity, fix_price, dis_price, free, real_price, single_price,
+    amount, tax_rate, create_by, create_time, update_by, update_time, check_status, check_result, check_date,
+    check_user, batch_code, goods_id, product_date, exp_date, location, back_quantity
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select 
+    <include refid="Base_Column_List" />
+    from sell_order_detail
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
+    delete from sell_order_detail
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="com.yiban.erp.entities.SellOrderDetail" keyProperty="id" useGeneratedKeys="true" >
+    insert into sell_order_detail (sell_order_id, repertory_id,
+      quantity, fix_price, dis_price, 
+      free, real_price, single_price, 
+      amount, tax_rate, create_by, 
+      create_time, update_by, update_time,
+      check_status, check_result, check_date,
+      check_user, batch_code, goods_id, product_date, exp_date, location, back_quantity
+      )
+    values (#{sellOrderId,jdbcType=BIGINT}, #{repertoryId,jdbcType=BIGINT},
+      #{quantity,jdbcType=DECIMAL}, #{fixPrice,jdbcType=DECIMAL}, #{disPrice,jdbcType=DECIMAL},
+      #{free,jdbcType=DECIMAL}, #{realPrice,jdbcType=DECIMAL}, #{singlePrice,jdbcType=DECIMAL}, 
+      #{amount,jdbcType=DECIMAL}, #{taxRate,jdbcType=DECIMAL}, #{createBy,jdbcType=VARCHAR}, 
+      #{createTime,jdbcType=TIMESTAMP}, #{updateBy,jdbcType=VARCHAR}, #{updateTime,jdbcType=TIMESTAMP},
+      #{checkStatus,jdbcType=VARCHAR}, #{checkResult,jdbcType=VARCHAR}, #{checkDate,jdbcType=TIMESTAMP},
+      #{checkUser,jdbcType=VARCHAR}, #{batchCode,jdbcType=VARCHAR}, #{goodsId,jdbcType=BIGINT},
+      #{productDate,jdbcType=DATE}, #{expDate, jdbcType=DATE}, #{location,jdbcType=VARCHAR},
+      #{backQuantity,jdbcType=DECIMAL}
+      )
+  </insert>
+
+  <insert id="replaceBatch" parameterType="map" keyProperty="id" useGeneratedKeys="true">
+    replace into sell_order_detail (sell_order_id, repertory_id,
+      quantity, fix_price, dis_price,
+      free, real_price, single_price,
+      amount, tax_rate, create_by,
+      create_time, update_by, update_time,
+      check_status, check_result, check_date,
+      check_user, batch_code, goods_id, product_date, exp_date, location, back_quantity
+      )
+    values
+    <foreach collection="detailList" item="item" open="(" close=")" separator="), (">
+      #{item.sellOrderId,jdbcType=BIGINT}, #{item.repertoryId,jdbcType=BIGINT},
+      #{item.quantity,jdbcType=DECIMAL}, #{item.fixPrice,jdbcType=DECIMAL}, #{item.disPrice,jdbcType=DECIMAL},
+      #{item.free,jdbcType=DECIMAL}, #{item.realPrice,jdbcType=DECIMAL}, #{item.singlePrice,jdbcType=DECIMAL},
+      #{item.amount,jdbcType=DECIMAL}, #{item.taxRate,jdbcType=DECIMAL}, #{item.createBy,jdbcType=VARCHAR},
+      #{item.createTime,jdbcType=TIMESTAMP}, #{item.updateBy,jdbcType=VARCHAR}, #{item.updateTime,jdbcType=TIMESTAMP},
+      #{item.checkStatus,jdbcType=VARCHAR}, #{item.checkResult,jdbcType=VARCHAR}, #{item.checkDate,jdbcType=TIMESTAMP},
+      #{item.checkUser,jdbcType=VARCHAR}, #{item.batchCode,jdbcType=VARCHAR}, #{item.goodsId,jdbcType=BIGINT},
+      #{item.productDate,jdbcType=DATE}, #{item.expDate, jdbcType=DATE}, #{item.location, jdbcType=VARCHAR},
+      #{item.backQuantity,jdbcType=DECIMAL}
+    </foreach>
+  </insert>
+
+  <update id="updateByPrimaryKeySelective" parameterType="com.yiban.erp.entities.SellOrderDetail" >
+    update sell_order_detail
+    <set >
+      <if test="sellOrderId != null" >
+        sell_order_id = #{sellOrderId,jdbcType=BIGINT},
+      </if>
+      <if test="repertoryId != null" >
+        repertory_id = #{repertoryId,jdbcType=BIGINT},
+      </if>
+      <if test="quantity != null" >
+        quantity = #{quantity,jdbcType=DECIMAL},
+      </if>
+      <if test="fixPrice != null" >
+        fix_price = #{fixPrice,jdbcType=DECIMAL},
+      </if>
+      <if test="disPrice != null" >
+        dis_price = #{disPrice,jdbcType=DECIMAL},
+      </if>
+      <if test="free != null" >
+        free = #{free,jdbcType=DECIMAL},
+      </if>
+      <if test="realPrice != null" >
+        real_price = #{realPrice,jdbcType=DECIMAL},
+      </if>
+      <if test="singlePrice != null" >
+        single_price = #{singlePrice,jdbcType=DECIMAL},
+      </if>
+      <if test="amount != null" >
+        amount = #{amount,jdbcType=DECIMAL},
+      </if>
+      <if test="taxRate != null" >
+        tax_rate = #{taxRate,jdbcType=DECIMAL},
+      </if>
+      <if test="createBy != null" >
+        create_by = #{createBy,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateBy != null" >
+        update_by = #{updateBy,jdbcType=VARCHAR},
+      </if>
+      <if test="updateTime != null" >
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="checkStatus != null" >
+        check_status = #{checkStatus,jdbcType=VARCHAR},
+      </if>
+      <if test="checkResult != null" >
+        check_result = #{checkResult,jdbcType=VARCHAR},
+      </if>
+      <if test="checkDate != null" >
+        check_date = #{checkDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="checkUser != null" >
+        check_user = #{checkUser,jdbcType=VARCHAR},
+      </if>
+      <if test="batchCode != null" >
+        batch_code = #{batchCode,jdbcType=VARCHAR},
+      </if>
+      <if test="goodsId != null" >
+        goods_id = #{goodsId,jdbcType=BIGINT},
+      </if>
+      <if test="productDate != null">
+        product_date = #{productDate,jdbcType=DATE},
+      </if>
+       <if test="expDate != null" >
+         exp_date = #{expDate, jdbcType=DATE},
+       </if>
+      <if test="location != null">
+        location = #{location,jdbcType=VARCHAR},
+      </if>
+      <if test="backQuantity != null">
+        back_quantity = #{backQuantity,jdbcType=DECIMAL},
+      </if>
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+
+  <select id="getDetailList" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select
+      s.*, r.quantity as repertoryQuantity, r.on_way_quantity as onWayQuantity
+    from sell_order_detail s, repertory_info r
+    where s.repertory_id = r.id
+      and sell_order_id = #{sellOrderId,jdbcType=BIGINT}
+  </select>
+
+  <select id="getDetailHistory" parameterType="map" resultMap="BaseResultMap">
+    select
+      t.*,
+      c.name as customerName,
+      s.create_order_date as createOrderDate,
+      u.nickname as saleNickName,
+      u.realname as saleRealName,
+      r.quantity as repertoryQuantity,
+      r.on_way_quantity as onWayQuantity
+    from sell_order_detail t, sell_order s, users u, customer c, repertory_info r
+    where t.sell_order_id = s.id and s.customer_id = c.id
+    and s.sale_id = u.id
+    and t.repertory_id = r.id
+    and s.company_id = #{companyId}
+    and s.customer_id = #{customerId}
+    and t.goods_id = #{goodsId}
+    order by s.create_order_date desc
+    <if test="offset != null and limit != null">
+      limit #{offset}, #{limit}
+    </if>
+  </select>
+
+  <select id="getUnCheckDetailIdList" parameterType="java.lang.Long" resultType="java.lang.Long">
+    select
+      distinct d.id
+    from sell_order s, sell_order_detail d
+    where s.id = d.sell_order_id
+    and s.id = #{sellOrderId}
+    and (d.check_status is null or d.check_status != 'OK');
+  </select>
+
+  <select id="getCheckOkDetailIdList" parameterType="java.lang.Long" resultType="java.lang.Long">
+    select
+    distinct d.id
+    from sell_order s, sell_order_detail d
+    where s.id = d.sell_order_id
+    and s.id = #{sellOrderId}
+    and d.check_status = 'OK';
+  </select>
+
+  <update id="updateCheckResult" parameterType="com.yiban.erp.dto.SellReviewAction" >
+    update sell_order_detail
+      set check_status = #{checkStatus},
+          check_result = #{checkResult},
+          check_user = #{checkUser},
+          check_date = #{checkDate},
+          update_time = #{updateTime},
+          update_by = #{updateBy}
+    where sell_order_id = #{sellOrderId}
+  </update>
+
+</mapper>

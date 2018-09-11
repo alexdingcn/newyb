@@ -1,0 +1,446 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.yiban.erp.dao.CustomerMapper" >
+  <resultMap id="BaseResultMap" type="com.yiban.erp.entities.Customer" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="company_id" property="companyId" jdbcType="INTEGER" />
+    <result column="customer_no" property="customerNo" jdbcType="VARCHAR" />
+    <result column="category_id" property="categoryId" jdbcType="INTEGER" />
+    <result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="pinyin" property="pinyin" jdbcType="VARCHAR" />
+    <result column="status" property="status" jdbcType="VARCHAR" />
+    <result column="enabled" property="enabled" jdbcType="BIT" />
+    <result column="can_sale_special" property="canSaleSpecial" jdbcType="BIT" />
+    <result column="is_limit_special" property="isLimitSpecial" jdbcType="BIT" />
+    <result column="city" property="city" jdbcType="VARCHAR" />
+    <result column="address" property="address" jdbcType="VARCHAR" />
+    <result column="postcode" property="postcode" jdbcType="VARCHAR" />
+    <result column="legal_person" property="legalPerson" jdbcType="VARCHAR" />
+    <result column="employee" property="employee" jdbcType="VARCHAR" />
+    <result column="contact_phone" property="contactPhone" jdbcType="VARCHAR" />
+    <result column="contact_fax" property="contactFax" jdbcType="VARCHAR" />
+    <result column="email" property="email" jdbcType="VARCHAR" />
+    <result column="is_direction" property="isDirection" jdbcType="BIT" />
+    <result column="sale_area" property="saleArea" jdbcType="VARCHAR" />
+    <result column="sale_man" property="saleMan" jdbcType="VARCHAR" />
+    <result column="member_level" property="memberLevel" jdbcType="VARCHAR" />
+    <result column="class_att_one" property="classAttOne" jdbcType="VARCHAR" />
+    <result column="class_att_two" property="classAttTwo" jdbcType="VARCHAR" />
+    <result column="stamp_template" property="stampTemplate" jdbcType="VARCHAR" />
+    <result column="bill_template" property="billTemplate" jdbcType="VARCHAR" />
+    <result column="is_cold_business" property="isColdBusiness" jdbcType="BIT" />
+    <result column="is_two_ticket" property="isTwoTicket" jdbcType="BIT" />
+    <result column="business_scope" property="businessScope" jdbcType="VARCHAR" />
+    <result column="account_term" property="accountTerm" jdbcType="INTEGER" />
+    <result column="account_name" property="accountName" jdbcType="VARCHAR" />
+    <result column="bank_account" property="bankAccount" jdbcType="VARCHAR" />
+    <result column="bank_name" property="bankName" jdbcType="VARCHAR" />
+    <result column="tax_account" property="taxAccount" jdbcType="VARCHAR" />
+    <result column="qua_check" property="quaCheck" jdbcType="VARCHAR" />
+    <result column="file_no" property="fileNo" jdbcType="VARCHAR" />
+    <result column="supervise_no" property="superviseNo" jdbcType="VARCHAR" />
+    <result column="comment" property="comment" jdbcType="VARCHAR" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+    <result column="create_by" property="createBy" jdbcType="VARCHAR" />
+    <result column="update_by" property="updateBy" jdbcType="VARCHAR" />
+    <result column="account_amount" property="accountAmount" jdbcType="DECIMAL" />
+    <result column="is_invoice" property="isInvoice" jdbcType="BIT" />
+    <result column="tax_rate" property="taxRate" jdbcType="DECIMAL" />
+    <result column="bill_type" property="billType" jdbcType="INTEGER" />
+    <result column="invoice_title" property="invoiceTitle" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, company_id, customer_no, category_id, name, pinyin, status, enabled, can_sale_special,
+    is_limit_special, city, address, postcode, legal_person, employee,
+    contact_phone, contact_fax, email, is_direction, sale_area, sale_man, member_level,
+    class_att_one, class_att_two, stamp_template, bill_template,is_cold_business, is_two_ticket, business_scope, account_term,
+    account_name, bank_account, bank_name, tax_account, qua_check, file_no, supervise_no, comment, create_time,
+    update_time, create_by, update_by, account_amount,is_invoice,tax_rate,bill_type,invoice_title
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select 
+    <include refid="Base_Column_List" />
+    from customer
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
+    delete from customer
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="com.yiban.erp.entities.Customer" keyProperty="id" useGeneratedKeys="true" >
+    insert into customer (company_id, customer_no, category_id,
+      name, pinyin, status,
+      enabled, can_sale_special, is_limit_special,
+      city, address, postcode, 
+      legal_person, employee,
+      contact_phone, contact_fax, email, 
+      is_direction, sale_area, sale_man,
+      member_level, class_att_one, class_att_two, 
+      stamp_template, bill_template, is_cold_business, is_two_ticket, business_scope,
+      account_term, account_name, bank_account,
+      bank_name, tax_account, qua_check, file_no, supervise_no,
+      comment, create_time, update_time, 
+      create_by, update_by, account_amount,is_invoice,tax_rate,bill_type,invoice_title)
+    values (#{companyId,jdbcType=INTEGER}, #{customerNo,jdbcType=VARCHAR}, #{categoryId,jdbcType=INTEGER},
+      #{name,jdbcType=VARCHAR}, #{pinyin,jdbcType=VARCHAR}, #{status,jdbcType=VARCHAR},
+      #{enabled,jdbcType=BIT}, #{canSaleSpecial,jdbcType=BIT}, #{isLimitSpecial,jdbcType=BIT},
+      #{city,jdbcType=VARCHAR}, #{address,jdbcType=VARCHAR}, #{postcode,jdbcType=VARCHAR}, 
+      #{legalPerson,jdbcType=VARCHAR}, #{employee,jdbcType=VARCHAR},
+      #{contactPhone,jdbcType=VARCHAR}, #{contactFax,jdbcType=VARCHAR}, #{email,jdbcType=VARCHAR}, 
+      #{isDirection,jdbcType=BIT}, #{saleArea,jdbcType=VARCHAR}, #{saleMan,jdbcType=VARCHAR},
+      #{memberLevel,jdbcType=VARCHAR}, #{classAttOne,jdbcType=VARCHAR}, #{classAttTwo,jdbcType=VARCHAR}, 
+      #{stampTemplate,jdbcType=VARCHAR}, #{billTemplate,jdbcType=VARCHAR},
+      #{isColdBusiness,jdbcType=BIT}, #{isTwoTicket,jdbcType=BIT}, #{businessScope,jdbcType=VARCHAR},
+      #{accountTerm,jdbcType=INTEGER}, #{accountName,jdbcType=VARCHAR}, #{bankAccount,jdbcType=VARCHAR},
+      #{bankName,jdbcType=VARCHAR}, #{taxAccount,jdbcType=VARCHAR},
+      #{quaCheck,jdbcType=VARCHAR}, #{fileNo,jdbcType=VARCHAR}, #{superviseNo,jdbcType=VARCHAR},
+      #{comment,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, 
+      #{createBy,jdbcType=VARCHAR}, #{updateBy,jdbcType=VARCHAR}, #{accountAmount,jdbcType=DECIMAL},
+      #{isInvoice,jdbcType=BIT}, #{taxRate,jdbcType=DECIMAL}, #{billType,jdbcType=INTEGER}, #{invoiceTitle,jdbcType=VARCHAR}
+      )
+  </insert>
+
+  <update id="updateByPrimaryKeySelective" parameterType="com.yiban.erp.entities.Customer" >
+    update customer
+    <set >
+      <if test="customerNo != null" >
+        customer_no = #{customerNo,jdbcType=VARCHAR},
+      </if>
+      <if test="categoryId != null" >
+        category_id = #{categoryId,jdbcType=INTEGER},
+      </if>
+      <if test="name != null" >
+        name = #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="pinyin != null" >
+        pinyin = #{pinyin,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null" >
+        status = #{status,jdbcType=VARCHAR},
+      </if>
+      <if test="enabled != null" >
+        enabled = #{enabled,jdbcType=BIT},
+      </if>
+      <if test="canSaleSpecial != null" >
+        can_sale_special = #{canSaleSpecial,jdbcType=BIT},
+      </if>
+      <if test="isLimitSpecial != null" >
+        is_limit_special = #{isLimitSpecial,jdbcType=BIT},
+      </if>
+      <if test="city != null" >
+        city = #{city,jdbcType=VARCHAR},
+      </if>
+      <if test="address != null" >
+        address = #{address,jdbcType=VARCHAR},
+      </if>
+      <if test="postcode != null" >
+        postcode = #{postcode,jdbcType=VARCHAR},
+      </if>
+      <if test="legalPerson != null" >
+        legal_person = #{legalPerson,jdbcType=VARCHAR},
+      </if>
+      <if test="employee != null" >
+        employee = #{employee,jdbcType=VARCHAR},
+      </if>
+      <if test="contactPhone != null" >
+        contact_phone = #{contactPhone,jdbcType=VARCHAR},
+      </if>
+      <if test="contactFax != null" >
+        contact_fax = #{contactFax,jdbcType=VARCHAR},
+      </if>
+      <if test="email != null" >
+        email = #{email,jdbcType=VARCHAR},
+      </if>
+      <if test="isDirection != null" >
+        is_direction = #{isDirection,jdbcType=BIT},
+      </if>
+      <if test="saleArea != null" >
+        sale_area = #{saleArea,jdbcType=VARCHAR},
+      </if>
+      <if test="saleMan != null" >
+        sale_man = #{saleMan,jdbcType=VARCHAR},
+      </if>
+      <if test="memberLevel != null" >
+        member_level = #{memberLevel,jdbcType=VARCHAR},
+      </if>
+      <if test="classAttOne != null" >
+        class_att_one = #{classAttOne,jdbcType=VARCHAR},
+      </if>
+      <if test="classAttTwo != null" >
+        class_att_two = #{classAttTwo,jdbcType=VARCHAR},
+      </if>
+      <if test="stampTemplate != null" >
+        stamp_template = #{stampTemplate,jdbcType=VARCHAR},
+      </if>
+      <if test="billTemplate != null" >
+        bill_template = #{billTemplate,jdbcType=VARCHAR},
+      </if>
+      <if test="isColdBusiness != null" >
+        is_cold_business = #{isColdBusiness, jdbcType=BIT},
+      </if>
+      <if test="isTwoTicket != null" >
+        is_two_ticket = #{isTwoTicket, jdbcType=BIT},
+      </if>
+      <if test="businessScope != null" >
+        business_scope = #{businessScope,jdbcType=VARCHAR},
+      </if>
+      <if test="accountTerm != null" >
+        account_term = #{accountTerm,jdbcType=INTEGER},
+      </if>
+      <if test="accountName != null" >
+        account_name = #{accountName,jdbcType=VARCHAR},
+      </if>
+      <if test="bankAccount != null" >
+        bank_account = #{bankAccount,jdbcType=VARCHAR},
+      </if>
+      <if test="bankName != null" >
+        bank_name = #{bankName,jdbcType=VARCHAR},
+      </if>
+      <if test="taxAccount != null" >
+        tax_account = #{taxAccount,jdbcType=VARCHAR},
+      </if>
+      <if test="quaCheck != null" >
+        qua_check = #{quaCheck,jdbcType=VARCHAR},
+      </if>
+      <if test="fileNo != null" >
+        file_no = #{fileNo,jdbcType=VARCHAR},
+      </if>
+      <if test="superviseNo != null" >
+        supervise_no = #{superviseNo,jdbcType=VARCHAR},
+      </if>
+      <if test="comment != null" >
+        comment = #{comment,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createBy != null" >
+        create_by = #{createBy,jdbcType=VARCHAR},
+      </if>
+      <if test="updateBy != null" >
+        update_by = #{updateBy,jdbcType=VARCHAR},
+      </if>
+
+      <if test="isInvoice != null" >
+        is_invoice = #{isInvoice,jdbcType=BIT},
+      </if>
+      <if test="taxRate != null" >
+        tax_rate = #{taxRate,jdbcType=DECIMAL},
+      </if>
+      <if test="billType != null" >
+        bill_type = #{billType,jdbcType=INTEGER},
+      </if>
+      <if test="invoiceTitle != null" >
+        invoice_title = #{invoiceTitle,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+
+  <resultMap id="CUSTOMER_DETAIL_MAP" type="com.yiban.erp.entities.Customer">
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="company_id" property="companyId" jdbcType="INTEGER" />
+    <result column="customer_no" property="customerNo" jdbcType="VARCHAR" />
+    <result column="category_id" property="categoryId" jdbcType="INTEGER" />
+    <result column="category_name" property="categoryName" jdbcType="VARCHAR"/>
+    <result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="pinyin" property="pinyin" jdbcType="VARCHAR" />
+    <result column="status" property="status" jdbcType="VARCHAR" />
+    <result column="enabled" property="enabled" jdbcType="BIT" />
+    <result column="can_sale_special" property="canSaleSpecial" jdbcType="BIT" />
+    <result column="is_limit_special" property="isLimitSpecial" jdbcType="BIT" />
+    <result column="city" property="city" jdbcType="VARCHAR" />
+    <result column="address" property="address" jdbcType="VARCHAR" />
+    <result column="postcode" property="postcode" jdbcType="VARCHAR" />
+    <result column="legal_person" property="legalPerson" jdbcType="VARCHAR" />
+    <result column="employee" property="employee" jdbcType="VARCHAR" />
+    <result column="contact_phone" property="contactPhone" jdbcType="VARCHAR" />
+    <result column="contact_fax" property="contactFax" jdbcType="VARCHAR" />
+    <result column="email" property="email" jdbcType="VARCHAR" />
+    <result column="is_direction" property="isDirection" jdbcType="BIT" />
+    <result column="sale_area" property="saleArea" jdbcType="VARCHAR" />
+    <result column="sale_man" property="saleMan" jdbcType="VARCHAR" />
+    <result column="member_level" property="memberLevel" jdbcType="VARCHAR" />
+    <result column="class_att_one" property="classAttOne" jdbcType="VARCHAR" />
+    <result column="class_att_two" property="classAttTwo" jdbcType="VARCHAR" />
+    <result column="stamp_template" property="stampTemplate" jdbcType="VARCHAR" />
+    <result column="bill_template" property="billTemplate" jdbcType="VARCHAR" />
+    <result column="is_cold_business" property="isColdBusiness" jdbcType="BIT" />
+    <result column="is_two_ticket" property="isTwoTicket" jdbcType="BIT" />
+    <result column="business_scope" property="businessScope" jdbcType="VARCHAR" />
+    <result column="account_term" property="accountTerm" jdbcType="INTEGER" />
+    <result column="account_name" property="accountName" jdbcType="VARCHAR" />
+    <result column="bank_account" property="bankAccount" jdbcType="VARCHAR" />
+    <result column="bank_name" property="bankName" jdbcType="VARCHAR" />
+    <result column="tax_account" property="taxAccount" jdbcType="VARCHAR" />
+    <result column="qua_check" property="quaCheck" jdbcType="VARCHAR" />
+    <result column="file_no" property="fileNo" jdbcType="VARCHAR" />
+    <result column="supervise_no" property="superviseNo" jdbcType="VARCHAR" />
+    <result column="comment" property="comment" jdbcType="VARCHAR" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+    <result column="create_by" property="createBy" jdbcType="VARCHAR" />
+    <result column="update_by" property="updateBy" jdbcType="VARCHAR" />
+    <result column="account_amount" property="accountAmount" jdbcType="DECIMAL"/>
+
+    <result column="is_invoice" property="isInvoice" jdbcType="BIT" />
+    <result column="tax_rate" property="taxRate" jdbcType="DECIMAL" />
+    <result column="bill_type" property="billType" jdbcType="INTEGER" />
+    <result column="invoice_title" property="invoiceTitle" jdbcType="VARCHAR" />
+
+    <association property="customerCategory" javaType="com.yiban.erp.entities.CustomerCategory">
+      <id column="category_id" property="id" jdbcType="INTEGER" />
+      <result column="company_id" property="companyId" jdbcType="INTEGER" />
+      <result column="cat_name" property="name" jdbcType="VARCHAR" />
+      <result column="parent_id" property="parentId" jdbcType="INTEGER" />
+      <result column="sequence_no" property="sequenceNo" jdbcType="INTEGER" />
+      <result column="cat_comment" property="comment" jdbcType="VARCHAR" />
+    </association>
+    <collection property="customerReps" ofType="com.yiban.erp.entities.CustomerRep">
+      <id column="rep_id" property="id" jdbcType="INTEGER" />
+      <result column="rep_customer_id" property="customerId" jdbcType="BIGINT" />
+      <result column="rep_name" property="name" jdbcType="VARCHAR" />
+      <result column="rep_contact_phone" property="contactPhone" jdbcType="VARCHAR" />
+      <result column="rep_repertory_address" property="repertoryAddress" jdbcType="VARCHAR" />
+      <result column="rep_postcode" property="postcode" jdbcType="VARCHAR" />
+      <result column="rep_enabled" property="enabled" jdbcType="BIT" />
+      <result column="rep_default_time" property="defaultTime" jdbcType="TIMESTAMP" />
+      <result column="rep_comment" property="comment" jdbcType="VARCHAR" />
+      <result column="rep_create_time" property="createTime" jdbcType="TIMESTAMP" />
+      <result column="rep_update_time" property="updateTime" jdbcType="TIMESTAMP" />
+      <result column="rep_create_by" property="createBy" jdbcType="VARCHAR" />
+      <result column="rep_update_by" property="updateBy" jdbcType="VARCHAR" />
+    </collection>
+  </resultMap>
+
+  <sql id="CUSTOMER_DETAIL_COL">
+    t1.id, t1.company_id, t1.customer_no, t1.category_id, t2.name as category_name, t1.name, t1.pinyin, t1.status, t1.enabled, t1.can_sale_special,
+    t1.is_limit_special, t1.city, t1.address, t1.postcode, t1.legal_person, t1.employee,
+    t1.contact_phone, t1.contact_fax, t1.email, t1.is_direction, t1.sale_area, t1.sale_man, t1.member_level,
+    t1.class_att_one, t1.class_att_two, t1.stamp_template, t1.bill_template, t1.is_cold_business, t1.is_two_ticket,
+    t1.business_scope, t1.account_term,
+    t1.account_name, t1.bank_account, t1.bank_name, t1.tax_account,
+    t1.qua_check, t1.file_no, t1.supervise_no, t1.comment, t1.create_time,
+    t1.update_time, t1.create_by, t1.update_by, t1.account_amount,
+    t1.is_invoice,t1.tax_rate,t1.bill_type,t1.invoice_title,
+    t2.name as cat_name, t2.parent_id, t2.sequence_no, t2.comment as cat_comment,
+    t4.id as rep_id, t4.customer_id as rep_customer_id, t4.name as rep_name,
+    t4.contact_phone as rep_contact_phone, t4.repertory_address as rep_repertory_address,
+    t4.postcode as rep_postcode, t4.enabled as rep_enabled, t4.default_time as rep_default_time,
+    t4.comment as rep_comment, t4.create_time as rep_create_time,
+    t4.update_time as rep_update_time, t4.create_by as rep_create_by, t4.update_by as rep_update_by
+  </sql>
+
+  <select id="getCustomerDetailById" resultMap="CUSTOMER_DETAIL_MAP" parameterType="map">
+    select
+      <include refid="CUSTOMER_DETAIL_COL"/>
+    from customer t1
+      left join customer_category t2 on t1.category_id = t2.id
+      left join customer_rep t4 on t1.id = t4.customer_id
+    where 1=1
+      and t1.status != 'delete'
+      and t1.category_id = t2.id
+      and t1.company_id = #{companyId}
+      and t1.id = #{customerId}
+  </select>
+  
+  <select id="getByCategoryId" parameterType="map" resultMap="BaseResultMap">
+    select
+      <include refid="Base_Column_List"/>
+    from customer
+    where status != 'delete'
+      and category_id = #{categoryId}
+      and company_id = #{companyId}
+  </select>
+
+  <select id="selectAllCount" parameterType="map" resultType="java.lang.Integer">
+    select
+      count(1) as count
+    from customer
+    where status != 'delete'
+      and company_id = #{companyId}
+    <if test="categoryId != null">
+      and category_id = #{categoryId}
+    </if>
+    <if test="customerName != null" >
+      <bind name="customerNameVal" value="'%' + customerName + '%'" />
+      and name like #{customerNameVal}
+    </if>
+    <if test="customerNo != null" >
+      <bind name="customerNoVal" value="customerNo + '%'" />
+      and customer_no like #{customerNoVal}
+    </if>
+    <if test="search != null" >
+      <bind name="pattern" value="'%' + search + '%'"/>
+      and (name like #{pattern} or
+          customer_no like #{pattern} or
+          lower(pinyin) like lower(#{pattern}) OR
+          employee like #{pattern} )
+    </if>
+  </select>
+
+  <select id="selectAll" parameterType="map" resultMap="BaseResultMap">
+    select
+      c.*, cc.name as categoryName
+    from customer c, customer_category cc
+    where c.status != 'delete'
+      and c.company_id = #{companyId}
+      and c.category_id = cc.id
+    <if test="categoryId != null">
+      and c.category_id = #{categoryId}
+    </if>
+    <if test="customerName != null" >
+      <bind name="customerNameVal" value="'%' + customerName + '%'" />
+      and c.name like #{customerNameVal}
+    </if>
+    <if test="customerNo != null" >
+      <bind name="customerNoVal" value="customerNo + '%'" />
+      and c.customer_no like #{customerNoVal}
+    </if>
+    <if test="search != null" >
+      <bind name="pattern" value="'%' + search + '%'"/>
+      and (c.name like #{pattern} or
+          c.customer_no like #{pattern} or
+          lower(c.pinyin) like lower(#{pattern}) OR
+          c.employee like #{pattern} )
+    </if>
+    <if test="offset != null and limit != null">
+      limit #{offset}, #{limit}
+    </if>
+  </select>
+
+  <update id="deleteByIdList" parameterType="map" >
+    update customer
+      set
+        status = 'delete',
+        update_by = #{updateBy},
+        update_time = #{updateTime}
+    where company_id = #{companyId}
+      and id in
+      <foreach collection="ids" item="item" open="(" close=")" separator=", ">
+        #{item}
+      </foreach>
+  </update>
+
+  <select id="searchLike" parameterType="map" resultMap="BaseResultMap">
+    select
+      <include refid="Base_Column_List"/>
+    from customer
+    where status != 'delete'
+      and company_id = #{companyId}
+      <bind name="nameVal" value="'%' + name + '%'"/>
+      and (name like #{nameVal} or lower(pinyin) like lower(#{nameVal}) )
+      order by enabled desc, id desc;
+  </select>
+
+  <update id="updateAccountAmount" parameterType="map" >
+    update customer
+      set account_amount = #{accountAmount}
+    where id = #{id}
+  </update>
+
+</mapper>

@@ -1,0 +1,250 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.yiban.erp.dao.RepertoryOutDetailMapper" >
+  <resultMap id="BaseResultMap" type="com.yiban.erp.entities.RepertoryOutDetail" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="repertory_out_id" property="repertoryOutId" jdbcType="BIGINT" />
+    <result column="repertory_info_id" property="repertoryInfoId" jdbcType="BIGINT" />
+    <result column="goods_id" property="goodsId" jdbcType="BIGINT" />
+    <result column="batch_code" property="batchCode" jdbcType="VARCHAR"/>
+    <result column="location" property="location" jdbcType="VARCHAR"/>
+    <result column="product_date" property="productDate" jdbcType="DATE"/>
+    <result column="exp_date" property="expDate" jdbcType="DATE"/>
+    <result column="quantity" property="quantity" jdbcType="DECIMAL" />
+    <result column="free" property="free" jdbcType="DECIMAL" />
+    <result column="price" property="price" jdbcType="DECIMAL" />
+    <result column="dis_price" property="disPrice" jdbcType="DECIMAL" />
+    <result column="amount" property="amount" jdbcType="DECIMAL" />
+    <result column="tax_rate" property="taxRate" jdbcType="DECIMAL" />
+
+    <result column="review_user" property="reviewUser" jdbcType="VARCHAR" />
+    <result column="review_next_user_id" property="reviewNextUserId" jdbcType="BIGINT" />
+    <result column="review_result" property="reviewResult" jdbcType="VARCHAR"/>
+    <result column="status" property="status" jdbcType="VARCHAR"/>
+
+
+    <result column="check_status" property="checkStatus" jdbcType="BIT" />
+    <result column="check_user" property="checkUser" jdbcType="VARCHAR" />
+    <result column="check_date" property="checkDate" jdbcType="TIMESTAMP" />
+    <result column="check_result" property="checkResult" jdbcType="VARCHAR" />
+    <result column="created_by" property="createdBy" jdbcType="VARCHAR" />
+    <result column="updated_by" property="updatedBy" jdbcType="VARCHAR" />
+    <result column="created_time" property="createdTime" jdbcType="TIMESTAMP" />
+    <result column="updated_time" property="updatedTime" jdbcType="TIMESTAMP" />
+
+    <result column="goToWareHouseName" property="warehouseName" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, repertory_out_id, repertory_info_id, goods_id, batch_code, location, product_date, exp_date,
+    quantity, free, price, dis_price, amount, tax_rate, check_status,review_user,review_next_user_id,review_result,status,
+    check_user, check_date, check_result, created_by, updated_by, created_time, updated_time
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select 
+    <include refid="Base_Column_List" />
+    from repertory_out_detail
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
+    delete from repertory_out_detail
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="com.yiban.erp.entities.RepertoryOutDetail" keyProperty="id" useGeneratedKeys="true">
+    insert into repertory_out_detail (repertory_out_id, repertory_info_id, goods_id,
+      batch_code, location, product_date, exp_date,
+      quantity, free, price, 
+      dis_price, amount, tax_rate,  check_status,review_user,review_next_user_id,review_result,status,
+      check_user, check_date, check_result, 
+      created_by, updated_by, created_time, 
+      updated_time)
+    values (#{repertoryOutId,jdbcType=BIGINT}, #{repertoryInfoId,jdbcType=BIGINT}, #{goodsId,jdbcType=BIGINT},
+      #{batchCode,jdbcType=VARCHAR}, #{location,jdbcType=VARCHAR},
+      #{productDate,jdbcType=DATE}, #{expDate,jdbcType=DATE},
+      #{quantity,jdbcType=DECIMAL}, #{free,jdbcType=DECIMAL}, #{price,jdbcType=DECIMAL}, 
+      #{disPrice,jdbcType=DECIMAL}, #{amount,jdbcType=DECIMAL}, #{taxRate,jdbcType=DECIMAL},  #{checkStatus,jdbcType=BIT}, #{reviewUser,jdbcType=VARCHAR}, #{reviewNextUserId,jdbcType=BIGINT}, #{reviewResult,jdbcType=VARCHAR}, #{status,jdbcType=VARCHAR},
+      #{checkUser,jdbcType=VARCHAR}, #{checkDate,jdbcType=TIMESTAMP}, #{checkResult,jdbcType=VARCHAR}, 
+      #{createdBy,jdbcType=VARCHAR}, #{updatedBy,jdbcType=VARCHAR}, #{createdTime,jdbcType=TIMESTAMP}, 
+      #{updatedTime,jdbcType=TIMESTAMP})
+  </insert>
+
+  <insert id="insertBatch" parameterType="map" keyProperty="id" useGeneratedKeys="true">
+    insert into repertory_out_detail (repertory_out_id, repertory_info_id, goods_id,
+      batch_code, location, product_date, exp_date,
+      quantity, free, price,
+      dis_price, amount, tax_rate,check_status,review_user,review_next_user_id,review_result,status,
+      check_user, check_date, check_result,
+      created_by, updated_by, created_time,
+      updated_time)
+    values
+     <foreach collection="details" separator="), (" open="(" close=")" item="item">
+       #{item.repertoryOutId,jdbcType=BIGINT}, #{item.repertoryInfoId,jdbcType=BIGINT}, #{item.goodsId,jdbcType=BIGINT},
+       #{item.batchCode,jdbcType=VARCHAR}, #{item.location,jdbcType=VARCHAR},
+       #{item.productDate,jdbcType=DATE}, #{item.expDate,jdbcType=DATE},
+       #{item.quantity,jdbcType=DECIMAL}, #{item.free,jdbcType=DECIMAL}, #{item.price,jdbcType=DECIMAL},
+       #{item.disPrice,jdbcType=DECIMAL}, #{item.amount,jdbcType=DECIMAL}, #{item.taxRate,jdbcType=DECIMAL},#{item.checkStatus,jdbcType=BIT},
+       #{item.reviewUser,jdbcType=VARCHAR}, #{item.reviewNextUserId,jdbcType=BIGINT}, #{item.reviewResult,jdbcType=VARCHAR}, #{item.status,jdbcType=VARCHAR},
+       #{item.checkUser,jdbcType=VARCHAR}, #{item.checkDate,jdbcType=TIMESTAMP}, #{item.checkResult,jdbcType=VARCHAR},
+       #{item.createdBy,jdbcType=VARCHAR}, #{item.updatedBy,jdbcType=VARCHAR}, #{item.createdTime,jdbcType=TIMESTAMP},
+       #{item.updatedTime,jdbcType=TIMESTAMP}
+     </foreach>
+  </insert>
+
+  <update id="updateByPrimaryKeySelective" parameterType="com.yiban.erp.entities.RepertoryOutDetail" >
+    update repertory_out_detail
+    <set >
+      <if test="repertoryOutId != null" >
+        repertory_out_id = #{repertoryOutId,jdbcType=BIGINT},
+      </if>
+      <if test="repertoryInfoId != null" >
+        repertory_info_id = #{repertoryInfoId,jdbcType=BIGINT},
+      </if>
+      <if test="goodsId != null" >
+        goods_id = #{goodsId,jdbcType=BIGINT},
+      </if>
+      <if test="batchCode != null">
+        batch_code = #{batchCode,jdbcType=VARCHAR},
+      </if>
+      <if test="location != null" >
+        location = #{location,jdbcType=VARCHAR},
+      </if>
+      <if test="productDate != null" >
+        product_date = #{productDate,jdbcType=DATE},
+      </if>
+      <if test="expDate != null" >
+        exp_date = #{expDate,jdbcType=DATE},
+      </if>
+      <if test="quantity != null" >
+        quantity = #{quantity,jdbcType=DECIMAL},
+      </if>
+      <if test="free != null" >
+        free = #{free,jdbcType=DECIMAL},
+      </if>
+      <if test="price != null" >
+        price = #{price,jdbcType=DECIMAL},
+      </if>
+      <if test="disPrice != null" >
+        dis_price = #{disPrice,jdbcType=DECIMAL},
+      </if>
+      <if test="amount != null" >
+        amount = #{amount,jdbcType=DECIMAL},
+      </if>
+      <if test="taxRate != null" >
+        tax_rate = #{taxRate,jdbcType=DECIMAL},
+      </if>
+      <if test="checkStatus != null" >
+        check_status = #{checkStatus,jdbcType=BIT},
+      </if>
+      <if test="reviewNextUserId != null" >
+        review_next_user_id = #{reviewNextUserId,jdbcType=BIGINT},
+      </if>
+      <if test="reviewResult != null" >
+        review_result = #{reviewResult,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null" >
+        status = #{status,jdbcType=VARCHAR},
+      </if>
+      <if test="checkUser != null" >
+        check_user = #{checkUser,jdbcType=VARCHAR},
+      </if>
+      <if test="checkDate != null" >
+        check_date = #{checkDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="checkResult != null" >
+        check_result = #{checkResult,jdbcType=VARCHAR},
+      </if>
+      <if test="createdBy != null" >
+        created_by = #{createdBy,jdbcType=VARCHAR},
+      </if>
+      <if test="updatedBy != null" >
+        updated_by = #{updatedBy,jdbcType=VARCHAR},
+      </if>
+      <if test="createdTime != null" >
+        created_time = #{createdTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updatedTime != null" >
+        updated_time = #{updatedTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="reviewUser != null" >
+        review_user = #{reviewUser,jdbcType=VARCHAR},
+      </if>
+      <if test="reviewResult != null" >
+        review_result = #{reviewResult,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null" >
+        status = #{status,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+
+  <select id="getByOrderId" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select
+    rod.id, rod.repertory_out_id, rod.repertory_info_id, rod.goods_id, rod.batch_code, rod.location, rod.product_date, rod.exp_date,
+    rod.quantity, rod.free, rod.price, rod.dis_price, rod.amount, rod.tax_rate, rod.check_status,rod.review_user,rod.review_next_user_id,rod.review_result,rod.status,
+    rod.check_user, rod.check_date, rod.check_result, rod.created_by, rod.updated_by, rod.created_time, rod.updated_time, w.name as goToWareHouseName,rod.review_user
+    from repertory_out_detail rod
+    left join repertory_out as ro on rod.repertory_out_id = ro.id
+    left join warehouse as w on ro.go_to_warehouse_id = w.id
+    where repertory_out_id = #{repertoryOutId}
+  </select>
+
+
+  <select id="getOutDetailList"  parameterType="com.yiban.erp.dto.RepertoryOutListReq"  resultMap="BaseResultMap">
+    select
+    outDetail.id, outDetail.repertory_out_id, outDetail.repertory_info_id, outDetail.goods_id, outDetail.batch_code, outDetail.location,
+    outDetail.product_date, outDetail.exp_date,outDetail.quantity, outDetail.free,outDetail.price, outDetail.dis_price, outDetail.amount,
+    outDetail.tax_rate, outDetail.check_status,outDetail.review_user,outDetail.review_next_user_id,outDetail.review_result,outDetail.status,
+    outDetail.check_user, outDetail.check_date, outDetail.check_result, outDetail.created_by, outDetail.updated_by, outDetail.created_time,
+    outDetail.updated_time
+    from repertory_out_detail outDetail
+    left join repertory_out o on outDetail.repertory_out_id = o.id
+
+    where
+    ( outDetail.status != 'DELETE' or outDetail.status is NULL)
+    <if test="warehouseId != null">
+      and o.warehouse_id = #{warehouseId}
+    </if>
+    <if test="startOutDate != null">
+      and o.created_time >= #{startOutDate}
+    </if>
+    <if test="endOutDate != null">
+      and o.created_time &lt;= #{endOutDate}
+    </if>
+    <if test="outTypeList != null" >
+      and o.ref_type in
+      <foreach collection="outTypeList" item="item" open="(" close=")" separator=", ">
+        #{item}
+      </foreach>
+    </if>
+  </select>
+
+  <select id="getUnchecked" resultType="com.yiban.erp.entities.RepertoryOutSider">
+    select
+     ro.id, ro.status,ro.ref_order_number as orderNumber,ro.created_time as createdTime, ro.created_by as createdBy,ro.review_order_user as reviewOrderUser, ro.review_order_result as reviewOrderResult
+    from repertory_out ro
+    where ro.company_id = #{companyId} and ro.ref_type = #{refType} and ro.status in ('INIT','REVIEW','REVIEW_REJECT')
+  </select>
+
+  <select id="getLastBuyPrice" parameterType="map" resultType="com.yiban.erp.dto.CurrentBalanceResp">
+    select
+      t1.goods_id as goodsId,
+      t1.price as lastBuyPrice
+    from repertory_out_detail t1, (
+      select max(d.id) as detailId from repertory_out_detail d, repertory_out o
+      where d.repertory_out_id = o.id
+        and o.customer_id = #{customerId} and o.ref_type='SELL_BATCH' and d.goods_id in
+        <foreach collection="goodsIdList" open="(" close=")" item="item" separator=",">
+          #{item}
+        </foreach>
+      group by goods_id ) t2
+    where t1.id = t2.detailId
+  </select>
+
+  <delete id="deleteByRepertoryOutId">
+    delete from repertory_out_detail
+    where repertory_out_id = #{id}
+  </delete>
+
+
+
+</mapper>

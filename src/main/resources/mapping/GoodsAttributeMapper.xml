@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.yiban.erp.dao.GoodsAttributeMapper" >
+  <resultMap id="BaseResultMap" type="com.yiban.erp.entities.GoodsAttribute" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="company_id" property="companyId" jdbcType="INTEGER" />
+    <result column="att_name" property="attName" jdbcType="VARCHAR" />
+    <result column="created_by" property="createdBy" jdbcType="VARCHAR" />
+    <result column="updated_by" property="updatedBy" jdbcType="VARCHAR" />
+    <result column="created_time" property="createdTime" jdbcType="TIMESTAMP" />
+    <result column="updated_time" property="updatedTime" jdbcType="TIMESTAMP" />
+    <result column="enable_default" property="enableDefault" jdbcType="BIT" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, company_id, att_name, created_by, updated_by, created_time, updated_time,enable_default
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select 
+    <include refid="Base_Column_List" />
+    from goods_attribute
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+
+  <select id="getByCompanyId" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select
+      <include refid="Base_Column_List" />
+    from goods_attribute
+    where company_id = #{companyId,jdbcType=INTEGER}
+      order by id asc
+  </select>
+
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
+    delete from goods_attribute
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+
+  <insert id="insert" parameterType="com.yiban.erp.entities.GoodsAttribute" keyProperty="id" useGeneratedKeys="true" >
+    insert into goods_attribute (company_id, att_name,
+      created_by, updated_by, created_time, 
+      updated_time,enable_default)
+    values (#{companyId,jdbcType=INTEGER}, #{attName,jdbcType=VARCHAR},
+      #{createdBy,jdbcType=VARCHAR}, #{updatedBy,jdbcType=VARCHAR}, #{createdTime,jdbcType=TIMESTAMP}, 
+      #{updatedTime,jdbcType=TIMESTAMP},#{enableDefault,jdbcType=BIT})
+  </insert>
+
+  <update id="updateByPrimaryKeySelective" parameterType="com.yiban.erp.entities.GoodsAttribute" >
+    update goods_attribute
+    <set >
+      <if test="attName != null" >
+        att_name = #{attName,jdbcType=VARCHAR},
+      </if>
+      <if test="createdBy != null" >
+        created_by = #{createdBy,jdbcType=VARCHAR},
+      </if>
+      <if test="updatedBy != null" >
+        updated_by = #{updatedBy,jdbcType=VARCHAR},
+      </if>
+      <if test="createdTime != null" >
+        created_time = #{createdTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updatedTime != null" >
+        updated_time = #{updatedTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="enableDefault != null" >
+        enable_default = #{enableDefault,jdbcType=BIT},
+      </if>
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <select id="isUsedAttribute" parameterType="java.lang.Long" resultType="java.lang.Boolean">
+    select count(1) > 0 from goods_attribute_ref where att_id = #{id};
+  </select>
+
+
+</mapper>

@@ -1,0 +1,315 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.yiban.erp.dao.RepertoryInMapper" >
+  <resultMap id="BaseResultMap" type="com.yiban.erp.entities.RepertoryIn" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="company_id" property="companyId" jdbcType="INTEGER" />
+    <result column="ref_order_id" property="refOrderId" jdbcType="BIGINT" />
+    <result column="ref_type" property="refType" jdbcType="VARCHAR" />
+    <result column="order_number" property="orderNumber" jdbcType="VARCHAR" />
+    <result column="ref_no" property="refNo" jdbcType="VARCHAR" />
+    <result column="supplier_id" property="supplierId" jdbcType="BIGINT" />
+    <result column="supplier_contact_id" property="supplierContactId" jdbcType="BIGINT" />
+    <result column="buyer_id" property="buyerId" jdbcType="BIGINT" />
+    <result column="status" property="status" jdbcType="VARCHAR" />
+    <result column="key_word" property="keyWord" jdbcType="VARCHAR" />
+    <result column="receive_date" property="receiveDate" jdbcType="TIMESTAMP" />
+    <result column="receive_user" property="receiveUser" jdbcType="VARCHAR" />
+    <result column="pay_date" property="payDate" jdbcType="TIMESTAMP" />
+    <result column="goods_bill_no" property="goodsBillNo" jdbcType="VARCHAR" />
+    <result column="temp_control_method" property="tempControlMethod" jdbcType="BIGINT" />
+    <result column="receive_temp" property="receiveTemp" jdbcType="DECIMAL" />
+    <result column="check_temp" property="checkTemp" jdbcType="DECIMAL" />
+    <result column="temp_control_status" property="tempControlStatus" jdbcType="BIGINT" />
+    <result column="ship_company_id" property="shipCompanyId" jdbcType="INTEGER" />
+    <result column="ship_method" property="shipMethod" jdbcType="BIGINT" />
+    <result column="ship_tool" property="shipTool" jdbcType="BIGINT" />
+    <result column="ship_car_no" property="shipCarNo" jdbcType="VARCHAR" />
+    <result column="ship_driver_name" property="shipDriverName" jdbcType="VARCHAR" />
+    <result column="ship_start_date" property="shipStartDate" jdbcType="TIMESTAMP" />
+    <result column="ship_end_date" property="shipEndDate" jdbcType="TIMESTAMP" />
+    <result column="ship_entrust_no" property="shipEntrustNo" jdbcType="VARCHAR" />
+    <result column="ship_start_address" property="shipStartAddress" jdbcType="VARCHAR" />
+    <result column="warehouse_id" property="warehouseId" jdbcType="INTEGER" />
+    <result column="buy_type" property="buyType" jdbcType="BIGINT" />
+    <result column="term" property="term" jdbcType="INTEGER" />
+    <result column="come_from" property="comeFrom" jdbcType="VARCHAR" />
+    <result column="bill_type" property="billType" jdbcType="BIGINT" />
+    <result column="file_no" property="fileNo" jdbcType="VARCHAR" />
+    <result column="create_by" property="createBy" jdbcType="VARCHAR" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_by" property="updateBy" jdbcType="VARCHAR" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+    <result column="total_quantity" property="totalQuantity" jdbcType="DECIMAL" />
+    <result column="total_amount" property="totalAmount" jdbcType="DECIMAL" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, company_id, ref_order_id, ref_type, order_number, ref_no, supplier_id, supplier_contact_id, 
+    buyer_id, status, key_word, receive_date, receive_user, pay_date, goods_bill_no, temp_control_method,
+    receive_temp, check_temp, temp_control_status, ship_company_id, ship_method, ship_tool, 
+    ship_car_no, ship_driver_name, ship_start_date, ship_end_date, ship_entrust_no, ship_start_address, 
+    warehouse_id, buy_type, term, come_from, bill_type, file_no, create_by, create_time, 
+    update_by, update_time, total_quantity, total_amount
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select 
+    <include refid="Base_Column_List" />
+    from repertory_in
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
+    delete from repertory_in
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="com.yiban.erp.entities.RepertoryIn" keyProperty="id" useGeneratedKeys="true" >
+    insert into repertory_in (company_id, ref_order_id,
+      ref_type, order_number, ref_no, 
+      supplier_id, supplier_contact_id, buyer_id, 
+      status, key_word, receive_date, receive_user,
+      pay_date, goods_bill_no, temp_control_method, 
+      receive_temp, check_temp, temp_control_status, 
+      ship_company_id, ship_method, ship_tool, 
+      ship_car_no, ship_driver_name, ship_start_date, 
+      ship_end_date, ship_entrust_no, ship_start_address, 
+      warehouse_id, buy_type, term, 
+      come_from, bill_type, file_no, 
+      create_by, create_time, update_by, 
+      update_time, total_quantity, total_amount)
+    values (#{companyId,jdbcType=INTEGER}, #{refOrderId,jdbcType=BIGINT},
+      #{refType,jdbcType=VARCHAR}, #{orderNumber,jdbcType=VARCHAR}, #{refNo,jdbcType=VARCHAR}, 
+      #{supplierId,jdbcType=BIGINT}, #{supplierContactId,jdbcType=BIGINT}, #{buyerId,jdbcType=BIGINT}, 
+      #{status,jdbcType=VARCHAR}, #{keyWord,jdbcType=VARCHAR}, #{receiveDate,jdbcType=TIMESTAMP}, #{receiveUser,jdbcType=VARCHAR},
+      #{payDate,jdbcType=TIMESTAMP}, #{goodsBillNo,jdbcType=VARCHAR}, #{tempControlMethod,jdbcType=BIGINT}, 
+      #{receiveTemp,jdbcType=DECIMAL}, #{checkTemp,jdbcType=DECIMAL}, #{tempControlStatus,jdbcType=BIGINT}, 
+      #{shipCompanyId,jdbcType=INTEGER}, #{shipMethod,jdbcType=BIGINT}, #{shipTool,jdbcType=BIGINT}, 
+      #{shipCarNo,jdbcType=VARCHAR}, #{shipDriverName,jdbcType=VARCHAR}, #{shipStartDate,jdbcType=TIMESTAMP}, 
+      #{shipEndDate,jdbcType=TIMESTAMP}, #{shipEntrustNo,jdbcType=VARCHAR}, #{shipStartAddress,jdbcType=VARCHAR}, 
+      #{warehouseId,jdbcType=INTEGER}, #{buyType,jdbcType=BIGINT}, #{term,jdbcType=INTEGER}, 
+      #{comeFrom,jdbcType=VARCHAR}, #{billType,jdbcType=BIGINT}, #{fileNo,jdbcType=VARCHAR}, 
+      #{createBy,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, #{updateBy,jdbcType=VARCHAR}, 
+      #{updateTime,jdbcType=TIMESTAMP}, #{totalQuantity,jdbcType=DECIMAL}, #{totalAmount,jdbcType=DECIMAL})
+  </insert>
+
+  <update id="updateByPrimaryKeySelective" parameterType="com.yiban.erp.entities.RepertoryIn" >
+    update repertory_in
+    <set >
+      <if test="companyId != null" >
+        company_id = #{companyId,jdbcType=INTEGER},
+      </if>
+      <if test="refOrderId != null" >
+        ref_order_id = #{refOrderId,jdbcType=BIGINT},
+      </if>
+      <if test="refType != null" >
+        ref_type = #{refType,jdbcType=VARCHAR},
+      </if>
+      <if test="orderNumber != null" >
+        order_number = #{orderNumber,jdbcType=VARCHAR},
+      </if>
+      <if test="refNo != null" >
+        ref_no = #{refNo,jdbcType=VARCHAR},
+      </if>
+      <if test="supplierId != null" >
+        supplier_id = #{supplierId,jdbcType=BIGINT},
+      </if>
+      <if test="supplierContactId != null" >
+        supplier_contact_id = #{supplierContactId,jdbcType=BIGINT},
+      </if>
+      <if test="buyerId != null" >
+        buyer_id = #{buyerId,jdbcType=BIGINT},
+      </if>
+      <if test="status != null" >
+        status = #{status,jdbcType=VARCHAR},
+      </if>
+      <if test="keyWord != null" >
+        key_word = #{keyWord,jdbcType=VARCHAR},
+      </if>
+      <if test="receiveDate != null" >
+        receive_date = #{receiveDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="receiveUser != null" >
+        receive_user = #{receiveUser, jdbcType=VARCHAR},
+      </if>
+      <if test="payDate != null" >
+        pay_date = #{payDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="goodsBillNo != null" >
+        goods_bill_no = #{goodsBillNo,jdbcType=VARCHAR},
+      </if>
+      <if test="tempControlMethod != null" >
+        temp_control_method = #{tempControlMethod,jdbcType=BIGINT},
+      </if>
+      <if test="receiveTemp != null" >
+        receive_temp = #{receiveTemp,jdbcType=DECIMAL},
+      </if>
+      <if test="checkTemp != null" >
+        check_temp = #{checkTemp,jdbcType=DECIMAL},
+      </if>
+      <if test="tempControlStatus != null" >
+        temp_control_status = #{tempControlStatus,jdbcType=BIGINT},
+      </if>
+      <if test="shipCompanyId != null" >
+        ship_company_id = #{shipCompanyId,jdbcType=INTEGER},
+      </if>
+      <if test="shipMethod != null" >
+        ship_method = #{shipMethod,jdbcType=BIGINT},
+      </if>
+      <if test="shipTool != null" >
+        ship_tool = #{shipTool,jdbcType=BIGINT},
+      </if>
+      <if test="shipCarNo != null" >
+        ship_car_no = #{shipCarNo,jdbcType=VARCHAR},
+      </if>
+      <if test="shipDriverName != null" >
+        ship_driver_name = #{shipDriverName,jdbcType=VARCHAR},
+      </if>
+      <if test="shipStartDate != null" >
+        ship_start_date = #{shipStartDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="shipEndDate != null" >
+        ship_end_date = #{shipEndDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="shipEntrustNo != null" >
+        ship_entrust_no = #{shipEntrustNo,jdbcType=VARCHAR},
+      </if>
+      <if test="shipStartAddress != null" >
+        ship_start_address = #{shipStartAddress,jdbcType=VARCHAR},
+      </if>
+      <if test="warehouseId != null" >
+        warehouse_id = #{warehouseId,jdbcType=INTEGER},
+      </if>
+      <if test="buyType != null" >
+        buy_type = #{buyType,jdbcType=BIGINT},
+      </if>
+      <if test="term != null" >
+        term = #{term,jdbcType=INTEGER},
+      </if>
+      <if test="comeFrom != null" >
+        come_from = #{comeFrom,jdbcType=VARCHAR},
+      </if>
+      <if test="billType != null" >
+        bill_type = #{billType,jdbcType=BIGINT},
+      </if>
+      <if test="fileNo != null" >
+        file_no = #{fileNo,jdbcType=VARCHAR},
+      </if>
+      <if test="createBy != null" >
+        create_by = #{createBy,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateBy != null" >
+        update_by = #{updateBy,jdbcType=VARCHAR},
+      </if>
+      <if test="updateTime != null" >
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="totalQuantity != null" >
+        total_quantity = #{totalQuantity,jdbcType=DECIMAL},
+      </if>
+      <if test="totalAmount != null" >
+        total_amount = #{totalAmount,jdbcType=DECIMAL},
+      </if>
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+
+  <select id="getOrderView" resultMap="BaseResultMap" parameterType="java.lang.Long">
+    select
+      r.*,
+      s.name as supplierName,
+      sc.name as supplierContactName,
+      w.name as warehouseName,
+      u.nickname as saleNickName,
+      sh.name as shipCompanyName
+    from repertory_in r
+    left join supplier s on r.supplier_id = s.id
+    left join supplier_contact sc on r.supplier_contact_id = sc.id
+    left join warehouse w on r.warehouse_id = w.id
+    left join users u on r.buyer_id = u.id
+    left join ship_company sh on r.ship_company_id = sh.id
+    where r.status != 'DELETE' and  r.id = #{id}
+  </select>
+
+
+  <sql id="listSql" >
+      o.*,
+      s.name as supplierName, s.is_cold_business as supplierColdManage, s.can_special as supplierSpecialManage,
+      sc.name as supplierContactName, w.name as warehouseName,
+      u.nickname as saleNickName, u.realname as saleRealName
+  </sql>
+
+  <select id="getList" parameterType="com.yiban.erp.dto.ReceiveListReq" resultMap="BaseResultMap">
+    select
+    <include refid="listSql"/>
+    from repertory_in o, supplier s, supplier_contact sc, warehouse w, users u
+    where o.supplier_id = s.id and o.supplier_contact_id = sc.id
+    and o.warehouse_id = w.id
+    and o.buyer_id = u.id
+    and o.company_id = #{companyId}
+    and o.status != 'DELETE'
+    <if test="warehouseId != null">
+      and o.warehouse_id = #{warehouseId}
+    </if>
+    <if test="supplierId != null" >
+      and o.supplier_id = #{supplierId}
+    </if>
+    <if test="startReceiveDate != null">
+      and o.create_time >= #{startReceiveDate}
+    </if>
+    <if test="endReceiveDate != null">
+      and o.create_time &lt;= #{endReceiveDate}
+    </if>
+    <if test="statusList != null" >
+      and o.status in
+      <foreach collection="statusList" item="item" open="(" close=")" separator=", ">
+        #{item}
+      </foreach>
+    </if>
+  </select>
+
+  <select id="getByRefOrder" parameterType="map" resultMap="BaseResultMap">
+    select
+    <include refid="listSql"/>
+    from repertory_in o, supplier s, supplier_contact sc, warehouse w, users u
+    where o.supplier_id = s.id and o.supplier_contact_id = sc.id
+    and o.warehouse_id = w.id
+    and o.buyer_id = u.id
+    and o.company_id = #{companyId}
+    and o.status != 'DELETE'
+    and o.ref_type = #{refType}
+    and o.ref_order_id = #{refOrderId}
+  </select>
+
+  <select id="getByIdWithSupplierInfo" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select
+      <include refid="listSql"/>
+    from repertory_in o, supplier s, supplier_contact sc, warehouse w, users u
+    where o.supplier_id = s.id and o.supplier_contact_id = sc.id
+    and o.warehouse_id = w.id and o.buyer_id = u.id
+    and o.status != 'DELETE'
+    and o.id = #{id}
+  </select>
+
+  <update id="setCheckStatus" parameterType="map">
+    update repertory_in
+      set status = #{status},
+          update_by = #{updateBy},
+          update_time = #{updateTime}
+    where id = #{id}
+  </update>
+
+
+  <select id="getInListById"  parameterType="map" resultType="com.yiban.erp.entities.RepertoryIn">
+    select
+    <include refid="listSql"/>
+    from repertory_in o, supplier s, supplier_contact sc, warehouse w, users u
+    where o.supplier_id = s.id and o.supplier_contact_id = sc.id
+    and o.warehouse_id = w.id
+    and o.buyer_id = u.id
+    and o.id in
+    <foreach collection="ids" item="item" open="(" close=")" separator=", ">
+      #{item}
+    </foreach>
+  </select>
+</mapper>

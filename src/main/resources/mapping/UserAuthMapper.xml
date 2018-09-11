@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.yiban.erp.dao.UserAuthMapper" >
+  <resultMap id="BaseResultMap" type="com.yiban.erp.entities.UserAuth" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="user_id" property="userId" jdbcType="BIGINT" />
+    <result column="identifier" property="identifier" jdbcType="VARCHAR" />
+    <result column="identifier_type" property="identifierType" jdbcType="VARCHAR" />
+    <result column="credential" property="credential" jdbcType="VARCHAR" />
+    <result column="verified" property="verified" jdbcType="BIT" />
+    <result column="created_by" property="createdBy" jdbcType="VARCHAR" />
+    <result column="updated_by" property="updatedBy" jdbcType="VARCHAR" />
+    <result column="created_time" property="createdTime" jdbcType="TIMESTAMP" />
+    <result column="updated_time" property="updatedTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, user_id, identifier, identifier_type, credential, verified, created_by, updated_by, 
+    created_time, updated_time
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select 
+    <include refid="Base_Column_List" />
+    from user_auths
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+
+  <select id="findByIdentifier" resultMap="BaseResultMap" parameterType="map" >
+    select
+    <include refid="Base_Column_List" />
+    from user_auths
+    where identifier = #{identifier, jdbcType=VARCHAR}
+    and identifier_type = #{type}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
+    delete from user_auths
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+
+  <delete id="deleteByUserId" parameterType="java.lang.Long">
+    delete from user_auths where user_id = #{userId}
+  </delete>
+
+  <insert id="insert" parameterType="com.yiban.erp.entities.UserAuth" useGeneratedKeys="true" keyProperty="id">
+    insert into user_auths (user_id, identifier,
+      identifier_type, credential, verified, 
+      created_by, updated_by, created_time, 
+      updated_time)
+    values (#{userId,jdbcType=BIGINT}, #{identifier,jdbcType=VARCHAR},
+      #{identifierType,jdbcType=VARCHAR}, #{credential,jdbcType=VARCHAR}, #{verified,jdbcType=BIT}, 
+      #{createdBy,jdbcType=VARCHAR}, #{updatedBy,jdbcType=VARCHAR}, #{createdTime,jdbcType=TIMESTAMP}, 
+      #{updatedTime,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" parameterType="com.yiban.erp.entities.UserAuth" useGeneratedKeys="true" keyProperty="id">
+    insert into user_auths
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+
+      <if test="userId != null" >
+        user_id,
+      </if>
+      <if test="identifier != null" >
+        identifier,
+      </if>
+      <if test="identifierType != null" >
+        identifier_type,
+      </if>
+      <if test="credential != null" >
+        credential,
+      </if>
+      <if test="verified != null" >
+        verified,
+      </if>
+      <if test="createdBy != null" >
+        created_by,
+      </if>
+      <if test="updatedBy != null" >
+        updated_by,
+      </if>
+      <if test="createdTime != null" >
+        created_time,
+      </if>
+      <if test="updatedTime != null" >
+        updated_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+
+      <if test="userId != null" >
+        #{userId,jdbcType=BIGINT},
+      </if>
+      <if test="identifier != null" >
+        #{identifier,jdbcType=VARCHAR},
+      </if>
+      <if test="identifierType != null" >
+        #{identifierType,jdbcType=VARCHAR},
+      </if>
+      <if test="credential != null" >
+        #{credential,jdbcType=VARCHAR},
+      </if>
+      <if test="verified != null" >
+        #{verified,jdbcType=BIT},
+      </if>
+      <if test="createdBy != null" >
+        #{createdBy,jdbcType=VARCHAR},
+      </if>
+      <if test="updatedBy != null" >
+        #{updatedBy,jdbcType=VARCHAR},
+      </if>
+      <if test="createdTime != null" >
+        #{createdTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updatedTime != null" >
+        #{updatedTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.yiban.erp.entities.UserAuth" >
+    update user_auths
+    <set >
+      <if test="userId != null" >
+        user_id = #{userId,jdbcType=BIGINT},
+      </if>
+      <if test="identifier != null" >
+        identifier = #{identifier,jdbcType=VARCHAR},
+      </if>
+      <if test="identifierType != null" >
+        identifier_type = #{identifierType,jdbcType=VARCHAR},
+      </if>
+      <if test="credential != null" >
+        credential = #{credential,jdbcType=VARCHAR},
+      </if>
+      <if test="verified != null" >
+        verified = #{verified,jdbcType=BIT},
+      </if>
+      <if test="createdBy != null" >
+        created_by = #{createdBy,jdbcType=VARCHAR},
+      </if>
+      <if test="updatedBy != null" >
+        updated_by = #{updatedBy,jdbcType=VARCHAR},
+      </if>
+      <if test="createdTime != null" >
+        created_time = #{createdTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updatedTime != null" >
+        updated_time = #{updatedTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.yiban.erp.entities.UserAuth" >
+    update user_auths
+    set user_id = #{userId,jdbcType=BIGINT},
+      identifier = #{identifier,jdbcType=VARCHAR},
+      identifier_type = #{identifierType,jdbcType=VARCHAR},
+      credential = #{credential,jdbcType=VARCHAR},
+      verified = #{verified,jdbcType=BIT},
+      created_by = #{createdBy,jdbcType=VARCHAR},
+      updated_by = #{updatedBy,jdbcType=VARCHAR},
+      created_time = #{createdTime,jdbcType=TIMESTAMP},
+      updated_time = #{updatedTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+
+  <update id="updateAuthIdentifier" parameterType="map">
+    update user_auths
+    set identifier = #{value},
+        updated_by = #{updatedBy},
+        updated_time = #{updatedTime}
+    where user_id = #{userId}
+      and identifier_type = #{type}
+  </update>
+
+  <update id="updatePassword" parameterType="map">
+    update user_auths
+      set
+        credential = #{credential},
+        updated_by = #{updatedBy},
+        updated_time = #{updatedTime}
+    where user_id = #{userId}
+      and (identifier_type = 'USERNAME' or identifier_type = 'MOBILE')
+  </update>
+
+  <select id="findByUserId" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select <include refid="Base_Column_List"/>
+    from user_auths
+    where user_id = #{userId}
+  </select>
+
+</mapper>

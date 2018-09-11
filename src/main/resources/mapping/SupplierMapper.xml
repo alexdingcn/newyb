@@ -1,0 +1,333 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.yiban.erp.dao.SupplierMapper" >
+  <resultMap id="BaseResultMap" type="com.yiban.erp.entities.Supplier" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="company_id" property="companyId" jdbcType="INTEGER" />
+    <result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="pinyin" property="pinyin" jdbcType="VARCHAR" />
+    <result column="enabled" property="enabled" jdbcType="BIT" />
+    <result column="term" property="term" jdbcType="INTEGER" />
+    <result column="city" property="city" jdbcType="VARCHAR" />
+    <result column="address" property="address" jdbcType="VARCHAR" />
+    <result column="postcode" property="postcode" jdbcType="VARCHAR" />
+    <result column="fax" property="fax" jdbcType="VARCHAR" />
+    <result column="phone" property="phone" jdbcType="VARCHAR" />
+    <result column="email" property="email" jdbcType="VARCHAR" />
+    <result column="contact" property="contact" jdbcType="VARCHAR" />
+    <result column="contact_phone" property="contactPhone" jdbcType="VARCHAR" />
+    <result column="employee" property="employee" jdbcType="VARCHAR" />
+    <result column="legal_person" property="legalPerson" jdbcType="VARCHAR" />
+    <result column="discount" property="discount" jdbcType="DECIMAL" />
+    <result column="bank_account" property="bankAccount" jdbcType="VARCHAR" />
+    <result column="bank_name" property="bankName" jdbcType="VARCHAR" />
+    <result column="bank_number" property="bankNumber" jdbcType="VARCHAR" />
+    <result column="tax_number" property="taxNumber" jdbcType="VARCHAR" />
+    <result column="billing_method_id" property="billingMethodId" jdbcType="BIGINT" />
+    <result column="supplier_type_id" property="supplierTypeId" jdbcType="BIGINT" />
+    <result column="have_stamp" property="haveStamp" jdbcType="BIT" />
+    <result column="have_bill_template" property="haveBillTemplate" jdbcType="BIT" />
+    <result column="check_first" property="checkFirst" jdbcType="BIT" />
+    <result column="is_factory" property="isFactory" jdbcType="BIT" />
+    <result column="is_direct_supplier" property="isDirectSupplier" jdbcType="BIT" />
+    <result column="is_cold_business" property="isColdBusiness" jdbcType="BIT" />
+    <result column="can_special" property="canSpecial" jdbcType="BIT" />
+    <result column="warehouse_address" property="warehouseAddress" jdbcType="VARCHAR" />
+    <result column="business_scope" property="businessScope" jdbcType="VARCHAR" />
+    <result column="comment" property="comment" jdbcType="VARCHAR" />
+    <result column="license" property="license" jdbcType="VARCHAR" />
+    <result column="license_exp" property="licenseExp" jdbcType="DATE" />
+    <result column="organization_no" property="organizationNo" jdbcType="VARCHAR" />
+    <result column="organization_exp" property="organizationExp" jdbcType="DATE" />
+    <result column="gsp_gmp_no" property="gspGmpNo" jdbcType="VARCHAR" />
+    <result column="gsp_gmp_exp" property="gspGmpExp" jdbcType="DATE" />
+    <result column="quality_protocol_no" property="qualityProtocolNo" jdbcType="VARCHAR" />
+    <result column="quality_protocol_exp" property="qualityProtocolExp" jdbcType="DATE" />
+    <result column="sale_protocol_no" property="saleProtocolNo" jdbcType="VARCHAR" />
+    <result column="sale_protocol_exp" property="saleProtocolExp" jdbcType="DATE" />
+    <result column="legal_protocol_no" property="legalProtocolNo" jdbcType="VARCHAR" />
+    <result column="legal_protocol_exp" property="legalProtocolExp" jdbcType="DATE" />
+    <result column="other_protocol_no" property="otherProtocolNo" jdbcType="VARCHAR" />
+    <result column="other_protocol_exp" property="otherProtocolExp" jdbcType="DATE" />
+    <result column="file_no" property="fileNo" jdbcType="VARCHAR" />
+    <result column="created_by" property="createdBy" jdbcType="VARCHAR" />
+    <result column="updated_by" property="updatedBy" jdbcType="VARCHAR" />
+    <result column="created_time" property="createdTime" jdbcType="TIMESTAMP" />
+    <result column="updated_time" property="updatedTime" jdbcType="TIMESTAMP" />
+    <result column="account_amount" property="accountAmount" jdbcType="DECIMAL" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, company_id, name, pinyin, enabled, term, city, address, postcode, fax, phone,
+    email, contact, contact_phone, employee, legal_person, discount, bank_account, bank_name,
+    bank_number, tax_number, billing_method_id, supplier_type_id, have_stamp, have_bill_template,
+    check_first, is_factory, is_direct_supplier, is_cold_business, can_special, warehouse_address,
+    business_scope, comment, license, license_exp, organization_no, organization_exp,
+    gsp_gmp_no, gsp_gmp_exp, quality_protocol_no, quality_protocol_exp, sale_protocol_no,
+    sale_protocol_exp, legal_protocol_no, legal_protocol_exp, other_protocol_no, other_protocol_exp,
+    file_no, created_by, updated_by, created_time, updated_time, account_amount
+  </sql>
+  <select id="selectAll" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select
+    <include refid="Base_Column_List" />
+    from supplier
+    where company_id = #{companyId}
+    order by id desc
+  </select>
+  <select id="searchByNameOrContact" parameterType="map" resultMap="BaseResultMap" >
+    <bind name="pattern" value="'%' + searchStr + '%'" />
+    select
+    <include refid="Base_Column_List" />
+    from supplier
+    where company_id = #{companyId} and (
+      name like #{pattern}
+      or contact like #{pattern}
+      or lower(pinyin) like lower(#{pattern})
+    )
+    order by id desc
+  </select>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select 
+    <include refid="Base_Column_List" />
+    from supplier
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
+    delete from supplier
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="com.yiban.erp.entities.Supplier" keyProperty="id" useGeneratedKeys="true">
+    insert into supplier (company_id, name,
+      pinyin, enabled, term,
+      city, address, postcode,
+      fax, phone, email,
+      contact, contact_phone, employee,
+      legal_person, discount, bank_account,
+      bank_name, bank_number, tax_number,
+      billing_method_id, supplier_type_id, have_stamp,
+      have_bill_template, check_first, is_factory,
+      is_direct_supplier, is_cold_business, can_special,
+      warehouse_address, business_scope, comment,
+      license, license_exp, organization_no,
+      organization_exp, gsp_gmp_no, gsp_gmp_exp,
+      quality_protocol_no, quality_protocol_exp, sale_protocol_no,
+      sale_protocol_exp, legal_protocol_no, legal_protocol_exp,
+      other_protocol_no, other_protocol_exp, file_no,
+      created_by, updated_by, created_time,
+      updated_time, account_amount)
+    values (#{companyId,jdbcType=INTEGER}, #{name,jdbcType=VARCHAR},
+      #{pinyin,jdbcType=VARCHAR}, #{enabled,jdbcType=BIT}, #{term,jdbcType=INTEGER},
+      #{city,jdbcType=VARCHAR}, #{address,jdbcType=VARCHAR}, #{postcode,jdbcType=VARCHAR},
+      #{fax,jdbcType=VARCHAR}, #{phone,jdbcType=VARCHAR}, #{email,jdbcType=VARCHAR},
+      #{contact,jdbcType=VARCHAR}, #{contactPhone,jdbcType=VARCHAR}, #{employee,jdbcType=VARCHAR},
+      #{legalPerson,jdbcType=VARCHAR}, #{discount,jdbcType=DECIMAL}, #{bankAccount,jdbcType=VARCHAR},
+      #{bankName,jdbcType=VARCHAR}, #{bankNumber,jdbcType=VARCHAR}, #{taxNumber,jdbcType=VARCHAR},
+      #{billingMethodId,jdbcType=BIGINT}, #{supplierTypeId,jdbcType=BIGINT}, #{haveStamp,jdbcType=BIT},
+      #{haveBillTemplate,jdbcType=BIT}, #{checkFirst,jdbcType=BIT}, #{isFactory,jdbcType=BIT},
+      #{isDirectSupplier,jdbcType=BIT}, #{isColdBusiness,jdbcType=BIT}, #{canSpecial,jdbcType=BIT},
+      #{warehouseAddress,jdbcType=VARCHAR}, #{businessScope,jdbcType=VARCHAR}, #{comment,jdbcType=VARCHAR},
+      #{license,jdbcType=VARCHAR}, #{licenseExp,jdbcType=DATE}, #{organizationNo,jdbcType=VARCHAR},
+      #{organizationExp,jdbcType=DATE}, #{gspGmpNo,jdbcType=VARCHAR}, #{gspGmpExp,jdbcType=DATE},
+      #{qualityProtocolNo,jdbcType=VARCHAR}, #{qualityProtocolExp,jdbcType=DATE}, #{saleProtocolNo,jdbcType=VARCHAR},
+      #{saleProtocolExp,jdbcType=DATE}, #{legalProtocolNo,jdbcType=VARCHAR}, #{legalProtocolExp,jdbcType=DATE},
+      #{otherProtocolNo,jdbcType=VARCHAR}, #{otherProtocolExp,jdbcType=DATE}, #{fileNo,jdbcType=VARCHAR},
+      #{createdBy,jdbcType=VARCHAR}, #{updatedBy,jdbcType=VARCHAR}, #{createdTime,jdbcType=TIMESTAMP},
+      #{updatedTime,jdbcType=TIMESTAMP}, #{accountAmount, jdbcType=DECIMAL})
+  </insert>
+
+  <update id="updateByPrimaryKeySelective" parameterType="com.yiban.erp.entities.Supplier" >
+    update supplier
+    <set >
+      <if test="name != null" >
+        name = #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="pinyin != null" >
+        pinyin = #{pinyin,jdbcType=VARCHAR},
+      </if>
+      <if test="enabled != null" >
+        enabled = #{enabled,jdbcType=BIT},
+      </if>
+      <if test="term != null" >
+        term = #{term,jdbcType=INTEGER},
+      </if>
+      <if test="city != null" >
+        city = #{city,jdbcType=VARCHAR},
+      </if>
+      <if test="address != null" >
+        address = #{address,jdbcType=VARCHAR},
+      </if>
+      <if test="postcode != null" >
+        postcode = #{postcode,jdbcType=VARCHAR},
+      </if>
+      <if test="fax != null" >
+        fax = #{fax,jdbcType=VARCHAR},
+      </if>
+      <if test="phone != null" >
+        phone = #{phone,jdbcType=VARCHAR},
+      </if>
+      <if test="email != null" >
+        email = #{email,jdbcType=VARCHAR},
+      </if>
+      <if test="contact != null" >
+        contact = #{contact,jdbcType=VARCHAR},
+      </if>
+      <if test="contactPhone != null" >
+        contact_phone = #{contactPhone,jdbcType=VARCHAR},
+      </if>
+      <if test="employee != null" >
+        employee = #{employee,jdbcType=VARCHAR},
+      </if>
+      <if test="legalPerson != null" >
+        legal_person = #{legalPerson,jdbcType=VARCHAR},
+      </if>
+      <if test="discount != null" >
+        discount = #{discount,jdbcType=DECIMAL},
+      </if>
+      <if test="bankAccount != null" >
+        bank_account = #{bankAccount,jdbcType=VARCHAR},
+      </if>
+      <if test="bankName != null" >
+        bank_name = #{bankName,jdbcType=VARCHAR},
+      </if>
+      <if test="bankNumber != null" >
+        bank_number = #{bankNumber,jdbcType=VARCHAR},
+      </if>
+      <if test="taxNumber != null" >
+        tax_number = #{taxNumber,jdbcType=VARCHAR},
+      </if>
+      <if test="billingMethodId != null" >
+        billing_method_id = #{billingMethodId,jdbcType=BIGINT},
+      </if>
+      <if test="supplierTypeId != null" >
+        supplier_type_id = #{supplierTypeId,jdbcType=BIGINT},
+      </if>
+      <if test="haveStamp != null" >
+        have_stamp = #{haveStamp,jdbcType=BIT},
+      </if>
+      <if test="haveBillTemplate != null" >
+        have_bill_template = #{haveBillTemplate,jdbcType=BIT},
+      </if>
+      <if test="checkFirst != null" >
+        check_first = #{checkFirst,jdbcType=BIT},
+      </if>
+      <if test="isFactory != null" >
+        is_factory = #{isFactory,jdbcType=BIT},
+      </if>
+      <if test="isDirectSupplier != null" >
+        is_direct_supplier = #{isDirectSupplier,jdbcType=BIT},
+      </if>
+      <if test="isColdBusiness != null" >
+        is_cold_business = #{isColdBusiness,jdbcType=BIT},
+      </if>
+      <if test="canSpecial != null" >
+        can_special = #{canSpecial,jdbcType=BIT},
+      </if>
+      <if test="warehouseAddress != null" >
+        warehouse_address = #{warehouseAddress,jdbcType=VARCHAR},
+      </if>
+      <if test="businessScope != null" >
+        business_scope = #{businessScope,jdbcType=VARCHAR},
+      </if>
+      <if test="comment != null" >
+        comment = #{comment,jdbcType=VARCHAR},
+      </if>
+      <if test="license != null" >
+        license = #{license,jdbcType=VARCHAR},
+      </if>
+      <if test="licenseExp != null" >
+        license_exp = #{licenseExp,jdbcType=DATE},
+      </if>
+      <if test="organizationNo != null" >
+        organization_no = #{organizationNo,jdbcType=VARCHAR},
+      </if>
+      <if test="organizationExp != null" >
+        organization_exp = #{organizationExp,jdbcType=DATE},
+      </if>
+      <if test="gspGmpNo != null" >
+        gsp_gmp_no = #{gspGmpNo,jdbcType=VARCHAR},
+      </if>
+      <if test="gspGmpExp != null" >
+        gsp_gmp_exp = #{gspGmpExp,jdbcType=DATE},
+      </if>
+      <if test="qualityProtocolNo != null" >
+        quality_protocol_no = #{qualityProtocolNo,jdbcType=VARCHAR},
+      </if>
+      <if test="qualityProtocolExp != null" >
+        quality_protocol_exp = #{qualityProtocolExp,jdbcType=DATE},
+      </if>
+      <if test="saleProtocolNo != null" >
+        sale_protocol_no = #{saleProtocolNo,jdbcType=VARCHAR},
+      </if>
+      <if test="saleProtocolExp != null" >
+        sale_protocol_exp = #{saleProtocolExp,jdbcType=DATE},
+      </if>
+      <if test="legalProtocolNo != null" >
+        legal_protocol_no = #{legalProtocolNo,jdbcType=VARCHAR},
+      </if>
+      <if test="legalProtocolExp != null" >
+        legal_protocol_exp = #{legalProtocolExp,jdbcType=DATE},
+      </if>
+      <if test="otherProtocolNo != null" >
+        other_protocol_no = #{otherProtocolNo,jdbcType=VARCHAR},
+      </if>
+      <if test="otherProtocolExp != null" >
+        other_protocol_exp = #{otherProtocolExp,jdbcType=DATE},
+      </if>
+      <if test="fileNo != null" >
+        file_no = #{fileNo,jdbcType=VARCHAR},
+      </if>
+      <if test="createdBy != null" >
+        created_by = #{createdBy,jdbcType=VARCHAR},
+      </if>
+      <if test="updatedBy != null" >
+        updated_by = #{updatedBy,jdbcType=VARCHAR},
+      </if>
+      <if test="createdTime != null" >
+        created_time = #{createdTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updatedTime != null" >
+        updated_time = #{updatedTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+
+  <update id="updateAccountAmount" parameterType="map" >
+    update supplier
+      set account_amount = #{accountAmount}
+    where id = #{id}
+  </update>
+
+    <select id="selectAllCount" parameterType="map" resultType="java.lang.Integer">
+        select
+        count(1) as count
+        from supplier
+        where enabled = 1
+        and company_id = #{companyId}
+        <if test="search != null" >
+            <bind name="pattern" value="'%' + search + '%'"/>
+            and (name like #{pattern} or
+            contact_phone like #{pattern} or
+            lower(pinyin) like lower(#{pattern}) OR
+            contact like #{pattern} )
+        </if>
+    </select>
+
+
+    <select id="selectAllPaged" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List" />
+        from supplier
+        where enabled = 1
+        and company_id = #{companyId}
+        <if test="search != null" >
+            <bind name="pattern" value="'%' + search + '%'"/>
+            and (name like #{pattern} or
+            contact_phone like #{pattern} or
+            lower(pinyin) like lower(#{pattern}) OR
+            contact like #{pattern} )
+        </if>
+        <if test="offset != null and limit != null">
+            limit #{offset}, #{limit}
+        </if>
+    </select>
+</mapper>

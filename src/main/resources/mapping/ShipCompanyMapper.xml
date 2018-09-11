@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yiban.erp.dao.ShipCompanyMapper">
+  <resultMap id="BaseResultMap" type="com.yiban.erp.entities.ShipCompany">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="company_id" jdbcType="INTEGER" property="companyId" />
+    <result column="name" jdbcType="VARCHAR" property="name" />
+    <result column="enabled" jdbcType="BIT" property="enabled" />
+    <result column="license" jdbcType="VARCHAR" property="license" />
+    <result column="license_exp" jdbcType="DATE" property="licenseExp" />
+    <result column="file_no" jdbcType="VARCHAR" property="fileNo" />
+    <result column="employee" jdbcType="VARCHAR" property="employee" />
+    <result column="phone" jdbcType="VARCHAR" property="phone" />
+    <result column="fax" jdbcType="VARCHAR" property="fax" />
+    <result column="email" jdbcType="VARCHAR" property="email" />
+    <result column="contact_user" jdbcType="VARCHAR" property="contactUser" />
+    <result column="contact_phone" jdbcType="VARCHAR" property="contactPhone" />
+    <result column="postcode" jdbcType="VARCHAR" property="postcode" />
+    <result column="address" jdbcType="VARCHAR" property="address" />
+    <result column="comment" jdbcType="VARCHAR" property="comment" />
+    <result column="create_by" jdbcType="VARCHAR" property="createBy" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="update_by" jdbcType="VARCHAR" property="updateBy" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, company_id, name, enabled, license, license_exp, file_no, employee,
+    phone, fax, email, contact_user, contact_phone, postcode, address, comment, create_by, create_time,
+    update_by, update_time
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from ship_company
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from ship_company
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.yiban.erp.entities.ShipCompany" keyProperty="id" useGeneratedKeys="true">
+    insert into ship_company (company_id, name,
+      enabled, license, license_exp,
+      file_no, employee, phone,
+      fax, email, contact_user, 
+      contact_phone, postcode, address, comment,
+      create_by, create_time, update_by, 
+      update_time)
+    values (#{companyId,jdbcType=INTEGER}, #{name,jdbcType=VARCHAR},
+      #{enabled,jdbcType=BIT}, #{license,jdbcType=VARCHAR}, #{licenseExp,jdbcType=DATE},
+      #{fileNo,jdbcType=VARCHAR}, #{employee,jdbcType=VARCHAR}, #{phone,jdbcType=VARCHAR},
+      #{fax,jdbcType=VARCHAR}, #{email,jdbcType=VARCHAR}, #{contactUser,jdbcType=VARCHAR}, 
+      #{contactPhone,jdbcType=VARCHAR}, #{postcode,jdbcType=VARCHAR}, #{address,jdbcType=VARCHAR}, #{comment,jdbcType=VARCHAR},
+      #{createBy,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, #{updateBy,jdbcType=VARCHAR}, 
+      #{updateTime,jdbcType=TIMESTAMP})
+  </insert>
+
+  <update id="updateByPrimaryKeySelective" parameterType="com.yiban.erp.entities.ShipCompany">
+    update ship_company
+    <set>
+      <if test="name != null">
+        name = #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="enabled != null">
+        enabled = #{enabled,jdbcType=BIT},
+      </if>
+      <if test="license != null">
+        license = #{license,jdbcType=VARCHAR},
+      </if>
+      <if test="licenseExp != null">
+        license_exp = #{licenseExp,jdbcType=DATE},
+      </if>
+      <if test="fileNo != null">
+        file_no = #{fileNo,jdbcType=VARCHAR},
+      </if>
+      <if test="employee != null">
+        employee = #{employee,jdbcType=VARCHAR},
+      </if>
+      <if test="phone != null">
+        phone = #{phone,jdbcType=VARCHAR},
+      </if>
+      <if test="fax != null">
+        fax = #{fax,jdbcType=VARCHAR},
+      </if>
+      <if test="email != null">
+        email = #{email,jdbcType=VARCHAR},
+      </if>
+      <if test="contactUser != null">
+        contact_user = #{contactUser,jdbcType=VARCHAR},
+      </if>
+      <if test="contactPhone != null">
+        contact_phone = #{contactPhone,jdbcType=VARCHAR},
+      </if>
+      <if test="postcode != null">
+        postcode = #{postcode,jdbcType=VARCHAR},
+      </if>
+      <if test="address != null">
+        address = #{address,jdbcType=VARCHAR},
+      </if>
+      <if test="comment != null">
+        comment = #{comment,jdbcType=VARCHAR},
+      </if>
+      <if test="createBy != null">
+        create_by = #{createBy,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null">
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateBy != null">
+        update_by = #{updateBy,jdbcType=VARCHAR},
+      </if>
+      <if test="updateTime != null">
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+
+  <select id="getListCount" parameterType="map" resultType="java.lang.Integer">
+    select count(1)
+    from ship_company
+    where company_id = #{companyId,jdbcType=INTEGER}
+    <if test="search != null">
+      <bind name="searchVal" value="'%' + search + '%'"/>
+      and (name like #{searchVal} or license like #{searchVal})
+    </if>
+  </select>
+
+  <select id="getList" parameterType="map" resultMap="BaseResultMap">
+    select <include refid="Base_Column_List" />
+    from ship_company
+    where company_id = #{companyId,jdbcType=INTEGER}
+      <if test="search != null">
+        <bind name="searchVal" value="'%' + search + '%'"/>
+        and (name like #{searchVal} or license like #{searchVal})
+      </if>
+      order by id desc
+      <if test="offset != null and limit != null">
+        limit #{offset}, #{limit}
+      </if>
+  </select>
+</mapper>

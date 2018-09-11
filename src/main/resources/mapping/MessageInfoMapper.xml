@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.yiban.erp.dao.MessageInfoMapper" >
+  <resultMap id="BaseResultMap" type="com.yiban.erp.entities.MessageInfo" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="company_id" property="companyId" jdbcType="INTEGER" />
+    <result column="status" property="status" jdbcType="VARCHAR" />
+    <result column="role_type" property="roleType" jdbcType="VARCHAR" />
+    <result column="title" property="title" jdbcType="VARCHAR" />
+    <result column="create_by" property="createBy" jdbcType="VARCHAR" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_by" property="updateBy" jdbcType="VARCHAR" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <resultMap id="ResultMapWithBLOBs" type="com.yiban.erp.entities.MessageInfo" extends="BaseResultMap" >
+    <result column="content" property="content" jdbcType="LONGVARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, company_id, status, role_type, title, create_by, create_time, update_by, update_time
+  </sql>
+  <sql id="Blob_Column_List" >
+    content
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="ResultMapWithBLOBs" parameterType="java.lang.Long" >
+    select 
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from message_info
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
+    delete from message_info
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="com.yiban.erp.entities.MessageInfo" keyProperty="id" useGeneratedKeys="true" >
+    insert into message_info (id, company_id, status, 
+      role_type, title, create_by, 
+      create_time, update_by, update_time, 
+      content)
+    values (#{id,jdbcType=BIGINT}, #{companyId,jdbcType=INTEGER}, #{status,jdbcType=VARCHAR}, 
+      #{roleType,jdbcType=VARCHAR}, #{title,jdbcType=VARCHAR}, #{createBy,jdbcType=VARCHAR}, 
+      #{createTime,jdbcType=TIMESTAMP}, #{updateBy,jdbcType=VARCHAR}, #{updateTime,jdbcType=TIMESTAMP}, 
+      #{content,jdbcType=LONGVARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.yiban.erp.entities.MessageInfo"  keyProperty="id" useGeneratedKeys="true" >
+    insert into message_info
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="companyId != null" >
+        company_id,
+      </if>
+      <if test="status != null" >
+        status,
+      </if>
+      <if test="roleType != null" >
+        role_type,
+      </if>
+      <if test="title != null" >
+        title,
+      </if>
+      <if test="createBy != null" >
+        create_by,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+      <if test="updateBy != null" >
+        update_by,
+      </if>
+      <if test="updateTime != null" >
+        update_time,
+      </if>
+      <if test="content != null" >
+        content,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=BIGINT},
+      </if>
+      <if test="companyId != null" >
+        #{companyId,jdbcType=INTEGER},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=VARCHAR},
+      </if>
+      <if test="roleType != null" >
+        #{roleType,jdbcType=VARCHAR},
+      </if>
+      <if test="title != null" >
+        #{title,jdbcType=VARCHAR},
+      </if>
+      <if test="createBy != null" >
+        #{createBy,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateBy != null" >
+        #{updateBy,jdbcType=VARCHAR},
+      </if>
+      <if test="updateTime != null" >
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="content != null" >
+        #{content,jdbcType=LONGVARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.yiban.erp.entities.MessageInfo" >
+    update message_info
+    <set >
+      <if test="status != null" >
+        status = #{status,jdbcType=VARCHAR},
+      </if>
+      <if test="roleType != null" >
+        role_type = #{roleType,jdbcType=VARCHAR},
+      </if>
+      <if test="title != null" >
+        title = #{title,jdbcType=VARCHAR},
+      </if>
+      <if test="createBy != null" >
+        create_by = #{createBy,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateBy != null" >
+        update_by = #{updateBy,jdbcType=VARCHAR},
+      </if>
+      <if test="updateTime != null" >
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="content != null" >
+        content = #{content,jdbcType=LONGVARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+
+  <resultMap id="DetailMap" type="com.yiban.erp.entities.MessageInfo">
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="company_id" property="companyId" jdbcType="INTEGER" />
+    <result column="status" property="status" jdbcType="VARCHAR" />
+    <result column="role_type" property="roleType" jdbcType="VARCHAR" />
+    <result column="title" property="title" jdbcType="VARCHAR" />
+    <result column="create_by" property="createBy" jdbcType="VARCHAR" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_by" property="updateBy" jdbcType="VARCHAR" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+    <result column="content" property="content" jdbcType="LONGVARCHAR" />
+    <collection property="options" ofType="com.yiban.erp.entities.MessageOption">
+      <id column="o_id" property="id" jdbcType="BIGINT" />
+      <result column="o_user_id" property="userId" jdbcType="BIGINT" />
+      <result column="o_message_id" property="messageId" jdbcType="BIGINT" />
+      <result column="o_option_status" property="optionStatus" jdbcType="VARCHAR" />
+      <result column="o_option_result" property="optionResult" jdbcType="VARCHAR" />
+      <result column="o_create_by" property="createBy" jdbcType="VARCHAR" />
+      <result column="o_create_time" property="createTime" jdbcType="TIMESTAMP" />
+      <result column="o_update_by" property="updateBy" jdbcType="VARCHAR" />
+      <result column="o_update_time" property="updateTime" jdbcType="TIMESTAMP" />
+      <result column="nickName" property="nickName" jdbcType="VARCHAR" />
+      <result column="realName" property="realName" jdbcType="VARCHAR" />
+    </collection>
+  </resultMap>
+
+  <sql id="detail_sql">
+    i.id, i.company_id, i.status, i.role_type, i.title, i.create_by, i.create_time, i.update_by, i.update_time, i.content,
+    o.id as o_id, o.user_id as o_user_id, o.message_id as  o_message_id, o.option_status as o_option_status,
+    o.option_result as o_option_result, o.create_by as o_create_by, o.create_time as o_create_time,
+    o.update_by as o_update_by, o.update_time as o_update_time, u.nickname as nickName, u.realname as realName
+  </sql>
+
+  <select id="query" parameterType="map" resultMap="DetailMap">
+    select
+      <include refid="detail_sql" />
+    from message_info i
+    left join message_option o on i.id = o.message_id
+    left join users u on u.id = o.user_id
+    where i.status = 'NORMAL'
+    and i.company_id = #{companyId}
+    and i.create_time >= #{startTime}
+    and i.create_time &lt;= #{endTime}
+    and i.role_type in
+    <foreach collection="roleTypeList" item="item" open="(" close=")" separator=",">
+      #{item}
+    </foreach>
+    order by i.id desc, o.id asc
+  </select>
+
+</mapper>

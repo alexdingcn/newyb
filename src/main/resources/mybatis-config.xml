@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+    <typeAliases>
+        <package name="com.yiban.erp.entities"/>
+    </typeAliases>
+    <mappers>
+        <mapper resource="mapping/CompanyMapper.xml"/>
+        <mapper resource="mapping/UserMapper.xml"/>
+        <mapper resource="mapping/UserRoleMapper.xml"/>
+        <mapper resource="mapping/UserAuthMapper.xml"/>
+        <mapper resource="mapping/UserRouteMapper.xml"/>
+        <mapper resource="mapping/GoodCategoryMapper.xml"/>
+        <mapper resource="mapping/GoodsInfoMapper.xml"/>
+        <mapper resource="mapping/GoodsBlackListMapper.xml"/>
+        <mapper resource="mapping/GoodsDetailMapper.xml"/>
+        <mapper resource="mapping/GoodsAttributeMapper.xml"/>
+        <mapper resource="mapping/GoodsAttributeRefMapper.xml"/>
+        <mapper resource="mapping/GoodsSpecMapper.xml"/>
+        <mapper resource="mapping/GoodsSourceMapper.xml"/>
+        <mapper resource="mapping/GoodsBrandMapper.xml"/>
+        <mapper resource="mapping/GoodsCareMapper.xml"/>
+        <mapper resource="mapping/PriceRuleMapper.xml"/>
+        <mapper resource="mapping/FactoryMapper.xml"/>
+        <mapper resource="mapping/FactoryDatabaseMapper.xml"/>
+        <mapper resource="mapping/ShipCompanyMapper.xml"/>
+        <mapper resource="mapping/SupplierMapper.xml"/>
+        <mapper resource="mapping/UnitMapper.xml"/>
+        <mapper resource="mapping/SupplierContactMapper.xml"/>
+        <mapper resource="mapping/CustomerCategoryMapper.xml"/>
+        <mapper resource="mapping/CustomerMapper.xml"/>
+        <mapper resource="mapping/CustomerRepMapper.xml"/>
+        <mapper resource="mapping/FileInfoMapper.xml"/>
+        <mapper resource="mapping/FileTypeMapper.xml"/>
+        <mapper resource="mapping/FileUploadMapper.xml"/>
+        <mapper resource="mapping/OptionsMapper.xml"/>
+        <mapper resource="mapping/WarehouseMapper.xml"/>
+        <mapper resource="mapping/WarehouseLocationMapper.xml"/>
+        <mapper resource="mapping/BuyOrderMapper.xml"/>
+        <mapper resource="mapping/BuyOrderDetailMapper.xml"/>
+        <mapper resource="mapping/SellOrderMapper.xml"/>
+        <mapper resource="mapping/SellOrderDetailMapper.xml"/>
+        <mapper resource="mapping/SellOrderShipMapper.xml"/>
+        <mapper resource="mapping/SellOrderBackMapper.xml" />
+        <mapper resource="mapping/SellOrderBackDetailMapper.xml" />
+        <mapper resource="mapping/RepertoryInfoMapper.xml"/>
+        <mapper resource="mapping/BizWxApplyMapper.xml"/>
+        <mapper resource="mapping/RepertoryInMapper.xml"/>
+        <mapper resource="mapping/RepertoryInDetailMapper.xml"/>
+        <mapper resource="mapping/RepertoryInBackMapper.xml"/>
+        <mapper resource="mapping/RepertoryInBackDetailMapper.xml"/>
+        <mapper resource="mapping/MessageInfoMapper.xml"/>
+        <mapper resource="mapping/MessageOptionMapper.xml"/>
+        <mapper resource="mapping/RepertoryOutMapper.xml"/>
+        <mapper resource="mapping/RepertoryOutDetailMapper.xml"/>
+        <mapper resource="mapping/FinancialFlowMapper.xml"/>
+        <mapper resource="mapping/FinancialPrePaidMapper.xml"/>
+        <mapper resource="mapping/FinancialPreReceiveMapper.xml"/>
+        <mapper resource="mapping/BizLockMapper.xml"/>
+        <mapper resource="mapping/OperationLogMapper.xml"/>
+        <mapper resource="mapping/SystemConfigMapper.xml"/>
+        <mapper resource="mapping/UpdateHistoryMapper.xml"/>
+        <mapper resource="mapping/SellOrderPaymentMapper.xml"/>
+        <mapper resource="mapping/BannerMapper.xml"/>
+        <mapper resource="mapping/BillBoardMapper.xml"/>
+        <mapper resource="mapping/RepertoryInventoryMapper.xml"/>
+        <mapper resource="mapping/RepertoryInventoryDetailMapper.xml"/>
+        <mapper resource="mapping/TodoItemsMapper.xml"/>
+        <mapper resource="mapping/BillTradeLogMapper.xml"/>
+    </mappers>
+</configuration>

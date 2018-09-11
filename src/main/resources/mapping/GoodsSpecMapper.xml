@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.yiban.erp.dao.GoodsSpecMapper" >
+  <resultMap id="BaseResultMap" type="com.yiban.erp.entities.GoodsSpec" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="company_id" property="companyId" jdbcType="INTEGER" />
+    <result column="spec_no" property="specNo" jdbcType="VARCHAR" />
+    <result column="spec_name" property="specName" jdbcType="VARCHAR" />
+    <result column="parent_id" property="parentId" jdbcType="BIGINT" />
+    <result column="parent_no" property="parentNo" jdbcType="VARCHAR" />
+    <result column="parent_name" property="parentName" jdbcType="VARCHAR" />
+    <result column="created_by" property="createdBy" jdbcType="VARCHAR" />
+    <result column="updated_by" property="updatedBy" jdbcType="VARCHAR" />
+    <result column="created_time" property="createdTime" jdbcType="TIMESTAMP" />
+    <result column="updated_time" property="updatedTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, company_id, spec_no, spec_name, parent_id, parent_no, parent_name, created_by,
+    updated_by, created_time, updated_time
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select 
+    <include refid="Base_Column_List" />
+    from goods_spec
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+
+  <select id="getByCompanyId" resultMap="BaseResultMap" parameterType="java.lang.Integer">
+    select <include refid="Base_Column_List" />
+    from goods_spec
+    where company_id = #{companyId}
+  </select>
+
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
+    delete from goods_spec
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="com.yiban.erp.entities.GoodsSpec" keyProperty="id" useGeneratedKeys="true" >
+    insert into goods_spec (company_id, spec_no,
+      spec_name, parent_id, parent_no,
+      parent_name, created_by, updated_by, 
+      created_time, updated_time)
+    values (#{companyId,jdbcType=INTEGER}, #{specNo,jdbcType=VARCHAR},
+      #{specName,jdbcType=VARCHAR}, #{parentId,jdbcType=BIGINT}, #{parentNo,jdbcType=VARCHAR},
+      #{parentName,jdbcType=VARCHAR}, #{createdBy,jdbcType=VARCHAR}, #{updatedBy,jdbcType=VARCHAR}, 
+      #{createdTime,jdbcType=TIMESTAMP}, #{updatedTime,jdbcType=TIMESTAMP})
+  </insert>
+
+  <insert id="insertBatch" parameterType="map" keyProperty="id" useGeneratedKeys="true">
+    insert into goods_spec (company_id, spec_no,
+      spec_name, parent_id, parent_no,
+      parent_name, created_by, updated_by,
+      created_time, updated_time)
+    values
+      <foreach collection="goodsSpecs" item="item" open="(" close=")" separator="), (">
+        #{item.companyId,jdbcType=INTEGER}, #{item.specNo,jdbcType=VARCHAR},
+        #{item.specName,jdbcType=VARCHAR}, #{item.parentId,jdbcType=BIGINT}, #{item.parentNo,jdbcType=VARCHAR},
+        #{item.parentName,jdbcType=VARCHAR}, #{item.createdBy,jdbcType=VARCHAR}, #{item.updatedBy,jdbcType=VARCHAR},
+        #{item.createdTime,jdbcType=TIMESTAMP}, #{item.updatedTime,jdbcType=TIMESTAMP}
+      </foreach>
+  </insert>
+
+  <update id="updateByPrimaryKeySelective" parameterType="com.yiban.erp.entities.GoodsSpec" >
+    update goods_spec
+    <set >
+      <if test="specNo != null" >
+        spec_no = #{specNo,jdbcType=VARCHAR},
+      </if>
+      <if test="specName != null" >
+        spec_name = #{specName,jdbcType=VARCHAR},
+      </if>
+      <if test="parentId != null" >
+        parent_id = #{parentId,jdbcType=BIGINT},
+      </if>
+      <if test="parentNo != null" >
+        parent_no = #{parentNo,jdbcType=VARCHAR},
+      </if>
+      <if test="parentName != null" >
+        parent_name = #{parentName,jdbcType=VARCHAR},
+      </if>
+      <if test="createdBy != null" >
+        created_by = #{createdBy,jdbcType=VARCHAR},
+      </if>
+      <if test="updatedBy != null" >
+        updated_by = #{updatedBy,jdbcType=VARCHAR},
+      </if>
+      <if test="createdTime != null" >
+        created_time = #{createdTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updatedTime != null" >
+        updated_time = #{updatedTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+
+  <select id="getSubSpecs" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select <include refid="Base_Column_List" />
+    from goods_spec
+    where parent_id = #{parentId}
+  </select>
+
+  <select id="isGoodsSpecUsed" parameterType="map" resultType="java.lang.Boolean">
+    select
+      count(1) > 0 as result
+    from goods_detail
+    where spec_one_id in
+      <foreach collection="specIds" separator=", " open="(" close=")" item="item">
+        #{item}
+      </foreach>
+    or spec_two_id in
+      <foreach collection="specIds" separator=", " open="(" close=")" item="item">
+        #{item}
+      </foreach>
+    or spec_three_id in
+    <foreach collection="specIds" separator=", " open="(" close=")" item="item">
+      #{item}
+    </foreach>
+    and status != 'DELETE'
+  </select>
+
+  <delete id="deleteByIds" parameterType="map">
+    delete from goods_spec
+    where id in
+    <foreach collection="specIds" separator=", " open="(" close=")" item="item">
+      #{item}
+    </foreach>
+  </delete>
+
+</mapper>

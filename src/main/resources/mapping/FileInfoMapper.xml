@@ -1,0 +1,266 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.yiban.erp.dao.FileInfoMapper" >
+  <resultMap id="BaseResultMap" type="com.yiban.erp.entities.FileInfo" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="company_id" property="companyId" jdbcType="INTEGER" />
+    <result column="file_no" property="fileNo" jdbcType="VARCHAR" />
+    <result column="file_status" property="fileStatus" jdbcType="VARCHAR" />
+    <result column="file_name" property="fileName" jdbcType="VARCHAR" />
+    <result column="file_type" property="fileType" jdbcType="VARCHAR" />
+    <result column="comment" property="comment" jdbcType="VARCHAR" />
+    <result column="create_by" property="createBy" jdbcType="VARCHAR" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_by" property="updateBy" jdbcType="VARCHAR" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, company_id, file_no, file_status, file_name, file_type, comment, create_by, create_time,
+    update_by, update_time
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from file_info
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from file_info
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.yiban.erp.entities.FileInfo" keyProperty="id" useGeneratedKeys="true" >
+    insert into file_info (company_id, file_no,
+      file_status, file_name, file_type, comment,
+      create_by, create_time, update_by, 
+      update_time)
+    values (#{companyId,jdbcType=INTEGER}, #{fileNo,jdbcType=VARCHAR},
+      #{fileStatus,jdbcType=VARCHAR}, #{fileName,jdbcType=VARCHAR}, #{fileType,jdbcType=VARCHAR},
+      #{comment,jdbcType=VARCHAR},
+      #{createBy,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, #{updateBy,jdbcType=VARCHAR}, 
+      #{updateTime,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" parameterType="com.yiban.erp.entities.FileInfo" keyProperty="id" useGeneratedKeys="true">
+    insert into file_info
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="companyId != null" >
+        company_id,
+      </if>
+      <if test="fileNo != null" >
+        file_no,
+      </if>
+      <if test="fileStatus != null" >
+        file_status,
+      </if>
+      <if test="fileName != null" >
+        file_name,
+      </if>
+      <if test="fileType != null" >
+        file_type,
+      </if>
+      <if test="comment != null" >
+        comment,
+      </if>
+      <if test="createBy != null" >
+        create_by,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+      <if test="updateBy != null" >
+        update_by,
+      </if>
+      <if test="updateTime != null" >
+        update_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="companyId != null" >
+        #{companyId,jdbcType=INTEGER},
+      </if>
+      <if test="fileNo != null" >
+        #{fileNo,jdbcType=VARCHAR},
+      </if>
+      <if test="fileStatus != null" >
+        #{fileStatus,jdbcType=VARCHAR},
+      </if>
+      <if test="fileName != null" >
+        #{fileName,jdbcType=VARCHAR},
+      </if>
+      <if test="fileType != null" >
+        #{fileType,jdbcType=VARCHAR},
+      </if>
+      <if test="comment != null" >
+        #{comment,jdbcType=VARCHAR},
+      </if>
+      <if test="createBy != null" >
+        #{createBy,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateBy != null" >
+        #{updateBy,jdbcType=VARCHAR},
+      </if>
+      <if test="updateTime != null" >
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.yiban.erp.entities.FileInfo" >
+    update file_info
+    <set >
+      <if test="companyId != null" >
+        company_id = #{companyId,jdbcType=INTEGER},
+      </if>
+      <if test="fileNo != null" >
+        file_no = #{fileNo,jdbcType=VARCHAR},
+      </if>
+      <if test="fileStatus != null" >
+        file_status = #{fileStatus,jdbcType=VARCHAR},
+      </if>
+      <if test="fileName != null" >
+        file_name = #{fileName,jdbcType=VARCHAR},
+      </if>
+      <if test="fileType != null" >
+        file_type = #{fileType,jdbcType=VARCHAR},
+      </if>
+      <if test="comment != null" >
+        comment = #{comment,jdbcType=VARCHAR},
+      </if>
+      <if test="createBy != null" >
+        create_by = #{createBy,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateBy != null" >
+        update_by = #{updateBy,jdbcType=VARCHAR},
+      </if>
+      <if test="updateTime != null" >
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.yiban.erp.entities.FileInfo" >
+    update file_info
+    set company_id = #{companyId,jdbcType=INTEGER},
+      file_no = #{fileNo,jdbcType=VARCHAR},
+      file_status = #{fileStatus,jdbcType=VARCHAR},
+      file_name = #{fileName,jdbcType=VARCHAR},
+      file_type = #{fileType,jdbcType=VARCHAR},
+      comment = #{comment,jdbcType=VARCHAR},
+      create_by = #{createBy,jdbcType=VARCHAR},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_by = #{updateBy,jdbcType=VARCHAR},
+      update_time = #{updateTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+
+  <resultMap id="DetailResultMap" type="com.yiban.erp.entities.FileInfo" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="company_id" property="companyId" jdbcType="INTEGER" />
+    <result column="file_no" property="fileNo" jdbcType="VARCHAR" />
+    <result column="file_status" property="fileStatus" jdbcType="VARCHAR" />
+    <result column="file_name" property="fileName" jdbcType="VARCHAR" />
+    <result column="file_type" property="fileType" jdbcType="VARCHAR" />
+    <result column="comment" property="comment" jdbcType="VARCHAR" />
+    <result column="create_by" property="createBy" jdbcType="VARCHAR" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_by" property="updateBy" jdbcType="VARCHAR" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+    <collection property="fileUploads" ofType="com.yiban.erp.entities.FileUpload">
+      <id column="upload_id" property="id" jdbcType="INTEGER" />
+      <result column="upload_file_id" property="fileId" jdbcType="INTEGER" />
+      <result column="upload_comment" property="comment" jdbcType="VARCHAR" />
+      <result column="upload_original_name" property="originalName" jdbcType="VARCHAR" />
+      <result column="upload_location" property="location" jdbcType="VARCHAR" />
+      <result column="upload_load_url" property="loadUrl" jdbcType="VARCHAR" />
+      <result column="upload_expiration" property="expiration" jdbcType="TIMESTAMP" />
+      <result column="upload_create_by" property="createBy" jdbcType="VARCHAR" />
+      <result column="upload_update_by" property="updateBy" jdbcType="VARCHAR" />
+      <result column="upload_create_time" property="createTime" jdbcType="TIMESTAMP" />
+      <result column="upload_update_time" property="updateTime" jdbcType="TIMESTAMP" />
+    </collection>
+  </resultMap>
+
+  <sql id="Detail_Column_List" >
+    t1.id, t1.company_id, t1.file_no, t1.file_status, t1.file_name, t1.file_type,
+    t1.comment, t1.create_by, t1.create_time, t1.update_by, t1.update_time,
+    t2.id as upload_id, t2.file_id as upload_file_id, t2.comment as upload_comment,
+    t2.original_name as upload_original_name, t2.location as upload_location,
+    t2.load_url as upload_load_url, t2.expiration as upload_expiration,
+    t2.create_by as upload_create_by, t2.update_by as upload_update_by,
+    t2.create_time as upload_create_time, t2.update_time as upload_update_time
+  </sql>
+
+  <select id="getFileInfoDetailById" parameterType="java.lang.Integer" resultMap="DetailResultMap">
+    select
+    <include refid="Detail_Column_List"/>
+    from file_info t1 left join file_upload t2 on t1.id=t2.file_id
+    where t1.id = #{id}
+    and t1.file_status != 'delete';
+  </select>
+
+  <select id="getByFileNo" parameterType="map" resultMap="DetailResultMap">
+    select
+      <include refid="Detail_Column_List"/>
+    from file_info t1 left join file_upload t2 on t1.id=t2.file_id
+    where t1.company_id = #{companyId,jdbcType=INTEGER}
+      and t1.file_no = #{fileNo,jdbcType=VARCHAR}
+      and t1.file_status != 'delete';
+  </select>
+
+  <select id="getByFileTypeAndNameCount" parameterType="map" resultType="java.lang.Integer">
+    select
+      count(1)
+    from file_info t1
+    where t1.company_id = #{companyId,jdbcType=INTEGER}
+    <if test="fileType != null" >
+      and t1.file_type = #{fileType,jdbcType=VARCHAR}
+    </if>
+    <if test="fileNo != null" >
+      <bind name="fileNoLike" value="fileNo + '%'"/>
+      and t1.file_no like #{fileNoLike,jdbcType=VARCHAR}
+    </if>
+    <if test="fileName != null" >
+      <bind name="fileNameLike" value="'%' + fileName +'%'"/>
+      and t1.file_name like #{fileNameLike}
+    </if>
+    and t1.file_status != 'delete'
+  </select>
+
+  <select id="getByFileTypeAndName" parameterType="map" resultMap="DetailResultMap">
+    select
+     <include refid="Base_Column_List"/>
+    from file_info t1
+    where t1.company_id = #{companyId,jdbcType=INTEGER}
+    <if test="fileType != null" >
+      and t1.file_type = #{fileType,jdbcType=VARCHAR}
+    </if>
+    <if test="fileNo != null" >
+      <bind name="fileNoLike" value="fileNo + '%'"/>
+      and t1.file_no like #{fileNoLike}
+    </if>
+    <if test="fileName != null" >
+      <bind name="fileNameLike" value="'%' + fileName +'%'"/>
+      and t1.file_name like #{fileNameLike}
+    </if>
+    and t1.file_status != 'delete'
+    <if test="offset != null and limit != null">
+      limit #{offset}, #{limit}
+    </if>
+  </select>
+
+  <update id="removeByIds" parameterType="map" >
+    update file_info
+      set file_status = 'delete',
+        update_by = #{updateBy},
+        update_time = #{updateTime}
+    where id in
+    <foreach collection="ids" item="item" open="(" close=")" separator=",">
+      #{item}
+    </foreach>
+  </update>
+
+</mapper>
